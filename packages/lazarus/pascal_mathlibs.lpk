@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="pascal_mathlibs"/>
+    <Author Value="ikelaiah"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="..\..\MathBase;..\..\AlgebraLib;..\..\FinanceLib;..\..\EngineeringLib;..\..\StatsLib"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="2"/>
+        </Optimizations>
+      </CodeGeneration>
+      <Other>
+        <CustomOptions Value="-FcUTF8"/>
+      </Other>
+    </CompilerOptions>
+    <Description Value="A focused monorepo of Free Pascal math libraries for scientific and engineering computing: MathBase, AlgebraLib, FinanceLib, EngineeringLib, StatsLib."/>
+    <License Value="MIT License
+
+Copyright (c) 2026 ikelaiah
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
+    <Version Major="1"/>
+    <Files>
+      <Item>
+        <Filename Value="..\..\MathBase\MathBase.MathConstants.pas"/>
+        <UnitName Value="MathBase.MathConstants"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\MathBase\MathBase.SharedTypes.pas"/>
+        <UnitName Value="MathBase.SharedTypes"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\MathBase\MathBase.Precision.pas"/>
+        <UnitName Value="MathBase.Precision"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\MathBase\MathBase.Trigonometry.pas"/>
+        <UnitName Value="MathBase.Trigonometry"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\AlgebraLib\AlgebraLib.Matrices.pas"/>
+        <UnitName Value="AlgebraLib.Matrices"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\AlgebraLib\AlgebraLib.Vectors.pas"/>
+        <UnitName Value="AlgebraLib.Vectors"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\AlgebraLib\AlgebraLib.Determinants.pas"/>
+        <UnitName Value="AlgebraLib.Determinants"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\FinanceLib\FinanceLib.Interest.pas"/>
+        <UnitName Value="FinanceLib.Interest"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\FinanceLib\FinanceLib.Bonds.pas"/>
+        <UnitName Value="FinanceLib.Bonds"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\FinanceLib\FinanceLib.NPV.pas"/>
+        <UnitName Value="FinanceLib.NPV"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\EngineeringLib\EngineeringLib.FluidDynamics.pas"/>
+        <UnitName Value="EngineeringLib.FluidDynamics"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\EngineeringLib\EngineeringLib.Thermodynamics.pas"/>
+        <UnitName Value="EngineeringLib.Thermodynamics"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\EngineeringLib\EngineeringLib.Signal.pas"/>
+        <UnitName Value="EngineeringLib.Signal"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\EngineeringLib\EngineeringLib.UnitConversion.pas"/>
+        <UnitName Value="EngineeringLib.UnitConversion"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\EngineeringLib\EngineeringLib.Velocity.pas"/>
+        <UnitName Value="EngineeringLib.Velocity"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\EngineeringLib\EngineeringLib.Pressure.pas"/>
+        <UnitName Value="EngineeringLib.Pressure"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\StatsLib\StatsLib.Stats.pas"/>
+        <UnitName Value="StatsLib.Stats"/>
+      </Item>
+      <Item>
+        <Filename Value="pascal_mathlibs.pas"/>
+        <Type Value="Main Unit"/>
+        <UnitName Value="pascal_mathlibs"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
