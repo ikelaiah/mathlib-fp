@@ -35,37 +35,32 @@ pascal-mathlibs/
 ├── CHANGELOG.md
 ├── LICENSE.md
 │
-├── MathBase/               ← foundation: types, constants, precision functions, trig
-│   ├── README.md
+├── src/                    ← all library units (add this single folder to -Fu)
 │   ├── MathBase.MathConstants.pas
 │   ├── MathBase.SharedTypes.pas
 │   ├── MathBase.Precision.pas
-│   └── MathBase.Trigonometry.pas
-│
-├── AlgebraLib/             ← linear algebra: matrices, vectors, decompositions
-│   ├── README.md
+│   ├── MathBase.Trigonometry.pas
 │   ├── AlgebraLib.Matrices.pas
 │   ├── AlgebraLib.Vectors.pas
-│   └── AlgebraLib.Determinants.pas
-│
-├── FinanceLib/             ← financial mathematics
-│   ├── README.md
+│   ├── AlgebraLib.Determinants.pas
 │   ├── FinanceLib.Interest.pas
 │   ├── FinanceLib.Bonds.pas
-│   └── FinanceLib.NPV.pas
-│
-├── EngineeringLib/         ← engineering: fluids, thermo, signals, unit conversion
-│   ├── README.md
+│   ├── FinanceLib.NPV.pas
 │   ├── EngineeringLib.FluidDynamics.pas
 │   ├── EngineeringLib.Thermodynamics.pas
 │   ├── EngineeringLib.Signal.pas
 │   ├── EngineeringLib.UnitConversion.pas
-│   ├── EngineeringLib.Velocity.pas     ← alias unit
-│   └── EngineeringLib.Pressure.pas     ← alias unit
-│
-├── StatsLib/               ← statistics
-│   ├── README.md
+│   ├── EngineeringLib.Velocity.pas
+│   └── EngineeringLib.Pressure.pas
 │   └── StatsLib.Stats.pas
+│
+├── MathBase/               ← README for the MathBase group
+├── AlgebraLib/             ← README for the AlgebraLib group
+├── FinanceLib/             ← README for the FinanceLib group
+├── EngineeringLib/         ← README for the EngineeringLib group
+├── StatsLib/               ← README for the StatsLib group
+│
+├── examples/               ← runnable example programs
 │
 └── tests/
     ├── TestMathBase.pas
@@ -81,9 +76,69 @@ pascal-mathlibs/
 
 ---
 
+## Getting Started in 5 Minutes
+
+### Step 1 — Clone
+
+```bash
+git clone https://github.com/ikelaiah/pascal-mathlibs
+cd pascal-mathlibs
+```
+
+### Step 2 — Add the source path to your project
+
+All units live in the `src/` folder. You only ever need to add one path.
+
+#### Lazarus IDE
+
+> Project → Project Options → Compiler Options → Paths → Other Unit Files (`-Fu`)
+
+```text
+../src
+```
+
+#### FPC command line
+
+```bash
+fpc -Fu../src my_program.lpr
+```
+
+### Step 3 — Use `{$mode objfpc}` in every source file
+
+All units in this project are compiled in `objfpc` mode. Your program file must declare the same mode or the compiler will reject the syntax:
+
+```pascal
+{$mode objfpc}{$H+}   // put this at the very top, before the program/unit keyword
+```
+
+`{$H+}` enables long (AnsiString) strings, which is the standard FP default in Lazarus.
+
+### Step 4 — Run an example
+
+The [examples/](examples/) folder contains six ready-to-compile programs that cover every library:
+
+| File | What it shows |
+|------|---------------|
+| [examples/01_stats_basics.lpr](examples/01_stats_basics.lpr) | Descriptive stats, percentiles, correlation, bootstrap CI |
+| [examples/02_hypothesis_test.lpr](examples/02_hypothesis_test.lpr) | t-test, Mann-Whitney U, Wilcoxon, effect size |
+| [examples/03_matrix_operations.lpr](examples/03_matrix_operations.lpr) | Matrix arithmetic, inverse, LU/QR decomposition |
+| [examples/04_finance_npv_irr.lpr](examples/04_finance_npv_irr.lpr) | PV/FV, NPV/IRR, loan payment, amortization schedule |
+| [examples/05_unit_conversion.lpr](examples/05_unit_conversion.lpr) | Length, mass, temperature, velocity, pressure, energy |
+| [examples/06_fluid_dynamics.lpr](examples/06_fluid_dynamics.lpr) | Reynolds number, Bernoulli, head loss, aerodynamics |
+
+Build and run example 5 (no physics knowledge required):
+
+```bash
+cd examples
+fpc -Fu../src 05_unit_conversion.lpr
+./05_unit_conversion
+```
+
+---
+
 ## Quick Start
 
-Add the relevant library folders to your project's search path, then use the units directly:
+Add `src/` to your project's search path (`-Fu../src`), then use the units directly:
 
 ```pascal
 uses
@@ -185,8 +240,9 @@ All libraries depend on **MathBase**. No library depends on another peer library
    git clone https://github.com/ikelaiah/pascal-mathlibs
    ```
 
-2. Add the required library folder(s) to your project's search path in Lazarus
-   or your `fpc` command line.
+2. Add `src/` to your project's search path:
+   - **Lazarus**: Other Unit Files → `../src`
+   - **FPC CLI**: `fpc -Fu../src my_program.lpr`
 
 3. No package manager or external dependencies required — only the Free Pascal RTL.
 

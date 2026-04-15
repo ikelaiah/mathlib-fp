@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/MathBase/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
+      "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/AlgebraLib/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
+      "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/FinanceLib/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
+      "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/EngineeringLib/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
+      "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/StatsLib/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
+      "Bash(python3 -c ':*)",
+      "Bash(powershell -Command ':*)"
+    ]
+  }
+}
