@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ...
 
+## [1.0.1] - 2026-04-16
+
+### Fixed
+
+- `AlgebraLib.Matrices` — `TMatrixKit.IsPositiveDefinite` previously used an
+  insufficient check (determinant > 0 and positive diagonal elements), which is
+  not a sufficient condition for positive definiteness. It now attempts a Cholesky
+  factorisation; success is the definitive test for symmetric positive definite matrices.
+- `AlgebraLib.Matrices` — `TMatrixKit.IsPositiveSemidefinite` had the same flaw.
+  It now computes all eigenvalues via `EigenDecomposition` and checks that none are
+  less than −1e-9.
+- `AlgebraLib.Matrices` — `TMatrixKit.Cholesky` previously called `IsPositiveDefinite`
+  as a pre-check, which created a circular dependency after the above fix. The guard has
+  been replaced with an inline check: if the diagonal term under the square root is
+  negative, `EMatrixError` is raised immediately.
+
+### Performance
+
+- `AlgebraLib.Matrices` — `TMatrixKit.Determinant` replaced recursive cofactor
+  expansion (O(n!)) with an LU-based calculation (O(n³)). The determinant is derived
+  from the product of the diagonal of U, with sign determined by counting permutation
+  cycles in the LU pivot array. Singular matrices return 0.
+- `AlgebraLib.Matrices` — `BLOCK_SIZE` increased from 4 to 64. The previous value
+  was too small to provide any L1 cache benefit; 64 doubles (512 bytes) fits
+  comfortably within a typical 32 KB L1 cache per block face.
+- `AlgebraLib.Matrices` — `TMatrixKit.Multiply` now uses parallel execution for
+  matrices with 64 or more rows. A pool of `TThread.ProcessorCount` worker threads
+  is spawned, each computing a disjoint range of output rows. Smaller matrices
+  continue to use the existing block or standard path. No locks are required as
+  output rows are fully independent.
+
 ## [1.0.0] - 2026-04-14
 
 ### Changed

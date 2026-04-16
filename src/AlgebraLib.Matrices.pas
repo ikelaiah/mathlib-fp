@@ -37,7 +37,8 @@ const
   
   { Block size for optimized matrix multiplication using cache-aware blocking algorithm.
     Adjusting this value can significantly impact performance based on CPU cache size. }
-  BLOCK_SIZE = 4;  // Optimal for 8x8 matrices
+  BLOCK_SIZE = 64;        // Tuned for L1 cache (64 doubles = 512 bytes per block face)
+  THREAD_THRESHOLD = 64; // Minimum matrix row count to enable parallel multiply
 
 type
   { Exception type for matrix operation errors }
@@ -2225,6 +2226,71 @@ begin
     Result := -Abs(Magnitude);
 end;
 
+{ Thread worker for parallel matrix multiplication.
+  Each instance computes output rows [FRowStart..FRowEnd-1] of FResult.
+  Rows are fully independent — no locking required. }
+type
+  TMultiplyThread = class(TThread)
+  private
+    FSelf:     TMatrixKit;  // Left matrix (read-only)
+    FOther:    IMatrix;     // Right matrix (read-only)
+    FResult:   TMatrixKit;  // Output matrix (disjoint row range per thread)
+    FRowStart: Integer;
+    FRowEnd:   Integer;     // Exclusive upper bound
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(ASelf: TMatrixKit; const AOther: IMatrix;
+                       AResult: TMatrixKit; ARowStart, ARowEnd: Integer);
+  end;
+
+constructor TMultiplyThread.Create(ASelf: TMatrixKit; const AOther: IMatrix;
+  AResult: TMatrixKit; ARowStart, ARowEnd: Integer);
+begin
+  inherited Create(True); // suspended
+  FreeOnTerminate := False;
+  FSelf     := ASelf;
+  FOther    := AOther;
+  FResult   := AResult;
+  FRowStart := ARowStart;
+  FRowEnd   := ARowEnd;
+end;
+
+procedure TMultiplyThread.Execute;
+var
+  I, J, K, II, JJ, KK: Integer;
+  Sum: Double;
+  RowLim, ColLim, KLim: Integer;
+begin
+  // Block multiply over the assigned row range
+  II := FRowStart;
+  while II < FRowEnd do
+  begin
+    RowLim := Min(II + BLOCK_SIZE - 1, FRowEnd - 1);
+    JJ := 0;
+    while JJ < FOther.Cols do
+    begin
+      ColLim := Min(JJ + BLOCK_SIZE - 1, FOther.Cols - 1);
+      KK := 0;
+      while KK < FSelf.GetCols do
+      begin
+        KLim := Min(KK + BLOCK_SIZE - 1, FSelf.GetCols - 1);
+        for I := II to RowLim do
+          for J := JJ to ColLim do
+          begin
+            Sum := FResult.FData[I, J];
+            for K := KK to KLim do
+              Sum := Sum + FSelf.FData[I, K] * FOther.GetValue(K, J);
+            FResult.FData[I, J] := Sum;
+          end;
+        Inc(KK, BLOCK_SIZE);
+      end;
+      Inc(JJ, BLOCK_SIZE);
+    end;
+    Inc(II, BLOCK_SIZE);
+  end;
+end;
+
 { TMatrixKit }
 
 constructor TMatrixKit.Create(const ARows, ACols: Integer);
@@ -2357,21 +2423,49 @@ var
   I, J, K, II, JJ, KK: Integer;
   Matrix: TMatrixKit;
   Sum: Double;
+  ThreadCount, T, RowsPerThread, RowStart, RowEnd: Integer;
+  Threads: array of TMultiplyThread;
 begin
   if GetCols <> Other.Rows then
     raise EMatrixError.Create('Matrix dimensions do not match for multiplication');
-    
+
   Matrix := TMatrixKit.Create(GetRows, Other.Cols);
-  
-  // Use block multiplication for larger matrices
-  if (GetRows >= BLOCK_SIZE) and (GetCols >= BLOCK_SIZE) and (Other.Cols >= BLOCK_SIZE) then
+
+  // Parallel block multiply for large matrices (>= THREAD_THRESHOLD rows)
+  if (GetRows >= THREAD_THRESHOLD) and (TThread.ProcessorCount > 1) then
   begin
-    // Initialize result matrix to zero
+    // Zero the result matrix
     for I := 0 to GetRows - 1 do
       for J := 0 to Other.Cols - 1 do
         Matrix.FData[I, J] := 0.0;
-    
-    // Block matrix multiplication
+
+    ThreadCount := Min(TThread.ProcessorCount, GetRows);
+    SetLength(Threads, ThreadCount);
+    RowsPerThread := (GetRows + ThreadCount - 1) div ThreadCount;
+
+    // Create and start one thread per row partition
+    for T := 0 to ThreadCount - 1 do
+    begin
+      RowStart := T * RowsPerThread;
+      RowEnd   := Min(RowStart + RowsPerThread, GetRows);
+      Threads[T] := TMultiplyThread.Create(Self, Other, Matrix, RowStart, RowEnd);
+      Threads[T].Start;
+    end;
+
+    // Wait for all threads to finish
+    for T := 0 to ThreadCount - 1 do
+    begin
+      Threads[T].WaitFor;
+      Threads[T].Free;
+    end;
+  end
+  // Block multiply for medium matrices (>= BLOCK_SIZE but below thread threshold)
+  else if (GetRows >= BLOCK_SIZE) and (GetCols >= BLOCK_SIZE) and (Other.Cols >= BLOCK_SIZE) then
+  begin
+    for I := 0 to GetRows - 1 do
+      for J := 0 to Other.Cols - 1 do
+        Matrix.FData[I, J] := 0.0;
+
     II := 0;
     while II < GetRows do
     begin
@@ -2381,11 +2475,11 @@ begin
         KK := 0;
         while KK < GetCols do
         begin
-          for I := II to Min(II+BLOCK_SIZE-1, GetRows-1) do
-            for J := JJ to Min(JJ+BLOCK_SIZE-1, Other.Cols-1) do
+          for I := II to Min(II + BLOCK_SIZE - 1, GetRows - 1) do
+            for J := JJ to Min(JJ + BLOCK_SIZE - 1, Other.Cols - 1) do
             begin
               Sum := Matrix.FData[I, J];
-              for K := KK to Min(KK+BLOCK_SIZE-1, GetCols-1) do
+              for K := KK to Min(KK + BLOCK_SIZE - 1, GetCols - 1) do
                 Sum := Sum + FData[I, K] * Other.GetValue(K, J);
               Matrix.FData[I, J] := Sum;
             end;
@@ -2398,17 +2492,17 @@ begin
   end
   else
   begin
-    // Standard multiplication for smaller matrices
-  for I := 0 to GetRows - 1 do
-    for J := 0 to Other.Cols - 1 do
-    begin
-      Sum := 0;
-      for K := 0 to GetCols - 1 do
-        Sum := Sum + FData[I, K] * Other.GetValue(K, J);
-      Matrix.FData[I, J] := Sum;
-    end;
+    // Standard multiply for small matrices
+    for I := 0 to GetRows - 1 do
+      for J := 0 to Other.Cols - 1 do
+      begin
+        Sum := 0;
+        for K := 0 to GetCols - 1 do
+          Sum := Sum + FData[I, K] * Other.GetValue(K, J);
+        Matrix.FData[I, J] := Sum;
+      end;
   end;
-  
+
   Result := Matrix;
 end;
 
@@ -2443,65 +2537,45 @@ end;
 
 function TMatrixKit.Determinant: Double;
 var
-  N, I, J, K: Integer;
-  Factor: Double;
-  Temp: IMatrix;
-  
-  function MinorDeterminant(const M: IMatrix; const Size: Integer): Double;
-  var
-    I, J, K, L: Integer;
-    SubMatrix: TMatrixKit;
-    Sign: Double;
-  begin
-    if Size = 1 then
-      Result := M.GetValue(0, 0)
-    else if Size = 2 then
-      Result := M.GetValue(0, 0) * M.GetValue(1, 1) - M.GetValue(0, 1) * M.GetValue(1, 0)
-    else
-    begin
-      Result := 0;
-      SubMatrix := TMatrixKit.Create(Size - 1, Size - 1);
-      try
-        for K := 0 to Size - 1 do
-        begin
-          L := 0;
-          for I := 1 to Size - 1 do
-          begin
-            for J := 0 to Size - 1 do
-              if J <> K then
-              begin
-                SubMatrix.FData[I - 1, L] := M.GetValue(I, J);
-                Inc(L);
-              end;
-            L := 0;
-          end;
-          
-          if K mod 2 = 0 then
-            Sign := 1
-          else
-            Sign := -1;
-            
-          Result := Result + Sign * M.GetValue(0, K) * MinorDeterminant(SubMatrix, Size - 1);
-        end;
-      finally
-        SubMatrix.Free;
-      end;
-    end;
-  end;
-  
+  N, I, J, CycleCount: Integer;
+  LUResult: TLUDecomposition;
+  Visited: array of Boolean;
 begin
   if not IsSquare then
     raise EMatrixError.Create('Matrix must be square to calculate determinant');
-    
+
   N := GetRows;
-  if N = 0 then
-    Result := 0
-  else if N = 1 then
-    Result := FData[0, 0]
-  else if N = 2 then
-    Result := FData[0, 0] * FData[1, 1] - FData[0, 1] * FData[1, 0]
-  else
-    Result := MinorDeterminant(Self, N);
+  if N = 0 then begin Result := 0; Exit; end;
+  if N = 1 then begin Result := FData[0, 0]; Exit; end;
+  if N = 2 then begin Result := FData[0, 0] * FData[1, 1] - FData[0, 1] * FData[1, 0]; Exit; end;
+
+  // O(n^3) via LU decomposition — det(A) = det(P^-1) * prod(diag(U))
+  try
+    LUResult := LU;
+  except
+    on E: EMatrixError do begin Result := 0; Exit; end; // singular
+  end;
+
+  Result := 1.0;
+  for I := 0 to N - 1 do
+    Result := Result * LUResult.U.GetValue(I, I);
+
+  // Determine sign from permutation: (-1)^(N - number_of_cycles)
+  SetLength(Visited, N);
+  CycleCount := 0;
+  for I := 0 to N - 1 do
+    if not Visited[I] then
+    begin
+      Inc(CycleCount);
+      J := I;
+      while not Visited[J] do
+      begin
+        Visited[J] := True;
+        J := LUResult.P[J];
+      end;
+    end;
+  if Odd(N - CycleCount) then
+    Result := -Result;
 end;
 
 function TMatrixKit.Trace: Double;
@@ -3352,41 +3426,36 @@ begin
 end;
 
 function TMatrixKit.IsPositiveDefinite: Boolean;
-var
-  I, J: Integer;
-  Det: Double;
 begin
-  if not IsSquare then
-    Exit(False);
-    
-  Det := Determinant;
-  if Det <= 0 then
-    Exit(False);
-    
-  for I := 0 to GetRows - 1 do
-    for J := 0 to GetCols - 1 do
-      if (I = J) and (FData[I, J] <= 0) then
-        Exit(False);
-  Exit(True);
+  Result := False;
+  if not IsSquare then Exit;
+  if not IsSymmetric then Exit;
+  // A symmetric matrix is positive definite iff Cholesky succeeds
+  try
+    Cholesky;
+    Result := True;
+  except
+    on EMatrixError do ;
+  end;
 end;
 
 function TMatrixKit.IsPositiveSemidefinite: Boolean;
 var
-  I, J: Integer;
-  Det: Double;
+  EigResult: TEigenDecomposition;
+  I: Integer;
 begin
-  if not IsSquare then
-    Exit(False);
-    
-  Det := Determinant;
-  if Det < 0 then
-    Exit(False);
-    
-  for I := 0 to GetRows - 1 do
-    for J := 0 to GetCols - 1 do
-      if (I = J) and (FData[I, J] < 0) then
-        Exit(False);
-  Exit(True);
+  Result := False;
+  if not IsSquare then Exit;
+  if not IsSymmetric then Exit;
+  // A symmetric matrix is positive semidefinite iff all eigenvalues >= 0
+  try
+    EigResult := EigenDecomposition;
+    for I := 0 to Length(EigResult.EigenValues) - 1 do
+      if EigResult.EigenValues[I] < -1E-9 then Exit;
+    Result := True;
+  except
+    on EMatrixError do ;
+  end;
 end;
 
 function TMatrixKit.IsOrthogonal: Boolean;
@@ -4702,9 +4771,6 @@ begin
   if not IsSquare then
     raise EMatrixError.Create('Cholesky decomposition requires square matrix');
     
-  if not IsPositiveDefinite then
-    raise EMatrixError.Create('Cholesky decomposition requires positive definite matrix');
-  
   L := TMatrixKit.Create(GetRows, GetRows);
   try
     for I := 0 to GetRows - 1 do
@@ -4712,12 +4778,14 @@ begin
       for J := 0 to I do
       begin
         Sum := 0;
-        
+
         if J = I then  // Diagonal elements
         begin
           for K := 0 to J - 1 do
             Sum := Sum + Sqr(L.FData[J, K]);
-            
+
+          if FData[J, J] - Sum < 0 then
+            raise EMatrixError.Create('Matrix is not positive definite');
           L.FData[J, J] := Sqrt(FData[J, J] - Sum);
         end
         else  // Lower triangular elements
