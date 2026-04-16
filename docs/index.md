@@ -7,19 +7,21 @@ A collection of Free Pascal mathematics libraries organised as a monorepo.
 | Library | Description | Depends on |
 |---------|-------------|------------|
 | [MathBase](MathBase.md) | Shared types, constants, precision functions, and trigonometry | — |
+| [AlgebraLib](AlgebraLib.md) | Dense matrix ops, decompositions, iterative solvers, vectors | MathBase |
 | [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
 | [StatsLib](StatsLib.md) | Descriptive stats, hypothesis testing, correlation, bootstrap | MathBase |
-| [AlgebraLib](AlgebraLib.md) | Dense matrix ops, decompositions, iterative solvers, vectors | MathBase |
-| [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing, unit conversion | MathBase |
+| [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing (FFT, FIR), unit conversion | MathBase |
+| [NumericsLib](NumericsLib.md) | Root finding, numerical integration, ODE solvers, interpolation | MathBase |
 
 ## Dependency Graph
 
-```
+```text
 MathBase
+├── AlgebraLib
 ├── FinanceLib
 ├── StatsLib
-├── AlgebraLib
-└── EngineeringLib
+├── EngineeringLib
+└── NumericsLib
 ```
 
 ## Common Base Types
@@ -36,7 +38,7 @@ TDoublePair    = record Lower, Upper: Double; end;
 
 ## Design Principles
 
-- All kit classes (`TFinanceKit`, `TStatsKit`, `TMatrixKit`, etc.) use **static class methods** — no instance required.
+- All kit classes (`TFinanceKit`, `TStatsKit`, `TMatrixKit`, `TNumericsKit`, etc.) use **static class methods** — no instance required.
 - Operations on collections take `TDoubleArray` as input.
 - An optional `ADecimals` parameter (default `4`) is available on most scalar-returning methods to control rounding.
-- Each library raises its own typed exception (`EFinanceError`, `EStatsError`, `EMatrixError`) for invalid inputs.
+- Each library raises its own typed exception (`EFinanceError`, `EStatsError`, `EMatrixError`, `EInvalidArgument`) for invalid inputs.

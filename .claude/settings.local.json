@@ -7,7 +7,13 @@
       "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/EngineeringLib/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
       "Bash(mv c:/Users/iwank/Documents/github/scikit-fp/StatsLib/*.pas c:/Users/iwank/Documents/github/scikit-fp/src/)",
       "Bash(python3 -c ':*)",
-      "Bash(powershell -Command ':*)"
+      "Bash(powershell -Command ':*)",
+      "Bash(wc -l /c/Users/iwank/Documents/github/scikit-fp/tests/*.pas)",
+      "Bash(wc -l /c/Users/iwank/Documents/github/scikit-fp/src/*.pas)",
+      "Bash(fpc TestRunner.lpr -FE. -Fu../src)",
+      "Bash(grep -v \"^$\")",
+      "Bash(./TestRunner.exe --format=plain)",
+      "Bash(/tmp/check_exc)"
     ]
   }
 }

@@ -19,7 +19,7 @@ Depends on: **MathBase**
 
 ## EngineeringLib.FluidDynamics — `TFluidDynamicsKit`
 
-### Built-in Constants
+### FluidDynamics Constants
 
 | Constant | Value | Description |
 |----------|-------|-------------|
@@ -125,7 +125,7 @@ class function KinematicViscosityWater: Double; // m²/s at 25 °C
 
 ## EngineeringLib.Thermodynamics — `TThermodynamicsKit`
 
-### Built-in Constants
+### Thermodynamics Constants
 
 | Constant | Value |
 |----------|-------|
@@ -246,16 +246,84 @@ class function GenerateWindow(WindowType: TWindowType; Size: Integer): TDoubleAr
 class function ApplyWindow(const InputSignal, Window: TDoubleArray): TDoubleArray;
 ```
 
-### Spectral Analysis
+| Window | First/last sample | Centre gain | Sidelobe attenuation |
+|--------|-------------------|-------------|----------------------|
+| Rectangular | 1.0 | 1.0 | ~13 dB |
+| Hann | 0.0 | 1.0 | ~31 dB |
+| Hamming | 0.08 | 1.0 | ~41 dB |
+| Blackman | 0.0 | 1.0 | ~57 dB |
+
+### FFT / Spectral Analysis
+
+Cooley-Tukey radix-2 DIT FFT. Input length must be a power of 2.
 
 ```pascal
+{ In-place FFT/IFFT — modifies RealPart and ImagPart in place }
+class procedure FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean = False);
+
+{ Convenience wrapper: real input → complex spectrum.
+  Auto-pads with zeros to the next power of 2. }
 class procedure CalculateFFT(const InputSignal: TDoubleArray;
-  out RealPart, ImaginaryPart: TDoubleArray);
+  out OutRealPart, OutImagPart: TDoubleArray);
+
+{ Inverse FFT: complex spectrum → real-valued signal }
+class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray;
+  out OutputSignal: TDoubleArray);
+
+{ One-sided magnitude and phase spectra }
 class procedure CalculateFFTMagnitudePhase(const InputSignal: TDoubleArray;
   out Magnitude, Phase: TDoubleArray);
 ```
 
-> **Note:** FFT stubs are included as placeholders for future expansion. A full FFT implementation requires a dedicated algorithm or external library.
+**Key properties verified by the test suite:**
+
+- Impulse at index 0 → flat magnitude spectrum (all 1s)
+- Parseval's theorem: `Σ|x[n]|² = (1/N) Σ|X[k]|²`
+- Linearity: `FFT(a·x + b·y) = a·FFT(x) + b·FFT(y)`
+- Round-trip: `IFFT(FFT(x)) = x` to floating-point precision
+
+### FIR Filter Design (windowed-sinc)
+
+All cutoff frequencies are **normalised**: 0 < fc < 0.5, where 0.5 = Nyquist frequency.
+All designs produce **symmetric (linear-phase)** coefficients. `Order` must be even (auto-incremented if odd).
+
+```pascal
+{ Low-pass: passes frequencies below CutoffFreq }
+class function DesignFIRLowPass(CutoffFreq: Double; Order: Integer;
+  WindowType: TWindowType = wtHamming): TDoubleArray;
+
+{ High-pass: passes frequencies above CutoffFreq }
+class function DesignFIRHighPass(CutoffFreq: Double; Order: Integer;
+  WindowType: TWindowType = wtHamming): TDoubleArray;
+
+{ Band-pass: passes frequencies between LowCutoff and HighCutoff }
+class function DesignFIRBandPass(LowCutoff, HighCutoff: Double; Order: Integer;
+  WindowType: TWindowType = wtHamming): TDoubleArray;
+
+{ Band-stop (notch): blocks frequencies between LowCutoff and HighCutoff }
+class function DesignFIRBandStop(LowCutoff, HighCutoff: Double; Order: Integer;
+  WindowType: TWindowType = wtHamming): TDoubleArray;
+
+{ Direct-form convolution. Output length = Length(Signal) + Length(Coeffs) - 1 }
+class function ApplyFIRFilter(const Signal, Coeffs: TDoubleArray): TDoubleArray;
+```
+
+**Quick example — low-pass filter:**
+
+```pascal
+uses EngineeringLib.Signal;
+
+var
+  Coeffs, Filtered: TDoubleArray;
+  Signal: TDoubleArray;
+begin
+  Signal := TDoubleArray.Create(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+  // Normalised cutoff 0.2 (20% of Nyquist), order 32, Hamming window
+  Coeffs   := TSignalKit.DesignFIRLowPass(0.2, 32, wtHamming);
+  Filtered := TSignalKit.ApplyFIRFilter(Signal, Coeffs);
+end.
+```
 
 ### Signal Properties
 

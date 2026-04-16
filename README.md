@@ -3,7 +3,7 @@
 [![FPC](https://img.shields.io/badge/Free%20Pascal-3.2.2-blue.svg)](https://www.freepascal.org/)
 [![Lazarus](https://img.shields.io/badge/Lazarus-3.6+-blue.svg)](https://www.lazarus-ide.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
-[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-364%20passing-brightgreen.svg)](tests/)
 ![Status](https://img.shields.io/badge/Status-Development-yellow.svg)
 
 A monorepo of focused Free Pascal math libraries for scientific and engineering computing. No external dependencies.
@@ -18,11 +18,12 @@ A monorepo of focused Free Pascal math libraries for scientific and engineering 
 
 | Library | Description | Main Class |
 | ------- | ----------- | ---------- |
-| [MathBase](MathBase/) | Shared types, constants, special functions, and trigonometry | `TTrigKit` |
-| [AlgebraLib](AlgebraLib/) | Dense matrix operations, decompositions, and linear solvers | `TMatrixKit` / `IMatrix` |
-| [FinanceLib](FinanceLib/) | Time value of money, bonds, NPV/IRR, option pricing, ratio analysis | `TFinanceKit` |
-| [EngineeringLib](EngineeringLib/) | Fluid dynamics, thermodynamics, signal processing, unit conversion | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit` |
-| [StatsLib](StatsLib/) | Descriptive stats, hypothesis tests, correlation, bootstrap, non-parametric tests | `TStatsKit` |
+| [MathBase](docs/MathBase.md) | Shared types, constants, special functions, and trigonometry | `TTrigKit` |
+| [AlgebraLib](docs/AlgebraLib.md) | Dense matrix operations, decompositions, and linear solvers | `TMatrixKit` / `IMatrix` |
+| [FinanceLib](docs/FinanceLib.md) | Time value of money, bonds, NPV/IRR, option pricing, ratio analysis | `TFinanceKit` |
+| [StatsLib](docs/StatsLib.md) | Descriptive stats, hypothesis tests, correlation, bootstrap, non-parametric tests | `TStatsKit` |
+| [EngineeringLib](docs/EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing (FFT, FIR), unit conversion | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit` |
+| [NumericsLib](docs/NumericsLib.md) | Root finding, numerical integration, ODE solvers, interpolation | `TNumericsKit` |
 
 ---
 
@@ -35,7 +36,7 @@ pascal-mathlibs/
 ├── CHANGELOG.md
 ├── LICENSE.md
 │
-├── src/                    ← all library units (add this single folder to -Fu)
+├── src/                          ← all library units (add this single folder to -Fu)
 │   ├── MathBase.MathConstants.pas
 │   ├── MathBase.SharedTypes.pas
 │   ├── MathBase.Precision.pas
@@ -46,32 +47,38 @@ pascal-mathlibs/
 │   ├── FinanceLib.Interest.pas
 │   ├── FinanceLib.Bonds.pas
 │   ├── FinanceLib.NPV.pas
+│   ├── StatsLib.Stats.pas
 │   ├── EngineeringLib.FluidDynamics.pas
 │   ├── EngineeringLib.Thermodynamics.pas
 │   ├── EngineeringLib.Signal.pas
 │   ├── EngineeringLib.UnitConversion.pas
 │   ├── EngineeringLib.Velocity.pas
-│   └── EngineeringLib.Pressure.pas
-│   └── StatsLib.Stats.pas
+│   ├── EngineeringLib.Pressure.pas
+│   └── NumericsLib.Numerics.pas
 │
-├── MathBase/               ← README for the MathBase group
-├── AlgebraLib/             ← README for the AlgebraLib group
-├── FinanceLib/             ← README for the FinanceLib group
-├── EngineeringLib/         ← README for the EngineeringLib group
-├── StatsLib/               ← README for the StatsLib group
+├── docs/                         ← per-library reference documentation
+│   ├── index.md
+│   ├── MathBase.md
+│   ├── AlgebraLib.md
+│   ├── FinanceLib.md
+│   ├── StatsLib.md
+│   ├── EngineeringLib.md
+│   └── NumericsLib.md
 │
-├── examples/               ← runnable example programs
+├── examples/                     ← runnable example programs
 │
 └── tests/
+    ├── TestRunner.lpr
     ├── TestMathBase.pas
     ├── TestAlgebraLib.pas
     ├── TestFinanceLib.pas
+    ├── TestStatsLib.pas
     ├── TestEngineeringLib.pas
     ├── TestEngineeringLib_FluidDynamics.pas
-    ├── TestEngineeringLib_Thermodynamics.pas
     ├── TestEngineeringLib_Signal.pas
+    ├── TestEngineeringLib_Thermodynamics.pas
     ├── TestEngineeringLib_UnitConversion.pas
-    └── TestStatsLib.pas
+    └── TestNumericsLib.pas
 ```
 
 ---
@@ -105,7 +112,7 @@ fpc -Fu../src my_program.lpr
 
 ### Step 3 — Use `{$mode objfpc}` in every source file
 
-All units in this project are compiled in `objfpc` mode. Your program file must declare the same mode or the compiler will reject the syntax:
+All units in this project are compiled in `objfpc` mode. Your program file must declare the same mode:
 
 ```pascal
 {$mode objfpc}{$H+}   // put this at the very top, before the program/unit keyword
@@ -115,7 +122,7 @@ All units in this project are compiled in `objfpc` mode. Your program file must 
 
 ### Step 4 — Run an example
 
-The [examples/](examples/) folder contains six ready-to-compile programs that cover every library:
+The [examples/](examples/) folder contains ready-to-compile programs that cover every library:
 
 | File | What it shows |
 |------|---------------|
@@ -125,8 +132,6 @@ The [examples/](examples/) folder contains six ready-to-compile programs that co
 | [examples/04_finance_npv_irr.lpr](examples/04_finance_npv_irr.lpr) | PV/FV, NPV/IRR, loan payment, amortization schedule |
 | [examples/05_unit_conversion.lpr](examples/05_unit_conversion.lpr) | Length, mass, temperature, velocity, pressure, energy |
 | [examples/06_fluid_dynamics.lpr](examples/06_fluid_dynamics.lpr) | Reynolds number, Bernoulli, head loss, aerodynamics |
-
-Build and run example 5 (no physics knowledge required):
 
 ```bash
 cd examples
@@ -142,17 +147,18 @@ Add `src/` to your project's search path (`-Fu../src`), then use the units direc
 
 ```pascal
 uses
-  MathBase.SharedTypes,       // TDoubleArray, TDoublePair
-  MathBase.MathConstants,     // MathPi, StandardGravity, …
-  MathBase.Precision,         // GammaLn, NormalCDF, …
-  MathBase.Trigonometry,      // TTrigKit
-  AlgebraLib.Matrices,        // TMatrixKit, IMatrix
-  FinanceLib.Interest,        // TFinanceKit
-  EngineeringLib.FluidDynamics,   // TFluidDynamicsKit
-  EngineeringLib.Thermodynamics,  // TThermodynamicsKit
-  EngineeringLib.UnitConversion,  // TUnitConversionKit
-  EngineeringLib.Signal,          // TSignalKit
-  StatsLib.Stats;             // TStatsKit
+  MathBase.SharedTypes,            // TDoubleArray, TDoublePair
+  MathBase.MathConstants,          // MathPi, StandardGravity, …
+  MathBase.Precision,              // GammaLn, NormalCDF, …
+  MathBase.Trigonometry,           // TTrigKit
+  AlgebraLib.Matrices,             // TMatrixKit, IMatrix
+  FinanceLib.Interest,             // TFinanceKit
+  StatsLib.Stats,                  // TStatsKit
+  EngineeringLib.FluidDynamics,    // TFluidDynamicsKit
+  EngineeringLib.Thermodynamics,   // TThermodynamicsKit
+  EngineeringLib.UnitConversion,   // TUnitConversionKit
+  EngineeringLib.Signal,           // TSignalKit
+  NumericsLib.Numerics;            // TNumericsKit
 ```
 
 Each library is independent (aside from MathBase, which all others depend on). Include only what you need.
@@ -180,11 +186,9 @@ uses AlgebraLib.Matrices;
 
 var
   A: IMatrix;
-  LU: TLUDecomposition;
 begin
-  A  := TMatrixKit.FromArray([[3,1],[1,3]]);
-  LU := A.LUDecompose;
-  Writeln('Det = ', A.Determinant:0:4);
+  A := TMatrixKit.FromArray([[3,1],[1,3]]);
+  Writeln('Det  = ', A.Determinant:0:4);
   Writeln('Rank = ', A.Rank);
 end.
 ```
@@ -198,8 +202,8 @@ var
   CashFlows: TDoubleArray;
 begin
   CashFlows := TDoubleArray.Create(20000, 25000, 30000, 35000, 40000);
-  Writeln('NPV  = ', TFinanceKit.NetPresentValue(100000, CashFlows, 0.10):0:2);
-  Writeln('IRR  = ', TFinanceKit.InternalRateOfReturn(100000, CashFlows) * 100:0:2, '%');
+  Writeln('NPV = ', TFinanceKit.NetPresentValue(100000, CashFlows, 0.10):0:2);
+  Writeln('IRR = ', TFinanceKit.InternalRateOfReturn(100000, CashFlows) * 100:0:2, '%');
 end.
 ```
 
@@ -217,6 +221,73 @@ begin
 end.
 ```
 
+### Example — Signal Processing (FFT)
+
+```pascal
+uses EngineeringLib.Signal;
+
+var
+  Signal, Re, Im, Mag, Phase: TDoubleArray;
+  I: Integer;
+begin
+  // Build a simple test signal: 8 samples
+  Signal := TDoubleArray.Create(1, 0, 0, 0, 0, 0, 0, 0);
+
+  // Forward FFT (auto-pads to next power of 2)
+  TSignalKit.CalculateFFT(Signal, Re, Im);
+
+  // Magnitude spectrum
+  TSignalKit.CalculateFFTMagnitudePhase(Signal, Mag, Phase);
+  for I := 0 to High(Mag) do
+    Writeln(Format('|X[%d]| = %.4f', [I, Mag[I]]));
+
+  // Design and apply a low-pass FIR filter (cutoff at 0.2 × Nyquist, order 32)
+  Signal := TDoubleArray.Create(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  Signal := TSignalKit.ApplyFIRFilter(Signal,
+    TSignalKit.DesignFIRLowPass(0.2, 32));
+end.
+```
+
+### Example — Numerical Methods
+
+```pascal
+uses NumericsLib.Numerics;
+
+function FX(X: Double): Double; begin Result := X*X - 2; end;   // root = sqrt(2)
+function DFX(X: Double): Double; begin Result := 2*X; end;
+
+function DYDT(T, Y: Double): Double; begin Result := Y; end;    // dy/dt = y → y=e^t
+
+var
+  Root, Integral: Double;
+  Sol: TODESolution;
+  XK, YK: TDoubleArray;
+  Spline: TCubicSpline;
+begin
+  // Root finding
+  Root := TNumericsKit.Brent(@FX, 1, 2);
+  Writeln('sqrt(2) ≈ ', Root:0:10);
+
+  // Newton-Raphson
+  Root := TNumericsKit.NewtonRaphson(@FX, @DFX, 1.5);
+  Writeln('sqrt(2) ≈ ', Root:0:10);
+
+  // Numerical integration: ∫₀¹ x² dx = 1/3
+  Integral := TNumericsKit.SimpsonRule(@FX, 0, 1, 1000);
+  Writeln('∫₀¹ x²-2 dx ≈ ', Integral:0:6);
+
+  // ODE: dy/dt = y, y(0)=1  →  y(1) = e
+  Sol := TNumericsKit.RK4Solve(@DYDT, 0, 1, 1, 100);
+  Writeln('e ≈ ', Sol.Y[100]:0:8);
+
+  // Natural cubic spline
+  XK := TDoubleArray.Create(0, 1, 2, 3);
+  YK := TDoubleArray.Create(0, 1, 4, 9);   // y = x²
+  Spline := TNumericsKit.CubicSplineBuild(XK, YK);
+  Writeln('Spline at x=1.5 ≈ ', TNumericsKit.CubicSplineEval(Spline, 1.5):0:4);
+end.
+```
+
 ---
 
 ## Dependency Graph
@@ -225,7 +296,8 @@ end.
 MathBase  ←  AlgebraLib
           ←  FinanceLib
           ←  StatsLib
-          ←  EngineeringLib  (independent of AlgebraLib, FinanceLib, StatsLib)
+          ←  EngineeringLib
+          ←  NumericsLib
 ```
 
 All libraries depend on **MathBase**. No library depends on another peer library.
@@ -262,6 +334,8 @@ All libraries depend on **MathBase**. No library depends on another peer library
 cd tests
 ./TestRunner.exe -a --format=plain
 ```
+
+The test suite currently contains **364 tests** across all libraries (0 failures, 0 memory leaks).
 
 ---
 

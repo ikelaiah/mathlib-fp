@@ -13,7 +13,8 @@ uses
   , TestEngineeringLib_FluidDynamics
   , TestEngineeringLib_Signal
   , TestEngineeringLib_Thermodynamics
-  , TestEngineeringLib_UnitConversion;
+  , TestEngineeringLib_UnitConversion
+  , TestNumericsLib;
 
 type
 
