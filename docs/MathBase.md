@@ -1,6 +1,6 @@
 # MathBase
 
-Foundation layer for the pascal-mathlibs monorepo. All other libraries depend on this package.
+Foundation layer for the mathlib-fp monorepo. All other libraries depend on this package.
 
 ## Units
 

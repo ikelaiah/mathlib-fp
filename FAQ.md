@@ -1,8 +1,8 @@
 # Frequently Asked Questions (FAQ)
 
-**Q1: What is the overall design philosophy of pascal-mathlibs' API?**
+**Q1: What is the overall design philosophy of mathlib-fp' API?**
 
-A1: pascal-mathlibs aims for simplicity and directness. All libraries expose
+A1: mathlib-fp aims for simplicity and directness. All libraries expose
 **static class methods** — no instance creation required. This suits the
 stateless nature of mathematical calculations.
 
@@ -31,7 +31,7 @@ value semantics for matrix operations, and is considered stable.
 
 A5: Those modules remain in the original
 [tidykit-fp](https://github.com/ikelaiah/tidykit-fp) repository.
-pascal-mathlibs is a focused monorepo containing only the math, statistics,
+mathlib-fp is a focused monorepo containing only the math, statistics,
 finance, and engineering libraries.
 
 **Q6: What are the future goals?**

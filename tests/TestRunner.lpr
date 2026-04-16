@@ -31,7 +31,7 @@ var
 begin
   Application := TMyTestRunner.Create(nil);
   Application.Initialize;
-  Application.Title := 'pascal-mathlibs Test Runner';
+  Application.Title := 'mathlib-fp Test Runner';
   Application.Run;
   Application.Free;
 end.

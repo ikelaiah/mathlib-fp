@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of pascal-mathlibs seriously. If you believe you have found
+We take the security of mathlib-fp seriously. If you believe you have found
 a security vulnerability, please report it to us as described below.
 
 **Please do not report security vulnerabilities through public GitHub issues.**

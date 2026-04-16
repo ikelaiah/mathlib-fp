@@ -1,4 +1,4 @@
-# pascal-mathlibs
+# mathlib-fp
 
 [![FPC](https://img.shields.io/badge/Free%20Pascal-3.2.2-blue.svg)](https://www.freepascal.org/)
 [![Lazarus](https://img.shields.io/badge/Lazarus-3.6+-blue.svg)](https://www.lazarus-ide.org/)
@@ -30,7 +30,7 @@ A monorepo of focused Free Pascal math libraries for scientific and engineering 
 ## Repository Layout
 
 ```text
-pascal-mathlibs/
+mathlib-fp/
 │
 ├── README.md
 ├── CHANGELOG.md
@@ -88,8 +88,8 @@ pascal-mathlibs/
 ### Step 1 — Clone
 
 ```bash
-git clone https://github.com/ikelaiah/pascal-mathlibs
-cd pascal-mathlibs
+git clone https://github.com/ikelaiah/mathlib-fp
+cd mathlib-fp
 ```
 
 ### Step 2 — Add the source path to your project
@@ -309,7 +309,7 @@ All libraries depend on **MathBase**. No library depends on another peer library
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/ikelaiah/pascal-mathlibs
+   git clone https://github.com/ikelaiah/mathlib-fp
    ```
 
 2. Add `src/` to your project's search path:

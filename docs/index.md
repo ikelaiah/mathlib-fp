@@ -1,4 +1,4 @@
-# pascal-mathlibs
+# mathlib-fp
 
 A collection of Free Pascal mathematics libraries organised as a monorepo.
 

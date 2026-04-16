@@ -1,6 +1,6 @@
-# Contributing to pascal-mathlibs
+# Contributing to mathlib-fp
 
-Thank you for your interest in contributing to pascal-mathlibs! We want to make
+Thank you for your interest in contributing to mathlib-fp! We want to make
 contributing to this project as easy and transparent as possible.
 
 ## 📝 Code of Conduct
@@ -16,7 +16,7 @@ contributing to this project as easy and transparent as possible.
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/your-username/pascal-mathlibs.git
+   git clone https://github.com/your-username/mathlib-fp.git
    ```
 3. Create a new branch:
    ```bash
