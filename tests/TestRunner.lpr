@@ -15,7 +15,9 @@ uses
   , TestEngineeringLib_Thermodynamics
   , TestEngineeringLib_UnitConversion
   , TestNumericsLib
-  , TestProbabilityLib;
+  , TestProbabilityLib
+  , TestCombinatoricsLib
+  , TestOptimizationLib;
 
 type
 
