@@ -14,7 +14,8 @@ uses
   , TestEngineeringLib_Signal
   , TestEngineeringLib_Thermodynamics
   , TestEngineeringLib_UnitConversion
-  , TestNumericsLib;
+  , TestNumericsLib
+  , TestProbabilityLib;
 
 type
 
