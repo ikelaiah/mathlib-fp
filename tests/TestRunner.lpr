@@ -18,7 +18,8 @@ uses
   , TestProbabilityLib
   , TestCombinatoricsLib
   , TestOptimizationLib
-  , TestTimeSeriesLib;
+  , TestTimeSeriesLib
+  , TestMLLib;
 
 type
 
