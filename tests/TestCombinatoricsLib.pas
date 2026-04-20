@@ -289,7 +289,7 @@ begin
   AssertEquals('C(10,3)=120', Int64(120), TCombinatoricsKit.Combination(10, 3));
 end;
 
-procedure TTestCombinatoricsKit.Test14_Combination_Symmetric;
+procedure TTestCombinatoricsLib.Test14_Combination_Symmetric;
 begin
   { C(n,k) = C(n, n-k) }
   AssertEquals('C(10,3)=C(10,7)', TCombinatoricsKit.Combination(10,3),
@@ -308,8 +308,8 @@ end;
 
 procedure TTestCombinatoricsLib.Test17_LogCombination_Large;
 begin
-  { ln C(100,50) ≈ 68.1583 }
-  AssertNearD(68.1583, TCombinatoricsKit.LogCombination(100, 50), 1E-3,
+  { ln C(100,50) ≈ 66.7838 }
+  AssertNearD(66.7838, TCombinatoricsKit.LogCombination(100, 50), 1E-3,
     'LogC(100,50)');
 end;
 

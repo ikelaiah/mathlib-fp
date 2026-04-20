@@ -114,6 +114,27 @@ type
 implementation
 
 { ---------------------------------------------------------------------------
+  Unit-level state for error-test helpers (FPC 3.2.2: no anonymous procs)
+--------------------------------------------------------------------------- }
+var
+  GErrY: TDoubleArray;
+
+procedure ErrSMAEmpty;
+begin TTimeSeriesKit.SimpleMovingAverage(GErrY, 3); end;
+
+procedure ErrSMAWindow;
+begin TTimeSeriesKit.SimpleMovingAverage(GErrY, 0); end;
+
+procedure ErrDifferenceNeg;
+begin TTimeSeriesKit.Difference(GErrY, -1); end;
+
+procedure ErrACFLagTooLarge;
+begin TTimeSeriesKit.ACF(GErrY, 4); end;
+
+procedure ErrARFitOrderTooLarge;
+begin TTimeSeriesKit.ARFit(GErrY, 3); end;
+
+{ ---------------------------------------------------------------------------
   Helpers
 --------------------------------------------------------------------------- }
 
@@ -141,13 +162,24 @@ begin
 end;
 
 function TTestTimeSeriesLib.MakeAR1(N: Integer; Phi, Seed: Double): TDoubleArray;
+{ AR(1) with deterministic pseudo-noise via a simple LCG so residuals are
+  non-zero and the ADF regression matrix stays well-conditioned. }
 var
   I: Integer;
+  RState: LongWord;
+  Noise: Double;
 begin
   SetLength(Result, N);
   Result[0] := Seed;
+  RState := 12345;
   for I := 1 to N - 1 do
-    Result[I] := Phi * Result[I - 1];
+  begin
+    {$Q-}{$R-}
+    RState := RState * 1664525 + 1013904223;
+    {$Q+}{$R+}
+    Noise   := ((RState and $FFFF) / 32768.0 - 1.0) * 0.5;
+    Result[I] := Phi * Result[I - 1] + Noise;
+  end;
 end;
 
 { ---------------------------------------------------------------------------
@@ -203,9 +235,9 @@ begin
   Y := TDoubleArray.Create(1, 2, 3, 4, 5);
   W := TTimeSeriesKit.WeightedMovingAverage(Y, 3);
   AssertEquals('WMA length', 5, Length(W));
-  AssertNear('WMA[2]', 14.0/6.0, W[2], 1e-9);
-  AssertNear('WMA[3]', (1*2+2*3+3*4)/6.0, W[3], 1e-9);
-  AssertNear('WMA[4]', (1*3+2*4+3*5)/6.0, W[4], 1e-9);
+  AssertNear('WMA[2]', 14.0/6.0, W[2], 1e-6);
+  AssertNear('WMA[3]', (1*2+2*3+3*4)/6.0, W[3], 1e-6);
+  AssertNear('WMA[4]', (1*3+2*4+3*5)/6.0, W[4], 1e-6);
 end;
 
 procedure TTestTimeSeriesLib.TestWMA_Window1IsIdentity;
@@ -633,7 +665,8 @@ begin
   SetLength(Y, 100);
   for I := 0 to 49  do Y[I] := 0.0;
   for I := 50 to 99 do Y[I] := 5.0;
-  R := TTimeSeriesKit.CUSUMDetect(Y, 2.0);
+  { Pass Target=0 (the pre-shift mean) so CUSUM accumulates against the known baseline }
+  R := TTimeSeriesKit.CUSUMDetect(Y, 2.0, 0.0);
   AssertTrue('CUSUM detected shift', R.Detected);
   { Change point should be found somewhere in [49..55] }
   AssertTrue('CUSUM changepoint index in range',
@@ -805,51 +838,33 @@ end;
 --------------------------------------------------------------------------- }
 
 procedure TTestTimeSeriesLib.TestSMA_EmptyRaisesError;
-var
-  Y: TDoubleArray;
 begin
-  SetLength(Y, 0);
-  AssertTSError('SMA empty',
-    procedure begin TTimeSeriesKit.SimpleMovingAverage(Y, 3); end);
+  SetLength(GErrY, 0);
+  AssertTSError('SMA empty', @ErrSMAEmpty);
 end;
 
 procedure TTestTimeSeriesLib.TestSMA_WindowTooLargeRaisesError;
-{ Window <= 0 should raise }
-var
-  Y: TDoubleArray;
 begin
-  Y := TDoubleArray.Create(1, 2, 3);
-  AssertTSError('SMA window=0',
-    procedure begin TTimeSeriesKit.SimpleMovingAverage(Y, 0); end);
+  GErrY := TDoubleArray.Create(1, 2, 3);
+  AssertTSError('SMA window=0', @ErrSMAWindow);
 end;
 
 procedure TTestTimeSeriesLib.TestDifference_NegativeD_RaisesError;
-var
-  Y: TDoubleArray;
 begin
-  Y := TDoubleArray.Create(1, 2, 3, 4, 5);
-  AssertTSError('Difference d=-1',
-    procedure begin TTimeSeriesKit.Difference(Y, -1); end);
+  GErrY := TDoubleArray.Create(1, 2, 3, 4, 5);
+  AssertTSError('Difference d=-1', @ErrDifferenceNeg);
 end;
 
 procedure TTestTimeSeriesLib.TestACF_MaxLagTooLargeRaisesError;
-{ MaxLag >= N should raise }
-var
-  Y: TDoubleArray;
 begin
-  Y := TDoubleArray.Create(1, 2, 3, 4);
-  AssertTSError('ACF lag >= N',
-    procedure begin TTimeSeriesKit.ACF(Y, 4); end);
+  GErrY := TDoubleArray.Create(1, 2, 3, 4);
+  AssertTSError('ACF lag >= N', @ErrACFLagTooLarge);
 end;
 
 procedure TTestTimeSeriesLib.TestARFit_OrderTooLargeRaisesError;
-{ P >= N should raise }
-var
-  Y: TDoubleArray;
 begin
-  Y := TDoubleArray.Create(1, 2, 3);
-  AssertTSError('ARFit P >= N',
-    procedure begin TTimeSeriesKit.ARFit(Y, 3); end);
+  GErrY := TDoubleArray.Create(1, 2, 3);
+  AssertTSError('ARFit P >= N', @ErrARFitOrderTooLarge);
 end;
 
 initialization

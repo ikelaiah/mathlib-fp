@@ -114,6 +114,31 @@ type
 implementation
 
 { ---------------------------------------------------------------------------
+  Unit-level state for error-test helpers (FPC 3.2.2: no anonymous procs)
+--------------------------------------------------------------------------- }
+var
+  GErrX:      TDoubleMatrix;
+  GErrY:      TDoubleArray;
+  GErrLabels: TIntegerArray;
+  GErrTrainX, GErrTestX: TDoubleMatrix;
+  GErrTrainY: TIntegerArray;
+
+procedure ErrNormaliseEmpty;
+begin TMLKit.Normalise(GErrX); end;
+
+procedure ErrKNNKTooLarge;
+begin TMLKit.KNearestNeighbours(GErrTrainX, GErrTrainY, GErrTestX, 5); end;
+
+procedure ErrOneHotBadLabel;
+begin TMLKit.OneHotEncode(GErrLabels, 3); end;
+
+procedure ErrLinearRegressionTooFew;
+begin TMLKit.LinearRegression(GErrX, GErrY); end;
+
+procedure ErrPCATooManyComponents;
+begin TMLKit.PCA(GErrX, 5); end;
+
+{ ---------------------------------------------------------------------------
   Helpers
 --------------------------------------------------------------------------- }
 
@@ -157,7 +182,7 @@ begin
   end;
 end;
 
-{ Y = 3 + 2*x1 + 5*x2, 20 samples }
+{ Y = 3 + 2*x1 + 5*x2, 20 samples (x2 = I*I to avoid collinearity with x1=I) }
 procedure TTestMLLib.MakeLinearData(out X: TDoubleMatrix; out Y: TDoubleArray);
 var I: Integer;
 begin
@@ -166,7 +191,7 @@ begin
   begin
     SetLength(X[I], 2);
     X[I][0] := I;
-    X[I][1] := I * 2;
+    X[I][1] := I * I;
     Y[I]    := 3 + 2 * X[I][0] + 5 * X[I][1];
   end;
 end;
@@ -486,6 +511,7 @@ procedure TTestMLLib.TestLogisticRegression_LinearSeparable;
 var
   X: TDoubleMatrix; TrainY, Pred: TIntegerArray;
   Acc: Double; I: Integer;
+  Model: TLinearModel;
 begin
   SetLength(X, 20); SetLength(TrainY, 20);
   for I := 0 to 19 do
@@ -493,7 +519,7 @@ begin
     SetLength(X[I], 1); X[I][0] := I;
     if I < 10 then TrainY[I] := 0 else TrainY[I] := 1;
   end;
-  var Model := TMLKit.LogisticRegression(X, TrainY, 0.05, 5000);
+  Model := TMLKit.LogisticRegression(X, TrainY, 0.05, 5000);
   Pred := TMLKit.LogisticPredict(Model, X);
   Acc  := TMLKit.Accuracy(TrainY, Pred);
   AssertTrue('Logistic separable acc >= 0.9', Acc >= 0.9);
@@ -503,13 +529,14 @@ procedure TTestMLLib.TestLogisticPredict_BinaryLabels;
 { All predictions must be 0 or 1 }
 var
   X: TDoubleMatrix; Y, Pred: TIntegerArray; I: Integer;
+  Model: TLinearModel;
 begin
   SetLength(X, 10); SetLength(Y, 10);
   for I := 0 to 9 do
   begin
     SetLength(X[I], 1); X[I][0] := I; Y[I] := I mod 2;
   end;
-  var Model := TMLKit.LogisticRegression(X, Y, 0.1, 500);
+  Model := TMLKit.LogisticRegression(X, Y, 0.1, 500);
   Pred := TMLKit.LogisticPredict(Model, X);
   for I := 0 to High(Pred) do
     AssertTrue('LogPred in {0,1}', (Pred[I] = 0) or (Pred[I] = 1));
@@ -538,7 +565,7 @@ begin
   begin
     SetLength(X[I], 1); X[I][0] := 20 + (I-20) * 0.1;
   end;
-  R := TMLKit.KMeans(X, 3, 300, 0);
+  R := TMLKit.KMeans(X, 3, 300, 1);
   AssertEquals('KMeans 3 clusters label count', 30, Length(R.Labels));
   { All points in the same group should share the same label }
   LabelA := R.Labels[0];
@@ -831,47 +858,39 @@ end;
 --------------------------------------------------------------------------- }
 
 procedure TTestMLLib.TestNormalise_EmptyRaises;
-var X: TDoubleMatrix;
 begin
-  SetLength(X, 0);
-  AssertMLError('Normalise empty', procedure begin TMLKit.Normalise(X); end);
+  SetLength(GErrX, 0);
+  AssertMLError('Normalise empty', @ErrNormaliseEmpty);
 end;
 
 procedure TTestMLLib.TestKNN_KTooLargeRaises;
-var TrainX, TestX: TDoubleMatrix; TrainY: TIntegerArray;
 begin
-  SetLength(TrainX, 2); SetLength(TrainY, 2);
-  SetLength(TrainX[0], 1); TrainX[0][0] := 0; TrainY[0] := 0;
-  SetLength(TrainX[1], 1); TrainX[1][0] := 1; TrainY[1] := 1;
-  SetLength(TestX, 1); SetLength(TestX[0], 1); TestX[0][0] := 0;
-  AssertMLError('KNN K>N',
-    procedure begin TMLKit.KNearestNeighbours(TrainX, TrainY, TestX, 5); end);
+  SetLength(GErrTrainX, 2); SetLength(GErrTrainY, 2);
+  SetLength(GErrTrainX[0], 1); GErrTrainX[0][0] := 0; GErrTrainY[0] := 0;
+  SetLength(GErrTrainX[1], 1); GErrTrainX[1][0] := 1; GErrTrainY[1] := 1;
+  SetLength(GErrTestX, 1); SetLength(GErrTestX[0], 1); GErrTestX[0][0] := 0;
+  AssertMLError('KNN K>N', @ErrKNNKTooLarge);
 end;
 
 procedure TTestMLLib.TestOneHotEncode_BadLabelRaises;
-var Labels: TIntegerArray;
 begin
-  Labels := TIntegerArray.Create(0, 1, 5);  { 5 >= NClasses=3 }
-  AssertMLError('OHE bad label',
-    procedure begin TMLKit.OneHotEncode(Labels, 3); end);
+  GErrLabels := TIntegerArray.Create(0, 1, 5);
+  AssertMLError('OHE bad label', @ErrOneHotBadLabel);
 end;
 
 procedure TTestMLLib.TestLinearRegression_TooFewSamplesRaises;
-var X: TDoubleMatrix; Y: TDoubleArray;
 begin
-  SetLength(X, 2); SetLength(Y, 2);
-  SetLength(X[0], 3); SetLength(X[1], 3);
-  AssertMLError('LR too few samples',
-    procedure begin TMLKit.LinearRegression(X, Y); end);
+  SetLength(GErrX, 2); SetLength(GErrY, 2);
+  SetLength(GErrX[0], 3); SetLength(GErrX[1], 3);
+  AssertMLError('LR too few samples', @ErrLinearRegressionTooFew);
 end;
 
 procedure TTestMLLib.TestPCA_TooManyComponentsRaises;
-var X: TDoubleMatrix; I: Integer;
+var I: Integer;
 begin
-  SetLength(X, 5);
-  for I := 0 to 4 do begin SetLength(X[I], 2); X[I][0] := I; X[I][1] := I; end;
-  AssertMLError('PCA components > features',
-    procedure begin TMLKit.PCA(X, 5); end);
+  SetLength(GErrX, 5);
+  for I := 0 to 4 do begin SetLength(GErrX[I], 2); GErrX[I][0] := I; GErrX[I][1] := I; end;
+  AssertMLError('PCA components > features', @ErrPCATooManyComponents);
 end;
 
 initialization

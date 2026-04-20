@@ -635,12 +635,14 @@ var
   N, NTest, NTrain, I, J, Tmp: Integer;
   Idx: TIntegerArray;
   { LCG random number generator for reproducibility }
-  RandState: Int64;
+  RandState: QWord;
 
   function LCGNext: Integer;
   begin
-    RandState := (RandState * 6364136223846793005 + 1442695040888963407) and $7FFFFFFFFFFFFFFF;
-    Result := RandState mod N;
+    {$Q-}
+    RandState := (RandState * QWord(6364136223846793005) + QWord(1442695040888963407)) and $7FFFFFFFFFFFFFFF;
+    {$Q+}
+    Result := RandState mod QWord(N);
   end;
 
 begin
@@ -882,15 +884,16 @@ begin
       SortedIdx[J] := J;
     end;
 
-    { Partial insertion sort to find K smallest }
-    for J := 1 to K do
-      for L := J - 1 downto 0 do
-      begin
-        if Distances[SortedIdx[L]] > Distances[SortedIdx[L + 1]] then
+    { Partial selection: find K nearest by scanning all training points.
+      After the loop, SortedIdx[0..K-1] holds the K closest (unsorted). }
+    for J := 0 to NTrain - 1 do SortedIdx[J] := J;
+    { Selection sort for first K positions }
+    for J := 0 to K - 1 do
+      for L := J + 1 to NTrain - 1 do
+        if Distances[SortedIdx[L]] < Distances[SortedIdx[J]] then
         begin
-          Tmp := SortedIdx[L]; SortedIdx[L] := SortedIdx[L+1]; SortedIdx[L+1] := Tmp;
-        end else Break;
-      end;
+          Tmp := SortedIdx[J]; SortedIdx[J] := SortedIdx[L]; SortedIdx[L] := Tmp;
+        end;
 
     { Majority vote among K nearest }
     SetLength(Votes, 0);
@@ -1065,12 +1068,14 @@ var
   ClusterSizes: TIntegerArray;
   MinDist, Dist, Inertia: Double;
   Changed: Boolean;
-  RandState: Int64;
+  RandState: QWord;
 
   function LCGNext(Range: Integer): Integer;
   begin
-    RandState := (RandState * 6364136223846793005 + 1442695040888963407) and $7FFFFFFFFFFFFFFF;
-    Result := RandState mod Range;
+    {$Q-}
+    RandState := (RandState * QWord(6364136223846793005) + QWord(1442695040888963407)) and $7FFFFFFFFFFFFFFF;
+    {$Q+}
+    Result := RandState mod QWord(Range);
   end;
 
 begin
@@ -1191,12 +1196,10 @@ begin
       if Length(NewNeighbours) >= MinPts then
         for J := 0 to High(NewNeighbours) do
         begin
+          if QTail >= Length(Queue) then
+            SetLength(Queue, Length(Queue) * 2);
           Queue[QTail] := NewNeighbours[J];
           Inc(QTail);
-          if QTail >= N * 4 then  { grow queue if needed }
-          begin
-            SetLength(Queue, Length(Queue) * 2);
-          end;
         end;
     end;
 

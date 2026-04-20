@@ -136,6 +136,36 @@ type
 implementation
 
 { ---------------------------------------------------------------------------
+  Unit-level state for error-test helpers (FPC 3.2.2: no anonymous procs)
+--------------------------------------------------------------------------- }
+var
+  GErrPts: TPolygon2D;
+
+procedure ErrNormaliseZero;
+var V: TVector2D;
+begin V := TVector2D.Create(0, 0); V.Normalise; end;
+
+procedure ErrLineSamePoint;
+begin TLine2D.FromPoints(TPoint2D.Create(1,1), TPoint2D.Create(1,1)); end;
+
+procedure ErrPolygonAreaTooFew;
+begin TGeometryKit.PolygonArea(GErrPts); end;
+
+procedure ErrConvexHullTooFew;
+begin TGeometryKit.ConvexHull(GErrPts); end;
+
+procedure ErrBoundingBoxEmpty;
+begin TGeometryKit.BoundingBox2D(GErrPts); end;
+
+procedure ErrPlaneCollinear;
+begin
+  TPlane3D.FromThreePoints(
+    TPoint3D.Create(0,0,0),
+    TPoint3D.Create(1,0,0),
+    TPoint3D.Create(2,0,0));
+end;
+
+{ ---------------------------------------------------------------------------
   Helpers
 --------------------------------------------------------------------------- }
 
@@ -838,57 +868,37 @@ end;
 
 procedure TTestGeometryLib.TestVector2D_NormaliseZeroRaises;
 begin
-  AssertGeoError('Normalise zero vector',
-    procedure
-    var V: TVector2D;
-    begin V := TVector2D.Create(0,0); V.Normalise; end);
+  AssertGeoError('Normalise zero vector', @ErrNormaliseZero);
 end;
 
 procedure TTestGeometryLib.TestLine2D_SamePointRaises;
 begin
-  AssertGeoError('Line from same point',
-    procedure
-    begin
-      TLine2D.FromPoints(TPoint2D.Create(1,1), TPoint2D.Create(1,1));
-    end);
+  AssertGeoError('Line from same point', @ErrLineSamePoint);
 end;
 
 procedure TTestGeometryLib.TestPolygonArea_TooFewRaises;
-var Pts: TPolygon2D;
 begin
-  SetLength(Pts, 2);
-  Pts[0] := TPoint2D.Create(0,0); Pts[1] := TPoint2D.Create(1,0);
-  AssertGeoError('Area < 3 vertices',
-    procedure begin TGeometryKit.PolygonArea(Pts); end);
+  SetLength(GErrPts, 2);
+  GErrPts[0] := TPoint2D.Create(0,0); GErrPts[1] := TPoint2D.Create(1,0);
+  AssertGeoError('Area < 3 vertices', @ErrPolygonAreaTooFew);
 end;
 
 procedure TTestGeometryLib.TestConvexHull_TooFewRaises;
-var Pts: TPolygon2D;
 begin
-  SetLength(Pts, 2);
-  Pts[0] := TPoint2D.Create(0,0); Pts[1] := TPoint2D.Create(1,0);
-  AssertGeoError('Hull < 3 points',
-    procedure begin TGeometryKit.ConvexHull(Pts); end);
+  SetLength(GErrPts, 2);
+  GErrPts[0] := TPoint2D.Create(0,0); GErrPts[1] := TPoint2D.Create(1,0);
+  AssertGeoError('Hull < 3 points', @ErrConvexHullTooFew);
 end;
 
 procedure TTestGeometryLib.TestBoundingBox2D_EmptyRaises;
-var Pts: TPolygon2D;
 begin
-  SetLength(Pts, 0);
-  AssertGeoError('BBox empty',
-    procedure begin TGeometryKit.BoundingBox2D(Pts); end);
+  SetLength(GErrPts, 0);
+  AssertGeoError('BBox empty', @ErrBoundingBoxEmpty);
 end;
 
 procedure TTestGeometryLib.TestPlane3D_CollinearRaises;
 begin
-  AssertGeoError('Plane from collinear points',
-    procedure
-    begin
-      TPlane3D.FromThreePoints(
-        TPoint3D.Create(0,0,0),
-        TPoint3D.Create(1,0,0),
-        TPoint3D.Create(2,0,0));
-    end);
+  AssertGeoError('Plane from collinear points', @ErrPlaneCollinear);
 end;
 
 initialization

@@ -433,7 +433,7 @@ class function TTimeSeriesKit.SimpleMovingAverage(const Y: TDoubleArray;
   Window: Integer): TDoubleArray;
 { Centred SMA; edges use available data. }
 var
-  N, I, Lo, Hi: Integer;
+  N, I, J, Lo, Hi: Integer;
   S: Double;
 begin
   N := Length(Y);
@@ -445,7 +445,6 @@ begin
     Lo := Max(0, I - Window div 2);
     Hi := Min(N-1, I + (Window-1) div 2);
     S  := 0;
-    var J: Integer;
     for J := Lo to Hi do S := S + Y[J];
     Result[I] := S / (Hi - Lo + 1);
   end;
@@ -465,10 +464,11 @@ begin
   for I := 0 to N-1 do
   begin
     WSum := 0; VSum := 0;
+    { Weff = number of values in this window; J=0 is most recent, weight = Weff-J }
     for J := 0 to Min(Window-1, I) do
     begin
-      WSum := WSum + (J + 1);
-      VSum := VSum + (J + 1) * Y[I - J];
+      WSum := WSum + (Min(Window, I + 1) - J);
+      VSum := VSum + (Min(Window, I + 1) - J) * Y[I - J];
     end;
     Result[I] := VSum / WSum;
   end;
@@ -738,21 +738,36 @@ end;
 
 class function TTimeSeriesKit.Undifference(const DiffY: TDoubleArray;
   const InitVals: TDoubleArray; D: Integer): TDoubleArray;
-{ Reconstruct by cumulative summation, D times }
-var I, Ord: Integer; Cur: TDoubleArray;
+{ Reconstruct by cumulative summation, D times.
+  InitVals[0..D-1] = the first D values of the original series.
+  We pre-compute the successive differences of InitVals to obtain the
+  seed for each integration pass (innermost first). }
+var
+  I, Ord: Integer;
+  Cur, Seeds: TDoubleArray;
 begin
+  if D = 0 then begin Result := DiffY; Exit; end;
   if Length(InitVals) < D then raise ETimeSeriesError.Create(
     'Undifference: InitVals must have at least D elements');
+
+  { Seeds[k] = k-th order difference of InitVals at position 0.
+    Seeds[0] = InitVals[0], Seeds[1] = InitVals[1]-InitVals[0], etc. }
+  SetLength(Seeds, D);
+  Seeds := Copy(InitVals, 0, D);
+  for Ord := 1 to D - 1 do
+    for I := D - 1 downto Ord do
+      Seeds[I] := Seeds[I] - Seeds[I - 1];
+
+  { Integrate D times, innermost (highest-order) pass first }
   Cur := DiffY;
-  for Ord := 1 to D do
+  for Ord := D downto 1 do
   begin
     SetLength(Result, Length(Cur) + 1);
-    Result[0] := InitVals[D - Ord];
+    Result[0] := Seeds[Ord - 1];
     for I := 1 to High(Result) do
       Result[I] := Result[I-1] + Cur[I-1];
     Cur := Result;
   end;
-  if D = 0 then Result := DiffY;
 end;
 
 { ---------------------------------------------------------------------------
@@ -764,11 +779,12 @@ class function TTimeSeriesKit.AugmentedDickeyFuller(const Y: TDoubleArray;
 { Regression: ΔY_t = alpha + beta*Y_{t-1} + sum(gamma_j*ΔY_{t-j}) + e_t
   Test statistic = beta / SE(beta).  MacKinnon (1994) critical values. }
 var
-  N, NReg, I, J, K: Integer;
+  N, NReg, I, J, K, NCol: Integer;
   DY: TDoubleArray;
   XMat: array of TDoubleArray;
-  YVec, Coeff, Resid, XTX_diag: TDoubleArray;
-  YLag, Beta, SumSq, SE: Double;
+  XTX, XTX2, XTX3: array of TDoubleArray;
+  YVec, Coeff, Resid, XTX_diag, XTY, Ident, InvCol: TDoubleArray;
+  YLag, Beta, SumSq, SE, Sigma2: Double;
   OK: Boolean;
 begin
   N := Length(Y);
@@ -796,28 +812,22 @@ begin
   end;
 
   { OLS: (X'X)^{-1} X'Y via normal equations — build X'X and X'Y }
-  var
-    NCol: Integer;
-    XTX: array of TDoubleArray;
-    XTY: TDoubleArray;
+  NCol := Lags + 2;
+  SetLength(XTX, NCol);
+  SetLength(XTY, NCol);
+  for I := 0 to NCol-1 do
   begin
-    NCol := Lags + 2;
-    SetLength(XTX, NCol);
-    SetLength(XTY, NCol);
+    SetLength(XTX[I], NCol);
+    XTY[I] := 0;
+  end;
+  for K := 0 to NReg-1 do
     for I := 0 to NCol-1 do
     begin
-      SetLength(XTX[I], NCol);
-      XTY[I] := 0;
+      XTY[I] := XTY[I] + XMat[K][I] * YVec[K];
+      for J := 0 to NCol-1 do
+        XTX[I][J] := XTX[I][J] + XMat[K][I] * XMat[K][J];
     end;
-    for K := 0 to NReg-1 do
-      for I := 0 to NCol-1 do
-      begin
-        XTY[I] := XTY[I] + XMat[K][I] * YVec[K];
-        for J := 0 to NCol-1 do
-          XTX[I][J] := XTX[I][J] + XMat[K][I] * XMat[K][J];
-      end;
-    OK := SolveLinear(XTX, XTY, Coeff);
-  end;
+  OK := SolveLinear(XTX, XTY, Coeff);
 
   if not OK then
   begin
@@ -835,40 +845,32 @@ begin
     for J := 0 to Lags+1 do Resid[I] := Resid[I] - XMat[I][J] * Coeff[J];
     SumSq := SumSq + Sqr(Resid[I]);
   end;
-  var Sigma2: Double := SumSq / (NReg - Lags - 2);
+  Sigma2 := SumSq / (NReg - Lags - 2);
 
   { SE of beta (coefficient index 1) = sqrt(Sigma2 * [(X'X)^{-1}]_{1,1}) }
   { We need the (1,1) diagonal of (X'X)^{-1}. Solve X'X * e_1 = e_1. }
-  var
-    Ident: TDoubleArray;
-    InvCol: TDoubleArray;
+  SetLength(Ident, NCol);
+  Ident[1] := 1;  { pick column 1 }
+  SetLength(XTX2, NCol);
+  for I := 0 to NCol-1 do
   begin
-    NCol := Lags + 2;
-    SetLength(Ident, NCol);
-    Ident[1] := 1;  { pick column 1 }
-    var XTX2: array of TDoubleArray;
-    SetLength(XTX2, NCol);
-    for I := 0 to NCol-1 do
-    begin
-      SetLength(XTX2[I], NCol);
-      for J := 0 to NReg-1 do
-        for K := 0 to NCol-1 do
-          XTX2[I][K] := XTX2[I][K] + XMat[J][I] * XMat[J][K];
-    end;
-    { Rebuild X'X cleanly }
-    var XTX3: array of TDoubleArray;
-    SetLength(XTX3, NCol);
-    for I := 0 to NCol-1 do SetLength(XTX3[I], NCol);
-    for K := 0 to NReg-1 do
-      for I := 0 to NCol-1 do
-        for J := 0 to NCol-1 do
-          XTX3[I][J] := XTX3[I][J] + XMat[K][I] * XMat[K][J];
-    SolveLinear(XTX3, Ident, InvCol);
-    SE := Sqrt(Abs(Sigma2 * InvCol[1]));
+    SetLength(XTX2[I], NCol);
+    for J := 0 to NReg-1 do
+      for K := 0 to NCol-1 do
+        XTX2[I][K] := XTX2[I][K] + XMat[J][I] * XMat[J][K];
   end;
+  { Rebuild X'X cleanly }
+  SetLength(XTX3, NCol);
+  for I := 0 to NCol-1 do SetLength(XTX3[I], NCol);
+  for K := 0 to NReg-1 do
+    for I := 0 to NCol-1 do
+      for J := 0 to NCol-1 do
+        XTX3[I][J] := XTX3[I][J] + XMat[K][I] * XMat[K][J];
+  SolveLinear(XTX3, Ident, InvCol);
+  SE := Sqrt(Abs(Sigma2 * InvCol[1]));
 
   Beta := Coeff[1];
-  Result.Statistic := IfThen(SE > 1E-14, Beta / SE, 0);
+  if SE > 1E-14 then Result.Statistic := Beta / SE else Result.Statistic := 0;
 
   { MacKinnon (1994) asymptotic critical values for no-trend regression }
   Result.Crit1Pct  := -3.43;
@@ -890,7 +892,7 @@ var
 begin
   N := Length(Y);
   if N < 2 then raise ETimeSeriesError.Create('ACF: need at least 2 observations');
-  if MaxLag >= N then MaxLag := N - 1;
+  if MaxLag >= N then raise ETimeSeriesError.Create('ACF: MaxLag must be < Length(Y)');
 
   Mu   := SliceMean(Y, 0, N-1);
   VarY := SliceVar(Y, 0, N-1) * (N - 1);  { unnormalised: sum of squared devs }
@@ -902,7 +904,7 @@ begin
     Cov := 0;
     for I := K to N-1 do
       Cov := Cov + (Y[I] - Mu) * (Y[I-K] - Mu);
-    Result[K] := IfThen(VarY > 1E-15, Cov / VarY, 0);
+    if VarY > 1E-15 then Result[K] := Cov / VarY else Result[K] := 0;
   end;
 end;
 
@@ -911,13 +913,13 @@ class function TTimeSeriesKit.PACF(const Y: TDoubleArray;
 { Yule-Walker equations solved iteratively (Durbin-Levinson) }
 var
   N, K, I, J: Integer;
-  Acf: TDoubleArray;
+  AcfVals: TDoubleArray;
   Phi, PhiNew: TDoubleArray;
   Num, Den, PhiKK: Double;
 begin
   N := Length(Y);
   if MaxLag >= N then MaxLag := N - 1;
-  Acf := ACF(Y, MaxLag);
+  AcfVals := ACF(Y, MaxLag);
 
   SetLength(Result, MaxLag + 1);
   Result[0] := 1.0;
@@ -925,17 +927,17 @@ begin
 
   { Durbin-Levinson recursion }
   SetLength(Phi, MaxLag + 1);
-  Phi[1]    := Acf[1];
-  Result[1] := Acf[1];
+  Phi[1]    := AcfVals[1];
+  Result[1] := AcfVals[1];
 
   for K := 2 to MaxLag do
   begin
-    Num := Acf[K];
+    Num := AcfVals[K];
     Den := 1.0;
     for J := 1 to K-1 do
     begin
-      Num := Num - Phi[J] * Acf[K-J];
-      Den := Den - Phi[J] * Acf[J];
+      Num := Num - Phi[J] * AcfVals[K-J];
+      Den := Den - Phi[J] * AcfVals[J];
     end;
     PhiKK := IfThen(Abs(Den) > 1E-15, Num / Den, 0);
     Result[K] := PhiKK;
@@ -951,13 +953,13 @@ class function TTimeSeriesKit.LjungBox(const Y: TDoubleArray;
 { Q = N*(N+2) * sum_{k=1}^{MaxLag} r_k^2 / (N-k) }
 var
   N, K: Integer;
-  Acf: TDoubleArray;
+  AcfVals: TDoubleArray;
 begin
-  N   := Length(Y);
-  Acf := ACF(Y, MaxLag);
-  Result := 0;
+  N       := Length(Y);
+  AcfVals := ACF(Y, MaxLag);
+  Result  := 0;
   for K := 1 to MaxLag do
-    Result := Result + Sqr(Acf[K]) / (N - K);
+    Result := Result + Sqr(AcfVals[K]) / (N - K);
   Result := N * (N + 2) * Result;
 end;
 
@@ -970,34 +972,34 @@ class function TTimeSeriesKit.ARFit(const Y: TDoubleArray;
 { Yule-Walker: solve Toeplitz system R*phi = r using ACF }
 var
   N, I, J: Integer;
-  Acf: TDoubleArray;
+  AcfVals: TDoubleArray;
   R: array of TDoubleArray;
   RVec, Phi: TDoubleArray;
-  Mu, ResSum: Double;
+  Mu, ResSum, Sigma2: Double;
 begin
   N := Length(Y);
   if P < 1 then raise ETimeSeriesError.Create('ARFit: P must be >= 1');
   if N <= P then raise ETimeSeriesError.Create('ARFit: series too short for P');
 
-  Mu  := SliceMean(Y, 0, N-1);
-  Acf := ACF(Y, P);
+  Mu      := SliceMean(Y, 0, N-1);
+  AcfVals := ACF(Y, P);
 
-  { Build Toeplitz matrix R[i][j] = Acf[|i-j|] }
+  { Build Toeplitz matrix R[i][j] = AcfVals[|i-j|] }
   SetLength(R, P);
   SetLength(RVec, P);
   for I := 0 to P-1 do
   begin
     SetLength(R[I], P);
-    RVec[I] := Acf[I+1];
-    for J := 0 to P-1 do R[I][J] := Acf[Abs(I-J)];
+    RVec[I] := AcfVals[I+1];
+    for J := 0 to P-1 do R[I][J] := AcfVals[Abs(I-J)];
   end;
 
   SolveLinear(R, RVec, Phi);
 
   { Compute innovation variance: Sigma^2 = Var(Y) * (1 - sum phi_i * r_i) }
-  var Sigma2: Double := SliceVar(Y, 0, N-1);
+  Sigma2 := SliceVar(Y, 0, N-1);
   ResSum := 0;
-  for I := 0 to P-1 do ResSum := ResSum + Phi[I] * Acf[I+1];
+  for I := 0 to P-1 do ResSum := ResSum + Phi[I] * AcfVals[I+1];
   Sigma2 := Sigma2 * (1 - ResSum);
 
   Result.P        := P;
@@ -1042,14 +1044,15 @@ class function TTimeSeriesKit.MAFit(const Y: TDoubleArray;
   theta[1..q] approximated from ACF using the Durbin relations. }
 var
   N, I, J: Integer;
-  Acf: TDoubleArray;
+  AcfVals: TDoubleArray;
   Theta: TDoubleArray;
   V: array of Double;
   ThetaMat: array of TDoubleArray;
+  Sum: Double;
 begin
-  N := Length(Y);
+  N       := Length(Y);
   if Q < 1 then raise ETimeSeriesError.Create('MAFit: Q must be >= 1');
-  Acf := ACF(Y, Q);
+  AcfVals := ACF(Y, Q);
 
   { Innovations algorithm (simplified): theta_{k,k} = acf[k] / v_{k-1} }
   SetLength(Theta, Q);
@@ -1060,7 +1063,7 @@ begin
   V[0] := SliceVar(Y, 0, N-1);
   for I := 1 to Q do
   begin
-    var Sum: Double := Acf[I] * (N-1) / (N-0) * V[0]; { approximate cov }
+    Sum := AcfVals[I] * (N-1) / (N-0) * V[0]; { approximate cov }
     for J := 1 to I-1 do
       Sum := Sum - ThetaMat[I][I-J] * ThetaMat[J][J] * V[I-J];
     ThetaMat[I][I] := Sum / V[I-1];
@@ -1085,7 +1088,7 @@ class function TTimeSeriesKit.ARIMAFit(const Y: TDoubleArray;
 var
   Z: TDoubleArray;
   ARMod, MAMod: TARIMAModel;
-  N, I: Integer;
+  N, I, J: Integer;
   Resid: TDoubleArray;
 begin
   if D < 0 then raise ETimeSeriesError.Create('ARIMAFit: D must be >= 0');
@@ -1110,7 +1113,6 @@ begin
   for I := 0 to N-1 do
   begin
     Resid[I] := Z[I] - ARMod.Mu;
-    var J: Integer;
     for J := 0 to P-1 do
       if I-J-1 >= 0 then
         Resid[I] := Resid[I] - ARMod.ARCoeffs[J] * (Z[I-J-1] - ARMod.Mu);
@@ -1129,7 +1131,8 @@ begin
   Result.Mu       := ARMod.Mu;
   Result.Sigma2   := ARMod.Sigma2;
   Result.ARCoeffs := ARMod.ARCoeffs;
-  Result.MACoeffs := IfThen(Q > 0, MAMod.MACoeffs, TDoubleArray(nil));
+  if Q > 0 then Result.MACoeffs := MAMod.MACoeffs
+  else SetLength(Result.MACoeffs, 0);
 end;
 
 class function TTimeSeriesKit.ARIMAForecast(const Model: TARIMAModel;
@@ -1225,7 +1228,7 @@ end;
 class function TTimeSeriesKit.RollingZScore(const Y: TDoubleArray;
   Window: Integer; Threshold: Double): TIntegerArray;
 var
-  N, I, Lo, Count: Integer;
+  N, I, Lo, Count, J, WN: Integer;
   Mu, StdDev, Sum, SumSq: Double;
 begin
   N := Length(Y);
@@ -1236,9 +1239,8 @@ begin
   begin
     Lo  := Max(0, I - Window + 1);
     Sum := 0; SumSq := 0;
-    var J: Integer;
-    for J := Lo to I-1 do begin Sum := Sum+Y[J]; SumSq := SumSq+Y[J]*Y[J]; end;
-    var WN: Integer := I - Lo;
+    for J := Lo to I do begin Sum := Sum+Y[J]; SumSq := SumSq+Y[J]*Y[J]; end;
+    WN := I - Lo + 1;
     if WN < 2 then Continue;
     Mu     := Sum / WN;
     StdDev := Sqrt(Max(0, SumSq/WN - Sqr(Mu)));
@@ -1260,7 +1262,7 @@ class function TTimeSeriesKit.LinearTrend(const Y: TDoubleArray): TLinearTrend;
 { OLS: Y = a + b*t,  t = 0..N-1 }
 var
   N, I: Integer;
-  SumT, SumY, SumTY, SumT2, TBar, YBar, SST, SSR: Double;
+  SumT, SumY, SumTY, SumT2, TBar, YBar, SST, SSR, Denom: Double;
 begin
   N := Length(Y);
   if N < 2 then raise ETimeSeriesError.Create('LinearTrend: need at least 2 points');
@@ -1274,7 +1276,7 @@ begin
   end;
   TBar := SumT / N;
   YBar := SumY / N;
-  var Denom: Double := SumT2 - N * TBar * TBar;
+  Denom := SumT2 - N * TBar * TBar;
   if Abs(Denom) < 1E-14 then
   begin
     Result.Slope     := 0;
@@ -1291,7 +1293,7 @@ begin
     SST := SST + Sqr(Y[I] - YBar);
     SSR := SSR + Sqr(Y[I] - (Result.Intercept + Result.Slope * I));
   end;
-  Result.RSquared := IfThen(SST > 1E-14, 1 - SSR/SST, 0);
+  if SST > 1E-14 then Result.RSquared := 1 - SSR/SST else Result.RSquared := 0;
 end;
 
 class function TTimeSeriesKit.DetrendLinear(const Y: TDoubleArray): TDoubleArray;
@@ -1326,24 +1328,21 @@ end;
 class function TTimeSeriesKit.Periodogram(const Y: TDoubleArray): TDoubleArray;
 { Power spectrum via FFT: |X[k]|^2 / N, one-sided (0..N/2) }
 var
-  N, NF, I: Integer;
+  N, NF, I, J, K, NPow, Len: Integer;
   Re, Im: TDoubleArray;
+  Angle, WR, WI, Ur, Ui, TR, TI, Tmp: Double;
 begin
   N  := Length(Y);
   NF := N div 2 + 1;
   { Pad to power of 2 }
-  var NPow: Integer := 1;
+  NPow := 1;
   while NPow < N do NPow := NPow shl 1;
   SetLength(Re, NPow);
   SetLength(Im, NPow);
   for I := 0 to N-1 do Re[I] := Y[I];
 
-  { In-place FFT using the same algorithm as EngineeringLib.Signal }
-  var Len: Integer := 1;
-  { Bit-reversal }
-  var J: Integer := 0;
-  var K: Integer;
-  var Tmp: Double;
+  { Bit-reversal permutation }
+  J := 0;
   for I := 1 to NPow-1 do
   begin
     K := NPow shr 1;
@@ -1355,22 +1354,25 @@ begin
       Tmp := Im[I]; Im[I] := Im[J]; Im[J] := Tmp;
     end;
   end;
+  { In-place FFT }
+  Len := 1;
   while Len < NPow do
   begin
-    Len := Len shl 1;
-    var Angle: Double := -2 * Pi / Len;
-    var WR: Double := Cos(Angle); var WI: Double := Sin(Angle);
-    I := 0;
+    Len  := Len shl 1;
+    Angle := -2 * Pi / Len;
+    WR   := Cos(Angle);
+    WI   := Sin(Angle);
+    I    := 0;
     while I < NPow do
     begin
-      var Ur: Double := 1; var Ui: Double := 0;
+      Ur := 1; Ui := 0;
       for J := 0 to Len div 2 - 1 do
       begin
-        K := I + J + Len div 2;
-        var TR: Double := Ur*Re[K] - Ui*Im[K];
-        var TI: Double := Ur*Im[K] + Ui*Re[K];
-        Re[K] := Re[I+J] - TR;  Im[K] := Im[I+J] - TI;
-        Re[I+J] := Re[I+J]+TR;  Im[I+J] := Im[I+J]+TI;
+        K      := I + J + Len div 2;
+        TR     := Ur*Re[K] - Ui*Im[K];
+        TI     := Ur*Im[K] + Ui*Re[K];
+        Re[K]  := Re[I+J] - TR;  Im[K]  := Im[I+J] - TI;
+        Re[I+J] := Re[I+J] + TR; Im[I+J] := Im[I+J] + TI;
         Tmp := Ur*WR - Ui*WI; Ui := Ur*WI + Ui*WR; Ur := Tmp;
       end;
       Inc(I, Len);

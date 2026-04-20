@@ -52,7 +52,8 @@ interface
 
 uses
   Classes, SysUtils, Math,
-  MathBase.SharedTypes;
+  MathBase.SharedTypes,
+  MathBase.Precision;
 
 type
   { Raised for invalid combinatorial inputs or overflow }
@@ -224,7 +225,7 @@ type
 
     { Sieve of Eratosthenes: returns all primes <= Limit as an Int64 array.
       Limit must be >= 2.  Memory: ~Limit/8 bytes. }
-    class function Sieve(Limit: Int64): array of Int64; static;
+    class function Sieve(Limit: Int64): TPascalRow; static;
 
     { Euler's totient φ(n) — count of integers in [1,n] coprime to n.
       φ(1)=1; φ prime p = p-1; φ(p^k) = p^(k-1)*(p-1). }
@@ -300,21 +301,14 @@ begin
     Inc(R);
   end;
 
-  X := 1;
   { Compute A^D mod N }
+  X := 1;
   Y := A mod N;
-  D := D;
+  while D > 0 do
   begin
-    var TmpD := D;
-    var TmpX := Int64(1);
-    var TmpY := Y;
-    while TmpD > 0 do
-    begin
-      if Odd(TmpD) then TmpX := MulMod(TmpX, TmpY, N);
-      TmpY  := MulMod(TmpY, TmpY, N);
-      TmpD  := TmpD shr 1;
-    end;
-    X := TmpX;
+    if Odd(D) then X := MulMod(X, Y, N);
+    Y := MulMod(Y, Y, N);
+    D := D shr 1;
   end;
 
   if (X = 1) or (X = N - 1) then Exit(False);  { probably prime }
@@ -382,24 +376,10 @@ begin
 end;
 
 class function TCombinatoricsKit.LogFactorial(N: Integer): Double;
-{ Uses Stirling's series via GammaLn(N+1) = ln(N!) for large N,
-  exact lookup for small N. }
-var
-  I: Integer;
-  S: Double;
+{ ln(N!) = GammaLn(N+1) via Lanczos approximation — accurate for all N }
 begin
   if N < 0 then raise ECombinatoricsError.Create('LogFactorial: N must be >= 0');
-  if N = 0 then Exit(0);
-  { Direct sum for small N — faster and exact }
-  if N <= 20 then
-  begin
-    S := 0;
-    for I := 2 to N do S := S + Ln(I);
-    Exit(S);
-  end;
-  { Stirling approximation: ln(n!) = n*ln(n) - n + 0.5*ln(2*pi*n) + 1/(12n) - ... }
-  Result := N * Ln(N) - N + 0.5 * Ln(2 * Pi * N)
-            + 1/(12*N) - 1/(360*N*N*N);
+  Result := GammaLn(N + 1);
 end;
 
 class function TCombinatoricsKit.Permutation(N, K: Integer): Int64;
@@ -716,7 +696,7 @@ begin
   if N < 2  then Exit(False);
   if N = 2  then Exit(True);
   if N = 3  then Exit(True);
-  if Even(N) then Exit(False);
+  if not Odd(N) then Exit(False);
   for W in Witnesses do
   begin
     if N = W then Exit(True);
@@ -728,7 +708,10 @@ end;
 class function TCombinatoricsKit.NextPrime(N: Int64): Int64;
 begin
   if N <= 2 then Exit(2);
-  if Even(N) then Inc(N) else Inc(N, 2);
+  { Return N itself if it is already prime }
+  if IsPrime(N) then Exit(N);
+  { Advance to the next odd candidate }
+  if not Odd(N) then Inc(N) else Inc(N, 2);
   while not IsPrime(N) do
     Inc(N, 2);
   Result := N;
@@ -771,7 +754,7 @@ begin
   end;
 end;
 
-class function TCombinatoricsKit.Sieve(Limit: Int64): array of Int64;
+class function TCombinatoricsKit.Sieve(Limit: Int64): TPascalRow;
 { Classic bitset sieve; returns primes as a dynamic array }
 var
   IsComposite: array of Boolean;

@@ -321,6 +321,38 @@ type
 implementation
 
 { ---------------------------------------------------------------------------
+  Unit-level state for PenaltyMethod
+  (needed because FPC cannot pass a nested function as a procedure variable)
+--------------------------------------------------------------------------- }
+type
+  TPenaltyState = record
+    F:        TMultivarFunc;
+    Constrs:  array of TConstraintFunc;
+    NC:       Integer;
+    Mu:       Double;
+  end;
+
+var
+  GPenalty:  TPenaltyState;
+  GMaximizeF: TMultivarFunc;
+
+function PenaltyObjective(const X: TDoubleArray): Double;
+var J: Integer; Viol: Double;
+begin
+  Result := GPenalty.F(X);
+  for J := 0 to GPenalty.NC - 1 do
+  begin
+    Viol := GPenalty.Constrs[J](X);
+    if Viol > 0 then Result := Result + GPenalty.Mu * Viol * Viol;
+  end;
+end;
+
+function NegObjective(const X: TDoubleArray): Double;
+begin
+  Result := -GMaximizeF(X);
+end;
+
+{ ---------------------------------------------------------------------------
   Private helpers
 --------------------------------------------------------------------------- }
 
@@ -873,7 +905,9 @@ var
   { Simple linear congruential generator for reproducibility }
   function LCG: Double;
   begin
+    {$Q-}{$R-}
     RandState := RandState * 1664525 + 1013904223;
+    {$Q+}{$R+}
     Result    := (RandState and $7FFFFFFF) / $7FFFFFFF;
   end;
 
@@ -938,35 +972,22 @@ class function TOptimizationKit.PenaltyMethod(F: TMultivarFunc;
 { Progressive penalty: solve a sequence of unconstrained problems with
   increasing Mu until the constraint violation is small }
 var
-  Round, NC, I: Integer;
+  Round, I: Integer;
   XCur: TDoubleArray;
   Mu_k: Double;
-  NC_: Integer;
-  Constrs: array of TConstraintFunc;
-
-  { Build penalised objective for current Mu }
-  function MakePenalised(const X_: TDoubleArray): Double;
-  var J: Integer; Viol: Double;
-  begin
-    Result := F(X_);
-    for J := 0 to High(Constrs) do
-    begin
-      Viol := Constrs[J](X_);
-      if Viol > 0 then Result := Result + Mu_k * Viol * Viol;
-    end;
-  end;
-
 begin
-  NC   := Length(Constraints);
-  SetLength(Constrs, NC);
-  for I := 0 to NC-1 do Constrs[I] := Constraints[I];
+  GPenalty.F  := F;
+  GPenalty.NC := Length(Constraints);
+  SetLength(GPenalty.Constrs, GPenalty.NC);
+  for I := 0 to GPenalty.NC - 1 do GPenalty.Constrs[I] := Constraints[I];
 
   XCur := VecCopy(X0);
   Mu_k := Mu;
 
   for Round := 1 to 10 do  { outer penalty loop }
   begin
-    Result := NelderMead(@MakePenalised, XCur, 1.0, Tol / Mu_k, MaxIter);
+    GPenalty.Mu := Mu_k;
+    Result := NelderMead(@PenaltyObjective, XCur, 1.0, Tol / Mu_k, MaxIter);
     XCur   := Result.X;
     Mu_k   := Mu_k * 10;   { increase penalty each round }
   end;
@@ -1024,8 +1045,8 @@ begin
     end;
   end;
 
-  { Objective row: [-C | 0 | 0] (we minimise, so negate for tableau max form) }
-  for J := 0 to N-1 do Tab[M][J] := -C[J];
+  { Objective row: [C | 0 | 0] — minimisation: enter when reduced cost < 0 }
+  for J := 0 to N-1 do Tab[M][J] := C[J];
 
   { Initial basis: slack variables N, N+1, ..., N+M-1 }
   SetLength(Basis, M);
@@ -1091,12 +1112,11 @@ end;
 
 class function TOptimizationKit.Maximize(F: TMultivarFunc;
   const X0: TDoubleArray; Scale, Tol: Double; MaxIter: Integer): TOptResult;
-{ Minimise -F }
-  function NegF(const X: TDoubleArray): Double;
-  begin Result := -F(X); end;
+{ Minimise -F via unit-level NegObjective to avoid nested-function pointer issue }
 begin
-  Result      := NelderMead(@NegF, X0, Scale, Tol, MaxIter);
-  Result.FVal := -Result.FVal;  { convert back to original scale }
+  GMaximizeF  := F;
+  Result      := NelderMead(@NegObjective, X0, Scale, Tol, MaxIter);
+  Result.FVal := -Result.FVal;
 end;
 
 end.

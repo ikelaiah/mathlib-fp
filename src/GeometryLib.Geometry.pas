@@ -829,7 +829,7 @@ end;
 
 class function TGeometryKit.ConvexHull(const Points: TPolygon2D): TPolygon2D;
 var
-  N, I, K: Integer;
+  N, I, K, T: Integer;
   Sorted: TPolygon2D;
   Stack: TPolygon2D;
 
@@ -843,7 +843,7 @@ var
   end;
 
   procedure SortPoints;
-  var J: Integer; Tmp: TPoint2D;
+  var I, J: Integer; Tmp: TPoint2D;
   begin
     { Insertion sort for correctness; input sizes are usually small }
     for I := 1 to N - 1 do
@@ -872,7 +872,7 @@ begin
   end;
   { Upper hull }
   I := N - 2;
-  var T := K + 1;
+  T := K + 1;
   while I >= 0 do
   begin
     while (K >= T) and (Cross2D(Stack[K-2], Stack[K-1], Sorted[I]) <= 0) do Dec(K);

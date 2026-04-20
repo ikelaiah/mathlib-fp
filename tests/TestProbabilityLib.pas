@@ -788,8 +788,8 @@ end;
 procedure TTestProbabilityLib.Test73_Hypergeometric_PMF;
 begin
   { N=20, K=7 successes, n=5 drawn: P(X=2) via formula
-    = C(7,2)*C(13,3)/C(20,5) = 21*286/15504 ≈ 0.387512 }
-  AssertNear(0.387512, TProbabilityKit.HypergeometricPMF(2, 20, 7, 5), EPS2,
+    = C(7,2)*C(13,3)/C(20,5) = 21*286/15504 ≈ 0.38738 }
+  AssertNear(0.38738, TProbabilityKit.HypergeometricPMF(2, 20, 7, 5), EPS2,
     'Hypergeometric PMF');
 end;
 

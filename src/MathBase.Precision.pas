@@ -69,49 +69,63 @@ begin
   Result := Exp(GammaLn(Z) + GammaLn(W) - GammaLn(Z + W));
 end;
 
-function BetaInc(const A, B, X: Double): Double;
+{ Evaluate the continued fraction for the incomplete beta via Lentz's method.
+  Returns the CF value; caller handles the x^a*(1-x)^b/B(a,b) prefactor. }
+function BetaCF(const A, B, X: Double): Double;
 const
-  MaxIter = 100;
-  Epsilon = 3.0e-7;
+  MaxIter = 200;
+  Eps     = 3.0e-7;
+  FPMin   = 1.0e-300;
 var
-  Qab, Qap, Qam, Am, Bm, Bz, Em, Tem, D, Ap, Bp, App, Bpp: Double;
-  M: Integer;
+  Qab, Qam, Qap, C, D, H, AA, Del: Double;
+  M, M2: Integer;
 begin
-  if X = 0 then Exit(0);
-  if X = 1 then Exit(1);
-
   Qab := A + B;
   Qap := A + 1.0;
   Qam := A - 1.0;
-  Am  := 1.0;
-  Bm  := 1.0;
-  Bz  := 1.0 - Qab * X / Qap;
-
+  C   := 1.0;
+  D   := 1.0 - Qab * X / Qap;
+  if Abs(D) < FPMin then D := FPMin;
+  D   := 1.0 / D;
+  H   := D;
   for M := 1 to MaxIter do
   begin
-    Em  := M;
-    Tem := Em + Em;
-    D   := Em * (B - Em) * X / ((Qam + Tem) * (A + Tem));
-    Ap  := Bz + D * Am;
-    Bp  := 1.0 + D * Bm;
-
-    if (Abs(Ap - 1.0) < Epsilon) and (Abs(Bp - 1.0) < Epsilon) then
-      Break;
-
-    Am := Ap;
-    Bm := Bp;
-
-    D   := -(A + Em) * (Qab + Em) * X / ((A + Tem) * (Qap + Tem));
-    App := Am + D * Bz;
-    Bpp := Bp + D * Am;
-
-    if (Abs(App - 1.0) < Epsilon) and (Abs(Bpp - 1.0) < Epsilon) then
-      Break;
-
-    Bz := App / Bpp;
+    M2 := 2 * M;
+    { Even step }
+    AA := M * (B - M) * X / ((Qam + M2) * (A + M2));
+    D  := 1.0 + AA * D;
+    if Abs(D) < FPMin then D := FPMin;
+    C  := 1.0 + AA / C;
+    if Abs(C) < FPMin then C := FPMin;
+    D  := 1.0 / D;
+    H  := H * D * C;
+    { Odd step }
+    AA := -(A + M) * (Qab + M) * X / ((A + M2) * (Qap + M2));
+    D  := 1.0 + AA * D;
+    if Abs(D) < FPMin then D := FPMin;
+    C  := 1.0 + AA / C;
+    if Abs(C) < FPMin then C := FPMin;
+    D  := 1.0 / D;
+    Del := D * C;
+    H   := H * Del;
+    if Abs(Del - 1.0) < Eps then Break;
   end;
+  Result := H;
+end;
 
-  Result := Bz;
+function BetaInc(const A, B, X: Double): Double;
+var
+  Bt: Double;
+begin
+  if X <= 0 then Exit(0);
+  if X >= 1 then Exit(1);
+  Bt := Exp(GammaLn(A + B) - GammaLn(A) - GammaLn(B)
+            + A * Ln(X) + B * Ln(1.0 - X));
+  { Use symmetry relation when x > (a+1)/(a+b+2) for better convergence }
+  if X < (A + 1.0) / (A + B + 2.0) then
+    Result := Bt * BetaCF(A, B, X) / A
+  else
+    Result := 1.0 - Bt * BetaCF(B, A, 1.0 - X) / B;
 end;
 
 function Erf(const X: Double): Double;

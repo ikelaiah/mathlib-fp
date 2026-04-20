@@ -59,6 +59,21 @@ function DoubleWell(const X: TDoubleArray): Double;
 { Negative concave paraboloid: -((x-1)^2+(y-2)^2-5)  — max at (1,2) }
 function ConcaveParaboloid(const X: TDoubleArray): Double;
 
+{ f([x]) = (x-5)^2 — 1-D NelderMead test, min at x=5 }
+function F1D(const X: TDoubleArray): Double;
+
+{ Penalty test: (x-5)^2 + (y-5)^2 — unconstrained min at (5,5) }
+function ObjFn(const X: TDoubleArray): Double;
+
+{ Penalty constraint: x+y <= 6 (written as x+y-6 <= 0) }
+function Constraint1(const X: TDoubleArray): Double;
+
+{ Penalty test 2: x^2 + y^2 }
+function ObjSimple(const X: TDoubleArray): Double;
+
+{ Penalty constraint 2: x[0] <= 1 }
+function ConstrX1(const X: TDoubleArray): Double;
+
 type
   TTestOptimizationLib = class(TTestCase)
   private
@@ -189,6 +204,21 @@ begin Result := Sqr(X[0]*X[0] - 1); end;
 function ConcaveParaboloid(const X: TDoubleArray): Double;
 begin Result := -(Sqr(X[0]-1) + Sqr(X[1]-2) - 5); end;
 
+function F1D(const X: TDoubleArray): Double;
+begin Result := Sqr(X[0] - 5); end;
+
+function ObjFn(const X: TDoubleArray): Double;
+begin Result := Sqr(X[0]-5) + Sqr(X[1]-5); end;
+
+function Constraint1(const X: TDoubleArray): Double;
+begin Result := X[0] + X[1] - 6; end;
+
+function ObjSimple(const X: TDoubleArray): Double;
+begin Result := Sqr(X[0]) + Sqr(X[1]); end;
+
+function ConstrX1(const X: TDoubleArray): Double;
+begin Result := X[0] - 1; end;
+
 { ---------------------------------------------------------------------------
   Test class helpers
 --------------------------------------------------------------------------- }
@@ -208,16 +238,16 @@ procedure TTestOptimizationLib.DoBrentMin_BadBracket;
 begin TOptimizationKit.BrentMinimize(@Parabola1D, 5, 1); end;
 
 procedure TTestOptimizationLib.DoGradDesc_EmptyX0;
-begin TOptimizationKit.GradientDescent(@QuadraticBowl, nil, TDoubleArray.Create()); end;
+var E: TDoubleArray; begin SetLength(E, 0); TOptimizationKit.GradientDescent(@QuadraticBowl, nil, E); end;
 
 procedure TTestOptimizationLib.DoNelderMead_EmptyX0;
-begin TOptimizationKit.NelderMead(@QuadraticBowl, TDoubleArray.Create()); end;
+var E: TDoubleArray; begin SetLength(E, 0); TOptimizationKit.NelderMead(@QuadraticBowl, E); end;
 
 procedure TTestOptimizationLib.DoSA_EmptyX0;
-begin TOptimizationKit.SimulatedAnnealing(@QuadraticBowl, TDoubleArray.Create()); end;
+var E: TDoubleArray; begin SetLength(E, 0); TOptimizationKit.SimulatedAnnealing(@QuadraticBowl, E); end;
 
 procedure TTestOptimizationLib.DoSimplexLP_NoConstraints;
-begin TOptimizationKit.SimplexLP(TDoubleArray.Create(1), [], TDoubleArray.Create()); end;
+var E: TDoubleArray; begin SetLength(E, 0); TOptimizationKit.SimplexLP(TDoubleArray.Create(1), [], E); end;
 
 { ===========================================================================
   GOLDEN SECTION
@@ -231,11 +261,11 @@ begin
 end;
 
 procedure TTestOptimizationLib.Test02_GoldenSection_Quartic;
-{ (x-2)^4 + (x-2) minimum at x = 2 - (1/4)^(1/3) ≈ 1.2063 }
+{ (x-2)^4 + (x-2) minimum at x = 2 - (1/4)^(1/3) ≈ 1.3700 }
 var XMin: Double;
 begin
   XMin := TOptimizationKit.GoldenSection(@Quartic1D, 0, 4);
-  AssertNear(1.2063, XMin, EPS_MED, 'GoldenSection quartic min');
+  AssertNear(1.3700, XMin, EPS_MED, 'GoldenSection quartic min');
 end;
 
 procedure TTestOptimizationLib.Test03_GoldenSection_BadBracket_Raises;
@@ -259,7 +289,7 @@ procedure TTestOptimizationLib.Test05_BrentMin_Quartic;
 var XMin: Double;
 begin
   XMin := TOptimizationKit.BrentMinimize(@Quartic1D, 0, 4);
-  AssertNear(1.2063, XMin, EPS_MED, 'BrentMin quartic');
+  AssertNear(1.3700, XMin, EPS_MED, 'BrentMin quartic');
 end;
 
 procedure TTestOptimizationLib.Test06_BrentMin_BadBracket_Raises;
@@ -401,8 +431,6 @@ end;
 procedure TTestOptimizationLib.Test20_NelderMead_1D;
 { Degenerate 1-D case: f([x]) = (x-5)^2 }
 var R: TOptResult;
-  function F1D(const X: TDoubleArray): Double;
-  begin Result := Sqr(X[0] - 5); end;
 begin
   R := TOptimizationKit.NelderMead(@F1D, TDoubleArray.Create(0));
   AssertNear(5.0, R.X[0], EPS_MED, 'NelderMead 1D');
@@ -457,10 +485,6 @@ end;
 procedure TTestOptimizationLib.Test25_Penalty_LinearConstraint;
 { minimise (x-5)^2 + (y-5)^2  subject to x+y <= 6
   Unconstrained min = (5,5), constrained min = (3,3), fval = 8 }
-  function ObjFn(const X: TDoubleArray): Double;
-  begin Result := Sqr(X[0]-5) + Sqr(X[1]-5); end;
-  function Constraint1(const X: TDoubleArray): Double;
-  begin Result := X[0] + X[1] - 6; end;  { g(x) <= 0 }
 var R: TOptResult;
 begin
   R := TOptimizationKit.PenaltyMethod(@ObjFn,
@@ -473,10 +497,6 @@ end;
 
 procedure TTestOptimizationLib.Test26_Penalty_FeasibleStart;
 { Feasible starting point should still converge }
-  function ObjSimple(const X: TDoubleArray): Double;
-  begin Result := Sqr(X[0]) + Sqr(X[1]); end;
-  function ConstrX1(const X: TDoubleArray): Double;
-  begin Result := X[0] - 1; end;  { x[0] <= 1 }
 var R: TOptResult;
 begin
   R := TOptimizationKit.PenaltyMethod(@ObjSimple,
