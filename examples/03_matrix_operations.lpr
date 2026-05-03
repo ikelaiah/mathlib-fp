@@ -69,7 +69,7 @@ begin
   WriteLn(Format('  Determinant : %.4f',  [A.Determinant]));
   WriteLn(Format('  Trace       : %.4f',  [A.Trace]));
   WriteLn(Format('  Rank        : %d',    [A.Rank]));
-  WriteLn(Format('  Frobenius   : %.4f',  [A.FrobeniusNorm]));
+  WriteLn(Format('  Frobenius   : %.4f',  [A.NormFrobenius]));
   WriteLn(Format('  Symmetric?  : %s',    [BoolToStr(A.IsSymmetric, True)]));
   WriteLn;
 
@@ -88,13 +88,13 @@ begin
 
   // ── 5. LU decomposition ───────────────────────────────────────────────
   // A = P^{-1} * L * U  (P stored as permutation indices)
-  LU := A.LUDecompose;
+  LU := A.LU;
   WriteLn('=== LU Decomposition of A ===');
   WriteLn(LU.ToString);
 
   // ── 6. QR decomposition ───────────────────────────────────────────────
   // A = Q * R  (Q orthogonal, R upper triangular)
-  QR := A.QRDecompose;
+  QR := A.QR;
   WriteLn('=== QR Decomposition of A ===');
   WriteLn(QR.ToString);
 

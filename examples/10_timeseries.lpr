@@ -195,7 +195,9 @@ end;
   SECTION 5 — ACF & PACF (model order selection)
 ============================================================ }
 procedure DemoACF_PACF;
-var Y, Acf, Pacf: TDoubleArray;
+var
+  Y, Acf, Pacf: TDoubleArray;
+  I: Integer;
 begin
   WriteLn;
   WriteLn('=== ACF & PACF (CHOOSING AR/MA ORDER) ===');
@@ -208,7 +210,7 @@ begin
 
   WriteLn('  ACF lags 0-5:');
   Write('    [');
-  for var I := 0 to 5 do
+  for I := 0 to 5 do
   begin
     if I > 0 then Write(', ');
     Write(Format('%.3f', [Acf[I]]));
@@ -217,7 +219,7 @@ begin
 
   WriteLn('  PACF lags 0-5:');
   Write('    [');
-  for var I := 0 to 5 do
+  for I := 0 to 5 do
   begin
     if I > 0 then Write(', ');
     Write(Format('%.3f', [Pacf[I]]));

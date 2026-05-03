@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Free Pascal
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fp-compiler fp-units-fcl
+
+      - name: Build and run tests
+        run: |
+          cd tests
+          mkdir -p lib/ci
+          fpc -Fu../src -FUlib/ci TestRunner.lpr
+          if ! ./TestRunner -a --format=plain > test-output.txt; then
+            cat test-output.txt
+            exit 1
+          fi
+          tail -n 20 test-output.txt
+
+      - name: Build examples
+        run: |
+          cd examples
+          mkdir -p lib/ci
+          for file in *.lpr; do
+            fpc -Fu../src -FUlib/ci "$file"
+          done

@@ -20,10 +20,10 @@
         <CustomOptions Value="-FcUTF8"/>
       </Other>
     </CompilerOptions>
-    <Description Value="A focused monorepo of Free Pascal math libraries for scientific and engineering computing: MathBase, AlgebraLib, FinanceLib, EngineeringLib, StatsLib."/>
+    <Description Value="A focused monorepo of Free Pascal math libraries for scientific and engineering computing: MathBase, AlgebraLib, FinanceLib, StatsLib, EngineeringLib, NumericsLib, ProbabilityLib, CombinatoricsLib, OptimizationLib, TimeSeriesLib, MLLib, and GeometryLib."/>
     <License Value="MIT License
 
-Copyright (c) 2026 ikelaiah
+Copyright (c) 2025-2026 ikelaiah
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -99,6 +99,34 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
       <Item>
         <Filename Value="..\..\src\StatsLib.Stats.pas"/>
         <UnitName Value="StatsLib.Stats"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\ProbabilityLib.Distributions.pas"/>
+        <UnitName Value="ProbabilityLib.Distributions"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\CombinatoricsLib.Combinatorics.pas"/>
+        <UnitName Value="CombinatoricsLib.Combinatorics"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\NumericsLib.Numerics.pas"/>
+        <UnitName Value="NumericsLib.Numerics"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\OptimizationLib.Optimization.pas"/>
+        <UnitName Value="OptimizationLib.Optimization"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\TimeSeriesLib.TimeSeries.pas"/>
+        <UnitName Value="TimeSeriesLib.TimeSeries"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\MLLib.MachineLearning.pas"/>
+        <UnitName Value="MLLib.MachineLearning"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GeometryLib.Geometry.pas"/>
+        <UnitName Value="GeometryLib.Geometry"/>
       </Item>
       <Item>
         <Filename Value="pascal_mathlibs.pas"/>

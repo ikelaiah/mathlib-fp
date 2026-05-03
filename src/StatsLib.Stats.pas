@@ -1,7 +1,7 @@
 unit StatsLib.Stats;
 
 {-----------------------------------------------------------------------------
- TidyKit.Math.Stats
+ StatsLib.Stats
 
  A library for statistical analysis in Free Pascal
  
@@ -19,7 +19,7 @@ unit StatsLib.Stats;
  
  Design principles:
  - Static class methods for easy access to functions
- - Uses TDoubleArray from TidyKit.Math for data input
+ - Uses TDoubleArray from MathBase.SharedTypes for data input
  - Provides TDescriptiveStats record for comprehensive summary output
  - Includes basic error handling for invalid inputs (e.g., empty arrays)
  - StdDev calculates sample standard deviation (using n-1 denominator), not population standard deviation
@@ -997,7 +997,7 @@ type
 
       @references https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test
 
-      @warning Raises EStatsError if either group has less than 2 values, if pooled variance is non-positive, or if standard error is zero. Assumes equal variances (use Welch's t-test if variances are unequal - not implemented here). Assumes normality. P-value is calculated using TidyKit.Math.StudentT.
+      @warning Raises EStatsError if either group has less than 2 values, if pooled variance is non-positive, or if standard error is zero. Assumes equal variances (use Welch's t-test if variances are unequal - not implemented here). Assumes normality. P-value is calculated using MathBase.Precision.StudentT.
 
       @example
       var

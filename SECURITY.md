@@ -13,7 +13,7 @@ a security vulnerability, please report it to us as described below.
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email or create a private security advisory in the repository.
+Instead, use GitHub private vulnerability reporting or create a private security advisory in the repository. If private reporting is unavailable, open a minimal public issue asking for maintainer contact and do not include vulnerability details.
 
 You should receive a response within 48 hours. If for some reason you do not, please follow up to ensure we received your original message.
 
@@ -29,4 +29,4 @@ Please include the following information:
 
 ## Preferred Languages
 
-We prefer all communications to be in English. 
+We prefer all communications to be in English.

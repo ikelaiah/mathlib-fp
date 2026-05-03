@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Actions CI workflow that installs Free Pascal, builds the test runner,
+  runs the full suite, and compiles every example program.
+
+### Changed
+
+- Updated `README.md` and `docs/index.md` to document all current libraries:
+  MathBase, AlgebraLib, FinanceLib, StatsLib, EngineeringLib, NumericsLib,
+  ProbabilityLib, CombinatoricsLib, OptimizationLib, TimeSeriesLib, MLLib,
+  and GeometryLib.
+- Updated the Lazarus package metadata and package unit so it includes every
+  public unit in `src/`.
+- Updated testing instructions and badges to reflect the current 709-test suite.
+- `AlgebraLib.Matrices` now raises `EMatrixError` when eigendecomposition does
+  not converge instead of writing a warning to stdout.
+- Refreshed stale source comments and documentation references from the old
+  TidyKit module names to the current library names.
+
+### Fixed
+
+- Fixed all example programs so they compile against the current APIs and FPC
+  3.2.2 syntax.
+- Fixed stale AlgebraLib documentation for `CreateFromArray`, `Zeros`, `LU`,
+  and `QR`.
+- Updated security/contribution docs to remove unclear placeholder reporting and
+  contributor-recognition text.
+
+### Removed
+
+- Removed tracked local Claude workspace settings and added `.claude/` to
+  `.gitignore`.
+
 ---
 
 ## [1.1.0] - 2026-04-16

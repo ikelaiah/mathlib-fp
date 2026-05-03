@@ -2,15 +2,18 @@
 
 [![FPC](https://img.shields.io/badge/Free%20Pascal-3.2.2-blue.svg)](https://www.freepascal.org/)
 [![Lazarus](https://img.shields.io/badge/Lazarus-3.6+-blue.svg)](https://www.lazarus-ide.org/)
+[![CI](https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg)](https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
-[![Tests](https://img.shields.io/badge/Tests-364%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-709%20passing-brightgreen.svg)](tests/)
 ![Status](https://img.shields.io/badge/Status-Development-yellow.svg)
 
-A monorepo of focused Free Pascal math libraries for scientific and engineering computing. No external dependencies.
+A focused Free Pascal math library collection for scientific, engineering,
+statistical, financial, optimization, time-series, machine-learning, and
+geometry work. The source has no third-party runtime dependencies.
 
 > [!NOTE]
-> This project was previously part of [tidykit-fp](https://github.com/ikelaiah/tidykit-fp). The math modules were separated into this standalone monorepo on 2026-04-14.
-> This library is under active development and APIs may change without notice.
+> This project was previously part of [tidykit-fp](https://github.com/ikelaiah/tidykit-fp). The math modules were separated into this standalone repository on 2026-04-14.
+> This library is under active development and APIs may change before the next stable release.
 
 ---
 
@@ -18,12 +21,18 @@ A monorepo of focused Free Pascal math libraries for scientific and engineering 
 
 | Library | Description | Main Class |
 | ------- | ----------- | ---------- |
-| [MathBase](docs/MathBase.md) | Shared types, constants, special functions, and trigonometry | `TTrigKit` |
+| [MathBase](docs/MathBase.md) | Shared types, constants, precision helpers, and trigonometry | `TTrigKit` |
 | [AlgebraLib](docs/AlgebraLib.md) | Dense matrix operations, decompositions, and linear solvers | `TMatrixKit` / `IMatrix` |
-| [FinanceLib](docs/FinanceLib.md) | Time value of money, bonds, NPV/IRR, option pricing, ratio analysis | `TFinanceKit` |
+| [FinanceLib](docs/FinanceLib.md) | Time value of money, bonds, NPV/IRR, option pricing, ratios, risk metrics | `TFinanceKit` |
 | [StatsLib](docs/StatsLib.md) | Descriptive stats, hypothesis tests, correlation, bootstrap, non-parametric tests | `TStatsKit` |
-| [EngineeringLib](docs/EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing (FFT, FIR), unit conversion | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit` |
+| [EngineeringLib](docs/EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing, unit conversion | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit` |
 | [NumericsLib](docs/NumericsLib.md) | Root finding, numerical integration, ODE solvers, interpolation | `TNumericsKit` |
+| [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete probability distributions | `TProbabilityKit` |
+| [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations, combinations | `TCombinatoricsKit` |
+| [OptimizationLib](docs/OptimizationLib.md) | Univariate, multivariate, constrained, and linear optimization | `TOptimizationKit` |
+| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ACF/PACF, ARIMA, anomaly detection | `TTimeSeriesKit` |
+| [MLLib](docs/MLLib.md) | Preprocessing, regression, classifiers, clustering, PCA, metrics | `TMLKit` |
+| [GeometryLib](docs/GeometryLib.md) | 2-D and 3-D computational geometry | `TGeometryKit` |
 
 ---
 
@@ -31,155 +40,126 @@ A monorepo of focused Free Pascal math libraries for scientific and engineering 
 
 ```text
 mathlib-fp/
-│
-├── README.md
-├── CHANGELOG.md
-├── LICENSE.md
-│
-├── src/                          ← all library units (add this single folder to -Fu)
-│   ├── MathBase.MathConstants.pas
-│   ├── MathBase.SharedTypes.pas
-│   ├── MathBase.Precision.pas
-│   ├── MathBase.Trigonometry.pas
-│   ├── AlgebraLib.Matrices.pas
-│   ├── AlgebraLib.Vectors.pas
-│   ├── AlgebraLib.Determinants.pas
-│   ├── FinanceLib.Interest.pas
-│   ├── FinanceLib.Bonds.pas
-│   ├── FinanceLib.NPV.pas
-│   ├── StatsLib.Stats.pas
-│   ├── EngineeringLib.FluidDynamics.pas
-│   ├── EngineeringLib.Thermodynamics.pas
-│   ├── EngineeringLib.Signal.pas
-│   ├── EngineeringLib.UnitConversion.pas
-│   ├── EngineeringLib.Velocity.pas
-│   ├── EngineeringLib.Pressure.pas
-│   └── NumericsLib.Numerics.pas
-│
-├── docs/                         ← per-library reference documentation
-│   ├── index.md
-│   ├── MathBase.md
-│   ├── AlgebraLib.md
-│   ├── FinanceLib.md
-│   ├── StatsLib.md
-│   ├── EngineeringLib.md
-│   └── NumericsLib.md
-│
-├── examples/                     ← runnable example programs
-│
-└── tests/
-    ├── TestRunner.lpr
-    ├── TestMathBase.pas
-    ├── TestAlgebraLib.pas
-    ├── TestFinanceLib.pas
-    ├── TestStatsLib.pas
-    ├── TestEngineeringLib.pas
-    ├── TestEngineeringLib_FluidDynamics.pas
-    ├── TestEngineeringLib_Signal.pas
-    ├── TestEngineeringLib_Thermodynamics.pas
-    ├── TestEngineeringLib_UnitConversion.pas
-    └── TestNumericsLib.pas
+├── src/                    # all library units; add this folder to -Fu
+├── docs/                   # per-library reference documentation
+├── examples/               # runnable example programs
+├── packages/lazarus/       # Lazarus package metadata
+└── tests/                  # FPCUnit test runner and suites
 ```
+
+All public units live in `src/`. Add that one folder to your compiler unit
+search path and include only the units your program uses.
 
 ---
 
-## Getting Started in 5 Minutes
+## Getting Started
 
-### Step 1 — Clone
+### Clone
 
 ```bash
 git clone https://github.com/ikelaiah/mathlib-fp
 cd mathlib-fp
 ```
 
-### Step 2 — Add the source path to your project
-
-All units live in the `src/` folder. You only ever need to add one path.
+### Add the Source Path
 
 #### Lazarus IDE
 
-> Project → Project Options → Compiler Options → Paths → Other Unit Files (`-Fu`)
+Open `Project -> Project Options -> Compiler Options -> Paths -> Other Unit Files`
+and add:
 
 ```text
 ../src
 ```
 
-#### FPC command line
+You can also open/install the Lazarus package at
+`packages/lazarus/pascal_mathlibs.lpk`.
+
+#### FPC Command Line
+
+Use `-Fu` for the library sources and `-FU` for compiler output:
 
 ```bash
-fpc -Fu../src my_program.lpr
+mkdir -p lib
+fpc -Fu../src -FUlib my_program.lpr
 ```
 
-### Step 3 — Use `{$mode objfpc}` in every source file
+### Source Mode
 
-All units in this project are compiled in `objfpc` mode. Your program file must declare the same mode:
+All units use `objfpc` mode. Put this before the `program` or `unit` keyword:
 
 ```pascal
-{$mode objfpc}{$H+}   // put this at the very top, before the program/unit keyword
+{$mode objfpc}{$H+}
 ```
 
-`{$H+}` enables long (AnsiString) strings, which is the standard FP default in Lazarus.
+---
 
-### Step 4 — Run an example
+## Examples
 
-The [examples/](examples/) folder contains ready-to-compile programs that cover every library:
+The [examples/](examples/) folder contains one walkthrough per library area:
 
 | File | What it shows |
 |------|---------------|
 | [examples/01_stats_basics.lpr](examples/01_stats_basics.lpr) | Descriptive stats, percentiles, correlation, bootstrap CI |
-| [examples/02_hypothesis_test.lpr](examples/02_hypothesis_test.lpr) | t-test, Mann-Whitney U, Wilcoxon, effect size |
+| [examples/02_hypothesis_test.lpr](examples/02_hypothesis_test.lpr) | t-test, Mann-Whitney U, Wilcoxon signed-rank, effect size |
 | [examples/03_matrix_operations.lpr](examples/03_matrix_operations.lpr) | Matrix arithmetic, inverse, LU/QR decomposition |
 | [examples/04_finance_npv_irr.lpr](examples/04_finance_npv_irr.lpr) | PV/FV, NPV/IRR, loan payment, amortization schedule |
 | [examples/05_unit_conversion.lpr](examples/05_unit_conversion.lpr) | Length, mass, temperature, velocity, pressure, energy |
 | [examples/06_fluid_dynamics.lpr](examples/06_fluid_dynamics.lpr) | Reynolds number, Bernoulli, head loss, aerodynamics |
+| [examples/07_probability.lpr](examples/07_probability.lpr) | Probability distributions, CDFs, survival functions |
+| [examples/08_combinatorics.lpr](examples/08_combinatorics.lpr) | Factorials, combinations, primes, permutations |
+| [examples/09_optimization.lpr](examples/09_optimization.lpr) | Scalar, vector, constrained, and linear optimization |
+| [examples/10_timeseries.lpr](examples/10_timeseries.lpr) | Smoothing, decomposition, ARIMA, anomaly detection |
+| [examples/11_machinelearning.lpr](examples/11_machinelearning.lpr) | Preprocessing, regression, classifiers, clustering, PCA |
+| [examples/12_geometry.lpr](examples/12_geometry.lpr) | 2-D/3-D geometry, intersections, polygons, convex hulls |
+
+Compile one example:
 
 ```bash
 cd examples
-fpc -Fu../src 05_unit_conversion.lpr
+mkdir -p lib
+fpc -Fu../src -FUlib 05_unit_conversion.lpr
 ./05_unit_conversion
 ```
+
+On Windows, run the generated `.exe`.
 
 ---
 
 ## Quick Start
 
-Add `src/` to your project's search path (`-Fu../src`), then use the units directly:
-
 ```pascal
 uses
-  MathBase.SharedTypes,            // TDoubleArray, TDoublePair
-  MathBase.MathConstants,          // MathPi, StandardGravity, …
-  MathBase.Precision,              // GammaLn, NormalCDF, …
-  MathBase.Trigonometry,           // TTrigKit
-  AlgebraLib.Matrices,             // TMatrixKit, IMatrix
-  FinanceLib.Interest,             // TFinanceKit
-  StatsLib.Stats,                  // TStatsKit
-  EngineeringLib.FluidDynamics,    // TFluidDynamicsKit
-  EngineeringLib.Thermodynamics,   // TThermodynamicsKit
-  EngineeringLib.UnitConversion,   // TUnitConversionKit
-  EngineeringLib.Signal,           // TSignalKit
-  NumericsLib.Numerics;            // TNumericsKit
+  MathBase.SharedTypes,
+  AlgebraLib.Matrices,
+  FinanceLib.Interest,
+  StatsLib.Stats,
+  EngineeringLib.UnitConversion,
+  NumericsLib.Numerics,
+  ProbabilityLib.Distributions,
+  CombinatoricsLib.Combinatorics,
+  OptimizationLib.Optimization,
+  TimeSeriesLib.TimeSeries,
+  MLLib.MachineLearning,
+  GeometryLib.Geometry;
 ```
 
-Each library is independent (aside from MathBase, which all others depend on). Include only what you need.
-
-### Example — Statistics
+### Statistics
 
 ```pascal
-uses StatsLib.Stats;
+uses MathBase.SharedTypes, StatsLib.Stats;
 
 var
   Data: TDoubleArray;
   Stats: TDescriptiveStats;
 begin
-  Data := TDoubleArray.Create(4.5, 3.0, 5.0, 4.0, 4.8, 3.2, 4.5, 4.9);
+  Data := TDoubleArray.Create(4.5, 3.0, 5.0, 4.0, 4.8);
   Stats := TStatsKit.Describe(Data);
   Writeln(Stats.ToString);
-  Writeln('Pearson r = ', TStatsKit.PearsonCorrelation(Data, Data):0:4);
 end.
 ```
 
-### Example — Matrix Operations
+### Matrix Operations
 
 ```pascal
 uses AlgebraLib.Matrices;
@@ -187,104 +167,19 @@ uses AlgebraLib.Matrices;
 var
   A: IMatrix;
 begin
-  A := TMatrixKit.FromArray([[3,1],[1,3]]);
+  A := TMatrixKit.CreateFromArray([[3.0, 1.0], [1.0, 3.0]]);
   Writeln('Det  = ', A.Determinant:0:4);
   Writeln('Rank = ', A.Rank);
 end.
 ```
 
-### Example — Finance
+### Probability
 
 ```pascal
-uses FinanceLib.Interest;
+uses ProbabilityLib.Distributions;
 
-var
-  CashFlows: TDoubleArray;
 begin
-  CashFlows := TDoubleArray.Create(20000, 25000, 30000, 35000, 40000);
-  Writeln('NPV = ', TFinanceKit.NetPresentValue(100000, CashFlows, 0.10):0:2);
-  Writeln('IRR = ', TFinanceKit.InternalRateOfReturn(100000, CashFlows) * 100:0:2, '%');
-end.
-```
-
-### Example — Engineering
-
-```pascal
-uses EngineeringLib.FluidDynamics, EngineeringLib.UnitConversion;
-
-var
-  Re, SpeedMph: Double;
-begin
-  Re       := TFluidDynamicsKit.ReynoldsNumber(997, 2.0, 0.05, 1.0e-3);
-  SpeedMph := TUnitConversionKit.ConvertVelocity(2.0, vuMeterPerSecond, vuMilePerHour);
-  Writeln('Re = ', Re:0:0, '  (', SpeedMph:0:2, ' mph)');
-end.
-```
-
-### Example — Signal Processing (FFT)
-
-```pascal
-uses EngineeringLib.Signal;
-
-var
-  Signal, Re, Im, Mag, Phase: TDoubleArray;
-  I: Integer;
-begin
-  // Build a simple test signal: 8 samples
-  Signal := TDoubleArray.Create(1, 0, 0, 0, 0, 0, 0, 0);
-
-  // Forward FFT (auto-pads to next power of 2)
-  TSignalKit.CalculateFFT(Signal, Re, Im);
-
-  // Magnitude spectrum
-  TSignalKit.CalculateFFTMagnitudePhase(Signal, Mag, Phase);
-  for I := 0 to High(Mag) do
-    Writeln(Format('|X[%d]| = %.4f', [I, Mag[I]]));
-
-  // Design and apply a low-pass FIR filter (cutoff at 0.2 × Nyquist, order 32)
-  Signal := TDoubleArray.Create(1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  Signal := TSignalKit.ApplyFIRFilter(Signal,
-    TSignalKit.DesignFIRLowPass(0.2, 32));
-end.
-```
-
-### Example — Numerical Methods
-
-```pascal
-uses NumericsLib.Numerics;
-
-function FX(X: Double): Double; begin Result := X*X - 2; end;   // root = sqrt(2)
-function DFX(X: Double): Double; begin Result := 2*X; end;
-
-function DYDT(T, Y: Double): Double; begin Result := Y; end;    // dy/dt = y → y=e^t
-
-var
-  Root, Integral: Double;
-  Sol: TODESolution;
-  XK, YK: TDoubleArray;
-  Spline: TCubicSpline;
-begin
-  // Root finding
-  Root := TNumericsKit.Brent(@FX, 1, 2);
-  Writeln('sqrt(2) ≈ ', Root:0:10);
-
-  // Newton-Raphson
-  Root := TNumericsKit.NewtonRaphson(@FX, @DFX, 1.5);
-  Writeln('sqrt(2) ≈ ', Root:0:10);
-
-  // Numerical integration: ∫₀¹ x² dx = 1/3
-  Integral := TNumericsKit.SimpsonRule(@FX, 0, 1, 1000);
-  Writeln('∫₀¹ x²-2 dx ≈ ', Integral:0:6);
-
-  // ODE: dy/dt = y, y(0)=1  →  y(1) = e
-  Sol := TNumericsKit.RK4Solve(@DYDT, 0, 1, 1, 100);
-  Writeln('e ≈ ', Sol.Y[100]:0:8);
-
-  // Natural cubic spline
-  XK := TDoubleArray.Create(0, 1, 2, 3);
-  YK := TDoubleArray.Create(0, 1, 4, 9);   // y = x²
-  Spline := TNumericsKit.CubicSplineBuild(XK, YK);
-  Writeln('Spline at x=1.5 ≈ ', TNumericsKit.CubicSplineEval(Spline, 1.5):0:4);
+  Writeln('P(Z <= 1.96) = ', TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
 end.
 ```
 
@@ -293,60 +188,54 @@ end.
 ## Dependency Graph
 
 ```text
-MathBase  ←  AlgebraLib
-          ←  FinanceLib
-          ←  StatsLib
-          ←  EngineeringLib
-          ←  NumericsLib
+MathBase
+├── AlgebraLib
+├── FinanceLib
+├── StatsLib
+├── EngineeringLib
+├── NumericsLib
+├── ProbabilityLib
+├── CombinatoricsLib
+├── OptimizationLib
+├── TimeSeriesLib
+├── MLLib
+└── GeometryLib
 ```
 
-All libraries depend on **MathBase**. No library depends on another peer library.
-
----
-
-## Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/ikelaiah/mathlib-fp
-   ```
-
-2. Add `src/` to your project's search path:
-   - **Lazarus**: Other Unit Files → `../src`
-   - **FPC CLI**: `fpc -Fu../src my_program.lpr`
-
-3. No package manager or external dependencies required — only the Free Pascal RTL.
+Peer libraries are designed to be used independently unless a specific unit
+documents otherwise.
 
 ---
 
 ## System Requirements
 
 - Free Pascal Compiler (FPC) 3.2.2+
-- Lazarus 3.6+ (optional, for IDE support)
-- Tested on Windows 11 and Ubuntu 24.04
+- Lazarus 3.6+ (optional, for IDE/package workflows)
+- Tested locally on Windows 11 and Ubuntu 24.04
 
 ---
 
 ## Testing
 
+Compile and run the test runner:
+
 ```bash
 cd tests
-./TestRunner.exe -a --format=plain
+mkdir -p lib
+fpc -Fu../src -FUlib TestRunner.lpr
+./TestRunner -a --format=plain
 ```
 
-The test suite currently contains **364 tests** across all libraries (0 failures, 0 memory leaks).
+On Windows:
 
----
+```powershell
+cd tests
+New-Item -ItemType Directory -Path lib -Force
+fpc "-Fu..\src" "-FUlib" TestRunner.lpr
+.\TestRunner.exe -a --format=plain
+```
 
-## Contributing
-
-Contributions are welcome. Please open an issue before submitting a pull request for significant changes.
-
-1. Fork the project
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes
-4. Push and open a pull request
+Current local result: **709 tests, 0 errors, 0 failures**.
 
 ---
 

@@ -4,7 +4,7 @@ unit AlgebraLib.Matrices;
 {$modeswitch advancedrecords}
 
 {-----------------------------------------------------------------------------
- TidyKit.Math.Matrices
+ AlgebraLib.Matrices
 
  A comprehensive matrix algebra library for Free Pascal
  
@@ -3156,7 +3156,7 @@ begin
     until Converged or (Iter >= MaxIter);
 
     if not Converged then
-      WriteLn('Warning: Eigendecomposition did not fully converge, results may be approximate');
+      raise EMatrixError.Create('Eigendecomposition did not converge');
 
     // Create eigenvector matrix
     EigenVectors := TMatrixKit.Create(GetRows, GetRows);

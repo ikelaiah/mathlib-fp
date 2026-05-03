@@ -34,7 +34,7 @@ var
   GroupA, GroupB: TDoubleArray;
   TStat, TPValue: Double;
   UStat, UPValue: Double;
-  WStat, WPValue: Double;
+  WStat: Double;
   KSStat, KSPValue: Double;
   ShapW, ShapP: Double;
   D, G: Double;
@@ -81,16 +81,16 @@ begin
   // ── 5. Wilcoxon Signed-Rank (for paired / one-sample problems) ─────────
   // Here we test whether the difference between paired scores is non-zero.
   WriteLn('=== Wilcoxon Signed-Rank Test (paired) ===');
-  WStat := TStatsKit.WilcoxonSignedRank(GroupA, GroupB, WPValue);
-  PrintDecision('Wilcoxon Signed-Rank', WStat, WPValue);
+  WStat := TStatsKit.WilcoxonSignedRank(GroupA, GroupB);
+  WriteLn(Format('  %-28s W = %7.4f', ['Wilcoxon Signed-Rank', WStat]));
   WriteLn;
 
   // ── 6. Effect size ──────────────────────────────────────────────────────
   WriteLn('=== Effect Size ===');
   D := TStatsKit.CohensD(GroupA, GroupB);
   G := TStatsKit.HedgesG(GroupA, GroupB);
-  WriteLn(Format("  Cohen's d  = %.4f", [D]));
-  WriteLn(Format("  Hedges' g  = %.4f", [G]));
+  WriteLn(Format('  Cohen''s d  = %.4f', [D]));
+  WriteLn(Format('  Hedges'' g  = %.4f', [G]));
   WriteLn('  |d| < 0.2 small, 0.2-0.5 medium, > 0.8 large');
   WriteLn;
 

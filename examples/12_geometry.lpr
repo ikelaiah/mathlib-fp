@@ -134,7 +134,7 @@ begin
   { Ray vs circle }
   WriteLn;
   C := TCircle2D.Create(TPoint2D.Create(5,0), 2.0);
-  WriteLn(Format('  Ray from (0,0) in direction (1,0) vs circle centred at (5,0) r=2:'));
+  WriteLn('  Ray from (0,0) in direction (1,0) vs circle centred at (5,0) r=2:');
   N := TGeometryKit.RayCircleIntersect(
     TPoint2D.Create(0,0), TPoint2D.Create(1,0), C, T1, T2);
   WriteLn(Format('  → %d hit(s): T1=%.4f, T2=%.4f  (hit at x=%.1f and x=%.1f)',
@@ -152,7 +152,7 @@ begin
   Sep;
 
   C := TCircle2D.Create(TPoint2D.Create(3, 4), 5.0);
-  WriteLn(Format('  Circle: centre=(3,4), radius=5'));
+  WriteLn('  Circle: centre=(3,4), radius=5');
   WriteLn(Format('  Area          = %.4f  (π r² = 25π)', [C.Area]));
   WriteLn(Format('  Circumference = %.4f  (2π r = 10π)', [C.Circumference]));
   WriteLn(Format('  Contains (3,4)? %s  (centre → yes)', [BoolToStr(C.ContainsPoint(TPoint2D.Create(3,4)), True)]));
@@ -312,7 +312,7 @@ begin
   Plane := TPlane3D.FromPointNormal(
     TPoint3D.Create(0,0,0), TVector3D.Create(0,0,1));
   P := TPoint3D.Create(3, 4, 7);
-  WriteLn(Format('  XY plane.  Point (3,4,7):'));
+  WriteLn('  XY plane.  Point (3,4,7):');
   WriteLn(Format('    Distance = %.4f  (= Z-coord)', [Plane.Distance(P)]));
   Closest := Plane.ClosestPoint(P);
   WriteLn(Format('    Closest  = %s  (= (3,4,0))', [Closest.ToString]));
@@ -320,7 +320,7 @@ begin
   { Triangle area in 3-D }
   WriteLn;
   C := TPoint3D.Create(4,0,0);
-  WriteLn(Format('  3-D triangle (0,0,0),(4,0,0),(0,3,0):'));
+  WriteLn('  3-D triangle (0,0,0),(4,0,0),(0,3,0):');
   WriteLn(Format('    Area = %.4f  (= 6)', [TGeometryKit.TriangleArea3D(
     TPoint3D.Create(0,0,0), TPoint3D.Create(4,0,0), TPoint3D.Create(0,3,0))]));
 

@@ -65,7 +65,7 @@ begin
 
   // ── 6. Bootstrap 95 %% confidence interval for the mean ─────────────────
   Randomize; // seed the RNG — required by bootstrap
-  CI := TStatsKit.BootstrapConfidenceInterval(Data, 1000, 0.95);
+  CI := TStatsKit.BootstrapConfidenceInterval(Data, 0.05, 1000);
   WriteLn('--- 95%% Bootstrap CI for the mean ---');
   WriteLn(Format('Lower : %.4f', [CI.Lower]));
   WriteLn(Format('Upper : %.4f', [CI.Upper]));

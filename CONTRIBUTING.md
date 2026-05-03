@@ -103,11 +103,8 @@ We especially welcome documentation improvements:
 
 ## ⭐ Recognition
 
-Contributors will be recognized in:
-- CONTRIBUTORS.md file
-- Release notes
-- Project documentation
+Contributors may be recognized in release notes and project documentation.
 
 ## 📄 License
 
-By contributing, you agree that your contributions will be licensed under the MIT License. 
+By contributing, you agree that your contributions will be licensed under the MIT License.

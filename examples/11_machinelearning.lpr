@@ -175,6 +175,7 @@ procedure DemoLinearRegression;
 var
   X, Xpoly: TDoubleMatrix; Y, YHat: TDoubleArray;
   Model: TLinearModel;
+  I: Integer;
 begin
   WriteLn;
   WriteLn('=== LINEAR REGRESSION ===');
@@ -184,16 +185,16 @@ begin
   MakeLinear1D(X, Y);
   Model := TMLKit.LinearRegression(X, Y);
   WriteLn(Format('  Fitted:   y = %.4f + %.4f * x', [Model.Intercept, Model.Coefficients[0]]));
-  WriteLn(Format('  Expected: y = 3.0000 + 2.0000 * x'));
+  WriteLn('  Expected: y = 3.0000 + 2.0000 * x');
   WriteLn(Format('  R² = %.6f  (1.0 = perfect fit)', [Model.RSquared]));
 
   WriteLn;
   WriteLn('  Polynomial regression (degree=2) on a curved target:');
   { Y = x² }
   SetLength(Y, 10);
-  for var I := 0 to 9 do Y[I] := I * I;
+  for I := 0 to 9 do Y[I] := I * I;
   SetLength(X, 10);
-  for var I := 0 to 9 do begin SetLength(X[I], 1); X[I][0] := I; end;
+  for I := 0 to 9 do begin SetLength(X[I], 1); X[I][0] := I; end;
   Xpoly := TMLKit.PolynomialFeatures(
     TDoubleArray.Create(0,1,2,3,4,5,6,7,8,9), 2);
   Model := TMLKit.LinearRegression(Xpoly, Y);
@@ -300,6 +301,7 @@ end;
 procedure DemoKMeans;
 var
   X: TDoubleMatrix; R: TKMeansResult;
+  I: Integer;
 begin
   WriteLn;
   WriteLn('=== K-MEANS CLUSTERING ===');
@@ -317,7 +319,7 @@ begin
 
   WriteLn;
   WriteLn('  Centroids:');
-  for var I := 0 to 2 do
+  for I := 0 to 2 do
     WriteLn(Format('    Cluster %d: (%.3f, %.3f)',
       [I, R.Centroids[I][0], R.Centroids[I][1]]));
 end;
@@ -380,7 +382,7 @@ begin
   WriteLn('  (PC1 should capture most variance since data lies along one direction)');
 
   Xr := TMLKit.PCATransform(R, X);
-  WriteLn(Format('  Original shape: 20 × 3 → Projected shape: 20 × 2'));
+  WriteLn('  Original shape: 20 × 3 → Projected shape: 20 × 2');
   WriteLn('  First 3 projected samples:');
   for I := 0 to 2 do
     WriteLn(Format('    [%.4f, %.4f]', [Xr[I][0], Xr[I][1]]));

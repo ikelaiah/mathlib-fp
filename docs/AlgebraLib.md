@@ -113,7 +113,7 @@ All operations return **new matrices** — existing matrices are never mutated.
 
 | Method | Returns | Notes |
 |--------|---------|-------|
-| `Determinant` | `Double` | Cofactor expansion; square matrices only; O(n!) — prefer LU for large n |
+| `Determinant` | `Double` | LU-based determinant; square matrices only |
 | `Trace` | `Double` | Sum of diagonal elements; square matrices only |
 | `Rank` | `Integer` | Via Gaussian elimination; tolerance 10⁻¹² |
 
@@ -131,8 +131,8 @@ function IsColumnVector: Boolean;
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `LUDecompose` | `TLUDecomposition` | PA = LU with partial pivoting |
-| `QRDecompose` | `TQRDecomposition` | A = QR via Gram-Schmidt |
+| `LU` | `TLUDecomposition` | PA = LU with partial pivoting |
+| `QR` | `TQRDecomposition` | A = QR via Gram-Schmidt |
 | `EigenDecompose` | `TEigenDecomposition` | A = VDV⁻¹ for diagonalisable matrices |
 | `SVDecompose` | `TSVD` | A = USVᵀ |
 | `CholeskyDecompose` | `TCholeskyDecomposition` | A = LLᵀ; symmetric positive-definite matrices only |
@@ -171,8 +171,8 @@ function IsColumnVector: Boolean;
 ```pascal
 class function Create(Rows, Cols: Integer): IMatrix;
 class function Identity(N: Integer): IMatrix;
-class function Zero(Rows, Cols: Integer): IMatrix;
-class function FromArray(const Data: TMatrixArray): IMatrix;
+class function Zeros(Rows, Cols: Integer): IMatrix;
+class function CreateFromArray(const Data: TMatrixArray): IMatrix;
 class function Diagonal(const Values: TDoubleArray): IMatrix;
 class function Random(Rows, Cols: Integer): IMatrix;
 ```
@@ -188,11 +188,11 @@ var
   A, B, C: IMatrix;
   LU: TLUDecomposition;
 begin
-  A := TMatrixKit.FromArray([[1,2],[3,4]]);
+  A := TMatrixKit.CreateFromArray([[1,2],[3,4]]);
   B := TMatrixKit.Identity(2);
 
   C  := A.Multiply(B);                // C = A × I = A
-  LU := A.LUDecompose;                // PA = LU
+  LU := A.LU;                         // PA = LU
 
   Writeln('Det = ', A.Determinant:0:4);  // -2.0
   Writeln('Rank = ', A.Rank);            // 2
@@ -203,5 +203,5 @@ end.
 
 - **Value semantics** — all operations return new `IMatrix` instances.
 - **Interface-based** — depend on `IMatrix`, not on `TMatrixKit`, for flexibility.
-- **Cache-aware blocking** — matrix multiplication uses `BLOCK_SIZE = 4` blocking; adjust for your CPU cache if working with large matrices.
+- **Cache-aware blocking** — matrix multiplication uses cache-aware blocking and parallel workers for larger matrices.
 - **Numerically stable** — LU uses partial pivoting; tolerances guard against near-zero pivots.

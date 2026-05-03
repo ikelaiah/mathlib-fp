@@ -1,7 +1,7 @@
 unit FinanceLib.Interest;
 
 {-----------------------------------------------------------------------------
- TidyKit.Math.Finance
+ FinanceLib.Interest
 
  A library for financial mathematics and analysis in Free Pascal
  
@@ -19,7 +19,7 @@ unit FinanceLib.Interest;
  
  Design principles:
  - Static class methods for calculations
- - Uses TDoubleArray from TidyKit.Math for cash flows and relevant data inputs
+ - Uses TDoubleArray from MathBase.SharedTypes for cash flows and relevant data inputs
  - Time is handled via periods/years (Integer/Double), not TDateTime directly
  - Provides specific record types for structured analysis results (TWorkingCapitalRatios, TLeverageRatios, etc.)
  - Includes error handling using EFinanceError for common calculation issues

@@ -29,7 +29,21 @@ uses
   EngineeringLib.Velocity,
   EngineeringLib.Pressure,
   { StatsLib }
-  StatsLib.Stats;
+  StatsLib.Stats,
+  { ProbabilityLib }
+  ProbabilityLib.Distributions,
+  { CombinatoricsLib }
+  CombinatoricsLib.Combinatorics,
+  { NumericsLib }
+  NumericsLib.Numerics,
+  { OptimizationLib }
+  OptimizationLib.Optimization,
+  { TimeSeriesLib }
+  TimeSeriesLib.TimeSeries,
+  { MLLib }
+  MLLib.MachineLearning,
+  { GeometryLib }
+  GeometryLib.Geometry;
 
 implementation
 
