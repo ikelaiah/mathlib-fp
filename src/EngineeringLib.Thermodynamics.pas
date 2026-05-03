@@ -21,11 +21,22 @@ type
 
     { Heat Transfer }
     // Q = k * A * (T_hot - T_cold) / d
-    class function HeatConductionRate(ThermalConductivity: Double; Area: Double; TempDifference: Double; Thickness: Double): Double; static;
+    class function HeatConductionRate(
+      ThermalConductivity: Double;
+      Area: Double;
+      TempDifference: Double;
+      Thickness: Double): Double; static;
     // Q = h * A * (T_surface - T_fluid)
-    class function HeatConvectionRate(ConvectionCoefficient: Double; Area: Double; TempDifference: Double): Double; static;
+    class function HeatConvectionRate(
+      ConvectionCoefficient: Double;
+      Area: Double;
+      TempDifference: Double): Double; static;
     // Q = ε * σ * A * (T_surface⁴ - T_surroundings⁴)
-    class function HeatRadiationRate(Emissivity: Double; Area: Double; SurfaceTempK: Double; SurroundingsTempK: Double): Double; static;
+    class function HeatRadiationRate(
+      Emissivity: Double;
+      Area: Double;
+      SurfaceTempK: Double;
+      SurroundingsTempK: Double): Double; static;
     // Q = m * c * ΔT
     class function HeatEnergyChange(Mass: Double; SpecificHeatCapacity: Double; TempChange: Double): Double; static;
 
@@ -33,9 +44,16 @@ type
     // ΔS = Q / T (for reversible process at constant T)
     class function EntropyChangeReversible(HeatTransfer: Double; AbsoluteTempK: Double): Double; static;
     // ΔS = m * c * ln(T_final / T_initial)
-    class function EntropyChangeHeating(Mass: Double; SpecificHeatCapacity: Double; InitialTempK: Double; FinalTempK: Double): Double; static;
+    class function EntropyChangeHeating(
+      Mass: Double;
+      SpecificHeatCapacity: Double;
+      InitialTempK: Double;
+      FinalTempK: Double): Double; static;
     // ΔS = n * R * ln(V_final / V_initial) (for isothermal expansion of ideal gas)
-    class function EntropyChangeIsothermalExpansion(Moles: Double; InitialVolume: Double; FinalVolume: Double): Double; static;
+    class function EntropyChangeIsothermalExpansion(
+      Moles: Double;
+      InitialVolume: Double;
+      FinalVolume: Double): Double; static;
 
     { Ideal Gas Law }
     // P * V = n * R * T
@@ -65,21 +83,35 @@ type
     class function OttoCycleEfficiency(CompressionRatio: Double; SpecificHeatRatio: Double): Double; static;
     // Diesel cycle efficiency (ideal compression-ignition engine)
     // η = 1 - (1/r^(γ-1)) * ((α^γ-1)/(γ*(α-1))) where r is compression ratio, α is cutoff ratio
-    class function DieselCycleEfficiency(CompressionRatio: Double; CutoffRatio: Double; SpecificHeatRatio: Double): Double; static;
+    class function DieselCycleEfficiency(
+      CompressionRatio: Double;
+      CutoffRatio: Double;
+      SpecificHeatRatio: Double): Double; static;
     // Brayton cycle efficiency (ideal gas turbine engine)
     // η = 1 - (1/r^((γ-1)/γ)) where r is pressure ratio
     class function BraytonCycleEfficiency(PressureRatio: Double; SpecificHeatRatio: Double): Double; static;
     // Rankine cycle calculations
-    class function RankineCycleEfficiency(TurbineWorkOutput: Double; PumpWorkInput: Double; HeatInput: Double): Double; static;
+    class function RankineCycleEfficiency(
+      TurbineWorkOutput: Double;
+      PumpWorkInput: Double;
+      HeatInput: Double): Double; static;
 
     { Adiabatic Process }
     // P1*V1^γ = P2*V2^γ (pressure-volume relation)
-    class function AdiabaticPressure(InitialPressure, InitialVolume, FinalVolume: Double; SpecificHeatRatio: Double): Double; static;
-    class function AdiabaticVolume(InitialPressure, InitialVolume, FinalPressure: Double; SpecificHeatRatio: Double): Double; static;
+    class function AdiabaticPressure(
+      InitialPressure, InitialVolume, FinalVolume: Double;
+      SpecificHeatRatio: Double): Double; static;
+    class function AdiabaticVolume(
+      InitialPressure, InitialVolume, FinalPressure: Double;
+      SpecificHeatRatio: Double): Double; static;
     // T1*V1^(γ-1) = T2*V2^(γ-1) (temperature-volume relation)
-    class function AdiabaticTemperature(InitialTemp, InitialVolume, FinalVolume: Double; SpecificHeatRatio: Double): Double; static;
+    class function AdiabaticTemperature(
+      InitialTemp, InitialVolume, FinalVolume: Double;
+      SpecificHeatRatio: Double): Double; static;
     // T2 = T1*(P2/P1)^((γ-1)/γ) (temperature-pressure relation)
-    class function AdiabaticTemperatureFromPressure(InitialTemp, InitialPressure, FinalPressure: Double; SpecificHeatRatio: Double): Double; static;
+    class function AdiabaticTemperatureFromPressure(
+      InitialTemp, InitialPressure, FinalPressure: Double;
+      SpecificHeatRatio: Double): Double; static;
     
     { Compressible Flow }
     // Critical pressure ratio for choked flow
@@ -114,19 +146,30 @@ implementation
 
 { TThermodynamicsKit }
 
-class function TThermodynamicsKit.HeatConductionRate(ThermalConductivity: Double; Area: Double; TempDifference: Double; Thickness: Double): Double;
+class function TThermodynamicsKit.HeatConductionRate(
+  ThermalConductivity: Double;
+  Area: Double;
+  TempDifference: Double;
+  Thickness: Double): Double;
 begin
   if Thickness <= 0 then
     raise Exception.Create('Thickness must be positive for heat conduction calculation.');
   Result := ThermalConductivity * Area * TempDifference / Thickness;
 end;
 
-class function TThermodynamicsKit.HeatConvectionRate(ConvectionCoefficient: Double; Area: Double; TempDifference: Double): Double;
+class function TThermodynamicsKit.HeatConvectionRate(
+  ConvectionCoefficient: Double;
+  Area: Double;
+  TempDifference: Double): Double;
 begin
   Result := ConvectionCoefficient * Area * TempDifference;
 end;
 
-class function TThermodynamicsKit.HeatRadiationRate(Emissivity: Double; Area: Double; SurfaceTempK: Double; SurroundingsTempK: Double): Double;
+class function TThermodynamicsKit.HeatRadiationRate(
+  Emissivity: Double;
+  Area: Double;
+  SurfaceTempK: Double;
+  SurroundingsTempK: Double): Double;
 begin
   if (Emissivity < 0) or (Emissivity > 1) then
     raise Exception.Create('Emissivity must be between 0 and 1.');
@@ -135,7 +178,10 @@ begin
   Result := Emissivity * StefanBoltzmannConstant * Area * (Power(SurfaceTempK, 4) - Power(SurroundingsTempK, 4));
 end;
 
-class function TThermodynamicsKit.HeatEnergyChange(Mass: Double; SpecificHeatCapacity: Double; TempChange: Double): Double;
+class function TThermodynamicsKit.HeatEnergyChange(
+  Mass: Double;
+  SpecificHeatCapacity: Double;
+  TempChange: Double): Double;
 begin
   Result := Mass * SpecificHeatCapacity * TempChange;
 end;
@@ -147,14 +193,21 @@ begin
   Result := HeatTransfer / AbsoluteTempK;
 end;
 
-class function TThermodynamicsKit.EntropyChangeHeating(Mass: Double; SpecificHeatCapacity: Double; InitialTempK: Double; FinalTempK: Double): Double;
+class function TThermodynamicsKit.EntropyChangeHeating(
+  Mass: Double;
+  SpecificHeatCapacity: Double;
+  InitialTempK: Double;
+  FinalTempK: Double): Double;
 begin
   if (InitialTempK <= 0) or (FinalTempK <= 0) then
     raise Exception.Create('Absolute temperatures must be positive for entropy calculation.');
   Result := Mass * SpecificHeatCapacity * Ln(FinalTempK / InitialTempK);
 end;
 
-class function TThermodynamicsKit.EntropyChangeIsothermalExpansion(Moles: Double; InitialVolume: Double; FinalVolume: Double): Double;
+class function TThermodynamicsKit.EntropyChangeIsothermalExpansion(
+  Moles: Double;
+  InitialVolume: Double;
+  FinalVolume: Double): Double;
 begin
   if (InitialVolume <= 0) or (FinalVolume <= 0) then
      raise Exception.Create('Volumes must be positive for entropy calculation.');
@@ -223,7 +276,9 @@ begin
   Result := WorkOutput / HeatInput;
 end;
 
-class function TThermodynamicsKit.CoefficientOfPerformanceRefrigeration(ColdHeatExtracted: Double; WorkInput: Double): Double;
+class function TThermodynamicsKit.CoefficientOfPerformanceRefrigeration(
+  ColdHeatExtracted: Double;
+  WorkInput: Double): Double;
 begin
   if WorkInput <= 0 then
     raise Exception.Create('Work input must be positive for COP calculation.');
@@ -246,7 +301,10 @@ begin
   Result := 1 - Power(1/CompressionRatio, SpecificHeatRatio - 1);
 end;
 
-class function TThermodynamicsKit.DieselCycleEfficiency(CompressionRatio: Double; CutoffRatio: Double; SpecificHeatRatio: Double): Double;
+class function TThermodynamicsKit.DieselCycleEfficiency(
+  CompressionRatio: Double;
+  CutoffRatio: Double;
+  SpecificHeatRatio: Double): Double;
 begin
   if CompressionRatio <= 1 then
     raise Exception.Create('Compression ratio must be greater than 1.');
@@ -268,35 +326,46 @@ begin
   Result := 1 - 1/Power(PressureRatio, (SpecificHeatRatio-1)/SpecificHeatRatio);
 end;
 
-class function TThermodynamicsKit.RankineCycleEfficiency(TurbineWorkOutput: Double; PumpWorkInput: Double; HeatInput: Double): Double;
+class function TThermodynamicsKit.RankineCycleEfficiency(
+  TurbineWorkOutput: Double;
+  PumpWorkInput: Double;
+  HeatInput: Double): Double;
 begin
   if HeatInput <= 0 then
     raise Exception.Create('Heat input must be positive for Rankine cycle calculation.');
   Result := (TurbineWorkOutput - PumpWorkInput) / HeatInput;
 end;
 
-class function TThermodynamicsKit.AdiabaticPressure(InitialPressure, InitialVolume, FinalVolume: Double; SpecificHeatRatio: Double): Double;
+class function TThermodynamicsKit.AdiabaticPressure(
+  InitialPressure, InitialVolume, FinalVolume: Double;
+  SpecificHeatRatio: Double): Double;
 begin
   if (InitialPressure <= 0) or (InitialVolume <= 0) or (FinalVolume <= 0) then
     raise Exception.Create('Pressure and volumes must be positive for adiabatic process calculation.');
   Result := InitialPressure * Power(InitialVolume / FinalVolume, SpecificHeatRatio);
 end;
 
-class function TThermodynamicsKit.AdiabaticVolume(InitialPressure, InitialVolume, FinalPressure: Double; SpecificHeatRatio: Double): Double;
+class function TThermodynamicsKit.AdiabaticVolume(
+  InitialPressure, InitialVolume, FinalPressure: Double;
+  SpecificHeatRatio: Double): Double;
 begin
   if (InitialPressure <= 0) or (InitialVolume <= 0) or (FinalPressure <= 0) then
     raise Exception.Create('Pressure and volume must be positive for adiabatic process calculation.');
   Result := InitialVolume * Power(InitialPressure / FinalPressure, 1/SpecificHeatRatio);
 end;
 
-class function TThermodynamicsKit.AdiabaticTemperature(InitialTemp, InitialVolume, FinalVolume: Double; SpecificHeatRatio: Double): Double;
+class function TThermodynamicsKit.AdiabaticTemperature(
+  InitialTemp, InitialVolume, FinalVolume: Double;
+  SpecificHeatRatio: Double): Double;
 begin
   if (InitialTemp <= 0) or (InitialVolume <= 0) or (FinalVolume <= 0) then
     raise Exception.Create('Temperature and volumes must be positive for adiabatic process calculation.');
   Result := InitialTemp * Power(InitialVolume / FinalVolume, SpecificHeatRatio - 1);
 end;
 
-class function TThermodynamicsKit.AdiabaticTemperatureFromPressure(InitialTemp, InitialPressure, FinalPressure: Double; SpecificHeatRatio: Double): Double;
+class function TThermodynamicsKit.AdiabaticTemperatureFromPressure(
+  InitialTemp, InitialPressure, FinalPressure: Double;
+  SpecificHeatRatio: Double): Double;
 begin
   if (InitialTemp <= 0) or (InitialPressure <= 0) or (FinalPressure <= 0) then
     raise Exception.Create('Temperature and pressures must be positive for adiabatic process calculation.');

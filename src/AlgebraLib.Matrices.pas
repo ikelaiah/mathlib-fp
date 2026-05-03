@@ -852,8 +852,11 @@ type
           on E: EMatrixError do Writeln('Iterative solve failed: ', E.Message);
         end;
     }
-    function SolveIterative(const B: IMatrix; Method: TIterativeMethod = imConjugateGradient;
-                            MaxIterations: Integer = 1000; Tolerance: Double = 1e-10): IMatrix;
+    function SolveIterative(
+      const B: IMatrix;
+      Method: TIterativeMethod = imConjugateGradient;
+      MaxIterations: Integer = 1000;
+      Tolerance: Double = 1e-10): IMatrix;
 
     {
       @description Finds the dominant eigenvalue (largest magnitude) and corresponding eigenvector using the Power Iteration method.
@@ -1868,8 +1871,11 @@ type
 
       @example See IMatrix.SolveIterative example.
     }
-    function SolveIterative(const B: IMatrix; Method: TIterativeMethod = imConjugateGradient;
-                            MaxIterations: Integer = 1000; Tolerance: Double = 1e-10): IMatrix;
+    function SolveIterative(
+      const B: IMatrix;
+      Method: TIterativeMethod = imConjugateGradient;
+      MaxIterations: Integer = 1000;
+      Tolerance: Double = 1e-10): IMatrix;
 
     {
       @description Finds dominant eigenvalue/eigenvector using power iteration. Implementation for TMatrixKit.
@@ -2240,12 +2246,14 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(ASelf: TMatrixKit; const AOther: IMatrix;
-                       AResult: TMatrixKit; ARowStart, ARowEnd: Integer);
+    constructor Create(ASelf: TMatrixKit; const AOther: IMatrix; AResult: TMatrixKit; ARowStart, ARowEnd: Integer);
   end;
 
-constructor TMultiplyThread.Create(ASelf: TMatrixKit; const AOther: IMatrix;
-  AResult: TMatrixKit; ARowStart, ARowEnd: Integer);
+constructor TMultiplyThread.Create(
+  ASelf: TMatrixKit;
+  const AOther: IMatrix;
+  AResult: TMatrixKit;
+  ARowStart, ARowEnd: Integer);
 begin
   inherited Create(True); // suspended
   FreeOnTerminate := False;
@@ -3891,8 +3899,11 @@ begin
   Result := ResultMatrix;
 end;
 
-function TMatrixKit.SolveIterative(const B: IMatrix; Method: TIterativeMethod = imConjugateGradient; 
-                            MaxIterations: Integer = 1000; Tolerance: Double = 1e-10): IMatrix;
+function TMatrixKit.SolveIterative(
+  const B: IMatrix;
+  Method: TIterativeMethod = imConjugateGradient;
+  MaxIterations: Integer = 1000;
+  Tolerance: Double = 1e-10): IMatrix;
 var
   X, R, P, AP, Temp: IMatrix;
   Alpha, Beta, RDotR, OldRDotR, NormB, ResidualNorm, PDotAP: Double;

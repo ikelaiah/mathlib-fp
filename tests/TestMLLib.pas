@@ -45,8 +45,7 @@ uses
 type
   TTestMLLib = class(TTestCase)
   private
-    procedure AssertNear(const AMsg: string; Expected, Got: Double;
-      Tol: Double = 1e-6);
+    procedure AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double = 1e-6);
     procedure AssertMLError(const AMsg: string; AProc: TProcedure);
     { Build a simple 2-D dataset: two well-separated clusters }
     function MakeClusterData(out Labels: TIntegerArray): TDoubleMatrix;
@@ -142,8 +141,7 @@ begin TMLKit.PCA(GErrX, 5); end;
   Helpers
 --------------------------------------------------------------------------- }
 
-procedure TTestMLLib.AssertNear(const AMsg: string;
-  Expected, Got: Double; Tol: Double);
+procedure TTestMLLib.AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double);
 begin
   if Abs(Got - Expected) > Tol then
     Fail(AMsg + Format(' — expected %.8g, got %.8g', [Expected, Got]));

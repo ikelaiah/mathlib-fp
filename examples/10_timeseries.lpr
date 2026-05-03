@@ -21,8 +21,7 @@ uses
 
 procedure Sep; begin WriteLn(StringOfChar('-', 55)); end;
 
-procedure ShowVec(const Lbl: String; const V: TDoubleArray;
-  MaxItems: Integer = 8);
+procedure ShowVec(const Lbl: String; const V: TDoubleArray; MaxItems: Integer = 8);
 var I: Integer;
 begin
   Write(Format('  %-28s [', [Lbl]));

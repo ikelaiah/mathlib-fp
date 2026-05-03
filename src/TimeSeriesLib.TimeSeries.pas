@@ -119,20 +119,20 @@ type
   TTimeSeriesKit = class
   private
     { Compute sample mean of array slice [Start..Stop] }
-    class function SliceMean(const Y: TDoubleArray;
-      Start, Stop: Integer): Double; static;
+    class function SliceMean(const Y: TDoubleArray; Start, Stop: Integer): Double; static;
 
     { Compute sample variance of array slice }
-    class function SliceVar(const Y: TDoubleArray;
-      Start, Stop: Integer): Double; static;
+    class function SliceVar(const Y: TDoubleArray; Start, Stop: Integer): Double; static;
 
     { Sort a double array (insertion sort — used for small windows) }
     class procedure InsertionSort(var A: TDoubleArray); static;
 
     { Solve an N×N linear system Ax = b via Gaussian elimination with
       partial pivoting. Returns False if singular. }
-    class function SolveLinear(const A: array of TDoubleArray;
-      const B: TDoubleArray; out X: TDoubleArray): Boolean; static;
+    class function SolveLinear(
+      const A: array of TDoubleArray;
+      const B: TDoubleArray;
+      out X: TDoubleArray): Boolean; static;
 
   public
 
@@ -147,21 +147,21 @@ type
 
       Example: SMA of daily stock prices with a 5-day window
         smooth := TTimeSeriesKit.SimpleMovingAverage(prices, 5); }
-    class function SimpleMovingAverage(const Y: TDoubleArray;
-      Window: Integer): TDoubleArray; static;
+    class function SimpleMovingAverage(const Y: TDoubleArray; Window: Integer): TDoubleArray; static;
 
     { Weighted Moving Average: like SMA but more recent values
       receive linearly larger weights (weight_i = i+1 for i=0..Window-1).
       Reacts faster than SMA to recent changes. }
-    class function WeightedMovingAverage(const Y: TDoubleArray;
-      Window: Integer): TDoubleArray; static;
+    class function WeightedMovingAverage(const Y: TDoubleArray; Window: Integer): TDoubleArray; static;
 
     { Exponential Smoothing (single / simple EMA).
       S_t = Alpha * Y_t + (1-Alpha) * S_{t-1}
       Alpha in (0,1]: small Alpha → heavy smoothing; large Alpha → tracks data closely.
       InitValue: starting value for S_0 (default = Y[0] if not supplied). }
-    class function ExponentialSmoothing(const Y: TDoubleArray;
-      Alpha: Double; InitValue: Double = NaN): TDoubleArray; static;
+    class function ExponentialSmoothing(
+      const Y: TDoubleArray;
+      Alpha: Double;
+      InitValue: Double = NaN): TDoubleArray; static;
 
     { Holt's Double Exponential Smoothing (additive trend).
       Tracks LEVEL and TREND separately.
@@ -170,8 +170,7 @@ type
       Returns smoothed series same length as Y.
 
       Good for data with a trend but no seasonality. }
-    class function DoubleExponentialSmoothing(const Y: TDoubleArray;
-      Alpha, Beta: Double): TDoubleArray; static;
+    class function DoubleExponentialSmoothing(const Y: TDoubleArray; Alpha, Beta: Double): TDoubleArray; static;
 
     { Holt-Winters Triple Exponential Smoothing.
       Handles data with TREND and SEASONALITY.
@@ -183,16 +182,20 @@ type
 
       Returns smoothed in-sample fitted values, same length as Y.
       Use HoltWintersForecast to project forward. }
-    class function TripleExponentialSmoothing(const Y: TDoubleArray;
-      Alpha, Beta, Gamma: Double; Period: Integer;
+    class function TripleExponentialSmoothing(
+      const Y: TDoubleArray;
+      Alpha, Beta, Gamma: Double;
+      Period: Integer;
       DType: TDecompType = dtAdditive): TDoubleArray; static;
 
     { Holt-Winters h-step ahead forecast.
       Uses the state (level L, trend B, seasonals S[]) at the end of Y
       to project H steps into the future.
       Returns array of length H. }
-    class function HoltWintersForecast(const Y: TDoubleArray;
-      Alpha, Beta, Gamma: Double; Period, H: Integer;
+    class function HoltWintersForecast(
+      const Y: TDoubleArray;
+      Alpha, Beta, Gamma: Double;
+      Period, H: Integer;
       DType: TDecompType = dtAdditive): TDoubleArray; static;
 
     { =======================================================================
@@ -205,7 +208,9 @@ type
       3. Residual = observed − trend − seasonal (additive) or observed/(trend*seasonal).
 
       Period: seasonal cycle length (e.g. 12 for monthly data). }
-    class function Decompose(const Y: TDoubleArray; Period: Integer;
+    class function Decompose(
+      const Y: TDoubleArray;
+      Period: Integer;
       DType: TDecompType = dtAdditive): TDecomposition; static;
 
     { =======================================================================
@@ -221,8 +226,10 @@ type
     { Invert differencing given the original first D values (initial conditions).
       Undifference(Diff1, [Y[0]], 1) reconstructs the original series.
       InitVals must have length D. }
-    class function Undifference(const DiffY: TDoubleArray;
-      const InitVals: TDoubleArray; D: Integer = 1): TDoubleArray; static;
+    class function Undifference(
+      const DiffY: TDoubleArray;
+      const InitVals: TDoubleArray;
+      D: Integer = 1): TDoubleArray; static;
 
     { Augmented Dickey-Fuller (ADF) unit-root test.
       Tests H0: series has a unit root (non-stationary) against
@@ -230,8 +237,7 @@ type
       Lags: number of lagged differences to include (0 = simple DF test).
       Critical values are MacKinnon (1994) approximations for n → ∞.
       Reject H0 (series IS stationary) when Statistic < CritValue. }
-    class function AugmentedDickeyFuller(const Y: TDoubleArray;
-      Lags: Integer = 1): TADFResult; static;
+    class function AugmentedDickeyFuller(const Y: TDoubleArray; Lags: Integer = 1): TADFResult; static;
 
     { =======================================================================
       AUTOCORRELATION
@@ -267,8 +273,7 @@ type
     { h-step forecast from AR coefficients.
       Simulates the AR recursion forward H steps from the end of History.
       History should be the original (or differenced) series. }
-    class function ARForecast(const Model: TARIMAModel;
-      const History: TDoubleArray; H: Integer): TDoubleArray; static;
+    class function ARForecast(const Model: TARIMAModel; const History: TDoubleArray; H: Integer): TDoubleArray; static;
 
     { Fit MA(q) model using innovations algorithm (approximate).
       Returns theta[1..q] and Sigma2. }
@@ -279,14 +284,15 @@ type
       2. Fits AR(p) to the differenced series to get phi coefficients.
       3. Computes residuals and fits MA(q) to them for theta coefficients.
       Returns a TARIMAModel with all fitted parameters. }
-    class function ARIMAFit(const Y: TDoubleArray;
-      P, D, Q: Integer): TARIMAModel; static;
+    class function ARIMAFit(const Y: TDoubleArray; P, D, Q: Integer): TARIMAModel; static;
 
     { H-step ahead ARIMA forecast.
       Undifferences the AR forecast back to the original scale.
       Returns array of length H. }
-    class function ARIMAForecast(const Model: TARIMAModel;
-      const OriginalY: TDoubleArray; H: Integer): TDoubleArray; static;
+    class function ARIMAForecast(
+      const Model: TARIMAModel;
+      const OriginalY: TDoubleArray;
+      H: Integer): TDoubleArray; static;
 
     { =======================================================================
       CHANGE-POINT & ANOMALY DETECTION
@@ -296,20 +302,23 @@ type
       Accumulates deviations from the target mean (defaults to sample mean).
       ChangePoint = first index where |CUSUM| > Threshold * StdDev.
       Set Threshold to 0 to disable detection and just return the CUSUM series. }
-    class function CUSUMDetect(const Y: TDoubleArray;
-      Threshold: Double = 4.0; Target: Double = NaN): TCUSUMResult; static;
+    class function CUSUMDetect(
+      const Y: TDoubleArray;
+      Threshold: Double = 4.0;
+      Target: Double = NaN): TCUSUMResult; static;
 
     { Return indices where |Z-score| > Threshold (default 3.0 sigma).
       A value is anomalous if it is more than Threshold standard deviations
       from the series mean. }
-    class function ZScoreAnomalies(const Y: TDoubleArray;
-      Threshold: Double = 3.0): TIntegerArray; static;
+    class function ZScoreAnomalies(const Y: TDoubleArray; Threshold: Double = 3.0): TIntegerArray; static;
 
     { Rolling Z-score: compute z-score within a rolling window of width Window.
       Points where |rolling z| > Threshold are flagged as anomalies.
       Returns the anomaly indices. }
-    class function RollingZScore(const Y: TDoubleArray;
-      Window: Integer; Threshold: Double = 3.0): TIntegerArray; static;
+    class function RollingZScore(
+      const Y: TDoubleArray;
+      Window: Integer;
+      Threshold: Double = 3.0): TIntegerArray; static;
 
     { =======================================================================
       TREND & SEASONALITY UTILITIES
@@ -332,8 +341,10 @@ type
       Returns the period (in samples) corresponding to the largest spectral peak,
       excluding the DC component (lag 0).
       MinPeriod / MaxPeriod: search range (default 2 .. N/2). }
-    class function PeriodogramPeak(const Y: TDoubleArray;
-      MinPeriod: Integer = 2; MaxPeriod: Integer = 0): Integer; static;
+    class function PeriodogramPeak(
+      const Y: TDoubleArray;
+      MinPeriod: Integer = 2;
+      MaxPeriod: Integer = 0): Integer; static;
 
     { Compute the power spectral density (periodogram) of Y.
       Returns N/2+1 values corresponding to frequencies 0, 1/N, 2/N, ..., 0.5. }
@@ -347,8 +358,7 @@ implementation
   Private helpers
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.SliceMean(const Y: TDoubleArray;
-  Start, Stop: Integer): Double;
+class function TTimeSeriesKit.SliceMean(const Y: TDoubleArray; Start, Stop: Integer): Double;
 var I: Integer; S: Double;
 begin
   S := 0;
@@ -356,8 +366,7 @@ begin
   Result := S / (Stop - Start + 1);
 end;
 
-class function TTimeSeriesKit.SliceVar(const Y: TDoubleArray;
-  Start, Stop: Integer): Double;
+class function TTimeSeriesKit.SliceVar(const Y: TDoubleArray; Start, Stop: Integer): Double;
 var I: Integer; M, S: Double;
 begin
   M := SliceMean(Y, Start, Stop);
@@ -378,8 +387,10 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.SolveLinear(const A: array of TDoubleArray;
-  const B: TDoubleArray; out X: TDoubleArray): Boolean;
+class function TTimeSeriesKit.SolveLinear(
+  const A: array of TDoubleArray;
+  const B: TDoubleArray;
+  out X: TDoubleArray): Boolean;
 { Gaussian elimination with partial pivoting. Modifies local copies. }
 var
   N, I, J, K, MaxRow: Integer;
@@ -429,8 +440,7 @@ end;
   SMOOTHING
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.SimpleMovingAverage(const Y: TDoubleArray;
-  Window: Integer): TDoubleArray;
+class function TTimeSeriesKit.SimpleMovingAverage(const Y: TDoubleArray; Window: Integer): TDoubleArray;
 { Centred SMA; edges use available data. }
 var
   N, I, J, Lo, Hi: Integer;
@@ -450,8 +460,7 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.WeightedMovingAverage(const Y: TDoubleArray;
-  Window: Integer): TDoubleArray;
+class function TTimeSeriesKit.WeightedMovingAverage(const Y: TDoubleArray; Window: Integer): TDoubleArray;
 { Trailing WMA: weight of position i within window = i+1 (most recent = Window) }
 var
   N, I, J: Integer;
@@ -474,8 +483,10 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.ExponentialSmoothing(const Y: TDoubleArray;
-  Alpha: Double; InitValue: Double): TDoubleArray;
+class function TTimeSeriesKit.ExponentialSmoothing(
+  const Y: TDoubleArray;
+  Alpha: Double;
+  InitValue: Double): TDoubleArray;
 { S_t = Alpha*Y_t + (1-Alpha)*S_{t-1} }
 var
   N, I: Integer;
@@ -494,8 +505,7 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.DoubleExponentialSmoothing(const Y: TDoubleArray;
-  Alpha, Beta: Double): TDoubleArray;
+class function TTimeSeriesKit.DoubleExponentialSmoothing(const Y: TDoubleArray; Alpha, Beta: Double): TDoubleArray;
 { Holt's method: tracks level L and trend B.
   L_t = Alpha*Y_t + (1-Alpha)*(L_{t-1} + B_{t-1})
   B_t = Beta*(L_t - L_{t-1}) + (1-Beta)*B_{t-1}
@@ -521,8 +531,11 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.TripleExponentialSmoothing(const Y: TDoubleArray;
-  Alpha, Beta, Gamma: Double; Period: Integer; DType: TDecompType): TDoubleArray;
+class function TTimeSeriesKit.TripleExponentialSmoothing(
+  const Y: TDoubleArray;
+  Alpha, Beta, Gamma: Double;
+  Period: Integer;
+  DType: TDecompType): TDoubleArray;
 { Holt-Winters: level L, trend B, seasonal S[0..Period-1] }
 var
   N, I, K: Integer;
@@ -576,8 +589,11 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.HoltWintersForecast(const Y: TDoubleArray;
-  Alpha, Beta, Gamma: Double; Period, H: Integer; DType: TDecompType): TDoubleArray;
+class function TTimeSeriesKit.HoltWintersForecast(
+  const Y: TDoubleArray;
+  Alpha, Beta, Gamma: Double;
+  Period, H: Integer;
+  DType: TDecompType): TDoubleArray;
 { Run the Holt-Winters update loop to get final state, then project H steps }
 var
   N, I, K: Integer;
@@ -639,8 +655,7 @@ end;
   DECOMPOSITION
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.Decompose(const Y: TDoubleArray;
-  Period: Integer; DType: TDecompType): TDecomposition;
+class function TTimeSeriesKit.Decompose(const Y: TDoubleArray; Period: Integer; DType: TDecompType): TDecomposition;
 { Classical decomposition:
   1. Trend via centred moving average of width Period.
   2. Seasonal = average of (Y/Trend or Y-Trend) per cycle position.
@@ -718,8 +733,7 @@ end;
   DIFFERENCING
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.Difference(const Y: TDoubleArray;
-  D: Integer): TDoubleArray;
+class function TTimeSeriesKit.Difference(const Y: TDoubleArray; D: Integer): TDoubleArray;
 var I, Ord: Integer; Cur: TDoubleArray;
 begin
   if D < 0 then raise ETimeSeriesError.Create('Difference: D must be >= 0');
@@ -736,8 +750,10 @@ begin
   if D = 0 then Result := Cur;
 end;
 
-class function TTimeSeriesKit.Undifference(const DiffY: TDoubleArray;
-  const InitVals: TDoubleArray; D: Integer): TDoubleArray;
+class function TTimeSeriesKit.Undifference(
+  const DiffY: TDoubleArray;
+  const InitVals: TDoubleArray;
+  D: Integer): TDoubleArray;
 { Reconstruct by cumulative summation, D times.
   InitVals[0..D-1] = the first D values of the original series.
   We pre-compute the successive differences of InitVals to obtain the
@@ -774,8 +790,7 @@ end;
   AUGMENTED DICKEY-FULLER
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.AugmentedDickeyFuller(const Y: TDoubleArray;
-  Lags: Integer): TADFResult;
+class function TTimeSeriesKit.AugmentedDickeyFuller(const Y: TDoubleArray; Lags: Integer): TADFResult;
 { Regression: ΔY_t = alpha + beta*Y_{t-1} + sum(gamma_j*ΔY_{t-j}) + e_t
   Test statistic = beta / SE(beta).  MacKinnon (1994) critical values. }
 var
@@ -883,8 +898,7 @@ end;
   AUTOCORRELATION
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.ACF(const Y: TDoubleArray;
-  MaxLag: Integer): TDoubleArray;
+class function TTimeSeriesKit.ACF(const Y: TDoubleArray; MaxLag: Integer): TDoubleArray;
 { r_k = Cov(Y_t, Y_{t-k}) / Var(Y) }
 var
   N, I, K: Integer;
@@ -908,8 +922,7 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.PACF(const Y: TDoubleArray;
-  MaxLag: Integer): TDoubleArray;
+class function TTimeSeriesKit.PACF(const Y: TDoubleArray; MaxLag: Integer): TDoubleArray;
 { Yule-Walker equations solved iteratively (Durbin-Levinson) }
 var
   N, K, I, J: Integer;
@@ -948,8 +961,7 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.LjungBox(const Y: TDoubleArray;
-  MaxLag: Integer): Double;
+class function TTimeSeriesKit.LjungBox(const Y: TDoubleArray; MaxLag: Integer): Double;
 { Q = N*(N+2) * sum_{k=1}^{MaxLag} r_k^2 / (N-k) }
 var
   N, K: Integer;
@@ -967,8 +979,7 @@ end;
   ARIMA
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.ARFit(const Y: TDoubleArray;
-  P: Integer): TARIMAModel;
+class function TTimeSeriesKit.ARFit(const Y: TDoubleArray; P: Integer): TARIMAModel;
 { Yule-Walker: solve Toeplitz system R*phi = r using ACF }
 var
   N, I, J: Integer;
@@ -1011,8 +1022,10 @@ begin
   SetLength(Result.MACoeffs, 0);
 end;
 
-class function TTimeSeriesKit.ARForecast(const Model: TARIMAModel;
-  const History: TDoubleArray; H: Integer): TDoubleArray;
+class function TTimeSeriesKit.ARForecast(
+  const Model: TARIMAModel;
+  const History: TDoubleArray;
+  H: Integer): TDoubleArray;
 { Recursively apply AR recursion: Y_hat_t = mu + phi_1*(Y_{t-1}-mu) + ... }
 var
   N, I, J, P: Integer;
@@ -1038,8 +1051,7 @@ begin
   for I := 0 to H-1 do Result[I] := Buf[N+I];
 end;
 
-class function TTimeSeriesKit.MAFit(const Y: TDoubleArray;
-  Q: Integer): TARIMAModel;
+class function TTimeSeriesKit.MAFit(const Y: TDoubleArray; Q: Integer): TARIMAModel;
 { Approximate MA(q) via innovations algorithm on the ACF.
   theta[1..q] approximated from ACF using the Durbin relations. }
 var
@@ -1083,8 +1095,7 @@ begin
   SetLength(Result.ARCoeffs, 0);
 end;
 
-class function TTimeSeriesKit.ARIMAFit(const Y: TDoubleArray;
-  P, D, Q: Integer): TARIMAModel;
+class function TTimeSeriesKit.ARIMAFit(const Y: TDoubleArray; P, D, Q: Integer): TARIMAModel;
 var
   Z: TDoubleArray;
   ARMod, MAMod: TARIMAModel;
@@ -1135,8 +1146,10 @@ begin
   else SetLength(Result.MACoeffs, 0);
 end;
 
-class function TTimeSeriesKit.ARIMAForecast(const Model: TARIMAModel;
-  const OriginalY: TDoubleArray; H: Integer): TDoubleArray;
+class function TTimeSeriesKit.ARIMAForecast(
+  const Model: TARIMAModel;
+  const OriginalY: TDoubleArray;
+  H: Integer): TDoubleArray;
 var
   Z, ZFcast: TDoubleArray;
   InitVals: TDoubleArray;
@@ -1168,8 +1181,7 @@ end;
   CHANGE-POINT & ANOMALY DETECTION
 --------------------------------------------------------------------------- }
 
-class function TTimeSeriesKit.CUSUMDetect(const Y: TDoubleArray;
-  Threshold: Double; Target: Double): TCUSUMResult;
+class function TTimeSeriesKit.CUSUMDetect(const Y: TDoubleArray; Threshold: Double; Target: Double): TCUSUMResult;
 var
   N, I: Integer;
   Mu, StdDev, CS, Sum, SumSq: Double;
@@ -1201,8 +1213,7 @@ begin
   end;
 end;
 
-class function TTimeSeriesKit.ZScoreAnomalies(const Y: TDoubleArray;
-  Threshold: Double): TIntegerArray;
+class function TTimeSeriesKit.ZScoreAnomalies(const Y: TDoubleArray; Threshold: Double): TIntegerArray;
 var
   N, I, Count: Integer;
   Mu, StdDev, Sum, SumSq: Double;
@@ -1225,8 +1236,7 @@ begin
   SetLength(Result, Count);
 end;
 
-class function TTimeSeriesKit.RollingZScore(const Y: TDoubleArray;
-  Window: Integer; Threshold: Double): TIntegerArray;
+class function TTimeSeriesKit.RollingZScore(const Y: TDoubleArray; Window: Integer; Threshold: Double): TIntegerArray;
 var
   N, I, Lo, Count, J, WN: Integer;
   Mu, StdDev, Sum, SumSq: Double;
@@ -1307,8 +1317,7 @@ begin
     Result[I] := Y[I] - (T.Intercept + T.Slope * I);
 end;
 
-class function TTimeSeriesKit.SeasonalStrength(
-  const Decomp: TDecomposition): Double;
+class function TTimeSeriesKit.SeasonalStrength(const Decomp: TDecomposition): Double;
 { F_S = max(0, 1 - Var(R) / Var(S+R)) }
 var
   N, I: Integer;
@@ -1384,8 +1393,7 @@ begin
     Result[I] := (Re[I]*Re[I] + Im[I]*Im[I]) / NPow;
 end;
 
-class function TTimeSeriesKit.PeriodogramPeak(const Y: TDoubleArray;
-  MinPeriod, MaxPeriod: Integer): Integer;
+class function TTimeSeriesKit.PeriodogramPeak(const Y: TDoubleArray; MinPeriod, MaxPeriod: Integer): Integer;
 { Find frequency bin k with highest power; period = N/k }
 var
   N, NF, I, KMin, KMax, BestK: Integer;

@@ -43,8 +43,7 @@ type
       EPS2 = 1E-4;   { looser tolerance for series approximations }
 
     { Asserts two doubles are within Tol of each other }
-    procedure AssertNear(const Expected, Actual, Tol: Double;
-      const Msg: String = '');
+    procedure AssertNear(const Expected, Actual, Tol: Double; const Msg: String = '');
 
     { Wrappers that trigger EProbabilityError — used with AssertException }
     procedure DoNormalPDF_BadSigma;
@@ -212,8 +211,7 @@ type
 
 implementation
 
-procedure TTestProbabilityLib.AssertNear(const Expected, Actual, Tol: Double;
-  const Msg: String);
+procedure TTestProbabilityLib.AssertNear(const Expected, Actual, Tol: Double; const Msg: String);
 begin
   if Abs(Expected - Actual) > Tol then
     Fail(Format('%s  expected %.10f, got %.10f  (tol %.2e)',

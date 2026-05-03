@@ -20,11 +20,29 @@ type
     { Bernoulli's Principle (for incompressible, inviscid flow along a streamline) }
     // P₁ + ½ρv₁² + ρgh₁ = P₂ + ½ρv₂² + ρgh₂
     // Calculates pressure at point 2 given conditions at point 1 and velocity/height at point 2
-    class function BernoulliPressure(Density: Double; Pressure1: Double; Velocity1: Double; Height1: Double; Velocity2: Double; Height2: Double): Double; static;
+    class function BernoulliPressure(
+      Density: Double;
+      Pressure1: Double;
+      Velocity1: Double;
+      Height1: Double;
+      Velocity2: Double;
+      Height2: Double): Double; static;
     // Calculates velocity at point 2 given conditions at point 1 and pressure/height at point 2
-    class function BernoulliVelocity(Density: Double; Pressure1: Double; Velocity1: Double; Height1: Double; Pressure2: Double; Height2: Double): Double; static;
+    class function BernoulliVelocity(
+      Density: Double;
+      Pressure1: Double;
+      Velocity1: Double;
+      Height1: Double;
+      Pressure2: Double;
+      Height2: Double): Double; static;
     // Calculates height at point 2 given conditions at point 1 and pressure/velocity at point 2
-    class function BernoulliHeight(Density: Double; Pressure1: Double; Velocity1: Double; Height1: Double; Pressure2: Double; Velocity2: Double): Double; static;
+    class function BernoulliHeight(
+      Density: Double;
+      Pressure1: Double;
+      Velocity1: Double;
+      Height1: Double;
+      Pressure2: Double;
+      Velocity2: Double): Double; static;
 
     { Flow Rate }
     // Rename one of the VolumeFlowRate functions to eliminate duplicate identifier
@@ -35,19 +53,38 @@ type
 
     { Reynolds Number (characterizes flow regime - laminar vs turbulent) }
     // Re = (ρ * v * L) / μ
-    class function ReynoldsNumber(Density: Double; Velocity: Double; CharacteristicLength: Double; DynamicViscosity: Double): Double; static;
+    class function ReynoldsNumber(
+      Density: Double;
+      Velocity: Double;
+      CharacteristicLength: Double;
+      DynamicViscosity: Double): Double; static;
     // Re = (v * L) / ν (where ν = μ / ρ is kinematic viscosity)
-    class function ReynoldsNumberKinematic(Velocity: Double; CharacteristicLength: Double; KinematicViscosity: Double): Double; static;
+    class function ReynoldsNumberKinematic(
+      Velocity: Double;
+      CharacteristicLength: Double;
+      KinematicViscosity: Double): Double; static;
 
     { Pipe Flow }
     // Head loss in pipe due to friction (Darcy-Weisbach equation): hf = f * (L/D) * (v²/2g)
-    class function FrictionHeadLoss(FrictionFactor: Double; Length: Double; Diameter: Double; Velocity: Double): Double; static;
+    class function FrictionHeadLoss(
+      FrictionFactor: Double;
+      Length: Double;
+      Diameter: Double;
+      Velocity: Double): Double; static;
     // Hazen-Williams formula for head loss in water pipes
-    class function HazenWilliamsHeadLoss(Length: Double; Diameter: Double; FlowRate: Double; CHW: Double): Double; static;
+    class function HazenWilliamsHeadLoss(
+      Length: Double;
+      Diameter: Double;
+      FlowRate: Double;
+      CHW: Double): Double; static;
     // Darcy friction factor for laminar flow: f = 64/Re
     class function LaminarFrictionFactor(ReynoldsNumberValue: Double): Double; static;
     // Darcy friction factor for turbulent flow (Colebrook-White equation - iterative)
-    class function TurbulentFrictionFactor(ReynoldsNumberValue: Double; RelativeRoughness: Double; Tolerance: Double = 1E-6; MaxIterations: Integer = 100): Double; static;
+    class function TurbulentFrictionFactor(
+      ReynoldsNumberValue: Double;
+      RelativeRoughness: Double;
+      Tolerance: Double = 1E-6;
+      MaxIterations: Integer = 100): Double; static;
     // Simplified Blasius correlation for smooth pipes: f = 0.316/Re^0.25 (valid for 4000 < Re < 10⁵)
     class function BlasiusFrictionFactor(ReynoldsNumberValue: Double): Double; static;
 
@@ -55,7 +92,11 @@ type
     // Froude number (ratio of inertial to gravitational forces): Fr = v/sqrt(g*L)
     class function FroudeNumber(Velocity: Double; CharacteristicLength: Double): Double; static;
     // Weber number (ratio of inertial force to surface tension): We = (ρ*v²*L)/σ
-    class function WeberNumber(Density: Double; Velocity: Double; CharacteristicLength: Double; SurfaceTension: Double): Double; static;
+    class function WeberNumber(
+      Density: Double;
+      Velocity: Double;
+      CharacteristicLength: Double;
+      SurfaceTension: Double): Double; static;
     // Euler number (ratio of pressure forces to inertial forces): Eu = ΔP/(ρ*v²)
     class function EulerNumber(PressureDifference: Double; Density: Double; Velocity: Double): Double; static;
     // Mach number (ratio of flow velocity to speed of sound): Ma = v/c
@@ -63,21 +104,39 @@ type
     // Strouhal number (measures oscillating flow mechanisms): St = (f*L)/v
     class function StrouhalNumber(Frequency: Double; CharacteristicLength: Double; Velocity: Double): Double; static;
     // Prandtl number (ratio of momentum diffusivity to thermal diffusivity): Pr = ν/α = (μ*cp)/k
-    class function PrandtlNumber(DynamicViscosity: Double; SpecificHeat: Double; ThermalConductivity: Double): Double; static;
+    class function PrandtlNumber(
+      DynamicViscosity: Double;
+      SpecificHeat: Double;
+      ThermalConductivity: Double): Double; static;
     // Nusselt number (ratio of convective to conductive heat transfer): Nu = (h*L)/k
-    class function NusseltNumber(HeatTransferCoefficient: Double; CharacteristicLength: Double; ThermalConductivity: Double): Double; static;
+    class function NusseltNumber(
+      HeatTransferCoefficient: Double;
+      CharacteristicLength: Double;
+      ThermalConductivity: Double): Double; static;
 
     { Aerodynamics }
     // Lift force: L = CL * 0.5 * ρ * v² * A
-    class function LiftForce(LiftCoefficient: Double; Density: Double; Velocity: Double; ReferenceArea: Double): Double; static;
+    class function LiftForce(
+      LiftCoefficient: Double;
+      Density: Double;
+      Velocity: Double;
+      ReferenceArea: Double): Double; static;
     // Drag force: D = CD * 0.5 * ρ * v² * A
-    class function DragForce(DragCoefficient: Double; Density: Double; Velocity: Double; ReferenceArea: Double): Double; static;
+    class function DragForce(
+      DragCoefficient: Double;
+      Density: Double;
+      Velocity: Double;
+      ReferenceArea: Double): Double; static;
     // Dynamic pressure: q = 0.5 * ρ * v²
     class function DynamicPressure(Density: Double; Velocity: Double): Double; static;
     // Stagnation pressure: p0 = p + q
     class function StagnationPressure(StaticPressure: Double; DynamicPressureValue: Double): Double; static;
     // Coefficient of pressure: Cp = (p - p∞)/(0.5*ρ*v²)
-    class function PressureCoefficient(Pressure: Double; FreeStreamPressure: Double; FreeStreamDensity: Double; FreeStreamVelocity: Double): Double; static;
+    class function PressureCoefficient(
+      Pressure: Double;
+      FreeStreamPressure: Double;
+      FreeStreamDensity: Double;
+      FreeStreamVelocity: Double): Double; static;
 
     { Compressible Flow }
     // Speed of sound in ideal gas: c = sqrt(γ*R*T)
@@ -93,7 +152,11 @@ type
     // Pump power: P = ρ*g*Q*H / η
     class function PumpPower(Density: Double; FlowRate: Double; Head: Double; Efficiency: Double): Double; static;
     // Pump head (energy per unit weight): H = (p2-p1)/(ρ*g) + (v2²-v1²)/(2*g) + (z2-z1)
-    class function PumpHead(PressureDiff: Double; Density: Double; VelocityDiff: Double; HeightDiff: Double): Double; static;
+    class function PumpHead(
+      PressureDiff: Double;
+      Density: Double;
+      VelocityDiff: Double;
+      HeightDiff: Double): Double; static;
     // Specific speed of pumps: Ns = N*sqrt(Q)/H^(3/4), where N is RPM
     class function PumpSpecificSpeed(RPM: Double; FlowRate: Double; Head: Double): Double; static;
     // Turbine power output: P = η*ρ*g*Q*H
@@ -101,9 +164,15 @@ type
 
     { Open Channel Flow }
     // Chezy formula for open channel flow: v = C*sqrt(R*S)
-    class function ChezyVelocity(ChezyCoefficient: Double; HydraulicRadius: Double; ChannelSlope: Double): Double; static;
+    class function ChezyVelocity(
+      ChezyCoefficient: Double;
+      HydraulicRadius: Double;
+      ChannelSlope: Double): Double; static;
     // Manning equation: v = (1/n)*R^(2/3)*S^(1/2)
-    class function ManningVelocity(ManningCoefficient: Double; HydraulicRadius: Double; ChannelSlope: Double): Double; static;
+    class function ManningVelocity(
+      ManningCoefficient: Double;
+      HydraulicRadius: Double;
+      ChannelSlope: Double): Double; static;
     // Critical depth for rectangular channel: yc = (q²/g)^(1/3)
     class function CriticalDepthRectangular(UnitDischarge: Double): Double; static;
     // Froude number for open channel: Fr = v/sqrt(g*y)
@@ -122,14 +191,26 @@ implementation
 
 { TFluidDynamicsKit }
 
-class function TFluidDynamicsKit.BernoulliPressure(Density: Double; Pressure1: Double; Velocity1: Double; Height1: Double; Velocity2: Double; Height2: Double): Double;
+class function TFluidDynamicsKit.BernoulliPressure(
+  Density: Double;
+  Pressure1: Double;
+  Velocity1: Double;
+  Height1: Double;
+  Velocity2: Double;
+  Height2: Double): Double;
 begin
   if Density <= 0 then
     raise Exception.Create('Density must be positive for Bernoulli calculation.');
   Result := Pressure1 + 0.5 * Density * (Power(Velocity1, 2) - Power(Velocity2, 2)) + Density * GravityAcceleration * (Height1 - Height2);
 end;
 
-class function TFluidDynamicsKit.BernoulliVelocity(Density: Double; Pressure1: Double; Velocity1: Double; Height1: Double; Pressure2: Double; Height2: Double): Double;
+class function TFluidDynamicsKit.BernoulliVelocity(
+  Density: Double;
+  Pressure1: Double;
+  Velocity1: Double;
+  Height1: Double;
+  Pressure2: Double;
+  Height2: Double): Double;
 var
   VelocitySquared: Double;
 begin
@@ -141,7 +222,13 @@ begin
   Result := Sqrt(VelocitySquared);
 end;
 
-class function TFluidDynamicsKit.BernoulliHeight(Density: Double; Pressure1: Double; Velocity1: Double; Height1: Double; Pressure2: Double; Velocity2: Double): Double;
+class function TFluidDynamicsKit.BernoulliHeight(
+  Density: Double;
+  Pressure1: Double;
+  Velocity1: Double;
+  Height1: Double;
+  Pressure2: Double;
+  Velocity2: Double): Double;
 begin
   if Density <= 0 then
     raise Exception.Create('Density must be positive for Bernoulli calculation.');
@@ -171,7 +258,11 @@ begin
   Result := Density * VolumeFlowRate;
 end;
 
-class function TFluidDynamicsKit.ReynoldsNumber(Density: Double; Velocity: Double; CharacteristicLength: Double; DynamicViscosity: Double): Double;
+class function TFluidDynamicsKit.ReynoldsNumber(
+  Density: Double;
+  Velocity: Double;
+  CharacteristicLength: Double;
+  DynamicViscosity: Double): Double;
 begin
   if DynamicViscosity <= 0 then
     raise Exception.Create('Dynamic viscosity must be positive for Reynolds number calculation.');
@@ -180,14 +271,21 @@ begin
   Result := (Density * Velocity * CharacteristicLength) / DynamicViscosity;
 end;
 
-class function TFluidDynamicsKit.ReynoldsNumberKinematic(Velocity: Double; CharacteristicLength: Double; KinematicViscosity: Double): Double;
+class function TFluidDynamicsKit.ReynoldsNumberKinematic(
+  Velocity: Double;
+  CharacteristicLength: Double;
+  KinematicViscosity: Double): Double;
 begin
   if KinematicViscosity <= 0 then
     raise Exception.Create('Kinematic viscosity must be positive for Reynolds number calculation.');
   Result := (Velocity * CharacteristicLength) / KinematicViscosity;
 end;
 
-class function TFluidDynamicsKit.FrictionHeadLoss(FrictionFactor: Double; Length: Double; Diameter: Double; Velocity: Double): Double;
+class function TFluidDynamicsKit.FrictionHeadLoss(
+  FrictionFactor: Double;
+  Length: Double;
+  Diameter: Double;
+  Velocity: Double): Double;
 begin
   if Diameter <= 0 then
     raise Exception.Create('Diameter must be positive for head loss calculation.');
@@ -197,7 +295,11 @@ begin
   Result := FrictionFactor * (Length / Diameter) * (Power(Velocity, 2) / (2 * GravityAcceleration));
 end;
 
-class function TFluidDynamicsKit.HazenWilliamsHeadLoss(Length: Double; Diameter: Double; FlowRate: Double; CHW: Double): Double;
+class function TFluidDynamicsKit.HazenWilliamsHeadLoss(
+  Length: Double;
+  Diameter: Double;
+  FlowRate: Double;
+  CHW: Double): Double;
 const
   K = 10.67; // Constant for SI units
 begin
@@ -222,7 +324,11 @@ begin
   Result := 64 / ReynoldsNumberValue;
 end;
 
-class function TFluidDynamicsKit.TurbulentFrictionFactor(ReynoldsNumberValue: Double; RelativeRoughness: Double; Tolerance: Double; MaxIterations: Integer): Double;
+class function TFluidDynamicsKit.TurbulentFrictionFactor(
+  ReynoldsNumberValue: Double;
+  RelativeRoughness: Double;
+  Tolerance: Double;
+  MaxIterations: Integer): Double;
 var
   f_old, f_new: Double;
   i: Integer;
@@ -270,7 +376,11 @@ begin
   Result := Velocity / Sqrt(GravityAcceleration * CharacteristicLength);
 end;
 
-class function TFluidDynamicsKit.WeberNumber(Density: Double; Velocity: Double; CharacteristicLength: Double; SurfaceTension: Double): Double;
+class function TFluidDynamicsKit.WeberNumber(
+  Density: Double;
+  Velocity: Double;
+  CharacteristicLength: Double;
+  SurfaceTension: Double): Double;
 begin
   if (Density < 0) or (CharacteristicLength <= 0) or (SurfaceTension <= 0) then
     raise Exception.Create('Density cannot be negative; characteristic length and surface tension must be positive.');
@@ -296,7 +406,10 @@ begin
   Result := Velocity / SpeedOfSound;
 end;
 
-class function TFluidDynamicsKit.StrouhalNumber(Frequency: Double; CharacteristicLength: Double; Velocity: Double): Double;
+class function TFluidDynamicsKit.StrouhalNumber(
+  Frequency: Double;
+  CharacteristicLength: Double;
+  Velocity: Double): Double;
 begin
   if (CharacteristicLength <= 0) or (Velocity = 0) then
     raise Exception.Create('Characteristic length must be positive and velocity non-zero for Strouhal number.');
@@ -304,7 +417,10 @@ begin
   Result := (Frequency * CharacteristicLength) / Velocity;
 end;
 
-class function TFluidDynamicsKit.PrandtlNumber(DynamicViscosity: Double; SpecificHeat: Double; ThermalConductivity: Double): Double;
+class function TFluidDynamicsKit.PrandtlNumber(
+  DynamicViscosity: Double;
+  SpecificHeat: Double;
+  ThermalConductivity: Double): Double;
 begin
   if (DynamicViscosity < 0) or (SpecificHeat <= 0) or (ThermalConductivity <= 0) then
     raise Exception.Create('Dynamic viscosity cannot be negative; specific heat and thermal conductivity must be positive.');
@@ -312,7 +428,10 @@ begin
   Result := (DynamicViscosity * SpecificHeat) / ThermalConductivity;
 end;
 
-class function TFluidDynamicsKit.NusseltNumber(HeatTransferCoefficient: Double; CharacteristicLength: Double; ThermalConductivity: Double): Double;
+class function TFluidDynamicsKit.NusseltNumber(
+  HeatTransferCoefficient: Double;
+  CharacteristicLength: Double;
+  ThermalConductivity: Double): Double;
 begin
   if (HeatTransferCoefficient <= 0) or (CharacteristicLength <= 0) or (ThermalConductivity <= 0) then
     raise Exception.Create('Heat transfer coefficient, characteristic length, and thermal conductivity must be positive.');
@@ -320,7 +439,11 @@ begin
   Result := (HeatTransferCoefficient * CharacteristicLength) / ThermalConductivity;
 end;
 
-class function TFluidDynamicsKit.LiftForce(LiftCoefficient: Double; Density: Double; Velocity: Double; ReferenceArea: Double): Double;
+class function TFluidDynamicsKit.LiftForce(
+  LiftCoefficient: Double;
+  Density: Double;
+  Velocity: Double;
+  ReferenceArea: Double): Double;
 begin
   if (Density < 0) or (ReferenceArea < 0) then
     raise Exception.Create('Density and reference area cannot be negative.');
@@ -328,7 +451,11 @@ begin
   Result := LiftCoefficient * 0.5 * Density * Power(Velocity, 2) * ReferenceArea;
 end;
 
-class function TFluidDynamicsKit.DragForce(DragCoefficient: Double; Density: Double; Velocity: Double; ReferenceArea: Double): Double;
+class function TFluidDynamicsKit.DragForce(
+  DragCoefficient: Double;
+  Density: Double;
+  Velocity: Double;
+  ReferenceArea: Double): Double;
 begin
   if (Density < 0) or (ReferenceArea < 0) then
     raise Exception.Create('Density and reference area cannot be negative.');
@@ -349,7 +476,11 @@ begin
   Result := StaticPressure + DynamicPressureValue;
 end;
 
-class function TFluidDynamicsKit.PressureCoefficient(Pressure: Double; FreeStreamPressure: Double; FreeStreamDensity: Double; FreeStreamVelocity: Double): Double;
+class function TFluidDynamicsKit.PressureCoefficient(
+  Pressure: Double;
+  FreeStreamPressure: Double;
+  FreeStreamDensity: Double;
+  FreeStreamVelocity: Double): Double;
 var
   DynPressure: Double; // Changed from DynamicPressure to DynPressure to avoid conflict
 begin
@@ -362,7 +493,10 @@ begin
   Result := (Pressure - FreeStreamPressure) / DynPressure;
 end;
 
-class function TFluidDynamicsKit.SpeedOfSound(SpecificHeatRatio: Double; GasConstant: Double; Temperature: Double): Double;
+class function TFluidDynamicsKit.SpeedOfSound(
+  SpecificHeatRatio: Double;
+  GasConstant: Double;
+  Temperature: Double): Double;
 begin
   if (SpecificHeatRatio <= 1) or (GasConstant <= 0) or (Temperature <= 0) then
     raise Exception.Create('Specific heat ratio must be > 1; gas constant and temperature must be positive.');
@@ -407,7 +541,11 @@ begin
   Result := Density * GravityAcceleration * FlowRate * Head / Efficiency;
 end;
 
-class function TFluidDynamicsKit.PumpHead(PressureDiff: Double; Density: Double; VelocityDiff: Double; HeightDiff: Double): Double;
+class function TFluidDynamicsKit.PumpHead(
+  PressureDiff: Double;
+  Density: Double;
+  VelocityDiff: Double;
+  HeightDiff: Double): Double;
 begin
   if Density <= 0 then
     raise Exception.Create('Density must be positive for pump head calculation.');
@@ -424,7 +562,11 @@ begin
   Result := RPM * Sqrt(FlowRate) / Power(Head, 0.75);
 end;
 
-class function TFluidDynamicsKit.TurbinePower(Efficiency: Double; Density: Double; FlowRate: Double; Head: Double): Double;
+class function TFluidDynamicsKit.TurbinePower(
+  Efficiency: Double;
+  Density: Double;
+  FlowRate: Double;
+  Head: Double): Double;
 begin
   if (Efficiency <= 0) or (Efficiency > 1) or (Density <= 0) or (Head < 0) then
     raise Exception.Create('Efficiency must be between 0 and 1; density must be positive.');
@@ -432,7 +574,10 @@ begin
   Result := Efficiency * Density * GravityAcceleration * FlowRate * Head;
 end;
 
-class function TFluidDynamicsKit.ChezyVelocity(ChezyCoefficient: Double; HydraulicRadius: Double; ChannelSlope: Double): Double;
+class function TFluidDynamicsKit.ChezyVelocity(
+  ChezyCoefficient: Double;
+  HydraulicRadius: Double;
+  ChannelSlope: Double): Double;
 begin
   if (ChezyCoefficient <= 0) or (HydraulicRadius <= 0) or (ChannelSlope <= 0) then
     raise Exception.Create('Chezy coefficient, hydraulic radius, and channel slope must be positive.');
@@ -440,7 +585,10 @@ begin
   Result := ChezyCoefficient * Sqrt(HydraulicRadius * ChannelSlope);
 end;
 
-class function TFluidDynamicsKit.ManningVelocity(ManningCoefficient: Double; HydraulicRadius: Double; ChannelSlope: Double): Double;
+class function TFluidDynamicsKit.ManningVelocity(
+  ManningCoefficient: Double;
+  HydraulicRadius: Double;
+  ChannelSlope: Double): Double;
 begin
   if (ManningCoefficient <= 0) or (HydraulicRadius <= 0) or (ChannelSlope <= 0) then
     raise Exception.Create('Manning coefficient, hydraulic radius, and channel slope must be positive.');

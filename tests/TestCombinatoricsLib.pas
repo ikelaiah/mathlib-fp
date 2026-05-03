@@ -176,8 +176,7 @@ type
 
 implementation
 
-procedure TTestCombinatoricsLib.AssertNearD(const Expected, Actual, Tol: Double;
-  const Msg: String);
+procedure TTestCombinatoricsLib.AssertNearD(const Expected, Actual, Tol: Double; const Msg: String);
 begin
   if Abs(Expected - Actual) > Tol then
     Fail(Format('%s  expected %.12f  got %.12f  (tol %.2e)',
@@ -185,19 +184,22 @@ begin
 end;
 
 { --- exception wrappers --- }
-procedure TTestCombinatoricsLib.DoFactorial_Negative;    begin TCombinatoricsKit.Factorial(-1); end;
-procedure TTestCombinatoricsLib.DoFactorial_TooLarge;    begin TCombinatoricsKit.Factorial(21); end;
-procedure TTestCombinatoricsLib.DoPermutation_KgtN;      begin TCombinatoricsKit.Permutation(3, 5); end;
-procedure TTestCombinatoricsLib.DoCombination_KgtN;      begin TCombinatoricsKit.Combination(3, 5); end;
-procedure TTestCombinatoricsLib.DoMultinomial_WrongSum;  begin TCombinatoricsKit.Multinomial(10, TIntegerArray.Create(2,3)); end;
+procedure TTestCombinatoricsLib.DoFactorial_Negative; begin TCombinatoricsKit.Factorial(-1); end;
+procedure TTestCombinatoricsLib.DoFactorial_TooLarge; begin TCombinatoricsKit.Factorial(21); end;
+procedure TTestCombinatoricsLib.DoPermutation_KgtN; begin TCombinatoricsKit.Permutation(3, 5); end;
+procedure TTestCombinatoricsLib.DoCombination_KgtN; begin TCombinatoricsKit.Combination(3, 5); end;
+procedure TTestCombinatoricsLib.DoMultinomial_WrongSum;
+begin
+  TCombinatoricsKit.Multinomial(10, TIntegerArray.Create(2,3));
+end;
 procedure TTestCombinatoricsLib.DoCatalanNumber_TooLarge;begin TCombinatoricsKit.CatalanNumber(31); end;
-procedure TTestCombinatoricsLib.DoBellNumber_TooLarge;   begin TCombinatoricsKit.BellNumber(19); end;
-procedure TTestCombinatoricsLib.DoModPow_ZeroM;          begin TCombinatoricsKit.ModPow(2, 10, 0); end;
-procedure TTestCombinatoricsLib.DoModInverse_NoInverse;  begin TCombinatoricsKit.ModInverse(4, 6); end;
-procedure TTestCombinatoricsLib.DoSieve_TooSmall;        begin TCombinatoricsKit.Sieve(1); end;
-procedure TTestCombinatoricsLib.DoPowerSet_TooLarge;     begin TCombinatoricsKit.PowerSet(25); end;
-procedure TTestCombinatoricsLib.DoFibonacci_Negative;    begin TCombinatoricsKit.Fibonacci(-1); end;
-procedure TTestCombinatoricsLib.DoPrimeFactors_One;      begin TCombinatoricsKit.PrimeFactors(1); end;
+procedure TTestCombinatoricsLib.DoBellNumber_TooLarge; begin TCombinatoricsKit.BellNumber(19); end;
+procedure TTestCombinatoricsLib.DoModPow_ZeroM; begin TCombinatoricsKit.ModPow(2, 10, 0); end;
+procedure TTestCombinatoricsLib.DoModInverse_NoInverse; begin TCombinatoricsKit.ModInverse(4, 6); end;
+procedure TTestCombinatoricsLib.DoSieve_TooSmall; begin TCombinatoricsKit.Sieve(1); end;
+procedure TTestCombinatoricsLib.DoPowerSet_TooLarge; begin TCombinatoricsKit.PowerSet(25); end;
+procedure TTestCombinatoricsLib.DoFibonacci_Negative; begin TCombinatoricsKit.Fibonacci(-1); end;
+procedure TTestCombinatoricsLib.DoPrimeFactors_One; begin TCombinatoricsKit.PrimeFactors(1); end;
 
 { ===========================================================================
   FACTORIAL

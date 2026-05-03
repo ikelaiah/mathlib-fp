@@ -91,12 +91,10 @@ type
     class function MillerRabinWitness(const N, A: Int64): Boolean; static;
 
     { Internal: multiply a 2x2 Int64 matrix (for Fibonacci fast-doubling) }
-    class procedure MatMul2x2(const A, B: array of Int64;
-      out C: array of Int64); static;
+    class procedure MatMul2x2(const A, B: array of Int64; out C: array of Int64); static;
 
     { Internal: raise 2x2 matrix to power P }
-    class procedure MatPow2x2(M: array of Int64; P: Int64;
-      out R: array of Int64); static;
+    class procedure MatPow2x2(M: array of Int64; P: Int64; out R: array of Int64); static;
 
   public
 
@@ -321,8 +319,7 @@ begin
   Result := True;  { composite }
 end;
 
-class procedure TCombinatoricsKit.MatMul2x2(const A, B: array of Int64;
-  out C: array of Int64);
+class procedure TCombinatoricsKit.MatMul2x2(const A, B: array of Int64; out C: array of Int64);
 { Multiply two 2x2 matrices stored as [a00, a01, a10, a11] }
 begin
   C[0] := A[0]*B[0] + A[1]*B[2];
@@ -331,8 +328,7 @@ begin
   C[3] := A[2]*B[1] + A[3]*B[3];
 end;
 
-class procedure TCombinatoricsKit.MatPow2x2(M: array of Int64; P: Int64;
-  out R: array of Int64);
+class procedure TCombinatoricsKit.MatPow2x2(M: array of Int64; P: Int64; out R: array of Int64);
 { Raise 2x2 matrix M to power P by repeated squaring }
 var
   Tmp: array[0..3] of Int64;
@@ -430,8 +426,7 @@ begin
   Result := LogFactorial(N) - LogFactorial(K) - LogFactorial(N - K);
 end;
 
-class function TCombinatoricsKit.Multinomial(N: Integer;
-  const K: TIntegerArray): Int64;
+class function TCombinatoricsKit.Multinomial(N: Integer; const K: TIntegerArray): Int64;
 { n! / (k[0]! * k[1]! * ... ) — checked that sum(K) = N }
 var
   I, Sum: Integer;
@@ -633,8 +628,7 @@ begin
   Result := Abs(A) div GCD(A, B) * Abs(B);
 end;
 
-class function TCombinatoricsKit.ExtendedGCD(A, B: Int64;
-  out X, Y: Int64): Int64;
+class function TCombinatoricsKit.ExtendedGCD(A, B: Int64; out X, Y: Int64): Int64;
 { Extended Euclidean algorithm — iterative version }
 var
   OldR, R, OldS, S, OldT, T, Q, Tmp: Int64;
@@ -810,8 +804,7 @@ end;
   PERMUTATION & COMBINATION GENERATION
 --------------------------------------------------------------------------- }
 
-class function TCombinatoricsKit.NextPermutation(
-  var Items: TIntegerArray): Boolean;
+class function TCombinatoricsKit.NextPermutation(var Items: TIntegerArray): Boolean;
 { Knuth's Algorithm L: find rightmost ascent, swap with ceiling, reverse tail }
 var
   N, I, J, K: Integer;
@@ -852,8 +845,7 @@ begin
   Result := True;
 end;
 
-class function TCombinatoricsKit.Permutations(
-  const Items: TIntegerArray): TPermutationList;
+class function TCombinatoricsKit.Permutations(const Items: TIntegerArray): TPermutationList;
 { Generate all permutations by sorting first then stepping with NextPermutation }
 var
   Perm: TIntegerArray;

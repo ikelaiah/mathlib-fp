@@ -30,8 +30,7 @@ type
       EPS_QUAD   = 1E-6;   { quadrature (composite rules use finite N) }
       EPS_INTERP = 1E-9;   { interpolation on polynomial data }
 
-    procedure AssertNear(const Expected, Actual, Tol: Double;
-      const Msg: String = '');
+    procedure AssertNear(const Expected, Actual, Tol: Double; const Msg: String = '');
 
     { Helpers for exception testing }
     procedure DoBisectionBadBracket;
@@ -121,12 +120,12 @@ function DFX_CosX_MinusX(X: Double): Double;
 begin Result := -Sin(X) - 1; end;
 
 { Integration test functions }
-function F_Linear(X: Double): Double;   begin Result := 2*X + 1; end;       { ∫0..1 = 2 }
+function F_Linear(X: Double): Double; begin Result := 2*X + 1; end;       { ∫0..1 = 2 }
 function F_Quadratic(X: Double): Double; begin Result := X*X; end;           { ∫0..1 = 1/3 }
-function F_Cubic(X: Double): Double;    begin Result := X*X*X; end;          { ∫0..1 = 0.25 }
-function F_Sine(X: Double): Double;     begin Result := Sin(X); end;         { ∫0..π = 2 }
-function F_Exp(X: Double): Double;      begin Result := Exp(X); end;         { ∫0..1 = e-1 }
-function F_Poly9(X: Double): Double;    begin Result := Power(X, 9); end;    { ∫0..1 = 0.1, degree 9 }
+function F_Cubic(X: Double): Double; begin Result := X*X*X; end;          { ∫0..1 = 0.25 }
+function F_Sine(X: Double): Double; begin Result := Sin(X); end;         { ∫0..π = 2 }
+function F_Exp(X: Double): Double; begin Result := Exp(X); end;         { ∫0..1 = e-1 }
+function F_Poly9(X: Double): Double; begin Result := Power(X, 9); end;    { ∫0..1 = 0.1, degree 9 }
 
 { ODE dy/dt = y  →  y(t) = y0 * exp(t) }
 function ODE_Exponential(T, Y: Double): Double;
@@ -146,8 +145,7 @@ begin Result := -Sin(T); end;  { d(cos t)/dt = -sin t }
   TTestNumericsLib helper
   ------------------------------------------------------------------------- }
 
-procedure TTestNumericsLib.AssertNear(const Expected, Actual, Tol: Double;
-  const Msg: String);
+procedure TTestNumericsLib.AssertNear(const Expected, Actual, Tol: Double; const Msg: String);
 begin
   AssertTrue(Msg + Format(' (expected %.10g, got %.10g, tol %.3g)',
     [Expected, Actual, Tol]), Abs(Expected - Actual) <= Tol);

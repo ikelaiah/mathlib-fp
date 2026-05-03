@@ -88,8 +88,7 @@ type
   TOptimizationKit = class
   private
     { Internal: numerical gradient via central differences }
-    class function NumericalGradient(F: TMultivarFunc;
-      const X: TDoubleArray; H: Double = 1E-5): TDoubleArray; static;
+    class function NumericalGradient(F: TMultivarFunc; const X: TDoubleArray; H: Double = 1E-5): TDoubleArray; static;
 
     { Internal: dot product of two vectors }
     class function Dot(const A, B: TDoubleArray): Double; static;
@@ -107,8 +106,11 @@ type
     class function VecCopy(const A: TDoubleArray): TDoubleArray; static;
 
     { Internal: backtracking line search (Armijo condition) }
-    class function LineSearch(F: TMultivarFunc; const X, Dir: TDoubleArray;
-      FX: Double; Alpha0: Double = 1.0): Double; static;
+    class function LineSearch(
+      F: TMultivarFunc;
+      const X, Dir: TDoubleArray;
+      FX: Double;
+      Alpha0: Double = 1.0): Double; static;
 
   public
 
@@ -123,16 +125,22 @@ type
 
       Example: find the minimum of (x-3)^2 on [0,10]
         xMin := TOptimizationKit.GoldenSection(f, 0, 10);  // ≈ 3.0 }
-    class function GoldenSection(F: TUnivarFunc; A, B: Double;
-      Tol: Double = 1E-8; MaxIter: Integer = 200): Double; static;
+    class function GoldenSection(
+      F: TUnivarFunc;
+      A, B: Double;
+      Tol: Double = 1E-8;
+      MaxIter: Integer = 200): Double; static;
 
     { Brent's method for single-variable minimization.
       Combines golden-section with parabolic interpolation — faster than
       GoldenSection for smooth functions, equally robust.
       Requires [A, B] to bracket a minimum (f has a valley inside).
       Returns the x value at the minimum. }
-    class function BrentMinimize(F: TUnivarFunc; A, B: Double;
-      Tol: Double = 1E-8; MaxIter: Integer = 200): Double; static;
+    class function BrentMinimize(
+      F: TUnivarFunc;
+      A, B: Double;
+      Tol: Double = 1E-8;
+      MaxIter: Integer = 200): Double; static;
 
     { =======================================================================
       GRADIENT-BASED MULTI-VARIABLE MINIMIZATION
@@ -149,9 +157,13 @@ type
 
       When to use: simple problems, educational purposes.
       For production use Adam or LBFGS instead. }
-    class function GradientDescent(F: TMultivarFunc; Grad: TGradFunc;
-      const X0: TDoubleArray; LR: Double = 0.1;
-      Tol: Double = 1E-6; MaxIter: Integer = 5000): TOptResult; static;
+    class function GradientDescent(
+      F: TMultivarFunc;
+      Grad: TGradFunc;
+      const X0: TDoubleArray;
+      LR: Double = 0.1;
+      Tol: Double = 1E-6;
+      MaxIter: Integer = 5000): TOptResult; static;
 
     { Adam optimizer (Adaptive Moment Estimation).
       The standard optimizer in deep learning — works well for non-convex
@@ -170,10 +182,15 @@ type
 
       Adam adapts the learning rate per parameter — you rarely need to tune
       it beyond the learning rate. }
-    class function Adam(F: TMultivarFunc; Grad: TGradFunc;
+    class function Adam(
+      F: TMultivarFunc;
+      Grad: TGradFunc;
       const X0: TDoubleArray;
-      LR: Double = 0.001; Beta1: Double = 0.9; Beta2: Double = 0.999;
-      Eps: Double = 1E-8; Tol: Double = 1E-6;
+      LR: Double = 0.001;
+      Beta1: Double = 0.9;
+      Beta2: Double = 0.999;
+      Eps: Double = 1E-8;
+      Tol: Double = 1E-6;
       MaxIter: Integer = 10000): TOptResult; static;
 
     { L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno).
@@ -191,9 +208,13 @@ type
       When to use: smooth objective functions, moderate dimensionality
       (N = 10s to 1000s of variables). Much faster than Adam on smooth
       convex problems. }
-    class function LBFGS(F: TMultivarFunc; Grad: TGradFunc;
-      const X0: TDoubleArray; M: Integer = 10;
-      Tol: Double = 1E-6; MaxIter: Integer = 1000): TOptResult; static;
+    class function LBFGS(
+      F: TMultivarFunc;
+      Grad: TGradFunc;
+      const X0: TDoubleArray;
+      M: Integer = 10;
+      Tol: Double = 1E-6;
+      MaxIter: Integer = 1000): TOptResult; static;
 
     { =======================================================================
       DERIVATIVE-FREE MULTI-VARIABLE MINIMIZATION
@@ -213,8 +234,11 @@ type
 
       When to use: simulation outputs, engineering design, hyperparameter
       tuning — any situation where you cannot compute a gradient. }
-    class function NelderMead(F: TMultivarFunc; const X0: TDoubleArray;
-      Scale: Double = 1.0; Tol: Double = 1E-8;
+    class function NelderMead(
+      F: TMultivarFunc;
+      const X0: TDoubleArray;
+      Scale: Double = 1.0;
+      Tol: Double = 1E-8;
       MaxIter: Integer = 10000): TOptResult; static;
 
     { Simulated Annealing — global stochastic optimizer.
@@ -234,11 +258,15 @@ type
 
       When to use: highly non-convex landscapes with many local minima,
       combinatorial-flavoured continuous problems. }
-    class function SimulatedAnnealing(F: TMultivarFunc;
+    class function SimulatedAnnealing(
+      F: TMultivarFunc;
       const X0: TDoubleArray;
-      T0: Double = 100.0; TMin: Double = 1E-8;
-      CoolRate: Double = 0.995; StepSize: Double = 0.1;
-      MaxIter: Integer = 100000; Seed: Integer = 42): TOptResult; static;
+      T0: Double = 100.0;
+      TMin: Double = 1E-8;
+      CoolRate: Double = 0.995;
+      StepSize: Double = 0.1;
+      MaxIter: Integer = 100000;
+      Seed: Integer = 42): TOptResult; static;
 
     { =======================================================================
       CONSTRAINED OPTIMIZATION
@@ -260,10 +288,12 @@ type
 
       Tip: start with a feasible X0. If the solution violates constraints
       significantly, increase Mu or MaxIter. }
-    class function PenaltyMethod(F: TMultivarFunc;
+    class function PenaltyMethod(
+      F: TMultivarFunc;
       const Constraints: array of TConstraintFunc;
       const X0: TDoubleArray;
-      Mu: Double = 1.0; Tol: Double = 1E-6;
+      Mu: Double = 1.0;
+      Tol: Double = 1E-6;
       MaxIter: Integer = 5000): TOptResult; static;
 
     { =======================================================================
@@ -293,7 +323,8 @@ type
         A := [[1,1],[1,0],[0,1]];
         b := [4,3,3];
         r := TOptimizationKit.SimplexLP(c, A, b); }
-    class function SimplexLP(const C: TDoubleArray;
+    class function SimplexLP(
+      const C: TDoubleArray;
       const A: array of TDoubleArray;
       const B: TDoubleArray): TLPResult; static;
 
@@ -306,14 +337,16 @@ type
         gradNum := TOptimizationKit.NumGrad(f, x);
         gradAna := MyGradient(x);
         // compare elementwise }
-    class function NumGrad(F: TMultivarFunc; const X: TDoubleArray;
-      H: Double = 1E-5): TDoubleArray; static;
+    class function NumGrad(F: TMultivarFunc; const X: TDoubleArray; H: Double = 1E-5): TDoubleArray; static;
 
     { Maximise F by minimising -F.  Wraps any minimizer.
       Example: find the peak of a hill function using NelderMead.
         result := TOptimizationKit.Maximize(f, x0); }
-    class function Maximize(F: TMultivarFunc; const X0: TDoubleArray;
-      Scale: Double = 1.0; Tol: Double = 1E-8;
+    class function Maximize(
+      F: TMultivarFunc;
+      const X0: TDoubleArray;
+      Scale: Double = 1.0;
+      Tol: Double = 1E-8;
       MaxIter: Integer = 10000): TOptResult; static;
 
   end;
@@ -356,8 +389,7 @@ end;
   Private helpers
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.NumericalGradient(F: TMultivarFunc;
-  const X: TDoubleArray; H: Double): TDoubleArray;
+class function TOptimizationKit.NumericalGradient(F: TMultivarFunc; const X: TDoubleArray; H: Double): TDoubleArray;
 { Central-difference gradient: (f(x+h*ei) - f(x-h*ei)) / (2h) }
 var
   I, N: Integer;
@@ -384,16 +416,14 @@ begin
   for I := 0 to High(A) do Result := Result + A[I] * B[I];
 end;
 
-class function TOptimizationKit.VecAdd(const A, B: TDoubleArray;
-  Scale: Double): TDoubleArray;
+class function TOptimizationKit.VecAdd(const A, B: TDoubleArray; Scale: Double): TDoubleArray;
 var I: Integer;
 begin
   SetLength(Result, Length(A));
   for I := 0 to High(A) do Result[I] := A[I] + Scale * B[I];
 end;
 
-class function TOptimizationKit.VecScale(const A: TDoubleArray;
-  S: Double): TDoubleArray;
+class function TOptimizationKit.VecScale(const A: TDoubleArray; S: Double): TDoubleArray;
 var I: Integer;
 begin
   SetLength(Result, Length(A));
@@ -415,8 +445,11 @@ begin
   for I := 0 to High(A) do Result[I] := A[I];
 end;
 
-class function TOptimizationKit.LineSearch(F: TMultivarFunc;
-  const X, Dir: TDoubleArray; FX: Double; Alpha0: Double): Double;
+class function TOptimizationKit.LineSearch(
+  F: TMultivarFunc;
+  const X, Dir: TDoubleArray;
+  FX: Double;
+  Alpha0: Double): Double;
 { Backtracking Armijo line search: halve alpha until sufficient decrease }
 const
   Rho = 0.5;
@@ -443,8 +476,7 @@ end;
   GOLDEN SECTION
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.GoldenSection(F: TUnivarFunc; A, B: Double;
-  Tol: Double; MaxIter: Integer): Double;
+class function TOptimizationKit.GoldenSection(F: TUnivarFunc; A, B: Double; Tol: Double; MaxIter: Integer): Double;
 { Reduces the interval by the golden ratio φ = (√5-1)/2 ≈ 0.618 each step }
 const
   Phi = 0.6180339887498949;  { (√5-1)/2 }
@@ -482,8 +514,7 @@ end;
   BRENT MINIMIZE
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.BrentMinimize(F: TUnivarFunc; A, B: Double;
-  Tol: Double; MaxIter: Integer): Double;
+class function TOptimizationKit.BrentMinimize(F: TUnivarFunc; A, B: Double; Tol: Double; MaxIter: Integer): Double;
 { Brent (1973) — combines golden section with inverse parabolic interpolation }
 const
   CGold = 0.3819660112501051;  { 1 - (√5-1)/2 }
@@ -565,8 +596,12 @@ end;
   GRADIENT DESCENT
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.GradientDescent(F: TMultivarFunc;
-  Grad: TGradFunc; const X0: TDoubleArray; LR: Double; Tol: Double;
+class function TOptimizationKit.GradientDescent(
+  F: TMultivarFunc;
+  Grad: TGradFunc;
+  const X0: TDoubleArray;
+  LR: Double;
+  Tol: Double;
   MaxIter: Integer): TOptResult;
 var
   X, G, Dir: TDoubleArray;
@@ -606,8 +641,11 @@ end;
   ADAM
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.Adam(F: TMultivarFunc; Grad: TGradFunc;
-  const X0: TDoubleArray; LR, Beta1, Beta2, Eps, Tol: Double;
+class function TOptimizationKit.Adam(
+  F: TMultivarFunc;
+  Grad: TGradFunc;
+  const X0: TDoubleArray;
+  LR, Beta1, Beta2, Eps, Tol: Double;
   MaxIter: Integer): TOptResult;
 var
   X, G, M, V: TDoubleArray;
@@ -660,8 +698,12 @@ end;
   L-BFGS
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.LBFGS(F: TMultivarFunc; Grad: TGradFunc;
-  const X0: TDoubleArray; M: Integer; Tol: Double;
+class function TOptimizationKit.LBFGS(
+  F: TMultivarFunc;
+  Grad: TGradFunc;
+  const X0: TDoubleArray;
+  M: Integer;
+  Tol: Double;
   MaxIter: Integer): TOptResult;
 { Two-loop recursion L-BFGS (Nocedal 1980).
   Stores the last M (s_k, y_k) pairs where s_k = x_{k+1}-x_k, y_k = g_{k+1}-g_k }
@@ -765,8 +807,11 @@ end;
   NELDER-MEAD
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.NelderMead(F: TMultivarFunc;
-  const X0: TDoubleArray; Scale, Tol: Double; MaxIter: Integer): TOptResult;
+class function TOptimizationKit.NelderMead(
+  F: TMultivarFunc;
+  const X0: TDoubleArray;
+  Scale, Tol: Double;
+  MaxIter: Integer): TOptResult;
 { Standard Nelder-Mead with reflection α=1, expansion γ=2,
   contraction ρ=0.5, shrink σ=0.5 }
 const
@@ -892,8 +937,10 @@ end;
   SIMULATED ANNEALING
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.SimulatedAnnealing(F: TMultivarFunc;
-  const X0: TDoubleArray; T0, TMin, CoolRate, StepSize: Double;
+class function TOptimizationKit.SimulatedAnnealing(
+  F: TMultivarFunc;
+  const X0: TDoubleArray;
+  T0, TMin, CoolRate, StepSize: Double;
   MaxIter, Seed: Integer): TOptResult;
 { Metropolis–Hastings acceptance: accept worse if rand < exp(-ΔE/T) }
 var
@@ -966,9 +1013,12 @@ end;
   PENALTY METHOD
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.PenaltyMethod(F: TMultivarFunc;
+class function TOptimizationKit.PenaltyMethod(
+  F: TMultivarFunc;
   const Constraints: array of TConstraintFunc;
-  const X0: TDoubleArray; Mu, Tol: Double; MaxIter: Integer): TOptResult;
+  const X0: TDoubleArray;
+  Mu, Tol: Double;
+  MaxIter: Integer): TOptResult;
 { Progressive penalty: solve a sequence of unconstrained problems with
   increasing Mu until the constraint violation is small }
 var
@@ -999,8 +1049,10 @@ end;
   SIMPLEX LP
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.SimplexLP(const C: TDoubleArray;
-  const A: array of TDoubleArray; const B: TDoubleArray): TLPResult;
+class function TOptimizationKit.SimplexLP(
+  const C: TDoubleArray;
+  const A: array of TDoubleArray;
+  const B: TDoubleArray): TLPResult;
 { Standard Simplex in tableau form.
   Adds slack variables to convert Ax <= b into Ax + Is = b (s >= 0).
   Tableau: M+1 rows × (N+M+1) cols — last row = reduced costs. }
@@ -1104,14 +1156,16 @@ end;
   PUBLIC UTILITIES
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.NumGrad(F: TMultivarFunc;
-  const X: TDoubleArray; H: Double): TDoubleArray;
+class function TOptimizationKit.NumGrad(F: TMultivarFunc; const X: TDoubleArray; H: Double): TDoubleArray;
 begin
   Result := NumericalGradient(F, X, H);
 end;
 
-class function TOptimizationKit.Maximize(F: TMultivarFunc;
-  const X0: TDoubleArray; Scale, Tol: Double; MaxIter: Integer): TOptResult;
+class function TOptimizationKit.Maximize(
+  F: TMultivarFunc;
+  const X0: TDoubleArray;
+  Scale, Tol: Double;
+  MaxIter: Integer): TOptResult;
 { Minimise -F via unit-level NegObjective to avoid nested-function pointer issue }
 begin
   GMaximizeF  := F;

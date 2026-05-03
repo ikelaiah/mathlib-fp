@@ -147,7 +147,10 @@ type
           // Returns approximately 680.5832
         end;
     }
-    class function PresentValue(const AFutureValue, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double; static;
+    class function PresentValue(
+      const AFutureValue, ARate: Double;
+      const APeriods: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description Future Value represents the value of a present sum at a future date.
@@ -177,7 +180,10 @@ type
           // Returns approximately 1469.3282
         end;
     }
-    class function FutureValue(const APresentValue, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double; static;
+    class function FutureValue(
+      const APresentValue, ARate: Double;
+      const APeriods: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description Compound Interest is the interest earned on both initial principal and accumulated interest.
@@ -208,7 +214,10 @@ type
           // Returns approximately 469.3282 (the difference between future value and principal)
         end;
     }
-    class function CompoundInterest(const APrincipal, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double; static;
+    class function CompoundInterest(
+      const APrincipal, ARate: Double;
+      const APeriods: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description Calculates the periodic payment required to amortize a loan.
@@ -247,7 +256,10 @@ type
           // Returns approximately 1013.3721 per month
         end;
     }
-    class function Payment(const APresentValue, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double; static;
+    class function Payment(
+      const APresentValue, ARate: Double;
+      const APeriods: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description NPV is the difference between the present value of cash inflows and outflows.
@@ -292,7 +304,11 @@ type
           // Returns positive value if project is profitable at 10% discount rate
         end;
     }
-    class function NetPresentValue(const AInitialInvestment: Double; const ACashFlows: TDoubleArray; const Rate: Double; const ADecimals: Integer = 4): Double; static;
+    class function NetPresentValue(
+      const AInitialInvestment: Double;
+      const ACashFlows: TDoubleArray;
+      const Rate: Double;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description IRR is the discount rate that makes NPV = 0.
@@ -335,7 +351,10 @@ type
           // Returns approximately 0.1797 (17.97%) if convergence is reached
         end;
     }
-    class function InternalRateOfReturn(const AInitialInvestment: Double; const ACashFlows: TDoubleArray; const ADecimals: Integer = 4): Double; static;
+    class function InternalRateOfReturn(
+      const AInitialInvestment: Double;
+      const ACashFlows: TDoubleArray;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description Straight-Line Depreciation:
@@ -361,7 +380,10 @@ type
           // Returns 4500.0000 per year
         end;
     }
-    class function StraightLineDepreciation(const ACost, ASalvage: Double; const ALife: Integer; const ADecimals: Integer = 4): Double; static;
+    class function StraightLineDepreciation(
+      const ACost, ASalvage: Double;
+      const ALife: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description A form of accelerated depreciation using twice the straight-line rate.
@@ -400,7 +422,11 @@ type
           // Returns approximately 8000 for year 2 (less than year 1)
         end;
     }
-    class function DecliningBalanceDepreciation(const ACost, ASalvage: Double; const ALife: Integer; const APeriod: Integer; const ADecimals: Integer = 4): Double; static;
+    class function DecliningBalanceDepreciation(
+      const ACost, ASalvage: Double;
+      const ALife: Integer;
+      const APeriod: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description ROI = (Gain - Cost) / Cost
@@ -450,7 +476,9 @@ type
           // Returns approximately 0.1333 (13.33% return on equity)
         end;
     }
-    class function ReturnOnEquity(const ANetIncome, AShareholdersEquity: Double; const ADecimals: Integer = 4): Double; static;
+    class function ReturnOnEquity(
+      const ANetIncome, AShareholdersEquity: Double;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description Calculates the present value of a bond's cash flows.
@@ -487,8 +515,10 @@ type
           // Returns approximately 1123.2526
         end;
     }
-    class function BondPrice(const AFaceValue, ACouponRate, AYieldRate: Double;
-      const APeriodsPerYear, AYearsToMaturity: Integer; const ADecimals: Integer = 4): Double; static;
+    class function BondPrice(
+      const AFaceValue, ACouponRate, AYieldRate: Double;
+      const APeriodsPerYear, AYearsToMaturity: Integer;
+      const ADecimals: Integer = 4): Double; static;
     
     {
       @description Calculates the yield that makes present value equal to bond price.
@@ -520,9 +550,10 @@ type
           // Returns the yield that would make the present value of this bond equal to $950
         end;
     }
-    class function BondYieldToMaturity(const ABondPrice, AFaceValue, ACouponRate: Double;
-                                       const APeriodsPerYear, AYearsToMaturity: Integer;
-                                       const ADecimals: Integer = 4): Double; static;
+    class function BondYieldToMaturity(
+      const ABondPrice, AFaceValue, ACouponRate: Double;
+      const APeriodsPerYear, AYearsToMaturity: Integer;
+      const ADecimals: Integer = 4): Double; static;
 
     { ArmotizationPayment type for calculating amortization schedule}
     type
@@ -579,9 +610,10 @@ type
           end;
         end;
     }
-    class function AmortizationSchedule(const ALoanAmount, ARate: Double;
-                                        const ANumberOfPayments: Integer;
-                                        const ADecimals: Integer = 4): TAmortizationArray; static;
+    class function AmortizationSchedule(
+      const ALoanAmount, ARate: Double;
+      const ANumberOfPayments: Integer;
+      const ADecimals: Integer = 4): TAmortizationArray; static;
       
     {
       @description Converts nominal rates to effective annual rates considering compounding frequency.
@@ -616,7 +648,9 @@ type
           // Returns approximately 0.0614 (6.14%)
         end;
     }
-    class function EffectiveAnnualRate(const ANominalRate: Double; const ACompoundingsPerYear: Integer;
+    class function EffectiveAnnualRate(
+      const ANominalRate: Double;
+      const ACompoundingsPerYear: Integer;
       const ADecimals: Integer = 4): Double; static;
       
     {
@@ -653,8 +687,10 @@ type
           // If Duration = 7.5, a 1% increase in yield would cause approximately a 7.5% decrease in price
         end;
     }
-    class function ModifiedDuration(const AFaceValue, ACouponRate, AYieldRate: Double;
-      const APeriodsPerYear, AYearsToMaturity: Integer; const ADecimals: Integer = 4): Double; static;
+    class function ModifiedDuration(
+      const AFaceValue, ACouponRate, AYieldRate: Double;
+      const APeriodsPerYear, AYearsToMaturity: Integer;
+      const ADecimals: Integer = 4): Double; static;
       
     {
       @description Calculates break-even point in units.
@@ -690,7 +726,8 @@ type
           // Returns 5000 units (at this quantity, total revenue equals total costs)
         end;
     }
-    class function BreakEvenUnits(const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double; 
+    class function BreakEvenUnits(
+      const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
       const ADecimals: Integer = 4): Double; static;
     
     {
@@ -728,8 +765,9 @@ type
           // Ratios.WorkingCapitalTurnover = 2.00
         end;
     }
-    class function WorkingCapitalRatios(const ACurrentAssets, ACurrentLiabilities,
-      AInventory, ACash, ASales: Double; const ADecimals: Integer = 4): TWorkingCapitalRatios; static;
+    class function WorkingCapitalRatios(
+      const ACurrentAssets, ACurrentLiabilities, AInventory, ACash, ASales: Double;
+      const ADecimals: Integer = 4): TWorkingCapitalRatios; static;
       
     {
       @description Financial Leverage Analysis
@@ -766,8 +804,9 @@ type
           // Ratios.TimesInterestEarned = 4.00
         end;
     }
-    class function LeverageRatios(const ATotalDebt, ATotalAssets, ATotalEquity,
-      AEBIT, AInterestExpense: Double; const ADecimals: Integer = 4): TLeverageRatios; static;
+    class function LeverageRatios(
+      const ATotalDebt, ATotalAssets, ATotalEquity, AEBIT, AInterestExpense: Double;
+      const ADecimals: Integer = 4): TLeverageRatios; static;
       
     {
       @description Black-Scholes Option Pricing Model
@@ -810,8 +849,10 @@ type
           // Returns approximately 7.94
         end;
     }
-    class function BlackScholes(const ASpotPrice, AStrikePrice, ARiskFreeRate, AVolatility, ATimeToMaturity: Double;
-      const AOptionType: TOptionType; const ADecimals: Integer = 4): Double; static;
+    class function BlackScholes(
+      const ASpotPrice, AStrikePrice, ARiskFreeRate, AVolatility, ATimeToMaturity: Double;
+      const AOptionType: TOptionType;
+      const ADecimals: Integer = 4): Double; static;
       
     {
       @description Risk-Adjusted Performance Metrics
@@ -852,8 +893,9 @@ type
           // Metrics.InformationRatio = 0.20
         end;
     }
-    class function RiskMetrics(const APortfolioReturn, ARiskFreeRate, AMarketReturn, ABeta,
-      APortfolioStdDev, ABenchmarkReturn, ATrackingError: Double; const ADecimals: Integer = 4): TRiskMetrics; static;
+    class function RiskMetrics(
+      const APortfolioReturn, ARiskFreeRate, AMarketReturn, ABeta, APortfolioStdDev, ABenchmarkReturn, ATrackingError: Double;
+      const ADecimals: Integer = 4): TRiskMetrics; static;
       
     {
       @description DuPont Analysis
@@ -889,7 +931,8 @@ type
           // Analysis.ROE = 0.10
         end;
     }
-    class function DuPontAnalysis(const ANetIncome, ASales, ATotalAssets, ATotalEquity: Double;
+    class function DuPontAnalysis(
+      const ANetIncome, ASales, ATotalAssets, ATotalEquity: Double;
       const ADecimals: Integer = 4): TDuPontAnalysis; static;
       
     {
@@ -930,8 +973,9 @@ type
           // Leverage.OperatingLeverage = 2.00
         end;
     }
-    class function OperatingLeverage(const AQuantity, APricePerUnit, AVariableCostPerUnit,
-      AFixedCosts: Double; const ADecimals: Integer = 4): TOperatingLeverage; static;
+    class function OperatingLeverage(
+      const AQuantity, APricePerUnit, AVariableCostPerUnit, AFixedCosts: Double;
+      const ADecimals: Integer = 4): TOperatingLeverage; static;
       
     {
       @description Profitability Analysis
@@ -971,8 +1015,9 @@ type
           // Ratios.ROCE = 0.10
         end;
     }
-    class function ProfitabilityRatios(const ARevenue, ACOGS, AEBIT, ANetIncome,
-      ATotalAssets, ACurrentLiabilities: Double; const ADecimals: Integer = 4): TProfitabilityRatios; static;
+    class function ProfitabilityRatios(
+      const ARevenue, ACOGS, AEBIT, ANetIncome, ATotalAssets, ACurrentLiabilities: Double;
+      const ADecimals: Integer = 4): TProfitabilityRatios; static;
 
     {
       @description Calculates break-even point in currency terms.
@@ -1008,7 +1053,8 @@ type
           // Returns $125,000 (at this revenue, total revenue equals total costs)
         end;
     }
-    class function BreakEvenRevenue(const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
+    class function BreakEvenRevenue(
+      const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
       const ADecimals: Integer = 4): Double; static;
 
     {
@@ -1052,7 +1098,8 @@ type
           // Returns approximately 0.093 (9.3%)
         end;
     }
-    class function WACC(const AEquityValue, ADebtValue, ACostOfEquity, ACostOfDebt, ATaxRate: Double;
+    class function WACC(
+      const AEquityValue, ADebtValue, ACostOfEquity, ACostOfDebt, ATaxRate: Double;
       const ADecimals: Integer = 4): Double; static;
 
     {
@@ -1091,7 +1138,8 @@ type
           // Returns 0.092 (9.2%) = 2% + 1.2 * (8% - 2%)
         end;
     }
-    class function CAPM(const ARiskFreeRate, ABeta, AExpectedMarketReturn: Double;
+    class function CAPM(
+      const ARiskFreeRate, ABeta, AExpectedMarketReturn: Double;
       const ADecimals: Integer = 4): Double; static;
 
     {
@@ -1129,8 +1177,9 @@ type
           // Returns $41.20 = $2.00 * (1 + 0.03) / (0.08 - 0.03)
         end;
     }
-    class function GordonGrowthModel(const ACurrentDividend, AGrowthRate, ARequiredReturn: Double;
-                                     const ADecimals: Integer = 4): Double; static;
+    class function GordonGrowthModel(
+      const ACurrentDividend, AGrowthRate, ARequiredReturn: Double;
+      const ADecimals: Integer = 4): Double; static;
     end;
 
 implementation
@@ -1173,7 +1222,10 @@ begin
   end;
 end;
 
-class function TFinanceKit.PresentValue(const AFutureValue, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.PresentValue(
+  const AFutureValue, ARate: Double;
+  const APeriods: Integer;
+  const ADecimals: Integer = 4): Double;
 begin
   if APeriods < 0 then
     raise EFinanceError.Create('Number of periods must be non-negative');
@@ -1183,17 +1235,26 @@ begin
     Result := SimpleRoundTo(AFutureValue / Power(1 + ARate, APeriods), -ADecimals);
 end;
 
-class function TFinanceKit.FutureValue(const APresentValue, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.FutureValue(
+  const APresentValue, ARate: Double;
+  const APeriods: Integer;
+  const ADecimals: Integer = 4): Double;
 begin
   Result := SimpleRoundTo(APresentValue * Power(1 + ARate, APeriods), -ADecimals);  // Use ADecimals decimals with bankers' rounding
 end;
 
-class function TFinanceKit.CompoundInterest(const APrincipal, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.CompoundInterest(
+  const APrincipal, ARate: Double;
+  const APeriods: Integer;
+  const ADecimals: Integer = 4): Double;
 begin
   Result := SimpleRoundTo(APrincipal * (Power(1 + ARate, APeriods) - 1), -ADecimals);  // Use ADecimals decimals with bankers' rounding
 end;
 
-class function TFinanceKit.Payment(const APresentValue, ARate: Double; const APeriods: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.Payment(
+  const APresentValue, ARate: Double;
+  const APeriods: Integer;
+  const ADecimals: Integer = 4): Double;
 var
   Numerator, Denominator, PowerTerm: Double;
 begin
@@ -1211,7 +1272,11 @@ begin
   end;
 end;
 
-class function TFinanceKit.NetPresentValue(const AInitialInvestment: Double; const ACashFlows: TDoubleArray; const Rate: Double; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.NetPresentValue(
+  const AInitialInvestment: Double;
+  const ACashFlows: TDoubleArray;
+  const Rate: Double;
+  const ADecimals: Integer = 4): Double;
 var
   I: Integer;
   NPV, Divisor: Double;
@@ -1232,7 +1297,10 @@ begin
   Result := SimpleRoundTo(NPV, -ADecimals);
 end;
 
-class function TFinanceKit.InternalRateOfReturn(const AInitialInvestment: Double; const ACashFlows: TDoubleArray; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.InternalRateOfReturn(
+  const AInitialInvestment: Double;
+  const ACashFlows: TDoubleArray;
+  const ADecimals: Integer = 4): Double;
 const
   TOLERANCE = 1E-6;
   MAX_ITERATIONS = 100;
@@ -1306,12 +1374,19 @@ begin
   Result := SimpleRoundTo(Rate, -ADecimals);  // Round to ADecimals decimals
 end;
 
-class function TFinanceKit.StraightLineDepreciation(const ACost, ASalvage: Double; const ALife: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.StraightLineDepreciation(
+  const ACost, ASalvage: Double;
+  const ALife: Integer;
+  const ADecimals: Integer = 4): Double;
 begin
   Result := (ACost - ASalvage) / ALife;
 end;
 
-class function TFinanceKit.DecliningBalanceDepreciation(const ACost, ASalvage: Double; const ALife: Integer; const APeriod: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.DecliningBalanceDepreciation(
+  const ACost, ASalvage: Double;
+  const ALife: Integer;
+  const APeriod: Integer;
+  const ADecimals: Integer = 4): Double;
 var
   Rate: Double;
 begin
@@ -1329,13 +1404,17 @@ begin
   Result := (AGain - ACost) / ACost;
 end;
 
-class function TFinanceKit.ReturnOnEquity(const ANetIncome, AShareholdersEquity: Double; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.ReturnOnEquity(
+  const ANetIncome, AShareholdersEquity: Double;
+  const ADecimals: Integer = 4): Double;
 begin
   Result := ANetIncome / AShareholdersEquity;
 end;
 
-class function TFinanceKit.BondPrice(const AFaceValue, ACouponRate, AYieldRate: Double;
-  const APeriodsPerYear, AYearsToMaturity: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.BondPrice(
+  const AFaceValue, ACouponRate, AYieldRate: Double;
+  const APeriodsPerYear, AYearsToMaturity: Integer;
+  const ADecimals: Integer = 4): Double;
 var
   TotalPeriods: Integer;
   CouponPayment, PVCoupons, PVPrincipal: Double;
@@ -1360,8 +1439,10 @@ begin
   Result := SimpleRoundTo(PVCoupons + PVPrincipal, -ADecimals);
 end;
 
-class function TFinanceKit.BondYieldToMaturity(const ABondPrice, AFaceValue, ACouponRate: Double;
-  const APeriodsPerYear, AYearsToMaturity: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.BondYieldToMaturity(
+  const ABondPrice, AFaceValue, ACouponRate: Double;
+  const APeriodsPerYear, AYearsToMaturity: Integer;
+  const ADecimals: Integer = 4): Double;
 const
   MAX_ITERATIONS = 100;
   TOLERANCE = 1E-10;
@@ -1425,8 +1506,10 @@ begin
   Result := SimpleRoundTo(Yield, -ADecimals);
 end;
 
-class function TFinanceKit.AmortizationSchedule(const ALoanAmount, ARate: Double;
-  const ANumberOfPayments: Integer; const ADecimals: Integer = 4): TAmortizationArray;
+class function TFinanceKit.AmortizationSchedule(
+  const ALoanAmount, ARate: Double;
+  const ANumberOfPayments: Integer;
+  const ADecimals: Integer = 4): TAmortizationArray;
 var
   I: Integer;
   Balance, PaymentAmount, InterestPayment, PrincipalPayment: Double;
@@ -1452,7 +1535,9 @@ begin
   end;
 end;
 
-class function TFinanceKit.EffectiveAnnualRate(const ANominalRate: Double; const ACompoundingsPerYear: Integer;
+class function TFinanceKit.EffectiveAnnualRate(
+  const ANominalRate: Double;
+  const ACompoundingsPerYear: Integer;
   const ADecimals: Integer = 4): Double;
 var
   CompoundFactor: Double;
@@ -1469,8 +1554,10 @@ begin
   end;
 end;
 
-class function TFinanceKit.ModifiedDuration(const AFaceValue, ACouponRate, AYieldRate: Double;
-  const APeriodsPerYear, AYearsToMaturity: Integer; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.ModifiedDuration(
+  const AFaceValue, ACouponRate, AYieldRate: Double;
+  const APeriodsPerYear, AYearsToMaturity: Integer;
+  const ADecimals: Integer = 4): Double;
 var
   TotalPeriods, T: Integer;
   CouponPayment, BondPV, WeightedTime, MacDur: Double;
@@ -1508,7 +1595,8 @@ begin
   Result := SimpleRoundTo((MacDur / APeriodsPerYear) / (1 + YieldPerPeriod), -ADecimals);
 end;
 
-class function TFinanceKit.BreakEvenUnits(const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
+class function TFinanceKit.BreakEvenUnits(
+  const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
   const ADecimals: Integer = 4): Double;
 begin
   if Abs(APricePerUnit - AVariableCostPerUnit) < 1E-10 then
@@ -1520,8 +1608,9 @@ begin
   Result := SimpleRoundTo(AFixedCosts / (APricePerUnit - AVariableCostPerUnit), -ADecimals);
 end;
 
-class function TFinanceKit.WorkingCapitalRatios(const ACurrentAssets, ACurrentLiabilities,
-  AInventory, ACash, ASales: Double; const ADecimals: Integer = 4): TWorkingCapitalRatios;
+class function TFinanceKit.WorkingCapitalRatios(
+  const ACurrentAssets, ACurrentLiabilities, AInventory, ACash, ASales: Double;
+  const ADecimals: Integer = 4): TWorkingCapitalRatios;
 var
   WorkingCapital: Double;
 begin
@@ -1545,8 +1634,9 @@ begin
     Result.WorkingCapitalTurnover := SimpleRoundTo(ASales / WorkingCapital, -ADecimals);
 end;
 
-class function TFinanceKit.LeverageRatios(const ATotalDebt, ATotalAssets, ATotalEquity,
-  AEBIT, AInterestExpense: Double; const ADecimals: Integer = 4): TLeverageRatios;
+class function TFinanceKit.LeverageRatios(
+  const ATotalDebt, ATotalAssets, ATotalEquity, AEBIT, AInterestExpense: Double;
+  const ADecimals: Integer = 4): TLeverageRatios;
 begin
   if Abs(ATotalAssets) < 1E-10 then
     raise EFinanceError.Create('Total assets must be non-zero');
@@ -1569,8 +1659,10 @@ begin
     Result.TimesInterestEarned := SimpleRoundTo(AEBIT / AInterestExpense, -ADecimals);
 end;
 
-class function TFinanceKit.BlackScholes(const ASpotPrice, AStrikePrice, ARiskFreeRate, AVolatility, ATimeToMaturity: Double;
-  const AOptionType: TOptionType; const ADecimals: Integer = 4): Double;
+class function TFinanceKit.BlackScholes(
+  const ASpotPrice, AStrikePrice, ARiskFreeRate, AVolatility, ATimeToMaturity: Double;
+  const AOptionType: TOptionType;
+  const ADecimals: Integer = 4): Double;
 var
   D1, D2: Double;
   DiscountFactor: Double;
@@ -1614,8 +1706,9 @@ begin
   end;
 end;
 
-class function TFinanceKit.RiskMetrics(const APortfolioReturn, ARiskFreeRate, AMarketReturn, ABeta,
-  APortfolioStdDev, ABenchmarkReturn, ATrackingError: Double; const ADecimals: Integer = 4): TRiskMetrics;
+class function TFinanceKit.RiskMetrics(
+  const APortfolioReturn, ARiskFreeRate, AMarketReturn, ABeta, APortfolioStdDev, ABenchmarkReturn, ATrackingError: Double;
+  const ADecimals: Integer = 4): TRiskMetrics;
 begin
   // Sharpe Ratio
   if Abs(APortfolioStdDev) < 1E-10 then
@@ -1645,7 +1738,8 @@ begin
     );
 end;
 
-class function TFinanceKit.DuPontAnalysis(const ANetIncome, ASales, ATotalAssets, ATotalEquity: Double;
+class function TFinanceKit.DuPontAnalysis(
+  const ANetIncome, ASales, ATotalAssets, ATotalEquity: Double;
   const ADecimals: Integer = 4): TDuPontAnalysis;
 begin
   if Abs(ASales) < 1E-10 then
@@ -1667,8 +1761,9 @@ begin
   );
 end;
 
-class function TFinanceKit.OperatingLeverage(const AQuantity, APricePerUnit, AVariableCostPerUnit,
-  AFixedCosts: Double; const ADecimals: Integer = 4): TOperatingLeverage;
+class function TFinanceKit.OperatingLeverage(
+  const AQuantity, APricePerUnit, AVariableCostPerUnit, AFixedCosts: Double;
+  const ADecimals: Integer = 4): TOperatingLeverage;
 var
   ContributionMargin, EBIT, TotalRevenue, TotalVariableCosts: Double;
 begin
@@ -1693,8 +1788,9 @@ begin
   Result.OperatingLeverage := Result.DOL;
 end;
 
-class function TFinanceKit.ProfitabilityRatios(const ARevenue, ACOGS, AEBIT, ANetIncome,
-  ATotalAssets, ACurrentLiabilities: Double; const ADecimals: Integer = 4): TProfitabilityRatios;
+class function TFinanceKit.ProfitabilityRatios(
+  const ARevenue, ACOGS, AEBIT, ANetIncome, ATotalAssets, ACurrentLiabilities: Double;
+  const ADecimals: Integer = 4): TProfitabilityRatios;
 begin
   if Abs(ARevenue) < 1E-10 then
     raise EFinanceError.Create('Revenue must be non-zero');
@@ -1720,7 +1816,8 @@ begin
     Result.ROCE := SimpleRoundTo(AEBIT / (ATotalAssets - ACurrentLiabilities), -ADecimals);
 end;
 
-class function TFinanceKit.BreakEvenRevenue(const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
+class function TFinanceKit.BreakEvenRevenue(
+  const AFixedCosts, APricePerUnit, AVariableCostPerUnit: Double;
   const ADecimals: Integer = 4): Double;
 begin
   if APricePerUnit <= AVariableCostPerUnit then
@@ -1729,7 +1826,8 @@ begin
   Result := AFixedCosts / (1 - AVariableCostPerUnit / APricePerUnit);
 end;
 
-class function TFinanceKit.WACC(const AEquityValue, ADebtValue, ACostOfEquity, ACostOfDebt, ATaxRate: Double;
+class function TFinanceKit.WACC(
+  const AEquityValue, ADebtValue, ACostOfEquity, ACostOfDebt, ATaxRate: Double;
   const ADecimals: Integer = 4): Double;
 var
   TotalValue, EquityWeight: Double;
@@ -1751,7 +1849,8 @@ begin
   );
 end;
 
-class function TFinanceKit.CAPM(const ARiskFreeRate, ABeta, AExpectedMarketReturn: Double;
+class function TFinanceKit.CAPM(
+  const ARiskFreeRate, ABeta, AExpectedMarketReturn: Double;
   const ADecimals: Integer = 4): Double;
 begin
   if (ARiskFreeRate < 0) or (ARiskFreeRate > 1) or (ABeta < -10) or (ABeta > 10) then
@@ -1760,7 +1859,8 @@ begin
   Result := ARiskFreeRate + ABeta * (AExpectedMarketReturn - ARiskFreeRate);
 end;
 
-class function TFinanceKit.GordonGrowthModel(const ACurrentDividend, AGrowthRate, ARequiredReturn: Double;
+class function TFinanceKit.GordonGrowthModel(
+  const ACurrentDividend, AGrowthRate, ARequiredReturn: Double;
   const ADecimals: Integer = 4): Double;
 begin
   if (ACurrentDividend < 0) or (AGrowthRate < 0) or (ARequiredReturn < 0) or (AGrowthRate >= ARequiredReturn) then

@@ -82,8 +82,7 @@ type
       EPS_MED    = 1E-3;
       EPS_LOOSE  = 1E-2;
 
-    procedure AssertNear(const Expected, Actual, Tol: Double;
-      const Msg: String = '');
+    procedure AssertNear(const Expected, Actual, Tol: Double; const Msg: String = '');
 
     procedure DoGoldenSection_BadBracket;
     procedure DoBrentMin_BadBracket;
@@ -223,8 +222,7 @@ begin Result := X[0] - 1; end;
   Test class helpers
 --------------------------------------------------------------------------- }
 
-procedure TTestOptimizationLib.AssertNear(const Expected, Actual, Tol: Double;
-  const Msg: String);
+procedure TTestOptimizationLib.AssertNear(const Expected, Actual, Tol: Double; const Msg: String);
 begin
   if Abs(Expected - Actual) > Tol then
     Fail(Format('%s  expected %.10f  got %.10f  (tol %.2e)',

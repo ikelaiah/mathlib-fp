@@ -69,39 +69,37 @@ type
       MaxIter: maximum iterations (default 100).
       Tol: absolute tolerance on the interval width (default 1e-10).
       Raises EInvalidArgument if f(A)*f(B) >= 0. }
-    class function Bisection(F: TScalarFunc; A, B: Double;
-      Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function Bisection(F: TScalarFunc; A, B: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
 
     { Newton-Raphson: find root starting from X0 using f and df/dx.
       Tol: tolerance on |f(x)| (default 1e-10).
       MaxIter: max iterations (default 100). }
-    class function NewtonRaphson(F, DF: TScalarFunc; X0: Double;
-      Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function NewtonRaphson(
+      F, DF: TScalarFunc;
+      X0: Double;
+      Tol: Double = 1E-10;
+      MaxIter: Integer = 100): Double; static;
 
     { Brent's method: robust bracketed root-finding combining bisection,
       secant, and inverse-quadratic interpolation.
       Requires f(A)*f(B) <= 0. }
-    class function Brent(F: TScalarFunc; A, B: Double;
-      Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function Brent(F: TScalarFunc; A, B: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
 
     { Secant method: derivative-free, requires two initial guesses X0, X1.
       Tol: tolerance on |f(x)| (default 1e-10).
       MaxIter: max iterations (default 100). }
-    class function Secant(F: TScalarFunc; X0, X1: Double;
-      Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function Secant(F: TScalarFunc; X0, X1: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
 
     { -----------------------------------------------------------------------
       Numerical Integration
     ----------------------------------------------------------------------- }
 
     { Composite trapezoidal rule on [A,B] with N sub-intervals. }
-    class function TrapezoidalRule(F: TScalarFunc; A, B: Double;
-      N: Integer = 1000): Double; static;
+    class function TrapezoidalRule(F: TScalarFunc; A, B: Double; N: Integer = 1000): Double; static;
 
     { Composite Simpson's rule on [A,B] with N sub-intervals (N must be even;
       if odd, N is automatically incremented). }
-    class function SimpsonRule(F: TScalarFunc; A, B: Double;
-      N: Integer = 1000): Double; static;
+    class function SimpsonRule(F: TScalarFunc; A, B: Double; N: Integer = 1000): Double; static;
 
     { 5-point Gauss-Legendre quadrature on [A,B]. Very accurate for smooth
       functions; exact for polynomials up to degree 9. }
@@ -116,16 +114,14 @@ type
 
     { Euler solver over [T0, T1] with N steps.
       Returns TODESolution with T and Y arrays of length N+1. }
-    class function EulerSolve(F: TODEFunc; T0, Y0, T1: Double;
-      N: Integer): TODESolution; static;
+    class function EulerSolve(F: TODEFunc; T0, Y0, T1: Double; N: Integer): TODESolution; static;
 
     { Single RK4 step: returns y(T0+H). }
     class function RK4Step(F: TODEFunc; T0, Y0, H: Double): Double; static;
 
     { RK4 solver over [T0, T1] with N steps.
       Returns TODESolution with T and Y arrays of length N+1. }
-    class function RK4Solve(F: TODEFunc; T0, Y0, T1: Double;
-      N: Integer): TODESolution; static;
+    class function RK4Solve(F: TODEFunc; T0, Y0, T1: Double; N: Integer): TODESolution; static;
 
     { -----------------------------------------------------------------------
       Interpolation
@@ -134,14 +130,12 @@ type
     { Piecewise linear interpolation.
       XKnots/YKnots must be the same length, XKnots sorted ascending.
       Clamps to endpoint values outside the range. }
-    class function LinearInterp(const XKnots, YKnots: TDoubleArray;
-      X: Double): Double; static;
+    class function LinearInterp(const XKnots, YKnots: TDoubleArray; X: Double): Double; static;
 
     { Global Lagrange polynomial interpolation through all N knots.
       XKnots/YKnots must be the same length.
       Warning: ill-conditioned for N > ~10; prefer spline for larger sets. }
-    class function LagrangeInterp(const XKnots, YKnots: TDoubleArray;
-      X: Double): Double; static;
+    class function LagrangeInterp(const XKnots, YKnots: TDoubleArray; X: Double): Double; static;
 
     { Build a natural cubic spline through the given knots (XKnots sorted asc).
       Returns a TCubicSpline that can be evaluated with SplineEval. }
@@ -158,8 +152,7 @@ implementation
   Root Finding
   ========================================================================= }
 
-class function TNumericsKit.Bisection(F: TScalarFunc; A, B: Double;
-  Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.Bisection(F: TScalarFunc; A, B: Double; Tol: Double; MaxIter: Integer): Double;
 var
   FA, FB, FMid, Mid: Double;
   Iter: Integer;
@@ -190,8 +183,7 @@ begin
   Result := (A + B) / 2;
 end;
 
-class function TNumericsKit.NewtonRaphson(F, DF: TScalarFunc; X0: Double;
-  Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.NewtonRaphson(F, DF: TScalarFunc; X0: Double; Tol: Double; MaxIter: Integer): Double;
 var
   X, FX, DFX: Double;
   Iter: Integer;
@@ -210,8 +202,7 @@ begin
   Result := X;
 end;
 
-class function TNumericsKit.Brent(F: TScalarFunc; A, B: Double;
-  Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.Brent(F: TScalarFunc; A, B: Double; Tol: Double; MaxIter: Integer): Double;
 var
   FA, FB, FC, C, D, S: Double;
   Tmp: Double;
@@ -297,8 +288,7 @@ begin
   Result := B;
 end;
 
-class function TNumericsKit.Secant(F: TScalarFunc; X0, X1: Double;
-  Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.Secant(F: TScalarFunc; X0, X1: Double; Tol: Double; MaxIter: Integer): Double;
 var
   F0, F1, X2: Double;
   Iter: Integer;
@@ -322,8 +312,7 @@ end;
   Numerical Integration
   ========================================================================= }
 
-class function TNumericsKit.TrapezoidalRule(F: TScalarFunc; A, B: Double;
-  N: Integer): Double;
+class function TNumericsKit.TrapezoidalRule(F: TScalarFunc; A, B: Double; N: Integer): Double;
 var
   H, Sum: Double;
   I: Integer;
@@ -337,8 +326,7 @@ begin
   Result := H * Sum;
 end;
 
-class function TNumericsKit.SimpsonRule(F: TScalarFunc; A, B: Double;
-  N: Integer): Double;
+class function TNumericsKit.SimpsonRule(F: TScalarFunc; A, B: Double; N: Integer): Double;
 var
   H, Sum: Double;
   I: Integer;
@@ -386,8 +374,7 @@ begin
   Result := Y0 + H * F(T0, Y0);
 end;
 
-class function TNumericsKit.EulerSolve(F: TODEFunc; T0, Y0, T1: Double;
-  N: Integer): TODESolution;
+class function TNumericsKit.EulerSolve(F: TODEFunc; T0, Y0, T1: Double; N: Integer): TODESolution;
 var
   H, T, Y: Double;
   I: Integer;
@@ -420,8 +407,7 @@ begin
   Result := Y0 + H * (K1 + 2*K2 + 2*K3 + K4) / 6;
 end;
 
-class function TNumericsKit.RK4Solve(F: TODEFunc; T0, Y0, T1: Double;
-  N: Integer): TODESolution;
+class function TNumericsKit.RK4Solve(F: TODEFunc; T0, Y0, T1: Double; N: Integer): TODESolution;
 var
   H, T, Y: Double;
   I: Integer;
@@ -447,8 +433,7 @@ end;
   Interpolation
   ========================================================================= }
 
-class function TNumericsKit.LinearInterp(const XKnots, YKnots: TDoubleArray;
-  X: Double): Double;
+class function TNumericsKit.LinearInterp(const XKnots, YKnots: TDoubleArray; X: Double): Double;
 var
   N, Lo, Hi, Mid: Integer;
   T: Double;
@@ -478,8 +463,7 @@ begin
   Result := YKnots[Lo] + T * (YKnots[Lo + 1] - YKnots[Lo]);
 end;
 
-class function TNumericsKit.LagrangeInterp(const XKnots, YKnots: TDoubleArray;
-  X: Double): Double;
+class function TNumericsKit.LagrangeInterp(const XKnots, YKnots: TDoubleArray; X: Double): Double;
 var
   N, I, J: Integer;
   L, Sum: Double;
@@ -502,8 +486,7 @@ begin
   Result := Sum;
 end;
 
-class function TNumericsKit.CubicSplineBuild(const XKnots,
-  YKnots: TDoubleArray): TCubicSpline;
+class function TNumericsKit.CubicSplineBuild(const XKnots, YKnots: TDoubleArray): TCubicSpline;
 { Natural cubic spline: second derivatives at endpoints = 0.
   Solves the tridiagonal system with Thomas algorithm. }
 var
@@ -565,8 +548,7 @@ begin
     Result.C[I] := C[I];
 end;
 
-class function TNumericsKit.CubicSplineEval(const S: TCubicSpline;
-  X: Double): Double;
+class function TNumericsKit.CubicSplineEval(const S: TCubicSpline; X: Double): Double;
 var
   N, Lo, Hi, Mid: Integer;
   DX: Double;

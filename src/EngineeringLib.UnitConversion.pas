@@ -104,7 +104,9 @@ type
     class function ConvertElectricalCurrent(Value: Double; FromUnit, ToUnit: TElectricalCurrentUnit): Double; static;
 
     { Electrical potential conversions }
-    class function ConvertElectricalPotential(Value: Double; FromUnit, ToUnit: TElectricalPotentialUnit): Double; static;
+    class function ConvertElectricalPotential(
+      Value: Double;
+      FromUnit, ToUnit: TElectricalPotentialUnit): Double; static;
 
     { Frequency conversions }
     class function ConvertFrequency(Value: Double; FromUnit, ToUnit: TFrequencyUnit): Double; static;
@@ -131,12 +133,16 @@ type
     class function FormatWithUnit(Value: Double; AUnitName: string; Decimals: Integer = 2): string; static;
 
     { Advanced formatting functions }
-    class function FormatWithScientificNotation(Value: Double; AUnitName: string; 
+    class function FormatWithScientificNotation(
+      Value: Double;
+      AUnitName: string;
       SignificantDigits: Integer = 3): string; static;
     class function RoundToSignificantDigits(Value: Double; SignificantDigits: Integer): Double; static;
 
     { String-based unit conversion functions }
-    class function TryConvertByUnitName(Value: Double; FromAUnitName, ToAUnitName: string; 
+    class function TryConvertByUnitName(
+      Value: Double;
+      FromAUnitName, ToAUnitName: string;
       out ConvertedValue: Double): Boolean; static;
     class function GetUnitTypeFromUnitName(AUnitName: string): TUnitType; static;
 
@@ -154,15 +160,20 @@ type
     class function TryGetVolumeUnitFromName(AUnitName: string; out Unit_: TVolumeUnit): Boolean; static;
     class function TryGetAngleUnitFromName(AUnitName: string; out Unit_: TAngleUnit): Boolean; static;
     class function TryGetDensityUnitFromName(AUnitName: string; out Unit_: TDensityUnit): Boolean; static;
-    class function TryGetElectricalCurrentUnitFromName(AUnitName: string; out Unit_: TElectricalCurrentUnit): Boolean; static;
-    class function TryGetElectricalPotentialUnitFromName(AUnitName: string; out Unit_: TElectricalPotentialUnit): Boolean; static;
+    class function TryGetElectricalCurrentUnitFromName(
+      AUnitName: string;
+      out Unit_: TElectricalCurrentUnit): Boolean; static;
+    class function TryGetElectricalPotentialUnitFromName(
+      AUnitName: string;
+      out Unit_: TElectricalPotentialUnit): Boolean; static;
     class function TryGetFrequencyUnitFromName(AUnitName: string; out Unit_: TFrequencyUnit): Boolean; static;
 
     { String parsing functions }
-    class function TryParseValueWithUnit(const ValueStr: string; out Value: Double; 
+    class function TryParseValueWithUnit(
+      const ValueStr: string;
+      out Value: Double;
       out AUnitName: string): Boolean; static;
-    class function TryParseAndConvert(const ValueStr, ToAUnitName: string; 
-      out ConvertedValue: Double): Boolean; static;
+    class function TryParseAndConvert(const ValueStr, ToAUnitName: string; out ConvertedValue: Double): Boolean; static;
 
     { Unit compatibility checking }
     class function AreUnitsCompatible(UnitType1, UnitType2: TUnitType): Boolean; static;
@@ -442,7 +453,9 @@ begin
   Result := Value * ToKgPerCubicMeterFactors[FromUnit] / ToKgPerCubicMeterFactors[ToUnit];
 end;
 
-class function TUnitConversionKit.ConvertElectricalCurrent(Value: Double; FromUnit, ToUnit: TElectricalCurrentUnit): Double;
+class function TUnitConversionKit.ConvertElectricalCurrent(
+  Value: Double;
+  FromUnit, ToUnit: TElectricalCurrentUnit): Double;
 const
   // Conversion factors to amperes
   ToAmpereFactors: array[TElectricalCurrentUnit] of Double = (
@@ -456,7 +469,9 @@ begin
   Result := Value * ToAmpereFactors[FromUnit] / ToAmpereFactors[ToUnit];
 end;
 
-class function TUnitConversionKit.ConvertElectricalPotential(Value: Double; FromUnit, ToUnit: TElectricalPotentialUnit): Double;
+class function TUnitConversionKit.ConvertElectricalPotential(
+  Value: Double;
+  FromUnit, ToUnit: TElectricalPotentialUnit): Double;
 const
   // Conversion factors to volts
   ToVoltFactors: array[TElectricalPotentialUnit] of Double = (
@@ -636,7 +651,9 @@ begin
   Result := Format('%.*f %s', [Decimals, Value, AUnitName]);
 end;
 
-class function TUnitConversionKit.FormatWithScientificNotation(Value: Double; AUnitName: string;
+class function TUnitConversionKit.FormatWithScientificNotation(
+  Value: Double;
+  AUnitName: string;
   SignificantDigits: Integer): string;
 var
   Exponent: Integer;
@@ -674,7 +691,9 @@ begin
   end;
 end;
 
-class function TUnitConversionKit.TryConvertByUnitName(Value: Double; FromAUnitName, ToAUnitName: string;
+class function TUnitConversionKit.TryConvertByUnitName(
+  Value: Double;
+  FromAUnitName, ToAUnitName: string;
   out ConvertedValue: Double): Boolean;
 var
   UnitType: TUnitType;
@@ -1017,7 +1036,9 @@ begin
     Result := False;
 end;
 
-class function TUnitConversionKit.TryGetTemperatureUnitFromName(AUnitName: string; out Unit_: TTemperatureUnit): Boolean;
+class function TUnitConversionKit.TryGetTemperatureUnitFromName(
+  AUnitName: string;
+  out Unit_: TTemperatureUnit): Boolean;
 begin
   Result := True;
   
@@ -1227,7 +1248,9 @@ begin
     Result := False;
 end;
 
-class function TUnitConversionKit.TryGetElectricalCurrentUnitFromName(AUnitName: string; out Unit_: TElectricalCurrentUnit): Boolean;
+class function TUnitConversionKit.TryGetElectricalCurrentUnitFromName(
+  AUnitName: string;
+  out Unit_: TElectricalCurrentUnit): Boolean;
 begin
   Result := True;
   
@@ -1241,7 +1264,9 @@ begin
     Result := False;
 end;
 
-class function TUnitConversionKit.TryGetElectricalPotentialUnitFromName(AUnitName: string; out Unit_: TElectricalPotentialUnit): Boolean;
+class function TUnitConversionKit.TryGetElectricalPotentialUnitFromName(
+  AUnitName: string;
+  out Unit_: TElectricalPotentialUnit): Boolean;
 begin
   Result := True;
   
@@ -1275,7 +1300,9 @@ begin
     Result := False;
 end;
 
-class function TUnitConversionKit.TryParseValueWithUnit(const ValueStr: string; out Value: Double;
+class function TUnitConversionKit.TryParseValueWithUnit(
+  const ValueStr: string;
+  out Value: Double;
   out AUnitName: string): Boolean;
 var
   S: string;
@@ -1301,7 +1328,8 @@ begin
   end;
 end;
 
-class function TUnitConversionKit.TryParseAndConvert(const ValueStr, ToAUnitName: string;
+class function TUnitConversionKit.TryParseAndConvert(
+  const ValueStr, ToAUnitName: string;
   out ConvertedValue: Double): Boolean;
 var
   Value: Double;

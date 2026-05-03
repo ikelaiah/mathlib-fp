@@ -48,8 +48,7 @@ type
   TTestTimeSeriesLib = class(TTestCase)
   private
     { Helper: assert two doubles are close to ADecimals places }
-    procedure AssertNear(const AMsg: string; Expected, Got: Double;
-      Tol: Double = 1e-6);
+    procedure AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double = 1e-6);
     { Helper: assert that calling AProc raises ETimeSeriesError }
     procedure AssertTSError(const AMsg: string; AProc: TProcedure);
     { Build a simple AR(1) series: Y[t] = Phi*Y[t-1] + noise (deterministic noise=0) }
@@ -138,8 +137,7 @@ begin TTimeSeriesKit.ARFit(GErrY, 3); end;
   Helpers
 --------------------------------------------------------------------------- }
 
-procedure TTestTimeSeriesLib.AssertNear(const AMsg: string;
-  Expected, Got: Double; Tol: Double);
+procedure TTestTimeSeriesLib.AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double);
 begin
   if IsNaN(Expected) or IsNaN(Got) then
     Fail(AMsg + Format(' — NaN encountered (expected %.6g, got %.6g)',
@@ -149,8 +147,7 @@ begin
       [Expected, Got, Abs(Got - Expected)]));
 end;
 
-procedure TTestTimeSeriesLib.AssertTSError(const AMsg: string;
-  AProc: TProcedure);
+procedure TTestTimeSeriesLib.AssertTSError(const AMsg: string; AProc: TProcedure);
 begin
   try
     AProc;

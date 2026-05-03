@@ -31,10 +31,8 @@ type
       TOL_FFT    = 1E-8;   { floating-point accumulation in FFT }
       TOL_FILTER = 1E-6;   { FIR: DC gain tolerance }
 
-    procedure AssertArraysNear(const Msg: string;
-      const Expected, Actual: TDoubleArray; Tol: Double);
-    procedure AssertNear(const Expected, Actual, Tol: Double;
-      const Msg: String = '');
+    procedure AssertArraysNear(const Msg: string; const Expected, Actual: TDoubleArray; Tol: Double);
+    procedure AssertNear(const Expected, Actual, Tol: Double; const Msg: String = '');
 
     { Exception helpers }
     procedure DoMovingAverageWithZeroWindow;
@@ -122,8 +120,7 @@ implementation
   Helpers
   ========================================================================= }
 
-procedure TTestSignalKit.AssertArraysNear(const Msg: string;
-  const Expected, Actual: TDoubleArray; Tol: Double);
+procedure TTestSignalKit.AssertArraysNear(const Msg: string; const Expected, Actual: TDoubleArray; Tol: Double);
 var I: Integer;
 begin
   AssertEquals(Msg + ': length', Length(Expected), Length(Actual));
@@ -132,8 +129,7 @@ begin
       Abs(Expected[I] - Actual[I]) <= Tol);
 end;
 
-procedure TTestSignalKit.AssertNear(const Expected, Actual, Tol: Double;
-  const Msg: String);
+procedure TTestSignalKit.AssertNear(const Expected, Actual, Tol: Double; const Msg: String);
 begin
   AssertTrue(Msg + Format(' (exp %.10g, got %.10g)', [Expected, Actual]),
     Abs(Expected - Actual) <= Tol);

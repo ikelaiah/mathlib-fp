@@ -41,10 +41,8 @@ uses
 type
   TTestGeometryLib = class(TTestCase)
   private
-    procedure AssertNear(const AMsg: string; Expected, Got: Double;
-      Tol: Double = 1e-9);
-    procedure AssertPoint2DNear(const AMsg: string;
-      EX, EY: Double; const Got: TPoint2D; Tol: Double = 1e-9);
+    procedure AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double = 1e-9);
+    procedure AssertPoint2DNear(const AMsg: string; EX, EY: Double; const Got: TPoint2D; Tol: Double = 1e-9);
     procedure AssertGeoError(const AMsg: string; AProc: TProcedure);
     { Build a unit square CCW: (0,0),(1,0),(1,1),(0,1) }
     function UnitSquare: TPolygon2D;
@@ -169,15 +167,13 @@ end;
   Helpers
 --------------------------------------------------------------------------- }
 
-procedure TTestGeometryLib.AssertNear(const AMsg: string;
-  Expected, Got: Double; Tol: Double);
+procedure TTestGeometryLib.AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double);
 begin
   if Abs(Got - Expected) > Tol then
     Fail(AMsg + Format(' — expected %.10g, got %.10g', [Expected, Got]));
 end;
 
-procedure TTestGeometryLib.AssertPoint2DNear(const AMsg: string;
-  EX, EY: Double; const Got: TPoint2D; Tol: Double);
+procedure TTestGeometryLib.AssertPoint2DNear(const AMsg: string; EX, EY: Double; const Got: TPoint2D; Tol: Double);
 begin
   AssertNear(AMsg + ' X', EX, Got.X, Tol);
   AssertNear(AMsg + ' Y', EY, Got.Y, Tol);

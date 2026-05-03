@@ -48,12 +48,10 @@ type
   TSignalKit = class
   public
     { --- Basic Filtering --- }
-    class function MovingAverage(const InputSignal: TDoubleArray;
-      WindowSize: Integer): TDoubleArray; static;
+    class function MovingAverage(const InputSignal: TDoubleArray; WindowSize: Integer): TDoubleArray; static;
 
     { --- Windowing --- }
-    class function GenerateWindow(WindowType: TWindowType;
-      Size: Integer): TDoubleArray; static;
+    class function GenerateWindow(WindowType: TWindowType; Size: Integer): TDoubleArray; static;
     class function ApplyWindow(const InputSignal, Window: TDoubleArray): TDoubleArray; static;
 
     { --- FFT / Spectral Analysis ---
@@ -63,21 +61,21 @@ type
     { In-place Cooley-Tukey radix-2 DIT FFT.
       RealPart and ImagPart must both have length N (a power of 2).
       Set Inverse=True for IFFT (includes the 1/N scaling). }
-    class procedure FFT(var RealPart, ImagPart: TDoubleArray;
-      Inverse: Boolean = False); static;
+    class procedure FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean = False); static;
 
     { Convenience wrapper: real-valued input signal → complex spectrum.
       Pads or truncates to the nearest power-of-2 length automatically.
       OutRealPart[0..N/2] and OutImagPart[0..N/2] are the one-sided spectrum. }
-    class procedure CalculateFFT(const InputSignal: TDoubleArray;
+    class procedure CalculateFFT(
+      const InputSignal: TDoubleArray;
       out OutRealPart, OutImagPart: TDoubleArray); overload; static;
 
     { Inverse FFT: complex spectrum → real-valued signal. }
-    class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray;
-      out OutputSignal: TDoubleArray); static;
+    class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray; out OutputSignal: TDoubleArray); static;
 
     { Magnitude and phase spectra (one-sided, 0..N/2). }
-    class procedure CalculateFFTMagnitudePhase(const InputSignal: TDoubleArray;
+    class procedure CalculateFFTMagnitudePhase(
+      const InputSignal: TDoubleArray;
       out Magnitude, Phase: TDoubleArray); static;
 
     { --- FIR Filter Design (windowed-sinc) ---
@@ -86,17 +84,25 @@ type
       for symmetric linear-phase FIR).
       WindowType selects the window used to taper the ideal sinc kernel. }
 
-    class function DesignFIRLowPass(CutoffFreq: Double; Order: Integer;
+    class function DesignFIRLowPass(
+      CutoffFreq: Double;
+      Order: Integer;
       WindowType: TWindowType = wtHamming): TDoubleArray; static;
 
-    class function DesignFIRHighPass(CutoffFreq: Double; Order: Integer;
+    class function DesignFIRHighPass(
+      CutoffFreq: Double;
+      Order: Integer;
       WindowType: TWindowType = wtHamming): TDoubleArray; static;
 
-    class function DesignFIRBandPass(LowCutoff, HighCutoff: Double;
-      Order: Integer; WindowType: TWindowType = wtHamming): TDoubleArray; static;
+    class function DesignFIRBandPass(
+      LowCutoff, HighCutoff: Double;
+      Order: Integer;
+      WindowType: TWindowType = wtHamming): TDoubleArray; static;
 
-    class function DesignFIRBandStop(LowCutoff, HighCutoff: Double;
-      Order: Integer; WindowType: TWindowType = wtHamming): TDoubleArray; static;
+    class function DesignFIRBandStop(
+      LowCutoff, HighCutoff: Double;
+      Order: Integer;
+      WindowType: TWindowType = wtHamming): TDoubleArray; static;
 
     { Convolve Signal with FIR Coefficients (linear/direct-form convolution).
       Output length = Length(Signal) + Length(Coeffs) - 1. }
@@ -146,8 +152,7 @@ end;
   TSignalKit — Moving Average
   --------------------------------------------------------------------------- }
 
-class function TSignalKit.MovingAverage(const InputSignal: TDoubleArray;
-  WindowSize: Integer): TDoubleArray;
+class function TSignalKit.MovingAverage(const InputSignal: TDoubleArray; WindowSize: Integer): TDoubleArray;
 var
   N, I: Integer;
   Sum: Double;
@@ -180,8 +185,7 @@ end;
   TSignalKit — Windowing
   --------------------------------------------------------------------------- }
 
-class function TSignalKit.GenerateWindow(WindowType: TWindowType;
-  Size: Integer): TDoubleArray;
+class function TSignalKit.GenerateWindow(WindowType: TWindowType; Size: Integer): TDoubleArray;
 var
   I: Integer;
   N_1: Double;
@@ -215,8 +219,7 @@ begin
   end;
 end;
 
-class function TSignalKit.ApplyWindow(const InputSignal,
-  Window: TDoubleArray): TDoubleArray;
+class function TSignalKit.ApplyWindow(const InputSignal, Window: TDoubleArray): TDoubleArray;
 var
   N, M, I: Integer;
 begin
@@ -234,8 +237,7 @@ end;
   TSignalKit — FFT  (Cooley-Tukey radix-2 DIT)
   --------------------------------------------------------------------------- }
 
-class procedure TSignalKit.FFT(var RealPart, ImagPart: TDoubleArray;
-  Inverse: Boolean);
+class procedure TSignalKit.FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean);
 var
   N, Len, I, J, K: Integer;
   Angle, WR, WI, Ur, Ui, TR, TI: Double;
@@ -288,8 +290,7 @@ begin
     end;
 end;
 
-class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray;
-  out OutRealPart, OutImagPart: TDoubleArray);
+class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray; out OutRealPart, OutImagPart: TDoubleArray);
 var
   N, I: Integer;
 begin
@@ -305,8 +306,7 @@ begin
   FFT(OutRealPart, OutImagPart, False);
 end;
 
-class procedure TSignalKit.CalculateIFFT(const InRealPart,
-  InImagPart: TDoubleArray; out OutputSignal: TDoubleArray);
+class procedure TSignalKit.CalculateIFFT(const InRealPart, InImagPart: TDoubleArray; out OutputSignal: TDoubleArray);
 var
   Re, Im: TDoubleArray;
   N, I: Integer;
@@ -344,8 +344,7 @@ end;
   --------------------------------------------------------------------------- }
 
 { Ideal low-pass sinc kernel, centred at tap M/2, normalised cutoff fc }
-function SincKernel(Order: Integer; CutoffFreq: Double;
-  WinType: TWindowType): TDoubleArray;
+function SincKernel(Order: Integer; CutoffFreq: Double; WinType: TWindowType): TDoubleArray;
 var
   M, I: Integer;
   Fc2Pi, N0, Sinc: Double;
@@ -378,8 +377,7 @@ begin
     for I := 0 to High(C) do C[I] := C[I] / Sum;
 end;
 
-class function TSignalKit.DesignFIRLowPass(CutoffFreq: Double;
-  Order: Integer; WindowType: TWindowType): TDoubleArray;
+class function TSignalKit.DesignFIRLowPass(CutoffFreq: Double; Order: Integer; WindowType: TWindowType): TDoubleArray;
 begin
   if (CutoffFreq <= 0) or (CutoffFreq >= 0.5) then
     raise EInvalidArgument.Create('DesignFIRLowPass: CutoffFreq must be in (0, 0.5).');
@@ -389,8 +387,7 @@ begin
   NormaliseCoeffs(Result);
 end;
 
-class function TSignalKit.DesignFIRHighPass(CutoffFreq: Double;
-  Order: Integer; WindowType: TWindowType): TDoubleArray;
+class function TSignalKit.DesignFIRHighPass(CutoffFreq: Double; Order: Integer; WindowType: TWindowType): TDoubleArray;
 var
   LP: TDoubleArray;
   I: Integer;
@@ -403,8 +400,10 @@ begin
   Result[Order div 2] := Result[Order div 2] + 1.0;
 end;
 
-class function TSignalKit.DesignFIRBandPass(LowCutoff, HighCutoff: Double;
-  Order: Integer; WindowType: TWindowType): TDoubleArray;
+class function TSignalKit.DesignFIRBandPass(
+  LowCutoff, HighCutoff: Double;
+  Order: Integer;
+  WindowType: TWindowType): TDoubleArray;
 var
   LP_Lo, LP_Hi: TDoubleArray;
   I: Integer;
@@ -419,8 +418,10 @@ begin
     Result[I] := LP_Hi[I] - LP_Lo[I];
 end;
 
-class function TSignalKit.DesignFIRBandStop(LowCutoff, HighCutoff: Double;
-  Order: Integer; WindowType: TWindowType): TDoubleArray;
+class function TSignalKit.DesignFIRBandStop(
+  LowCutoff, HighCutoff: Double;
+  Order: Integer;
+  WindowType: TWindowType): TDoubleArray;
 var
   BP: TDoubleArray;
   I: Integer;
@@ -433,8 +434,7 @@ begin
   Result[Order div 2] := Result[Order div 2] + 1.0;
 end;
 
-class function TSignalKit.ApplyFIRFilter(const Signal,
-  Coeffs: TDoubleArray): TDoubleArray;
+class function TSignalKit.ApplyFIRFilter(const Signal, Coeffs: TDoubleArray): TDoubleArray;
 var
   NS, NC, OutLen, I, J, K: Integer;
 begin

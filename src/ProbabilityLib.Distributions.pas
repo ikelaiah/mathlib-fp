@@ -101,18 +101,15 @@ type
     { PDF: height of the bell curve at X.
       Result is the probability density, NOT a probability itself.
       Example: NormalPDF(0, 0, 1) = 0.3989  (peak of the standard Normal) }
-    class function NormalPDF(const X, Mu, Sigma: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function NormalPDF(const X, Mu, Sigma: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x) — area under the bell curve to the left of x.
       Example: NormalCDF(1.96, 0, 1) ≈ 0.975  (classic 95% one-tail) }
-    class function NormalCDF(const X, Mu, Sigma: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function NormalCDF(const X, Mu, Sigma: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = 1 - CDF.  Upper tail probability.
       Example: NormalSurvival(1.96, 0, 1) ≈ 0.025 }
-    class function NormalSurvival(const X, Mu, Sigma: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function NormalSurvival(const X, Mu, Sigma: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean of the Normal distribution = Mu }
     class function NormalMean(const Mu, Sigma: Double): Double; static;
@@ -134,16 +131,13 @@ type
     ======================================================================= }
 
     { PDF: probability density of the LogNormal at X (X must be > 0). }
-    class function LogNormalPDF(const X, Mu, Sigma: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function LogNormalPDF(const X, Mu, Sigma: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x). }
-    class function LogNormalCDF(const X, Mu, Sigma: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function LogNormalCDF(const X, Mu, Sigma: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = 1 - CDF. }
-    class function LogNormalSurvival(const X, Mu, Sigma: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function LogNormalSurvival(const X, Mu, Sigma: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = exp(Mu + Sigma^2 / 2) }
     class function LogNormalMean(const Mu, Sigma: Double): Double; static;
@@ -164,17 +158,14 @@ type
     ======================================================================= }
 
     { PDF: probability density at X (X must be >= 0). }
-    class function ExponentialPDF(const X, Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function ExponentialPDF(const X, Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x) = 1 - exp(-Lambda * x). }
-    class function ExponentialCDF(const X, Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function ExponentialCDF(const X, Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = exp(-Lambda * x).
       This is the "reliability function" — probability of surviving past x. }
-    class function ExponentialSurvival(const X, Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function ExponentialSurvival(const X, Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = 1 / Lambda }
     class function ExponentialMean(const Lambda: Double): Double; static;
@@ -199,16 +190,13 @@ type
     ======================================================================= }
 
     { PDF: probability density at X (X must be > 0). }
-    class function GammaPDF(const X, Alpha, Beta: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function GammaPDF(const X, Alpha, Beta: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x), computed via regularised incomplete gamma function. }
-    class function GammaCDF(const X, Alpha, Beta: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function GammaCDF(const X, Alpha, Beta: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = 1 - CDF. }
-    class function GammaSurvival(const X, Alpha, Beta: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function GammaSurvival(const X, Alpha, Beta: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = Alpha / Beta }
     class function GammaMean(const Alpha, Beta: Double): Double; static;
@@ -236,16 +224,13 @@ type
     ======================================================================= }
 
     { PDF: probability density at X (X must be in (0,1)). }
-    class function BetaPDF(const X, Alpha, Beta: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function BetaPDF(const X, Alpha, Beta: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x), computed via regularised incomplete beta function. }
-    class function BetaCDF(const X, Alpha, Beta: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function BetaCDF(const X, Alpha, Beta: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = 1 - CDF. }
-    class function BetaSurvival(const X, Alpha, Beta: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function BetaSurvival(const X, Alpha, Beta: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = Alpha / (Alpha + Beta) }
     class function BetaMean(const Alpha, Beta: Double): Double; static;
@@ -268,16 +253,13 @@ type
     ======================================================================= }
 
     { PDF: probability density at X (X must be >= 0). }
-    class function ChiSquaredPDF(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function ChiSquaredPDF(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x). }
-    class function ChiSquaredCDF(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function ChiSquaredCDF(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x).  This is the p-value from a chi-squared test. }
-    class function ChiSquaredSurvival(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function ChiSquaredSurvival(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { Mean = DF }
     class function ChiSquaredMean(DF: Integer): Double; static;
@@ -300,21 +282,17 @@ type
     ======================================================================= }
 
     { PDF: probability density at X. }
-    class function StudentTPDF(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function StudentTPDF(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x). }
-    class function StudentTCDF(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function StudentTCDF(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x). }
-    class function StudentTSurvival(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function StudentTSurvival(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { Two-tailed p-value: P(|X| > |x|) = 2 * Survival(|x|).
       Use this when your hypothesis test is two-sided. }
-    class function StudentTTwoTail(const X: Double; DF: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function StudentTTwoTail(const X: Double; DF: Integer; ADecimals: Integer = -1): Double; static;
 
     { Mean = 0 (only defined for DF > 1) }
     class function StudentTMean(DF: Integer): Double; static;
@@ -338,16 +316,13 @@ type
     ======================================================================= }
 
     { PDF: probability density at X (X must be >= 0). }
-    class function FPDF(const X: Double; DF1, DF2: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function FPDF(const X: Double; DF1, DF2: Integer; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x). }
-    class function FCDF(const X: Double; DF1, DF2: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function FCDF(const X: Double; DF1, DF2: Integer; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x).  This is the p-value from an F-test. }
-    class function FSurvival(const X: Double; DF1, DF2: Integer;
-      ADecimals: Integer = -1): Double; static;
+    class function FSurvival(const X: Double; DF1, DF2: Integer; ADecimals: Integer = -1): Double; static;
 
     { Mean = DF2 / (DF2 - 2)  (defined for DF2 > 2) }
     class function FMean(DF1, DF2: Integer): Double; static;
@@ -373,17 +348,14 @@ type
     ======================================================================= }
 
     { PDF: probability density at X (X must be >= 0). }
-    class function WeibullPDF(const X, K, Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function WeibullPDF(const X, K, Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= x) = 1 - exp(-(x/Lambda)^K). }
-    class function WeibullCDF(const X, K, Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function WeibullCDF(const X, K, Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = exp(-(x/Lambda)^K).
       This is the "reliability function" used in survival analysis. }
-    class function WeibullSurvival(const X, K, Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function WeibullSurvival(const X, K, Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = Lambda * Gamma(1 + 1/K) }
     class function WeibullMean(const K, Lambda: Double): Double; static;
@@ -406,16 +378,13 @@ type
     ======================================================================= }
 
     { PDF: 1/(B-A) inside [A,B], zero outside. }
-    class function UniformPDF(const X, A, B: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function UniformPDF(const X, A, B: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: (x-A)/(B-A) for x in [A,B]; 0 below A; 1 above B. }
-    class function UniformCDF(const X, A, B: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function UniformCDF(const X, A, B: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > x) = 1 - CDF. }
-    class function UniformSurvival(const X, A, B: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function UniformSurvival(const X, A, B: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = (A + B) / 2 }
     class function UniformMean(const A, B: Double): Double; static;
@@ -437,16 +406,13 @@ type
 
     { PMF: P(X = k) — probability of exactly K successes in N trials.
       Example: BinomialPMF(3, 10, 0.5) = P(3 heads in 10 flips) ≈ 0.117 }
-    class function BinomialPMF(const K, N: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function BinomialPMF(const K, N: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= k) — probability of at most K successes. }
-    class function BinomialCDF(const K, N: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function BinomialCDF(const K, N: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > k) = 1 - P(X <= k). }
-    class function BinomialSurvival(const K, N: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function BinomialSurvival(const K, N: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = N * P }
     class function BinomialMean(const N: Integer; const P: Double): Double; static;
@@ -467,16 +433,13 @@ type
 
     { PMF: P(X = k) — probability of exactly K events.
       Example: PoissonPMF(2, 3.0) = P(2 events when average is 3) ≈ 0.224 }
-    class function PoissonPMF(const K: Integer; const Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function PoissonPMF(const K: Integer; const Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= k). }
-    class function PoissonCDF(const K: Integer; const Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function PoissonCDF(const K: Integer; const Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > k) = 1 - CDF. }
-    class function PoissonSurvival(const K: Integer; const Lambda: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function PoissonSurvival(const K: Integer; const Lambda: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = Lambda }
     class function PoissonMean(const Lambda: Double): Double; static;
@@ -500,16 +463,13 @@ type
 
     { PMF: P(X = k) = (1-P)^(k-1) * P  for k = 1, 2, 3, ...
       Example: GeometricPMF(3, 0.5) = P(first success on 3rd flip) = 0.125 }
-    class function GeometricPMF(const K: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function GeometricPMF(const K: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= k) = 1 - (1-P)^k. }
-    class function GeometricCDF(const K: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function GeometricCDF(const K: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { Survival: P(X > k) = (1-P)^k. }
-    class function GeometricSurvival(const K: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function GeometricSurvival(const K: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = 1 / P }
     class function GeometricMean(const P: Double): Double; static;
@@ -534,12 +494,10 @@ type
 
     { PMF: P(X = k) where k is the total number of trials to get R successes.
       k must be >= R. }
-    class function NegBinomialPMF(const K, R: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function NegBinomialPMF(const K, R: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= k). }
-    class function NegBinomialCDF(const K, R: Integer; const P: Double;
-      ADecimals: Integer = -1): Double; static;
+    class function NegBinomialCDF(const K, R: Integer; const P: Double; ADecimals: Integer = -1): Double; static;
 
     { Mean = R / P }
     class function NegBinomialMean(const R: Integer; const P: Double): Double; static;
@@ -564,11 +522,13 @@ type
     ======================================================================= }
 
     { PMF: P(X = k) — probability of exactly K successes in the sample. }
-    class function HypergeometricPMF(const K, PopSize, SuccPop, SampleN: Integer;
+    class function HypergeometricPMF(
+      const K, PopSize, SuccPop, SampleN: Integer;
       ADecimals: Integer = -1): Double; static;
 
     { CDF: P(X <= k). }
-    class function HypergeometricCDF(const K, PopSize, SuccPop, SampleN: Integer;
+    class function HypergeometricCDF(
+      const K, PopSize, SuccPop, SampleN: Integer;
       ADecimals: Integer = -1): Double; static;
 
     { Mean = n * K / N }
@@ -585,8 +545,7 @@ implementation
   Private helpers
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.RoundResult(const V: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.RoundResult(const V: Double; ADecimals: Integer): Double;
 begin
   if ADecimals < 0 then
     Result := V
@@ -613,8 +572,7 @@ end;
   NORMAL
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.NormalPDF(const X, Mu, Sigma: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.NormalPDF(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 var
   Z: Double;
 begin
@@ -624,8 +582,7 @@ begin
   Result := RoundResult(Exp(-0.5 * Z * Z) / (Sigma * Sqrt(2 * Pi)), ADecimals);
 end;
 
-class function TProbabilityKit.NormalCDF(const X, Mu, Sigma: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.NormalCDF(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
   if Sigma <= 0 then
     raise EProbabilityError.Create('NormalCDF: Sigma must be > 0');
@@ -633,8 +590,7 @@ begin
   Result := RoundResult(MathBase.Precision.NormalCDF((X - Mu) / Sigma), ADecimals);
 end;
 
-class function TProbabilityKit.NormalSurvival(const X, Mu, Sigma: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.NormalSurvival(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - NormalCDF(X, Mu, Sigma), ADecimals);
 end;
@@ -655,8 +611,7 @@ end;
   LOGNORMAL
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.LogNormalPDF(const X, Mu, Sigma: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.LogNormalPDF(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 var
   LnX, Z: Double;
 begin
@@ -669,8 +624,7 @@ begin
   Result := RoundResult(Exp(-0.5 * Z * Z) / (X * Sigma * Sqrt(2 * Pi)), ADecimals);
 end;
 
-class function TProbabilityKit.LogNormalCDF(const X, Mu, Sigma: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.LogNormalCDF(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
   if Sigma <= 0 then
     raise EProbabilityError.Create('LogNormalCDF: Sigma must be > 0');
@@ -680,8 +634,7 @@ begin
   Result := RoundResult(MathBase.Precision.NormalCDF((Ln(X) - Mu) / Sigma), ADecimals);
 end;
 
-class function TProbabilityKit.LogNormalSurvival(const X, Mu, Sigma: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.LogNormalSurvival(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - LogNormalCDF(X, Mu, Sigma), ADecimals);
 end;
@@ -703,8 +656,7 @@ end;
   EXPONENTIAL
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.ExponentialPDF(const X, Lambda: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.ExponentialPDF(const X, Lambda: Double; ADecimals: Integer): Double;
 begin
   if Lambda <= 0 then
     raise EProbabilityError.Create('ExponentialPDF: Lambda must be > 0');
@@ -713,8 +665,7 @@ begin
   Result := RoundResult(Lambda * Exp(-Lambda * X), ADecimals);
 end;
 
-class function TProbabilityKit.ExponentialCDF(const X, Lambda: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.ExponentialCDF(const X, Lambda: Double; ADecimals: Integer): Double;
 begin
   if Lambda <= 0 then
     raise EProbabilityError.Create('ExponentialCDF: Lambda must be > 0');
@@ -723,8 +674,7 @@ begin
   Result := RoundResult(1.0 - Exp(-Lambda * X), ADecimals);
 end;
 
-class function TProbabilityKit.ExponentialSurvival(const X, Lambda: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.ExponentialSurvival(const X, Lambda: Double; ADecimals: Integer): Double;
 begin
   if Lambda <= 0 then
     raise EProbabilityError.Create('ExponentialSurvival: Lambda must be > 0');
@@ -809,8 +759,7 @@ begin
   end;
 end;
 
-class function TProbabilityKit.GammaPDF(const X, Alpha, Beta: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.GammaPDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
   if Alpha <= 0 then raise EProbabilityError.Create('GammaPDF: Alpha must be > 0');
   if Beta  <= 0 then raise EProbabilityError.Create('GammaPDF: Beta must be > 0');
@@ -821,8 +770,7 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.GammaCDF(const X, Alpha, Beta: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.GammaCDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
   if Alpha <= 0 then raise EProbabilityError.Create('GammaCDF: Alpha must be > 0');
   if Beta  <= 0 then raise EProbabilityError.Create('GammaCDF: Beta must be > 0');
@@ -831,8 +779,7 @@ begin
   Result := RoundResult(RegIncGamma(Alpha, Beta * X), ADecimals);
 end;
 
-class function TProbabilityKit.GammaSurvival(const X, Alpha, Beta: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.GammaSurvival(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - GammaCDF(X, Alpha, Beta), ADecimals);
 end;
@@ -853,8 +800,7 @@ end;
   BETA
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.BetaPDF(const X, Alpha, Beta: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.BetaPDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
   if Alpha <= 0 then raise EProbabilityError.Create('BetaPDF: Alpha must be > 0');
   if Beta  <= 0 then raise EProbabilityError.Create('BetaPDF: Beta must be > 0');
@@ -866,8 +812,7 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.BetaCDF(const X, Alpha, Beta: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.BetaCDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
   if Alpha <= 0 then raise EProbabilityError.Create('BetaCDF: Alpha must be > 0');
   if Beta  <= 0 then raise EProbabilityError.Create('BetaCDF: Beta must be > 0');
@@ -877,8 +822,7 @@ begin
   Result := RoundResult(BetaInc(Alpha, Beta, X), ADecimals);
 end;
 
-class function TProbabilityKit.BetaSurvival(const X, Alpha, Beta: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.BetaSurvival(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - BetaCDF(X, Alpha, Beta), ADecimals);
 end;
@@ -900,23 +844,20 @@ end;
   CHI-SQUARED  — special case of Gamma(DF/2, 1/2)
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.ChiSquaredPDF(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.ChiSquaredPDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('ChiSquaredPDF: DF must be >= 1');
   Result := GammaPDF(X, DF / 2.0, 0.5, ADecimals);
 end;
 
-class function TProbabilityKit.ChiSquaredCDF(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.ChiSquaredCDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('ChiSquaredCDF: DF must be >= 1');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   Result := RoundResult(RegIncGamma(DF / 2.0, X / 2.0), ADecimals);
 end;
 
-class function TProbabilityKit.ChiSquaredSurvival(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.ChiSquaredSurvival(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - ChiSquaredCDF(X, DF), ADecimals);
 end;
@@ -935,8 +876,7 @@ end;
   STUDENT'S T
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.StudentTPDF(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.StudentTPDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 var
   Nu, LogC: Double;
 begin
@@ -947,8 +887,7 @@ begin
   Result := RoundResult(Exp(LogC - ((Nu + 1) / 2) * Ln(1 + X * X / Nu)), ADecimals);
 end;
 
-class function TProbabilityKit.StudentTCDF(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.StudentTCDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 var
   Nu, BetaX: Double;
 begin
@@ -963,14 +902,12 @@ begin
     Result := RoundResult(0.5 * BetaInc(Nu / 2, 0.5, BetaX), ADecimals);
 end;
 
-class function TProbabilityKit.StudentTSurvival(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.StudentTSurvival(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - StudentTCDF(X, DF), ADecimals);
 end;
 
-class function TProbabilityKit.StudentTTwoTail(const X: Double; DF: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.StudentTTwoTail(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   { Two-tailed p = 2 * P(T > |x|) }
   Result := RoundResult(2.0 * StudentTSurvival(Abs(X), DF), ADecimals);
@@ -994,8 +931,7 @@ end;
   F DISTRIBUTION
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.FPDF(const X: Double; DF1, DF2: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.FPDF(const X: Double; DF1, DF2: Integer; ADecimals: Integer): Double;
 var
   D1, D2, LogNum: Double;
 begin
@@ -1015,8 +951,7 @@ begin
   Result := RoundResult(Exp(LogNum), ADecimals);
 end;
 
-class function TProbabilityKit.FCDF(const X: Double; DF1, DF2: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.FCDF(const X: Double; DF1, DF2: Integer; ADecimals: Integer): Double;
 var
   D1, D2, T: Double;
 begin
@@ -1030,8 +965,7 @@ begin
   Result := RoundResult(BetaInc(D1 / 2, D2 / 2, T), ADecimals);
 end;
 
-class function TProbabilityKit.FSurvival(const X: Double; DF1, DF2: Integer;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.FSurvival(const X: Double; DF1, DF2: Integer; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - FCDF(X, DF1, DF2), ADecimals);
 end;
@@ -1059,8 +993,7 @@ end;
   WEIBULL
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.WeibullPDF(const X, K, Lambda: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.WeibullPDF(const X, K, Lambda: Double; ADecimals: Integer): Double;
 begin
   if K      <= 0 then raise EProbabilityError.Create('WeibullPDF: K must be > 0');
   if Lambda <= 0 then raise EProbabilityError.Create('WeibullPDF: Lambda must be > 0');
@@ -1078,8 +1011,7 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.WeibullCDF(const X, K, Lambda: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.WeibullCDF(const X, K, Lambda: Double; ADecimals: Integer): Double;
 begin
   if K      <= 0 then raise EProbabilityError.Create('WeibullCDF: K must be > 0');
   if Lambda <= 0 then raise EProbabilityError.Create('WeibullCDF: Lambda must be > 0');
@@ -1087,8 +1019,7 @@ begin
   Result := RoundResult(1.0 - Exp(-Power(X / Lambda, K)), ADecimals);
 end;
 
-class function TProbabilityKit.WeibullSurvival(const X, K, Lambda: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.WeibullSurvival(const X, K, Lambda: Double; ADecimals: Integer): Double;
 begin
   if K      <= 0 then raise EProbabilityError.Create('WeibullSurvival: K must be > 0');
   if Lambda <= 0 then raise EProbabilityError.Create('WeibullSurvival: Lambda must be > 0');
@@ -1118,8 +1049,7 @@ end;
   UNIFORM (continuous)
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.UniformPDF(const X, A, B: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.UniformPDF(const X, A, B: Double; ADecimals: Integer): Double;
 begin
   if B <= A then raise EProbabilityError.Create('UniformPDF: B must be > A');
   if (X < A) or (X > B) then
@@ -1128,8 +1058,7 @@ begin
     Result := RoundResult(1.0 / (B - A), ADecimals);
 end;
 
-class function TProbabilityKit.UniformCDF(const X, A, B: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.UniformCDF(const X, A, B: Double; ADecimals: Integer): Double;
 begin
   if B <= A then raise EProbabilityError.Create('UniformCDF: B must be > A');
   if X <= A then Result := RoundResult(0, ADecimals)
@@ -1137,8 +1066,7 @@ begin
   else Result := RoundResult((X - A) / (B - A), ADecimals);
 end;
 
-class function TProbabilityKit.UniformSurvival(const X, A, B: Double;
-  ADecimals: Integer): Double;
+class function TProbabilityKit.UniformSurvival(const X, A, B: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - UniformCDF(X, A, B), ADecimals);
 end;
@@ -1158,8 +1086,7 @@ end;
   BINOMIAL (discrete)
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.BinomialPMF(const K, N: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.BinomialPMF(const K, N: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if N < 1  then raise EProbabilityError.Create('BinomialPMF: N must be >= 1');
   if (P < 0) or (P > 1) then raise EProbabilityError.Create('BinomialPMF: P must be in [0,1]');
@@ -1172,8 +1099,7 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.BinomialCDF(const K, N: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.BinomialCDF(const K, N: Integer; const P: Double; ADecimals: Integer): Double;
 var
   I: Integer;
   Sum: Double;
@@ -1196,20 +1122,17 @@ begin
     Result := RoundResult(BetaInc(N - K, K + 1, 1 - P), ADecimals);
 end;
 
-class function TProbabilityKit.BinomialSurvival(const K, N: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.BinomialSurvival(const K, N: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - BinomialCDF(K, N, P), ADecimals);
 end;
 
-class function TProbabilityKit.BinomialMean(const N: Integer;
-  const P: Double): Double;
+class function TProbabilityKit.BinomialMean(const N: Integer; const P: Double): Double;
 begin
   Result := N * P;
 end;
 
-class function TProbabilityKit.BinomialVariance(const N: Integer;
-  const P: Double): Double;
+class function TProbabilityKit.BinomialVariance(const N: Integer; const P: Double): Double;
 begin
   Result := N * P * (1 - P);
 end;
@@ -1218,8 +1141,7 @@ end;
   POISSON (discrete)
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.PoissonPMF(const K: Integer;
-  const Lambda: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.PoissonPMF(const K: Integer; const Lambda: Double; ADecimals: Integer): Double;
 begin
   if Lambda <= 0 then raise EProbabilityError.Create('PoissonPMF: Lambda must be > 0');
   if K < 0 then Exit(RoundResult(0, ADecimals));
@@ -1229,8 +1151,7 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.PoissonCDF(const K: Integer;
-  const Lambda: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.PoissonCDF(const K: Integer; const Lambda: Double; ADecimals: Integer): Double;
 var
   I: Integer;
   Sum: Double;
@@ -1243,8 +1164,7 @@ begin
   Result := RoundResult(Sum, ADecimals);
 end;
 
-class function TProbabilityKit.PoissonSurvival(const K: Integer;
-  const Lambda: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.PoissonSurvival(const K: Integer; const Lambda: Double; ADecimals: Integer): Double;
 begin
   Result := RoundResult(1.0 - PoissonCDF(K, Lambda), ADecimals);
 end;
@@ -1263,8 +1183,7 @@ end;
   GEOMETRIC (discrete) — number-of-trials convention (X >= 1)
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.GeometricPMF(const K: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.GeometricPMF(const K: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if (P <= 0) or (P > 1) then
     raise EProbabilityError.Create('GeometricPMF: P must be in (0,1]');
@@ -1273,8 +1192,7 @@ begin
   Result := RoundResult(Power(1 - P, K - 1) * P, ADecimals);
 end;
 
-class function TProbabilityKit.GeometricCDF(const K: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.GeometricCDF(const K: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if (P <= 0) or (P > 1) then
     raise EProbabilityError.Create('GeometricCDF: P must be in (0,1]');
@@ -1283,8 +1201,7 @@ begin
   Result := RoundResult(1.0 - Power(1 - P, K), ADecimals);
 end;
 
-class function TProbabilityKit.GeometricSurvival(const K: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.GeometricSurvival(const K: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if (P <= 0) or (P > 1) then
     raise EProbabilityError.Create('GeometricSurvival: P must be in (0,1]');
@@ -1310,8 +1227,7 @@ end;
   NEGATIVE BINOMIAL (discrete) — total trials to get R successes
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.NegBinomialPMF(const K, R: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.NegBinomialPMF(const K, R: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if R < 1 then raise EProbabilityError.Create('NegBinomialPMF: R must be >= 1');
   if (P <= 0) or (P > 1) then
@@ -1323,8 +1239,7 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.NegBinomialCDF(const K, R: Integer;
-  const P: Double; ADecimals: Integer): Double;
+class function TProbabilityKit.NegBinomialCDF(const K, R: Integer; const P: Double; ADecimals: Integer): Double;
 var
   I: Integer;
   Sum: Double;
@@ -1339,14 +1254,12 @@ begin
   Result := RoundResult(Sum, ADecimals);
 end;
 
-class function TProbabilityKit.NegBinomialMean(const R: Integer;
-  const P: Double): Double;
+class function TProbabilityKit.NegBinomialMean(const R: Integer; const P: Double): Double;
 begin
   Result := R / P;
 end;
 
-class function TProbabilityKit.NegBinomialVariance(const R: Integer;
-  const P: Double): Double;
+class function TProbabilityKit.NegBinomialVariance(const R: Integer; const P: Double): Double;
 begin
   Result := R * (1 - P) / (P * P);
 end;
@@ -1355,8 +1268,9 @@ end;
   HYPERGEOMETRIC (discrete) — sampling without replacement
 --------------------------------------------------------------------------- }
 
-class function TProbabilityKit.HypergeometricPMF(const K, PopSize, SuccPop,
-  SampleN: Integer; ADecimals: Integer): Double;
+class function TProbabilityKit.HypergeometricPMF(
+  const K, PopSize, SuccPop, SampleN: Integer;
+  ADecimals: Integer): Double;
 begin
   if PopSize < 1 then raise EProbabilityError.Create('HypergeometricPMF: PopSize must be >= 1');
   if SuccPop > PopSize then raise EProbabilityError.Create('HypergeometricPMF: SuccPop must be <= PopSize');
@@ -1372,8 +1286,9 @@ begin
     ADecimals);
 end;
 
-class function TProbabilityKit.HypergeometricCDF(const K, PopSize, SuccPop,
-  SampleN: Integer; ADecimals: Integer): Double;
+class function TProbabilityKit.HypergeometricCDF(
+  const K, PopSize, SuccPop, SampleN: Integer;
+  ADecimals: Integer): Double;
 var
   I: Integer;
   Sum: Double;
@@ -1385,14 +1300,12 @@ begin
   Result := RoundResult(Sum, ADecimals);
 end;
 
-class function TProbabilityKit.HypergeometricMean(PopSize, SuccPop,
-  SampleN: Integer): Double;
+class function TProbabilityKit.HypergeometricMean(PopSize, SuccPop, SampleN: Integer): Double;
 begin
   Result := SampleN * SuccPop / PopSize;
 end;
 
-class function TProbabilityKit.HypergeometricVariance(PopSize, SuccPop,
-  SampleN: Integer): Double;
+class function TProbabilityKit.HypergeometricVariance(PopSize, SuccPop, SampleN: Integer): Double;
 var
   N, K, N_: Double;
 begin

@@ -109,11 +109,9 @@ type
     { Internal matrix helpers }
     class function MatMul(const A, B: TDoubleMatrix): TDoubleMatrix; static;
     class function MatTranspose(const A: TDoubleMatrix): TDoubleMatrix; static;
-    class function MatAddIdentity(const A: TDoubleMatrix;
-      Lambda: Double): TDoubleMatrix; static;
+    class function MatAddIdentity(const A: TDoubleMatrix; Lambda: Double): TDoubleMatrix; static;
     { Solve A*x = b for symmetric positive-definite A (Cholesky-like Gauss elim) }
-    class function SolveLinear(const A: TDoubleMatrix;
-      const B: TDoubleArray): TDoubleArray; static;
+    class function SolveLinear(const A: TDoubleMatrix; const B: TDoubleArray): TDoubleArray; static;
     { Euclidean distance between two vectors }
     class function EuclidDist(const A, B: TDoubleArray): Double; static;
     { Dot product }
@@ -121,15 +119,15 @@ type
     { Sigmoid function }
     class function Sigmoid(Z: Double): Double; static;
     { Power iteration to find dominant eigenvector of symmetric matrix }
-    class function PowerIter(const M: TDoubleMatrix;
-      MaxIter: Integer; Tol: Double;
+    class function PowerIter(
+      const M: TDoubleMatrix;
+      MaxIter: Integer;
+      Tol: Double;
       out EigenVal: Double): TDoubleArray; static;
     { Deflate matrix: remove contribution of one eigenvector }
-    class procedure Deflate(var M: TDoubleMatrix;
-      const V: TDoubleArray; EigenVal: Double); static;
+    class procedure Deflate(var M: TDoubleMatrix; const V: TDoubleArray; EigenVal: Double); static;
     { Region query for DBSCAN: return indices within Eps of point }
-    class function RegionQuery(const X: TDoubleMatrix;
-      PointIdx: Integer; Eps: Double): TIntegerArray; static;
+    class function RegionQuery(const X: TDoubleMatrix; PointIdx: Integer; Eps: Double): TIntegerArray; static;
 
   public
 
@@ -159,10 +157,14 @@ type
 
       Outputs: TrainX, TrainY, TestX, TestY }
     class procedure TrainTestSplit(
-      const X: TDoubleMatrix; const Y: TIntegerArray;
-      TestFraction: Double; Seed: Integer;
-      out TrainX: TDoubleMatrix; out TrainY: TIntegerArray;
-      out TestX:  TDoubleMatrix; out TestY:  TIntegerArray); static;
+      const X: TDoubleMatrix;
+      const Y: TIntegerArray;
+      TestFraction: Double;
+      Seed: Integer;
+      out TrainX: TDoubleMatrix;
+      out TrainY: TIntegerArray;
+      out TestX: TDoubleMatrix;
+      out TestY: TIntegerArray); static;
 
     { Convert integer class labels [0..NClasses-1] to a binary indicator matrix.
       Each row has exactly one 1 at column = label.
@@ -172,8 +174,7 @@ type
         [[1,0,0],
          [0,0,1],
          [0,1,0]] }
-    class function OneHotEncode(const Labels: TIntegerArray;
-      NClasses: Integer): TDoubleMatrix; static;
+    class function OneHotEncode(const Labels: TIntegerArray; NClasses: Integer): TDoubleMatrix; static;
 
     { =======================================================================
       REGRESSION
@@ -189,16 +190,14 @@ type
       Example:
         model := TMLKit.LinearRegression(X, Y);
         pred  := model.Intercept + Dot(model.Coefficients, newX); }
-    class function LinearRegression(const X: TDoubleMatrix;
-      const Y: TDoubleArray): TLinearModel; static;
+    class function LinearRegression(const X: TDoubleMatrix; const Y: TDoubleArray): TLinearModel; static;
 
     { Ridge regression (L2-regularised linear regression).
       Solves: beta = (X'X + lambda*I)^{-1} X'y
       Lambda: regularisation strength (0 → same as OLS; larger → more shrinkage).
 
       Use when features are correlated or N < NFeatures. }
-    class function RidgeRegression(const X: TDoubleMatrix;
-      const Y: TDoubleArray; Lambda: Double): TLinearModel; static;
+    class function RidgeRegression(const X: TDoubleMatrix; const Y: TDoubleArray; Lambda: Double): TLinearModel; static;
 
     { Expand a 1-D feature vector into polynomial features up to Degree.
       Input:  [x_0, x_1, ..., x_{N-1}]
@@ -207,13 +206,11 @@ type
       Combine with LinearRegression for polynomial regression:
         Xpoly := TMLKit.PolynomialFeatures(x, 3);
         model := TMLKit.LinearRegression(Xpoly, y); }
-    class function PolynomialFeatures(const X: TDoubleArray;
-      Degree: Integer): TDoubleMatrix; static;
+    class function PolynomialFeatures(const X: TDoubleArray; Degree: Integer): TDoubleMatrix; static;
 
     { Predict values from a linear model for a new dataset.
       Xnew: NSamples × NFeatures (same features as training X) }
-    class function LinearPredict(const Model: TLinearModel;
-      const Xnew: TDoubleMatrix): TDoubleArray; static;
+    class function LinearPredict(const Model: TLinearModel; const Xnew: TDoubleMatrix): TDoubleArray; static;
 
     { =======================================================================
       CLASSIFICATION
@@ -230,8 +227,10 @@ type
       TestX:   MTestSamples × NFeatures query points
       Returns: MTestSamples predicted labels }
     class function KNearestNeighbours(
-      const TrainX: TDoubleMatrix; const TrainY: TIntegerArray;
-      const TestX: TDoubleMatrix; K: Integer): TIntegerArray; static;
+      const TrainX: TDoubleMatrix;
+      const TrainY: TIntegerArray;
+      const TestX: TDoubleMatrix;
+      K: Integer): TIntegerArray; static;
 
     { Gaussian Naive Bayes classifier.
       Trains per-class mean and variance for each feature, then classifies
@@ -243,7 +242,8 @@ type
       TestX:  MTestSamples × NFeatures
       Returns: MTestSamples predicted labels }
     class function NaiveBayes(
-      const TrainX: TDoubleMatrix; const TrainY: TIntegerArray;
+      const TrainX: TDoubleMatrix;
+      const TrainY: TIntegerArray;
       const TestX: TDoubleMatrix): TIntegerArray; static;
 
     { Binary logistic regression trained with gradient descent.
@@ -256,13 +256,14 @@ type
 
       Use LogisticPredict to classify new points. }
     class function LogisticRegression(
-      const TrainX: TDoubleMatrix; const TrainY: TIntegerArray;
-      LR: Double = 0.1; MaxIter: Integer = 1000;
+      const TrainX: TDoubleMatrix;
+      const TrainY: TIntegerArray;
+      LR: Double = 0.1;
+      MaxIter: Integer = 1000;
       Tol: Double = 1e-5): TLinearModel; static;
 
     { Predict binary class labels (0 or 1) from a logistic regression model. }
-    class function LogisticPredict(const Model: TLinearModel;
-      const Xnew: TDoubleMatrix): TIntegerArray; static;
+    class function LogisticPredict(const Model: TLinearModel; const Xnew: TDoubleMatrix): TIntegerArray; static;
 
     { =======================================================================
       CLUSTERING
@@ -277,8 +278,11 @@ type
       Tips:
       - Run several times with different seeds and pick the lowest Inertia.
       - Choose K by plotting Inertia vs K and looking for the "elbow". }
-    class function KMeans(const X: TDoubleMatrix; K: Integer;
-      MaxIter: Integer = 300; Seed: Integer = 42): TKMeansResult; static;
+    class function KMeans(
+      const X: TDoubleMatrix;
+      K: Integer;
+      MaxIter: Integer = 300;
+      Seed: Integer = 42): TKMeansResult; static;
 
     { DBSCAN (Density-Based Spatial Clustering of Applications with Noise).
       Groups points that are close together (density reachable) and marks
@@ -290,8 +294,7 @@ type
       Tips:
       - Eps: plot k-distance graph (distances to k-th nearest neighbour), look for elbow.
       - MinPts: rule of thumb = 2 × NFeatures. }
-    class function DBSCAN(const X: TDoubleMatrix;
-      Eps: Double; MinPts: Integer): TDBSCANResult; static;
+    class function DBSCAN(const X: TDoubleMatrix; Eps: Double; MinPts: Integer): TDBSCANResult; static;
 
     { =======================================================================
       DIMENSIONALITY REDUCTION
@@ -309,14 +312,16 @@ type
 
       To project new data:
         Xtransformed := TMLKit.PCATransform(pca, Xnew); }
-    class function PCA(const X: TDoubleMatrix; NComponents: Integer;
-      MaxIter: Integer = 1000; Tol: Double = 1e-8): TPCAResult; static;
+    class function PCA(
+      const X: TDoubleMatrix;
+      NComponents: Integer;
+      MaxIter: Integer = 1000;
+      Tol: Double = 1e-8): TPCAResult; static;
 
     { Project data onto PCA components.
       Subtracts the training mean then multiplies by the component matrix.
       Returns NSamples × NComponents score matrix. }
-    class function PCATransform(const PCARes: TPCAResult;
-      const X: TDoubleMatrix): TDoubleMatrix; static;
+    class function PCATransform(const PCARes: TPCAResult; const X: TDoubleMatrix): TDoubleMatrix; static;
 
     { =======================================================================
       MODEL EVALUATION
@@ -329,24 +334,20 @@ type
     { Precision for one class (binary or one-vs-rest).
       ClassLabel: which class to treat as positive.
       Precision = TP / (TP + FP).  Returns 0 when TP+FP=0. }
-    class function Precision(const YTrue, YPred: TIntegerArray;
-      ClassLabel: Integer): Double; static;
+    class function Precision(const YTrue, YPred: TIntegerArray; ClassLabel: Integer): Double; static;
 
     { Recall (sensitivity / true-positive rate).
       Recall = TP / (TP + FN).  Returns 0 when TP+FN=0. }
-    class function Recall(const YTrue, YPred: TIntegerArray;
-      ClassLabel: Integer): Double; static;
+    class function Recall(const YTrue, YPred: TIntegerArray; ClassLabel: Integer): Double; static;
 
     { F1 score: harmonic mean of Precision and Recall.
       F1 = 2 * Precision * Recall / (Precision + Recall) }
-    class function F1Score(const YTrue, YPred: TIntegerArray;
-      ClassLabel: Integer): Double; static;
+    class function F1Score(const YTrue, YPred: TIntegerArray; ClassLabel: Integer): Double; static;
 
     { Build a confusion matrix.
       Entry [i][j] = number of samples with true class i predicted as class j.
       NClasses: total number of classes (labels assumed 0..NClasses-1) }
-    class function BuildConfusionMatrix(const YTrue, YPred: TIntegerArray;
-      NClasses: Integer): TConfusionMatrix; static;
+    class function BuildConfusionMatrix(const YTrue, YPred: TIntegerArray; NClasses: Integer): TConfusionMatrix; static;
 
     { Mean Squared Error: mean of (y_true - y_pred)² }
     class function MSE(const YTrue, YPred: TDoubleArray): Double; static;
@@ -426,8 +427,7 @@ begin
   end;
 end;
 
-class function TMLKit.MatAddIdentity(const A: TDoubleMatrix;
-  Lambda: Double): TDoubleMatrix;
+class function TMLKit.MatAddIdentity(const A: TDoubleMatrix; Lambda: Double): TDoubleMatrix;
 var N, I, J: Integer;
 begin
   N := Length(A);
@@ -443,8 +443,7 @@ end;
 
 { Gaussian elimination with partial pivoting — solves A*x = b.
   A is copied internally; b is not modified. }
-class function TMLKit.SolveLinear(const A: TDoubleMatrix;
-  const B: TDoubleArray): TDoubleArray;
+class function TMLKit.SolveLinear(const A: TDoubleMatrix; const B: TDoubleArray): TDoubleArray;
 var
   N, I, J, K, PivRow: Integer;
   PivVal, F, Tmp: Double;
@@ -502,8 +501,11 @@ end;
 
 { Power iteration: find dominant eigenvector of symmetric matrix M.
   Returns unit-length eigenvector; sets EigenVal. }
-class function TMLKit.PowerIter(const M: TDoubleMatrix;
-  MaxIter: Integer; Tol: Double; out EigenVal: Double): TDoubleArray;
+class function TMLKit.PowerIter(
+  const M: TDoubleMatrix;
+  MaxIter: Integer;
+  Tol: Double;
+  out EigenVal: Double): TDoubleArray;
 var
   N, I, J, Iter: Integer;
   Norm, Delta: Double;
@@ -544,8 +546,7 @@ end;
 
 { Remove contribution of eigenvector V (with eigenvalue EigenVal) from M.
   M := M - EigenVal * v*v' }
-class procedure TMLKit.Deflate(var M: TDoubleMatrix;
-  const V: TDoubleArray; EigenVal: Double);
+class procedure TMLKit.Deflate(var M: TDoubleMatrix; const V: TDoubleArray; EigenVal: Double);
 var N, I, J: Integer;
 begin
   N := Length(M);
@@ -554,8 +555,7 @@ begin
       M[I][J] := M[I][J] - EigenVal * V[I] * V[J];
 end;
 
-class function TMLKit.RegionQuery(const X: TDoubleMatrix;
-  PointIdx: Integer; Eps: Double): TIntegerArray;
+class function TMLKit.RegionQuery(const X: TDoubleMatrix; PointIdx: Integer; Eps: Double): TIntegerArray;
 var
   I, Count: Integer;
 begin
@@ -627,10 +627,14 @@ begin
 end;
 
 class procedure TMLKit.TrainTestSplit(
-  const X: TDoubleMatrix; const Y: TIntegerArray;
-  TestFraction: Double; Seed: Integer;
-  out TrainX: TDoubleMatrix; out TrainY: TIntegerArray;
-  out TestX:  TDoubleMatrix; out TestY:  TIntegerArray);
+  const X: TDoubleMatrix;
+  const Y: TIntegerArray;
+  TestFraction: Double;
+  Seed: Integer;
+  out TrainX: TDoubleMatrix;
+  out TrainY: TIntegerArray;
+  out TestX: TDoubleMatrix;
+  out TestY: TIntegerArray);
 var
   N, NTest, NTrain, I, J, Tmp: Integer;
   Idx: TIntegerArray;
@@ -683,8 +687,7 @@ begin
   end;
 end;
 
-class function TMLKit.OneHotEncode(const Labels: TIntegerArray;
-  NClasses: Integer): TDoubleMatrix;
+class function TMLKit.OneHotEncode(const Labels: TIntegerArray; NClasses: Integer): TDoubleMatrix;
 var I, J: Integer;
 begin
   if NClasses < 2 then
@@ -705,8 +708,7 @@ end;
 --------------------------------------------------------------------------- }
 
 { Build augmented X with intercept column prepended, solve normal equations }
-class function TMLKit.LinearRegression(const X: TDoubleMatrix;
-  const Y: TDoubleArray): TLinearModel;
+class function TMLKit.LinearRegression(const X: TDoubleMatrix; const Y: TDoubleArray): TLinearModel;
 var
   NSamples, NFeatures, I, J, K: Integer;
   XA: TDoubleMatrix;  { augmented X: [1 | X] }
@@ -762,8 +764,7 @@ begin
   else              Result.RSquared := 1.0;
 end;
 
-class function TMLKit.RidgeRegression(const X: TDoubleMatrix;
-  const Y: TDoubleArray; Lambda: Double): TLinearModel;
+class function TMLKit.RidgeRegression(const X: TDoubleMatrix; const Y: TDoubleArray; Lambda: Double): TLinearModel;
 var
   NSamples, NFeatures, I, J, K: Integer;
   XA, XAt, XAtXA, Reg: TDoubleMatrix;
@@ -815,8 +816,7 @@ begin
   else              Result.RSquared := 1.0;
 end;
 
-class function TMLKit.PolynomialFeatures(const X: TDoubleArray;
-  Degree: Integer): TDoubleMatrix;
+class function TMLKit.PolynomialFeatures(const X: TDoubleArray; Degree: Integer): TDoubleMatrix;
 var
   N, I, D: Integer;
 begin
@@ -832,8 +832,7 @@ begin
   end;
 end;
 
-class function TMLKit.LinearPredict(const Model: TLinearModel;
-  const Xnew: TDoubleMatrix): TDoubleArray;
+class function TMLKit.LinearPredict(const Model: TLinearModel; const Xnew: TDoubleMatrix): TDoubleArray;
 var
   NSamples, NFeatures, I, J: Integer;
 begin
@@ -853,8 +852,10 @@ end;
 --------------------------------------------------------------------------- }
 
 class function TMLKit.KNearestNeighbours(
-  const TrainX: TDoubleMatrix; const TrainY: TIntegerArray;
-  const TestX: TDoubleMatrix; K: Integer): TIntegerArray;
+  const TrainX: TDoubleMatrix;
+  const TrainY: TIntegerArray;
+  const TestX: TDoubleMatrix;
+  K: Integer): TIntegerArray;
 var
   NTrain, NTest, NFeatures, I, J, L, MaxCount, MaxClass: Integer;
   Dist: Double;
@@ -916,7 +917,8 @@ begin
 end;
 
 class function TMLKit.NaiveBayes(
-  const TrainX: TDoubleMatrix; const TrainY: TIntegerArray;
+  const TrainX: TDoubleMatrix;
+  const TrainY: TIntegerArray;
   const TestX: TDoubleMatrix): TIntegerArray;
 var
   NSamples, NTest, NFeatures, NClasses, I, J, C: Integer;
@@ -992,8 +994,11 @@ begin
 end;
 
 class function TMLKit.LogisticRegression(
-  const TrainX: TDoubleMatrix; const TrainY: TIntegerArray;
-  LR: Double; MaxIter: Integer; Tol: Double): TLinearModel;
+  const TrainX: TDoubleMatrix;
+  const TrainY: TIntegerArray;
+  LR: Double;
+  MaxIter: Integer;
+  Tol: Double): TLinearModel;
 var
   NSamples, NFeatures, I, J, Iter: Integer;
   W: TDoubleArray;  { weights including bias at index 0 }
@@ -1038,8 +1043,7 @@ begin
   Result.RSquared := 0;  { not meaningful for logistic — use Accuracy instead }
 end;
 
-class function TMLKit.LogisticPredict(const Model: TLinearModel;
-  const Xnew: TDoubleMatrix): TIntegerArray;
+class function TMLKit.LogisticPredict(const Model: TLinearModel; const Xnew: TDoubleMatrix): TIntegerArray;
 var
   NSamples, NFeatures, I, J: Integer;
   Z: Double;
@@ -1059,8 +1063,7 @@ end;
   CLUSTERING
 --------------------------------------------------------------------------- }
 
-class function TMLKit.KMeans(const X: TDoubleMatrix; K: Integer;
-  MaxIter: Integer; Seed: Integer): TKMeansResult;
+class function TMLKit.KMeans(const X: TDoubleMatrix; K: Integer; MaxIter: Integer; Seed: Integer): TKMeansResult;
 var
   NSamples, NFeatures, I, J, C, Iter, NearC: Integer;
   Centroids: TDoubleMatrix;
@@ -1144,8 +1147,7 @@ begin
   Result.Iters     := Iter + 1;
 end;
 
-class function TMLKit.DBSCAN(const X: TDoubleMatrix;
-  Eps: Double; MinPts: Integer): TDBSCANResult;
+class function TMLKit.DBSCAN(const X: TDoubleMatrix; Eps: Double; MinPts: Integer): TDBSCANResult;
 var
   N, I, J, ClusterID: Integer;
   Labels: TIntegerArray;
@@ -1214,8 +1216,7 @@ end;
   DIMENSIONALITY REDUCTION
 --------------------------------------------------------------------------- }
 
-class function TMLKit.PCA(const X: TDoubleMatrix; NComponents: Integer;
-  MaxIter: Integer; Tol: Double): TPCAResult;
+class function TMLKit.PCA(const X: TDoubleMatrix; NComponents: Integer; MaxIter: Integer; Tol: Double): TPCAResult;
 var
   NSamples, NFeatures, I, J, K: Integer;
   Mu: TDoubleArray;
@@ -1296,8 +1297,7 @@ begin
   Result.Mean := Mu;
 end;
 
-class function TMLKit.PCATransform(const PCARes: TPCAResult;
-  const X: TDoubleMatrix): TDoubleMatrix;
+class function TMLKit.PCATransform(const PCARes: TPCAResult; const X: TDoubleMatrix): TDoubleMatrix;
 var
   NSamples, NFeatures, NComponents, I, J, K: Integer;
   Centered: TDoubleArray;
@@ -1335,8 +1335,7 @@ begin
   Result := Correct / N;
 end;
 
-class function TMLKit.Precision(const YTrue, YPred: TIntegerArray;
-  ClassLabel: Integer): Double;
+class function TMLKit.Precision(const YTrue, YPred: TIntegerArray; ClassLabel: Integer): Double;
 var N, I, TP, FP: Integer;
 begin
   N := Length(YTrue);
@@ -1351,8 +1350,7 @@ begin
   if TP + FP = 0 then Result := 0 else Result := TP / (TP + FP);
 end;
 
-class function TMLKit.Recall(const YTrue, YPred: TIntegerArray;
-  ClassLabel: Integer): Double;
+class function TMLKit.Recall(const YTrue, YPred: TIntegerArray; ClassLabel: Integer): Double;
 var N, I, TP, FN: Integer;
 begin
   N := Length(YTrue);
@@ -1367,8 +1365,7 @@ begin
   if TP + FN = 0 then Result := 0 else Result := TP / (TP + FN);
 end;
 
-class function TMLKit.F1Score(const YTrue, YPred: TIntegerArray;
-  ClassLabel: Integer): Double;
+class function TMLKit.F1Score(const YTrue, YPred: TIntegerArray; ClassLabel: Integer): Double;
 var P, R: Double;
 begin
   P := Precision(YTrue, YPred, ClassLabel);
@@ -1377,8 +1374,7 @@ begin
   else              Result := 2 * P * R / (P + R);
 end;
 
-class function TMLKit.BuildConfusionMatrix(const YTrue, YPred: TIntegerArray;
-  NClasses: Integer): TConfusionMatrix;
+class function TMLKit.BuildConfusionMatrix(const YTrue, YPred: TIntegerArray; NClasses: Integer): TConfusionMatrix;
 var N, I, C: Integer;
 begin
   N := Length(YTrue);

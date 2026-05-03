@@ -86,8 +86,8 @@ type
   TPoint2D = record
     X, Y: Double;
     class function Create(AX, AY: Double): TPoint2D; static;
-    function  DistanceTo(const Other: TPoint2D): Double;
-    function  ToString: String;
+    function DistanceTo(const Other: TPoint2D): Double;
+    function ToString: String;
   end;
 
   TVector2D = record
@@ -95,21 +95,21 @@ type
     class function Create(AX, AY: Double): TVector2D; static;
     { From P → Q }
     class function FromPoints(const P, Q: TPoint2D): TVector2D; static;
-    function  Magnitude: Double;
-    function  Normalise: TVector2D;       { unit vector; raises if zero }
-    function  Dot(const V: TVector2D): Double;
-    function  Cross(const V: TVector2D): Double;  { 2-D: scalar z-component }
-    function  Perpendicular: TVector2D;   { rotate 90° CCW }
-    function  ToString: String;
+    function Magnitude: Double;
+    function Normalise: TVector2D; { unit vector; raises if zero }
+    function Dot(const V: TVector2D): Double;
+    function Cross(const V: TVector2D): Double; { 2-D: scalar z-component }
+    function Perpendicular: TVector2D; { rotate 90° CCW }
+    function ToString: String;
   end;
 
   TSegment2D = record
     P, Q: TPoint2D;
     class function Create(const AP, AQ: TPoint2D): TSegment2D; static;
-    function  Length: Double;
-    function  Midpoint: TPoint2D;
-    function  Direction: TVector2D;
-    function  ToString: String;
+    function Length: Double;
+    function Midpoint: TPoint2D;
+    function Direction: TVector2D;
+    function ToString: String;
   end;
 
   TLine2D = record
@@ -142,19 +142,19 @@ type
   TPoint3D = record
     X, Y, Z: Double;
     class function Create(AX, AY, AZ: Double): TPoint3D; static;
-    function  DistanceTo(const Other: TPoint3D): Double;
-    function  ToString: String;
+    function DistanceTo(const Other: TPoint3D): Double;
+    function ToString: String;
   end;
 
   TVector3D = record
     X, Y, Z: Double;
     class function Create(AX, AY, AZ: Double): TVector3D; static;
     class function FromPoints(const P, Q: TPoint3D): TVector3D; static;
-    function  Magnitude: Double;
-    function  Normalise: TVector3D;
-    function  Dot(const V: TVector3D): Double;
-    function  Cross(const V: TVector3D): TVector3D;
-    function  ToString: String;
+    function Magnitude: Double;
+    function Normalise: TVector3D;
+    function Dot(const V: TVector3D): Double;
+    function Cross(const V: TVector3D): TVector3D;
+    function ToString: String;
   end;
 
   TSegment3D = record
@@ -167,8 +167,7 @@ type
   TPlane3D = record
     { ax + by + cz + d = 0 with (a,b,c) unit normal }
     A, B, C, D: Double;
-    class function FromPointNormal(const P: TPoint3D;
-      const N: TVector3D): TPlane3D; static;
+    class function FromPointNormal(const P: TPoint3D; const N: TVector3D): TPlane3D; static;
     class function FromThreePoints(const P1, P2, P3: TPoint3D): TPlane3D; static;
     function SignedDistance(const P: TPoint3D): Double;
     function Distance(const P: TPoint3D): Double;
@@ -210,8 +209,7 @@ type
     { Shortest distance from point P to line segment AB.
       Returns the distance; optionally sets T (0..1) to the parameter of
       the closest point on AB. }
-    class function PointToSegment2D(const P, A, B: TPoint2D;
-      out T: Double): Double; static;
+    class function PointToSegment2D(const P, A, B: TPoint2D; out T: Double): Double; static;
 
     { Perpendicular distance from point P to infinite line through A and B }
     class function PointToLine2D(const P, A, B: TPoint2D): Double; static;
@@ -224,12 +222,10 @@ type
     class function PointToPoint3D(const A, B: TPoint3D): Double; static;
 
     { Shortest distance from point P to 3-D segment AB }
-    class function PointToSegment3D(const P, A, B: TPoint3D;
-      out T: Double): Double; static;
+    class function PointToSegment3D(const P, A, B: TPoint3D; out T: Double): Double; static;
 
     { Distance from point to plane }
-    class function PointToPlane3D(const P: TPoint3D;
-      const Plane: TPlane3D): Double; static;
+    class function PointToPlane3D(const P: TPoint3D; const Plane: TPlane3D): Double; static;
 
     { ===================================================================
       INTERSECTION
@@ -241,21 +237,19 @@ type
 
     { Find intersection point of two segments. Returns False if parallel/no cross.
       Sets T to parameter along (A1,A2) where intersection occurs. }
-    class function SegmentIntersect2D(const A1, A2, B1, B2: TPoint2D;
-      out Pt: TPoint2D; out T: Double): Boolean; static;
+    class function SegmentIntersect2D(const A1, A2, B1, B2: TPoint2D; out Pt: TPoint2D; out T: Double): Boolean; static;
 
     { Intersection of two infinite lines (each defined by two points).
       Returns False if lines are parallel (or coincident). }
-    class function LineIntersect2D(const A1, A2, B1, B2: TPoint2D;
-      out Pt: TPoint2D): Boolean; static;
+    class function LineIntersect2D(const A1, A2, B1, B2: TPoint2D; out Pt: TPoint2D): Boolean; static;
 
     { Returns True if segment (P,Q) intersects or is inside circle C }
-    class function SegmentCircleIntersect(const P, Q: TPoint2D;
-      const C: TCircle2D): Boolean; static;
+    class function SegmentCircleIntersect(const P, Q: TPoint2D; const C: TCircle2D): Boolean; static;
 
     { Ray from Origin in Direction intersects circle.
       Returns number of intersections (0, 1, or 2) and the near/far t-values. }
-    class function RayCircleIntersect(const Origin, Direction: TPoint2D;
+    class function RayCircleIntersect(
+      const Origin, Direction: TPoint2D;
       const C: TCircle2D;
       out T1, T2: Double): Integer; static;
 
@@ -276,8 +270,7 @@ type
     { Point-in-polygon test using ray casting.
       Returns True if P is strictly inside Poly (not on boundary).
       Works for concave polygons; does not handle self-intersecting. }
-    class function PointInPolygon(const P: TPoint2D;
-      const Poly: TPolygon2D): Boolean; static;
+    class function PointInPolygon(const P: TPoint2D; const Poly: TPolygon2D): Boolean; static;
 
     { Returns True if polygon is convex (all cross-products same sign) }
     class function IsConvex(const Poly: TPolygon2D): Boolean; static;
@@ -292,16 +285,13 @@ type
     =================================================================== }
 
     { Translate all points by (DX, DY) }
-    class function Translate2D(const Poly: TPolygon2D;
-      DX, DY: Double): TPolygon2D; static;
+    class function Translate2D(const Poly: TPolygon2D; DX, DY: Double): TPolygon2D; static;
 
     { Scale all points by SX, SY about the origin }
-    class function Scale2D(const Poly: TPolygon2D;
-      SX, SY: Double): TPolygon2D; static;
+    class function Scale2D(const Poly: TPolygon2D; SX, SY: Double): TPolygon2D; static;
 
     { Rotate all points CCW by Angle radians about Centre }
-    class function Rotate2D(const Poly: TPolygon2D;
-      Angle: Double; const Centre: TPoint2D): TPolygon2D; static;
+    class function Rotate2D(const Poly: TPolygon2D; Angle: Double; const Centre: TPoint2D): TPolygon2D; static;
 
     { ===================================================================
       ANGLES & TRIANGLES
@@ -505,8 +495,7 @@ end;
   TPlane3D
 --------------------------------------------------------------------------- }
 
-class function TPlane3D.FromPointNormal(const P: TPoint3D;
-  const N: TVector3D): TPlane3D;
+class function TPlane3D.FromPointNormal(const P: TPoint3D; const N: TVector3D): TPlane3D;
 var UN: TVector3D;
 begin
   UN := N.Normalise;
@@ -560,9 +549,9 @@ begin Result := Centre.DistanceTo(P) <= Radius; end;
   TBoundingBox2D
 --------------------------------------------------------------------------- }
 
-function TBoundingBox2D.Width:  Double; begin Result := MaxX - MinX; end;
+function TBoundingBox2D.Width: Double; begin Result := MaxX - MinX; end;
 function TBoundingBox2D.Height: Double; begin Result := MaxY - MinY; end;
-function TBoundingBox2D.Area:   Double; begin Result := Width * Height; end;
+function TBoundingBox2D.Area: Double; begin Result := Width * Height; end;
 
 function TBoundingBox2D.ContainsPoint(const P: TPoint2D): Boolean;
 begin
@@ -577,8 +566,7 @@ end;
 class function TGeometryKit.PointToPoint2D(const A, B: TPoint2D): Double;
 begin Result := A.DistanceTo(B); end;
 
-class function TGeometryKit.PointToSegment2D(const P, A, B: TPoint2D;
-  out T: Double): Double;
+class function TGeometryKit.PointToSegment2D(const P, A, B: TPoint2D; out T: Double): Double;
 var DX, DY, Len2, PX, PY: Double;
 begin
   DX := B.X - A.X; DY := B.Y - A.Y;
@@ -600,8 +588,7 @@ begin
   Result := L.Distance(P);
 end;
 
-class function TGeometryKit.SegmentToSegment2D(
-  const A1, A2, B1, B2: TPoint2D): Double;
+class function TGeometryKit.SegmentToSegment2D(const A1, A2, B1, B2: TPoint2D): Double;
 var T: Double; D1, D2, D3, D4: Double;
 begin
   { If segments intersect, distance is 0 }
@@ -616,8 +603,7 @@ end;
 class function TGeometryKit.PointToPoint3D(const A, B: TPoint3D): Double;
 begin Result := A.DistanceTo(B); end;
 
-class function TGeometryKit.PointToSegment3D(const P, A, B: TPoint3D;
-  out T: Double): Double;
+class function TGeometryKit.PointToSegment3D(const P, A, B: TPoint3D; out T: Double): Double;
 var DX, DY, DZ, Len2, CX, CY, CZ: Double;
 begin
   DX := B.X-A.X; DY := B.Y-A.Y; DZ := B.Z-A.Z;
@@ -629,8 +615,7 @@ begin
   Result := Sqrt(Sqr(P.X-CX)+Sqr(P.Y-CY)+Sqr(P.Z-CZ));
 end;
 
-class function TGeometryKit.PointToPlane3D(const P: TPoint3D;
-  const Plane: TPlane3D): Double;
+class function TGeometryKit.PointToPlane3D(const P: TPoint3D; const Plane: TPlane3D): Double;
 begin Result := Plane.Distance(P); end;
 
 { ---------------------------------------------------------------------------
@@ -649,8 +634,7 @@ begin
             (Min(A.Y,B.Y) <= P.Y+GEO_EPS) and (P.Y <= Max(A.Y,B.Y)+GEO_EPS);
 end;
 
-class function TGeometryKit.SegmentsIntersect2D(
-  const A1, A2, B1, B2: TPoint2D): Boolean;
+class function TGeometryKit.SegmentsIntersect2D(const A1, A2, B1, B2: TPoint2D): Boolean;
 var D1, D2, D3, D4: Double;
 begin
   D1 := Cross2D(B1, B2, A1);
@@ -670,8 +654,10 @@ begin
   Result := False;
 end;
 
-class function TGeometryKit.SegmentIntersect2D(const A1, A2, B1, B2: TPoint2D;
-  out Pt: TPoint2D; out T: Double): Boolean;
+class function TGeometryKit.SegmentIntersect2D(
+  const A1, A2, B1, B2: TPoint2D;
+  out Pt: TPoint2D;
+  out T: Double): Boolean;
 var
   R, S, RxS, TNum: Double;
   RV, SV: TVector2D;
@@ -698,8 +684,7 @@ begin
   Result := True;
 end;
 
-class function TGeometryKit.LineIntersect2D(const A1, A2, B1, B2: TPoint2D;
-  out Pt: TPoint2D): Boolean;
+class function TGeometryKit.LineIntersect2D(const A1, A2, B1, B2: TPoint2D; out Pt: TPoint2D): Boolean;
 var
   LA, LB: TLine2D;
   Det: Double;
@@ -713,8 +698,7 @@ begin
   Result := True;
 end;
 
-class function TGeometryKit.SegmentCircleIntersect(const P, Q: TPoint2D;
-  const C: TCircle2D): Boolean;
+class function TGeometryKit.SegmentCircleIntersect(const P, Q: TPoint2D; const C: TCircle2D): Boolean;
 var T: Double;
 begin
   { Closest point on PQ to centre; if within radius, they intersect }
@@ -722,7 +706,8 @@ begin
 end;
 
 class function TGeometryKit.RayCircleIntersect(
-  const Origin, Direction: TPoint2D; const C: TCircle2D;
+  const Origin, Direction: TPoint2D;
+  const C: TCircle2D;
   out T1, T2: Double): Integer;
 var
   DX, DY, OX, OY, A, B, Disc: Double;
@@ -795,8 +780,7 @@ begin
   Result.Y := Y / (6 * A);
 end;
 
-class function TGeometryKit.PointInPolygon(const P: TPoint2D;
-  const Poly: TPolygon2D): Boolean;
+class function TGeometryKit.PointInPolygon(const P: TPoint2D; const Poly: TPolygon2D): Boolean;
 var I, J, N: Integer;
 begin
   N := Length(Poly); Result := False;
@@ -887,8 +871,7 @@ end;
   TGeometryKit — Transformations
 --------------------------------------------------------------------------- }
 
-class function TGeometryKit.Translate2D(const Poly: TPolygon2D;
-  DX, DY: Double): TPolygon2D;
+class function TGeometryKit.Translate2D(const Poly: TPolygon2D; DX, DY: Double): TPolygon2D;
 var I: Integer;
 begin
   SetLength(Result, Length(Poly));
@@ -899,8 +882,7 @@ begin
   end;
 end;
 
-class function TGeometryKit.Scale2D(const Poly: TPolygon2D;
-  SX, SY: Double): TPolygon2D;
+class function TGeometryKit.Scale2D(const Poly: TPolygon2D; SX, SY: Double): TPolygon2D;
 var I: Integer;
 begin
   SetLength(Result, Length(Poly));
@@ -911,8 +893,7 @@ begin
   end;
 end;
 
-class function TGeometryKit.Rotate2D(const Poly: TPolygon2D;
-  Angle: Double; const Centre: TPoint2D): TPolygon2D;
+class function TGeometryKit.Rotate2D(const Poly: TPolygon2D; Angle: Double; const Centre: TPoint2D): TPolygon2D;
 var I: Integer; CosA, SinA, DX, DY: Double;
 begin
   CosA := Cos(Angle); SinA := Sin(Angle);

@@ -1411,8 +1411,10 @@ type
         WriteLn('95% Bootstrap CI for Mean: [', CI.Lower:0:4, ', ', CI.Upper:0:4, ']');
       end;
     }
-    class function BootstrapConfidenceInterval(const Data: TDoubleArray;
-      const Alpha: Double = 0.05; const Iterations: Integer = 1000): TDoublePair; static;
+    class function BootstrapConfidenceInterval(
+      const Data: TDoubleArray;
+      const Alpha: Double = 0.05;
+      const Iterations: Integer = 1000): TDoublePair; static;
   end;
 
 implementation
@@ -2065,8 +2067,10 @@ begin
   end;
 end;
 
-class function TStatsKit.BootstrapConfidenceInterval(const Data: TDoubleArray; 
-  const Alpha: Double = 0.05; const Iterations: Integer = 1000): TDoublePair;
+class function TStatsKit.BootstrapConfidenceInterval(
+  const Data: TDoubleArray;
+  const Alpha: Double = 0.05;
+  const Iterations: Integer = 1000): TDoublePair;
 var
   Means: TDoubleArray;
 begin
