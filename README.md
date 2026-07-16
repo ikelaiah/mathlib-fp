@@ -8,7 +8,7 @@
 [![Lazarus](https://img.shields.io/badge/Lazarus-3.6+-blue.svg)](https://www.lazarus-ide.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 [![Tests](https://img.shields.io/badge/Tests-720%20passing-brightgreen.svg)](tests/)
-![Status](https://img.shields.io/badge/Status-Development-yellow.svg)
+![Status](https://img.shields.io/badge/Status-Stable-yellow.svg)
 
 A focused Free Pascal math library collection for scientific, engineering,
 statistical, financial, optimization, time-series, machine-learning, and
