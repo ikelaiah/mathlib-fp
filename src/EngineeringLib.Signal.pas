@@ -38,7 +38,7 @@ unit EngineeringLib.Signal;
 interface
 
 uses
-  Classes, SysUtils, Math;
+  Classes, SysUtils, Math, EngineeringLib.Common;
 
 type
   TDoubleArray = array of Double;
@@ -162,7 +162,7 @@ begin
 
   N := Length(InputSignal);
   if (WindowSize <= 0) or (WindowSize > N) then
-    raise EInvalidOp.Create('Invalid window size for moving average.');
+    raise ESignalError.Create('Invalid window size for moving average.');
 
   SetLength(Result, N);
 
@@ -194,8 +194,9 @@ const
   Blackman_a1 = 0.5;
   Blackman_a2 = 0.08;
 begin
+  Result := nil;
   if Size <= 0 then
-    raise Exception.Create('Window size must be positive.');
+    raise ESignalError.Create('Window size must be positive.');
   SetLength(Result, Size);
   N_1 := Size - 1;
   if N_1 = 0 then begin Result[0] := 1.0; Exit; end;
@@ -215,7 +216,7 @@ begin
                    - Blackman_a1 * Cos(2 * Pi * I / N_1)
                    + Blackman_a2 * Cos(4 * Pi * I / N_1);
   else
-    raise Exception.Create('Unknown window type specified.');
+    raise ESignalError.Create('Unknown window type specified.');
   end;
 end;
 
@@ -226,7 +227,7 @@ begin
   N := Length(InputSignal);
   M := Length(Window);
   if N <> M then
-    raise EInvalidOp.Create('Input signal and window must have the same length.');
+    raise ESignalError.Create('Input signal and window must have the same length.');
   if N = 0 then Exit(nil);
   SetLength(Result, N);
   for I := 0 to N - 1 do
@@ -245,10 +246,10 @@ var
 begin
   N := Length(RealPart);
   if N <> Length(ImagPart) then
-    raise EInvalidArgument.Create('FFT: RealPart and ImagPart must have the same length.');
+    raise ESignalError.Create('FFT: RealPart and ImagPart must have the same length.');
   if N <= 1 then Exit;
   if (N and (N - 1)) <> 0 then
-    raise EInvalidArgument.Create('FFT: length must be a power of 2.');
+    raise ESignalError.Create('FFT: length must be a power of 2.');
 
   BitReverse(RealPart, ImagPart);
 
@@ -350,6 +351,7 @@ var
   Fc2Pi, N0, Sinc: Double;
   Win: TDoubleArray;
 begin
+  Result := nil;
   M     := Order;
   Fc2Pi := 2 * Pi * CutoffFreq;
   SetLength(Result, M + 1);
@@ -380,7 +382,7 @@ end;
 class function TSignalKit.DesignFIRLowPass(CutoffFreq: Double; Order: Integer; WindowType: TWindowType): TDoubleArray;
 begin
   if (CutoffFreq <= 0) or (CutoffFreq >= 0.5) then
-    raise EInvalidArgument.Create('DesignFIRLowPass: CutoffFreq must be in (0, 0.5).');
+    raise ESignalError.Create('DesignFIRLowPass: CutoffFreq must be in (0, 0.5).');
   if Order < 2 then Order := 2;
   if Odd(Order) then Inc(Order);
   Result := SincKernel(Order, CutoffFreq, WindowType);
@@ -392,6 +394,7 @@ var
   LP: TDoubleArray;
   I: Integer;
 begin
+  Result := nil;
   { High-pass = spectral inversion of low-pass }
   LP := DesignFIRLowPass(CutoffFreq, Order, WindowType);
   SetLength(Result, Length(LP));
@@ -408,9 +411,10 @@ var
   LP_Lo, LP_Hi: TDoubleArray;
   I: Integer;
 begin
+  Result := nil;
   { Band-pass = low-pass(fc_hi) − low-pass(fc_lo) }
   if LowCutoff >= HighCutoff then
-    raise EInvalidArgument.Create('DesignFIRBandPass: LowCutoff must be < HighCutoff.');
+    raise ESignalError.Create('DesignFIRBandPass: LowCutoff must be < HighCutoff.');
   LP_Lo := DesignFIRLowPass(LowCutoff,  Order, WindowType);
   LP_Hi := DesignFIRLowPass(HighCutoff, Order, WindowType);
   SetLength(Result, Length(LP_Lo));
@@ -426,6 +430,7 @@ var
   BP: TDoubleArray;
   I: Integer;
 begin
+  Result := nil;
   { Band-stop = 1 − band-pass (spectral inversion) }
   BP := DesignFIRBandPass(LowCutoff, HighCutoff, Order, WindowType);
   SetLength(Result, Length(BP));

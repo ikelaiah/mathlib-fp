@@ -182,6 +182,7 @@ begin Result := Sqr(X[0] - 2) + Sqr(X[1] + 1); end;
 
 function QuadraticBowlGrad(const X: TDoubleArray): TDoubleArray;
 begin
+  Result := nil;
   SetLength(Result, 2);
   Result[0] := 2 * (X[0] - 2);
   Result[1] := 2 * (X[1] + 1);

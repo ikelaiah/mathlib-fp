@@ -396,6 +396,7 @@ var
   XFwd, XBwd: TDoubleArray;
 begin
   N := Length(X);
+  Result := nil;
   SetLength(Result, N);
   XFwd := VecCopy(X);
   XBwd := VecCopy(X);
@@ -419,6 +420,7 @@ end;
 class function TOptimizationKit.VecAdd(const A, B: TDoubleArray; Scale: Double): TDoubleArray;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(A));
   for I := 0 to High(A) do Result[I] := A[I] + Scale * B[I];
 end;
@@ -426,6 +428,7 @@ end;
 class function TOptimizationKit.VecScale(const A: TDoubleArray; S: Double): TDoubleArray;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(A));
   for I := 0 to High(A) do Result[I] := A[I] * S;
 end;
@@ -441,6 +444,7 @@ end;
 class function TOptimizationKit.VecCopy(const A: TDoubleArray): TDoubleArray;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(A));
   for I := 0 to High(A) do Result[I] := A[I];
 end;
@@ -706,7 +710,7 @@ class function TOptimizationKit.LBFGS(
   Tol: Double;
   MaxIter: Integer): TOptResult;
 { Two-loop recursion L-BFGS (Nocedal 1980).
-  Stores the last M (s_k, y_k) pairs where s_k = x_{k+1}-x_k, y_k = g_{k+1}-g_k }
+  Stores the last M (s_k, y_k) pairs where s_k = x_(k+1)-x_k, y_k = g_(k+1)-g_k }
 var
   N, Iter, K, I, J, Bound: Integer;
   X, G, GNew, Q, R, S, Y, Alpha_arr, Rho_arr: TDoubleArray;
@@ -787,7 +791,7 @@ begin
     else GNew := NumericalGradient(F, X);
 
     { Store (s_k, y_k) in circular buffer }
-    Y      := VecAdd(GNew, G, -1);  { y_k = g_{k+1} - g_k }
+    Y      := VecAdd(GNew, G, -1);  { y_k = g_(k+1) - g_k }
     Sy     := Dot(S, Y);
     J      := K mod M;
     SBuf[J] := VecCopy(S);

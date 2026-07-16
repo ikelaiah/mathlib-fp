@@ -1,10 +1,13 @@
+<p align="center">
+  <img src="docs/assets/mathlib-fp-logo.svg" alt="mathlib-fp — mathematics and engineering for Free Pascal" width="760">
+</p>
+
 # mathlib-fp
 
 [![FPC](https://img.shields.io/badge/Free%20Pascal-3.2.2-blue.svg)](https://www.freepascal.org/)
 [![Lazarus](https://img.shields.io/badge/Lazarus-3.6+-blue.svg)](https://www.lazarus-ide.org/)
-[![CI](https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg)](https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
-[![Tests](https://img.shields.io/badge/Tests-709%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-720%20passing-brightgreen.svg)](tests/)
 ![Status](https://img.shields.io/badge/Status-Development-yellow.svg)
 
 A focused Free Pascal math library collection for scientific, engineering,
@@ -40,6 +43,7 @@ geometry work. The source has no third-party runtime dependencies.
 
 ```text
 mathlib-fp/
+├── fpmake.pp              # FPMake/FPPKG package definition
 ├── src/                    # all library units; add this folder to -Fu
 ├── docs/                   # per-library reference documentation
 ├── examples/               # runnable example programs
@@ -81,8 +85,22 @@ Use `-Fu` for the library sources and `-FU` for compiler output:
 
 ```bash
 mkdir -p lib
-fpc -Fu../src -FUlib my_program.lpr
+fpc -Fusrc -FUlib my_program.lpr
 ```
+
+#### FPMake / FPPKG
+
+The repository includes `fpmake.pp` for command-line package workflows. A
+configured FPPKG installation can build or install the package from the
+repository root:
+
+```bash
+fppkg build
+fppkg install
+```
+
+FPPKG configuration is compiler-installation specific; direct `-Fusrc` builds
+remain the simplest option when FPPKG has not been configured.
 
 ### Source Mode
 
@@ -235,7 +253,10 @@ fpc "-Fu..\src" "-FUlib" TestRunner.lpr
 .\TestRunner.exe -a --format=plain
 ```
 
-Current local result: **709 tests, 0 errors, 0 failures**.
+Current local result: **720 tests, 0 errors, 0 failures**. A clean rebuild with
+`-FcUTF8` also completes with zero compiler warnings. Set
+`MATHLIB_TEST_VERBOSE=1` to enable the algebra suite's diagnostic matrices and
+timings.
 
 ---
 

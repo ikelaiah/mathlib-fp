@@ -155,7 +155,7 @@ type
     class function WeightedMovingAverage(const Y: TDoubleArray; Window: Integer): TDoubleArray; static;
 
     { Exponential Smoothing (single / simple EMA).
-      S_t = Alpha * Y_t + (1-Alpha) * S_{t-1}
+      S_t = Alpha * Y_t + (1-Alpha) * S_(t-1)
       Alpha in (0,1]: small Alpha → heavy smoothing; large Alpha → tracks data closely.
       InitValue: starting value for S_0 (default = Y[0] if not supplied). }
     class function ExponentialSmoothing(
@@ -267,7 +267,7 @@ type
 
     { Fit AR(p) model via Yule-Walker equations.
       Returns coefficients phi[1..p] and innovation variance Sigma2.
-      The AR(p) model: Y_t = phi_1*Y_{t-1} + ... + phi_p*Y_{t-p} + e_t }
+      The AR(p) model: Y_t = phi_1 Y_(t-1) + ... + phi_p Y_(t-p) + e_t }
     class function ARFit(const Y: TDoubleArray; P: Integer): TARIMAModel; static;
 
     { h-step forecast from AR coefficients.
@@ -449,6 +449,7 @@ begin
   N := Length(Y);
   if N = 0 then raise ETimeSeriesError.Create('SimpleMovingAverage: empty series');
   if Window < 1 then raise ETimeSeriesError.Create('SimpleMovingAverage: Window must be >= 1');
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N-1 do
   begin
@@ -469,6 +470,7 @@ begin
   N := Length(Y);
   if N = 0 then raise ETimeSeriesError.Create('WeightedMovingAverage: empty series');
   if Window < 1 then raise ETimeSeriesError.Create('WeightedMovingAverage: Window must be >= 1');
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N-1 do
   begin
@@ -487,7 +489,7 @@ class function TTimeSeriesKit.ExponentialSmoothing(
   const Y: TDoubleArray;
   Alpha: Double;
   InitValue: Double): TDoubleArray;
-{ S_t = Alpha*Y_t + (1-Alpha)*S_{t-1} }
+{ S_t = Alpha Y_t + (1-Alpha) S_(t-1) }
 var
   N, I: Integer;
   S: Double;
@@ -496,6 +498,7 @@ begin
   if N = 0 then raise ETimeSeriesError.Create('ExponentialSmoothing: empty series');
   if (Alpha <= 0) or (Alpha > 1) then
     raise ETimeSeriesError.Create('ExponentialSmoothing: Alpha must be in (0,1]');
+  Result := nil;
   SetLength(Result, N);
   S := IfThen(IsNan(InitValue), Y[0], InitValue);
   for I := 0 to N-1 do
@@ -507,9 +510,9 @@ end;
 
 class function TTimeSeriesKit.DoubleExponentialSmoothing(const Y: TDoubleArray; Alpha, Beta: Double): TDoubleArray;
 { Holt's method: tracks level L and trend B.
-  L_t = Alpha*Y_t + (1-Alpha)*(L_{t-1} + B_{t-1})
-  B_t = Beta*(L_t - L_{t-1}) + (1-Beta)*B_{t-1}
-  Fitted = L_{t-1} + B_{t-1} }
+  L_t = Alpha Y_t + (1-Alpha) (L_(t-1) + B_(t-1))
+  B_t = Beta (L_t - L_(t-1)) + (1-Beta) B_(t-1)
+  Fitted = L_(t-1) + B_(t-1) }
 var
   N, I: Integer;
   L, B, LPrev: Double;
@@ -518,6 +521,7 @@ begin
   if N < 2 then raise ETimeSeriesError.Create('DoubleExponentialSmoothing: need at least 2 points');
   if (Alpha <= 0) or (Alpha > 1) then raise ETimeSeriesError.Create('Alpha must be in (0,1]');
   if (Beta  <= 0) or (Beta  > 1) then raise ETimeSeriesError.Create('Beta must be in (0,1]');
+  Result := nil;
   SetLength(Result, N);
   L := Y[0];
   B := Y[1] - Y[0];  { initial trend estimate }
@@ -565,6 +569,7 @@ begin
   L := SliceMean(Y, 0, Period-1);
   B := (SliceMean(Y, Period, 2*Period-1) - L) / Period;
 
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N-1 do
   begin
@@ -640,6 +645,7 @@ begin
   end;
 
   { Project H steps ahead }
+  Result := nil;
   SetLength(Result, H);
   for I := 1 to H do
   begin
@@ -737,6 +743,7 @@ class function TTimeSeriesKit.Difference(const Y: TDoubleArray; D: Integer): TDo
 var I, Ord: Integer; Cur: TDoubleArray;
 begin
   if D < 0 then raise ETimeSeriesError.Create('Difference: D must be >= 0');
+  Result := nil;
   Cur := Y;
   for Ord := 1 to D do
   begin
@@ -791,7 +798,7 @@ end;
 --------------------------------------------------------------------------- }
 
 class function TTimeSeriesKit.AugmentedDickeyFuller(const Y: TDoubleArray; Lags: Integer): TADFResult;
-{ Regression: ΔY_t = alpha + beta*Y_{t-1} + sum(gamma_j*ΔY_{t-j}) + e_t
+{ Regression: ΔY_t = alpha + beta Y_(t-1) + sum(gamma_j ΔY_(t-j)) + e_t
   Test statistic = beta / SE(beta).  MacKinnon (1994) critical values. }
 var
   N, NReg, I, J, K, NCol: Integer;
@@ -812,7 +819,7 @@ begin
   { Number of regression observations (skip first Lags+1 due to lags) }
   NReg := N - Lags - 1;
 
-  { Build design matrix: [1, Y_{t-1}, ΔY_{t-1}, ..., ΔY_{t-Lags}] }
+  { Build design matrix: [1, Y_(t-1), ΔY_(t-1), ..., ΔY_(t-Lags)] }
   SetLength(XMat, NReg);
   SetLength(YVec, NReg);
   for I := 0 to NReg-1 do
@@ -820,13 +827,13 @@ begin
     K := I + Lags;  { offset into DY }
     SetLength(XMat[I], Lags + 2);
     XMat[I][0] := 1;               { intercept }
-    XMat[I][1] := Y[K];            { Y_{t-1} (level lag) }
+    XMat[I][1] := Y[K];            { Y_(t-1), the level lag }
     for J := 1 to Lags do
       XMat[I][J+1] := DY[K - J];   { lagged differences }
     YVec[I] := DY[K];              { ΔY_t }
   end;
 
-  { OLS: (X'X)^{-1} X'Y via normal equations — build X'X and X'Y }
+  { OLS: inverse(X'X) X'Y via normal equations — build X'X and X'Y }
   NCol := Lags + 2;
   SetLength(XTX, NCol);
   SetLength(XTY, NCol);
@@ -862,8 +869,8 @@ begin
   end;
   Sigma2 := SumSq / (NReg - Lags - 2);
 
-  { SE of beta (coefficient index 1) = sqrt(Sigma2 * [(X'X)^{-1}]_{1,1}) }
-  { We need the (1,1) diagonal of (X'X)^{-1}. Solve X'X * e_1 = e_1. }
+  { SE of beta (coefficient index 1) = sqrt(Sigma2 times inverse(X'X)[1,1]) }
+  { We need diagonal (1,1) of inverse(X'X). Solve X'X e_1 = e_1. }
   SetLength(Ident, NCol);
   Ident[1] := 1;  { pick column 1 }
   SetLength(XTX2, NCol);
@@ -899,7 +906,7 @@ end;
 --------------------------------------------------------------------------- }
 
 class function TTimeSeriesKit.ACF(const Y: TDoubleArray; MaxLag: Integer): TDoubleArray;
-{ r_k = Cov(Y_t, Y_{t-k}) / Var(Y) }
+{ r_k = Cov(Y_t, Y_(t-k)) / Var(Y) }
 var
   N, I, K: Integer;
   Mu, VarY, Cov: Double;
@@ -911,6 +918,7 @@ begin
   Mu   := SliceMean(Y, 0, N-1);
   VarY := SliceVar(Y, 0, N-1) * (N - 1);  { unnormalised: sum of squared devs }
 
+  Result := nil;
   SetLength(Result, MaxLag + 1);
   Result[0] := 1.0;
   for K := 1 to MaxLag do
@@ -934,6 +942,7 @@ begin
   if MaxLag >= N then MaxLag := N - 1;
   AcfVals := ACF(Y, MaxLag);
 
+  Result := nil;
   SetLength(Result, MaxLag + 1);
   Result[0] := 1.0;
   if MaxLag < 1 then Exit;
@@ -962,7 +971,7 @@ begin
 end;
 
 class function TTimeSeriesKit.LjungBox(const Y: TDoubleArray; MaxLag: Integer): Double;
-{ Q = N*(N+2) * sum_{k=1}^{MaxLag} r_k^2 / (N-k) }
+{ Q = N (N+2) sum(k=1..MaxLag) r_k^2 / (N-k) }
 var
   N, K: Integer;
   AcfVals: TDoubleArray;
@@ -1026,7 +1035,7 @@ class function TTimeSeriesKit.ARForecast(
   const Model: TARIMAModel;
   const History: TDoubleArray;
   H: Integer): TDoubleArray;
-{ Recursively apply AR recursion: Y_hat_t = mu + phi_1*(Y_{t-1}-mu) + ... }
+{ Recursively apply AR recursion: Y_hat_t = mu + phi_1 (Y_(t-1)-mu) + ... }
 var
   N, I, J, P: Integer;
   Buf: TDoubleArray;
@@ -1047,6 +1056,7 @@ begin
         Buf[N+I] := Buf[N+I] + Model.ARCoeffs[J] * (Buf[N+I-J-1] - Model.Mu);
   end;
 
+  Result := nil;
   SetLength(Result, H);
   for I := 0 to H-1 do Result[I] := Buf[N+I];
 end;
@@ -1066,7 +1076,7 @@ begin
   if Q < 1 then raise ETimeSeriesError.Create('MAFit: Q must be >= 1');
   AcfVals := ACF(Y, Q);
 
-  { Innovations algorithm (simplified): theta_{k,k} = acf[k] / v_{k-1} }
+  { Innovations algorithm (simplified): theta_(k,k) = acf[k] / v_(k-1) }
   SetLength(Theta, Q);
   SetLength(V, Q+1);
   SetLength(ThetaMat, Q+1);
@@ -1186,6 +1196,7 @@ var
   N, I: Integer;
   Mu, StdDev, CS, Sum, SumSq: Double;
 begin
+  Result := Default(TCUSUMResult);
   N := Length(Y);
   if N < 2 then raise ETimeSeriesError.Create('CUSUMDetect: need at least 2 points');
 
@@ -1218,6 +1229,7 @@ var
   N, I, Count: Integer;
   Mu, StdDev, Sum, SumSq: Double;
 begin
+  Result := nil;
   N := Length(Y);
   Sum := 0; SumSq := 0;
   for I := 0 to N-1 do begin Sum := Sum + Y[I]; SumSq := SumSq + Y[I]*Y[I]; end;
@@ -1241,6 +1253,7 @@ var
   N, I, Lo, Count, J, WN: Integer;
   Mu, StdDev, Sum, SumSq: Double;
 begin
+  Result := nil;
   N := Length(Y);
   if Window < 2 then raise ETimeSeriesError.Create('RollingZScore: Window must be >= 2');
   Count := 0;
@@ -1312,6 +1325,7 @@ var
   I: Integer;
 begin
   T := LinearTrend(Y);
+  Result := nil;
   SetLength(Result, Length(Y));
   for I := 0 to High(Y) do
     Result[I] := Y[I] - (T.Intercept + T.Slope * I);
@@ -1388,6 +1402,7 @@ begin
     end;
   end;
 
+  Result := nil;
   SetLength(Result, NF);
   for I := 0 to NF-1 do
     Result[I] := (Re[I]*Re[I] + Im[I]*Im[I]) / NPow;

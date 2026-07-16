@@ -7,38 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - Unreleased
+
 ### Added
 
-- GitHub Actions CI workflow that installs Free Pascal, builds the test runner,
-  runs the full suite, and compiles every example program.
+- `fpmake.pp` package metadata for FPMake/FPPKG command-line workflows.
+- `EngineeringLib.Common` with `EEngineeringError` and domain-specific
+  exceptions for fluid dynamics, thermodynamics, signals, and unit conversion.
+- Seeded `CreateRandom`, `BootstrapMean`, and
+  `BootstrapConfidenceInterval` overloads that are reproducible without
+  changing global random state.
+- `PolynomialFeatures(..., IncludeBias)` overload so callers can omit the bias
+  column when fitting models that already estimate an intercept.
+- Edge, property, residual, deterministic-randomness, rounding, UTF-8, and
+  parallel-multiplication coverage, bringing the suite to 720 tests.
 
 ### Changed
 
-- Updated `README.md` and `docs/index.md` to document all current libraries:
-  MathBase, AlgebraLib, FinanceLib, StatsLib, EngineeringLib, NumericsLib,
-  ProbabilityLib, CombinatoricsLib, OptimizationLib, TimeSeriesLib, MLLib,
-  and GeometryLib.
-- Updated the Lazarus package metadata and package unit so it includes every
-  public unit in `src/`.
-- Updated testing instructions and badges to reflect the current 709-test suite.
-- `AlgebraLib.Matrices` now raises `EMatrixError` when eigendecomposition does
-  not converge instead of writing a warning to stdout.
-- Refreshed stale source comments and documentation references from the old
-  TidyKit module names to the current library names.
+- Replaced hard-coded eigendecomposition and power-method cases with general
+  real algorithms and residual-based convergence checks.
+- Fractional matrix powers now use the symmetric eigendecomposition and require
+  a symmetric positive-definite matrix; integer powers use exponentiation by
+  squaring.
+- Matrix multiplication uses an operation-count threshold, caps worker count,
+  propagates worker failures, and falls back safely on Unix programs without a
+  thread manager.
+- ML entry points consistently reject empty, ragged, non-finite, mismatched,
+  or out-of-range inputs with `EMLError`.
+- Financial methods that expose `ADecimals` now apply it consistently, and
+  ratio/depreciation denominators are validated.
+- Random-producing library functions no longer call `Randomize` internally.
+- The test runner installs `cthreads` first on Unix and verbose algebra-test
+  output is opt-in through `MATHLIB_TEST_VERBOSE`.
+- The Lazarus package version is now 1.2.0 and includes the shared engineering
+  exception unit.
 
 ### Fixed
 
-- Fixed all example programs so they compile against the current APIs and FPC
-  3.2.2 syntax.
-- Fixed stale AlgebraLib documentation for `CreateFromArray`, `Zeros`, `LU`,
-  and `QR`.
-- Updated security/contribution docs to remove unclear placeholder reporting and
-  contributor-recognition text.
-
-### Removed
-
-- Removed tracked local Claude workspace settings and added `.claude/` to
-  `.gitignore`.
+- Fixed example 11's unsupported format specifier and duplicate polynomial
+  intercept, which previously caused a singular regression system.
+- Unknown unit names no longer silently default to length. Non-`Try` APIs raise
+  `EUnitConversionError`; `Try...` APIs retain their `False` contract.
+- Removed all compiler warnings from clean normal and UTF-8 builds.
+- Fixed broken source links, stale API names, version text, and random/bootstrap
+  contracts across the documentation.
 
 ---
 

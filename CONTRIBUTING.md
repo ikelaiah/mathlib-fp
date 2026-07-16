@@ -34,17 +34,17 @@ contributing to this project as easy and transparent as possible.
 
 ### Commit Messages
 
-- Use clear and meaningful commit messages
-- Start with a verb (Add, Fix, Update, etc.)
-- Reference issues when relevant
+- Use Conventional Commit subjects: `type(scope): concise description`
+- Common types are `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, and `build`
+- Use a library name such as `algebra`, `stats`, or `engineering` as the scope
+- Reference issues in the body when relevant
 
 Example:
 ```
-Add string reverse function to TStatsKit
+fix(algebra): compute fractional powers from symmetric eigenpairs
 
-- Implement string reversal functionality
-- Add unit tests
-- Update documentation
+- reject non-positive-definite matrices
+- add reconstruction and residual tests
 Fixes #123
 ```
 
@@ -52,8 +52,15 @@ Fixes #123
 
 - Add unit tests for new functionality
 - Ensure all tests pass before submitting PR
+- Rebuild with `-FcUTF8` and resolve compiler warnings
 - Test on Windows (minimum requirement)
 - If possible, test on Linux/macOS
+
+```bash
+cd tests
+fpc -B -FcUTF8 -Fu../src -FUlib TestRunner.lpr
+./TestRunner -a --format=plain
+```
 
 ### Documentation
 
@@ -74,15 +81,10 @@ Fixes #123
 ### Pull Request Title Format
 
 ```
-[Type] Short description
-
-Types:
-- [Feature] - New functionality
-- [Fix] - Bug fixes
-- [Docs] - Documentation only
-- [Test] - Test-related changes
-- [Refactor] - Code refactoring
+type(scope): short description
 ```
+
+Use the same Conventional Commit types as commit subjects.
 
 ## 🐛 Reporting Issues
 
@@ -90,7 +92,6 @@ Types:
 - Describe the bug or feature request clearly
 - Include code examples if relevant
 - Provide system information (OS, FPC version)
-- Follow the issue template
 
 ## 📚 Documentation Contributions
 

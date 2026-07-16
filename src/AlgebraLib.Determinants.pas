@@ -6,7 +6,7 @@ unit AlgebraLib.Determinants;
  Re-exports decomposition records and determinant-related types from
  AlgebraLib.Matrices.
 
- All decomposition logic lives in AlgebraLib.Matrices (uMatrices.pas) because
+ All decomposition logic lives in AlgebraLib.Matrices.pas because
  the algorithms are tightly coupled to the TMatrixKit implementation.
  This unit provides a named entry point for code that is specifically focused
  on decompositions and matrix properties.

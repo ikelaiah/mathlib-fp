@@ -8,9 +8,11 @@ stateless nature of mathematical calculations.
 
 **Q2: Is the API stable?**
 
-A2: The library is under active development. APIs may change without notice
-before version 1.0. Check the `CHANGELOG.md` and library `README.md` files
-for the latest status.
+A2: The library follows semantic versioning. Within the 1.x series, existing
+public signatures are preserved where practical and new behavior is normally
+introduced through overloads. Correctness fixes may tighten validation or
+replace mathematically invalid output with a typed exception. Check
+`CHANGELOG.md` before upgrading.
 
 **Q3: Why static methods instead of Factory/Interface?**
 
@@ -36,5 +38,6 @@ finance, and engineering libraries.
 
 **Q6: What are the future goals?**
 
-A6: Planned additions include more real-world examples, expanded engineering
-modules, and DataFrame-like structures for data manipulation.
+A6: Near-term work focuses on numerical correctness, cross-platform validation,
+reference datasets, performance benchmarks, and clearer API documentation.
+Data-frame functionality remains outside this focused mathematics library.

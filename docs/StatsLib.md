@@ -8,7 +8,7 @@ Depends on: **MathBase**
 
 | Unit | File | Class |
 |------|------|-------|
-| `StatsLib.Stats` | [StatsLib.Stats.pas](StatsLib.Stats.pas) | `TStatsKit` |
+| `StatsLib.Stats` | [StatsLib.Stats.pas](../src/StatsLib.Stats.pas) | `TStatsKit` |
 
 ---
 
@@ -173,14 +173,25 @@ Interpretation: 0.2 = small, 0.5 = medium, 0.8 = large.
 ### Bootstrap Methods
 
 ```pascal
-class function BootstrapMean(const Data: TDoubleArray; Iterations: Integer = 1000): Double;
-class function BootstrapCI(const Data: TDoubleArray; Confidence: Double = 0.95;
-  Iterations: Integer = 1000): TDoublePair;
+class function BootstrapMean(const Data: TDoubleArray;
+  Iterations: Integer): TDoubleArray; overload;
+class function BootstrapMean(const Data: TDoubleArray;
+  Iterations: Integer; Seed: LongWord): TDoubleArray; overload;
+
+class function BootstrapConfidenceInterval(const Data: TDoubleArray;
+  Alpha: Double = 0.05; Iterations: Integer = 1000): TDoublePair; overload;
+class function BootstrapConfidenceInterval(const Data: TDoubleArray;
+  Alpha: Double; Iterations: Integer; Seed: LongWord): TDoublePair; overload;
+
+class function RandomSample(const Data: TDoubleArray): TDoubleArray;
 ```
 
-`TDoublePair` (from `MathBase.SharedTypes`) holds `Lower` and `Upper` confidence bounds.
+`BootstrapMean` returns one resampled mean per iteration. `TDoublePair` (from
+`MathBase.SharedTypes`) holds the lower and upper confidence bounds.
 
-> Call `Randomize` before using bootstrap methods to seed the random generator.
+The compatibility overloads use caller-managed global random state and never
+call `Randomize`. The seeded overloads use local state, are reproducible, and
+do not change the process-wide `RandSeed`.
 
 ---
 
@@ -204,8 +215,7 @@ begin
   r := TStatsKit.PearsonCorrelation(Data1, Data2);
   Writeln('r = ', r:0:4);
 
-  Randomize;
-  CI := TStatsKit.BootstrapCI(Data1, 0.95, 2000);
+  CI := TStatsKit.BootstrapConfidenceInterval(Data1, 0.05, 2000, 2026);
   Writeln('95% CI: [', CI.Lower:0:4, ', ', CI.Upper:0:4, ']');
 end.
 ```
@@ -218,5 +228,5 @@ end.
 - `StandardDeviation` uses the **n** (population) denominator; use `SampleStandardDeviation` for the n − 1 version.
 - `Skewness` uses the population standard deviation; `Kurtosis` uses the sample standard deviation.
 - Percentile uses **method R-7** (linear interpolation), matching Excel's `PERCENTILE` and R's default.
-- Bootstrap results depend on the random seed — call `Randomize` for non-deterministic runs.
+- Prefer the seeded bootstrap overloads for reproducible tests and analyses. Use `Randomize` once in the application only when intentionally using the global-RNG overloads.
 - `EStatsError` is raised for empty arrays, arrays too small for a given statistic, or out-of-range parameters.

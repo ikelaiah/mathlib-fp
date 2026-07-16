@@ -7,9 +7,9 @@ program example08_combinatorics;
  Each section introduces one concept with a plain-English explanation
  and shows the corresponding function call.
 
- Compile:  fpc example08_combinatorics.lpr
- Run:      ./example08_combinatorics   (Linux/Mac)
-           example08_combinatorics.exe (Windows)
+ Compile:  fpc -Fu../src -FUlib 08_combinatorics.lpr
+ Run:      ./08_combinatorics   (Linux/macOS)
+           08_combinatorics.exe (Windows)
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}

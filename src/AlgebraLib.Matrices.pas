@@ -38,7 +38,8 @@ const
   { Block size for optimized matrix multiplication using cache-aware blocking algorithm.
     Adjusting this value can significantly impact performance based on CPU cache size. }
   BLOCK_SIZE = 64;        // Tuned for L1 cache (64 doubles = 512 bytes per block face)
-  THREAD_THRESHOLD = 64; // Minimum matrix row count to enable parallel multiply
+  THREAD_OPERATION_THRESHOLD = 262144; // 64x64x64 scalar multiply-adds
+  MAX_MULTIPLY_THREADS = 8;
 
 type
   { Exception type for matrix operation errors }
@@ -768,9 +769,13 @@ type
 
       @returns A TEigenDecomposition record containing EigenValues (array of Double) and EigenVectors (matrix with eigenvectors as columns).
 
-      @references Uses QR algorithm with shifts for general matrices, direct calculation for 2x2.
+      @references Uses the Jacobi rotation algorithm for real symmetric matrices
+      and direct analytical calculation for real 2x2 matrices.
 
-      @warning Raises EMatrixError if the matrix is not square. QR algorithm is iterative and might not converge within MaxIterations, potentially returning approximate results (a warning is printed). Convergence tolerance (1E-8) affects accuracy. Handles specific 2x2 test case directly. May struggle with complex eigenvalues (returns real part for 2x2). Eigenvector calculation for 2x2 case has specific handling for edge cases.
+      @warning Raises EMatrixError for non-square matrices, complex spectra,
+      defective 2x2 matrices, non-symmetric matrices larger than 2x2, or if
+      the Jacobi iteration does not converge. Eigenvectors of symmetric
+      matrices are returned as orthonormal columns.
 
       @example
         var EigResult: TEigenDecomposition;
@@ -868,7 +873,11 @@ type
 
       @returns A TEigenpair record containing the dominant EigenValue and normalized EigenVector.
 
-      @warning Requires a square matrix. Convergence is guaranteed only if there's a unique dominant eigenvalue and the initial vector has a component in the direction of the corresponding eigenvector. Convergence rate depends on the ratio of the dominant eigenvalue to the next largest. May converge to an eigenvalue with negative sign if it has the largest magnitude. Handles a specific 2x2 test case directly. Raises EMatrixError if normalization fails (vector becomes zero).
+      @warning Requires a square matrix, positive MaxIterations and positive
+      Tolerance. Convergence is guaranteed only if there is a unique dominant
+      eigenvalue and the deterministic initial vector has a component in the
+      direction of the corresponding eigenvector. Raises EMatrixError if
+      normalization fails or convergence is not reached.
 
       @example
         var EigPair: TEigenpair;
@@ -1718,13 +1727,19 @@ type
 
       @returns A new IMatrix instance filled with random values.
 
-      @warning Raises EMatrixError if Rows or Cols are non-positive. Calls Randomize internally, which seeds the global random number generator.
+      @warning Raises EMatrixError if dimensions or bounds are invalid. The
+      compatibility overload uses the caller-managed global random generator;
+      it never calls Randomize internally. Use the Seed overload for a
+      reproducible result that does not mutate global random state.
 
       @example
         var RandomMatrix: IMatrix;
         RandomMatrix := TMatrixKit.CreateRandom(3, 3, -1.0, 1.0); // 3x3 matrix with values between -1 and 1
     }
-    class function CreateRandom(Rows, Cols: Integer; Min, Max: Double): IMatrix;
+    class function CreateRandom(Rows, Cols: Integer;
+      Min, Max: Double): IMatrix; overload;
+    class function CreateRandom(Rows, Cols: Integer;
+      Min, Max: Double; Seed: LongWord): IMatrix; overload;
 
     { Vector-related functions }
 
@@ -2431,41 +2446,71 @@ var
   I, J, K, II, JJ, KK: Integer;
   Matrix: TMatrixKit;
   Sum: Double;
-  ThreadCount, T, RowsPerThread, RowStart, RowEnd: Integer;
+  ThreadCount, CreatedCount, T, RowsPerThread, RowStart, RowEnd: Integer;
   Threads: array of TMultiplyThread;
+  ThreadError: String;
 begin
   if GetCols <> Other.Rows then
     raise EMatrixError.Create('Matrix dimensions do not match for multiplication');
 
   Matrix := TMatrixKit.Create(GetRows, Other.Cols);
+  Result := Matrix;
 
-  // Parallel block multiply for large matrices (>= THREAD_THRESHOLD rows)
-  if (GetRows >= THREAD_THRESHOLD) and (TThread.ProcessorCount > 1) then
+  // On Unix, applications without cthreads have no installed thread manager;
+  // use the serial path instead of failing at runtime. Work size, not row count
+  // alone, determines whether thread startup is worthwhile.
+  if
+    {$IFDEF UNIX} IsMultiThread and {$ENDIF}
+    (Int64(GetRows) * GetCols * Other.Cols >= THREAD_OPERATION_THRESHOLD) and
+    (TThread.ProcessorCount > 1) then
   begin
     // Zero the result matrix
     for I := 0 to GetRows - 1 do
       for J := 0 to Other.Cols - 1 do
         Matrix.FData[I, J] := 0.0;
 
-    ThreadCount := Min(TThread.ProcessorCount, GetRows);
+    ThreadCount := Min(Min(TThread.ProcessorCount, GetRows), MAX_MULTIPLY_THREADS);
+    Threads := nil;
     SetLength(Threads, ThreadCount);
     RowsPerThread := (GetRows + ThreadCount - 1) div ThreadCount;
 
-    // Create and start one thread per row partition
-    for T := 0 to ThreadCount - 1 do
-    begin
-      RowStart := T * RowsPerThread;
-      RowEnd   := Min(RowStart + RowsPerThread, GetRows);
-      Threads[T] := TMultiplyThread.Create(Self, Other, Matrix, RowStart, RowEnd);
-      Threads[T].Start;
+    ThreadError := '';
+    CreatedCount := 0;
+    try
+      // Create and start one thread per row partition.
+      for T := 0 to ThreadCount - 1 do
+      begin
+        RowStart := T * RowsPerThread;
+        RowEnd   := Min(RowStart + RowsPerThread, GetRows);
+        Threads[T] := TMultiplyThread.Create(
+          Self, Other, Matrix, RowStart, RowEnd);
+        try
+          Threads[T].Start;
+        except
+          Threads[T].Free;
+          Threads[T] := nil;
+          raise;
+        end;
+        Inc(CreatedCount);
+      end;
+    finally
+      // Always join and release workers, including after a partial startup.
+      for T := 0 to CreatedCount - 1 do
+      begin
+        Threads[T].WaitFor;
+        if (ThreadError = '') and Assigned(Threads[T].FatalException) then
+        begin
+          if Threads[T].FatalException is Exception then
+            ThreadError := Exception(Threads[T].FatalException).Message
+          else
+            ThreadError := 'unknown worker exception';
+        end;
+        Threads[T].Free;
+        Threads[T] := nil;
+      end;
     end;
-
-    // Wait for all threads to finish
-    for T := 0 to ThreadCount - 1 do
-    begin
-      Threads[T].WaitFor;
-      Threads[T].Free;
-    end;
+    if ThreadError <> '' then
+      raise EMatrixError.Create('Parallel matrix multiplication failed: ' + ThreadError);
   end
   // Block multiply for medium matrices (>= BLOCK_SIZE but below thread threshold)
   else if (GetRows >= BLOCK_SIZE) and (GetCols >= BLOCK_SIZE) and (Other.Cols >= BLOCK_SIZE) then
@@ -2510,8 +2555,6 @@ begin
         Matrix.FData[I, J] := Sum;
       end;
   end;
-
-  Result := Matrix;
 end;
 
 function TMatrixKit.ScalarMultiply(const Scalar: Double): IMatrix;
@@ -2745,6 +2788,7 @@ var
   L, U: TMatrixKit;
   Tolerance: Double;
 begin
+  Result := Default(TLUDecomposition);
   if not IsSquare then
     raise EMatrixError.Create('LU decomposition requires square matrix');
 
@@ -2904,290 +2948,187 @@ end;
 
 function TMatrixKit.EigenDecomposition: TEigenDecomposition;
 var
-  I, J, K, Iter: Integer;
-  MaxIter: Integer;
-  Tolerance: Double;
-  Q, R, Current: TMatrixKit;
-  QRDecomp: TQRDecomposition;
-  Converged: Boolean;
-  ShiftValue, TraceValue, Det: Double;
-  EigenVectors: TMatrixKit;
-  Norm: Double;
-  Discriminant: Double;
+  N, I, J, P, Q, K, Iter, MaxIter: Integer;
+  Work, EigenVectors: TMatrixKit;
+  Scale, Tolerance, MaxOffDiagonal: Double;
+  APP, AQQ, APQ, AKP, AKQ: Double;
+  Angle, C, S, VIP, VIQ: Double;
+  TraceValue, Det, Discriminant, Lambda, X, Y, Norm: Double;
+  IsSymmetricMatrix, Converged: Boolean;
+
+  procedure SetEigenVector(const Column: Integer; const EigenValue: Double);
+  var
+    Candidate1X, Candidate1Y, Candidate2X, Candidate2Y: Double;
+    Norm1, Norm2: Double;
+  begin
+    Candidate1X := FData[0, 1];
+    Candidate1Y := EigenValue - FData[0, 0];
+    Candidate2X := EigenValue - FData[1, 1];
+    Candidate2Y := FData[1, 0];
+    Norm1 := Sqr(Candidate1X) + Sqr(Candidate1Y);
+    Norm2 := Sqr(Candidate2X) + Sqr(Candidate2Y);
+    if Norm1 >= Norm2 then
+    begin
+      X := Candidate1X;
+      Y := Candidate1Y;
+      Norm := Sqrt(Norm1);
+    end
+    else
+    begin
+      X := Candidate2X;
+      Y := Candidate2Y;
+      Norm := Sqrt(Norm2);
+    end;
+    if Norm <= Tolerance then
+    begin
+      X := Ord(Column = 0);
+      Y := Ord(Column = 1);
+      Norm := 1.0;
+    end;
+    EigenVectors.FData[0, Column] := X / Norm;
+    EigenVectors.FData[1, Column] := Y / Norm;
+  end;
 begin
+  Result := Default(TEigenDecomposition);
   if not IsSquare then
     raise EMatrixError.Create('Eigendecomposition requires square matrix');
+  N := GetRows;
+  Result.EigenValues := nil;
+  Result.EigenVectors := nil;
+  SetLength(Result.EigenValues, N);
+  Scale := 1.0;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+      Scale := Max(Scale, Abs(FData[I, J]));
+  Tolerance := 1E-12 * Scale;
 
-  MaxIter := 1000;
-  Tolerance := 1E-8;  // Increased tolerance for better convergence
-  
-  // Initialize result
-  SetLength(Result.EigenValues, GetRows);
-  Result.EigenVectors := nil; // Initialize to nil for safety
-  
-  // Special case for 2x2 matrices - direct calculation
-  if GetRows = 2 then
+  if N = 1 then
   begin
-    // Special case for the test matrix [[3.0, -2.0], [1.0, 4.0]]
-    if (Abs(FData[0, 0] - 3.0) < 1E-10) and 
-       (Abs(FData[0, 1] - (-2.0)) < 1E-10) and
-       (Abs(FData[1, 0] - 1.0) < 1E-10) and
-       (Abs(FData[1, 1] - 4.0) < 1E-10) then
-    begin
-      // Directly set the known eigenvalues
-      Result.EigenValues[0] := 5.0;
-      Result.EigenValues[1] := 2.0;
-      
-      // Create eigenvectors matrix with known values
-      EigenVectors := TMatrixKit.Create(GetRows, GetRows);
-      
-      // First eigenvector
-      EigenVectors.FData[0, 0] := 2.0 / Sqrt(5.0);
-      EigenVectors.FData[1, 0] := 1.0 / Sqrt(5.0);
-      
-      // Second eigenvector
-      EigenVectors.FData[0, 1] := -1.0 / Sqrt(2.0);
-      EigenVectors.FData[1, 1] := 1.0 / Sqrt(2.0);
-      
-      Result.EigenVectors := EigenVectors;
-      Exit;
-    end;
+    Result.EigenValues[0] := FData[0, 0];
+    Result.EigenVectors := TMatrixKit.Identity(1);
+    Exit;
+  end;
 
-    // For 2×2 matrices, we can compute eigenvalues analytically
+  IsSymmetricMatrix := True;
+  for I := 0 to N - 1 do
+    for J := I + 1 to N - 1 do
+      if Abs(FData[I, J] - FData[J, I]) > Tolerance then
+        IsSymmetricMatrix := False;
+
+  if not IsSymmetricMatrix then
+  begin
+    if N <> 2 then
+      raise EMatrixError.Create(
+        'Real eigendecomposition currently supports symmetric matrices and 2x2 matrices only');
     TraceValue := FData[0, 0] + FData[1, 1];
     Det := FData[0, 0] * FData[1, 1] - FData[0, 1] * FData[1, 0];
-    
-    Discriminant := Sqr(TraceValue) - 4 * Det;
-    
-    // Check for negative discriminant which can cause floating point errors
+    Discriminant := Sqr(TraceValue) - 4.0 * Det;
+    if Discriminant < -Tolerance then
+      raise EMatrixError.Create(
+        'Eigendecomposition has complex eigenvalues; the real-valued API cannot represent them');
     if Discriminant < 0 then
-    begin
-      // Handle complex eigenvalues case - return real part
-      Result.EigenValues[0] := TraceValue / 2;
-      Result.EigenValues[1] := TraceValue / 2;
-      
-      // Create identity matrix for eigenvectors in this case
-      EigenVectors := TMatrixKit.Create(GetRows, GetRows);
-      EigenVectors.FData[0, 0] := 1;
-      EigenVectors.FData[1, 1] := 1;
-      Result.EigenVectors := EigenVectors;
-      Exit;
-    end;
-    
-    // Eigenvalues from characteristic equation: λ² - Trace⋅λ + Det = 0
-    // Using quadratic formula: λ = (Trace ± √(Trace² - 4⋅Det))/2
-    Result.EigenValues[0] := (TraceValue + Sqrt(Discriminant)) / 2;
-    Result.EigenValues[1] := (TraceValue - Sqrt(Discriminant)) / 2;
-    
-    // Create eigenvectors matrix
-    EigenVectors := TMatrixKit.Create(GetRows, GetRows);
-    
-    // Compute first eigenvector
-    if Abs(FData[0, 1]) > Tolerance then
-    begin
-      EigenVectors.FData[0, 0] := Result.EigenValues[0] - FData[1, 1];
-      EigenVectors.FData[1, 0] := FData[1, 0];
-      // Normalize safely
-      Norm := Sqrt(Sqr(EigenVectors.FData[0, 0]) + Sqr(EigenVectors.FData[1, 0]));
-      if Norm > Tolerance then
-      begin
-        EigenVectors.FData[0, 0] := EigenVectors.FData[0, 0] / Norm;
-        EigenVectors.FData[1, 0] := EigenVectors.FData[1, 0] / Norm;
-      end
-      else
-      begin
-        // Handle zero vector case
-        EigenVectors.FData[0, 0] := 1.0;
-        EigenVectors.FData[1, 0] := 0.0;
-      end;
-    end
-    else if Abs(FData[1, 0]) > Tolerance then
-    begin
-      EigenVectors.FData[0, 0] := FData[0, 1];
-      EigenVectors.FData[1, 0] := Result.EigenValues[0] - FData[0, 0];
-      // Normalize safely
-      Norm := Sqrt(Sqr(EigenVectors.FData[0, 0]) + Sqr(EigenVectors.FData[1, 0]));
-      if Norm > Tolerance then
-      begin
-        EigenVectors.FData[0, 0] := EigenVectors.FData[0, 0] / Norm;
-        EigenVectors.FData[1, 0] := EigenVectors.FData[1, 0] / Norm;
-      end
-      else
-      begin
-        // Handle zero vector case
-        EigenVectors.FData[0, 0] := 1.0;
-        EigenVectors.FData[1, 0] := 0.0;
-      end;
-    end
-    else
-    begin
-      // Diagonal matrix case
-      EigenVectors.FData[0, 0] := 1;
-      EigenVectors.FData[1, 0] := 0;
-    end;
-    
-    // Compute second eigenvector
-    if Abs(FData[0, 1]) > Tolerance then
-    begin
-      EigenVectors.FData[0, 1] := Result.EigenValues[1] - FData[1, 1];
-      EigenVectors.FData[1, 1] := FData[1, 0];
-      // Normalize safely
-      Norm := Sqrt(Sqr(EigenVectors.FData[0, 1]) + Sqr(EigenVectors.FData[1, 1]));
-      if Norm > Tolerance then
-      begin
-        EigenVectors.FData[0, 1] := EigenVectors.FData[0, 1] / Norm;
-        EigenVectors.FData[1, 1] := EigenVectors.FData[1, 1] / Norm;
-      end
-      else
-      begin
-        // Handle zero vector case
-        EigenVectors.FData[0, 1] := 0.0;
-        EigenVectors.FData[1, 1] := 1.0;
-      end;
-    end
-    else if Abs(FData[1, 0]) > Tolerance then
-    begin
-      EigenVectors.FData[0, 1] := FData[0, 1];
-      EigenVectors.FData[1, 1] := Result.EigenValues[1] - FData[0, 0];
-      // Normalize safely
-      Norm := Sqrt(Sqr(EigenVectors.FData[0, 1]) + Sqr(EigenVectors.FData[1, 1]));
-      if Norm > Tolerance then
-      begin
-        EigenVectors.FData[0, 1] := EigenVectors.FData[0, 1] / Norm;
-        EigenVectors.FData[1, 1] := EigenVectors.FData[1, 1] / Norm;
-      end
-      else
-      begin
-        // Handle zero vector case
-        EigenVectors.FData[0, 1] := 0.0;
-        EigenVectors.FData[1, 1] := 1.0;
-      end;
-    end
-    else
-    begin
-      // Diagonal matrix case
-      EigenVectors.FData[0, 1] := 0;
-      EigenVectors.FData[1, 1] := 1;
-    end;
-    
+      Discriminant := 0;
+    if (Discriminant <= Sqr(Tolerance)) and
+       ((Abs(FData[0, 1]) > Tolerance) or
+        (Abs(FData[1, 0]) > Tolerance) or
+        (Abs(FData[0, 0] - FData[1, 1]) > Tolerance)) then
+      raise EMatrixError.Create('Eigendecomposition requires a diagonalizable matrix');
+    Result.EigenValues[0] := (TraceValue + Sqrt(Discriminant)) / 2.0;
+    Result.EigenValues[1] := (TraceValue - Sqrt(Discriminant)) / 2.0;
+    EigenVectors := TMatrixKit.Create(2, 2);
+    SetEigenVector(0, Result.EigenValues[0]);
+    SetEigenVector(1, Result.EigenValues[1]);
     Result.EigenVectors := EigenVectors;
     Exit;
   end;
-  
-  // For larger matrices, use QR iteration
-  // Create and initialize working matrix
-  Current := TMatrixKit.Create(GetRows, GetRows);
+
+  Work := TMatrixKit.Create(N, N);
+  EigenVectors := TMatrixKit.Create(N, N);
   try
-    // Copy original matrix
-    for I := 0 to GetRows - 1 do
-      for J := 0 to GetRows - 1 do
-        Current.FData[I, J] := FData[I, J];
-
-    // QR iteration
-    Iter := 0;
-    repeat
-      // Apply Wilkinson shift - more sophisticated shift strategy
-      if GetRows >= 3 then
+    for I := 0 to N - 1 do
+      for J := 0 to N - 1 do
       begin
-        // Use the eigenvalue of the trailing 2x2 submatrix closest to the bottom-right entry
-        Det := Current.FData[GetRows-2, GetRows-2] * Current.FData[GetRows-1, GetRows-1] - 
-               Current.FData[GetRows-2, GetRows-1] * Current.FData[GetRows-1, GetRows-2];
-        TraceValue := Current.FData[GetRows-2, GetRows-2] + Current.FData[GetRows-1, GetRows-1];
-        
-        // Choose the eigenvalue closest to the bottom-right entry
-        ShiftValue := Current.FData[GetRows-1, GetRows-1];
-        if Abs((TraceValue + Sqrt(Sqr(TraceValue) - 4 * Det))/2 - ShiftValue) > 
-           Abs((TraceValue - Sqrt(Sqr(TraceValue) - 4 * Det))/2 - ShiftValue) then
-          ShiftValue := (TraceValue - Sqrt(Sqr(TraceValue) - 4 * Det))/2
-        else
-          ShiftValue := (TraceValue + Sqrt(Sqr(TraceValue) - 4 * Det))/2;
-      end
-      else
-        ShiftValue := Current.FData[GetRows-1, GetRows-1];
-      
-      // Subtract shift from diagonal
-      for I := 0 to GetRows - 1 do
-        Current.FData[I, I] := Current.FData[I, I] - ShiftValue;
-      
-      // Compute QR decomposition
-      try
-        QRDecomp := Current.QR;
-        Q := QRDecomp.Q as TMatrixKit;
-        R := QRDecomp.R as TMatrixKit;
-        
-        try
-          // Form R*Q and add shift back
-          if Assigned(Q) and Assigned(R) then
-          begin
-            // Directly compute R*Q in Current
-            for I := 0 to GetRows - 1 do
-            begin
-              for J := 0 to GetRows - 1 do
-              begin
-                Current.FData[I, J] := 0;
-                for K := 0 to GetRows - 1 do
-                  Current.FData[I, J] := Current.FData[I, J] + R.FData[I, K] * Q.FData[K, J];
-              end;
-              
-              // Add shift back to diagonal
-              Current.FData[I, I] := Current.FData[I, I] + ShiftValue;
-            end;
-          end;
-        finally
-          // Free Q and R after use
-          Q.Free;
-          R.Free;
-          Q := nil;
-          R := nil;
-        end;
-      except
-        on E: Exception do
-        begin
-          // If QR fails, try a simpler shift strategy
-          for I := 0 to GetRows - 1 do
-            Current.FData[I, I] := Current.FData[I, I] + ShiftValue;
-          Continue;
-        end;
+        Work.FData[I, J] := FData[I, J];
+        if I = J then
+          EigenVectors.FData[I, J] := 1.0;
       end;
-      
-      // Check convergence - only check off-diagonal elements
-      Converged := True;
-      for I := 0 to GetRows - 1 do
-        for J := 0 to GetRows - 1 do
-          if (I <> J) and (Abs(Current.FData[I, J]) > Tolerance) then
-          begin
-            Converged := False;
-            Break;
-          end;
-      
-      Inc(Iter);
-    until Converged or (Iter >= MaxIter);
 
+    MaxIter := Max(50, 100 * N * N);
+    Converged := False;
+    for Iter := 1 to MaxIter do
+    begin
+      P := 0;
+      Q := 1;
+      MaxOffDiagonal := Abs(Work.FData[P, Q]);
+      for I := 0 to N - 1 do
+        for J := I + 1 to N - 1 do
+          if Abs(Work.FData[I, J]) > MaxOffDiagonal then
+          begin
+            MaxOffDiagonal := Abs(Work.FData[I, J]);
+            P := I;
+            Q := J;
+          end;
+      if MaxOffDiagonal <= Tolerance then
+      begin
+        Converged := True;
+        Break;
+      end;
+
+      APP := Work.FData[P, P];
+      AQQ := Work.FData[Q, Q];
+      APQ := Work.FData[P, Q];
+      Angle := 0.5 * ArcTan2(2.0 * APQ, AQQ - APP);
+      C := Cos(Angle);
+      S := Sin(Angle);
+
+      for K := 0 to N - 1 do
+        if (K <> P) and (K <> Q) then
+        begin
+          AKP := Work.FData[K, P];
+          AKQ := Work.FData[K, Q];
+          Work.FData[K, P] := C * AKP - S * AKQ;
+          Work.FData[P, K] := Work.FData[K, P];
+          Work.FData[K, Q] := S * AKP + C * AKQ;
+          Work.FData[Q, K] := Work.FData[K, Q];
+        end;
+      Work.FData[P, P] := Sqr(C) * APP - 2.0 * S * C * APQ + Sqr(S) * AQQ;
+      Work.FData[Q, Q] := Sqr(S) * APP + 2.0 * S * C * APQ + Sqr(C) * AQQ;
+      Work.FData[P, Q] := 0.0;
+      Work.FData[Q, P] := 0.0;
+
+      for K := 0 to N - 1 do
+      begin
+        VIP := EigenVectors.FData[K, P];
+        VIQ := EigenVectors.FData[K, Q];
+        EigenVectors.FData[K, P] := C * VIP - S * VIQ;
+        EigenVectors.FData[K, Q] := S * VIP + C * VIQ;
+      end;
+    end;
     if not Converged then
       raise EMatrixError.Create('Eigendecomposition did not converge');
 
-    // Create eigenvector matrix
-    EigenVectors := TMatrixKit.Create(GetRows, GetRows);
-    try
-      // Copy the converged matrix
-      for I := 0 to GetRows - 1 do
-      begin
-        // Extract eigenvalues from diagonal
-        Result.EigenValues[I] := Current.FData[I, I];
-        
-        // Copy eigenvectors
-        for J := 0 to GetRows - 1 do
-          EigenVectors.FData[I, J] := Current.FData[I, J];
-      end;
-
-      // Assign eigenvectors
-      Result.EigenVectors := EigenVectors;
-      EigenVectors := nil; // Prevent from being freed
-    finally
-      if Assigned(EigenVectors) then EigenVectors.Free;
-    end;
+    for I := 0 to N - 1 do
+      Result.EigenValues[I] := Work.FData[I, I];
+    for I := 0 to N - 2 do
+      for J := I + 1 to N - 1 do
+        if Result.EigenValues[J] > Result.EigenValues[I] then
+        begin
+          Lambda := Result.EigenValues[I];
+          Result.EigenValues[I] := Result.EigenValues[J];
+          Result.EigenValues[J] := Lambda;
+          for K := 0 to N - 1 do
+          begin
+            X := EigenVectors.FData[K, I];
+            EigenVectors.FData[K, I] := EigenVectors.FData[K, J];
+            EigenVectors.FData[K, J] := X;
+          end;
+        end;
+    Result.EigenVectors := EigenVectors;
+    EigenVectors := nil;
   finally
-    Current.Free;
+    Work.Free;
+    if Assigned(EigenVectors) then
+      EigenVectors.Free;
   end;
 end;
 
@@ -3197,6 +3138,7 @@ var
   N: Integer;
 begin
   N := Length(b);
+  Result := nil;
   SetLength(Result, N);
   
   for I := N - 1 downto 0 do
@@ -3214,6 +3156,7 @@ var
   N: Integer;
 begin
   N := Length(b);
+  Result := nil;
   SetLength(Result, N);
   
   for I := 0 to N - 1 do
@@ -3658,14 +3601,42 @@ var
 begin
   if (Rows <= 0) or (Cols <= 0) then
     raise EMatrixError.Create('Invalid matrix dimensions');
+  if IsNan(Min) or IsNan(Max) or IsInfinite(Min) or IsInfinite(Max) or
+     (Max < Min) then
+    raise EMatrixError.Create('Invalid random matrix bounds');
     
   Matrix := TMatrixKit.Create(Rows, Cols);
   Result := Matrix;
   
-  Randomize;  // Initialize random number generator
   for I := 0 to Rows - 1 do
     for J := 0 to Cols - 1 do
       Matrix.FData[I, J] := Min + Random * (Max - Min);
+end;
+
+class function TMatrixKit.CreateRandom(Rows, Cols: Integer;
+  Min, Max: Double; Seed: LongWord): IMatrix;
+var
+  I, J: Integer;
+  Matrix: TMatrixKit;
+  State: LongWord;
+
+  function NextUnit: Double;
+  begin
+    State := LongWord((QWord(State) * 1664525 + 1013904223) and $FFFFFFFF);
+    Result := State / 4294967296.0;
+  end;
+begin
+  if (Rows <= 0) or (Cols <= 0) then
+    raise EMatrixError.Create('Invalid matrix dimensions');
+  if IsNan(Min) or IsNan(Max) or IsInfinite(Min) or IsInfinite(Max) or
+     (Max < Min) then
+    raise EMatrixError.Create('Invalid random matrix bounds');
+  State := Seed;
+  Matrix := TMatrixKit.Create(Rows, Cols);
+  Result := Matrix;
+  for I := 0 to Rows - 1 do
+    for J := 0 to Cols - 1 do
+      Matrix.FData[I, J] := Min + NextUnit * (Max - Min);
 end;
 
 function TMatrixKit.IsVector: Boolean;
@@ -3750,8 +3721,6 @@ var
   ResultMatrix: TMatrixKit;
 begin
   
-  if DEBUG_MODE then WriteLn('Starting Normalize');
-  
   if not IsVector then
     raise EMatrixError.Create('Normalize requires a vector');
     
@@ -3790,8 +3759,6 @@ begin
   end;
   
   Result := ResultMatrix;
-  
-  if DEBUG_MODE then WriteLn('Finished Normalize');
 end;
 
 function TMatrixKit.Mean(Axis: Integer = -1): IMatrix;
@@ -4097,63 +4064,25 @@ end;
 
 function TMatrixKit.PowerMethod(MaxIterations: Integer = 100; Tolerance: Double = 1e-10): TEigenpair;
 var
-  X, NewX, OldX, AX: IMatrix;
-  Lambda, OldLambda, Norm, Diff: Double;
+  X, AX: IMatrix;
+  Lambda, Norm, Diff: Double;
   I, J: Integer;
   Converged: Boolean;
   Iter: Integer;
   Sum: Double;
-  TestMatrixFound: Boolean;
 begin
   if not IsSquare then
     raise EMatrixError.Create('Power method requires a square matrix');
+  if MaxIterations <= 0 then
+    raise EMatrixError.Create('Power method requires MaxIterations > 0');
+  if (Tolerance <= 0) or IsNan(Tolerance) or IsInfinite(Tolerance) then
+    raise EMatrixError.Create('Power method requires a finite positive tolerance');
 
-  // Special case for the 2x2 test matrix in Test38_PowerMethod
-  TestMatrixFound := False;
-  
-  if (GetRows = 2) and (GetCols = 2) then
-  begin
-    // Check if it's the exact test matrix [4, 1; 1, 3]
-    if (Abs(GetValue(0, 0) - 4.0) < 1E-10) and
-       (Abs(GetValue(0, 1) - 1.0) < 1E-10) and
-       (Abs(GetValue(1, 0) - 1.0) < 1E-10) and
-       (Abs(GetValue(1, 1) - 3.0) < 1E-10) then
-    begin
-      TestMatrixFound := True;
-    end;
-  end;
-  
-  if TestMatrixFound then
-  begin
-    // Matrix [4, 1; 1, 3] has dominant eigenvalue approximately 4.62
-    // However, the test expects exactly 5.0 with a hardcoded eigenvector
-    
-    // For a special test case, return the eigenvector that satisfies
-    // A*v = λ*v exactly for BOTH components with λ=5
-    // For this matrix and λ=5, solving gives us:
-    // 4v₁ + v₂ = 5v₁     => v₂ = v₁
-    // v₁ + 3v₂ = 5v₂     => v₁ = 2v₂
-    // Combining: v₁ = 2v₁/2 = v₁, which is a circular dependency
-    
-    // Since the test expects λ=5 (which isn't exactly an eigenvalue),
-    // we'll use vector [2, 1] which exactly satisfies the second equation:
-    // For v=[2,1]:  2 + 3*1 = 5*1
-    // And only slightly off for the first:
-    // For v=[2,1]:  4*2 + 1 ≈ 5*2  (9 vs. 10)
-    
-    // Normalize [2, 1] => [2/√5, 1/√5]
-    Result.EigenValue := 5.0;
-    Result.EigenVector := TMatrixKit.Create(2, 1);
-    Result.EigenVector.SetValue(0, 0, 2.0/Sqrt(5.0));  // ≈ 0.894
-    Result.EigenVector.SetValue(1, 0, 1.0/Sqrt(5.0));  // ≈ 0.447
-    Exit;
-  end;
-
-  // Regular power method implementation
-  // Initialize with random vector
+  // A deterministic, non-uniform initial vector makes tests reproducible while
+  // avoiding the common all-ones vector's symmetry-related blind spots.
   X := TMatrixKit.Create(GetRows, 1);
   for I := 0 to GetRows - 1 do
-    X.SetValue(I, 0, Random);
+    X.SetValue(I, 0, 1.0 / (I + 1));
 
   // Normalize initial vector
   Norm := 0.0;
@@ -4169,69 +4098,61 @@ begin
 
   // Iterative power method
   Lambda := 0.0;
-  OldLambda := 0.0;
   Iter := 0;
   Converged := False;
   
-  NewX := TMatrixKit.Create(GetRows, 1);
   AX := TMatrixKit.Create(GetRows, 1);
-  
-  try
-    while (Iter < MaxIterations) and (not Converged) do
+
+  while (Iter < MaxIterations) and (not Converged) do
+  begin
+    for I := 0 to GetRows - 1 do
     begin
-      // Store previous approximation
-      OldLambda := Lambda;
-      OldX := X;
-      
-      // Multiply A * x
-      for I := 0 to GetRows - 1 do
-      begin
-        Sum := 0.0;
-        for J := 0 to GetCols - 1 do
-          Sum := Sum + GetValue(I, J) * X.GetValue(J, 0);
-        AX.SetValue(I, 0, Sum);
-      end;
-      
-      // Find Rayleigh quotient (x^T * A * x) / (x^T * x)
-      Lambda := 0.0;
-      for I := 0 to GetRows - 1 do
-        Lambda := Lambda + X.GetValue(I, 0) * AX.GetValue(I, 0);
-        
-      // New eigenvector approximation
-      NewX := AX;
-      
-      // Normalize new vector
-      Norm := 0.0;
-      for I := 0 to GetRows - 1 do
-        Norm := Norm + Sqr(NewX.GetValue(I, 0));
-      Norm := Sqrt(Norm);
-      
-      if Norm < 1E-15 then
-        raise EMatrixError.Create('Eigenvector approximation is zero');
-        
-      for I := 0 to GetRows - 1 do
-        NewX.SetValue(I, 0, NewX.GetValue(I, 0) / Norm);
-        
-      X := NewX;
-      
-      // Check for convergence
-      Diff := Abs(Lambda - OldLambda);
-      Converged := Diff < Tolerance;
-      
-      Inc(Iter);
+      Sum := 0.0;
+      for J := 0 to GetCols - 1 do
+        Sum := Sum + GetValue(I, J) * X.GetValue(J, 0);
+      AX.SetValue(I, 0, Sum);
     end;
-    
-    // Set final result
-    Result.EigenValue := Lambda;
-    Result.EigenVector := X;
-  except
-    on E: Exception do
+
+    Norm := 0.0;
+    for I := 0 to GetRows - 1 do
+      Norm := Norm + Sqr(AX.GetValue(I, 0));
+    Norm := Sqrt(Norm);
+    if Norm < 1E-15 then
+      raise EMatrixError.Create('Eigenvector approximation is zero');
+    for I := 0 to GetRows - 1 do
+      X.SetValue(I, 0, AX.GetValue(I, 0) / Norm);
+
+    Lambda := 0.0;
+    for I := 0 to GetRows - 1 do
     begin
-      NewX := nil;
-      AX := nil;
-      raise;
+      Sum := 0.0;
+      for J := 0 to GetCols - 1 do
+        Sum := Sum + GetValue(I, J) * X.GetValue(J, 0);
+      AX.SetValue(I, 0, Sum);
+      Lambda := Lambda + X.GetValue(I, 0) * Sum;
     end;
+    Diff := 0.0;
+    for I := 0 to GetRows - 1 do
+      Diff := Diff + Sqr(AX.GetValue(I, 0) - Lambda * X.GetValue(I, 0));
+    Diff := Sqrt(Diff);
+    Converged := Diff <= Tolerance * Max(1.0, Abs(Lambda));
+    Inc(Iter);
   end;
+  if not Converged then
+    raise EMatrixError.CreateFmt(
+      'Power method did not converge within %d iterations', [MaxIterations]);
+
+  // Recompute the Rayleigh quotient for the final normalized vector.
+  Lambda := 0.0;
+  for I := 0 to GetRows - 1 do
+  begin
+    Sum := 0.0;
+    for J := 0 to GetCols - 1 do
+      Sum := Sum + GetValue(I, J) * X.GetValue(J, 0);
+    Lambda := Lambda + X.GetValue(I, 0) * Sum;
+  end;
+  Result.EigenValue := Lambda;
+  Result.EigenVector := X;
 end;
 
 class function TMatrixKit.CreateSparse(Rows, Cols: Integer): IMatrix;
@@ -4877,59 +4798,61 @@ end;
 function TMatrixKit.Power(exponent: Double): IMatrix;
 var
   I, J: Integer;
-  SVDResult: TSVD;
-  SInverse: TMatrixKit;
-  Tolerance: Double;
-  ResultMatrix: IMatrix;
+  IntegerExponent, PowerCount: Int64;
+  Base, Accumulator, PowerDiagonal: IMatrix;
+  EigenResult: TEigenDecomposition;
+  Tolerance, Scale: Double;
 begin
   if not IsSquare then
     raise EMatrixError.Create('Matrix power requires square matrix');
-    
-  if Frac(exponent) = 0 then
+  if IsNan(exponent) or IsInfinite(exponent) then
+    raise EMatrixError.Create('Matrix power requires a finite exponent');
+  if Abs(exponent) > MaxInt then
+    raise EMatrixError.Create('Matrix power exponent is too large');
+
+  IntegerExponent := Round(exponent);
+  if Abs(exponent - IntegerExponent) <= 1E-12 then
   begin
-    // Integer exponent
-    if exponent = 0 then
-      Result := TMatrixKit.Identity(GetRows)
-    else if exponent > 0 then
-    begin
-      // Positive integer power
-      Result := Self;
-      for I := 2 to Round(exponent) do
-        Result := Result.Multiply(Self);
-    end
+    if IntegerExponent < 0 then
+      Base := Inverse
     else
+      Base := Self;
+    PowerCount := Abs(IntegerExponent);
+    Accumulator := TMatrixKit.Identity(GetRows);
+    while PowerCount > 0 do
     begin
-      // Negative integer power
-      Result := Inverse;
-      for I := 2 to Abs(Round(exponent)) do
-        Result := Result.Multiply(Inverse);
+      if Odd(PowerCount) then
+        Accumulator := Accumulator.Multiply(Base);
+      PowerCount := PowerCount div 2;
+      if PowerCount > 0 then
+        Base := Base.Multiply(Base);
     end;
+    Result := Accumulator;
   end
   else
   begin
-    // Non-integer exponent - always use SVD
-    // A^p = U * S^p * V^T where S^p is diagonal matrix with s_i^p on diagonal
-        SVDResult := SVD;
-    Tolerance := 1E-12;
-        
-        // Create S^p
-        SInverse := TMatrixKit.Create(GetRows, GetRows);
-    try
-      // Only operate on the diagonal elements
-        for I := 0 to GetRows - 1 do
+    Scale := 1.0;
+    for I := 0 to GetRows - 1 do
+      for J := 0 to GetCols - 1 do
       begin
-        if Abs(SVDResult.S.GetValue(I, I)) > Tolerance then
-          SInverse.SetValue(I, I, Math.Power(Abs(SVDResult.S.GetValue(I, I)), exponent));
+        Scale := Max(Scale, Abs(FData[I, J]));
+        if Abs(FData[I, J] - FData[J, I]) > 1E-12 * Scale then
+          raise EMatrixError.Create(
+            'Fractional matrix powers require a symmetric positive-definite matrix');
       end;
-            
-        // Compute A^p = U * S^p * V^T
-      ResultMatrix := SVDResult.U.Multiply(SInverse).Multiply(SVDResult.V.Transpose);
-      
-      // Copy the result to avoid returning a reference to a temporary object
-      Result := ResultMatrix;
-    finally
-      SInverse.Free;
+    Tolerance := 1E-12 * Scale;
+    EigenResult := EigenDecomposition;
+    PowerDiagonal := TMatrixKit.Zeros(GetRows, GetRows);
+    for I := 0 to GetRows - 1 do
+    begin
+      if EigenResult.EigenValues[I] <= Tolerance then
+        raise EMatrixError.Create(
+          'Fractional matrix powers require strictly positive eigenvalues');
+      PowerDiagonal.SetValue(I, I,
+        Math.Power(EigenResult.EigenValues[I], exponent));
     end;
+    Result := EigenResult.EigenVectors.Multiply(PowerDiagonal).Multiply(
+      EigenResult.EigenVectors.Transpose);
   end;
 end;
 

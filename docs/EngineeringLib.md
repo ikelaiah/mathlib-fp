@@ -8,12 +8,30 @@ Depends on: **MathBase**
 
 | Unit | File | Class |
 |------|------|-------|
-| `EngineeringLib.FluidDynamics` | [EngineeringLib.FluidDynamics.pas](EngineeringLib.FluidDynamics.pas) | `TFluidDynamicsKit` — core implementation |
-| `EngineeringLib.Thermodynamics` | [EngineeringLib.Thermodynamics.pas](EngineeringLib.Thermodynamics.pas) | `TThermodynamicsKit` |
-| `EngineeringLib.Signal` | [EngineeringLib.Signal.pas](EngineeringLib.Signal.pas) | `TSignalKit` |
-| `EngineeringLib.UnitConversion` | [EngineeringLib.UnitConversion.pas](EngineeringLib.UnitConversion.pas) | `TUnitConversionKit` |
-| `EngineeringLib.Velocity` | [EngineeringLib.Velocity.pas](EngineeringLib.Velocity.pas) | Alias → `TVelocityKit = TFluidDynamicsKit` |
-| `EngineeringLib.Pressure` | [EngineeringLib.Pressure.pas](EngineeringLib.Pressure.pas) | Alias → `TPressureKit = TFluidDynamicsKit` |
+| `EngineeringLib.Common` | [EngineeringLib.Common.pas](../src/EngineeringLib.Common.pas) | Shared typed exception hierarchy |
+| `EngineeringLib.FluidDynamics` | [EngineeringLib.FluidDynamics.pas](../src/EngineeringLib.FluidDynamics.pas) | `TFluidDynamicsKit` — core implementation |
+| `EngineeringLib.Thermodynamics` | [EngineeringLib.Thermodynamics.pas](../src/EngineeringLib.Thermodynamics.pas) | `TThermodynamicsKit` |
+| `EngineeringLib.Signal` | [EngineeringLib.Signal.pas](../src/EngineeringLib.Signal.pas) | `TSignalKit` |
+| `EngineeringLib.UnitConversion` | [EngineeringLib.UnitConversion.pas](../src/EngineeringLib.UnitConversion.pas) | `TUnitConversionKit` |
+| `EngineeringLib.Velocity` | [EngineeringLib.Velocity.pas](../src/EngineeringLib.Velocity.pas) | Alias → `TVelocityKit = TFluidDynamicsKit` |
+| `EngineeringLib.Pressure` | [EngineeringLib.Pressure.pas](../src/EngineeringLib.Pressure.pas) | Alias → `TPressureKit = TFluidDynamicsKit` |
+
+---
+
+## Exception Hierarchy
+
+```pascal
+EEngineeringError
+├── EFluidDynamicsError
+├── EThermodynamicsError
+├── ESignalError
+└── EUnitConversionError
+```
+
+Catch a specific subtype when recovering from one engineering domain, or
+`EEngineeringError` when a caller handles all EngineeringLib validation
+errors uniformly. `Try...` unit-name APIs continue to return `False` for
+unknown input; non-`Try` APIs raise `EUnitConversionError`.
 
 ---
 

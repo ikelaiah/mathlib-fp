@@ -21,7 +21,7 @@ interface
 uses
   Classes, SysUtils, Math,
   fpcunit, testutils, testregistry,
-  EngineeringLib.Signal;
+  EngineeringLib.Common, EngineeringLib.Signal;
 
 type
   TTestSignalKit = class(TTestCase)
@@ -228,12 +228,12 @@ end;
 
 procedure TTestSignalKit.TestMovingAverage_ZeroWindowRaises;
 begin
-  AssertException('MA zero window raises', EInvalidOp, @DoMovingAverageWithZeroWindow);
+  AssertException('MA zero window raises', ESignalError, @DoMovingAverageWithZeroWindow);
 end;
 
 procedure TTestSignalKit.TestMovingAverage_TooLargeWindowRaises;
 begin
-  AssertException('MA too-large window raises', EInvalidOp, @DoMovingAverageWithLargeWindow);
+  AssertException('MA too-large window raises', ESignalError, @DoMovingAverageWithLargeWindow);
 end;
 
 { =========================================================================
@@ -330,7 +330,7 @@ end;
 
 procedure TTestSignalKit.TestApplyWindow_MismatchRaises;
 begin
-  AssertException('ApplyWindow mismatch raises', EInvalidOp,
+  AssertException('ApplyWindow mismatch raises', ESignalError,
     @DoApplyWindowWithMismatchedSizes);
 end;
 
@@ -474,12 +474,12 @@ end;
 
 procedure TTestSignalKit.TestFFT_NotPow2Raises;
 begin
-  AssertException('FFT non-pow2 raises', EInvalidArgument, @DoFFT_NotPow2);
+  AssertException('FFT non-pow2 raises', ESignalError, @DoFFT_NotPow2);
 end;
 
 procedure TTestSignalKit.TestFFT_MismatchedArraysRaises;
 begin
-  AssertException('FFT mismatched arrays raises', EInvalidArgument,
+  AssertException('FFT mismatched arrays raises', ESignalError,
     @DoFFT_MismatchedArrays);
 end;
 
@@ -634,19 +634,19 @@ end;
 
 procedure TTestSignalKit.TestFIR_BadCutoffHighRaises;
 begin
-  AssertException('LP cutoff >= 0.5 raises', EInvalidArgument,
+  AssertException('LP cutoff >= 0.5 raises', ESignalError,
     @DoFIR_LP_BadCutoff_High);
 end;
 
 procedure TTestSignalKit.TestFIR_BadCutoffLowRaises;
 begin
-  AssertException('LP cutoff <= 0 raises', EInvalidArgument,
+  AssertException('LP cutoff <= 0 raises', ESignalError,
     @DoFIR_LP_BadCutoff_Low);
 end;
 
 procedure TTestSignalKit.TestFIR_BandPass_SwappedRaises;
 begin
-  AssertException('BP low>high raises', EInvalidArgument,
+  AssertException('BP low>high raises', ESignalError,
     @DoFIR_BP_SwappedCutoffs);
 end;
 

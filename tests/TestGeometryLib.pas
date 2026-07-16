@@ -183,7 +183,7 @@ procedure TTestGeometryLib.AssertGeoError(const AMsg: string; AProc: TProcedure)
 begin
   try
     AProc;
-    Fail(AMsg + ' — expected EGeometryError but none raised');
+    Fail(AMsg + ': expected EGeometryError but none raised');
   except
     on E: EGeometryError do { pass }
     else raise;
@@ -192,6 +192,7 @@ end;
 
 function TTestGeometryLib.UnitSquare: TPolygon2D;
 begin
+  Result := nil;
   SetLength(Result, 4);
   Result[0] := TPoint2D.Create(0, 0);
   Result[1] := TPoint2D.Create(1, 0);
@@ -201,6 +202,7 @@ end;
 
 function TTestGeometryLib.Triangle: TPolygon2D;
 begin
+  Result := nil;
   SetLength(Result, 3);
   Result[0] := TPoint2D.Create(0, 0);
   Result[1] := TPoint2D.Create(4, 0);

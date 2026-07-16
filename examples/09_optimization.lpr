@@ -7,9 +7,9 @@ program example09_optimization;
  Each section introduces one optimizer with a plain-English explanation
  of what it does, when to use it, and a concrete example.
 
- Compile:  fpc example09_optimization.lpr
- Run:      ./example09_optimization   (Linux/Mac)
-           example09_optimization.exe (Windows)
+ Compile:  fpc -Fu../src -FUlib 09_optimization.lpr
+ Run:      ./09_optimization   (Linux/macOS)
+           09_optimization.exe (Windows)
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -48,6 +48,7 @@ begin Result := Sqr(X[0]-2) + Sqr(X[1]+1); end;
 { Gradient of Bowl (optional — can pass nil to use numerical gradient) }
 function BowlGrad(const X: TDoubleArray): TDoubleArray;
 begin
+  Result := nil;
   SetLength(Result, 2);
   Result[0] := 2*(X[0]-2);
   Result[1] := 2*(X[1]+1);

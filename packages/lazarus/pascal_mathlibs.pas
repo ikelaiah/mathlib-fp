@@ -22,6 +22,7 @@ uses
   FinanceLib.Bonds,
   FinanceLib.NPV,
   { EngineeringLib }
+  EngineeringLib.Common,
   EngineeringLib.FluidDynamics,
   EngineeringLib.Thermodynamics,
   EngineeringLib.Signal,

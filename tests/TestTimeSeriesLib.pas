@@ -151,7 +151,7 @@ procedure TTestTimeSeriesLib.AssertTSError(const AMsg: string; AProc: TProcedure
 begin
   try
     AProc;
-    Fail(AMsg + ' — expected ETimeSeriesError but none was raised');
+    Fail(AMsg + ': expected ETimeSeriesError but none was raised');
   except
     on E: ETimeSeriesError do { pass }
     else raise;
@@ -166,6 +166,7 @@ var
   RState: LongWord;
   Noise: Double;
 begin
+  Result := nil;
   SetLength(Result, N);
   Result[0] := Seed;
   RState := 12345;

@@ -44,6 +44,7 @@ function ToDoubleArray(const Data: TIntegerArray): TDoubleArray;
 var
   I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(Data));
   for I := 0 to High(Data) do
     Result[I] := Data[I];
@@ -53,6 +54,7 @@ function ToDoubleArray(const Data: TSingleArray): TDoubleArray;
 var
   I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(Data));
   for I := 0 to High(Data) do
     Result[I] := Data[I];
@@ -62,6 +64,7 @@ function ToDoubleArray(const Data: TExtendedArray): TDoubleArray;
 var
   I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(Data));
   for I := 0 to High(Data) do
     Result[I] := Data[I];

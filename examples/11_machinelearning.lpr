@@ -7,9 +7,9 @@ program example11_machinelearning;
  Each section introduces one technique with a plain-English explanation,
  a concrete toy dataset, and guidance on when to use it.
 
- Compile:  fpc example11_machinelearning.lpr
- Run:      ./example11_machinelearning   (Linux/Mac)
-           example11_machinelearning.exe (Windows)
+ Compile:  fpc -Fu../src -FUlib 11_machinelearning.lpr
+ Run:      ./11_machinelearning   (Linux/macOS)
+           11_machinelearning.exe (Windows)
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -86,6 +86,7 @@ end;
 function MakeClusterData: TDoubleMatrix;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, 30);
   for I := 0 to 9 do
   begin
@@ -135,7 +136,7 @@ begin
   S := TMLKit.Standardise(X);
   WriteLn('  After Standardise — mean=0, std=1 per column:');
   for I := 0 to 4 do
-    WriteLn(Format('    [%+.4f, %+.4f]', [S[I][0], S[I][1]]));
+    WriteLn(Format('    [%8.4f, %8.4f]', [S[I][0], S[I][1]]));
 
   WriteLn;
   WriteLn('  Rule of thumb: Standardise before KNN, PCA, logistic regression.');
@@ -196,9 +197,9 @@ begin
   SetLength(X, 10);
   for I := 0 to 9 do begin SetLength(X[I], 1); X[I][0] := I; end;
   Xpoly := TMLKit.PolynomialFeatures(
-    TDoubleArray.Create(0,1,2,3,4,5,6,7,8,9), 2);
+    TDoubleArray.Create(0,1,2,3,4,5,6,7,8,9), 2, False);
   Model := TMLKit.LinearRegression(Xpoly, Y);
-  WriteLn(Format('  Poly R² = %.6f  (fitting x² with [1, x, x²] features)', [Model.RSquared]));
+  WriteLn(Format('  Poly R² = %.6f  (intercept + [x, x²] features)', [Model.RSquared]));
   YHat := TMLKit.LinearPredict(Model, Xpoly);
   WriteLn(Format('  Prediction at x=5: %.4f  (true: 25.0)', [YHat[5]]));
 end;

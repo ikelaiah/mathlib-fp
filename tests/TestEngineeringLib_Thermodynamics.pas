@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, fpcunit, testutils, testregistry, Math,
-  EngineeringLib.Thermodynamics;
+  EngineeringLib.Common, EngineeringLib.Thermodynamics;
 
 type
 
@@ -341,9 +341,9 @@ end;
 procedure TTestThermodynamicsKit.Test16_OriginalEdgeCases;
 begin
   // Test zero thickness conduction
-  AssertException('Conduction zero thickness', Exception, @ZeroThicknessHeatConductionTest);
+  AssertException('Conduction zero thickness', EThermodynamicsError, @ZeroThicknessHeatConductionTest);
   // Test zero absolute temperature entropy
-  AssertException('Entropy zero temp', Exception, @ZeroTempEntropyTest);
+  AssertException('Entropy zero temp', EThermodynamicsError, @ZeroTempEntropyTest);
 end;
 
 // Tests for additional efficiency metrics
@@ -355,7 +355,7 @@ begin
   W_in := 1000.0; // J (work input)
   AssertEquals('COP Refrigeration', Q_cold/W_in, TThermodynamicsKit.CoefficientOfPerformanceRefrigeration(Q_cold, W_in), Tolerance);
   // Edge case: zero work input
-  AssertException('COP zero work input', Exception, @ZeroWorkInputCOPRefrigerationTest);
+  AssertException('COP zero work input', EThermodynamicsError, @ZeroWorkInputCOPRefrigerationTest);
 end;
 
 procedure TTestThermodynamicsKit.Test18_CoefficientOfPerformanceHeatPump;
@@ -366,7 +366,7 @@ begin
   W_in := 1000.0; // J (work input)
   AssertEquals('COP Heat Pump', Q_hot/W_in, TThermodynamicsKit.CoefficientOfPerformanceHeatPump(Q_hot, W_in), Tolerance);
   // Edge case: zero work input
-  AssertException('COP HP zero work input', Exception, @ZeroWorkInputCOPHeatPumpTest);
+  AssertException('COP HP zero work input', EThermodynamicsError, @ZeroWorkInputCOPHeatPumpTest);
 end;
 
 // Tests for thermodynamic cycles
@@ -378,8 +378,8 @@ begin
   gamma := 1.4; // Specific heat ratio for air
   AssertEquals('Otto Cycle Efficiency', 1.0 - Power(1.0/r, gamma-1), TThermodynamicsKit.OttoCycleEfficiency(r, gamma), Tolerance);
   // Edge cases
-  AssertException('Otto r <= 1', Exception, @LowCompressionRatioOttoTest);
-  AssertException('Otto gamma <= 1', Exception, @LowGammaOttoTest);
+  AssertException('Otto r <= 1', EThermodynamicsError, @LowCompressionRatioOttoTest);
+  AssertException('Otto gamma <= 1', EThermodynamicsError, @LowGammaOttoTest);
 end;
 
 procedure TTestThermodynamicsKit.Test20_DieselCycleEfficiency;
@@ -393,9 +393,9 @@ begin
   expected := 1.0 - (1.0/Power(r, gamma-1)) * (Power(alpha, gamma) - 1) / (gamma * (alpha - 1));
   AssertEquals('Diesel Cycle Efficiency', expected, TThermodynamicsKit.DieselCycleEfficiency(r, alpha, gamma), Tolerance);
   // Edge cases
-  AssertException('Diesel r <= 1', Exception, @LowCompressionRatioDieselTest);
-  AssertException('Diesel alpha <= 1', Exception, @LowCutoffRatioDieselTest);
-  AssertException('Diesel gamma <= 1', Exception, @LowGammaDieselTest);
+  AssertException('Diesel r <= 1', EThermodynamicsError, @LowCompressionRatioDieselTest);
+  AssertException('Diesel alpha <= 1', EThermodynamicsError, @LowCutoffRatioDieselTest);
+  AssertException('Diesel gamma <= 1', EThermodynamicsError, @LowGammaDieselTest);
 end;
 
 procedure TTestThermodynamicsKit.Test21_BraytonCycleEfficiency;
@@ -406,8 +406,8 @@ begin
   gamma := 1.4; // Specific heat ratio
   AssertEquals('Brayton Cycle Efficiency', 1.0 - 1.0/Power(r, (gamma-1)/gamma), TThermodynamicsKit.BraytonCycleEfficiency(r, gamma), Tolerance);
   // Edge cases
-  AssertException('Brayton r <= 1', Exception, @LowPressureRatioBraytonTest);
-  AssertException('Brayton gamma <= 1', Exception, @LowGammaBraytonTest);
+  AssertException('Brayton r <= 1', EThermodynamicsError, @LowPressureRatioBraytonTest);
+  AssertException('Brayton gamma <= 1', EThermodynamicsError, @LowGammaBraytonTest);
 end;
 
 procedure TTestThermodynamicsKit.Test22_RankineCycleEfficiency;
@@ -419,7 +419,7 @@ begin
   Q_in := 3000.0; // J
   AssertEquals('Rankine Cycle Efficiency', (W_turbine - W_pump)/Q_in, TThermodynamicsKit.RankineCycleEfficiency(W_turbine, W_pump, Q_in), Tolerance);
   // Edge case: zero heat input
-  AssertException('Rankine zero heat input', Exception, @ZeroHeatInputRankineTest);
+  AssertException('Rankine zero heat input', EThermodynamicsError, @ZeroHeatInputRankineTest);
 end;
 
 procedure TTestThermodynamicsKit.Test23_AdiabaticPressure;
@@ -599,7 +599,7 @@ begin
   AssertEquals('Kelvin to Celsius (freezing)', 0.0, TThermodynamicsKit.KelvinToCelsius(273.15), Tolerance);
   AssertEquals('Kelvin to Celsius (boiling)', 100.0, TThermodynamicsKit.KelvinToCelsius(373.15), Tolerance);
   // Edge case
-  AssertException('Kelvin to Celsius negative temperature', Exception, @NegativeTempKelvinTest);
+  AssertException('Kelvin to Celsius negative temperature', EThermodynamicsError, @NegativeTempKelvinTest);
 end;
 
 procedure TTestThermodynamicsKit.Test39_BarToPascal;
@@ -617,21 +617,21 @@ end;
 procedure TTestThermodynamicsKit.Test41_NewFunctionsEdgeCases;
 begin
   // Psychrometrics edge cases
-  AssertException('Dew point zero RH', Exception, @ZeroRHDewPointTest);
-  AssertException('Dew point RH > 100%', Exception, @HighRHDewPointTest);
+  AssertException('Dew point zero RH', EThermodynamicsError, @ZeroRHDewPointTest);
+  AssertException('Dew point RH > 100%', EThermodynamicsError, @HighRHDewPointTest);
   
   // Thermodynamic cycles edge cases
-  AssertException('Otto cycle compression ratio = 1', Exception, @LowCompressionRatioOttoTest);
-  AssertException('Otto cycle gamma = 1', Exception, @LowGammaOttoTest);
-  AssertException('Diesel cycle compression ratio = 1', Exception, @LowCompressionRatioDieselTest);
-  AssertException('Diesel cycle cutoff ratio = 1', Exception, @LowCutoffRatioDieselTest);
-  AssertException('Diesel cycle gamma = 1', Exception, @LowGammaDieselTest);
-  AssertException('Brayton cycle pressure ratio = 1', Exception, @LowPressureRatioBraytonTest);
-  AssertException('Brayton cycle gamma = 1', Exception, @LowGammaBraytonTest);
-  AssertException('Rankine cycle zero heat input', Exception, @ZeroHeatInputRankineTest);
+  AssertException('Otto cycle compression ratio = 1', EThermodynamicsError, @LowCompressionRatioOttoTest);
+  AssertException('Otto cycle gamma = 1', EThermodynamicsError, @LowGammaOttoTest);
+  AssertException('Diesel cycle compression ratio = 1', EThermodynamicsError, @LowCompressionRatioDieselTest);
+  AssertException('Diesel cycle cutoff ratio = 1', EThermodynamicsError, @LowCutoffRatioDieselTest);
+  AssertException('Diesel cycle gamma = 1', EThermodynamicsError, @LowGammaDieselTest);
+  AssertException('Brayton cycle pressure ratio = 1', EThermodynamicsError, @LowPressureRatioBraytonTest);
+  AssertException('Brayton cycle gamma = 1', EThermodynamicsError, @LowGammaBraytonTest);
+  AssertException('Rankine cycle zero heat input', EThermodynamicsError, @ZeroHeatInputRankineTest);
   
   // Unit conversion edge cases
-  AssertException('Kelvin negative temperature', Exception, @NegativeTempKelvinTest);
+  AssertException('Kelvin negative temperature', EThermodynamicsError, @NegativeTempKelvinTest);
 end;
 
 initialization

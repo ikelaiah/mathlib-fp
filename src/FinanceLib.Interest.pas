@@ -1379,7 +1379,11 @@ class function TFinanceKit.StraightLineDepreciation(
   const ALife: Integer;
   const ADecimals: Integer = 4): Double;
 begin
-  Result := (ACost - ASalvage) / ALife;
+  if ALife <= 0 then
+    raise EFinanceError.Create('Asset life must be positive');
+  if ACost < ASalvage then
+    raise EFinanceError.Create('Cost must be greater than or equal to salvage value');
+  Result := SimpleRoundTo((ACost - ASalvage) / ALife, -ADecimals);
 end;
 
 class function TFinanceKit.DecliningBalanceDepreciation(
@@ -1401,14 +1405,18 @@ end;
 
 class function TFinanceKit.ReturnOnInvestment(const AGain, ACost: Double; const ADecimals: Integer = 4): Double;
 begin
-  Result := (AGain - ACost) / ACost;
+  if Abs(ACost) < 1E-15 then
+    raise EFinanceError.Create('Investment cost must be non-zero');
+  Result := SimpleRoundTo((AGain - ACost) / ACost, -ADecimals);
 end;
 
 class function TFinanceKit.ReturnOnEquity(
   const ANetIncome, AShareholdersEquity: Double;
   const ADecimals: Integer = 4): Double;
 begin
-  Result := ANetIncome / AShareholdersEquity;
+  if Abs(AShareholdersEquity) < 1E-15 then
+    raise EFinanceError.Create('Shareholders'' equity must be non-zero');
+  Result := SimpleRoundTo(ANetIncome / AShareholdersEquity, -ADecimals);
 end;
 
 class function TFinanceKit.BondPrice(
@@ -1514,6 +1522,7 @@ var
   I: Integer;
   Balance, PaymentAmount, InterestPayment, PrincipalPayment: Double;
 begin
+  Result := nil;
   if ANumberOfPayments <= 0 then
     raise EFinanceError.Create('Number of payments must be positive');
     
@@ -1823,7 +1832,8 @@ begin
   if APricePerUnit <= AVariableCostPerUnit then
     raise EFinanceError.Create('Price must be greater than variable cost');
     
-  Result := AFixedCosts / (1 - AVariableCostPerUnit / APricePerUnit);
+  Result := SimpleRoundTo(
+    AFixedCosts / (1 - AVariableCostPerUnit / APricePerUnit), -ADecimals);
 end;
 
 class function TFinanceKit.WACC(
@@ -1856,7 +1866,8 @@ begin
   if (ARiskFreeRate < 0) or (ARiskFreeRate > 1) or (ABeta < -10) or (ABeta > 10) then
     raise EFinanceError.Create('Invalid input parameters');
     
-  Result := ARiskFreeRate + ABeta * (AExpectedMarketReturn - ARiskFreeRate);
+  Result := SimpleRoundTo(
+    ARiskFreeRate + ABeta * (AExpectedMarketReturn - ARiskFreeRate), -ADecimals);
 end;
 
 class function TFinanceKit.GordonGrowthModel(
@@ -1866,7 +1877,9 @@ begin
   if (ACurrentDividend < 0) or (AGrowthRate < 0) or (ARequiredReturn < 0) or (AGrowthRate >= ARequiredReturn) then
     raise EFinanceError.Create('Invalid input parameters');
     
-  Result := ACurrentDividend * (1 + AGrowthRate) / (ARequiredReturn - AGrowthRate);
+  Result := SimpleRoundTo(
+    ACurrentDividend * (1 + AGrowthRate) /
+      (ARequiredReturn - AGrowthRate), -ADecimals);
 end;
 
 

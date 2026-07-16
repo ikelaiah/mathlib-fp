@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, fpcunit, testutils, testregistry, Math,
-  EngineeringLib.FluidDynamics;
+  EngineeringLib.Common, EngineeringLib.FluidDynamics;
 
 type
 
@@ -317,15 +317,15 @@ end;
 procedure TTestFluidDynamicsKit.Test09_EdgeCases;
 begin
   // Test zero density - using a temporary method to avoid array parameter issue
-  AssertException('Bernoulli zero density', Exception, @BernoulliPressureTest);
+  AssertException('Bernoulli zero density', EFluidDynamicsError, @BernoulliPressureTest);
                   
   // Test negative velocity squared result in BernoulliVelocity
-  AssertException('Bernoulli negative velocity sq', Exception, @BernoulliVelocityTest);
+  AssertException('Bernoulli negative velocity sq', EFluidDynamicsError, @BernoulliVelocityTest);
                   
   // Test zero viscosity
-  AssertException('Reynolds zero dynamic viscosity', Exception, @ReynoldsNumberTest);
+  AssertException('Reynolds zero dynamic viscosity', EFluidDynamicsError, @ReynoldsNumberTest);
                   
-  AssertException('Reynolds zero kinematic viscosity', Exception, @ReynoldsNumberKinematicTest);
+  AssertException('Reynolds zero kinematic viscosity', EFluidDynamicsError, @ReynoldsNumberKinematicTest);
                   
   // Test zero area flow rate
   AssertEquals('Volume Flow Rate zero area', 0.0, TFluidDynamicsKit.CalculateVolumeFlowRate(0.0, 5.0), Tolerance);
@@ -340,7 +340,7 @@ begin
   Re := 1000.0;
   AssertEquals('Laminar Friction Factor', 64.0/Re, TFluidDynamicsKit.LaminarFrictionFactor(Re), Tolerance);
   // Test edge case - Reynolds number too high
-  AssertException('Laminar friction factor above Re=2300', Exception, @LaminarFrictionFactorTest);
+  AssertException('Laminar friction factor above Re=2300', EFluidDynamicsError, @LaminarFrictionFactorTest);
 end;
 
 procedure TTestFluidDynamicsKit.Test13_TurbulentFrictionFactor;
@@ -354,7 +354,7 @@ begin
   f := Power(1 / (-1.8 * Log10(Power(RelRough / 3.7, 1.11) + 6.9 / Re)), 2);
   AssertEquals('Turbulent Friction Factor', f, TFluidDynamicsKit.TurbulentFrictionFactor(Re, RelRough), 1E-4);
   // Test edge case - Reynolds number too low
-  AssertException('Turbulent friction factor below Re=4000', Exception, @TurbulentFrictionFactorTest);
+  AssertException('Turbulent friction factor below Re=4000', EFluidDynamicsError, @TurbulentFrictionFactorTest);
 end;
 
 procedure TTestFluidDynamicsKit.Test14_BlasiusFrictionFactor;
@@ -364,8 +364,8 @@ begin
   Re := 10000.0;
   AssertEquals('Blasius Friction Factor', 0.316/Power(Re, 0.25), TFluidDynamicsKit.BlasiusFrictionFactor(Re), Tolerance);
   // Test edge cases outside valid range
-  AssertException('Blasius friction factor below Re=4000', Exception, @BlasiusFrictionFactorLowTest);
-  AssertException('Blasius friction factor above Re=100000', Exception, @BlasiusFrictionFactorHighTest);
+  AssertException('Blasius friction factor below Re=4000', EFluidDynamicsError, @BlasiusFrictionFactorLowTest);
+  AssertException('Blasius friction factor above Re=100000', EFluidDynamicsError, @BlasiusFrictionFactorHighTest);
 end;
 
 procedure TTestFluidDynamicsKit.Test10_FrictionHeadLoss;
@@ -645,30 +645,30 @@ end;
 procedure TTestFluidDynamicsKit.Test39_NewFunctionsEdgeCases;
 begin
   // Pipe flow edge cases
-  AssertException('Zero diameter head loss', Exception, @ZeroDiameterHeadLossTest);
-  AssertException('Zero diameter Hazen-Williams', Exception, @ZeroDiameterHazenWilliamsTest);
-  AssertException('Zero C_HW coefficient', Exception, @ZeroCHWCoefficientTest);
+  AssertException('Zero diameter head loss', EFluidDynamicsError, @ZeroDiameterHeadLossTest);
+  AssertException('Zero diameter Hazen-Williams', EFluidDynamicsError, @ZeroDiameterHazenWilliamsTest);
+  AssertException('Zero C_HW coefficient', EFluidDynamicsError, @ZeroCHWCoefficientTest);
   
   // Dimensional analysis edge cases
-  AssertException('Zero length Froude number', Exception, @ZeroLengthFroudeNumberTest);
-  AssertException('Zero surface tension Weber number', Exception, @ZeroSurfaceTensionWeberNumberTest);
-  AssertException('Zero density Euler number', Exception, @ZeroDensityEulerNumberTest);
-  AssertException('Zero velocity Euler number', Exception, @ZeroVelocityEulerNumberTest);
-  AssertException('Zero speed of sound Mach number', Exception, @ZeroSpeedOfSoundMachNumberTest);
+  AssertException('Zero length Froude number', EFluidDynamicsError, @ZeroLengthFroudeNumberTest);
+  AssertException('Zero surface tension Weber number', EFluidDynamicsError, @ZeroSurfaceTensionWeberNumberTest);
+  AssertException('Zero density Euler number', EFluidDynamicsError, @ZeroDensityEulerNumberTest);
+  AssertException('Zero velocity Euler number', EFluidDynamicsError, @ZeroVelocityEulerNumberTest);
+  AssertException('Zero speed of sound Mach number', EFluidDynamicsError, @ZeroSpeedOfSoundMachNumberTest);
   
   // Compressible flow edge cases
-  AssertException('Gamma equals 1 speed of sound', Exception, @GammaEqualsOneSpeedOfSoundTest);
-  AssertException('Zero Mach number area ratio', Exception, @ZeroMachNumberAreaRatioTest);
+  AssertException('Gamma equals 1 speed of sound', EFluidDynamicsError, @GammaEqualsOneSpeedOfSoundTest);
+  AssertException('Zero Mach number area ratio', EFluidDynamicsError, @ZeroMachNumberAreaRatioTest);
   
   // Pumps and turbines edge cases
-  AssertException('Zero efficiency pump power', Exception, @ZeroEfficiencyPumpPowerTest);
-  AssertException('Zero RPM specific speed', Exception, @ZeroRPMSpecificSpeedTest);
-  AssertException('Zero flow rate specific speed', Exception, @ZeroFlowRateSpecificSpeedTest);
-  AssertException('Zero head specific speed', Exception, @ZeroHeadSpecificSpeedTest);
+  AssertException('Zero efficiency pump power', EFluidDynamicsError, @ZeroEfficiencyPumpPowerTest);
+  AssertException('Zero RPM specific speed', EFluidDynamicsError, @ZeroRPMSpecificSpeedTest);
+  AssertException('Zero flow rate specific speed', EFluidDynamicsError, @ZeroFlowRateSpecificSpeedTest);
+  AssertException('Zero head specific speed', EFluidDynamicsError, @ZeroHeadSpecificSpeedTest);
   
   // Open channel flow edge cases
-  AssertException('Zero Chezy coefficient', Exception, @ZeroChezyCoeffientTest);
-  AssertException('Zero depth Froude number', Exception, @ZeroDepthFroudeNumberTest);
+  AssertException('Zero Chezy coefficient', EFluidDynamicsError, @ZeroChezyCoeffientTest);
+  AssertException('Zero depth Froude number', EFluidDynamicsError, @ZeroDepthFroudeNumberTest);
 end;
 
 initialization

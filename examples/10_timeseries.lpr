@@ -7,9 +7,9 @@ program example10_timeseries;
  Each section introduces one technique with a plain-English explanation,
  a concrete example, and guidance on when to use it.
 
- Compile:  fpc example10_timeseries.lpr
- Run:      ./example10_timeseries   (Linux/Mac)
-           example10_timeseries.exe (Windows)
+ Compile:  fpc -Fu../src -FUlib 10_timeseries.lpr
+ Run:      ./10_timeseries   (Linux/macOS)
+           10_timeseries.exe (Windows)
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -42,6 +42,7 @@ end;
 function MakeTrendySeasonal(N: Integer): TDoubleArray;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N - 1 do
     Result[I] := 2.0 * I + 10.0 * Sin(2 * Pi * I / 12.0) + (I mod 7) * 0.5;
@@ -51,6 +52,7 @@ end;
 function MakeAR1(N: Integer; Phi: Double): TDoubleArray;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, N);
   Result[0] := 1.0;
   for I := 1 to N - 1 do
@@ -61,6 +63,7 @@ end;
 function MakeShiftSeries(N: Integer): TDoubleArray;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N - 1 do
     if I < N div 2 then Result[I] := 0.0

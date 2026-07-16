@@ -863,6 +863,7 @@ begin
     Stack[K] := Sorted[I]; Inc(K);
     Dec(I);
   end;
+  Result := nil;
   SetLength(Result, K - 1);
   for I := 0 to K - 2 do Result[I] := Stack[I];
 end;
@@ -874,6 +875,7 @@ end;
 class function TGeometryKit.Translate2D(const Poly: TPolygon2D; DX, DY: Double): TPolygon2D;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(Poly));
   for I := 0 to High(Poly) do
   begin
@@ -885,6 +887,7 @@ end;
 class function TGeometryKit.Scale2D(const Poly: TPolygon2D; SX, SY: Double): TPolygon2D;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(Poly));
   for I := 0 to High(Poly) do
   begin
@@ -897,6 +900,7 @@ class function TGeometryKit.Rotate2D(const Poly: TPolygon2D; Angle: Double; cons
 var I: Integer; CosA, SinA, DX, DY: Double;
 begin
   CosA := Cos(Angle); SinA := Sin(Angle);
+  Result := nil;
   SetLength(Result, Length(Poly));
   for I := 0 to High(Poly) do
   begin

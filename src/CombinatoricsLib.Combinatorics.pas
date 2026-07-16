@@ -24,7 +24,7 @@ unit CombinatoricsLib.Combinatorics;
    Lucas              — L_n Lucas numbers
    PascalRow          — one row of Pascal's triangle
    PascalTriangle     — full triangle up to row N
-   PowerSet           — all 2^n subsets of {0..n-1}
+    PowerSet           — all 2^n subsets of [0..n-1]
    GCD / LCM          — greatest common divisor, least common multiple
    ExtendedGCD        — Bezout coefficients: a*x + b*y = GCD(a,b)
    ModPow             — a^b mod m  (fast exponentiation)
@@ -37,7 +37,7 @@ unit CombinatoricsLib.Combinatorics;
  Permutation generation
    Permutations       — all permutations of an integer array
    NextPermutation    — advance one step in lexicographic order (in-place)
-   Combinations       — all k-combinations of {0..n-1}
+    Combinations       — all k-combinations of [0..n-1]
 
  Design
    All methods static on TCombinatoricsKit — no object creation needed.
@@ -94,7 +94,7 @@ type
     class procedure MatMul2x2(const A, B: array of Int64; out C: array of Int64); static;
 
     { Internal: raise 2x2 matrix to power P }
-    class procedure MatPow2x2(M: array of Int64; P: Int64; out R: array of Int64); static;
+    class procedure MatPow2x2(M: array of Int64; P: Int64; var R: array of Int64); static;
 
   public
 
@@ -157,7 +157,7 @@ type
 
     { D_n — number of derangements: permutations of N with no fixed points.
       D_0=1, D_1=0, D_2=1, D_3=2, D_4=9, D_5=44 ...
-      Recurrence: D_n = (n-1)*(D_{n-1} + D_{n-2}) }
+       Recurrence: D_n = (n-1) * (D_(n-1) + D_(n-2)) }
     class function DerangementCount(N: Integer): Int64; static;
 
     { =======================================================================
@@ -245,12 +245,12 @@ type
         repeat ... until not NextPermutation(perm); }
     class function NextPermutation(var Items: TIntegerArray): Boolean; static;
 
-    { All K-combinations of {0, 1, ..., N-1} in lexicographic order.
+     { All K-combinations of [0, 1, ..., N-1] in lexicographic order.
       Example: Combinations(4,2) = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]
       Warning: result has C(N,K) entries. }
     class function Combinations(N, K: Integer): TCombinationList; static;
 
-    { Power set of {0, 1, ..., N-1}: all 2^N subsets.
+     { Power set of [0, 1, ..., N-1]: all 2^N subsets.
       Subsets are returned in lexicographic order of their bitmask.
       Warning: result has 2^N entries — only practical for N <= 20. }
     class function PowerSet(N: Integer): TSubsetList; static;
@@ -328,7 +328,7 @@ begin
   C[3] := A[2]*B[1] + A[3]*B[3];
 end;
 
-class procedure TCombinatoricsKit.MatPow2x2(M: array of Int64; P: Int64; out R: array of Int64);
+class procedure TCombinatoricsKit.MatPow2x2(M: array of Int64; P: Int64; var R: array of Int64);
 { Raise 2x2 matrix M to power P by repeated squaring }
 var
   Tmp: array[0..3] of Int64;
@@ -398,7 +398,7 @@ begin
 end;
 
 class function TCombinatoricsKit.Combination(N, K: Integer): Int64;
-{ C(n,k) using the multiplicative formula: product_{i=1}^{k} (n-k+i)/i
+ { C(n,k) using the multiplicative formula: product(i=1..k) (n-k+i)/i
   Divides at each step to keep intermediate values small. }
 var
   I: Integer;
@@ -524,7 +524,7 @@ begin
 end;
 
 class function TCombinatoricsKit.DerangementCount(N: Integer): Int64;
-{ D_n via recurrence D_n = (n-1)*(D_{n-1} + D_{n-2})
+ { D_n via recurrence D_n = (n-1) * (D_(n-1) + D_(n-2))
   D_0=1, D_1=0 }
 var
   A, B, C: Int64;
@@ -573,7 +573,7 @@ begin
 end;
 
 class function TCombinatoricsKit.Lucas(N: Integer): Int64;
-{ L_n = F_{n-1} + F_{n+1}  (identity relating Lucas to Fibonacci) }
+ { L_n = F_(n-1) + F_(n+1) (identity relating Lucas to Fibonacci) }
 begin
   if N < 0 then raise ECombinatoricsError.Create('Lucas: N must be >= 0');
   if N = 0 then Exit(2);
@@ -586,6 +586,7 @@ class function TCombinatoricsKit.PascalRow(N: Integer): TPascalRow;
 var
   K: Integer;
 begin
+  Result := nil;
   if N < 0 then raise ECombinatoricsError.Create('PascalRow: N must be >= 0');
   SetLength(Result, N + 1);
   Result[0] := 1;
@@ -598,6 +599,7 @@ class function TCombinatoricsKit.PascalTriangle(N: Integer): TPascalTriangle;
 var
   I: Integer;
 begin
+  Result := nil;
   if N < 0 then raise ECombinatoricsError.Create('PascalTriangle: N must be >= 0');
   SetLength(Result, N + 1);
   for I := 0 to N do
@@ -718,6 +720,7 @@ var
   Exp: Integer;
   Len: Integer;
 begin
+  Result := nil;
   if N <= 1 then raise ECombinatoricsError.Create(
     'PrimeFactors: N must be >= 2');
   SetLength(Result, 0);
@@ -776,6 +779,7 @@ begin
   Count := 0;
   for I := 2 to Limit do
     if not IsComposite[I] then Inc(Count);
+  Result := nil;
   SetLength(Result, Count);
   Idx := 0;
   for I := 2 to Limit do
@@ -863,6 +867,7 @@ begin
       end;
 
   Count := Factorial(Length(Perm));
+  Result := nil;
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
   begin
@@ -873,7 +878,7 @@ begin
 end;
 
 class function TCombinatoricsKit.Combinations(N, K: Integer): TCombinationList;
-{ Generate all C(N,K) combinations of {0..N-1} in lex order
+ { Generate all C(N,K) combinations of [0..N-1] in lex order
   using the combinatorial number system algorithm }
 var
   Combo: TCombination;
@@ -885,6 +890,7 @@ begin
     'Combinations: K must be in [0,N]');
 
   Count := Combination(N, K);
+  Result := nil;
   SetLength(Result, Count);
   SetLength(Combo, K);
 
@@ -918,6 +924,7 @@ begin
   if N > 24 then raise ECombinatoricsError.Create(
     'PowerSet: N > 24 would produce > 16M subsets — use a generator instead');
   Total := 1 shl N;
+  Result := nil;
   SetLength(Result, Total);
   for Mask := 0 to Total - 1 do
   begin

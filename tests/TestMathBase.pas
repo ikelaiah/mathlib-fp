@@ -202,10 +202,6 @@ begin
   else
     RelativeDiff := Abs(Expected - Actual);
     
-  if RelativeDiff >= FINANCE_EPSILON then
-    WriteLn(Format('Expected: %.10f, Actual: %.10f, Diff: %.10f, RelDiff: %.10f', 
-      [Expected, Actual, Abs(Expected - Actual), RelativeDiff]));
-      
   AssertTrue(Msg, RelativeDiff < FINANCE_EPSILON);
 end;
 
@@ -340,7 +336,6 @@ begin
   X := TDoubleArray.Create(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   Y := TDoubleArray.Create(1.0, 2.0, 3.0, 4.0, 5.0, 7.37789955, 7.0, 8.0, 9.0, 10.0);
   Correlation := TStatsKit.PearsonCorrelation(X, Y);
-  WriteLn(Format('Pearson Correlation: %.10f', [Correlation]));
   AssertTrue('Moderate correlation should be close to 0.99',
              Abs(Correlation - 0.99) < 1E-4);
 end;
@@ -437,18 +432,9 @@ var
   Data: TDoubleArray;
   Stats: TDescriptiveStats;
 begin
-  WriteLn('Test26_Describe_N: Starting');
   Data := TDoubleArray.Create(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   Stats := TStatsKit.Describe(Data);
-
-  WriteLn(Stats.ToString);
-
-  WriteLn('--------------------------------');
-
-  WriteLn(Stats.ToStringWide);
-
   AssertEquals(10, Stats.N, 'N calculation failed');
-  WriteLn('Test26_Describe_N: Finished');
 end;
 
 procedure TTestCaseStats.Test26_Describe_Mean;
@@ -506,12 +492,9 @@ var
   Data: TDoubleArray;
   Stats: TDescriptiveStats;
 begin
-  WriteLn('Test26_Describe_StdDev: Starting');
   Data := TDoubleArray.Create(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
   Stats := TStatsKit.Describe(Data);
-  WriteLn(Format('StdDev: %.6f', [Stats.StdDev]));
   AssertEquals(2.872281, Stats.StdDev, 'StdDev calculation failed');
-  WriteLn('Test26_Describe_StdDev: Finished');
 end;
 
 procedure TTestCaseStats.Test27_GeometricMean;
@@ -526,11 +509,8 @@ procedure TTestCaseStats.Test28_HarmonicMean;
 var
   Data: TDoubleArray;
 begin
-  WriteLn('Test28_HarmonicMean: Starting');
   Data := TDoubleArray.Create(1, 2, 4, 8);
-  WriteLn(Format('Harmonic Mean: %.6f', [TStatsKit.HarmonicMean(Data)]));
   AssertEquals(2.133333, TStatsKit.HarmonicMean(Data), 'Harmonic mean failed');
-  WriteLn('Test28_HarmonicMean: Finished');
 end;
 
 procedure TTestCaseStats.Test29_TrimmedMean;
@@ -736,10 +716,7 @@ procedure TTestCaseFinance.Test01_PresentValue;
 var
   Result: Double;
 begin
-  WriteLn('Test #1: Present Value Test');
-  WriteLn('Input: FV=100, Rate=0.1, Periods=1');
   Result := TFinanceKit.PresentValue(100, 0.1, 1, 4);
-  WriteLn(Format('Expected: %.10f, Got: %.10f', [90.9091, Result]));
   AssertFinanceEquals(90.9091, Result, 'Present value calculation failed');
 end;
 
@@ -757,10 +734,7 @@ procedure TTestCaseFinance.Test04_Payment;
 var
   Result: Double;
 begin
-  WriteLn('Test #2: Payment Test');
-  WriteLn('Input: PV=10000, Rate=0.05, Periods=10');
   Result := TFinanceKit.Payment(10000, 0.05, 10, 4);
-  WriteLn(Format('Expected: %.10f, Got: %.10f', [1295.0457, Result]));
   AssertFinanceEquals(1295.0457, Result, 'Payment calculation failed');
 end;
 
@@ -769,11 +743,8 @@ var
   CashFlows: TDoubleArray;
   Result: Double;
 begin
-  WriteLn('Test #3: NPV Test');
-  WriteLn('Input: Initial=100, CashFlows=[100,200,300], Rate=0.1');
   CashFlows := TDoubleArray.Create(100, 200, 300);
   Result := TFinanceKit.NetPresentValue(100, CashFlows, 0.1, 4);
-  WriteLn(Format('Expected: %.10f, Got: %.10f', [381.5928, Result]));
   AssertFinanceEquals(381.5928, Result, 'NPV calculation failed');
 end;
 
@@ -782,13 +753,8 @@ var
   CashFlows: TDoubleArray;
   Result: Double;
 begin
-  WriteLn('Test #4: IRR Test');
-  WriteLn('Input: Initial=100, CashFlows=[110,121,133.1]');
   CashFlows := TDoubleArray.Create(110, 121, 133.1);
   Result := TFinanceKit.InternalRateOfReturn(100, CashFlows, 4);
-  WriteLn(Format('Expected: %.10f, Got: %.10f', [0.1, Result]));
-  if Abs(Result - 0.1) >= FINANCE_EPSILON then
-    WriteLn(Format('Expected: %.10f, Actual: %.10f, Diff: %.10f', [0.1, Result, Abs(0.1 - Result)]));
   AssertTrue('IRR calculation failed', Abs(Result - 0.1) < FINANCE_EPSILON);
 end;
 
@@ -796,12 +762,8 @@ procedure TTestCaseFinance.Test07_Depreciation;
 var
   SLResult, DBResult: Double;
 begin
-  WriteLn('Test #5: Depreciation Test');
-  WriteLn('Input: Cost=1000, Salvage=100, Life=5, Period=1');
   SLResult := TFinanceKit.StraightLineDepreciation(1000, 100, 5, 4);
   DBResult := TFinanceKit.DecliningBalanceDepreciation(1000, 100, 5, 1, 4);
-  WriteLn(Format('Expected SL: %.10f, Got: %.10f', [180.0, SLResult]));
-  WriteLn(Format('Expected DB: %.10f, Got: %.10f', [400.0, DBResult]));
   AssertFinanceEquals(180.0, SLResult, 'Straight-line depreciation failed');
   AssertFinanceEquals(400.0, DBResult, 'Declining balance depreciation failed');
 end;
@@ -821,12 +783,9 @@ const
   YEARS_TO_MATURITY = 5;
 begin
   // Bond price should be higher than face value when yield < coupon rate
-  WriteLn('Test 09: Bond Price Test: Starting with FACE_VALUE = 1000.0, COUPON_RATE = 0.06, YIELD_RATE = 0.05, PERIODS_PER_YEAR = 2, YEARS_TO_MATURITY = 5');
-
   AssertFinanceEquals(1043.76, TFinanceKit.BondPrice(
     FACE_VALUE, COUPON_RATE, YIELD_RATE, PERIODS_PER_YEAR, YEARS_TO_MATURITY
   ), 'Bond price calculation failed');
-  WriteLn('Test 09: Bond Price Test: Finished');
 end;
 
 procedure TTestCaseFinance.Test10_BondYieldToMaturity;
@@ -837,13 +796,9 @@ const
   PERIODS_PER_YEAR = 2;
   YEARS_TO_MATURITY = 5;
 begin
-  WriteLn('Test 10: Bond Yield to Maturity Test: Starting with BOND_PRICE = 1043.76, FACE_VALUE = 1000.0, COUPON_RATE = 0.06, PERIODS_PER_YEAR = 2, YEARS_TO_MATURITY = 5');
-
   AssertFinanceEquals(0.05, TFinanceKit.BondYieldToMaturity(
     BOND_PRICE, FACE_VALUE, COUPON_RATE, PERIODS_PER_YEAR, YEARS_TO_MATURITY
   ), 'Bond yield to maturity calculation failed');
-
-  WriteLn('Test 10: Bond Yield to Maturity Test: Finished');
 end;
 
 procedure TTestCaseFinance.Test11_EffectiveAnnualRate;
@@ -851,13 +806,9 @@ const
   NOMINAL_RATE = 0.12;  // 12% nominal rate
   COMPOUNDINGS = 12;    // Monthly compounding
 begin
-  WriteLn('Test 11: Effective Annual Rate Test: Starting with NOMINAL_RATE = 0.12, COMPOUNDINGS = 12');
-
   AssertFinanceEquals(0.1268, TFinanceKit.EffectiveAnnualRate(  // Updated to match precise calculation
     NOMINAL_RATE, COMPOUNDINGS
   ), 'Effective annual rate calculation failed');
-
-  WriteLn('Test 11: Effective Annual Rate Test: Finished');
 end;
 
 procedure TTestCaseFinance.Test12_ModifiedDuration;
@@ -868,16 +819,9 @@ const
   PERIODS_PER_YEAR = 2;
   YEARS_TO_MATURITY = 5;
 begin
-  WriteLn('Test 12: Modified Duration Test: Starting with FACE_VALUE = 1000.0, COUPON_RATE = 0.06, YIELD_RATE = 0.05, PERIODS_PER_YEAR = 2, YEARS_TO_MATURITY = 5');  
-  WriteLn('Modified Duration: ', TFinanceKit.ModifiedDuration(
-    FACE_VALUE, COUPON_RATE, YIELD_RATE, PERIODS_PER_YEAR, YEARS_TO_MATURITY
-  ));
-
   AssertFinanceEquals(4.3009, TFinanceKit.ModifiedDuration(
     FACE_VALUE, COUPON_RATE, YIELD_RATE, PERIODS_PER_YEAR, YEARS_TO_MATURITY
   ), 'Modified duration calculation failed');
-
-  WriteLn('Test 12: Modified Duration Test: Finished');
 end;
 
 procedure TTestCaseFinance.Test13_BreakEvenAnalysis;
@@ -980,8 +924,6 @@ const
 var
   CallPrice, PutPrice: Double;
 begin
-  WriteLn('Test 19: Black-Scholes Test: Starting with SPOT_PRICE = 100.0, STRIKE_PRICE = 100.0, RISK_FREE_RATE = 0.05, VOLATILITY = 0.2, TIME_TO_MATURITY = 1.0');
-
   CallPrice := TFinanceKit.BlackScholes(
     SPOT_PRICE, STRIKE_PRICE, RISK_FREE_RATE, VOLATILITY, TIME_TO_MATURITY, otCall
   );
@@ -991,8 +933,6 @@ begin
 
   AssertFinanceEquals(10.4506, CallPrice, 'Black-Scholes call option price calculation failed');
   AssertFinanceEquals(5.5735, PutPrice, 'Black-Scholes put option price calculation failed');
-
-  WriteLn('Test 19: Black-Scholes Test: Finished');
 end;
 
 procedure TTestCaseFinance.Test20_RiskMetrics;
@@ -1046,7 +986,6 @@ const
 var
   Leverage: TOperatingLeverage;
 begin
-  WriteLn('Test 22: Operating Leverage Test: Starting with QUANTITY = 10000.0, PRICE_PER_UNIT = 50.0, VARIABLE_COST_PER_UNIT = 30.0, FIXED_COSTS = 100000.0');
   Leverage := TFinanceKit.OperatingLeverage(
     QUANTITY, PRICE_PER_UNIT, VARIABLE_COST_PER_UNIT, FIXED_COSTS
   );
@@ -1054,8 +993,6 @@ begin
   AssertFinanceEquals(2.0000, Leverage.DOL, 'Degree of operating leverage calculation failed');
   AssertFinanceEquals(5000.0, Leverage.BreakEvenPoint, 'Break-even point calculation failed');
   AssertFinanceEquals(2.0000, Leverage.OperatingLeverage, 'Operating leverage calculation failed');
-
-  WriteLn('Test 22: Operating Leverage Test: Finished');
 end;
 
 procedure TTestCaseFinance.Test23_ProfitabilityRatios;

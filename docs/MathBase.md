@@ -6,10 +6,10 @@ Foundation layer for the mathlib-fp monorepo. All other libraries depend on this
 
 | Unit | File |
 |------|------|
-| `MathBase.SharedTypes` | [MathBase.SharedTypes.pas](MathBase.SharedTypes.pas) |
-| `MathBase.MathConstants` | [MathBase.MathConstants.pas](MathBase.MathConstants.pas) |
-| `MathBase.Precision` | [MathBase.Precision.pas](MathBase.Precision.pas) |
-| `MathBase.Trigonometry` | [MathBase.Trigonometry.pas](MathBase.Trigonometry.pas) |
+| `MathBase.SharedTypes` | [MathBase.SharedTypes.pas](../src/MathBase.SharedTypes.pas) |
+| `MathBase.MathConstants` | [MathBase.MathConstants.pas](../src/MathBase.MathConstants.pas) |
+| `MathBase.Precision` | [MathBase.Precision.pas](../src/MathBase.Precision.pas) |
+| `MathBase.Trigonometry` | [MathBase.Trigonometry.pas](../src/MathBase.Trigonometry.pas) |
 
 ---
 

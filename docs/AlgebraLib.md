@@ -8,9 +8,9 @@ Depends on: **MathBase**
 
 | Unit | File | Purpose |
 |------|------|---------|
-| `AlgebraLib.Matrices` | [AlgebraLib.Matrices.pas](AlgebraLib.Matrices.pas) | Core implementation — all logic lives here |
-| `AlgebraLib.Vectors` | [AlgebraLib.Vectors.pas](AlgebraLib.Vectors.pas) | Re-exports vector-oriented type aliases |
-| `AlgebraLib.Determinants` | [AlgebraLib.Determinants.pas](AlgebraLib.Determinants.pas) | Re-exports decomposition type aliases |
+| `AlgebraLib.Matrices` | [AlgebraLib.Matrices.pas](../src/AlgebraLib.Matrices.pas) | Core implementation — all logic lives here |
+| `AlgebraLib.Vectors` | [AlgebraLib.Vectors.pas](../src/AlgebraLib.Vectors.pas) | Re-exports vector-oriented type aliases |
+| `AlgebraLib.Determinants` | [AlgebraLib.Determinants.pas](../src/AlgebraLib.Determinants.pas) | Re-exports decomposition type aliases |
 
 ---
 
@@ -107,7 +107,7 @@ All operations return **new matrices** — existing matrices are never mutated.
 | Method | Parameters | Description |
 |--------|-----------|-------------|
 | `Exp` | — | Matrix exponential e^A via Taylor series (N = 20 terms); square matrices only |
-| `Power` | `exponent: Double` | A^p; integer exponents use repeated multiplication; fractional exponents use SVD |
+| `Power` | `Exponent: Double` | Integer powers use exponentiation by squaring; fractional powers use the symmetric eigendecomposition and require a positive-definite matrix |
 
 ### Matrix Properties (scalar results)
 
@@ -133,7 +133,7 @@ function IsColumnVector: Boolean;
 |--------|---------|-------------|
 | `LU` | `TLUDecomposition` | PA = LU with partial pivoting |
 | `QR` | `TQRDecomposition` | A = QR via Gram-Schmidt |
-| `EigenDecompose` | `TEigenDecomposition` | A = VDV⁻¹ for diagonalisable matrices |
+| `EigenDecomposition` | `TEigenDecomposition` | Real symmetric matrices use Jacobi rotations; real 2×2 nonsymmetric matrices are handled analytically |
 | `SVDecompose` | `TSVD` | A = USVᵀ |
 | `CholeskyDecompose` | `TCholeskyDecomposition` | A = LLᵀ; symmetric positive-definite matrices only |
 
@@ -174,7 +174,9 @@ class function Identity(N: Integer): IMatrix;
 class function Zeros(Rows, Cols: Integer): IMatrix;
 class function CreateFromArray(const Data: TMatrixArray): IMatrix;
 class function Diagonal(const Values: TDoubleArray): IMatrix;
-class function Random(Rows, Cols: Integer): IMatrix;
+class function CreateRandom(Rows, Cols: Integer; Min, Max: Double): IMatrix; overload;
+class function CreateRandom(Rows, Cols: Integer; Min, Max: Double;
+  Seed: LongWord): IMatrix; overload;
 ```
 
 ---
@@ -203,5 +205,7 @@ end.
 
 - **Value semantics** — all operations return new `IMatrix` instances.
 - **Interface-based** — depend on `IMatrix`, not on `TMatrixKit`, for flexibility.
-- **Cache-aware blocking** — matrix multiplication uses cache-aware blocking and parallel workers for larger matrices.
+- **Cache-aware blocking** — matrix multiplication uses cache-aware blocking and bounded parallel workers when the operation count justifies thread startup. Unix callers without an installed thread manager automatically use the serial path.
 - **Numerically stable** — LU uses partial pivoting; tolerances guard against near-zero pivots.
+- **Real eigensystem contract** — the API raises `EMatrixError` for complex spectra, defective matrices, and unsupported nonsymmetric matrices larger than 2×2 instead of returning misleading real approximations.
+- **Reproducible random matrices** — the seeded `CreateRandom` overload uses local state and does not change the process-wide `RandSeed`; the compatibility overload uses caller-managed global state and never calls `Randomize`.

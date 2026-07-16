@@ -894,7 +894,7 @@ begin
   if DF < 1 then raise EProbabilityError.Create('StudentTCDF: DF must be >= 1');
   Nu    := DF;
   { Use the incomplete beta relationship:
-    CDF(x) = I_{t}(DF/2, 1/2)/2  where t = DF/(DF+x²), adjusted for sign }
+    CDF(x) = I_t(DF/2, 1/2)/2 where t = DF/(DF+x²), adjusted for sign }
   BetaX := Nu / (Nu + X * X);
   if X >= 0 then
     Result := RoundResult(1.0 - 0.5 * BetaInc(Nu / 2, 0.5, BetaX), ADecimals)
@@ -960,7 +960,7 @@ begin
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   D1 := DF1;
   D2 := DF2;
-  { CDF = I_{t}(d1/2, d2/2)  where t = d1*x / (d1*x + d2) }
+  { CDF = I_t(d1/2, d2/2) where t = d1*x / (d1*x + d2) }
   T      := D1 * X / (D1 * X + D2);
   Result := RoundResult(BetaInc(D1 / 2, D2 / 2, T), ADecimals);
 end;
@@ -1108,7 +1108,7 @@ begin
   if (P < 0) or (P > 1) then raise EProbabilityError.Create('BinomialCDF: P must be in [0,1]');
   if K < 0 then Exit(RoundResult(0, ADecimals));
   if K >= N then Exit(RoundResult(1, ADecimals));
-  { CDF = I_{1-p}(n-k, k+1) via incomplete beta; or sum for small N }
+  { CDF = I_(1-p)(n-k, k+1) via incomplete beta; or sum for small N }
   if N <= 1000 then
   begin
     Sum := 0;
@@ -1118,7 +1118,7 @@ begin
   end
   else
     { For large N use the incomplete beta relationship:
-      CDF(k; n, p) = I_{1-p}(n-k, k+1) }
+      CDF(k; n, p) = I_(1-p)(n-k, k+1) }
     Result := RoundResult(BetaInc(N - K, K + 1, 1 - P), ADecimals);
 end;
 

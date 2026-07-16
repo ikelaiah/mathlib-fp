@@ -8,9 +8,9 @@ Depends on: **MathBase**
 
 | Unit | File | Purpose |
 |------|------|---------|
-| `FinanceLib.Interest` | [FinanceLib.Interest.pas](FinanceLib.Interest.pas) | Core implementation — all logic lives here (`TFinanceKit`) |
-| `FinanceLib.Bonds` | [FinanceLib.Bonds.pas](FinanceLib.Bonds.pas) | Re-exports bond-oriented aliases (`TBondKit`, `EBondError`) |
-| `FinanceLib.NPV` | [FinanceLib.NPV.pas](FinanceLib.NPV.pas) | Re-exports NPV/capital-budgeting aliases (`TNPVKit`, `ENPVError`) |
+| `FinanceLib.Interest` | [FinanceLib.Interest.pas](../src/FinanceLib.Interest.pas) | Core implementation — all logic lives here (`TFinanceKit`) |
+| `FinanceLib.Bonds` | [FinanceLib.Bonds.pas](../src/FinanceLib.Bonds.pas) | Re-exports bond-oriented aliases (`TBondKit`, `EBondError`) |
+| `FinanceLib.NPV` | [FinanceLib.NPV.pas](../src/FinanceLib.NPV.pas) | Re-exports NPV/capital-budgeting aliases (`TNPVKit`, `ENPVError`) |
 
 ---
 

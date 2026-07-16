@@ -55,15 +55,19 @@ type
     procedure Test38_PowerMethod;
     procedure Test39_SolveIterative;
     procedure Test40_SparseMatrix;
+    procedure Test41_RandomMatrixSeeding;
   end;
 
 implementation
+
+var
+  VerboseTests: Boolean;
 
 procedure TMatrixTest.Test01_CreateFromArray;
 var
   M: IMatrix;
 begin
-  WriteLn('Starting Test01_CreateFromArray');
+  if VerboseTests then WriteLn('Starting Test01_CreateFromArray');
   
   M := TMatrixKit.CreateFromArray([
     [1.0, 2.0, 3.0],
@@ -77,14 +81,14 @@ begin
   AssertEquals('Value at [1,1]', 5.0, M.GetValue(1, 1));
   AssertEquals('Value at [2,2]', 9.0, M.GetValue(2, 2));
   
-  WriteLn('Finished Test01_CreateFromArray');
+  if VerboseTests then WriteLn('Finished Test01_CreateFromArray');
 end;
 
 procedure TMatrixTest.Test02_Identity;
 var
   M: IMatrix;
 begin
-  WriteLn('Starting Test02_Identity');
+  if VerboseTests then WriteLn('Starting Test02_Identity');
   
   M := TMatrixKit.Identity(3);
   
@@ -95,14 +99,14 @@ begin
   AssertEquals('Off-diagonal element [0,1]', 0.0, M.GetValue(0, 1));
   AssertEquals('Off-diagonal element [1,0]', 0.0, M.GetValue(1, 0));
   
-  WriteLn('Finished Test02_Identity');
+  if VerboseTests then WriteLn('Finished Test02_Identity');
 end;
 
 procedure TMatrixTest.Test03_Zeros;
 var
   M: IMatrix;
 begin
-  WriteLn('Starting Test03_Zeros');
+  if VerboseTests then WriteLn('Starting Test03_Zeros');
   
   M := TMatrixKit.Zeros(2, 3);
   
@@ -111,14 +115,14 @@ begin
   AssertEquals('Element [0,0]', 0.0, M.GetValue(0, 0));
   AssertEquals('Element [1,2]', 0.0, M.GetValue(1, 2));
   
-  WriteLn('Finished Test03_Zeros');
+  if VerboseTests then WriteLn('Finished Test03_Zeros');
 end;
 
 procedure TMatrixTest.Test04_Ones;
 var
   M: IMatrix;
 begin
-  WriteLn('Starting Test04_Ones');
+  if VerboseTests then WriteLn('Starting Test04_Ones');
 
   M := TMatrixKit.Ones(2, 3);
   
@@ -127,14 +131,14 @@ begin
   AssertEquals('Element [0,0]', 1.0, M.Values[0, 0]);
   AssertEquals('Element [1,2]', 1.0, M.Values[1, 2]);
 
-  WriteLn('Finished Test04_Ones');  
+  if VerboseTests then WriteLn('Finished Test04_Ones');
 end;
 
 procedure TMatrixTest.Test05_Add;
 var
   A, B, C: IMatrix;
 begin
-  WriteLn('Starting Test05_Add');
+  if VerboseTests then WriteLn('Starting Test05_Add');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -153,14 +157,14 @@ begin
   AssertEquals('Sum [1,0]', 10.0, C.Values[1, 0]);
   AssertEquals('Sum [1,1]', 12.0, C.Values[1, 1]);
 
-  WriteLn('Finished Test05_Add');
+  if VerboseTests then WriteLn('Finished Test05_Add');
 end;
 
 procedure TMatrixTest.Test06_Subtract;
 var
   A, B, C: IMatrix;
 begin
-  WriteLn('Starting Test06_Subtract');
+  if VerboseTests then WriteLn('Starting Test06_Subtract');
 
   A := TMatrixKit.CreateFromArray([
     [5.0, 6.0],
@@ -179,14 +183,15 @@ begin
   AssertEquals('Difference [1,0]', 4.0, C.Values[1, 0]);
   AssertEquals('Difference [1,1]', 4.0, C.Values[1, 1]);
 
-  WriteLn('Finished Test06_Subtract');
+  if VerboseTests then WriteLn('Finished Test06_Subtract');
 end;
 
 procedure TMatrixTest.Test07_Multiply;
 var
   A, B, C: IMatrix;
+  I, J: Integer;
 begin
-  WriteLn('Starting Test07_Multiply');
+  if VerboseTests then WriteLn('Starting Test07_Multiply');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -205,14 +210,23 @@ begin
   AssertEquals('Product [1,0]', 43.0, C.Values[1, 0]);
   AssertEquals('Product [1,1]', 50.0, C.Values[1, 1]);
 
-  WriteLn('Finished Test07_Multiply');
+  // Exercise the operation-count threshold and parallel worker path on
+  // platforms with an available thread manager.
+  A := TMatrixKit.Identity(64);
+  B := TMatrixKit.Ones(64, 64);
+  C := A.Multiply(B);
+  for I := 0 to 63 do
+    for J := 0 to 63 do
+      AssertEquals('64x64 identity product', 1.0, C.Values[I, J]);
+
+  if VerboseTests then WriteLn('Finished Test07_Multiply');
 end;
 
 procedure TMatrixTest.Test08_ScalarMultiply;
 var
   A, B: IMatrix;
 begin
-  WriteLn('Starting Test08_ScalarMultiply');
+  if VerboseTests then WriteLn('Starting Test08_ScalarMultiply');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -226,14 +240,14 @@ begin
   AssertEquals('Scaled [1,0]', 6.0, B.Values[1, 0]);
   AssertEquals('Scaled [1,1]', 8.0, B.Values[1, 1]);
 
-  WriteLn('Finished Test08_ScalarMultiply');
+  if VerboseTests then WriteLn('Finished Test08_ScalarMultiply');
 end;
 
 procedure TMatrixTest.Test09_Transpose;
 var
   A, B: IMatrix;
 begin
-  WriteLn('Starting Test09_Transpose');
+  if VerboseTests then WriteLn('Starting Test09_Transpose');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0, 3.0],
@@ -251,14 +265,14 @@ begin
   AssertEquals('Transposed [1,1]', 5.0, B.Values[1, 1]);
   AssertEquals('Transposed [2,1]', 6.0, B.Values[2, 1]);
 
-  WriteLn('Finished Test09_Transpose');
+  if VerboseTests then WriteLn('Finished Test09_Transpose');
 end;
 
 procedure TMatrixTest.Test10_Determinant;
 var
   A: IMatrix;
 begin
-  WriteLn('Starting Test10_Determinant');
+  if VerboseTests then WriteLn('Starting Test10_Determinant');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -267,14 +281,14 @@ begin
   
   AssertEquals('Determinant', -2.0, A.Determinant);
 
-  WriteLn('Finished Test10_Determinant');
+  if VerboseTests then WriteLn('Finished Test10_Determinant');
 end;
 
 procedure TMatrixTest.Test11_Trace;
 var
   A: IMatrix;
 begin
-  WriteLn('Starting Test11_Trace');
+  if VerboseTests then WriteLn('Starting Test11_Trace');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -283,14 +297,14 @@ begin
   
   AssertEquals('Trace', 5.0, A.Trace);
 
-  WriteLn('Finished Test11_Trace');
+  if VerboseTests then WriteLn('Finished Test11_Trace');
 end;
 
 procedure TMatrixTest.Test12_Rank;
 var
   A: IMatrix;
 begin
-  WriteLn('Starting Test12_Rank');
+  if VerboseTests then WriteLn('Starting Test12_Rank');
 
   // Full rank matrix
   A := TMatrixKit.CreateFromArray([
@@ -316,7 +330,7 @@ begin
   ]);
   AssertEquals('Rank 1 matrix', 1, A.Rank);
 
-  WriteLn('Finished Test12_Rank');
+  if VerboseTests then WriteLn('Finished Test12_Rank');
 end;
 
 procedure TMatrixTest.Test13_Inverse;
@@ -325,7 +339,7 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test13_Inverse');
+  if VerboseTests then WriteLn('Starting Test13_Inverse');
 
   A := TMatrixKit.CreateFromArray([
     [4.0, 7.0],
@@ -343,7 +357,7 @@ begin
       else
         AssertTrue('Identity off-diagonal element', Abs(C.Values[I, J]) < Tolerance);
 
-  WriteLn('Finished Test13_Inverse');
+  if VerboseTests then WriteLn('Finished Test13_Inverse');
 end;
 
 procedure TMatrixTest.Test14_LUDecomposition;
@@ -354,7 +368,7 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test14_LUDecomposition');
+  if VerboseTests then WriteLn('Starting Test14_LUDecomposition');
 
   A := TMatrixKit.CreateFromArray([
     [4.0, 3.0],
@@ -376,7 +390,7 @@ begin
       AssertTrue('LU product matches original', 
         Abs(Product.Values[I, J] - Original.Values[I, J]) < Tolerance);
 
-  WriteLn('Finished Test14_LUDecomposition');
+  if VerboseTests then WriteLn('Finished Test14_LUDecomposition');
 end;
 
 procedure TMatrixTest.Test15_QRDecomposition;
@@ -387,7 +401,7 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test15_QRDecomposition');
+  if VerboseTests then WriteLn('Starting Test15_QRDecomposition');
 
     A := TMatrixKit.CreateFromArray([
     [12.0, -51.0],
@@ -417,40 +431,52 @@ end;
 
 procedure TMatrixTest.Test16_EigenDecomposition;
 var
-  A: IMatrix;
+  A, AV: IMatrix;
   Eigen: TEigenDecomposition;
   Tolerance: Double;
+  I, J: Integer;
 begin
-  WriteLn('Starting Test16_EigenDecomposition');
+  if VerboseTests then WriteLn('Starting Test16_EigenDecomposition');
 
   A := TMatrixKit.CreateFromArray([
-    [3.0, -2.0],
-    [1.0, 4.0]
+    [4.0, 1.0],
+    [1.0, 3.0]
   ]);
-  
+
   Eigen := A.EigenDecomposition;
-  Tolerance := 1E-6;  // Larger tolerance due to iterative nature
-  
-  // Sort eigenvalues for consistent testing
-  if Eigen.EigenValues[0] > Eigen.EigenValues[1] then
-  begin
-    AssertTrue('Larger eigenvalue', Abs(Eigen.EigenValues[0] - 5.0) < Tolerance);
-    AssertTrue('Smaller eigenvalue', Abs(Eigen.EigenValues[1] - 2.0) < Tolerance);
-  end
-  else
-  begin
-    AssertTrue('Larger eigenvalue', Abs(Eigen.EigenValues[1] - 5.0) < Tolerance);
-    AssertTrue('Smaller eigenvalue', Abs(Eigen.EigenValues[0] - 2.0) < Tolerance);
+  Tolerance := 1E-9;
+  AssertTrue('Larger eigenvalue',
+    Abs(Eigen.EigenValues[0] - (7.0 + Sqrt(5.0)) / 2.0) < Tolerance);
+  AssertTrue('Smaller eigenvalue',
+    Abs(Eigen.EigenValues[1] - (7.0 - Sqrt(5.0)) / 2.0) < Tolerance);
+
+  AV := A.Multiply(Eigen.EigenVectors);
+  for I := 0 to 1 do
+    for J := 0 to 1 do
+      AssertTrue('Eigenpair residual',
+        Abs(AV.GetValue(I, J) - Eigen.EigenValues[J] *
+          Eigen.EigenVectors.GetValue(I, J)) < Tolerance);
+
+  A := TMatrixKit.CreateFromArray([
+    [0.0, -1.0],
+    [1.0, 0.0]
+  ]);
+  try
+    Eigen := A.EigenDecomposition;
+    Fail('Complex eigenvalues must be rejected by the real-valued API');
+  except
+    on E: EMatrixError do
+      AssertTrue('Complex-spectrum error message', Pos('complex', LowerCase(E.Message)) > 0);
   end;
 
-  WriteLn('Finished Test16_EigenDecomposition');
+  if VerboseTests then WriteLn('Finished Test16_EigenDecomposition');
 end;
 
 procedure TMatrixTest.Test17_SingularMatrix;
 var
   A: IMatrix;
 begin
-  WriteLn('Starting Test17_SingularMatrix');
+  if VerboseTests then WriteLn('Starting Test17_SingularMatrix');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 1.0],
@@ -473,7 +499,7 @@ begin
       ; // Expected exception
   end;
 
-  WriteLn('Finished Test17_SingularMatrix');
+  if VerboseTests then WriteLn('Finished Test17_SingularMatrix');
 end;
 
 procedure TMatrixTest.Test18_ToString;
@@ -481,7 +507,7 @@ var
   M: IMatrix;
   Expected, Actual: string;
 begin
-  WriteLn('Starting Test18_ToString');
+  if VerboseTests then WriteLn('Starting Test18_ToString');
 
   M := TMatrixKit.CreateFromArray([
     [1.0, -2.5],
@@ -495,7 +521,7 @@ begin
   Actual := M.ToString;
   AssertEquals('Matrix string representation', Expected, Actual);
 
-  WriteLn('Finished Test18_ToString');
+  if VerboseTests then WriteLn('Finished Test18_ToString');
 end;
 
 procedure TMatrixTest.Test19_MatrixNorms;
@@ -503,7 +529,7 @@ var
   M: IMatrix;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test19_MatrixNorms');
+  if VerboseTests then WriteLn('Starting Test19_MatrixNorms');
 
   M := TMatrixKit.CreateFromArray([
     [1.0, -2.0],
@@ -531,7 +557,7 @@ begin
   AssertTrue('Matrix Frobenius norm', 
     Abs(M.NormFrobenius - Sqrt(30)) < Tolerance);
 
-  WriteLn('Finished Test19_MatrixNorms');
+  if VerboseTests then WriteLn('Finished Test19_MatrixNorms');
 end;
 
 procedure TMatrixTest.Test20_SpecialMatrices;
@@ -539,11 +565,11 @@ var
   M: IMatrix;
   Diagonal: array[0..2] of Double;
 begin
-  WriteLn('Starting Test20_SpecialMatrices');
+  if VerboseTests then WriteLn('Starting Test20_SpecialMatrices');
 
   // Test band matrix
   M := TMatrixKit.CreateBandMatrix(3, 1, 1);
-  WriteLn('Band matrix size', M.ToString);
+  if VerboseTests then WriteLn('Band matrix size', M.ToString);
 
   AssertEquals('Band matrix size', 3, M.Rows);
   AssertEquals('Band matrix [0,0]', 1.0, M.Values[0, 0]);
@@ -575,14 +601,14 @@ begin
   AssertEquals('Random matrix size', 2, M.Rows);
   AssertTrue('Random matrix range', (M.Values[0, 0] >= 0.0) and (M.Values[0, 0] <= 1.0));
 
-  WriteLn('Finished Test20_SpecialMatrices');
+  if VerboseTests then WriteLn('Finished Test20_SpecialMatrices');
 end;
 
 procedure TMatrixTest.Test21_MatrixProperties;
 var
   M: IMatrix;
 begin
-  WriteLn('Starting Test21_MatrixProperties');
+  if VerboseTests then WriteLn('Starting Test21_MatrixProperties');
 
   // Test symmetric property
   M := TMatrixKit.CreateSymmetric([
@@ -615,14 +641,14 @@ begin
   AssertTrue('IsTriangular upper true case', M.IsTriangular(True));
   AssertFalse('IsTriangular lower false case', M.IsTriangular(False));
 
-  WriteLn('Finished Test21_MatrixProperties');
+  if VerboseTests then WriteLn('Finished Test21_MatrixProperties');
 end;
 
 procedure TMatrixTest.Test22_BlockOperations;
 var
   M, Sub: IMatrix;
 begin
-  WriteLn('Starting Test22_BlockOperations');
+  if VerboseTests then WriteLn('Starting Test22_BlockOperations');
 
   M := TMatrixKit.CreateFromArray([
     [1.0, 2.0, 3.0],
@@ -645,14 +671,14 @@ begin
   AssertEquals('SetSubMatrix [0,0]', 10.0, M.Values[0, 0]);
   AssertEquals('SetSubMatrix [1,1]', 13.0, M.Values[1, 1]);
 
-  WriteLn('Finished Test22_BlockOperations');
+  if VerboseTests then WriteLn('Finished Test22_BlockOperations');
 end;
 
 procedure TMatrixTest.Test23_ElementWiseOperations;
 var
   A, B, C: IMatrix;
 begin
-  WriteLn('Starting Test23_ElementWiseOperations'); 
+  if VerboseTests then WriteLn('Starting Test23_ElementWiseOperations');
 
   A := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -674,7 +700,7 @@ begin
   AssertEquals('ElementWiseDivide [0,0]', 0.5, C.Values[0, 0]);
   AssertEquals('ElementWiseDivide [1,1]', 0.8, C.Values[1, 1]);
 
-  WriteLn('Finished Test23_ElementWiseOperations'); 
+  if VerboseTests then WriteLn('Finished Test23_ElementWiseOperations');
 end;
 
 procedure TMatrixTest.Test24_EdgeCases;
@@ -682,7 +708,7 @@ var
   M: IMatrix;
   LargeSize: Integer;
 begin
-  WriteLn('Starting Test24_EdgeCases');
+  if VerboseTests then WriteLn('Starting Test24_EdgeCases');
 
   // Test 1x1 matrix
   M := TMatrixKit.CreateFromArray([[42.0]]);
@@ -709,14 +735,14 @@ begin
   AssertTrue('Extreme min value within tolerance', 
     Abs(M.Values[1, 1] - (-1.0E10)) < 1.0E-6);
 
-  WriteLn('Finished Test24_EdgeCases');
+  if VerboseTests then WriteLn('Finished Test24_EdgeCases');
 end;
 
 procedure TMatrixTest.Test25_ErrorConditions;
 var
   M, Other: IMatrix;
 begin
-  WriteLn('Starting Test25_ErrorConditions');
+  if VerboseTests then WriteLn('Starting Test25_ErrorConditions');
 
   M := TMatrixKit.CreateFromArray([
     [1.0, 2.0],
@@ -766,7 +792,7 @@ begin
       ; // Expected exception
   end;
 
-  WriteLn('Finished Test25_ErrorConditions');
+  if VerboseTests then WriteLn('Finished Test25_ErrorConditions');
 end;
 
 procedure TMatrixTest.Test26_AdditionalProperties;
@@ -774,7 +800,7 @@ var
   M: IMatrix;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test26_AdditionalProperties');
+  if VerboseTests then WriteLn('Starting Test26_AdditionalProperties');
 
   Tolerance := 1E-12;
   
@@ -814,7 +840,7 @@ begin
   ]);
   AssertFalse('Should not be orthogonal', M.IsOrthogonal);
 
-  WriteLn('Finished Test26_AdditionalProperties');
+  if VerboseTests then WriteLn('Finished Test26_AdditionalProperties');
 end;
 
 procedure TMatrixTest.Test27_SVD;
@@ -824,7 +850,7 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test27_SVD');
+  if VerboseTests then WriteLn('Starting Test27_SVD');
   
   // Test with a simple 2x2 matrix
   M := TMatrixKit.CreateFromArray([
@@ -877,7 +903,7 @@ begin
       AssertTrue('SVD product equals original', 
         Abs(Product.GetValue(I, J) - M.GetValue(I, J)) < Tolerance);
         
-  WriteLn('Finished Test27_SVD');
+  if VerboseTests then WriteLn('Finished Test27_SVD');
 end;
 
 procedure TMatrixTest.Test28_Cholesky;
@@ -887,7 +913,7 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test28_Cholesky');
+  if VerboseTests then WriteLn('Starting Test28_Cholesky');
   
   // Test with a positive definite matrix
   M := TMatrixKit.CreateFromArray([
@@ -895,11 +921,11 @@ begin
     [1.0, 5.0]
   ]);
   
-  WriteLn('Created matrix for Cholesky test');
+  if VerboseTests then WriteLn('Created matrix for Cholesky test');
   
   Chol := M.Cholesky;
   
-  WriteLn('Computed Cholesky decomposition');
+  if VerboseTests then WriteLn('Computed Cholesky decomposition');
   
   L := Chol.L;
   
@@ -919,7 +945,7 @@ begin
       AssertTrue('Cholesky product equals original', 
         Abs(Product.Values[I, J] - M.Values[I, J]) < Tolerance);
         
-  WriteLn('Finished Test28_Cholesky');
+  if VerboseTests then WriteLn('Finished Test28_Cholesky');
 end;
 
 procedure TMatrixTest.Test29_PseudoInverse;
@@ -928,35 +954,35 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test29_PseudoInverse');
+  if VerboseTests then WriteLn('Starting Test29_PseudoInverse');
   
   // Only test with a square matrix to avoid hanging
-  WriteLn('Creating square matrix for PseudoInverse test');
+  if VerboseTests then WriteLn('Creating square matrix for PseudoInverse test');
   M := TMatrixKit.CreateFromArray([
     [4.0, 7.0],
     [2.0, 6.0]
   ]);
   
-  WriteLn('Computing PseudoInverse');
+  if VerboseTests then WriteLn('Computing PseudoInverse');
   PInv := M.PseudoInverse;
   
-  WriteLn('Checking dimensions');
+  if VerboseTests then WriteLn('Checking dimensions');
   // Check dimensions
   AssertEquals('PInv rows', 2, PInv.Rows);
   AssertEquals('PInv cols', 2, PInv.Cols);
   
-  WriteLn('Checking M * M^+ * M = M property');
+  if VerboseTests then WriteLn('Checking M * M^+ * M = M property');
   // Check if M * M^+ * M = M
   Product := M.Multiply(PInv).Multiply(M);
   Tolerance := 1E-6;
   
-  WriteLn('Verifying results');
+  if VerboseTests then WriteLn('Verifying results');
   for I := 0 to 1 do
     for J := 0 to 1 do
       AssertTrue('Pseudoinverse property 1', 
         Abs(Product.GetValue(I, J) - M.GetValue(I, J)) < Tolerance);
         
-  WriteLn('Finished Test29_PseudoInverse');
+  if VerboseTests then WriteLn('Finished Test29_PseudoInverse');
 end;
 
 procedure TMatrixTest.Test30_MatrixFunctions;
@@ -965,19 +991,19 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test30_MatrixFunctions');
+  if VerboseTests then WriteLn('Starting Test30_MatrixFunctions');
   
   // Test matrix exponential
-  WriteLn('Creating matrix for exponential test');
+  if VerboseTests then WriteLn('Creating matrix for exponential test');
   M := TMatrixKit.CreateFromArray([
     [0.0, 1.0],
     [-1.0, 0.0]
   ]);
   
-  WriteLn('Computing matrix exponential');
+  if VerboseTests then WriteLn('Computing matrix exponential');
   ExpM := M.Exp;
   
-  WriteLn('Checking exponential results');
+  if VerboseTests then WriteLn('Checking exponential results');
   // For this specific matrix, e^M should approximate cos(1) and sin(1)
   Tolerance := 1E-2;  // Larger tolerance due to series approximation
   AssertTrue('Exp[0,0] ≈ cos(1)', Abs(ExpM.GetValue(0, 0) - Cos(1.0)) < Tolerance);
@@ -985,14 +1011,14 @@ begin
   AssertTrue('Exp[1,0] ≈ -sin(1)', Abs(ExpM.GetValue(1, 0) - (-Sin(1.0))) < Tolerance);
   AssertTrue('Exp[1,1] ≈ cos(1)', Abs(ExpM.GetValue(1, 1) - Cos(1.0)) < Tolerance);
   
-  WriteLn('Testing matrix power');
+  if VerboseTests then WriteLn('Testing matrix power');
   // Test matrix power
   M := TMatrixKit.CreateFromArray([
     [2.0, 1.0],
     [1.0, 3.0]
   ]);
   
-  WriteLn('Computing integer power');
+  if VerboseTests then WriteLn('Computing integer power');
   // Test integer power
   PowerM := M.Power(2.0);
   Product := M.Multiply(M);
@@ -1003,16 +1029,14 @@ begin
       AssertTrue('Integer power', 
         Abs(PowerM.GetValue(I, J) - Product.GetValue(I, J)) < Tolerance);
   
-  WriteLn('Skipping fractional power test due to implementation issues');
-  // The fractional power (matrix square root) test is skipped because the implementation
-  // appears to have significant issues, producing results far from expected values.
-  // For example, the test matrix:
-  //   [2.0, 1.0]
-  //   [1.0, 3.0]
-  // When computing M^0.5 and then squaring the result, should approximate the original M.
-  // However, the current implementation produces negative values where positive ones are expected.
+  PowerM := M.Power(0.5);
+  Product := PowerM.Multiply(PowerM);
+  for I := 0 to 1 do
+    for J := 0 to 1 do
+      AssertTrue('SPD square-root reconstruction',
+        Abs(Product.GetValue(I, J) - M.GetValue(I, J)) < Tolerance);
   
-  WriteLn('Finished Test30_MatrixFunctions');
+  if VerboseTests then WriteLn('Finished Test30_MatrixFunctions');
 end;
 
 procedure TMatrixTest.Test31_VectorOperations;
@@ -1021,7 +1045,7 @@ var
   DotProduct: Double;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test31_VectorOperations');
+  if VerboseTests then WriteLn('Starting Test31_VectorOperations');
   
   // Test vector operations
   V1 := TMatrixKit.CreateFromArray([[1.0], [2.0], [3.0]]);  // Column vector
@@ -1052,7 +1076,7 @@ begin
   AssertTrue('Normalize [0]', Abs(Result.GetValue(0, 0) - 0.6) < Tolerance);
   AssertTrue('Normalize [1]', Abs(Result.GetValue(1, 0) - 0.8) < Tolerance);
   
-  WriteLn('Finished Test31_VectorOperations');
+  if VerboseTests then WriteLn('Finished Test31_VectorOperations');
 end;
 
 procedure TMatrixTest.Test32_StatisticalOperations;
@@ -1060,7 +1084,7 @@ var
   M, Result: IMatrix;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test32_StatisticalOperations');
+  if VerboseTests then WriteLn('Starting Test32_StatisticalOperations');
   
   // Test statistical operations
   M := TMatrixKit.CreateFromArray([
@@ -1093,7 +1117,7 @@ begin
   AssertEquals('Correlation rows', M.Cols, Result.Rows);
   AssertEquals('Correlation cols', M.Cols, Result.Cols);
   
-  WriteLn('Finished Test32_StatisticalOperations');
+  if VerboseTests then WriteLn('Finished Test32_StatisticalOperations');
 end;
 
 procedure TMatrixTest.Test33_AdvancedMatrixCreation;
@@ -1148,10 +1172,10 @@ var
   EigenP: TEigenpair;
   S: String;
 begin
-  WriteLn('Starting Test34_ToStringMethods');
+  if VerboseTests then WriteLn('Starting Test34_ToStringMethods');
   
   // Test TEigenpair.ToString
-  WriteLn('Testing TEigenpair.ToString');
+  if VerboseTests then WriteLn('Testing TEigenpair.ToString');
   EigenP.EigenValue := 3.14;
   EigenP.EigenVector := TMatrixKit.CreateFromArray([[1.0], [2.0], [3.0]]);
   S := EigenP.ToString;
@@ -1159,7 +1183,7 @@ begin
   AssertTrue('TEigenpair.ToString contains vector part', Pos('EigenVector', S) > 0);
   
   // Test TLUDecomposition.ToString
-  WriteLn('Testing TLUDecomposition.ToString');
+  if VerboseTests then WriteLn('Testing TLUDecomposition.ToString');
   A := TMatrixKit.CreateFromArray([
     [4.0, 3.0],
     [6.0, 3.0]
@@ -1171,7 +1195,7 @@ begin
   AssertTrue('TLUDecomposition.ToString contains P', Pos('P =', S) > 0);
   
   // Test TQRDecomposition.ToString
-  WriteLn('Testing TQRDecomposition.ToString');
+  if VerboseTests then WriteLn('Testing TQRDecomposition.ToString');
   A := TMatrixKit.CreateFromArray([
     [12.0, -51.0],
     [6.0, 167.0],
@@ -1183,7 +1207,7 @@ begin
   AssertTrue('TQRDecomposition.ToString contains R', Pos('R =', S) > 0);
   
   // Test TEigenDecomposition.ToString
-  WriteLn('Testing TEigenDecomposition.ToString');
+  if VerboseTests then WriteLn('Testing TEigenDecomposition.ToString');
   // Use a simple symmetric matrix for well-defined eigenvalues
   A := TMatrixKit.CreateFromArray([
     [2.0, 1.0],
@@ -1195,7 +1219,7 @@ begin
   AssertTrue('TEigenDecomposition.ToString contains EigenVectors', Pos('EigenVectors', S) > 0);
   
   // Test TSVD.ToString - MODIFIED TO BE MORE ROBUST
-  WriteLn('Testing TSVD.ToString - using dummy values');
+  if VerboseTests then WriteLn('Testing TSVD.ToString - using dummy values');
   // Instead of calculating SVD which may be slow/problematic, create a dummy TSVD
   SVDDec.U := TMatrixKit.Identity(2);
   SVDDec.S := TMatrixKit.Identity(2);
@@ -1206,7 +1230,7 @@ begin
   AssertTrue('TSVD.ToString contains V', Pos('V =', S) > 0);
   
   // Test TCholeskyDecomposition.ToString
-  WriteLn('Testing TCholeskyDecomposition.ToString');
+  if VerboseTests then WriteLn('Testing TCholeskyDecomposition.ToString');
   A := TMatrixKit.CreateFromArray([
     [4.0, 1.0],
     [1.0, 5.0]
@@ -1215,7 +1239,7 @@ begin
   S := CholDec.ToString;
   AssertTrue('TCholeskyDecomposition.ToString contains L', Pos('L =', S) > 0);
   
-  WriteLn('Finished Test34_ToStringMethods');
+  if VerboseTests then WriteLn('Finished Test34_ToStringMethods');
 end;
 
 procedure TMatrixTest.Test35_DecompositionsLarge;
@@ -1228,10 +1252,10 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test35_DecompositionsLarge');
+  if VerboseTests then WriteLn('Starting Test35_DecompositionsLarge');
   
   // Create a 4x4 matrix for testing decompositions
-  WriteLn('Creating 4x4 matrix');
+  if VerboseTests then WriteLn('Creating 4x4 matrix');
   A := TMatrixKit.CreateFromArray([
     [5.0, 1.0, 2.0, 1.0],
     [1.0, 4.0, 0.0, 1.0],
@@ -1247,7 +1271,7 @@ begin
   // ---------------------------------------------------------
   // 1. Test LU Decomposition with 4x4 matrix
   // ---------------------------------------------------------
-  WriteLn('Testing LU Decomposition on 4x4 matrix');
+  if VerboseTests then WriteLn('Testing LU Decomposition on 4x4 matrix');
   LU := A.LU;
   
   // Check dimensions
@@ -1283,7 +1307,7 @@ begin
   // ---------------------------------------------------------
   // 2. Test QR Decomposition with 4x4 matrix
   // ---------------------------------------------------------
-  WriteLn('Testing QR Decomposition on 4x4 matrix');
+  if VerboseTests then WriteLn('Testing QR Decomposition on 4x4 matrix');
   QR := A.QR;
   
   // Check dimensions
@@ -1316,11 +1340,11 @@ begin
   // ---------------------------------------------------------
   // 3. Test SVD Decomposition with 4x4 matrix 
   // ---------------------------------------------------------
-  WriteLn('Testing SVD Decomposition on 4x4 matrix');
+  if VerboseTests then WriteLn('Testing SVD Decomposition on 4x4 matrix');
   
   // Use a simpler, more predictable matrix for SVD testing
   // This is a symmetric matrix which has better convergence properties for SVD
-  WriteLn('Using a specialized matrix for SVD that has better convergence properties');
+  if VerboseTests then WriteLn('Using a specialized matrix for SVD that has better convergence properties');
   M := TMatrixKit.CreateFromArray([
     [4.0, 0.0, 0.0, 0.0],
     [0.0, 3.0, 0.0, 0.0],
@@ -1328,10 +1352,10 @@ begin
     [0.0, 0.0, 0.0, 1.0]
   ]);
   
-  WriteLn('Computing SVD for diagonal 4x4 matrix (should be faster than arbitrary 4x4)');
+  if VerboseTests then WriteLn('Computing SVD for diagonal 4x4 matrix (should be faster than arbitrary 4x4)');
   SVD := M.SVD;
   
-  WriteLn('Performing basic validation of SVD results');
+  if VerboseTests then WriteLn('Performing basic validation of SVD results');
   
   // Check dimensions
   AssertEquals('SVD.U rows', 4, SVD.U.Rows);
@@ -1352,91 +1376,91 @@ begin
     end;
   
   // Debug output for U matrix
-  WriteLn('U matrix after normalization:');
+  if VerboseTests then WriteLn('U matrix after normalization:');
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [SVD.U.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [SVD.U.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Debug output for S matrix
-  WriteLn('S matrix:');
+  if VerboseTests then WriteLn('S matrix:');
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [SVD.S.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [SVD.S.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Debug output for V matrix after normalization
-  WriteLn('V matrix after normalization:');
+  if VerboseTests then WriteLn('V matrix after normalization:');
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [SVD.V.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [SVD.V.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Check if U is orthogonal (U^T * U = I)
-  WriteLn('Checking if U is orthogonal...');
+  if VerboseTests then WriteLn('Checking if U is orthogonal...');
   Product := SVD.U.Transpose.Multiply(SVD.U);
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [Product.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [Product.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Check if V is orthogonal (V^T * V = I)
-  WriteLn('Checking if V is orthogonal...');
+  if VerboseTests then WriteLn('Checking if V is orthogonal...');
   Product := SVD.V.Transpose.Multiply(SVD.V);
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [Product.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [Product.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Now calculate U*S
-  WriteLn('Calculating U*S...');
+  if VerboseTests then WriteLn('Calculating U*S...');
   Product := SVD.U.Multiply(SVD.S);
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [Product.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [Product.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Finally calculate (U*S)*V^T
-  WriteLn('Calculating final product (U*S)*V^T...');
+  if VerboseTests then WriteLn('Calculating final product (U*S)*V^T...');
   Product := Product.Multiply(SVD.V.Transpose);
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [Product.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [Product.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Original matrix for comparison
-  WriteLn('Original matrix:');
+  if VerboseTests then WriteLn('Original matrix:');
   for I := 0 to 3 do
   begin
-    Write('|');
+    if VerboseTests then Write('|');
     for J := 0 to 3 do
-      Write(Format(' %8.4f', [M.GetValue(I, J)]));
-    WriteLn(' |');
+      if VerboseTests then Write(Format(' %8.4f', [M.GetValue(I, J)]));
+    if VerboseTests then WriteLn(' |');
   end;
   
   // Check singular values with relaxed tolerance
-  WriteLn('Checking singular values...');
+  if VerboseTests then WriteLn('Checking singular values...');
   AssertTrue('First singular value should be 4.0', 
     Abs(SVD.S.GetValue(0, 0) - 4.0) < 1E-4);
   AssertTrue('Second singular value should be 3.0', 
@@ -1453,10 +1477,10 @@ begin
   // Final product validation
   Product := SVD.U.Multiply(SVD.S).Multiply(SVD.V.Transpose);
   
-  WriteLn('DEBUGGING SVD RESULTS:');
+  if VerboseTests then WriteLn('DEBUGGING SVD RESULTS:');
   for I := 0 to 3 do
     for J := 0 to 3 do
-      WriteLn(Format('Product[%d,%d]=%g, Original[%d,%d]=%g, Diff=%g',
+      if VerboseTests then WriteLn(Format('Product[%d,%d]=%g, Original[%d,%d]=%g, Diff=%g',
         [I, J, Product.GetValue(I, J), I, J, M.GetValue(I, J),
          Abs(Product.GetValue(I, J) - M.GetValue(I, J))]));
   
@@ -1466,12 +1490,12 @@ begin
       AssertTrue(Format('SVD product should match original at [%d,%d]', [I, J]),
         Abs(Product.GetValue(I, J) - M.GetValue(I, J)) < 1E-4);
   
-  WriteLn('SVD test for 4x4 diagonal matrix completed successfully');
+  if VerboseTests then WriteLn('SVD test for 4x4 diagonal matrix completed successfully');
   
   // ---------------------------------------------------------
   // 4. Test Cholesky Decomposition with 4x4 matrix
   // ---------------------------------------------------------
-  WriteLn('Testing Cholesky Decomposition on 4x4 matrix');
+  if VerboseTests then WriteLn('Testing Cholesky Decomposition on 4x4 matrix');
   Chol := A.Cholesky;
   
   // Check dimensions
@@ -1488,7 +1512,7 @@ begin
       AssertTrue(Format('Cholesky product matches original at [%d,%d]', [I, J]), 
         Abs(Product.Values[I, J] - A.Values[I, J]) < Tolerance);
   
-  WriteLn('Finished Test35_DecompositionsLarge');
+  if VerboseTests then WriteLn('Finished Test35_DecompositionsLarge');
 end;
 
 procedure TMatrixTest.Test36_Matrix8x8;
@@ -1500,7 +1524,7 @@ var
   StartTime, EndTime: TDateTime;
   ElapsedMS: Double;
 begin
-  WriteLn('Starting Test36_Matrix8x8');
+  if VerboseTests then WriteLn('Starting Test36_Matrix8x8');
   
   // Create test matrices
   A := TMatrixKit.CreateFromArray([
@@ -1526,31 +1550,31 @@ begin
   ]);
   
   // Test basic operations
-  WriteLn('Testing basic operations...');
+  if VerboseTests then WriteLn('Testing basic operations...');
   
   StartTime := Now;
   C := A.Multiply(B);
   EndTime := Now;
   ElapsedMS := (EndTime - StartTime) * 24 * 60 * 60 * 1000;
-  WriteLn(Format('Matrix multiplication took %.2f ms', [ElapsedMS]));
+  if VerboseTests then WriteLn(Format('Matrix multiplication took %.2f ms', [ElapsedMS]));
 
-  WriteLn('C:');
-  WriteLn(C.ToString);
+  if VerboseTests then WriteLn('C:');
+  if VerboseTests then WriteLn(C.ToString);
 
   AssertEquals('8x8 result rows', 8, C.Rows);
   AssertEquals('8x8 result cols', 8, C.Cols);
   
   // Test SVD
-  WriteLn('Testing SVD decomposition...');
+  if VerboseTests then WriteLn('Testing SVD decomposition...');
   
   StartTime := Now;
   SVD := A.SVD;
   EndTime := Now;
   ElapsedMS := (EndTime - StartTime) * 24 * 60 * 60 * 1000;
-  WriteLn(Format('SVD decomposition took %.2f ms', [ElapsedMS]));
+  if VerboseTests then WriteLn(Format('SVD decomposition took %.2f ms', [ElapsedMS]));
   
-  WriteLn('SVD:');
-  WriteLn(SVD.ToString);
+  if VerboseTests then WriteLn('SVD:');
+  if VerboseTests then WriteLn(SVD.ToString);
 
   // Verify SVD properties
   AssertEquals('SVD.U rows', 8, SVD.U.Rows);
@@ -1569,7 +1593,7 @@ begin
       AssertTrue(Format('SVD reconstruction at [%d,%d]', [I, J]),
         Abs(C.Values[I, J] - A.Values[I, J]) < Tolerance);
   
-  WriteLn('Finished Test36_Matrix8x8');
+  if VerboseTests then WriteLn('Finished Test36_Matrix8x8');
 end;
 
 procedure TMatrixTest.Test37_FractionalPower8x8;
@@ -1578,7 +1602,7 @@ var
   I, J: Integer;
   Tolerance: Double;
 begin
-  WriteLn('Starting Test37_FractionalPower8x8: Testing fractional power on 8x8 matrix...');
+  if VerboseTests then WriteLn('Starting Test37_FractionalPower8x8: Testing fractional power on 8x8 matrix...');
   
   // Create a well-conditioned positive definite matrix
   Matrix := TMatrixKit.CreateFromArray([
@@ -1592,10 +1616,10 @@ begin
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 4.0]
   ]);
   
-  WriteLn('Computing matrix to power 0.5...');
+  if VerboseTests then WriteLn('Computing matrix to power 0.5...');
   PowerMatrix := Matrix.Power(0.5);
   
-  WriteLn('Verifying results...');
+  if VerboseTests then WriteLn('Verifying results...');
   // Check that PowerMatrix * PowerMatrix ≈ Matrix
   CheckMatrix := PowerMatrix.Multiply(PowerMatrix);
   
@@ -1606,7 +1630,7 @@ begin
         Fail(Format('Matrix power verification failed at [%d,%d]: expected %.10f, got %.10f',
           [I, J, Matrix.Values[I, J], CheckMatrix.Values[I, J]]));
           
-  WriteLn('Testing negative fractional power...');
+  if VerboseTests then WriteLn('Testing negative fractional power...');
   PowerMatrix := Matrix.Power(-0.5);
   CheckMatrix := PowerMatrix.Multiply(PowerMatrix);
   
@@ -1618,7 +1642,7 @@ begin
         Fail(Format('Matrix negative power verification failed at [%d,%d]: expected %.10f, got %.10f',
           [I, J, Matrix.Values[I, J], CheckMatrix.Values[I, J]]));
           
-  WriteLn('Completed Test37_FractionalPower8x8');
+  if VerboseTests then WriteLn('Completed Test37_FractionalPower8x8');
 end;
 
 procedure TMatrixTest.Test38_PowerMethod;
@@ -1630,7 +1654,7 @@ var
   I: Integer;
   Av: IMatrix;
 begin
-  WriteLn('Starting Test38_PowerMethod: Testing PowerMethod...');
+  if VerboseTests then WriteLn('Starting Test38_PowerMethod: Testing PowerMethod...');
   
   // Create a simple test matrix with known dominant eigenvalue
   M := TMatrixKit.CreateFromArray([
@@ -1638,20 +1662,19 @@ begin
     [1.0, 3.0]
   ]);
   
-  WriteLn('Test matrix:');
-  WriteLn(M.ToString);
+  if VerboseTests then WriteLn('Test matrix:');
+  if VerboseTests then WriteLn(M.ToString);
   
   // Compute the dominant eigenpair using the power method
   Pair := M.PowerMethod;
   
-  WriteLn('Computed eigenvalue: ', Pair.EigenValue:10:6);
-  WriteLn('Computed eigenvector:');
-  WriteLn(Pair.EigenVector.ToString);
+  if VerboseTests then WriteLn('Computed eigenvalue: ', Pair.EigenValue:10:6);
+  if VerboseTests then WriteLn('Computed eigenvector:');
+  if VerboseTests then WriteLn(Pair.EigenVector.ToString);
   
-  // The dominant eigenvalue should be approximately 5.0
-  Tolerance := 1E-6;
-  AssertTrue('Dominant eigenvalue should be approximately 5.0', 
-             Abs(Pair.EigenValue - 5.0) < Tolerance);
+  Tolerance := 1E-8;
+  AssertTrue('Dominant eigenvalue should match the analytical value',
+    Abs(Pair.EigenValue - (7.0 + Sqrt(5.0)) / 2.0) < Tolerance);
              
   // Check that the eigenvector is normalized - calculate its norm
   NormValue := 0.0;
@@ -1659,7 +1682,7 @@ begin
     NormValue := NormValue + Sqr(Pair.EigenVector.GetValue(I, 0));
   NormValue := Sqrt(NormValue);
   
-  WriteLn('Eigenvector norm: ', NormValue:10:6);
+  if VerboseTests then WriteLn('Eigenvector norm: ', NormValue:10:6);
   
   // Check normalization
   Tolerance := 1E-10;
@@ -1669,27 +1692,20 @@ begin
   // Compute A*v
   Av := M.Multiply(Pair.EigenVector);
   
-  WriteLn('A*v:');
-  WriteLn(Av.ToString);
+  if VerboseTests then WriteLn('A*v:');
+  if VerboseTests then WriteLn(Av.ToString);
   
-  WriteLn('λ*v:');
+  if VerboseTests then WriteLn('λ*v:');
   for I := 0 to Pair.EigenVector.GetRows - 1 do
-    WriteLn(Pair.EigenValue * Pair.EigenVector.GetValue(I, 0):10:6);
-  
-  // Note: For the matrix [4, 1; 1, 3], the dominant eigenvalue is not exactly 5.0
-  // but the test expects that value. 5.0 is not an eigenvalue, so there is no
-  // eigenvector v that satisfies A*v = 5*v exactly. We use a relaxed tolerance
-  // to accommodate this mathematical constraint.
-  
-  // Check that A*v ≈ λ*v (with a relaxed tolerance for this specific test case)
-  Tolerance := 0.5; // Increased tolerance because 5 is not an exact eigenvalue
-  AssertTrue('A*v should approximately equal λ*v', 
-             Abs(Av.GetValue(0, 0) - Pair.EigenValue * Pair.EigenVector.GetValue(0, 0)) < Tolerance);
-  Tolerance := 1E-5; // Tighter tolerance for second component which can match exactly
-  AssertTrue('A*v should equal λ*v', 
-             Abs(Av.GetValue(1, 0) - Pair.EigenValue * Pair.EigenVector.GetValue(1, 0)) < Tolerance);
-  
-  WriteLn('Completed Test38_PowerMethod');
+    if VerboseTests then WriteLn(Pair.EigenValue * Pair.EigenVector.GetValue(I, 0):10:6);
+
+  Tolerance := 1E-8;
+  for I := 0 to Pair.EigenVector.GetRows - 1 do
+    AssertTrue('Power-method eigenpair residual',
+      Abs(Av.GetValue(I, 0) - Pair.EigenValue *
+        Pair.EigenVector.GetValue(I, 0)) < Tolerance);
+
+  if VerboseTests then WriteLn('Completed Test38_PowerMethod');
 end;
 
 procedure TMatrixTest.Test39_SolveIterative;
@@ -1698,7 +1714,7 @@ var
   Tolerance: Double;
   ResidualNorm: Double;
 begin
-  WriteLn('Starting Test39_SolveIterative: Testing iterative solvers...');
+  if VerboseTests then WriteLn('Starting Test39_SolveIterative: Testing iterative solvers...');
   
   // Create a symmetric positive definite matrix for testing
   A := TMatrixKit.CreateFromArray([
@@ -1712,7 +1728,7 @@ begin
     [2.0]
   ]);
   
-  WriteLn('Testing Conjugate Gradient method...');
+  if VerboseTests then WriteLn('Testing Conjugate Gradient method...');
   X := A.SolveIterative(B, imConjugateGradient);
   
   // Check that solution is correct by computing residual ||A*x - b||
@@ -1724,7 +1740,7 @@ begin
   
   AssertTrue('Conjugate Gradient: Residual should be small', ResidualNorm < Tolerance);
   
-  WriteLn('Testing Jacobi method...');
+  if VerboseTests then WriteLn('Testing Jacobi method...');
   X := A.SolveIterative(B, imJacobi);
   
   // Check solution
@@ -1733,7 +1749,7 @@ begin
   
   AssertTrue('Jacobi: Residual should be small', ResidualNorm < Tolerance);
   
-  WriteLn('Testing Gauss-Seidel method...');
+  if VerboseTests then WriteLn('Testing Gauss-Seidel method...');
   X := A.SolveIterative(B, imGaussSeidel);
   
   // Check solution
@@ -1742,7 +1758,7 @@ begin
   
   AssertTrue('Gauss-Seidel: Residual should be small', ResidualNorm < Tolerance);
   
-  WriteLn('Completed Test39_SolveIterative');
+  if VerboseTests then WriteLn('Completed Test39_SolveIterative');
 end;
 
 procedure TMatrixTest.Test40_SparseMatrix;
@@ -1754,7 +1770,7 @@ var
   NonZeroCount: Integer;
   val1, val2: Double;
 begin
-  WriteLn('Starting Test40_SparseMatrix: Testing sparse matrix implementation...');
+  if VerboseTests then WriteLn('Starting Test40_SparseMatrix: Testing sparse matrix implementation...');
   
   // Create a sparse matrix
   M := TMatrixKit.CreateSparse(5, 5);
@@ -1766,12 +1782,12 @@ begin
   M.SetValue(0, 4, 5.0);
   M.SetValue(4, 0, 5.0);
   
-  WriteLn('Sparse matrix created with values:');
-  WriteLn('M[0,0] = ', M.GetValue(0, 0):0:1);
-  WriteLn('M[1,1] = ', M.GetValue(1, 1):0:1);
-  WriteLn('M[2,2] = ', M.GetValue(2, 2):0:1);
-  WriteLn('M[0,4] = ', M.GetValue(0, 4):0:1);
-  WriteLn('M[4,0] = ', M.GetValue(4, 0):0:1);
+  if VerboseTests then WriteLn('Sparse matrix created with values:');
+  if VerboseTests then WriteLn('M[0,0] = ', M.GetValue(0, 0):0:1);
+  if VerboseTests then WriteLn('M[1,1] = ', M.GetValue(1, 1):0:1);
+  if VerboseTests then WriteLn('M[2,2] = ', M.GetValue(2, 2):0:1);
+  if VerboseTests then WriteLn('M[0,4] = ', M.GetValue(0, 4):0:1);
+  if VerboseTests then WriteLn('M[4,0] = ', M.GetValue(4, 0):0:1);
   
   // Check values
   AssertEquals('Sparse [0,0]', 1.0, M.GetValue(0, 0));
@@ -1812,7 +1828,7 @@ begin
   AssertEquals('Non-zero count', 5, NonZeroCount);
   
   // Test matrix operations
-  WriteLn('Testing matrix addition...');
+  if VerboseTests then WriteLn('Testing matrix addition...');
   
   // Create a result matrix manually instead of using M.Add(M)
   Result := TMatrixKit.CreateSparse(5, 5);
@@ -1822,32 +1838,68 @@ begin
   Result.SetValue(0, 4, 10.0);
   Result.SetValue(4, 0, 10.0);
   
-  WriteLn('Original values:');
+  if VerboseTests then WriteLn('Original values:');
   for I := 0 to 4 do
     for J := 0 to 4 do
       if Abs(M.GetValue(I, J)) > 1E-10 then
-        WriteLn(Format('M[%d,%d] = %.2f', [I, J, M.GetValue(I, J)]));
+        if VerboseTests then WriteLn(Format('M[%d,%d] = %.2f', [I, J, M.GetValue(I, J)]));
   
-  WriteLn('Result values after addition:');
+  if VerboseTests then WriteLn('Result values after addition:');
   for I := 0 to 4 do
     for J := 0 to 4 do
       if Abs(Result.GetValue(I, J)) > 1E-10 then
-        WriteLn(Format('Result[%d,%d] = %.2f', [I, J, Result.GetValue(I, J)]));
+        if VerboseTests then WriteLn(Format('Result[%d,%d] = %.2f', [I, J, Result.GetValue(I, J)]));
   
   for I := 0 to M.GetRows - 1 do
     for J := 0 to M.GetCols - 1 do
     begin
       val1 := M.GetValue(I, J) * 2;
       val2 := Result.GetValue(I, J);
-      WriteLn(Format('Checking [%d,%d]: Expected=%.2f, Actual=%.2f, Diff=%.2f', 
+      if VerboseTests then WriteLn(Format('Checking [%d,%d]: Expected=%.2f, Actual=%.2f, Diff=%.2f',
                     [I, J, val1, val2, Abs(val1-val2)]));
       AssertEquals(Format('Sparse+Sparse [%d,%d]', [I, J]),
                   M.GetValue(I, J) * 2, Result.GetValue(I, J));
     end;
   
-  WriteLn('Completed Test40_SparseMatrix');
+  if VerboseTests then WriteLn('Completed Test40_SparseMatrix');
+end;
+
+procedure TMatrixTest.Test41_RandomMatrixSeeding;
+var
+  A, B: IMatrix;
+  I, J: Integer;
+  ExpectedNext, ActualNext: Double;
+begin
+  A := TMatrixKit.CreateRandom(4, 3, -2.0, 5.0, 123456);
+  B := TMatrixKit.CreateRandom(4, 3, -2.0, 5.0, 123456);
+  for I := 0 to A.Rows - 1 do
+    for J := 0 to A.Cols - 1 do
+    begin
+      AssertEquals('same matrix seed must reproduce values',
+        A.GetValue(I, J), B.GetValue(I, J), 0.0);
+      AssertTrue('random value respects lower bound', A.GetValue(I, J) >= -2.0);
+      AssertTrue('random value respects upper bound', A.GetValue(I, J) <= 5.0);
+    end;
+
+  RandSeed := 13579;
+  ExpectedNext := Random;
+  RandSeed := 13579;
+  TMatrixKit.CreateRandom(2, 2, 0.0, 1.0, 42);
+  ActualNext := Random;
+  AssertEquals('seeded matrix generation must not mutate RandSeed',
+    ExpectedNext, ActualNext, 0.0);
+
+  RandSeed := 24680;
+  A := TMatrixKit.CreateRandom(2, 2, 0.0, 1.0);
+  RandSeed := 24680;
+  B := TMatrixKit.CreateRandom(2, 2, 0.0, 1.0);
+  for I := 0 to 1 do
+    for J := 0 to 1 do
+      AssertEquals('global RNG remains caller-controlled',
+        A.GetValue(I, J), B.GetValue(I, J), 0.0);
 end;
 
 initialization
+  VerboseTests := GetEnvironmentVariable('MATHLIB_TEST_VERBOSE') <> '';
   RegisterTest(TMatrixTest);
 end. 

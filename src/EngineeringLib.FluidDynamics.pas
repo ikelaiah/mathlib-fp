@@ -5,7 +5,7 @@ unit EngineeringLib.FluidDynamics;
 interface
 
 uses
-  Classes, SysUtils, Math;
+  Classes, SysUtils, Math, EngineeringLib.Common;
 
 type
   TFluidDynamicsKit = class
@@ -200,7 +200,7 @@ class function TFluidDynamicsKit.BernoulliPressure(
   Height2: Double): Double;
 begin
   if Density <= 0 then
-    raise Exception.Create('Density must be positive for Bernoulli calculation.');
+    raise EFluidDynamicsError.Create('Density must be positive for Bernoulli calculation.');
   Result := Pressure1 + 0.5 * Density * (Power(Velocity1, 2) - Power(Velocity2, 2)) + Density * GravityAcceleration * (Height1 - Height2);
 end;
 
@@ -215,10 +215,10 @@ var
   VelocitySquared: Double;
 begin
   if Density <= 0 then
-    raise Exception.Create('Density must be positive for Bernoulli calculation.');
+    raise EFluidDynamicsError.Create('Density must be positive for Bernoulli calculation.');
   VelocitySquared := Power(Velocity1, 2) + 2 * (Pressure1 - Pressure2) / Density + 2 * GravityAcceleration * (Height1 - Height2);
   if VelocitySquared < 0 then
-    raise Exception.Create('Cannot calculate velocity: resulting velocity squared is negative (check input values).');
+    raise EFluidDynamicsError.Create('Cannot calculate velocity: resulting velocity squared is negative (check input values).');
   Result := Sqrt(VelocitySquared);
 end;
 
@@ -231,30 +231,28 @@ class function TFluidDynamicsKit.BernoulliHeight(
   Velocity2: Double): Double;
 begin
   if Density <= 0 then
-    raise Exception.Create('Density must be positive for Bernoulli calculation.');
-  if GravityAcceleration = 0 then
-     raise Exception.Create('Gravity acceleration cannot be zero for height calculation.');
+    raise EFluidDynamicsError.Create('Density must be positive for Bernoulli calculation.');
   Result := Height1 + (Pressure1 - Pressure2) / (Density * GravityAcceleration) + (Power(Velocity1, 2) - Power(Velocity2, 2)) / (2 * GravityAcceleration);
 end;
 
 class function TFluidDynamicsKit.CalculateVolumeFlowRate(Area: Double; Velocity: Double): Double;
 begin
   if Area < 0 then
-    raise Exception.Create('Area cannot be negative.');
+    raise EFluidDynamicsError.Create('Area cannot be negative.');
   Result := Area * Velocity;
 end;
 
 class function TFluidDynamicsKit.MassFlowRate(Density: Double; Area: Double; Velocity: Double): Double;
 begin
   if Density < 0 then
-    raise Exception.Create('Density cannot be negative.');
+    raise EFluidDynamicsError.Create('Density cannot be negative.');
   Result := Density * CalculateVolumeFlowRate(Area, Velocity);
 end;
 
 class function TFluidDynamicsKit.MassFlowRate(Density: Double; VolumeFlowRate: Double): Double;
 begin
   if Density < 0 then
-    raise Exception.Create('Density cannot be negative.');
+    raise EFluidDynamicsError.Create('Density cannot be negative.');
   Result := Density * VolumeFlowRate;
 end;
 
@@ -265,9 +263,9 @@ class function TFluidDynamicsKit.ReynoldsNumber(
   DynamicViscosity: Double): Double;
 begin
   if DynamicViscosity <= 0 then
-    raise Exception.Create('Dynamic viscosity must be positive for Reynolds number calculation.');
+    raise EFluidDynamicsError.Create('Dynamic viscosity must be positive for Reynolds number calculation.');
   if Density < 0 then
-    raise Exception.Create('Density cannot be negative.');
+    raise EFluidDynamicsError.Create('Density cannot be negative.');
   Result := (Density * Velocity * CharacteristicLength) / DynamicViscosity;
 end;
 
@@ -277,7 +275,7 @@ class function TFluidDynamicsKit.ReynoldsNumberKinematic(
   KinematicViscosity: Double): Double;
 begin
   if KinematicViscosity <= 0 then
-    raise Exception.Create('Kinematic viscosity must be positive for Reynolds number calculation.');
+    raise EFluidDynamicsError.Create('Kinematic viscosity must be positive for Reynolds number calculation.');
   Result := (Velocity * CharacteristicLength) / KinematicViscosity;
 end;
 
@@ -288,9 +286,9 @@ class function TFluidDynamicsKit.FrictionHeadLoss(
   Velocity: Double): Double;
 begin
   if Diameter <= 0 then
-    raise Exception.Create('Diameter must be positive for head loss calculation.');
+    raise EFluidDynamicsError.Create('Diameter must be positive for head loss calculation.');
   if FrictionFactor < 0 then
-    raise Exception.Create('Friction factor cannot be negative.');
+    raise EFluidDynamicsError.Create('Friction factor cannot be negative.');
   
   Result := FrictionFactor * (Length / Diameter) * (Power(Velocity, 2) / (2 * GravityAcceleration));
 end;
@@ -304,11 +302,11 @@ const
   K = 10.67; // Constant for SI units
 begin
   if (Diameter <= 0) or (Length <= 0) then
-    raise Exception.Create('Diameter and length must be positive for Hazen-Williams calculation.');
+    raise EFluidDynamicsError.Create('Diameter and length must be positive for Hazen-Williams calculation.');
   if CHW <= 0 then
-    raise Exception.Create('Hazen-Williams coefficient must be positive.');
+    raise EFluidDynamicsError.Create('Hazen-Williams coefficient must be positive.');
   if FlowRate < 0 then
-    raise Exception.Create('Flow rate cannot be negative.');
+    raise EFluidDynamicsError.Create('Flow rate cannot be negative.');
   
   // Units: Length (m), Diameter (m), FlowRate (m³/s), Result (m)
   Result := K * (Power(FlowRate, 1.85) / Power(CHW, 1.85)) * (Length / Power(Diameter, 4.87));
@@ -317,9 +315,9 @@ end;
 class function TFluidDynamicsKit.LaminarFrictionFactor(ReynoldsNumberValue: Double): Double;
 begin
   if ReynoldsNumberValue <= 0 then
-    raise Exception.Create('Reynolds number must be positive for friction factor calculation.');
+    raise EFluidDynamicsError.Create('Reynolds number must be positive for friction factor calculation.');
   if ReynoldsNumberValue >= 2300 then
-    raise Exception.Create('Laminar friction factor applies only for Reynolds numbers below 2300.');
+    raise EFluidDynamicsError.Create('Laminar friction factor applies only for Reynolds numbers below 2300.');
   
   Result := 64 / ReynoldsNumberValue;
 end;
@@ -334,11 +332,11 @@ var
   i: Integer;
 begin
   if ReynoldsNumberValue <= 0 then
-    raise Exception.Create('Reynolds number must be positive for friction factor calculation.');
+    raise EFluidDynamicsError.Create('Reynolds number must be positive for friction factor calculation.');
   if RelativeRoughness < 0 then
-    raise Exception.Create('Relative roughness cannot be negative.');
+    raise EFluidDynamicsError.Create('Relative roughness cannot be negative.');
   if ReynoldsNumberValue < 4000 then
-    raise Exception.Create('Turbulent friction factor applies only for Reynolds numbers above 4000.');
+    raise EFluidDynamicsError.Create('Turbulent friction factor applies only for Reynolds numbers above 4000.');
   
   // Initial guess using Haaland equation
   f_old := Power(1 / (-1.8 * Log10(Power(RelativeRoughness / 3.7, 1.11) + 6.9 / ReynoldsNumberValue)), 2);
@@ -356,14 +354,14 @@ begin
   end;
   
   // If max iterations reached, return the last calculated value
-  raise Exception.Create('Maximum iterations reached in friction factor calculation.');
+  raise EFluidDynamicsError.Create('Maximum iterations reached in friction factor calculation.');
   Result := f_old;
 end;
 
 class function TFluidDynamicsKit.BlasiusFrictionFactor(ReynoldsNumberValue: Double): Double;
 begin
   if (ReynoldsNumberValue < 4000) or (ReynoldsNumberValue > 100000) then
-    raise Exception.Create('Blasius equation is valid for Reynolds numbers between 4000 and 100000.');
+    raise EFluidDynamicsError.Create('Blasius equation is valid for Reynolds numbers between 4000 and 100000.');
   
   Result := 0.316 / Power(ReynoldsNumberValue, 0.25);
 end;
@@ -371,7 +369,7 @@ end;
 class function TFluidDynamicsKit.FroudeNumber(Velocity: Double; CharacteristicLength: Double): Double;
 begin
   if CharacteristicLength <= 0 then
-    raise Exception.Create('Characteristic length must be positive for Froude number calculation.');
+    raise EFluidDynamicsError.Create('Characteristic length must be positive for Froude number calculation.');
   
   Result := Velocity / Sqrt(GravityAcceleration * CharacteristicLength);
 end;
@@ -383,7 +381,7 @@ class function TFluidDynamicsKit.WeberNumber(
   SurfaceTension: Double): Double;
 begin
   if (Density < 0) or (CharacteristicLength <= 0) or (SurfaceTension <= 0) then
-    raise Exception.Create('Density cannot be negative; characteristic length and surface tension must be positive.');
+    raise EFluidDynamicsError.Create('Density cannot be negative; characteristic length and surface tension must be positive.');
   
   Result := (Density * Power(Velocity, 2) * CharacteristicLength) / SurfaceTension;
 end;
@@ -391,9 +389,9 @@ end;
 class function TFluidDynamicsKit.EulerNumber(PressureDifference: Double; Density: Double; Velocity: Double): Double;
 begin
   if Density <= 0 then
-    raise Exception.Create('Density must be positive for Euler number calculation.');
+    raise EFluidDynamicsError.Create('Density must be positive for Euler number calculation.');
   if Velocity = 0 then
-    raise Exception.Create('Velocity cannot be zero for Euler number calculation.');
+    raise EFluidDynamicsError.Create('Velocity cannot be zero for Euler number calculation.');
   
   Result := PressureDifference / (Density * Power(Velocity, 2));
 end;
@@ -401,7 +399,7 @@ end;
 class function TFluidDynamicsKit.MachNumber(Velocity: Double; SpeedOfSound: Double): Double;
 begin
   if SpeedOfSound <= 0 then
-    raise Exception.Create('Speed of sound must be positive for Mach number calculation.');
+    raise EFluidDynamicsError.Create('Speed of sound must be positive for Mach number calculation.');
   
   Result := Velocity / SpeedOfSound;
 end;
@@ -412,7 +410,7 @@ class function TFluidDynamicsKit.StrouhalNumber(
   Velocity: Double): Double;
 begin
   if (CharacteristicLength <= 0) or (Velocity = 0) then
-    raise Exception.Create('Characteristic length must be positive and velocity non-zero for Strouhal number.');
+    raise EFluidDynamicsError.Create('Characteristic length must be positive and velocity non-zero for Strouhal number.');
   
   Result := (Frequency * CharacteristicLength) / Velocity;
 end;
@@ -423,7 +421,7 @@ class function TFluidDynamicsKit.PrandtlNumber(
   ThermalConductivity: Double): Double;
 begin
   if (DynamicViscosity < 0) or (SpecificHeat <= 0) or (ThermalConductivity <= 0) then
-    raise Exception.Create('Dynamic viscosity cannot be negative; specific heat and thermal conductivity must be positive.');
+    raise EFluidDynamicsError.Create('Dynamic viscosity cannot be negative; specific heat and thermal conductivity must be positive.');
   
   Result := (DynamicViscosity * SpecificHeat) / ThermalConductivity;
 end;
@@ -434,7 +432,7 @@ class function TFluidDynamicsKit.NusseltNumber(
   ThermalConductivity: Double): Double;
 begin
   if (HeatTransferCoefficient <= 0) or (CharacteristicLength <= 0) or (ThermalConductivity <= 0) then
-    raise Exception.Create('Heat transfer coefficient, characteristic length, and thermal conductivity must be positive.');
+    raise EFluidDynamicsError.Create('Heat transfer coefficient, characteristic length, and thermal conductivity must be positive.');
   
   Result := (HeatTransferCoefficient * CharacteristicLength) / ThermalConductivity;
 end;
@@ -446,7 +444,7 @@ class function TFluidDynamicsKit.LiftForce(
   ReferenceArea: Double): Double;
 begin
   if (Density < 0) or (ReferenceArea < 0) then
-    raise Exception.Create('Density and reference area cannot be negative.');
+    raise EFluidDynamicsError.Create('Density and reference area cannot be negative.');
   
   Result := LiftCoefficient * 0.5 * Density * Power(Velocity, 2) * ReferenceArea;
 end;
@@ -458,7 +456,7 @@ class function TFluidDynamicsKit.DragForce(
   ReferenceArea: Double): Double;
 begin
   if (Density < 0) or (ReferenceArea < 0) then
-    raise Exception.Create('Density and reference area cannot be negative.');
+    raise EFluidDynamicsError.Create('Density and reference area cannot be negative.');
   
   Result := DragCoefficient * 0.5 * Density * Power(Velocity, 2) * ReferenceArea;
 end;
@@ -466,7 +464,7 @@ end;
 class function TFluidDynamicsKit.DynamicPressure(Density: Double; Velocity: Double): Double;
 begin
   if Density < 0 then
-    raise Exception.Create('Density cannot be negative.');
+    raise EFluidDynamicsError.Create('Density cannot be negative.');
   
   Result := 0.5 * Density * Power(Velocity, 2);
 end;
@@ -485,9 +483,9 @@ var
   DynPressure: Double; // Changed from DynamicPressure to DynPressure to avoid conflict
 begin
   if FreeStreamDensity <= 0 then
-    raise Exception.Create('Free stream density must be positive.');
+    raise EFluidDynamicsError.Create('Free stream density must be positive.');
   if FreeStreamVelocity = 0 then
-    raise Exception.Create('Free stream velocity cannot be zero for pressure coefficient calculation.');
+    raise EFluidDynamicsError.Create('Free stream velocity cannot be zero for pressure coefficient calculation.');
   
   DynPressure := 0.5 * FreeStreamDensity * Power(FreeStreamVelocity, 2);
   Result := (Pressure - FreeStreamPressure) / DynPressure;
@@ -499,7 +497,7 @@ class function TFluidDynamicsKit.SpeedOfSound(
   Temperature: Double): Double;
 begin
   if (SpecificHeatRatio <= 1) or (GasConstant <= 0) or (Temperature <= 0) then
-    raise Exception.Create('Specific heat ratio must be > 1; gas constant and temperature must be positive.');
+    raise EFluidDynamicsError.Create('Specific heat ratio must be > 1; gas constant and temperature must be positive.');
   
   Result := Sqrt(SpecificHeatRatio * GasConstant * Temperature);
 end;
@@ -507,7 +505,7 @@ end;
 class function TFluidDynamicsKit.StagnationTemperatureRatio(MachNumberValue: Double; SpecificHeatRatio: Double): Double;
 begin
   if (MachNumberValue < 0) or (SpecificHeatRatio <= 1) then
-    raise Exception.Create('Mach number cannot be negative; specific heat ratio must be > 1.');
+    raise EFluidDynamicsError.Create('Mach number cannot be negative; specific heat ratio must be > 1.');
   
   Result := 1 + ((SpecificHeatRatio - 1) / 2) * Power(MachNumberValue, 2);
 end;
@@ -515,7 +513,7 @@ end;
 class function TFluidDynamicsKit.StagnationPressureRatio(MachNumberValue: Double; SpecificHeatRatio: Double): Double;
 begin
   if (MachNumberValue < 0) or (SpecificHeatRatio <= 1) then
-    raise Exception.Create('Mach number cannot be negative; specific heat ratio must be > 1.');
+    raise EFluidDynamicsError.Create('Mach number cannot be negative; specific heat ratio must be > 1.');
   
   Result := Power(1 + ((SpecificHeatRatio - 1) / 2) * Power(MachNumberValue, 2), SpecificHeatRatio / (SpecificHeatRatio - 1));
 end;
@@ -525,7 +523,7 @@ var
   Term1, Term2: Double;
 begin
   if (MachNumberValue <= 0) or (SpecificHeatRatio <= 1) then
-    raise Exception.Create('Mach number must be positive; specific heat ratio must be > 1.');
+    raise EFluidDynamicsError.Create('Mach number must be positive; specific heat ratio must be > 1.');
   
   Term1 := 1 / MachNumberValue;
   Term2 := Power((2 / (SpecificHeatRatio + 1)) * (1 + ((SpecificHeatRatio - 1) / 2) * Power(MachNumberValue, 2)), 
@@ -536,7 +534,7 @@ end;
 class function TFluidDynamicsKit.PumpPower(Density: Double; FlowRate: Double; Head: Double; Efficiency: Double): Double;
 begin
   if (Density <= 0) or (Head < 0) or (Efficiency <= 0) or (Efficiency > 1) then
-    raise Exception.Create('Density and efficiency must be positive; efficiency must be between 0 and 1.');
+    raise EFluidDynamicsError.Create('Density and efficiency must be positive; efficiency must be between 0 and 1.');
   
   Result := Density * GravityAcceleration * FlowRate * Head / Efficiency;
 end;
@@ -548,7 +546,7 @@ class function TFluidDynamicsKit.PumpHead(
   HeightDiff: Double): Double;
 begin
   if Density <= 0 then
-    raise Exception.Create('Density must be positive for pump head calculation.');
+    raise EFluidDynamicsError.Create('Density must be positive for pump head calculation.');
   
   Result := PressureDiff / (Density * GravityAcceleration) + 
             Power(VelocityDiff, 2) / (2 * GravityAcceleration) + HeightDiff;
@@ -557,7 +555,7 @@ end;
 class function TFluidDynamicsKit.PumpSpecificSpeed(RPM: Double; FlowRate: Double; Head: Double): Double;
 begin
   if (RPM <= 0) or (FlowRate <= 0) or (Head <= 0) then
-    raise Exception.Create('RPM, flow rate, and head must be positive for specific speed calculation.');
+    raise EFluidDynamicsError.Create('RPM, flow rate, and head must be positive for specific speed calculation.');
   
   Result := RPM * Sqrt(FlowRate) / Power(Head, 0.75);
 end;
@@ -569,7 +567,7 @@ class function TFluidDynamicsKit.TurbinePower(
   Head: Double): Double;
 begin
   if (Efficiency <= 0) or (Efficiency > 1) or (Density <= 0) or (Head < 0) then
-    raise Exception.Create('Efficiency must be between 0 and 1; density must be positive.');
+    raise EFluidDynamicsError.Create('Efficiency must be between 0 and 1; density must be positive.');
   
   Result := Efficiency * Density * GravityAcceleration * FlowRate * Head;
 end;
@@ -580,7 +578,7 @@ class function TFluidDynamicsKit.ChezyVelocity(
   ChannelSlope: Double): Double;
 begin
   if (ChezyCoefficient <= 0) or (HydraulicRadius <= 0) or (ChannelSlope <= 0) then
-    raise Exception.Create('Chezy coefficient, hydraulic radius, and channel slope must be positive.');
+    raise EFluidDynamicsError.Create('Chezy coefficient, hydraulic radius, and channel slope must be positive.');
   
   Result := ChezyCoefficient * Sqrt(HydraulicRadius * ChannelSlope);
 end;
@@ -591,7 +589,7 @@ class function TFluidDynamicsKit.ManningVelocity(
   ChannelSlope: Double): Double;
 begin
   if (ManningCoefficient <= 0) or (HydraulicRadius <= 0) or (ChannelSlope <= 0) then
-    raise Exception.Create('Manning coefficient, hydraulic radius, and channel slope must be positive.');
+    raise EFluidDynamicsError.Create('Manning coefficient, hydraulic radius, and channel slope must be positive.');
   
   Result := (1 / ManningCoefficient) * Power(HydraulicRadius, 2/3) * Power(ChannelSlope, 1/2);
 end;
@@ -599,7 +597,7 @@ end;
 class function TFluidDynamicsKit.CriticalDepthRectangular(UnitDischarge: Double): Double;
 begin
   if UnitDischarge <= 0 then
-    raise Exception.Create('Unit discharge must be positive for critical depth calculation.');
+    raise EFluidDynamicsError.Create('Unit discharge must be positive for critical depth calculation.');
   
   Result := Power(UnitDischarge * UnitDischarge / GravityAcceleration, 1/3);
 end;
@@ -607,7 +605,7 @@ end;
 class function TFluidDynamicsKit.OpenChannelFroudeNumber(Velocity: Double; Depth: Double): Double;
 begin
   if Depth <= 0 then
-    raise Exception.Create('Depth must be positive for open channel Froude number calculation.');
+    raise EFluidDynamicsError.Create('Depth must be positive for open channel Froude number calculation.');
   
   Result := Velocity / Sqrt(GravityAcceleration * Depth);
 end;

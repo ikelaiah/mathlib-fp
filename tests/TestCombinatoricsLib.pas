@@ -788,7 +788,7 @@ begin
   AssertEquals('2^3 = 8 subsets', 8, Length(S));
   { Mask 0 = empty set }
   AssertEquals('empty subset', 0, Length(S[0]));
-  { Mask 7 = {0,1,2} }
+  { Mask 7 = [0,1,2] }
   AssertEquals('full subset length', 3, Length(S[7]));
 end;
 

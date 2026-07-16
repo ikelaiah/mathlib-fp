@@ -69,6 +69,7 @@ type
     procedure TestRidgeRegression_LargeLambdaShrinks;
     procedure TestPolynomialFeatures_Shape;
     procedure TestPolynomialFeatures_Values;
+    procedure TestPolynomialFeatures_NoBias;
     procedure TestLinearPredict_PerfectFit;
     { --- Classification ---------------------------------------------------- }
     procedure TestKNN_K1_NearestLabel;
@@ -108,6 +109,9 @@ type
     procedure TestOneHotEncode_BadLabelRaises;
     procedure TestLinearRegression_TooFewSamplesRaises;
     procedure TestPCA_TooManyComponentsRaises;
+    procedure TestRaggedMatrixRaises;
+    procedure TestNonFiniteFeatureRaises;
+    procedure TestMetricLengthMismatchRaises;
   end;
 
 implementation
@@ -117,7 +121,7 @@ implementation
 --------------------------------------------------------------------------- }
 var
   GErrX:      TDoubleMatrix;
-  GErrY:      TDoubleArray;
+  GErrY, GErrY2: TDoubleArray;
   GErrLabels: TIntegerArray;
   GErrTrainX, GErrTestX: TDoubleMatrix;
   GErrTrainY: TIntegerArray;
@@ -133,6 +137,15 @@ begin TMLKit.OneHotEncode(GErrLabels, 3); end;
 
 procedure ErrLinearRegressionTooFew;
 begin TMLKit.LinearRegression(GErrX, GErrY); end;
+
+procedure ErrNormaliseRagged;
+begin TMLKit.Normalise(GErrX); end;
+
+procedure ErrLinearRegressionNonFinite;
+begin TMLKit.LinearRegression(GErrX, GErrY); end;
+
+procedure ErrMSELengthMismatch;
+begin TMLKit.MSE(GErrY, GErrY2); end;
 
 procedure ErrPCATooManyComponents;
 begin TMLKit.PCA(GErrX, 5); end;
@@ -151,7 +164,7 @@ procedure TTestMLLib.AssertMLError(const AMsg: string; AProc: TProcedure);
 begin
   try
     AProc;
-    Fail(AMsg + ' — expected EMLError but none raised');
+    Fail(AMsg + ': expected EMLError but none raised');
   except
     on E: EMLError do { pass }
     else raise;
@@ -162,6 +175,7 @@ end;
 function TTestMLLib.MakeClusterData(out Labels: TIntegerArray): TDoubleMatrix;
 var I: Integer;
 begin
+  Result := nil;
   SetLength(Result, 20);
   SetLength(Labels,  20);
   for I := 0 to 9 do
@@ -430,6 +444,17 @@ begin
   AssertNear('Poly[1]=2', 2.0, M[0][1], 1e-10);
   AssertNear('Poly[2]=4', 4.0, M[0][2], 1e-10);
   AssertNear('Poly[3]=8', 8.0, M[0][3], 1e-10);
+end;
+
+procedure TTestMLLib.TestPolynomialFeatures_NoBias;
+var X: TDoubleArray; M: TDoubleMatrix;
+begin
+  X := TDoubleArray.Create(2.0);
+  M := TMLKit.PolynomialFeatures(X, 3, False);
+  AssertEquals('PolyFeat without bias cols', 3, Length(M[0]));
+  AssertNear('Poly no-bias x', 2.0, M[0][0], 1e-10);
+  AssertNear('Poly no-bias x^2', 4.0, M[0][1], 1e-10);
+  AssertNear('Poly no-bias x^3', 8.0, M[0][2], 1e-10);
 end;
 
 procedure TTestMLLib.TestLinearPredict_PerfectFit;
@@ -889,6 +914,34 @@ begin
   SetLength(GErrX, 5);
   for I := 0 to 4 do begin SetLength(GErrX[I], 2); GErrX[I][0] := I; GErrX[I][1] := I; end;
   AssertMLError('PCA components > features', @ErrPCATooManyComponents);
+end;
+
+procedure TTestMLLib.TestRaggedMatrixRaises;
+begin
+  SetLength(GErrX, 2);
+  SetLength(GErrX[0], 2);
+  SetLength(GErrX[1], 1);
+  AssertMLError('ragged matrix', @ErrNormaliseRagged);
+end;
+
+procedure TTestMLLib.TestNonFiniteFeatureRaises;
+begin
+  SetLength(GErrX, 3);
+  SetLength(GErrX[0], 1);
+  SetLength(GErrX[1], 1);
+  SetLength(GErrX[2], 1);
+  GErrX[0][0] := 1;
+  GErrX[1][0] := NaN;
+  GErrX[2][0] := 3;
+  GErrY := TDoubleArray.Create(1, 2, 3);
+  AssertMLError('non-finite feature', @ErrLinearRegressionNonFinite);
+end;
+
+procedure TTestMLLib.TestMetricLengthMismatchRaises;
+begin
+  GErrY := TDoubleArray.Create(1, 2, 3);
+  GErrY2 := TDoubleArray.Create(1, 2);
+  AssertMLError('metric vector length mismatch', @ErrMSELengthMismatch);
 end;
 
 initialization

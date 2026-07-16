@@ -5,7 +5,7 @@ unit EngineeringLib.Thermodynamics;
 interface
 
 uses
-  Classes, SysUtils, Math;
+  Classes, SysUtils, Math, EngineeringLib.Common;
 
 type
   TThermodynamicsKit = class
@@ -153,7 +153,7 @@ class function TThermodynamicsKit.HeatConductionRate(
   Thickness: Double): Double;
 begin
   if Thickness <= 0 then
-    raise Exception.Create('Thickness must be positive for heat conduction calculation.');
+    raise EThermodynamicsError.Create('Thickness must be positive for heat conduction calculation.');
   Result := ThermalConductivity * Area * TempDifference / Thickness;
 end;
 
@@ -172,9 +172,9 @@ class function TThermodynamicsKit.HeatRadiationRate(
   SurroundingsTempK: Double): Double;
 begin
   if (Emissivity < 0) or (Emissivity > 1) then
-    raise Exception.Create('Emissivity must be between 0 and 1.');
+    raise EThermodynamicsError.Create('Emissivity must be between 0 and 1.');
   if (SurfaceTempK < 0) or (SurroundingsTempK < 0) then
-    raise Exception.Create('Temperatures must be in Kelvin (non-negative).');
+    raise EThermodynamicsError.Create('Temperatures must be in Kelvin (non-negative).');
   Result := Emissivity * StefanBoltzmannConstant * Area * (Power(SurfaceTempK, 4) - Power(SurroundingsTempK, 4));
 end;
 
@@ -189,7 +189,7 @@ end;
 class function TThermodynamicsKit.EntropyChangeReversible(HeatTransfer: Double; AbsoluteTempK: Double): Double;
 begin
   if AbsoluteTempK <= 0 then
-    raise Exception.Create('Absolute temperature must be positive for entropy calculation.');
+    raise EThermodynamicsError.Create('Absolute temperature must be positive for entropy calculation.');
   Result := HeatTransfer / AbsoluteTempK;
 end;
 
@@ -200,7 +200,7 @@ class function TThermodynamicsKit.EntropyChangeHeating(
   FinalTempK: Double): Double;
 begin
   if (InitialTempK <= 0) or (FinalTempK <= 0) then
-    raise Exception.Create('Absolute temperatures must be positive for entropy calculation.');
+    raise EThermodynamicsError.Create('Absolute temperatures must be positive for entropy calculation.');
   Result := Mass * SpecificHeatCapacity * Ln(FinalTempK / InitialTempK);
 end;
 
@@ -210,43 +210,43 @@ class function TThermodynamicsKit.EntropyChangeIsothermalExpansion(
   FinalVolume: Double): Double;
 begin
   if (InitialVolume <= 0) or (FinalVolume <= 0) then
-     raise Exception.Create('Volumes must be positive for entropy calculation.');
+     raise EThermodynamicsError.Create('Volumes must be positive for entropy calculation.');
   Result := Moles * IdealGasConstant * Ln(FinalVolume / InitialVolume);
 end;
 
 class function TThermodynamicsKit.IdealGasPressure(Moles: Double; Volume: Double; AbsoluteTempK: Double): Double;
 begin
   if Volume <= 0 then
-    raise Exception.Create('Volume must be positive for ideal gas calculation.');
+    raise EThermodynamicsError.Create('Volume must be positive for ideal gas calculation.');
   if AbsoluteTempK < 0 then
-    raise Exception.Create('Absolute temperature cannot be negative.');
+    raise EThermodynamicsError.Create('Absolute temperature cannot be negative.');
   Result := Moles * IdealGasConstant * AbsoluteTempK / Volume;
 end;
 
 class function TThermodynamicsKit.IdealGasVolume(Moles: Double; Pressure: Double; AbsoluteTempK: Double): Double;
 begin
   if Pressure <= 0 then
-    raise Exception.Create('Pressure must be positive for ideal gas calculation.');
+    raise EThermodynamicsError.Create('Pressure must be positive for ideal gas calculation.');
   if AbsoluteTempK < 0 then
-    raise Exception.Create('Absolute temperature cannot be negative.');
+    raise EThermodynamicsError.Create('Absolute temperature cannot be negative.');
   Result := Moles * IdealGasConstant * AbsoluteTempK / Pressure;
 end;
 
 class function TThermodynamicsKit.IdealGasTemperature(Pressure: Double; Volume: Double; Moles: Double): Double;
 begin
   if Moles <= 0 then
-    raise Exception.Create('Number of moles must be positive.');
+    raise EThermodynamicsError.Create('Number of moles must be positive.');
   if (Pressure <= 0) or (Volume <= 0) then
-    raise Exception.Create('Pressure and Volume must be positive.');
+    raise EThermodynamicsError.Create('Pressure and Volume must be positive.');
   Result := Pressure * Volume / (Moles * IdealGasConstant);
 end;
 
 class function TThermodynamicsKit.IdealGasMoles(Pressure: Double; Volume: Double; AbsoluteTempK: Double): Double;
 begin
   if AbsoluteTempK <= 0 then
-    raise Exception.Create('Absolute temperature must be positive.');
+    raise EThermodynamicsError.Create('Absolute temperature must be positive.');
   if (Pressure <= 0) or (Volume <= 0) then
-    raise Exception.Create('Pressure and Volume must be positive.');
+    raise EThermodynamicsError.Create('Pressure and Volume must be positive.');
   Result := Pressure * Volume / (IdealGasConstant * AbsoluteTempK);
 end;
 
@@ -263,16 +263,16 @@ end;
 class function TThermodynamicsKit.CarnotEfficiency(HotTempK: Double; ColdTempK: Double): Double;
 begin
   if (HotTempK <= 0) or (ColdTempK < 0) then
-    raise Exception.Create('Absolute temperatures must be positive (Hot > 0, Cold >= 0).');
+    raise EThermodynamicsError.Create('Absolute temperatures must be positive (Hot > 0, Cold >= 0).');
   if ColdTempK >= HotTempK then
-    raise Exception.Create('Hot temperature must be greater than cold temperature for Carnot efficiency.');
+    raise EThermodynamicsError.Create('Hot temperature must be greater than cold temperature for Carnot efficiency.');
   Result := 1.0 - (ColdTempK / HotTempK);
 end;
 
 class function TThermodynamicsKit.ThermalEfficiency(WorkOutput: Double; HeatInput: Double): Double;
 begin
   if HeatInput <= 0 then
-    raise Exception.Create('Heat input must be positive for thermal efficiency calculation.');
+    raise EThermodynamicsError.Create('Heat input must be positive for thermal efficiency calculation.');
   Result := WorkOutput / HeatInput;
 end;
 
@@ -281,23 +281,23 @@ class function TThermodynamicsKit.CoefficientOfPerformanceRefrigeration(
   WorkInput: Double): Double;
 begin
   if WorkInput <= 0 then
-    raise Exception.Create('Work input must be positive for COP calculation.');
+    raise EThermodynamicsError.Create('Work input must be positive for COP calculation.');
   Result := ColdHeatExtracted / WorkInput;
 end;
 
 class function TThermodynamicsKit.CoefficientOfPerformanceHeatPump(HotHeatDelivered: Double; WorkInput: Double): Double;
 begin
   if WorkInput <= 0 then
-    raise Exception.Create('Work input must be positive for COP calculation.');
+    raise EThermodynamicsError.Create('Work input must be positive for COP calculation.');
   Result := HotHeatDelivered / WorkInput;
 end;
 
 class function TThermodynamicsKit.OttoCycleEfficiency(CompressionRatio: Double; SpecificHeatRatio: Double): Double;
 begin
   if CompressionRatio <= 1 then
-    raise Exception.Create('Compression ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Compression ratio must be greater than 1.');
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := 1 - Power(1/CompressionRatio, SpecificHeatRatio - 1);
 end;
 
@@ -307,11 +307,11 @@ class function TThermodynamicsKit.DieselCycleEfficiency(
   SpecificHeatRatio: Double): Double;
 begin
   if CompressionRatio <= 1 then
-    raise Exception.Create('Compression ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Compression ratio must be greater than 1.');
   if CutoffRatio <= 1 then
-    raise Exception.Create('Cutoff ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Cutoff ratio must be greater than 1.');
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := 1 - (1/Power(CompressionRatio, SpecificHeatRatio-1)) * 
             (Power(CutoffRatio, SpecificHeatRatio) - 1) / 
             (SpecificHeatRatio * (CutoffRatio - 1));
@@ -320,9 +320,9 @@ end;
 class function TThermodynamicsKit.BraytonCycleEfficiency(PressureRatio: Double; SpecificHeatRatio: Double): Double;
 begin
   if PressureRatio <= 1 then
-    raise Exception.Create('Pressure ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Pressure ratio must be greater than 1.');
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := 1 - 1/Power(PressureRatio, (SpecificHeatRatio-1)/SpecificHeatRatio);
 end;
 
@@ -332,7 +332,7 @@ class function TThermodynamicsKit.RankineCycleEfficiency(
   HeatInput: Double): Double;
 begin
   if HeatInput <= 0 then
-    raise Exception.Create('Heat input must be positive for Rankine cycle calculation.');
+    raise EThermodynamicsError.Create('Heat input must be positive for Rankine cycle calculation.');
   Result := (TurbineWorkOutput - PumpWorkInput) / HeatInput;
 end;
 
@@ -341,7 +341,7 @@ class function TThermodynamicsKit.AdiabaticPressure(
   SpecificHeatRatio: Double): Double;
 begin
   if (InitialPressure <= 0) or (InitialVolume <= 0) or (FinalVolume <= 0) then
-    raise Exception.Create('Pressure and volumes must be positive for adiabatic process calculation.');
+    raise EThermodynamicsError.Create('Pressure and volumes must be positive for adiabatic process calculation.');
   Result := InitialPressure * Power(InitialVolume / FinalVolume, SpecificHeatRatio);
 end;
 
@@ -350,7 +350,7 @@ class function TThermodynamicsKit.AdiabaticVolume(
   SpecificHeatRatio: Double): Double;
 begin
   if (InitialPressure <= 0) or (InitialVolume <= 0) or (FinalPressure <= 0) then
-    raise Exception.Create('Pressure and volume must be positive for adiabatic process calculation.');
+    raise EThermodynamicsError.Create('Pressure and volume must be positive for adiabatic process calculation.');
   Result := InitialVolume * Power(InitialPressure / FinalPressure, 1/SpecificHeatRatio);
 end;
 
@@ -359,7 +359,7 @@ class function TThermodynamicsKit.AdiabaticTemperature(
   SpecificHeatRatio: Double): Double;
 begin
   if (InitialTemp <= 0) or (InitialVolume <= 0) or (FinalVolume <= 0) then
-    raise Exception.Create('Temperature and volumes must be positive for adiabatic process calculation.');
+    raise EThermodynamicsError.Create('Temperature and volumes must be positive for adiabatic process calculation.');
   Result := InitialTemp * Power(InitialVolume / FinalVolume, SpecificHeatRatio - 1);
 end;
 
@@ -368,14 +368,14 @@ class function TThermodynamicsKit.AdiabaticTemperatureFromPressure(
   SpecificHeatRatio: Double): Double;
 begin
   if (InitialTemp <= 0) or (InitialPressure <= 0) or (FinalPressure <= 0) then
-    raise Exception.Create('Temperature and pressures must be positive for adiabatic process calculation.');
+    raise EThermodynamicsError.Create('Temperature and pressures must be positive for adiabatic process calculation.');
   Result := InitialTemp * Power(FinalPressure / InitialPressure, (SpecificHeatRatio - 1) / SpecificHeatRatio);
 end;
 
 class function TThermodynamicsKit.CriticalPressureRatio(SpecificHeatRatio: Double): Double;
 begin
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := Power(2 / (SpecificHeatRatio + 1), SpecificHeatRatio / (SpecificHeatRatio - 1));
 end;
 
@@ -384,9 +384,9 @@ var
   Exponent: Double;
 begin
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   if (PressureRatio <= 0) or (PressureRatio > 1) then
-    raise Exception.Create('Pressure ratio must be between 0 and 1.');
+    raise EThermodynamicsError.Create('Pressure ratio must be between 0 and 1.');
   
   Exponent := (SpecificHeatRatio - 1) / SpecificHeatRatio;
   Result := Sqrt(2 / (SpecificHeatRatio - 1) * (Power(1 / PressureRatio, Exponent) - 1));
@@ -395,9 +395,9 @@ end;
 class function TThermodynamicsKit.IsentropicTemperatureRatio(MachNumber: Double; SpecificHeatRatio: Double): Double;
 begin
   if MachNumber < 0 then
-    raise Exception.Create('Mach number cannot be negative.');
+    raise EThermodynamicsError.Create('Mach number cannot be negative.');
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   
   Result := 1 + ((SpecificHeatRatio - 1) / 2) * Power(MachNumber, 2);
 end;
@@ -405,9 +405,9 @@ end;
 class function TThermodynamicsKit.IsentropicPressureRatio(MachNumber: Double; SpecificHeatRatio: Double): Double;
 begin
   if MachNumber < 0 then
-    raise Exception.Create('Mach number cannot be negative.');
+    raise EThermodynamicsError.Create('Mach number cannot be negative.');
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   
   Result := Power(1 + ((SpecificHeatRatio - 1) / 2) * Power(MachNumber, 2), -SpecificHeatRatio / (SpecificHeatRatio - 1));
 end;
@@ -415,9 +415,9 @@ end;
 class function TThermodynamicsKit.IsentropicDensityRatio(MachNumber: Double; SpecificHeatRatio: Double): Double;
 begin
   if MachNumber < 0 then
-    raise Exception.Create('Mach number cannot be negative.');
+    raise EThermodynamicsError.Create('Mach number cannot be negative.');
   if SpecificHeatRatio <= 1 then
-    raise Exception.Create('Specific heat ratio must be greater than 1.');
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   
   Result := Power(1 + ((SpecificHeatRatio - 1) / 2) * Power(MachNumber, 2), -1 / (SpecificHeatRatio - 1));
 end;
@@ -425,7 +425,7 @@ end;
 class function TThermodynamicsKit.RelativeHumidity(ActualVaporPressure: Double; SaturatedVaporPressure: Double): Double;
 begin
   if (ActualVaporPressure < 0) or (SaturatedVaporPressure <= 0) then
-    raise Exception.Create('Vapor pressures must be non-negative and saturated vapor pressure must be positive.');
+    raise EThermodynamicsError.Create('Vapor pressures must be non-negative and saturated vapor pressure must be positive.');
   Result := (ActualVaporPressure / SaturatedVaporPressure) * 100;
 end;
 
@@ -437,7 +437,7 @@ const
 begin
   // Using Antoine equation: log10(P) = A - (B / (T + C)) where P is in mmHg and T is in °C
   if (TemperatureC < 1) or (TemperatureC > 100) then
-    raise Exception.Create('Temperature should be between 1-100°C for accurate saturated vapor pressure calculation.');
+    raise EThermodynamicsError.Create('Temperature should be between 1-100°C for accurate saturated vapor pressure calculation.');
   
   Result := Power(10, A - (B / (TemperatureC + C))) * 133.322; // Convert mmHg to Pa
 end;
@@ -445,7 +445,7 @@ end;
 class function TThermodynamicsKit.HumidityRatio(VaporPressure: Double; AtmosphericPressure: Double): Double;
 begin
   if (VaporPressure < 0) or (AtmosphericPressure <= 0) then
-    raise Exception.Create('Vapor pressure must be non-negative and atmospheric pressure must be positive.');
+    raise EThermodynamicsError.Create('Vapor pressure must be non-negative and atmospheric pressure must be positive.');
   // w = 0.622 * (Pv / (P - Pv))
   Result := 0.622 * (VaporPressure / (AtmosphericPressure - VaporPressure));
 end;
@@ -456,7 +456,7 @@ var
   Alpha: Double;
 begin
   if (RelativeHumidityPercent <= 0) or (RelativeHumidityPercent > 100) then
-    raise Exception.Create('Relative humidity must be between 0 and 100%.');
+    raise EThermodynamicsError.Create('Relative humidity must be between 0 and 100%.');
   
   // Magnus formula constants for water vapor
   A := 17.27;
@@ -469,7 +469,7 @@ end;
 class function TThermodynamicsKit.MoistAirEnthalpy(TemperatureC: Double; HumidityRatioValue: Double): Double;
 begin
   if HumidityRatioValue < 0 then
-    raise Exception.Create('Humidity ratio cannot be negative.');
+    raise EThermodynamicsError.Create('Humidity ratio cannot be negative.');
   // h = cp,air * t + w * (hfg + cp,vapor * t) where cp,air ≈ 1.005 kJ/(kg·K), cp,vapor ≈ 1.82 kJ/(kg·K), hfg ≈ 2501 kJ/kg
   // Simplified form: h = 1.005 * t + w * (2501 + 1.82 * t) [kJ/kg]
   Result := 1.005 * TemperatureC + HumidityRatioValue * (2501 + 1.82 * TemperatureC);
@@ -483,7 +483,7 @@ end;
 class function TThermodynamicsKit.KelvinToCelsius(TempK: Double): Double;
 begin
   if TempK < 0 then
-    raise Exception.Create('Kelvin temperature cannot be negative.');
+    raise EThermodynamicsError.Create('Kelvin temperature cannot be negative.');
   Result := TempK - 273.15;
 end;
 

@@ -7,9 +7,9 @@ program example12_geometry;
  Each section introduces one concept with plain-English explanation
  and a concrete, runnable example.
 
- Compile:  fpc example12_geometry.lpr
- Run:      ./example12_geometry   (Linux/Mac)
-           example12_geometry.exe (Windows)
+ Compile:  fpc -Fu../src -FUlib 12_geometry.lpr
+ Run:      ./12_geometry   (Linux/macOS)
+           12_geometry.exe (Windows)
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}

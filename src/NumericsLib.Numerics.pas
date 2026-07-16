@@ -379,6 +379,7 @@ var
   H, T, Y: Double;
   I: Integer;
 begin
+  Result := Default(TODESolution);
   if N < 1 then
     raise EInvalidArgument.Create('EulerSolve: N must be >= 1.');
   H := (T1 - T0) / N;
@@ -412,6 +413,7 @@ var
   H, T, Y: Double;
   I: Integer;
 begin
+  Result := Default(TODESolution);
   if N < 1 then
     raise EInvalidArgument.Create('RK4Solve: N must be >= 1.');
   H := (T1 - T0) / N;
@@ -496,6 +498,7 @@ var
   L, Mu, Z: TDoubleArray;
   C: TDoubleArray;
 begin
+  Result := Default(TCubicSpline);
   N := Length(XKnots);
   if N < 2 then
     raise EInvalidArgument.Create('CubicSplineBuild: need at least 2 knots.');

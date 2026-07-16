@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, fpcunit, testutils, testregistry, StrUtils,
-  EngineeringLib.UnitConversion;
+  EngineeringLib.Common, EngineeringLib.UnitConversion;
 
 type
 
@@ -44,6 +44,7 @@ type
     procedure Test26_GetBaseUnit;
     procedure Test27_ConversionShortcuts;
     procedure Test28_TryGetUnitFromName;
+    procedure Test29_UnknownUnitNameRaises;
   end;
 
 implementation
@@ -376,6 +377,16 @@ begin
   Success := TUnitConversionKit.TryGetTemperatureUnitFromName('°C', TempUnit);
   AssertTrue('Valid temperature unit name should succeed', Success);
   AssertTrue('Should get correct unit enum', TempUnit = tpCelsius);
+end;
+
+procedure TTestUnitConversionKit.Test29_UnknownUnitNameRaises;
+begin
+  try
+    TUnitConversionKit.GetUnitTypeFromUnitName('definitely-not-a-unit');
+    Fail('unknown unit name must raise EUnitConversionError');
+  except
+    on E: EUnitConversionError do { expected };
+  end;
 end;
 
 initialization

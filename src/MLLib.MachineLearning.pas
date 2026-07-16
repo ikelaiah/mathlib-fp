@@ -106,6 +106,10 @@ type
   { TMLKit — all methods are class static }
   TMLKit = class
   private
+    class procedure ValidateMatrix(const X: TDoubleMatrix;
+      const AName: String); static;
+    class procedure ValidateDoubleVector(const X: TDoubleArray;
+      const AName: String); static;
     { Internal matrix helpers }
     class function MatMul(const A, B: TDoubleMatrix): TDoubleMatrix; static;
     class function MatTranspose(const A: TDoubleMatrix): TDoubleMatrix; static;
@@ -181,7 +185,7 @@ type
     ======================================================================= }
 
     { Ordinary Least Squares linear regression.
-      Solves: beta = (X'X)^{-1} X'y  (normal equations, augmented with intercept).
+      Solves: beta = inverse(X'X) X'y (normal equations, augmented with intercept).
       X: NSamples × NFeatures  (do NOT include a bias column — added internally)
       Y: NSamples target values
 
@@ -193,20 +197,25 @@ type
     class function LinearRegression(const X: TDoubleMatrix; const Y: TDoubleArray): TLinearModel; static;
 
     { Ridge regression (L2-regularised linear regression).
-      Solves: beta = (X'X + lambda*I)^{-1} X'y
+      Solves: beta = inverse(X'X + lambda I) X'y
       Lambda: regularisation strength (0 → same as OLS; larger → more shrinkage).
 
       Use when features are correlated or N < NFeatures. }
     class function RidgeRegression(const X: TDoubleMatrix; const Y: TDoubleArray; Lambda: Double): TLinearModel; static;
 
     { Expand a 1-D feature vector into polynomial features up to Degree.
-      Input:  [x_0, x_1, ..., x_{N-1}]
+      Input:  [x_0, x_1, ..., x_(N-1)]
       Output: NSamples × (Degree+1) matrix where row i = [1, x_i, x_i², ..., x_i^Degree]
 
-      Combine with LinearRegression for polynomial regression:
-        Xpoly := TMLKit.PolynomialFeatures(x, 3);
+      This compatibility overload includes a bias column. When combining with
+      LinearRegression, use IncludeBias=False because LinearRegression fits its
+      own intercept:
+        Xpoly := TMLKit.PolynomialFeatures(x, 3, False);
         model := TMLKit.LinearRegression(Xpoly, y); }
-    class function PolynomialFeatures(const X: TDoubleArray; Degree: Integer): TDoubleMatrix; static;
+    class function PolynomialFeatures(const X: TDoubleArray;
+      Degree: Integer): TDoubleMatrix; static; overload;
+    class function PolynomialFeatures(const X: TDoubleArray;
+      Degree: Integer; IncludeBias: Boolean): TDoubleMatrix; static; overload;
 
     { Predict values from a linear model for a new dataset.
       Xnew: NSamples × NFeatures (same features as training X) }
@@ -370,6 +379,38 @@ implementation
   Private helpers
 --------------------------------------------------------------------------- }
 
+class procedure TMLKit.ValidateMatrix(const X: TDoubleMatrix;
+  const AName: String);
+var
+  I, J, NFeatures: Integer;
+begin
+  if Length(X) = 0 then
+    raise EMLError.Create(AName + ': empty matrix');
+  NFeatures := Length(X[0]);
+  if NFeatures = 0 then
+    raise EMLError.Create(AName + ': matrix has no features');
+  for I := 0 to High(X) do
+  begin
+    if Length(X[I]) <> NFeatures then
+      raise EMLError.Create(AName + ': ragged matrix');
+    for J := 0 to NFeatures - 1 do
+      if IsNan(X[I][J]) or IsInfinite(X[I][J]) then
+        raise EMLError.Create(AName + ': matrix contains NaN or Infinity');
+  end;
+end;
+
+class procedure TMLKit.ValidateDoubleVector(const X: TDoubleArray;
+  const AName: String);
+var
+  I: Integer;
+begin
+  if Length(X) = 0 then
+    raise EMLError.Create(AName + ': empty array');
+  for I := 0 to High(X) do
+    if IsNan(X[I]) or IsInfinite(X[I]) then
+      raise EMLError.Create(AName + ': array contains NaN or Infinity');
+end;
+
 class function TMLKit.Dot(const A, B: TDoubleArray): Double;
 var I: Integer;
 begin
@@ -395,6 +436,7 @@ end;
 class function TMLKit.MatTranspose(const A: TDoubleMatrix): TDoubleMatrix;
 var R, C: Integer;
 begin
+  Result := nil;
   if Length(A) = 0 then begin SetLength(Result, 0); Exit; end;
   SetLength(Result, Length(A[0]));
   for C := 0 to High(A[0]) do
@@ -413,6 +455,7 @@ begin
   RA := Length(A);
   CA := Length(A[0]);
   CB := Length(B[0]);
+  Result := nil;
   SetLength(Result, RA);
   for I := 0 to RA - 1 do
   begin
@@ -431,6 +474,7 @@ class function TMLKit.MatAddIdentity(const A: TDoubleMatrix; Lambda: Double): TD
 var N, I, J: Integer;
 begin
   N := Length(A);
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N - 1 do
   begin
@@ -489,6 +533,7 @@ begin
   end;
 
   { Back-substitution }
+  Result := nil;
   SetLength(Result, N);
   for I := N - 1 downto 0 do
   begin
@@ -559,6 +604,7 @@ class function TMLKit.RegionQuery(const X: TDoubleMatrix; PointIdx: Integer; Eps
 var
   I, Count: Integer;
 begin
+  Result := nil;
   SetLength(Result, Length(X));
   Count := 0;
   for I := 0 to High(X) do
@@ -579,9 +625,10 @@ var
   NSamples, NFeatures, I, J: Integer;
   MinVal, MaxVal, Range: Double;
 begin
+  ValidateMatrix(X, 'Normalise');
   NSamples  := Length(X);
-  if NSamples = 0 then raise EMLError.Create('Normalise: empty matrix');
   NFeatures := Length(X[0]);
+  Result := nil;
   SetLength(Result, NSamples);
   for I := 0 to NSamples - 1 do SetLength(Result[I], NFeatures);
 
@@ -605,9 +652,10 @@ var
   NSamples, NFeatures, I, J: Integer;
   Mu, Variance, Std: Double;
 begin
+  ValidateMatrix(X, 'Standardise');
   NSamples  := Length(X);
-  if NSamples = 0 then raise EMLError.Create('Standardise: empty matrix');
   NFeatures := Length(X[0]);
+  Result := nil;
   SetLength(Result, NSamples);
   for I := 0 to NSamples - 1 do SetLength(Result[I], NFeatures);
 
@@ -650,8 +698,12 @@ var
   end;
 
 begin
+  ValidateMatrix(X, 'TrainTestSplit');
   N := Length(X);
-  if N = 0 then raise EMLError.Create('TrainTestSplit: empty dataset');
+  if N < 2 then raise EMLError.Create('TrainTestSplit: need at least 2 samples');
+  if Length(Y) <> N then raise EMLError.Create('TrainTestSplit: X/Y length mismatch');
+  if IsNan(TestFraction) or IsInfinite(TestFraction) then
+    raise EMLError.Create('TrainTestSplit: TestFraction must be finite');
   if (TestFraction <= 0) or (TestFraction >= 1) then
     raise EMLError.Create('TrainTestSplit: TestFraction must be in (0,1)');
 
@@ -690,6 +742,7 @@ end;
 class function TMLKit.OneHotEncode(const Labels: TIntegerArray; NClasses: Integer): TDoubleMatrix;
 var I, J: Integer;
 begin
+  Result := nil;
   if NClasses < 2 then
     raise EMLError.Create('OneHotEncode: NClasses must be >= 2');
   SetLength(Result, Length(Labels));
@@ -717,8 +770,12 @@ var
   Beta: TDoubleArray;
   YMean, SSTot, SSRes, YHat: Double;
 begin
+  ValidateMatrix(X, 'LinearRegression');
+  ValidateDoubleVector(Y, 'LinearRegression targets');
   NSamples  := Length(X);
   NFeatures := Length(X[0]);
+  if Length(Y) <> NSamples then
+    raise EMLError.Create('LinearRegression: X/Y length mismatch');
   if NSamples <= NFeatures then
     raise EMLError.Create('LinearRegression: need more samples than features');
 
@@ -771,8 +828,14 @@ var
   XAtY, Beta: TDoubleArray;
   YMean, SSTot, SSRes, YHat: Double;
 begin
+  ValidateMatrix(X, 'RidgeRegression');
+  ValidateDoubleVector(Y, 'RidgeRegression targets');
   NSamples  := Length(X);
   NFeatures := Length(X[0]);
+  if Length(Y) <> NSamples then
+    raise EMLError.Create('RidgeRegression: X/Y length mismatch');
+  if (Lambda < 0) or IsNan(Lambda) or IsInfinite(Lambda) then
+    raise EMLError.Create('RidgeRegression: Lambda must be finite and non-negative');
 
   SetLength(XA, NSamples);
   for I := 0 to NSamples - 1 do
@@ -816,19 +879,30 @@ begin
   else              Result.RSquared := 1.0;
 end;
 
-class function TMLKit.PolynomialFeatures(const X: TDoubleArray; Degree: Integer): TDoubleMatrix;
+class function TMLKit.PolynomialFeatures(const X: TDoubleArray;
+  Degree: Integer): TDoubleMatrix;
+begin
+  Result := PolynomialFeatures(X, Degree, True);
+end;
+
+class function TMLKit.PolynomialFeatures(const X: TDoubleArray;
+  Degree: Integer; IncludeBias: Boolean): TDoubleMatrix;
 var
-  N, I, D: Integer;
+  N, I, D, Offset: Integer;
 begin
   if Degree < 1 then raise EMLError.Create('PolynomialFeatures: Degree must be >= 1');
+  ValidateDoubleVector(X, 'PolynomialFeatures');
   N := Length(X);
+  Offset := Ord(IncludeBias);
+  Result := nil;
   SetLength(Result, N);
   for I := 0 to N - 1 do
   begin
-    SetLength(Result[I], Degree + 1);
-    Result[I][0] := 1.0;
+    SetLength(Result[I], Degree + Offset);
+    if IncludeBias then
+      Result[I][0] := 1.0;
     for D := 1 to Degree do
-      Result[I][D] := Power(X[I], D);
+      Result[I][D - 1 + Offset] := Power(X[I], D);
   end;
 end;
 
@@ -838,6 +912,10 @@ var
 begin
   NSamples  := Length(Xnew);
   NFeatures := Length(Model.Coefficients);
+  if NSamples = 0 then Exit(nil);
+  ValidateMatrix(Xnew, 'LinearPredict');
+  if Length(Xnew[0]) <> NFeatures then
+    raise EMLError.Create('LinearPredict: feature count mismatch');
   SetLength(Result, NSamples);
   for I := 0 to NSamples - 1 do
   begin
@@ -865,13 +943,20 @@ var
   Tmp: Integer;
   TmpD: Double;
 begin
+  ValidateMatrix(TrainX, 'KNN training data');
+  ValidateMatrix(TestX, 'KNN test data');
   NTrain    := Length(TrainX);
   NTest     := Length(TestX);
   NFeatures := Length(TrainX[0]);
 
   if K < 1 then raise EMLError.Create('KNN: K must be >= 1');
   if K > NTrain then raise EMLError.Create('KNN: K > training samples');
+  if Length(TrainY) <> NTrain then raise EMLError.Create('KNN: X/Y length mismatch');
+  if Length(TestX[0]) <> NFeatures then raise EMLError.Create('KNN: feature count mismatch');
+  for I := 0 to High(TrainY) do
+    if TrainY[I] < 0 then raise EMLError.Create('KNN: labels must be non-negative');
 
+  Result := nil;
   SetLength(Result, NTest);
   SetLength(Distances, NTrain);
   SetLength(SortedIdx, NTrain);
@@ -927,9 +1012,17 @@ var
   LogProb, BestProb, Diff, V: Double;
   BestClass: Integer;
 begin
+  ValidateMatrix(TrainX, 'NaiveBayes training data');
+  ValidateMatrix(TestX, 'NaiveBayes test data');
   NSamples  := Length(TrainX);
   NTest     := Length(TestX);
   NFeatures := Length(TrainX[0]);
+  if Length(TrainY) <> NSamples then
+    raise EMLError.Create('NaiveBayes: X/Y length mismatch');
+  if Length(TestX[0]) <> NFeatures then
+    raise EMLError.Create('NaiveBayes: feature count mismatch');
+  for I := 0 to High(TrainY) do
+    if TrainY[I] < 0 then raise EMLError.Create('NaiveBayes: labels must be non-negative');
 
   { Find NClasses }
   NClasses := 0;
@@ -971,6 +1064,7 @@ begin
         ClassVars[C][J] := ClassVars[C][J] / ClassCounts[C] + 1e-9;
 
   { Classify test points }
+  Result := nil;
   SetLength(Result, NTest);
   for I := 0 to NTest - 1 do
   begin
@@ -1005,8 +1099,19 @@ var
   YHat, Err, GradNorm, G: Double;
   Grad: TDoubleArray;
 begin
+  ValidateMatrix(TrainX, 'LogisticRegression');
   NSamples  := Length(TrainX);
   NFeatures := Length(TrainX[0]);
+  if Length(TrainY) <> NSamples then
+    raise EMLError.Create('LogisticRegression: X/Y length mismatch');
+  if (LR <= 0) or IsNan(LR) or IsInfinite(LR) then
+    raise EMLError.Create('LogisticRegression: LR must be finite and positive');
+  if MaxIter <= 0 then raise EMLError.Create('LogisticRegression: MaxIter must be positive');
+  if (Tol <= 0) or IsNan(Tol) or IsInfinite(Tol) then
+    raise EMLError.Create('LogisticRegression: Tol must be finite and positive');
+  for I := 0 to High(TrainY) do
+    if (TrainY[I] <> 0) and (TrainY[I] <> 1) then
+      raise EMLError.Create('LogisticRegression: labels must be 0 or 1');
 
   SetLength(W, NFeatures + 1);  { W[0] = bias }
   for I := 0 to High(W) do W[I] := 0.0;
@@ -1050,6 +1155,10 @@ var
 begin
   NSamples  := Length(Xnew);
   NFeatures := Length(Model.Coefficients);
+  if NSamples = 0 then Exit(nil);
+  ValidateMatrix(Xnew, 'LogisticPredict');
+  if Length(Xnew[0]) <> NFeatures then
+    raise EMLError.Create('LogisticPredict: feature count mismatch');
   SetLength(Result, NSamples);
   for I := 0 to NSamples - 1 do
   begin
@@ -1082,10 +1191,12 @@ var
   end;
 
 begin
+  ValidateMatrix(X, 'KMeans');
   NSamples  := Length(X);
   NFeatures := Length(X[0]);
   if K < 1 then raise EMLError.Create('KMeans: K must be >= 1');
   if K > NSamples then raise EMLError.Create('KMeans: K > number of samples');
+  if MaxIter <= 0 then raise EMLError.Create('KMeans: MaxIter must be positive');
 
   { Initialise centroids by random sampling }
   RandState := Seed + 1;
@@ -1156,8 +1267,11 @@ var
   Queue: TIntegerArray;
   QHead, QTail, QItem: Integer;
 begin
+  ValidateMatrix(X, 'DBSCAN');
   N := Length(X);
-  if N = 0 then raise EMLError.Create('DBSCAN: empty dataset');
+  if (Eps <= 0) or IsNan(Eps) or IsInfinite(Eps) then
+    raise EMLError.Create('DBSCAN: Eps must be finite and positive');
+  if MinPts <= 0 then raise EMLError.Create('DBSCAN: MinPts must be positive');
 
   SetLength(Labels,  N);
   SetLength(Visited, N);
@@ -1226,12 +1340,18 @@ var
   Component: TDoubleArray;
   CovCopy: TDoubleMatrix;
 begin
+  Result := Default(TPCAResult);
+  ValidateMatrix(X, 'PCA');
   NSamples  := Length(X);
   NFeatures := Length(X[0]);
+  if NSamples < 2 then raise EMLError.Create('PCA: need at least 2 samples');
   if NComponents < 1 then
     raise EMLError.Create('PCA: NComponents must be >= 1');
   if NComponents > NFeatures then
     raise EMLError.Create('PCA: NComponents > NFeatures');
+  if MaxIter <= 0 then raise EMLError.Create('PCA: MaxIter must be positive');
+  if (Tol <= 0) or IsNan(Tol) or IsInfinite(Tol) then
+    raise EMLError.Create('PCA: Tol must be finite and positive');
 
   { Compute column means }
   SetLength(Mu, NFeatures);
@@ -1303,8 +1423,12 @@ var
   Centered: TDoubleArray;
 begin
   NSamples    := Length(X);
+  if NSamples = 0 then Exit(nil);
+  ValidateMatrix(X, 'PCATransform');
   NFeatures   := Length(PCARes.Mean);
   NComponents := Length(PCARes.Components);
+  if Length(X[0]) <> NFeatures then
+    raise EMLError.Create('PCATransform: feature count mismatch');
 
   SetLength(Result, NSamples);
   SetLength(Centered, NFeatures);
@@ -1339,6 +1463,8 @@ class function TMLKit.Precision(const YTrue, YPred: TIntegerArray; ClassLabel: I
 var N, I, TP, FP: Integer;
 begin
   N := Length(YTrue);
+  if N = 0 then raise EMLError.Create('Precision: empty arrays');
+  if N <> Length(YPred) then raise EMLError.Create('Precision: length mismatch');
   TP := 0; FP := 0;
   for I := 0 to N - 1 do
   begin
@@ -1354,6 +1480,8 @@ class function TMLKit.Recall(const YTrue, YPred: TIntegerArray; ClassLabel: Inte
 var N, I, TP, FN: Integer;
 begin
   N := Length(YTrue);
+  if N = 0 then raise EMLError.Create('Recall: empty arrays');
+  if N <> Length(YPred) then raise EMLError.Create('Recall: length mismatch');
   TP := 0; FN := 0;
   for I := 0 to N - 1 do
   begin
@@ -1378,8 +1506,10 @@ class function TMLKit.BuildConfusionMatrix(const YTrue, YPred: TIntegerArray; NC
 var N, I, C: Integer;
 begin
   N := Length(YTrue);
+  if N = 0 then raise EMLError.Create('ConfusionMatrix: empty arrays');
   if N <> Length(YPred) then
     raise EMLError.Create('ConfusionMatrix: length mismatch');
+  if NClasses < 1 then raise EMLError.Create('ConfusionMatrix: NClasses must be positive');
   Result.NClasses := NClasses;
   SetLength(Result.Counts, NClasses);
   for C := 0 to NClasses - 1 do
@@ -1400,7 +1530,9 @@ class function TMLKit.MSE(const YTrue, YPred: TDoubleArray): Double;
 var N, I: Integer;
 begin
   N := Length(YTrue);
-  if N = 0 then raise EMLError.Create('MSE: empty arrays');
+  ValidateDoubleVector(YTrue, 'MSE expected');
+  ValidateDoubleVector(YPred, 'MSE predicted');
+  if N <> Length(YPred) then raise EMLError.Create('MSE: length mismatch');
   Result := 0;
   for I := 0 to N - 1 do Result := Result + Sqr(YTrue[I] - YPred[I]);
   Result := Result / N;
@@ -1415,7 +1547,9 @@ class function TMLKit.MAE(const YTrue, YPred: TDoubleArray): Double;
 var N, I: Integer;
 begin
   N := Length(YTrue);
-  if N = 0 then raise EMLError.Create('MAE: empty arrays');
+  ValidateDoubleVector(YTrue, 'MAE expected');
+  ValidateDoubleVector(YPred, 'MAE predicted');
+  if N <> Length(YPred) then raise EMLError.Create('MAE: length mismatch');
   Result := 0;
   for I := 0 to N - 1 do Result := Result + Abs(YTrue[I] - YPred[I]);
   Result := Result / N;
@@ -1426,7 +1560,9 @@ var N, I: Integer;
     YMean, SSTot, SSRes: Double;
 begin
   N := Length(YTrue);
-  if N = 0 then raise EMLError.Create('R2Score: empty arrays');
+  ValidateDoubleVector(YTrue, 'R2Score expected');
+  ValidateDoubleVector(YPred, 'R2Score predicted');
+  if N <> Length(YPred) then raise EMLError.Create('R2Score: length mismatch');
   YMean := 0;
   for I := 0 to N - 1 do YMean := YMean + YTrue[I];
   YMean := YMean / N;

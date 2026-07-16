@@ -115,7 +115,8 @@ type
 
       @returns A new array of the same size as Data, containing elements randomly drawn from Data with replacement.
 
-      @warning Requires the random number generator to be seeded (e.g., using Randomize).
+      @warning Uses the caller-managed global random generator. It never calls
+      Randomize internally.
 
       @example
       var
@@ -1377,7 +1378,10 @@ type
         // Calculate stats on BootMeans, e.g., TStatsKit.Mean(BootMeans)
       end;
     }
-    class function BootstrapMean(const Data: TDoubleArray; const Iterations: Integer): TDoubleArray; static;
+    class function BootstrapMean(const Data: TDoubleArray;
+      const Iterations: Integer): TDoubleArray; static; overload;
+    class function BootstrapMean(const Data: TDoubleArray;
+      const Iterations: Integer; const Seed: LongWord): TDoubleArray; static; overload;
 
     {
       @description Calculates a bootstrap percentile confidence interval for the mean.
@@ -1414,7 +1418,12 @@ type
     class function BootstrapConfidenceInterval(
       const Data: TDoubleArray;
       const Alpha: Double = 0.05;
-      const Iterations: Integer = 1000): TDoublePair; static;
+      const Iterations: Integer = 1000): TDoublePair; static; overload;
+    class function BootstrapConfidenceInterval(
+      const Data: TDoubleArray;
+      const Alpha: Double;
+      const Iterations: Integer;
+      const Seed: LongWord): TDoublePair; static; overload;
   end;
 
 implementation
@@ -1704,6 +1713,7 @@ var
     TieRankSum: Double;
     AverageRank: Double; // Added for clarity in tie handling
   begin
+    Result := nil;
     SetLength(SortedIndices, Length(Data));
     SetLength(SortedData, Length(Data));
     SetLength(Result, Length(Data));
@@ -2059,10 +2069,42 @@ var
   I: Integer;
   Sample: TDoubleArray;
 begin
+  Result := nil;
+  if Length(Data) = 0 then
+    raise EStatsError.Create('BootstrapMean requires non-empty data');
+  if Iterations <= 0 then
+    raise EStatsError.Create('BootstrapMean requires Iterations > 0');
   SetLength(Result, Iterations);
   for I := 0 to Iterations - 1 do
   begin
     Sample := RandomSample(Data);
+    Result[I] := Mean(Sample);
+  end;
+end;
+
+class function TStatsKit.BootstrapMean(const Data: TDoubleArray;
+  const Iterations: Integer; const Seed: LongWord): TDoubleArray;
+var
+  I, J, Index: Integer;
+  State: LongWord;
+  Sample: TDoubleArray;
+begin
+  Result := nil;
+  if Length(Data) = 0 then
+    raise EStatsError.Create('BootstrapMean requires non-empty data');
+  if Iterations <= 0 then
+    raise EStatsError.Create('BootstrapMean requires Iterations > 0');
+  State := Seed;
+  SetLength(Result, Iterations);
+  SetLength(Sample, Length(Data));
+  for I := 0 to Iterations - 1 do
+  begin
+    for J := 0 to High(Sample) do
+    begin
+      State := LongWord((QWord(State) * 1664525 + 1013904223) and $FFFFFFFF);
+      Index := State mod LongWord(Length(Data));
+      Sample[J] := Data[Index];
+    end;
     Result[I] := Mean(Sample);
   end;
 end;
@@ -2074,9 +2116,27 @@ class function TStatsKit.BootstrapConfidenceInterval(
 var
   Means: TDoubleArray;
 begin
+  if (Alpha <= 0) or (Alpha >= 1) or IsNan(Alpha) or IsInfinite(Alpha) then
+    raise EStatsError.Create('BootstrapConfidenceInterval requires Alpha in (0, 1)');
   Means := BootstrapMean(Data, Iterations);
   Sort(Means);
   
+  Result.Lower := Percentile(Means, (Alpha / 2) * 100);
+  Result.Upper := Percentile(Means, (1 - (Alpha / 2)) * 100);
+end;
+
+class function TStatsKit.BootstrapConfidenceInterval(
+  const Data: TDoubleArray;
+  const Alpha: Double;
+  const Iterations: Integer;
+  const Seed: LongWord): TDoublePair;
+var
+  Means: TDoubleArray;
+begin
+  if (Alpha <= 0) or (Alpha >= 1) or IsNan(Alpha) or IsInfinite(Alpha) then
+    raise EStatsError.Create('BootstrapConfidenceInterval requires Alpha in (0, 1)');
+  Means := BootstrapMean(Data, Iterations, Seed);
+  Sort(Means);
   Result.Lower := Percentile(Means, (Alpha / 2) * 100);
   Result.Upper := Percentile(Means, (1 - (Alpha / 2)) * 100);
 end;
@@ -2085,6 +2145,9 @@ class function TStatsKit.RandomSample(const Data: TDoubleArray): TDoubleArray;
 var
   I: Integer;
 begin
+  Result := nil;
+  if Length(Data) = 0 then
+    raise EStatsError.Create('RandomSample requires non-empty data');
   SetLength(Result, Length(Data));
   for I := 0 to High(Data) do
     Result[I] := Data[Random(Length(Data))];

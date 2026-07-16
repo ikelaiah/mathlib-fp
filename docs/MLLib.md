@@ -170,10 +170,15 @@ L2-regularised OLS: β = (X'X + λI)⁻¹ X'y. The intercept is not regularised.
 ```pascal
 Xpoly := TMLKit.PolynomialFeatures(X1D, Degree);
 // Xpoly[i] = [1, x_i, x_i², ..., x_i^Degree]
+
+// LinearRegression fits an intercept, so omit PolynomialFeatures' bias column:
+Xpoly := TMLKit.PolynomialFeatures(X1D, Degree, False);
 model := TMLKit.LinearRegression(Xpoly, Y);
 ```
 
-Expands a 1-D feature vector to a polynomial design matrix. Combine with LinearRegression for non-linear curve fitting.
+Expands a 1-D feature vector to a polynomial design matrix. The two-argument
+compatibility overload includes a bias column. Pass `IncludeBias = False` when
+combining it with `LinearRegression`, which fits its own intercept.
 
 ### LinearPredict
 
@@ -319,12 +324,14 @@ WriteLn(TMLKit.R2Score(YTrue, YPred));
 ## Error Handling
 
 `EMLError` is raised for:
-- Empty input matrix
+- Empty, ragged, or zero-feature matrices
+- NaN or infinite feature/target values
+- Feature-count or sample/target length mismatches
 - K > number of training samples (KNN, KMeans)
 - NComponents > NFeatures (PCA)
-- Label out of range (OneHotEncode, ConfusionMatrix)
+- Negative or out-of-range labels, and non-binary logistic-regression labels
 - NSamples ≤ NFeatures (LinearRegression — singular normal equations)
-- TestFraction outside (0, 1) (TrainTestSplit)
+- Invalid fractions, iteration counts, tolerances, learning rates, radii, or regularisation parameters
 
 ---
 

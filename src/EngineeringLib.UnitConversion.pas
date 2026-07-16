@@ -5,7 +5,7 @@ unit EngineeringLib.UnitConversion;
 interface
 
 uses
-  Classes, SysUtils, Math;
+  Classes, SysUtils, Math, EngineeringLib.Common;
 
 type
   { Unit types }
@@ -279,7 +279,7 @@ begin
     tpRankine: KelvinValue := Value * 5/9;
     tpReaumur: KelvinValue := Value * 1.25 + 273.15;
   else
-    raise Exception.Create('Unknown source temperature unit');
+    raise EUnitConversionError.Create('Unknown source temperature unit');
   end;
 
   // Then convert from Kelvin to target unit
@@ -290,7 +290,7 @@ begin
     tpRankine: Result := KelvinValue * 9/5;
     tpReaumur: Result := (KelvinValue - 273.15) * 0.8;
   else
-    raise Exception.Create('Unknown target temperature unit');
+    raise EUnitConversionError.Create('Unknown target temperature unit');
   end;
 end;
 
@@ -871,78 +871,41 @@ begin
 end;
 
 class function TUnitConversionKit.GetUnitTypeFromUnitName(AUnitName: string): TUnitType;
+var
+  LengthUnit: TLengthUnit;
+  MassUnit: TMassUnit;
+  TimeUnit: TTimeUnit;
+  TemperatureUnit: TTemperatureUnit;
+  ForceUnit: TForceUnit;
+  EnergyUnit: TEnergyUnit;
+  PowerUnit: TPowerUnit;
+  PressureUnit: TPressureUnit;
+  VelocityUnit: TVelocityUnit;
+  AreaUnit: TAreaUnit;
+  VolumeUnit: TVolumeUnit;
+  AngleUnit: TAngleUnit;
+  DensityUnit: TDensityUnit;
+  CurrentUnit: TElectricalCurrentUnit;
+  PotentialUnit: TElectricalPotentialUnit;
+  FrequencyUnit: TFrequencyUnit;
 begin
-  // Length units
-  if (AUnitName = 'm') or (AUnitName = 'km') or (AUnitName = 'cm') or (AUnitName = 'mm') or
-     (AUnitName = 'μm') or (AUnitName = 'nm') or (AUnitName = 'mi') or (AUnitName = 'yd') or
-     (AUnitName = 'ft') or (AUnitName = 'in') or (AUnitName = 'nmi') or (AUnitName = 'Å') or
-     (AUnitName = 'ly') then
-    Result := utLength
-  // Mass units
-  else if (AUnitName = 'kg') or (AUnitName = 'g') or (AUnitName = 'mg') or (AUnitName = 'μg') or
-          (AUnitName = 't') or (AUnitName = 'lb') or (AUnitName = 'oz') or (AUnitName = 'st') or
-          (AUnitName = 'US ton') or (AUnitName = 'imp ton') then
-    Result := utMass
-  // Time units
-  else if (AUnitName = 's') or (AUnitName = 'min') or (AUnitName = 'h') or (AUnitName = 'd') or
-          (AUnitName = 'wk') or (AUnitName = 'mo') or (AUnitName = 'yr') or (AUnitName = 'ms') or
-          (AUnitName = 'μs') or (AUnitName = 'ns') then
-    Result := utTime
-  // Temperature units
-  else if (AUnitName = 'K') or (AUnitName = '°C') or (AUnitName = '°F') or (AUnitName = '°R') or
-          (AUnitName = '°Ré') then
-    Result := utTemperature
-  // Force units
-  else if (AUnitName = 'N') or (AUnitName = 'kN') or (AUnitName = 'lbf') or (AUnitName = 'dyn') or
-          (AUnitName = 'kgf') then
-    Result := utForce
-  // Energy units
-  else if (AUnitName = 'J') or (AUnitName = 'kJ') or (AUnitName = 'cal') or (AUnitName = 'kcal') or
-          (AUnitName = 'Wh') or (AUnitName = 'kWh') or (AUnitName = 'eV') or (AUnitName = 'BTU') or
-          (AUnitName = 'therm') or (AUnitName = 'ft⋅lb') then
-    Result := utEnergy
-  // Power units
-  else if (AUnitName = 'W') or (AUnitName = 'kW') or (AUnitName = 'MW') or (AUnitName = 'hp') or
-          (AUnitName = 'BTU/h') then
-    Result := utPower
-  // Pressure units
-  else if (AUnitName = 'Pa') or (AUnitName = 'kPa') or (AUnitName = 'bar') or (AUnitName = 'atm') or
-          (AUnitName = 'Torr') or (AUnitName = 'psi') then
-    Result := utPressure
-  // Velocity units
-  else if (AUnitName = 'm/s') or (AUnitName = 'km/h') or (AUnitName = 'mph') or (AUnitName = 'ft/s') or
-          (AUnitName = 'kt') then
-    Result := utVelocity
-  // Area units
-  else if (AUnitName = 'm²') or (AUnitName = 'km²') or (AUnitName = 'ha') or (AUnitName = 'a') or
-          (AUnitName = 'mi²') or (AUnitName = 'acre') or (AUnitName = 'yd²') or (AUnitName = 'ft²') or
-          (AUnitName = 'in²') then
-    Result := utArea
-  // Volume units
-  else if (AUnitName = 'L') or (AUnitName = 'm³') or (AUnitName = 'mL') or (AUnitName = 'cm³') or
-          (AUnitName = 'gal (US)') or (AUnitName = 'gal (UK)') or (AUnitName = 'fl oz (US)') or
-          (AUnitName = 'fl oz (UK)') or (AUnitName = 'ft³') or (AUnitName = 'in³') then
-    Result := utVolume
-  // Angle units
-  else if (AUnitName = '°') or (AUnitName = 'rad') or (AUnitName = 'grad') or (AUnitName = '′') or
-          (AUnitName = '″') or (AUnitName = 'rev') then
-    Result := utAngle
-  // Density units
-  else if (AUnitName = 'kg/m³') or (AUnitName = 'g/cm³') or (AUnitName = 'lb/ft³') or
-          (AUnitName = 'lb/in³') then
-    Result := utDensity
-  // Electrical current units
-  else if (AUnitName = 'A') or (AUnitName = 'mA') or (AUnitName = 'μA') then
-    Result := utElectricalCurrent
-  // Electrical potential units
-  else if (AUnitName = 'V') or (AUnitName = 'kV') or (AUnitName = 'mV') or (AUnitName = 'μV') then
-    Result := utElectricalPotential
-  // Frequency units
-  else if (AUnitName = 'Hz') or (AUnitName = 'kHz') or (AUnitName = 'MHz') or (AUnitName = 'GHz') or
-          (AUnitName = 'cps') then
-    Result := utFrequency
-  else
-    Result := utLength; // Default to length if unknown
+  if TryGetLengthUnitFromName(AUnitName, LengthUnit) then Exit(utLength);
+  if TryGetMassUnitFromName(AUnitName, MassUnit) then Exit(utMass);
+  if TryGetTimeUnitFromName(AUnitName, TimeUnit) then Exit(utTime);
+  if TryGetTemperatureUnitFromName(AUnitName, TemperatureUnit) then Exit(utTemperature);
+  if TryGetForceUnitFromName(AUnitName, ForceUnit) then Exit(utForce);
+  if TryGetEnergyUnitFromName(AUnitName, EnergyUnit) then Exit(utEnergy);
+  if TryGetPowerUnitFromName(AUnitName, PowerUnit) then Exit(utPower);
+  if TryGetPressureUnitFromName(AUnitName, PressureUnit) then Exit(utPressure);
+  if TryGetVelocityUnitFromName(AUnitName, VelocityUnit) then Exit(utVelocity);
+  if TryGetAreaUnitFromName(AUnitName, AreaUnit) then Exit(utArea);
+  if TryGetVolumeUnitFromName(AUnitName, VolumeUnit) then Exit(utVolume);
+  if TryGetAngleUnitFromName(AUnitName, AngleUnit) then Exit(utAngle);
+  if TryGetDensityUnitFromName(AUnitName, DensityUnit) then Exit(utDensity);
+  if TryGetElectricalCurrentUnitFromName(AUnitName, CurrentUnit) then Exit(utElectricalCurrent);
+  if TryGetElectricalPotentialUnitFromName(AUnitName, PotentialUnit) then Exit(utElectricalPotential);
+  if TryGetFrequencyUnitFromName(AUnitName, FrequencyUnit) then Exit(utFrequency);
+  raise EUnitConversionError.CreateFmt('Unknown unit name: %s', [AUnitName]);
 end;
 
 // Helper methods to get enum values from unit names
@@ -958,7 +921,7 @@ begin
     Unit_ := luCentimeter
   else if AUnitName = 'mm' then
     Unit_ := luMillimeter
-  else if AUnitName = 'μm' then
+  else if AUnitName = GetLengthUnitName(luMicrometer) then
     Unit_ := luMicrometer
   else if AUnitName = 'nm' then
     Unit_ := luNanometer
@@ -972,7 +935,7 @@ begin
     Unit_ := luInch
   else if AUnitName = 'nmi' then
     Unit_ := luNauticalMile
-  else if AUnitName = 'Å' then
+  else if AUnitName = GetLengthUnitName(luAngstrom) then
     Unit_ := luAngstrom
   else if AUnitName = 'ly' then
     Unit_ := luLightYear
@@ -990,7 +953,7 @@ begin
     Unit_ := muGram
   else if AUnitName = 'mg' then
     Unit_ := muMilligram
-  else if AUnitName = 'μg' then
+  else if AUnitName = GetMassUnitName(muMicrogram) then
     Unit_ := muMicrogram
   else if AUnitName = 't' then
     Unit_ := muTonne
@@ -1028,7 +991,7 @@ begin
     Unit_ := tuYear
   else if AUnitName = 'ms' then
     Unit_ := tuMillisecond
-  else if AUnitName = 'μs' then
+  else if AUnitName = GetTimeUnitName(tuMicrosecond) then
     Unit_ := tuMicrosecond
   else if AUnitName = 'ns' then
     Unit_ := tuNanosecond
@@ -1044,13 +1007,13 @@ begin
   
   if AUnitName = 'K' then
     Unit_ := tpKelvin
-  else if AUnitName = '°C' then
+  else if AUnitName = GetTemperatureUnitName(tpCelsius) then
     Unit_ := tpCelsius
-  else if AUnitName = '°F' then
+  else if AUnitName = GetTemperatureUnitName(tpFahrenheit) then
     Unit_ := tpFahrenheit
-  else if AUnitName = '°R' then
+  else if AUnitName = GetTemperatureUnitName(tpRankine) then
     Unit_ := tpRankine
-  else if AUnitName = '°Ré' then
+  else if AUnitName = GetTemperatureUnitName(tpReaumur) then
     Unit_ := tpReaumur
   else
     Result := False;
@@ -1096,7 +1059,7 @@ begin
     Unit_ := euBTU
   else if AUnitName = 'therm' then
     Unit_ := euTherm
-  else if AUnitName = 'ft⋅lb' then
+  else if AUnitName = GetEnergyUnitName(euFootPound) then
     Unit_ := euFootPound
   else
     Result := False;
@@ -1162,23 +1125,23 @@ class function TUnitConversionKit.TryGetAreaUnitFromName(AUnitName: string; out 
 begin
   Result := True;
   
-  if AUnitName = 'm²' then
+  if AUnitName = GetAreaUnitName(auSquareMeter) then
     Unit_ := auSquareMeter
-  else if AUnitName = 'km²' then
+  else if AUnitName = GetAreaUnitName(auSquareKilometer) then
     Unit_ := auSquareKilometer
   else if AUnitName = 'ha' then
     Unit_ := auHectare
   else if AUnitName = 'a' then
     Unit_ := auAre
-  else if AUnitName = 'mi²' then
+  else if AUnitName = GetAreaUnitName(auSquareMile) then
     Unit_ := auSquareMile
   else if AUnitName = 'acre' then
     Unit_ := auAcre
-  else if AUnitName = 'yd²' then
+  else if AUnitName = GetAreaUnitName(auSquareYard) then
     Unit_ := auSquareYard
-  else if AUnitName = 'ft²' then
+  else if AUnitName = GetAreaUnitName(auSquareFoot) then
     Unit_ := auSquareFoot
-  else if AUnitName = 'in²' then
+  else if AUnitName = GetAreaUnitName(auSquareInch) then
     Unit_ := auSquareInch
   else
     Result := False;
@@ -1190,11 +1153,11 @@ begin
   
   if AUnitName = 'L' then
     Unit_ := voLiter
-  else if AUnitName = 'm³' then
+  else if AUnitName = GetVolumeUnitName(voCubicMeter) then
     Unit_ := voCubicMeter
   else if AUnitName = 'mL' then
     Unit_ := voMilliliter
-  else if AUnitName = 'cm³' then
+  else if AUnitName = GetVolumeUnitName(voCubicCentimeter) then
     Unit_ := voCubicCentimeter
   else if AUnitName = 'gal (US)' then
     Unit_ := voGallonUS
@@ -1204,9 +1167,9 @@ begin
     Unit_ := voFluidOunceUS
   else if AUnitName = 'fl oz (UK)' then
     Unit_ := voFluidOunceUK
-  else if AUnitName = 'ft³' then
+  else if AUnitName = GetVolumeUnitName(voCubicFoot) then
     Unit_ := voCubicFoot
-  else if AUnitName = 'in³' then
+  else if AUnitName = GetVolumeUnitName(voCubicInch) then
     Unit_ := voCubicInch
   else
     Result := False;
@@ -1216,15 +1179,15 @@ class function TUnitConversionKit.TryGetAngleUnitFromName(AUnitName: string; out
 begin
   Result := True;
   
-  if AUnitName = '°' then
+  if AUnitName = GetAngleUnitName(anDegree) then
     Unit_ := anDegree
   else if AUnitName = 'rad' then
     Unit_ := anRadian
   else if AUnitName = 'grad' then
     Unit_ := anGradian
-  else if AUnitName = '′' then
+  else if AUnitName = GetAngleUnitName(anMinuteOfArc) then
     Unit_ := anMinuteOfArc
-  else if AUnitName = '″' then
+  else if AUnitName = GetAngleUnitName(anSecondOfArc) then
     Unit_ := anSecondOfArc
   else if AUnitName = 'rev' then
     Unit_ := anRevolution
@@ -1236,13 +1199,13 @@ class function TUnitConversionKit.TryGetDensityUnitFromName(AUnitName: string; o
 begin
   Result := True;
   
-  if AUnitName = 'kg/m³' then
+  if AUnitName = GetDensityUnitName(deKilogramPerCubicMeter) then
     Unit_ := deKilogramPerCubicMeter
-  else if AUnitName = 'g/cm³' then
+  else if AUnitName = GetDensityUnitName(deGramPerCubicCentimeter) then
     Unit_ := deGramPerCubicCentimeter
-  else if AUnitName = 'lb/ft³' then
+  else if AUnitName = GetDensityUnitName(dePoundPerCubicFoot) then
     Unit_ := dePoundPerCubicFoot
-  else if AUnitName = 'lb/in³' then
+  else if AUnitName = GetDensityUnitName(dePoundPerCubicInch) then
     Unit_ := dePoundPerCubicInch
   else
     Result := False;
@@ -1258,7 +1221,7 @@ begin
     Unit_ := ecAmpere
   else if AUnitName = 'mA' then
     Unit_ := ecMilliampere
-  else if AUnitName = 'μA' then
+  else if AUnitName = GetElectricalCurrentUnitName(ecMicroampere) then
     Unit_ := ecMicroampere
   else
     Result := False;
@@ -1276,7 +1239,7 @@ begin
     Unit_ := epKilovolt
   else if AUnitName = 'mV' then
     Unit_ := epMillivolt
-  else if AUnitName = 'μV' then
+  else if AUnitName = GetElectricalPotentialUnitName(epMicrovolt) then
     Unit_ := epMicrovolt
   else
     Result := False;
@@ -1351,15 +1314,22 @@ class function TUnitConversionKit.AreUnitNamesCompatible(AUnitName1, AUnitName2:
 var
   UnitType1, UnitType2: TUnitType;
 begin
-  UnitType1 := GetUnitTypeFromUnitName(AUnitName1);
-  UnitType2 := GetUnitTypeFromUnitName(AUnitName2);
-  Result := AreUnitsCompatible(UnitType1, UnitType2);
+  Result := False;
+  try
+    UnitType1 := GetUnitTypeFromUnitName(AUnitName1);
+    UnitType2 := GetUnitTypeFromUnitName(AUnitName2);
+    Result := AreUnitsCompatible(UnitType1, UnitType2);
+  except
+    on E: EUnitConversionError do
+      Exit(False);
+  end;
 end;
 
 class function TUnitConversionKit.GetAllUnitsOfType(UnitType: TUnitType): TStringArray;
 var
   I: Integer;
 begin
+  Result := nil;
   case UnitType of
     utLength:
       begin
@@ -1464,6 +1434,7 @@ end;
 
 class function TUnitConversionKit.GetAllUnitTypes: TStringArray;
 begin
+  Result := nil;
   SetLength(Result, Ord(High(TUnitType)) + 1);
   Result[Ord(utLength)] := 'Length';
   Result[Ord(utMass)] := 'Mass';
