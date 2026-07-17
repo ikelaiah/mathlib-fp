@@ -22,7 +22,8 @@ unit StatsLib.Stats;
  - Uses TDoubleArray from MathBase.SharedTypes for data input
  - Provides TDescriptiveStats record for comprehensive summary output
  - Includes basic error handling for invalid inputs (e.g., empty arrays)
- - StdDev calculates sample standard deviation (using n-1 denominator), not population standard deviation
+ - StandardDeviation and TDescriptiveStats.StdDev use the population (n)
+   denominator; SampleStandardDeviation uses the sample (n-1) denominator
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -1359,7 +1360,10 @@ type
 
       @returns An array containing the means calculated from each bootstrap sample.
 
-      @warning Requires the random number generator to be seeded (e.g., using Randomize). The number of iterations should be sufficiently large (e.g., 1000 or more) for stable results.
+      @warning The unseeded overload uses caller-managed global random state;
+      call Randomize once in the application if nondeterministic samples are
+      wanted. The Seed overload uses local reproducible state and does not
+      change RandSeed. More iterations generally produce a stabler estimate.
 
       @example
       var
@@ -1396,7 +1400,10 @@ type
 
       @references https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Bootstrap_percentile_interval
 
-      @warning Requires the random number generator to be seeded. Accuracy depends on the number of iterations. Raises errors from underlying functions (BootstrapMean, Percentile) if conditions aren't met.
+      @warning The compatibility overload uses caller-managed global random
+      state. The Seed overload is locally reproducible and does not change
+      RandSeed. Accuracy depends on the number of iterations; invalid input is
+      rejected by BootstrapMean and Percentile.
 
       @example
       var

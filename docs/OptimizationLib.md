@@ -66,7 +66,7 @@ end;
 | ML / deep learning style | `Adam` | Adaptive rates, handles noise |
 | Non-convex, many local minima | `SimulatedAnnealing` | Global search |
 | Constrained problems | `PenaltyMethod` + `NelderMead` | Easy to set up |
-| Linear programming | `SimplexLP` | Exact, polynomial-time |
+| Small standard-form linear programs | `SimplexLP` | Tableau simplex with an immediately feasible slack basis |
 
 ---
 
@@ -160,8 +160,8 @@ Probabilistic global search. Accepts worse solutions with probability `exp(-ΔE/
 - `Seed` — RNG seed for reproducibility (default 42)
 
 **Tuning tips:**
-- If the solver misses the global minimum: increase `T0` or decrease `CoolRate`
-- If convergence is slow: increase `CoolRate` closer to 1
+- If the solver misses the global minimum: increase `T0` or increase `CoolRate` closer to 1
+- If cooling is too slow: decrease `CoolRate`
 - For higher-dimensional problems: increase `MaxIter`
 
 ---
@@ -213,20 +213,29 @@ if lp.Feasible then
 ```
 
 **Standard form requirements:**
-- All right-hand sides `b[i] >= 0` (multiply any negative constraint by -1)
-- Variables implicitly >= 0
 
-**Example — classic diet problem:**
+- All right-hand sides `b[i] >= 0`, so the added slack variables form the
+  initial feasible basis
+- Variables implicitly >= 0
+- Only `<=` constraints are supported; there is no Phase I procedure for
+  `>=`, equality, or a non-obvious initial feasible basis
+
+**Example — capacity-constrained production:**
+
 ```pascal
-// minimise   cost = 3*food1 + 2*food2
-// subject to food1 + 2*food2 >= 4   → -food1 - 2*food2 <= -4
-//            food1 >= 0, food2 >= 0
+// maximise x1+x2 by minimising -x1-x2
+// subject to x1+x2 <= 4, x1 <= 3, x2 <= 3, and x >= 0
 
 lp := TOptimizationKit.SimplexLP(
-  TDoubleArray.Create(3, 2),
-  [TDoubleArray.Create(-1, -2)],
-  TDoubleArray.Create(-4));
+  TDoubleArray.Create(-1, -1),
+  [TDoubleArray.Create(1, 1),
+   TDoubleArray.Create(1, 0),
+   TDoubleArray.Create(0, 1)],
+  TDoubleArray.Create(4, 3, 3));
 ```
+
+`Feasible = False` is also used for an unbounded tableau, so the result does
+not distinguish infeasibility from unboundedness.
 
 ---
 
@@ -272,6 +281,15 @@ Numerical gradients are slightly slower (~2N function evaluations per gradient) 
 - `GoldenSection` / `BrentMinimize`: B <= A
 - Any multi-variable solver: empty `X0`
 - `SimplexLP`: no constraints or no variables provided
+
+Other dimensions and numeric controls are not comprehensively validated.
+Callers must supply rectangular `A`, matching `A`/`B` lengths, matching row and
+cost-vector widths, non-nil objective functions, positive tolerances and
+iteration counts, and meaningful solver hyperparameters.
+
+`PenaltyMethod` and `Maximize` use unit-level callback state to bridge Free
+Pascal procedure-variable restrictions. Do not run overlapping calls to those
+methods from multiple threads.
 
 ---
 

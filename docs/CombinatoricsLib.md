@@ -64,7 +64,8 @@ TCombinatoricsKit.PascalTriangle(4)   // rows 0..4
 
 `PascalTriangle(N)[i][k]` = C(i, k). Row i sums to 2^i.
 
-`Fibonacci` uses **fast matrix doubling** — O(log N) multiplications, safe up to N=92.
+`Fibonacci` uses **fast doubling** — O(log N) multiplications, safe up to N=92.
+The largest safe Lucas index is 90.
 
 ---
 
@@ -97,7 +98,9 @@ TCombinatoricsKit.IsPrime(999999937)     // True
 TCombinatoricsKit.NextPrime(100)         // 101
 ```
 
-`IsPrime` uses **deterministic Miller-Rabin** with 7 carefully chosen witnesses — correct for all N < 3.3 × 10²⁴, no false positives.
+`IsPrime` uses Miller-Rabin with bases 2, 3, 5, 7, 11, 13, and 17. This
+witness set is deterministic for `N < 341,550,071,728,321`. Do not extrapolate
+the guarantee to the full `Int64` range.
 
 ### Factorisation & Sieve
 
@@ -110,6 +113,9 @@ factors := TCombinatoricsKit.PrimeFactors(360);
 
 primes := TCombinatoricsKit.Sieve(100);  // all 25 primes <= 100
 ```
+
+`Sieve` stores one Boolean per integer through `Limit`; its memory use is O(Limit),
+not a packed one-bit-per-number representation.
 
 ### Euler's Totient
 
@@ -137,6 +143,8 @@ until not TCombinatoricsKit.NextPermutation(perm);
 ```
 
 `NextPermutation` uses **Knuth's Algorithm L** and returns `False` (resetting to first) when the last permutation is reached.
+`Permutations` allocates `Length(Items)!` rows. Repeated input values therefore
+produce repeated rows rather than only the distinct permutations.
 
 ### All K-combinations
 
@@ -169,26 +177,33 @@ end;
 ```
 
 `ECombinatoricsError` is raised for:
-- N < 0 on any function
+
+- negative N or K on counting/generation functions whose domain requires them
 - K > N for Permutation, Combination
 - Factorial(N > 20) or CatalanNumber(N > 30) or BellNumber(N > 18) — Int64 overflow
 - `ModInverse` when GCD(A,M) ≠ 1
-- `ModPow` with M = 0
+- `ModPow` with M <= 0
 - `PrimeFactors(N <= 1)`
 - `Sieve(Limit < 2)`
 - `PowerSet(N > 24)`
+
+`ModPow` also requires a non-negative exponent, although a negative exponent is
+not currently rejected. Its `Int64` multiplications can overflow for large
+moduli; it is not an arbitrary-precision modular arithmetic routine. Likewise,
+`LCM`, Stirling/derangement recurrences, and some sequence builders do not all
+perform explicit overflow checks.
 
 ---
 
 ## Overflow Reference
 
-| Function | Max safe N | Value at max |
+| Function | Documented safe/accepted maximum | Value at maximum |
 |----------|-----------|--------------|
 | `Factorial` | 20 | 2.4 × 10¹⁸ |
-| `CatalanNumber` | 30 | 5.9 × 10¹⁶ |
-| `BellNumber` | 18 | 4.7 × 10¹⁵ |
+| `CatalanNumber` | 30 | 3,814,986,502,092,304 |
+| `BellNumber` | 18 | 682,076,806,159 |
 | `Fibonacci` | 92 | 7.5 × 10¹⁸ |
-| `Lucas` | 91 | 4.7 × 10¹⁸ |
+| `Lucas` | 90 | 6,440,026,026,380,244,498 |
 
 For larger values use `LogFactorial` / `LogCombination` which return `Double`.
 
@@ -197,5 +212,6 @@ For larger values use `LogFactorial` / `LogCombination` which return `Double`.
 ## Dependencies
 
 - `MathBase.SharedTypes` — `TIntegerArray`
+- `MathBase.Precision` — `GammaLn`, used by `LogFactorial`
 
 No other external libraries required.

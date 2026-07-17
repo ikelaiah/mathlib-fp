@@ -37,9 +37,11 @@ type
     class function RadToGrad(const Radians: Double): Double; static;
 
     { ---- Angle normalisation ---- }
-    { Normalise to [0, 2π) }
+    { Normalise a finite, ordinary-sized angle to [0, 2π) using repeated
+      addition/subtraction. Infinity does not terminate. }
     class function NormalizeAngle(const Angle: Double): Double; static;
-    { Normalise to [0, 360) }
+    { Normalise a finite, ordinary-sized angle to [0, 360) using repeated
+      addition/subtraction. Infinity does not terminate. }
     class function NormalizeAngleDeg(const Angle: Double): Double; static;
 
     { ---- Basic trig ---- }
@@ -77,7 +79,7 @@ type
     class function TriangleArea(const Base, Height: Double): Double; static;
     { Area from two sides and included angle (SAS) — angle in radians }
     class function TriangleAreaSAS(const SideA, Angle, SideB: Double): Double; static;
-    { Area from three sides (Heron's formula) }
+    { Area from three sides (Heron's formula). Sides are not validated. }
     class function TriangleAreaSSS(const A, B, C: Double): Double; static;
     class function TrianglePerimeter(const A, B, C: Double): Double; static;
     { Radius of inscribed circle }

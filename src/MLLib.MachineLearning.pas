@@ -37,7 +37,7 @@ unit MLLib.MachineLearning;
    Precision           — TP / (TP + FP) for binary or per-class
    Recall              — TP / (TP + FN)
    F1Score             — harmonic mean of Precision and Recall
-   ConfusionMatrix     — NClass × NClass count matrix
+   BuildConfusionMatrix — NClass × NClass count matrix
    MSE                 — mean squared error
    RMSE                — root mean squared error
    MAE                 — mean absolute error

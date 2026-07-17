@@ -103,7 +103,8 @@ Xscaled := TMLKit.Normalise(X);
 Scales each feature (column) to [0, 1]. Formula: `(x − min) / (max − min)`.  
 Columns where max = min are set to 0.
 
-**When to use:** tree-based models are invariant, but KNN, SVM, and neural nets benefit.
+**When to use:** distance- and gradient-based models such as KNN and logistic
+regression benefit when feature ranges differ substantially.
 
 ### Standardise
 
@@ -114,7 +115,10 @@ Xscaled := TMLKit.Standardise(X);
 Centres each feature at zero mean and scales to unit variance. Formula: `(x − μ) / σ`.  
 Columns with σ = 0 are set to 0.
 
-**When to use:** PCA, logistic regression, any model that uses distances or dot products.
+**When to use:** PCA when feature scales should contribute comparably, logistic
+regression, and models that use distances or dot products. `PCA` centres input
+itself; standardisation is optional and changes covariance PCA into a
+scale-normalised analysis.
 
 ### TrainTestSplit
 
@@ -228,7 +232,10 @@ Binary (0/1) logistic regression trained with gradient descent.
 
 **Parameters:** `LR` learning rate (0.1), `MaxIter` (1000), `Tol` gradient norm (1e-5).
 
-**When to use:** binary classification where you also want calibrated probabilities (call Sigmoid on the linear output).
+**When to use:** binary classification. `LogisticPredict` returns labels only;
+there is no public probability method, so callers needing scores must evaluate
+`1 / (1 + Exp(-(Intercept + dot(Coefficients, x))))` themselves. Probability
+calibration is not assessed by this implementation.
 
 ---
 
@@ -319,6 +326,10 @@ WriteLn(TMLKit.RMSE(YTrue, YPred));
 WriteLn(TMLKit.R2Score(YTrue, YPred));
 ```
 
+For a constant `YTrue` (zero total sum of squares), `R2Score` returns `1.0`
+regardless of predictions. Handle that degenerate case separately if your
+application needs a different convention.
+
 ---
 
 ## Error Handling
@@ -332,6 +343,9 @@ WriteLn(TMLKit.R2Score(YTrue, YPred));
 - Negative or out-of-range labels, and non-binary logistic-regression labels
 - NSamples ≤ NFeatures (LinearRegression — singular normal equations)
 - Invalid fractions, iteration counts, tolerances, learning rates, radii, or regularisation parameters
+
+`PCATransform` is an exception to the general empty-matrix rule: it returns
+`nil` for empty input.
 
 ---
 

@@ -76,12 +76,17 @@ Low-level special functions used as building blocks by `StatsLib` and `FinanceLi
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `GammaLn` | `(X: Double): Double` | ln(Γ(x)) via Lanczos approximation; X must be positive |
-| `Beta` | `(Z, W: Double): Double` | Beta function B(z,w) = Γ(z)Γ(w)/Γ(z+w) |
-| `BetaInc` | `(A, B, X: Double): Double` | Regularised incomplete beta I_x(a,b); X ∈ [0,1] |
+| `GammaLn` | `(X: Double): Double` | ln(Γ(x)) via Lanczos approximation; caller must supply X > 0 |
+| `Beta` | `(Z, W: Double): Double` | Beta function B(z,w); caller must supply Z, W > 0 |
+| `BetaInc` | `(A, B, X: Double): Double` | Regularised incomplete beta I_x(a,b); clamps X outside [0,1], while A and B must be positive |
 | `Erf` | `(X: Double): Double` | Error function, Horner polynomial, max error < 1.5 × 10⁻⁷ |
 | `NormalCDF` | `(X: Double): Double` | Φ(x) = 0.5 × (1 + Erf(x / √2)) |
-| `StudentT` | `(DF: Integer; X: Double): Double` | Student's t CDF; DF ≥ 1 |
+| `StudentT` | `(DF: Integer; X: Double): Double` | Student's t CDF helper for non-negative X; caller must supply DF ≥ 1 |
+
+These low-level functions do not validate their shape/domain parameters.
+Invalid values can yield NaN, Infinity, or a floating-point exception. The
+`StudentT` helper in this unit does not apply the negative-X symmetry; use
+`TProbabilityKit.StudentTCDF` when a complete signed t CDF is required.
 
 ---
 
@@ -104,6 +109,10 @@ class function RadToGrad(const Radians: Double): Double;
 class function NormalizeAngle(const Angle: Double): Double;    // → [0, 2π)
 class function NormalizeAngleDeg(const Angle: Double): Double; // → [0, 360)
 ```
+
+The normalisation routines use repeated addition/subtraction. Pass finite,
+ordinary-sized angles; Infinity does not terminate and very large magnitudes
+can require many iterations.
 
 ### Basic Trigonometry
 
@@ -172,6 +181,11 @@ class function Cot(const X: Double): Double;
 |--------|-----------|-------------|
 | `VectorMagnitude` | `X, Y` | Euclidean magnitude √(X² + Y²) |
 | `VectorAngle` | `X1, Y1, X2, Y2` | Angle in radians ∈ [−π, π] from (X1,Y1) to (X2,Y2) |
+
+The triangle, circle, reciprocal-trigonometric, and vector helpers are direct
+formula evaluators. They do not reject negative dimensions, invalid triangle
+sides, zero divisors, or other degenerate geometry; validate such inputs in the
+calling application.
 
 ---
 

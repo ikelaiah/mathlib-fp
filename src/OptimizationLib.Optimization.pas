@@ -13,7 +13,7 @@ unit OptimizationLib.Optimization;
    BrentMinimize      — Brent's method, parabolic interpolation + golden section
 
  Unconstrained multi-variable (gradient-based)
-   GradientDescent    — vanilla steepest-descent with fixed step
+   GradientDescent    — steepest descent with backtracking line search
    Adam               — adaptive moment estimation (de-facto ML standard)
    LBFGS              — Limited-memory BFGS quasi-Newton (fast, low memory)
 
@@ -22,11 +22,10 @@ unit OptimizationLib.Optimization;
    SimulatedAnnealing — global optimiser, escapes local minima
 
  Constrained
-   PenaltyMethod      — convert a constrained problem to unconstrained via
-                        quadratic penalty; works with any unconstrained solver
+   PenaltyMethod      — quadratic penalty with Nelder-Mead inner solves
 
  Linear Programming
-   SimplexLP          — revised Simplex method for standard-form LP:
+   SimplexLP          — tableau Simplex method for standard-form LP:
                         min c'x  s.t. Ax <= b, x >= 0
 
  Function types
@@ -300,7 +299,7 @@ type
       LINEAR PROGRAMMING
     ======================================================================= }
 
-    { Revised Simplex method for standard-form LP:
+    { Tableau Simplex method for standard-form LP with a feasible slack basis:
         minimise   c' x
         subject to A x <= b,   x >= 0
 
@@ -308,7 +307,8 @@ type
         C  — cost vector (length N)
         A  — constraint matrix (M rows × N cols), stored row-major
         B  — right-hand side (length M); all b_i must be >= 0
-             (multiply any negative constraint by -1 before calling)
+             Negative right-hand sides are not supported because this
+             implementation does not include a Phase I procedure.
 
       Result
         TLPResult.Feasible = False  →  infeasible or unbounded

@@ -114,7 +114,8 @@ class function SimpsonRule(F: TScalarFunc; A, B: Double;
   N: Integer = 1000): Double;
 ```
 
-Composite Simpson's 1/3 rule with N sub-intervals (N is auto-incremented to even if odd).
+Composite Simpson's 1/3 rule with N sub-intervals. Values below 2 are changed
+to 2, and an odd N is incremented to the next even value.
 Error O(h⁴). Exact for polynomials of degree ≤ 3.
 
 ### `GaussLegendre5`
@@ -180,6 +181,10 @@ class function LinearInterp(const XKnots, YKnots: TDoubleArray; X: Double): Doub
 Piecewise linear interpolation between sorted knots using binary search.
 Clamps to endpoint values outside the knot range.
 
+`XKnots` must be strictly increasing and the two arrays must have equal,
+non-zero length. Array lengths are checked; ordering and duplicate knots are
+caller requirements and are not validated.
+
 ### `LagrangeInterp`
 
 ```pascal
@@ -187,6 +192,9 @@ class function LagrangeInterp(const XKnots, YKnots: TDoubleArray; X: Double): Do
 ```
 
 Global Lagrange polynomial interpolation through all N knots. Exact at every knot.
+
+The arrays must have equal, non-zero length and X knots must be distinct.
+Distinctness is a caller requirement and is not validated.
 
 > **Warning:** ill-conditioned for N > ~10 (Runge phenomenon). Prefer `CubicSplineBuild` for larger datasets.
 
@@ -200,6 +208,9 @@ class function CubicSplineEval(const S: TCubicSpline; X: Double): Double;
 Natural cubic spline (zero second-derivative boundary conditions) solved via the
 Thomas tridiagonal algorithm. Exact at every knot; smooth C² between knots.
 Clamps to endpoint values outside the knot range.
+
+Spline construction requires equal-length arrays with at least two strictly
+increasing knots. Ordering and duplicate knots are not validated.
 
 ---
 
@@ -242,7 +253,7 @@ begin
   XK := TDoubleArray.Create(0, 1, 2, 3, 4);
   YK := TDoubleArray.Create(0, 1, 4, 9, 16);
   Spline := TNumericsKit.CubicSplineBuild(XK, YK);
-  Writeln('Spline(1.5) = ', TNumericsKit.CubicSplineEval(Spline, 1.5):0:4);  // ≈ 2.25
+  Writeln('Spline(1.5) = ', TNumericsKit.CubicSplineEval(Spline, 1.5):0:4);  // ≈ 2.2321
 end.
 ```
 
@@ -258,7 +269,9 @@ end.
 | TrapezoidalRule: N < 1 | `EInvalidArgument` |
 | EulerSolve / RK4Solve: N < 1 | `EInvalidArgument` |
 | LinearInterp / LagrangeInterp: empty arrays | `EInvalidArgument` |
+| Interpolation: X/Y array lengths differ | `EInvalidArgument` |
 | CubicSplineBuild: fewer than 2 knots | `EInvalidArgument` |
+| CubicSplineEval: empty spline | `EInvalidArgument` |
 
 ---
 
@@ -270,4 +283,10 @@ end.
   This is the standard choice when no derivative information is available at the boundaries.
 - `GaussLegendre5` performs only **5 function evaluations** regardless of the smoothness
   of f. For oscillatory functions, use `SimpsonRule` with a large N instead.
-- `TODESolution` arrays are **1-indexed from 0**: `Sol.T[0] = T0`, `Sol.T[N] = T1`.
+- `TODESolution` arrays are **zero-indexed**: `Sol.T[0] = T0`, `Sol.T[N] = T1`.
+- Root finders return their last iterate when `MaxIter` is exhausted; no
+  convergence-status flag or exception is produced. `Tol`, `MaxIter`, function
+  pointers, and most non-finite inputs are caller-validated.
+- `Bisection` requires a strict sign-changing bracket in practice. Although the
+  implementation accepts a zero endpoint product, an endpoint root is not
+  handled reliably; `Brent` is the safer choice when an endpoint may be a root.

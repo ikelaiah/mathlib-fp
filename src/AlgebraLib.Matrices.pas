@@ -360,7 +360,8 @@ type
 
       @returns The determinant value (Double).
 
-      @warning Raises EMatrixError if the matrix is not square. Uses recursive cofactor expansion for calculation, which can be computationally expensive (O(n!)) for large matrices. LU decomposition is generally preferred for larger matrices.
+      @warning Raises EMatrixError if the matrix is not square. Matrices of
+      size 3 and above use LU decomposition; singular matrices return zero.
 
       @example
         var Det: Double;
@@ -1468,7 +1469,9 @@ type
 
       @returns A new IMatrix representing A^p.
 
-      @warning Requires square matrix. Uses direct multiplication for positive integers, inverse for negative integers, SVD for non-integers.
+      @warning Requires a square matrix. Integer exponents use exponentiation
+      by squaring (and inverse for negative integers). Non-integer exponents use
+      symmetric eigendecomposition and require strictly positive eigenvalues.
 
       @example See IMatrix.Power example.
     }
@@ -1481,7 +1484,7 @@ type
 
       @returns The determinant value.
 
-      @warning Requires square matrix. Uses recursive cofactor expansion (inefficient for large matrices).
+      @warning Requires a square matrix. Sizes 3 and above use LU decomposition.
 
       @example See IMatrix.Determinant example.
     }
@@ -1679,14 +1682,14 @@ type
 
       @example
         var
-          UpperData: TMatrixArray;
+          LowerData: TMatrixArray;
           SymMatrix: IMatrix;
         begin
-          SetLength(UpperData, 3, 3);
-          UpperData[0, 0] := 1; UpperData[0, 1] := 2; UpperData[0, 2] := 3;
-          UpperData[1, 1] := 4; UpperData[1, 2] := 5; // Lower part ignored by this specific implementation logic
-          UpperData[2, 2] := 6;
-          SymMatrix := TMatrixKit.CreateSymmetric(UpperData);
+          SetLength(LowerData, 3, 3);
+          LowerData[0, 0] := 1;
+          LowerData[1, 0] := 2; LowerData[1, 1] := 4;
+          LowerData[2, 0] := 3; LowerData[2, 1] := 5; LowerData[2, 2] := 6;
+          SymMatrix := TMatrixKit.CreateSymmetric(LowerData);
           // Result: [[1, 2, 3], [2, 4, 5], [3, 5, 6]]
         end;
     }

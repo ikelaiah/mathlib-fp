@@ -58,23 +58,26 @@ IVector = IMatrix;     // A vector is a 1-row or 1-column IMatrix
 TVector = TMatrixKit;  // Concrete type for construction
 ```
 
-### Decomposition Aliases (`AlgebraLib.Determinants`)
+### Decomposition Entry Point (`AlgebraLib.Determinants`)
 
 ```pascal
-TLUDecomp        = TLUDecomposition;
-TQRDecomp        = TQRDecomposition;
-TEigenDecomp     = TEigenDecomposition;
-TSVDecomp        = TSVD;
-TCholeskyDecomp  = TCholeskyDecomposition;
-TEigenPair       = TEigenpair;
 TIterSolverMethod = TIterativeMethod;
 ```
+
+The decomposition records retain their original names from
+`AlgebraLib.Matrices`: `TLUDecomposition`, `TQRDecomposition`,
+`TEigenDecomposition`, `TSVD`, `TCholeskyDecomposition`, and `TEigenpair`.
+`AlgebraLib.Determinants` provides the focused import path and the one explicit
+enum alias shown above; it does not declare shortened record aliases such as
+`TLUDecomp` or `TSVDecomp`.
 
 ---
 
 ## IMatrix Interface
 
-All operations return **new matrices** — existing matrices are never mutated.
+Arithmetic, transformations, decompositions, and matrix functions return new
+matrices. `SetValue` and `SetSubMatrix` are explicit in-place mutators; the
+sparse implementation also exposes mutating storage methods.
 
 ### Dimensions
 
@@ -93,6 +96,8 @@ All operations return **new matrices** — existing matrices are never mutated.
 | `Subtract` | `Other: IMatrix` | Element-wise A − B; dimensions must match |
 | `Multiply` | `Other: IMatrix` | Matrix multiplication A × B; uses cache-aware block algorithm |
 | `ScalarMultiply` | `Scalar: Double` | k × A for every element |
+| `ElementWiseMultiply` | `Other: IMatrix` | Hadamard product; dimensions must match |
+| `ElementWiseDivide` | `Other: IMatrix` | Element-wise quotient; dimensions must match and divisors must be non-zero |
 
 ### Transformations
 
@@ -116,12 +121,21 @@ All operations return **new matrices** — existing matrices are never mutated.
 | `Determinant` | `Double` | LU-based determinant; square matrices only |
 | `Trace` | `Double` | Sum of diagonal elements; square matrices only |
 | `Rank` | `Integer` | Via Gaussian elimination; tolerance 10⁻¹² |
+| `NormOne` | `Double` | Maximum absolute column sum |
+| `NormInf` | `Double` | Maximum absolute row sum |
+| `NormFrobenius` | `Double` | Square root of the sum of squared elements |
+| `Condition` | `Double` | 1-norm condition estimate, `NormOne * Inverse.NormOne` |
 
 ### Type Checks
 
 ```pascal
 function IsSquare: Boolean;
 function IsSymmetric: Boolean;
+function IsDiagonal: Boolean;
+function IsTriangular(Upper: Boolean = True): Boolean;
+function IsPositiveDefinite: Boolean;
+function IsPositiveSemidefinite: Boolean;
+function IsOrthogonal: Boolean;
 function IsVector: Boolean;
 function IsRowVector: Boolean;
 function IsColumnVector: Boolean;
@@ -141,9 +155,13 @@ function IsColumnVector: Boolean;
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `SolveLinear` | `B: IMatrix` | Direct solve Ax = B via LU decomposition |
-| `SolveIterative` | `B: IMatrix; Method: TIterativeMethod; MaxIter, Tol` | Iterative solve; method selected by enum |
+| `SolveIterative` | `B: IMatrix; Method := imConjugateGradient; MaxIterations := 1000; Tolerance := 1e-10` | Iterative solve for a column-vector right-hand side; conjugate gradient assumes symmetric positive-definite A |
 | `PseudoInverse` | none | Moore-Penrose pseudoinverse; use `A.PseudoInverse.Multiply(B)` for least-squares solutions |
+
+There is no public direct `SolveLinear` method. For a direct solve, multiply the
+right-hand side by `A.Inverse`, or use `A.PseudoInverse` for least squares.
+`SolveIterative` returns its last iterate if the convergence tolerance is not
+reached; it does not return a convergence-status record.
 
 ### Vector Operations (single-row or single-column matrices)
 
@@ -157,26 +175,65 @@ function IsColumnVector: Boolean;
 
 | Method | Returns |
 |--------|---------|
-| `Mean` | Column/row mean depending on orientation |
-| `Variance` | Column/row variance |
-| `Covariance(Other)` | Covariance matrix |
+| `Mean(Axis := -1)` | 1×1 overall mean for `-1`, 1×Cols column means for `0`, or Rows×1 row means for `1` |
+| `Covariance` | Cols×Cols sample covariance matrix; rows are observations |
+| `Correlation` | Cols×Cols correlation matrix; a zero-variance column produces zeros |
+
+### Submatrices and Dominant Eigenpair
+
+```pascal
+function GetSubMatrix(StartRow, StartCol, NumRows, NumCols: Integer): IMatrix;
+procedure SetSubMatrix(StartRow, StartCol: Integer; const SubMatrix: IMatrix);
+function PowerMethod(MaxIterations: Integer = 100;
+  Tolerance: Double = 1e-10): TEigenpair;
+```
+
+All indices are zero-based. `SetSubMatrix` mutates the receiving matrix.
+`PowerMethod` returns the dominant real eigenpair and requires a square matrix.
 
 ---
 
 ## TMatrixKit — Factory Methods
 
-`TMatrixKit` is the concrete class that implements `IMatrix`. Use its class methods to construct matrices.
+`TMatrixKit` is the concrete class that implements `IMatrix`. Its constructor
+creates a zero-filled dense matrix; class functions provide specialised forms.
 
 ```pascal
-class function Create(Rows, Cols: Integer): IMatrix;
+constructor Create(Rows, Cols: Integer);
 class function Identity(N: Integer): IMatrix;
 class function Zeros(Rows, Cols: Integer): IMatrix;
+class function Ones(Rows, Cols: Integer): IMatrix;
 class function CreateFromArray(const Data: TMatrixArray): IMatrix;
-class function Diagonal(const Values: TDoubleArray): IMatrix;
+class function CreateSparse(Rows, Cols: Integer): IMatrix;
+class function CreateDiagonal(const Values: array of Double): IMatrix;
+class function CreateBandMatrix(Size, LowerBand, UpperBand: Integer): IMatrix;
+class function CreateSymmetric(const Data: TMatrixArray): IMatrix;
+class function CreateHilbert(Size: Integer): IMatrix;
+class function CreateToeplitz(const FirstRow, FirstCol: TDoubleArray): IMatrix;
+class function CreateVandermonde(const Vector: TDoubleArray): IMatrix;
 class function CreateRandom(Rows, Cols: Integer; Min, Max: Double): IMatrix; overload;
 class function CreateRandom(Rows, Cols: Integer; Min, Max: Double;
   Seed: LongWord): IMatrix; overload;
 ```
+
+`CreateBandMatrix` fills the requested band with ones. `CreateSymmetric` reads
+the lower triangle of `Data` and mirrors it. `CreateToeplitz` returns a
+`Length(FirstCol)` by `Length(FirstRow)` matrix and requires matching first
+elements.
+
+### Sparse Matrices
+
+`TMatrixKitSparse` stores non-zero entries in row-major order. `GetValue` and
+`SetValue` are available through `IMatrix`; zero (within `1e-15`) removes an
+entry. The concrete class additionally exposes:
+
+```pascal
+procedure AddElement(Row, Col: Integer; Value: Double); // set/replace, not accumulate
+procedure CompactStorage;
+```
+
+Sparse lookup and insertion are linear in the number of stored entries, and
+`Add` currently returns a dense matrix.
 
 ---
 
@@ -202,7 +259,8 @@ end.
 
 ## Design Notes
 
-- **Value semantics** — all operations return new `IMatrix` instances.
+- **Mostly value-oriented** — calculations return new `IMatrix` instances;
+  the explicitly named setters mutate their receiver.
 - **Interface-based** — depend on `IMatrix`, not on `TMatrixKit`, for flexibility.
 - **Cache-aware blocking** — matrix multiplication uses cache-aware blocking and bounded parallel workers when the operation count justifies thread startup. Unix callers without an installed thread manager automatically use the serial path.
 - **Numerically stable** — LU uses partial pivoting; tolerances guard against near-zero pivots.

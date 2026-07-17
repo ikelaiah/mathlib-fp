@@ -64,7 +64,7 @@ All methods are `class ... static` — no instance required. Input data is alway
 | `Median(Data)` | 1 | Middle value; average of two middles for even N |
 | `Mode(Data)` | 1 | Most frequent value |
 | `Range(Data)` | 1 | Max − Min |
-| `Describe(Data)` | 1 | Full `TDescriptiveStats` record |
+| `Describe(Data)` | 4 | Full `TDescriptiveStats` record; inherited constraints (such as non-zero spread and mean) also apply |
 
 ```pascal
 var Data: TDoubleArray;
@@ -81,17 +81,21 @@ end.
 | Method | Denominator | Min N |
 |--------|-------------|-------|
 | `Variance(Data)` | n − 1 | 2 |
-| `SampleVariance(Data)` | n − 1 | 2 | (alias of `Variance`) |
+| `SampleVariance(Data)` | n − 1 | 2 (same calculation as `Variance`) |
 | `StandardDeviation(Data)` | **n** (population) | 2 |
 | `SampleStandardDeviation(Data)` | n − 1 | 2 |
 
-### Distribution Measures
+### Distribution Measures and Aggregates
 
 ```pascal
-class function Skewness(const Data: TDoubleArray): Double;  // Requires N >= 3
-class function Kurtosis(const Data: TDoubleArray): Double;  // Sample excess kurtosis; N >= 4
-class function SEM(const Data: TDoubleArray): Double;       // StdDev / √N
-class function CV(const Data: TDoubleArray): Double;        // (StdDev / Mean) * 100
+class function Skewness(const Data: TDoubleArray): Double;            // N >= 3
+class function Kurtosis(const Data: TDoubleArray): Double;            // Sample excess kurtosis; N >= 4
+class function StandardErrorOfMean(const Data: TDoubleArray): Double; // SampleStdDev / sqrt(N); N >= 2
+class function CoefficientOfVariation(const Data: TDoubleArray): Double; // PopulationStdDev / abs(Mean) * 100
+class function GeometricMean(const Data: TDoubleArray): Double;       // Values must be > 0
+class function HarmonicMean(const Data: TDoubleArray): Double;        // Values must be non-zero
+class function Sum(const Data: TDoubleArray): Double;
+class function SumOfSquares(const Data: TDoubleArray): Double;
 ```
 
 ### Percentiles and Quartiles
@@ -100,7 +104,8 @@ class function CV(const Data: TDoubleArray): Double;        // (StdDev / Mean) *
 class function Percentile(const Data: TDoubleArray; const P: Double): Double; // 0 <= P <= 100; method R-7
 class function Quartile1(const Data: TDoubleArray): Double;   // Percentile(Data, 25)
 class function Quartile3(const Data: TDoubleArray): Double;   // Percentile(Data, 75)
-class function IQR(const Data: TDoubleArray): Double;         // Q3 − Q1
+class function InterquartileRange(const Data: TDoubleArray): Double; // Q3 − Q1
+class function Quantile(const Data: TDoubleArray; const Q: Double): Double; // 0 <= Q <= 1
 ```
 
 Percentile uses linear interpolation (Excel/R default, method R-7).
@@ -111,52 +116,60 @@ Percentile uses linear interpolation (Excel/R default, method R-7).
 class function PearsonCorrelation(const X, Y: TDoubleArray): Double;  // r ∈ [−1, 1]
 class function SpearmanCorrelation(const X, Y: TDoubleArray): Double; // ρ ∈ [−1, 1]
 class function Covariance(const X, Y: TDoubleArray): Double;          // Sample covariance
-class function CovarianceMatrix(const Data: array of TDoubleArray): TMatrixResult; // N × N matrix
 ```
 
 ### Standardisation
 
 ```pascal
-class function ZScores(const Data: TDoubleArray): TDoubleArray;         // (xi − mean) / stddev
-class function Standardize(const Data: TDoubleArray): TDoubleArray;     // Alias of ZScores
-class function Normalize(const Data: TDoubleArray): TDoubleArray;       // Scale to [0, 1]
+class function ZScore(const Value, AMean, StdDev: Double): Double;
+class procedure Standardize(var Data: TDoubleArray);
 ```
+
+`Standardize` modifies `Data` in place using the population standard deviation.
+It raises `EStatsError` for constant data. StatsLib does not expose a min-max
+normalisation routine.
 
 ### Hypothesis Testing
 
-#### One-Sample and Two-Sample t-Tests
-
 ```pascal
-class function OneSampleTTest(const Data: TDoubleArray; HypothesisedMean: Double): Double;
-class function TwoSampleTTest(const Data1, Data2: TDoubleArray): Double;  // Independent samples
-class function PairedTTest(const Data1, Data2: TDoubleArray): Double;
+class function TTest(const X, Y: TDoubleArray; out TPValue: Double): Double;
 ```
 
-Returns the t-statistic. Use `MathBase.Precision.StudentT` to obtain the p-value.
+`TTest` is an independent two-sample, equal-variance (pooled) t-test. It returns
+the t-statistic and writes the two-sided p-value to `TPValue`; each group needs
+at least two observations. There are no one-sample or paired t-test entry points.
 
 ### Normality Tests
 
 ```pascal
-class function KolmogorovSmirnovTest(const Data: TDoubleArray): Double;  // KS statistic
-class function ShapiroWilkTest(const Data: TDoubleArray): Double;        // W statistic
+class function KolmogorovSmirnovTest(const Data: TDoubleArray; out KSPValue: Double): Double;
+class function IsNormal(const Data: TDoubleArray; const Alpha: Double = 0.05): Boolean;
+class function ShapiroWilkTest(const Data: TDoubleArray; out WPValue: Double): Double;
 ```
 
-Higher W (closer to 1) indicates normality.
+These are lightweight approximations. `KolmogorovSmirnovTest` requires at least
+five values and currently writes the D statistic (not a calibrated p-value) to
+`KSPValue`. `ShapiroWilkTest` accepts 3 through 50 values and returns an
+approximate W and heuristic `WPValue`. Do not use `IsNormal` or these approximate
+p-values for publication-grade inference without independent validation.
 
 ### Non-Parametric Tests
 
 | Method | Description |
 |--------|-------------|
-| `SignTest(Data, HypothesisedMedian)` | Sign test statistic |
+| `SignTest(X, Y)` | Proportion of non-tied pairs for which `X[i] > Y[i]` |
 | `WilcoxonSignedRank(Data1, Data2)` | Wilcoxon signed-rank W statistic |
-| `MannWhitneyU(Data1, Data2)` | Mann-Whitney U statistic |
+| `MannWhitneyU(Data1, Data2, out PValue)` | Smaller Mann-Whitney U and a normal-approximation p-value only when both groups have more than 10 values; otherwise p-value is 1 |
 | `KendallTau(X, Y)` | Kendall's τ correlation |
 
 ### Robust Statistics
 
 ```pascal
 class function MedianAbsoluteDeviation(const Data: TDoubleArray): Double;  // MAD
-class function HuberMEstimator(const Data: TDoubleArray; k: Double = 1.345): Double;
+class function RobustStandardDeviation(const Data: TDoubleArray): Double;  // 1.4826 * MAD
+class function HuberM(const Data: TDoubleArray; K: Double = 1.5): Double;
+class function TrimmedMean(const Data: TDoubleArray; Percent: Double): Double;
+class function WinsorizedMean(const Data: TDoubleArray; Percent: Double): Double;
 ```
 
 MAD and the Huber M-estimator are resistant to outliers.
@@ -164,7 +177,7 @@ MAD and the Huber M-estimator are resistant to outliers.
 ### Effect Size
 
 ```pascal
-class function CohenD(const Data1, Data2: TDoubleArray): Double;    // Cohen's d
+class function CohensD(const Data1, Data2: TDoubleArray): Double;   // Cohen's d
 class function HedgesG(const Data1, Data2: TDoubleArray): Double;   // Hedges' g (bias-corrected)
 ```
 
@@ -228,5 +241,7 @@ end.
 - `StandardDeviation` uses the **n** (population) denominator; use `SampleStandardDeviation` for the n − 1 version.
 - `Skewness` uses the population standard deviation; `Kurtosis` uses the sample standard deviation.
 - Percentile uses **method R-7** (linear interpolation), matching Excel's `PERCENTILE` and R's default.
+- `Sum`, `SumOfSquares`, and `Sort` accept empty arrays; the sums return zero and sorting is a no-op. `Sort` modifies its argument in place.
+- The normality-test implementations are approximations; in particular, the K-S out parameter is the statistic rather than a p-value.
 - Prefer the seeded bootstrap overloads for reproducible tests and analyses. Use `Randomize` once in the application only when intentionally using the global-RNG overloads.
 - `EStatsError` is raised for empty arrays, arrays too small for a given statistic, or out-of-range parameters.

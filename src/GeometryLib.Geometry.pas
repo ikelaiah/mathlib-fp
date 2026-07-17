@@ -37,15 +37,15 @@ unit GeometryLib.Geometry;
    SegmentIntersect2D     — find the actual intersection point
    LineIntersect2D        — intersection of two infinite lines
    SegmentCircleIntersect — does segment intersect a circle?
-   RayCircleIntersect     — ray-circle intersection (ray casting)
+   RayCircleIntersect     — signed supporting-line/circle roots
 
  Polygon & Convex Hull
    PolygonArea            — signed area (positive = CCW)
    PolygonPerimeter       — total edge length
    PolygonCentroid        — area-weighted centroid
-   PointInPolygon         — ray-casting test (handles holes & concave)
+   PointInPolygon         — ray-casting test for simple concave polygons
    IsConvex               — test convexity
-   ConvexHull             — Graham scan, O(n log n)
+   ConvexHull             — monotone-chain scan after insertion sorting
 
  Geometric Transformations
    Translate2D            — shift all points by (dx, dy)
@@ -246,8 +246,9 @@ type
     { Returns True if segment (P,Q) intersects or is inside circle C }
     class function SegmentCircleIntersect(const P, Q: TPoint2D; const C: TCircle2D): Boolean; static;
 
-    { Ray from Origin in Direction intersects circle.
-      Returns number of intersections (0, 1, or 2) and the near/far t-values. }
+    { Supporting line from Origin in Direction intersects circle.
+      Returns the two signed roots without filtering negative values behind the
+      origin. Callers needing ray semantics must keep only t >= 0. }
     class function RayCircleIntersect(
       const Origin, Direction: TPoint2D;
       const C: TCircle2D;
@@ -268,14 +269,15 @@ type
     class function PolygonCentroid(const Poly: TPolygon2D): TPoint2D; static;
 
     { Point-in-polygon test using ray casting.
-      Returns True if P is strictly inside Poly (not on boundary).
-      Works for concave polygons; does not handle self-intersecting. }
+      Works for concave simple polygons; boundary classification is undefined.
+      Does not handle holes or self-intersecting polygons. }
     class function PointInPolygon(const P: TPoint2D; const Poly: TPolygon2D): Boolean; static;
 
     { Returns True if polygon is convex (all cross-products same sign) }
     class function IsConvex(const Poly: TPolygon2D): Boolean; static;
 
-    { Convex hull of a point set using Graham scan. O(n log n).
+    { Convex hull of a point set using a monotone-chain scan after an O(n^2)
+      insertion sort.
       Returns the hull vertices in CCW order.
       Input must have at least 3 non-collinear points. }
     class function ConvexHull(const Points: TPolygon2D): TPolygon2D; static;

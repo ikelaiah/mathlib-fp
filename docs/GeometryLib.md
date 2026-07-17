@@ -52,9 +52,11 @@ end;
 
 TSegment2D = record
   P, Q: TPoint2D;
+  class function Create(const AP, AQ: TPoint2D): TSegment2D; static;
   function Length: Double;
   function Midpoint: TPoint2D;
   function Direction: TVector2D;
+  function ToString: String;
 end;
 
 TLine2D = record
@@ -68,6 +70,7 @@ end;
 TCircle2D = record
   Centre: TPoint2D;
   Radius: Double;
+  class function Create(const ACentre: TPoint2D; ARadius: Double): TCircle2D; static;
   function Area: Double;
   function Circumference: Double;
   function ContainsPoint(const P: TPoint2D): Boolean;
@@ -89,15 +92,27 @@ end;
 ```pascal
 TPoint3D = record
   X, Y, Z: Double;
+  class function Create(AX, AY, AZ: Double): TPoint3D; static;
   function DistanceTo(const Other: TPoint3D): Double;
+  function ToString: String;
 end;
 
 TVector3D = record
   X, Y, Z: Double;
+  class function Create(AX, AY, AZ: Double): TVector3D; static;
+  class function FromPoints(const P, Q: TPoint3D): TVector3D; static;
   function Magnitude: Double;
   function Normalise: TVector3D;
   function Dot(const V: TVector3D): Double;
   function Cross(const V: TVector3D): TVector3D;
+  function ToString: String;
+end;
+
+TSegment3D = record
+  P, Q: TPoint3D;
+  class function Create(const AP, AQ: TPoint3D): TSegment3D; static;
+  function Length: Double;
+  function Midpoint: TPoint3D;
 end;
 
 TPlane3D = record
@@ -112,6 +127,7 @@ end;
 TSphere3D = record
   Centre: TPoint3D;
   Radius: Double;
+  class function Create(const ACentre: TPoint3D; ARadius: Double): TSphere3D; static;
   function Volume: Double;
   function SurfaceArea: Double;
   function ContainsPoint(const P: TPoint3D): Boolean;
@@ -160,6 +176,10 @@ if TGeometryKit.SegmentIntersect2D(A1, A2, B1, B2, Pt, T) then
   WriteLn('Intersects at ', Pt.ToString, ' T=', T:6:4);
 ```
 
+`SegmentsIntersect2D` includes collinear overlaps. `SegmentIntersect2D` returns
+`False` for parallel or collinear segments, so it cannot return a representative
+point for an overlapping interval.
+
 ### Line–Line (infinite lines, 2-D)
 
 ```pascal
@@ -170,13 +190,18 @@ if TGeometryKit.LineIntersect2D(A1, A2, B1, B2, Pt) then
 ### Segment–Circle and Ray–Circle
 
 ```pascal
-// Does segment PQ cross circle C?
+// Does segment PQ touch, cross, or lie inside circle C?
 if TGeometryKit.SegmentCircleIntersect(P, Q, C) then ...
 
 // Ray from Origin in Direction vs circle C
 // Returns 0, 1, or 2; T1 ≤ T2 are the hit distances
 N := TGeometryKit.RayCircleIntersect(Origin, Dir, C, T1, T2);
 ```
+
+`Direction` is normalised internally, so the returned `T` values are signed
+distances. The current implementation returns both roots of the supporting
+line and does not discard negative values behind the ray origin. Count only
+roots with `T >= 0` when forward-ray semantics are required.
 
 ---
 
@@ -197,7 +222,9 @@ if TGeometryKit.PointInPolygon(P, Poly) then
   WriteLn('Inside');
 ```
 
-Uses ray casting — works for concave polygons. Does not handle self-intersecting polygons.
+Uses ray casting and works for concave simple polygons. Self-intersecting
+polygons and polygons with holes are unsupported. Boundary-point classification
+is not defined; test the boundary separately if it matters.
 
 ### Convexity & Convex Hull
 
@@ -205,10 +232,15 @@ Uses ray casting — works for concave polygons. Does not handle self-intersecti
 // Is the polygon convex?
 if TGeometryKit.IsConvex(Poly) then ...
 
-// Compute convex hull (Graham scan, O(n log n))
+// Compute convex hull (monotone chain)
 Hull := TGeometryKit.ConvexHull(Points);
 // Hull vertices are in CCW order
 ```
+
+The current point sort is insertion sort, so total worst-case complexity is
+O(n²), despite the linear hull scan. Collinear interior boundary points are
+discarded. At least three input points are required; all-collinear input is not
+explicitly rejected and can produce a two-point result.
 
 ---
 
@@ -247,6 +279,9 @@ BB := TGeometryKit.BoundingBox2D(Points);
 // BB.MinX, BB.MaxX, BB.MinY, BB.MaxY, BB.Width, BB.Height, BB.Area
 ```
 
+Angle helpers do not reject zero vectors. A zero-vector 3-D input currently
+produces `Pi/2`; treat the angle as undefined and validate magnitudes first.
+
 ---
 
 ## Error Handling
@@ -259,6 +294,11 @@ BB := TGeometryKit.BoundingBox2D(Points);
 - `ConvexHull` with fewer than 3 points
 - `BoundingBox2D` with an empty point set
 - `PolygonCentroid` on a degenerate (zero-area) polygon
+- `RayCircleIntersect` with a zero-length direction
+
+Circle and sphere constructors do not validate non-negative radii. Their area,
+volume, containment, and intersection methods operate on the stored value, so
+callers should enforce `Radius >= 0`.
 
 ---
 

@@ -32,8 +32,9 @@ See the [documentation index](index.md) for the API guides and the
 
 ## Highlights
 
-- General real eigendecomposition and residual-based convergence checks replace
-  hard-coded matrix cases.
+- Real symmetric eigendecomposition and supported real 2×2 nonsymmetric cases
+  use residual-based convergence checks; unsupported nonsymmetric or complex
+  spectra raise `EMatrixError`.
 - Fractional matrix powers use symmetric eigendecomposition and require a
   symmetric positive-definite matrix; integer powers use exponentiation by
   squaring.

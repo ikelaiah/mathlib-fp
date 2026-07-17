@@ -13,8 +13,8 @@ unit NumericsLib.Numerics;
      Secant           — derivative-free quasi-Newton
 
    Numerical Integration (quadrature)
-     TrapezoidalRule  — 1st-order composite rule
-     SimpsonRule      — 3rd-order composite rule (n must be even)
+     TrapezoidalRule  — composite rule with O(h^2) global error
+     SimpsonRule      — composite rule with O(h^4) global error (n even)
      GaussLegendre5   — 5-point Gauss-Legendre on [a,b]
 
    ODE Solvers (initial-value problems)
@@ -24,7 +24,8 @@ unit NumericsLib.Numerics;
    Interpolation
      LinearInterp     — piecewise linear between sorted knots
      LagrangeInterp   — global Lagrange polynomial (small n)
-     CubicSplineNat   — natural cubic spline (clamped ends = 0 slope)
+     CubicSplineBuild / CubicSplineEval — natural cubic spline
+                         (zero second derivatives at both ends)
 
  All functions are class-static (no instantiation required):
    result := TNumericsKit.Bisection(f, a, b);
@@ -68,7 +69,9 @@ type
     { Bisection method: find root of f in [A, B] where f(A)*f(B) < 0.
       MaxIter: maximum iterations (default 100).
       Tol: absolute tolerance on the interval width (default 1e-10).
-      Raises EInvalidArgument if f(A)*f(B) >= 0. }
+      Raises EInvalidArgument if f(A) and f(B) have the same non-zero sign.
+      Although a zero endpoint product is accepted, endpoint roots are not
+      handled reliably; use Brent or pre-check the endpoints. }
     class function Bisection(F: TScalarFunc; A, B: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
 
     { Newton-Raphson: find root starting from X0 using f and df/dx.
@@ -138,7 +141,7 @@ type
     class function LagrangeInterp(const XKnots, YKnots: TDoubleArray; X: Double): Double; static;
 
     { Build a natural cubic spline through the given knots (XKnots sorted asc).
-      Returns a TCubicSpline that can be evaluated with SplineEval. }
+      Returns a TCubicSpline that can be evaluated with CubicSplineEval. }
     class function CubicSplineBuild(const XKnots, YKnots: TDoubleArray): TCubicSpline; static;
 
     { Evaluate a previously built TCubicSpline at point X.

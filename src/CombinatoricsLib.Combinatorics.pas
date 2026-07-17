@@ -4,7 +4,7 @@ unit CombinatoricsLib.Combinatorics;
  CombinatoricsLib.Combinatorics
 
  Discrete mathematics and combinatorics for Free Pascal.
- No external dependencies — only the standard RTL.
+ Depends on MathBase plus the standard RTL.
 
  What this library gives you
  ---------------------------
@@ -20,7 +20,7 @@ unit CombinatoricsLib.Combinatorics;
    DerangementCount   — D_n  — permutations with no fixed points
 
  Sequences & number theory
-   Fibonacci          — F_n using fast matrix exponentiation
+   Fibonacci          — F_n using fast doubling
    Lucas              — L_n Lucas numbers
    PascalRow          — one row of Pascal's triangle
    PascalTriangle     — full triangle up to row N
@@ -29,7 +29,7 @@ unit CombinatoricsLib.Combinatorics;
    ExtendedGCD        — Bezout coefficients: a*x + b*y = GCD(a,b)
    ModPow             — a^b mod m  (fast exponentiation)
    ModInverse         — modular multiplicative inverse
-   IsPrime            — Miller-Rabin primality test (deterministic for n < 3.2e18)
+   IsPrime            — Miller-Rabin primality test using bases 2..17
    NextPrime          — next prime >= n
    PrimeFactors       — prime factorisation as (prime, exponent) pairs
    Sieve              — Sieve of Eratosthenes up to limit N
@@ -43,7 +43,8 @@ unit CombinatoricsLib.Combinatorics;
    All methods static on TCombinatoricsKit — no object creation needed.
    Int64 is used throughout to handle large intermediate values.
    Raises ECombinatoricsError for invalid inputs (negative n, k>n, etc.).
-   Results that would overflow Int64 raise ECombinatoricsError too.
+   Selected counting methods check Int64 overflow; callers must still respect
+   each method's documented safe range.
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -105,7 +106,7 @@ type
     { n! — factorial of N.
       Returns 1 for N=0.  Raises ECombinatoricsError for N < 0 or N > 20
       (20! is the largest factorial that fits in Int64).
-      For larger N use LogFactorial from ProbabilityLib or GammaLn. }
+      For larger N use this unit's LogFactorial method. }
     class function Factorial(N: Integer): Int64; static;
 
     { ln(n!) — log-factorial, valid for any N >= 0.
@@ -171,7 +172,7 @@ type
 
     { L_n — Lucas number (L_0=2, L_1=1, L_2=3, L_3=4 ...).
       Same recurrence as Fibonacci but different seed values.
-      Max safe N ≈ 91 before Int64 overflow. }
+      Max safe N = 90 before Int64 overflow. }
     class function Lucas(N: Integer): Int64; static;
 
     { Returns row N of Pascal's triangle as an array of Int64.
@@ -210,7 +211,8 @@ type
       Raises ECombinatoricsError if GCD(A, M) ≠ 1 (inverse does not exist). }
     class function ModInverse(A, M: Int64): Int64; static;
 
-    { True if N is prime.  Uses deterministic Miller-Rabin for N < 3.2e18.
+    { True if N is prime. The selected witnesses are deterministic for
+      N < 341,550,071,728,321.
       IsPrime(0) = False; IsPrime(1) = False; IsPrime(2) = True. }
     class function IsPrime(N: Int64): Boolean; static;
 
@@ -222,7 +224,7 @@ type
     class function PrimeFactors(N: Int64): TPrimeFactorArray; static;
 
     { Sieve of Eratosthenes: returns all primes <= Limit as an Int64 array.
-      Limit must be >= 2.  Memory: ~Limit/8 bytes. }
+      Limit must be >= 2. Uses one Boolean entry per integer through Limit. }
     class function Sieve(Limit: Int64): TPascalRow; static;
 
     { Euler's totient φ(n) — count of integers in [1,n] coprime to n.
@@ -265,14 +267,14 @@ implementation
 
 class function TCombinatoricsKit.MillerRabinWitness(const N, A: Int64): Boolean;
 { Returns True if A is a witness to N being composite (i.e. N is NOT prime).
-  Uses 128-bit-safe arithmetic via Double for the modular multiplication. }
+  Modular multiplication uses repeated doubling in Int64. }
 var
   D, R, X, Y: Int64;
   I: Integer;
 
-  { Multiply A*B mod M without overflow using __int128 emulation via Double.
-    For n < 2^63 and a,b < n, the product a*b can overflow Int64.
-    We use the "Russian peasant" binary method. }
+  { Multiply A*B mod M with the "Russian peasant" binary method. This avoids
+    the direct product, but its additions still require representable Int64
+    intermediate values. }
   function MulMod(AA, BB, MM: Int64): Int64;
   var
     Res: Int64;
@@ -681,10 +683,9 @@ begin
 end;
 
 class function TCombinatoricsKit.IsPrime(N: Int64): Boolean;
-{ Deterministic Miller-Rabin with witnesses sufficient for N < 3,215,031,751
-  and with extra witnesses covering all N < 3.3 * 10^24 }
+{ Deterministic Miller-Rabin for the range covered by bases 2 through 17. }
 const
-  { These 7 witnesses are sufficient for all N < 3,317,044,064,679,887,385,961,981 }
+  { These bases are sufficient for all N < 341,550,071,728,321. }
   Witnesses: array[0..6] of Int64 = (2, 3, 5, 7, 11, 13, 17);
 var
   W: Int64;
@@ -752,7 +753,7 @@ begin
 end;
 
 class function TCombinatoricsKit.Sieve(Limit: Int64): TPascalRow;
-{ Classic bitset sieve; returns primes as a dynamic array }
+{ Classic Boolean-array sieve; returns primes as a dynamic array }
 var
   IsComposite: array of Boolean;
   I, J, Count, Idx: Int64;

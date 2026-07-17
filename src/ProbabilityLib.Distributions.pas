@@ -52,7 +52,8 @@ unit ProbabilityLib.Distributions;
  - All methods are class static: call TProbabilityKit.XXX directly.
  - Parameters follow the convention (x, distribution params...).
  - Optional ADecimals rounds the result (default = -1 means no rounding).
- - Raises EProbabilityError for invalid parameters (e.g. negative variance).
+ - Distribution constraints are caller requirements. Density/CDF methods and
+   many helpers raise EProbabilityError, but validation is method-specific.
  - Depends only on MathBase.Precision and MathBase.SharedTypes.
 -----------------------------------------------------------------------------}
 

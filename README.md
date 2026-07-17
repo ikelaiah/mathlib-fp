@@ -84,7 +84,8 @@ All public units live in `src/`; the libraries can be used independently unless 
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory has a small walkthrough for every library area. Compile one in seconds:
+The [`examples/`](examples/) directory contains 12 small walkthroughs covering
+the major library workflows. Compile one in seconds:
 
 ```bash
 cd examples

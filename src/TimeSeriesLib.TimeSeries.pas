@@ -17,7 +17,6 @@ unit TimeSeriesLib.TimeSeries;
 
  Decomposition
    Decompose              — additive/multiplicative trend+seasonal+residual
-   STLDecompose           — simplified STL: loess trend + seasonal extraction
 
  Differencing & Stationarity
    Difference             — d-th order differencing
@@ -44,8 +43,8 @@ unit TimeSeriesLib.TimeSeries;
  Trend & Seasonality Utilities
    LinearTrend            — fit y = a + b*t by OLS; return slope + intercept
    DetrendLinear          — subtract the fitted linear trend
-   SeasonalStrength       — var(seasonal) / (var(seasonal) + var(residual))
-   PeriodogramPeak        — dominant period from FFT power spectrum
+   SeasonalStrength       — max(0, 1 - var(residual)/var(seasonal+residual))
+   PeriodogramPeak        — dominant-period estimate from FFT power spectrum
 
  Result records
    TDecomposition         — Trend, Seasonal, Residual arrays
@@ -63,8 +62,7 @@ interface
 
 uses
   Classes, SysUtils, Math,
-  MathBase.SharedTypes,
-  MathBase.Precision;
+  MathBase.SharedTypes;
 
 type
   { Raised for invalid time series inputs }
@@ -73,7 +71,7 @@ type
   { Additive or multiplicative decomposition type }
   TDecompType = (dtAdditive, dtMultiplicative);
 
-  { Result of Decompose / STLDecompose }
+  { Result of Decompose }
   TDecomposition = record
     Trend:    TDoubleArray;  { smoothed trend component }
     Seasonal: TDoubleArray;  { repeating seasonal component }
@@ -225,7 +223,7 @@ type
 
     { Invert differencing given the original first D values (initial conditions).
       Undifference(Diff1, [Y[0]], 1) reconstructs the original series.
-      InitVals must have length D. }
+      InitVals must have at least D elements; extra values are ignored. }
     class function Undifference(
       const DiffY: TDoubleArray;
       const InitVals: TDoubleArray;
@@ -337,17 +335,18 @@ type
       Values near 1 indicate strong seasonality; near 0 means weak. }
     class function SeasonalStrength(const Decomp: TDecomposition): Double; static;
 
-    { Find the dominant period in Y using FFT power spectrum.
+    { Find the dominant period in Y using an FFT power spectrum.
       Returns the period (in samples) corresponding to the largest spectral peak,
       excluding the DC component (lag 0).
-      MinPeriod / MaxPeriod: search range (default 2 .. N/2). }
+      MinPeriod / MaxPeriod: search range (default 2 .. N/2).
+      Current period conversion assumes a power-of-two input length. }
     class function PeriodogramPeak(
       const Y: TDoubleArray;
       MinPeriod: Integer = 2;
       MaxPeriod: Integer = 0): Integer; static;
 
-    { Compute the power spectral density (periodogram) of Y.
-      Returns N/2+1 values corresponding to frequencies 0, 1/N, 2/N, ..., 0.5. }
+    { Compute a one-sided power spectrum of Y after zero-padding to NPow, the
+      next power of two. Returns N/2+1 bins; bin k has frequency k/NPow. }
     class function Periodogram(const Y: TDoubleArray): TDoubleArray; static;
 
   end;
@@ -1349,7 +1348,7 @@ begin
 end;
 
 class function TTimeSeriesKit.Periodogram(const Y: TDoubleArray): TDoubleArray;
-{ Power spectrum via FFT: |X[k]|^2 / N, one-sided (0..N/2) }
+{ Power spectrum via zero-padded FFT: |X[k]|^2 / NPow, one-sided subset. }
 var
   N, NF, I, J, K, NPow, Len: Integer;
   Re, Im: TDoubleArray;
