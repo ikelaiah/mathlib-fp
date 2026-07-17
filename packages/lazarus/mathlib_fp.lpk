@@ -2,8 +2,8 @@
 <CONFIG>
   <Package Version="5">
     <PathDelim Value="\"/>
-    <Name Value="pascal_mathlibs"/>
-    <Author Value="ikelaiah"/>
+    <Name Value="mathlib_fp"/>
+    <Author Value="ikelaiah and mathlib-fp contributors"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
@@ -20,7 +20,7 @@
         <CustomOptions Value="-FcUTF8"/>
       </Other>
     </CompilerOptions>
-    <Description Value="A focused monorepo of Free Pascal math libraries for scientific and engineering computing: MathBase, AlgebraLib, FinanceLib, StatsLib, EngineeringLib, NumericsLib, ProbabilityLib, CombinatoricsLib, OptimizationLib, TimeSeriesLib, MLLib, and GeometryLib."/>
+    <Description Value="mathlib-fp: Free Pascal libraries for scientific, engineering, statistical, financial, numerical, machine-learning, and geometry work."/>
     <License Value="MIT License
 
 Copyright (c) 2025-2026 ikelaiah
@@ -133,9 +133,9 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
         <UnitName Value="GeometryLib.Geometry"/>
       </Item>
       <Item>
-        <Filename Value="pascal_mathlibs.pas"/>
+        <Filename Value="mathlib_fp.pas"/>
         <Type Value="Main Unit"/>
-        <UnitName Value="pascal_mathlibs"/>
+        <UnitName Value="mathlib_fp"/>
       </Item>
     </Files>
     <RequiredPkgs>

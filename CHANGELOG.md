@@ -13,7 +13,6 @@ No changes yet.
 
 ### Added
 
-- `fpmake.pp` package metadata for compatibility with FPMake tooling.
 - `EngineeringLib.Common` with `EEngineeringError` and domain-specific
   exceptions for fluid dynamics, thermodynamics, signals, and unit conversion.
 - Seeded `CreateRandom`, `BootstrapMean`, and
@@ -43,6 +42,8 @@ No changes yet.
   output is opt-in through `MATHLIB_TEST_VERBOSE`.
 - The Lazarus package version is now 1.2.0 and includes the shared engineering
   exception unit.
+- The Lazarus package and registration unit are now named `mathlib_fp` to match
+  the mathlib-fp project name.
 
 ### Fixed
 

@@ -8,7 +8,7 @@ unit AlgebraLib.Vectors;
  Vector operations are implemented on IMatrix instances — any matrix with a
  single row or column is treated as a vector.  The relevant IMatrix methods are:
    IsVector, IsRowVector, IsColumnVector
-   DotProduct, CrossProduct, Normalize, OuterProduct
+   DotProduct, CrossProduct, Normalize
    VectorMagnitude (via the 2-D helpers in MathBase.Trigonometry)
 
  Add this unit to your uses clause together with AlgebraLib.Matrices when you

@@ -12,21 +12,23 @@
 We take the security of mathlib-fp seriously. If you believe you have found
 a security vulnerability, please report it to us as described below.
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+**Do not include vulnerability details in a public GitHub issue.**
 
-Instead, use GitHub private vulnerability reporting or create a private security advisory in the repository. If private reporting is unavailable, open a minimal public issue asking for maintainer contact and do not include vulnerability details.
+Submit a [private vulnerability report](https://github.com/ikelaiah/mathlib-fp/security/advisories/new).
+If that form is unavailable, open a minimal public issue asking for maintainer
+contact without including vulnerability details.
 
 You should receive a response within 48 hours. If for some reason you do not, please follow up to ensure we received your original message.
 
 Please include the following information:
 
-* Type of issue (e.g. buffer overflow, SQL injection, cross-site scripting, etc.)
-* Full paths of source file(s) related to the manifestation of the issue
-* The location of the affected source code (tag/branch/commit or direct URL)
-* Any special configuration required to reproduce the issue
-* Step-by-step instructions to reproduce the issue
-* Proof-of-concept or exploit code (if possible)
-* Impact of the issue, including how an attacker might exploit it
+- Type of issue (for example, memory corruption or unsafe numerical behaviour)
+- Full paths of source files related to the issue
+- Affected tag, branch, commit, or direct source URL
+- Any special configuration required to reproduce the issue
+- Step-by-step reproduction instructions
+- Proof-of-concept code, if available
+- The impact and how the issue might be exploited
 
 ## Preferred Languages
 

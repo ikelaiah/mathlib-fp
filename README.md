@@ -60,7 +60,7 @@ fpc -Fusrc -FUlib my_program.lpr
 ./my_program
 ```
 
-Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths → Other Unit Files**, or install [`packages/lazarus/pascal_mathlibs.lpk`](packages/lazarus/pascal_mathlibs.lpk).
+Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths → Other Unit Files**, or install the mathlib-fp package from [`packages/lazarus/mathlib_fp.lpk`](packages/lazarus/mathlib_fp.lpk).
 
 ## 🧰 What's included
 

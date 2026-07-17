@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/ikelaiah/mathlib-fp/security/policy
+    about: Read the private vulnerability reporting instructions before sharing details.

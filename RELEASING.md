@@ -6,12 +6,14 @@ Use this checklist for the 1.2.0 first public release and later releases.
 
 - [ ] Freeze the public API and review exception, rounding, random-state, and
   ownership semantics in the reference docs.
-- [ ] Confirm the version matches in `fpmake.pp`, the Lazarus `.lpk`, the
+- [ ] Confirm the version matches in `packages/lazarus/mathlib_fp.lpk`, the
   README badge, and `CHANGELOG.md`.
 - [ ] Confirm the release section has the publication date and **Unreleased**
   contains only changes made after that release.
 - [ ] Confirm CI passes with FPC 3.2.2 on Linux and Windows.
-- [ ] Confirm CI compiles every example, and test the Lazarus package manually.
+- [ ] Confirm CI compiles and runs every example and builds the Lazarus package.
+- [ ] Install `packages/lazarus/mathlib_fp.lpk` in a clean Lazarus profile and
+  compile a small consumer project.
 - [ ] Check all Markdown links and compare documented public names with the
   declarations in each unit's `interface` section.
 - [ ] Review the MIT license, security contact route, repository URL, and
@@ -25,10 +27,12 @@ Use this checklist for the 1.2.0 first public release and later releases.
   panel so the project can be discovered.
 - [ ] Confirm GitHub detects the MIT license and that Issues are enabled if
   they are the supported bug-reporting route.
-- [ ] Enable private vulnerability reporting so the route documented in
-  `SECURITY.md` is available.
+- [ ] Under **Settings → Security → Code security**, enable private
+  vulnerability reporting and verify that the **Report a vulnerability** form
+  linked from `SECURITY.md` opens.
 - [ ] Protect the default branch and require the Linux and Windows CI checks
   if the repository's collaboration model permits it.
+- [ ] Confirm the issue forms and pull-request template render correctly.
 
 Recommended commands:
 
@@ -44,7 +48,11 @@ cd ../examples
 mkdir -p lib/release
 for file in *.lpr; do
   fpc -B -FcUTF8 -Fu../src -FUlib/release "$file"
+  "./${file%.lpr}" > /dev/null
 done
+
+cd ..
+lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 ```
 
 ## Publish
@@ -66,5 +74,5 @@ done
   tree.
 - [ ] Confirm the archive includes `src/`, `docs/`, `examples/`, package
   metadata, tests, and the license, but no compiler output.
-- [ ] Install the Lazarus package from a clean environment.
+- [ ] Install `packages/lazarus/mathlib_fp.lpk` from a clean environment.
 - [ ] Mark only the maintained release lines as supported in `SECURITY.md`.

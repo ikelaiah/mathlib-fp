@@ -152,7 +152,6 @@ function IsColumnVector: Boolean;
 | `DotProduct(Other)` | `Double` | Inner product; vectors must have the same length |
 | `CrossProduct(Other)` | `IMatrix` | 3-element vectors only |
 | `Normalize` | `IMatrix` | Unit vector; raises `EMatrixError` if zero magnitude |
-| `OuterProduct(Other)` | `IMatrix` | m × n rank-1 matrix |
 
 ### Statistical Methods
 

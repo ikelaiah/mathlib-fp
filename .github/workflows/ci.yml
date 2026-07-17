@@ -4,13 +4,20 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   linux:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Free Pascal
         run: |
@@ -31,12 +38,13 @@ jobs:
           fi
           tail -n 20 test-output.txt
 
-      - name: Build examples
+      - name: Build and run examples
         run: |
           cd examples
           mkdir -p lib/ci
           for file in *.lpr; do
             fpc -B -FcUTF8 -Fu../src -FUlib/ci "$file"
+            "./${file%.lpr}" > /dev/null
           done
 
       - name: Test README quick start from a source archive
@@ -61,12 +69,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Lazarus and Free Pascal
-        uses: gcarreno/setup-lazarus@v3
+        uses: gcarreno/setup-lazarus@3ee9d77e0c771b37c1069f218cb68bd5ce7c30fe # v3
         with:
-          lazarus-version: stable
+          lazarus-version: 3.6
           with-cache: false
 
       - name: Verify Free Pascal version
@@ -83,17 +91,26 @@ jobs:
         run: |
           Set-Location tests
           New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
-          fpc -B -FcUTF8 -Fu../src -FUlib/ci TestRunner.lpr
+          & fpc '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' 'TestRunner.lpr'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          ./TestRunner.exe -a --format=plain
+          & ./TestRunner.exe '-a' '--format=plain'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Build examples
+      - name: Build and run examples
         shell: pwsh
         run: |
           Set-Location examples
           New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
           Get-ChildItem *.lpr | ForEach-Object {
-            fpc -B -FcUTF8 -Fu../src -FUlib/ci $_.FullName
+            & fpc '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' $_.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $executable = Join-Path $_.DirectoryName ($_.BaseName + '.exe')
+            & $executable | Out-Null
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+
+      - name: Build Lazarus package
+        shell: pwsh
+        run: |
+          & lazbuild '--build-all' 'packages/lazarus/mathlib_fp.lpk'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

@@ -1,0 +1,52 @@
+name: Feature request
+description: Suggest a new API or improvement for mathlib-fp
+title: "[Feature]: "
+body:
+  - type: dropdown
+    id: library
+    attributes:
+      label: Target library
+      options:
+        - MathBase
+        - AlgebraLib
+        - FinanceLib
+        - StatsLib
+        - EngineeringLib
+        - NumericsLib
+        - ProbabilityLib
+        - CombinatoricsLib
+        - OptimizationLib
+        - TimeSeriesLib
+        - MLLib
+        - GeometryLib
+        - Lazarus package or build
+        - New library area
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Explain the mathematical or engineering task this would address.
+    validations:
+      required: true
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API or behaviour
+      description: Include a Pascal signature or usage example when possible.
+      render: Pascal
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Link to algorithms, standards, papers, or comparable implementations.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and documentation for this functionality.
+          required: true
