@@ -74,12 +74,6 @@ PMT := TFinanceKit.Payment(200000, 0.045/12, 360); // ≈ 1013.3721
 |--------|-------------|
 | `NetPresentValue(InitialInvestment, CashFlows, Rate [, Decimals])` | NPV = −I + Σ CFt / (1+r)ᵗ |
 | `InternalRateOfReturn(InitialInvestment, CashFlows [, Decimals])` | Rate where NPV = 0; secant method with dampening |
-| `ModifiedIRR(CashFlows, FinanceRate, ReinvestRate [, Decimals])` | MIRR |
-| `XNPV(CashFlows, Dates, Rate [, Decimals])` | NPV with irregular date-spaced cash flows |
-| `XIRR(CashFlows, Dates [, Decimals])` | IRR with irregular date-spaced cash flows |
-| `Payback(InitialInvestment, CashFlows)` | Simple payback period (periods) |
-| `ModifiedPayback(InitialInvestment, CashFlows, Rate)` | Discounted payback period |
-| `NPVProfile(InitialInvestment, CashFlows, RateMin, RateMax, Steps)` | NPV at a range of discount rates |
 
 ```pascal
 CashFlows := TDoubleArray.Create(20000, 25000, 30000, 35000, 40000);
@@ -101,11 +95,6 @@ IRR := TFinanceKit.InternalRateOfReturn(100000, CashFlows); // ≈ 17.97%
 | `BondPrice(FaceValue, CouponRate, YieldRate, PeriodsPerYear, YearsToMaturity [, Decimals])` | Fair price from cash flow discounting |
 | `BondYieldToMaturity(BondPrice, FaceValue, CouponRate, PeriodsPerYear, YearsToMaturity [, Decimals])` | YTM via Newton-Raphson |
 | `ModifiedDuration(FaceValue, CouponRate, YieldRate, PeriodsPerYear, YearsToMaturity [, Decimals])` | Price sensitivity to yield change |
-| `BondDuration(FaceValue, CouponRate, YieldRate, PeriodsPerYear, YearsToMaturity [, Decimals])` | Macaulay duration |
-| `BondConvexity(FaceValue, CouponRate, YieldRate, PeriodsPerYear, YearsToMaturity [, Decimals])` | Second-order price sensitivity |
-| `AccruedInterest(FaceValue, CouponRate, DaysSinceLastPayment, DaysInPeriod [, Decimals])` | Accrued coupon since last payment |
-| `DirtyPrice(CleanPrice, AccruedInterestValue [, Decimals])` | Clean price + accrued interest |
-| `BondSpreadToBenchmark(BondYield, BenchmarkRate [, Decimals])` | Yield spread in basis points |
 | `AmortizationSchedule(LoanAmount, Rate, NumberOfPayments [, Decimals])` | Full `TAmortizationArray` table |
 
 ```pascal
@@ -117,12 +106,7 @@ Price := TFinanceKit.BondPrice(1000, 0.06, 0.045, 2, 10); // ≈ 1123.2526
 
 | Method | Description |
 |--------|-------------|
-| `BlackScholesPrice(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry, OptionType [, Decimals])` | European option price |
-| `BlackScholesDelta(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry, OptionType)` | Delta (∂V/∂S) |
-| `BlackScholesGamma(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry)` | Gamma (∂²V/∂S²) |
-| `BlackScholesVega(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry)` | Vega (∂V/∂σ) |
-| `BlackScholesTheta(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry, OptionType)` | Theta (∂V/∂t) |
-| `BlackScholesRho(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry, OptionType)` | Rho (∂V/∂r) |
+| `BlackScholes(SpotPrice, StrikePrice, RiskFreeRate, Volatility, TimeToExpiry, OptionType [, Decimals])` | European call or put price |
 
 ### Investment & Return Metrics
 
@@ -142,7 +126,9 @@ Price := TFinanceKit.BondPrice(1000, 0.06, 0.045, 2, 10); // ≈ 1123.2526
 | `LeverageRatios(TotalDebt, TotalAssets, TotalEquity, EBIT, InterestExpense [, Decimals])` | `TLeverageRatios` |
 | `ProfitabilityRatios(Revenue, COGS, EBIT, NetIncome, TotalAssets, CurrentLiabilities [, Decimals])` | `TProfitabilityRatios` |
 | `DuPontAnalysis(NetIncome, Sales, TotalAssets, TotalEquity [, Decimals])` | `TDuPontAnalysis` |
-| `OperatingLeverageAnalysis(Sales, VariableCosts, FixedCosts, UnitPrice, UnitVariableCost [, Decimals])` | `TOperatingLeverage` |
+| `OperatingLeverage(SalesVolume, UnitPrice, UnitVariableCost, FixedCosts [, Decimals])` | `TOperatingLeverage` |
+| `BreakEvenUnits(FixedCosts, UnitPrice, UnitVariableCost [, Decimals])` | Break-even sales volume |
+| `BreakEvenRevenue(FixedCosts, ContributionMarginRatio [, Decimals])` | Break-even revenue |
 
 ### Risk-Adjusted Performance
 

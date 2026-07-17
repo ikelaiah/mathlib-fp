@@ -470,12 +470,12 @@ type
 
       @returns True if the matrix is symmetric and positive definite, False otherwise.
 
-      @warning Requires a square matrix. Current implementation only checks if determinant > 0 and diagonal elements > 0, which is NOT a sufficient condition for positive definiteness. A more robust check (e.g., via Cholesky decomposition attempt or eigenvalues) is needed for guaranteed accuracy.
+      @warning Requires a square, symmetric matrix. The implementation verifies positive definiteness by attempting a Cholesky decomposition.
 
       @example
-        // Warning: Current implementation is not fully reliable.
+        // Positive definiteness is checked through Cholesky decomposition.
         if MyMatrix.IsPositiveDefinite then
-           // Matrix might be positive definite (based on limited check)
+           // Matrix is symmetric positive definite.
     }
     function IsPositiveDefinite: Boolean;
 
@@ -486,12 +486,12 @@ type
 
       @returns True if the matrix is symmetric and positive semidefinite, False otherwise.
 
-      @warning Requires a square matrix. Current implementation only checks if determinant >= 0 and diagonal elements >= 0, which is NOT a sufficient condition for positive semidefiniteness. A more robust check is needed.
+      @warning Requires a square, symmetric matrix. Eigenvalues within 1E-9 of zero are treated as zero.
 
       @example
-        // Warning: Current implementation is not fully reliable.
+        // Positive semidefiniteness is checked from the real eigenvalues.
         if MyMatrix.IsPositiveSemidefinite then
-          // Matrix might be positive semidefinite (based on limited check)
+          // Matrix has no eigenvalue below the negative tolerance.
     }
     function IsPositiveSemidefinite: Boolean;
 
@@ -819,7 +819,7 @@ type
 
       @references Cholesky–Banachiewicz algorithm.
 
-      @warning Raises EMatrixError if the matrix is not square or not positive definite (check fails during computation, e.g., sqrt of negative). Relies on IsPositiveDefinite check which might be unreliable.
+      @warning Raises EMatrixError if the matrix is not square, symmetric, or positive definite.
 
       @example
         var CholResult: TCholeskyDecomposition;
@@ -1585,7 +1585,7 @@ type
 
       @returns TCholeskyDecomposition record.
 
-      @warning Requires symmetric positive definite matrix. Raises EMatrixError otherwise. Relies on IsPositiveDefinite check.
+      @warning Requires a symmetric positive-definite matrix. Raises EMatrixError otherwise.
 
       @example See IMatrix.Cholesky example.
     }
@@ -1958,7 +1958,7 @@ type
 
       @returns True if potentially positive definite, False otherwise.
 
-      @warning Requires square matrix. Current check (Det>0, Diag>0) is insufficient and unreliable. Use Cholesky attempt for a better check.
+      @warning Requires a square, symmetric matrix. Returns False when Cholesky decomposition fails.
 
       @example See IMatrix.IsPositiveDefinite example.
     }
@@ -1971,7 +1971,7 @@ type
 
       @returns True if potentially positive semidefinite, False otherwise.
 
-      @warning Requires square matrix. Current check (Det>=0, Diag>=0) is insufficient and unreliable.
+      @warning Requires a square, symmetric matrix. Uses eigenvalue tolerance 1E-9.
 
       @example See IMatrix.IsPositiveSemidefinite example.
     }

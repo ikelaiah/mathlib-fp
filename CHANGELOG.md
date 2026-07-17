@@ -7,14 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-...
-
+No changes yet.
 
 ## [1.2.0] - 2026-07-17
 
 ### Added
 
-- `fpmake.pp` package metadata for FPMake/FPPKG command-line workflows.
+- `fpmake.pp` package metadata for compatibility with FPMake tooling.
 - `EngineeringLib.Common` with `EEngineeringError` and domain-specific
   exceptions for fluid dynamics, thermodynamics, signals, and unit conversion.
 - Seeded `CreateRandom`, `BootstrapMean`, and

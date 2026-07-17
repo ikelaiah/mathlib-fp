@@ -9,11 +9,6 @@ unit FinanceLib.Bonds;
    BondPrice              — fair price from coupon rate + YTM
    BondYieldToMaturity    — YTM from market price
    ModifiedDuration       — price sensitivity to yield change
-   BondDuration           — Macaulay duration
-   BondConvexity          — second-order price sensitivity
-   AccruedInterest        — accrued coupon since last payment date
-   DirtyPrice             — clean price + accrued interest
-   BondSpreadToBenchmark  — yield spread over a benchmark rate
    AmortizationSchedule   — loan/bond amortisation table
 -----------------------------------------------------------------------------}
 

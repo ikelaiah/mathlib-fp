@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,11 +17,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fp-compiler fp-units-fcl
 
+      - name: Verify Free Pascal version
+        run: test "$(fpc -iV)" = "3.2.2"
+
       - name: Build and run tests
         run: |
           cd tests
           mkdir -p lib/ci
-          fpc -Fu../src -FUlib/ci TestRunner.lpr
+          fpc -B -FcUTF8 -Fu../src -FUlib/ci TestRunner.lpr
           if ! ./TestRunner -a --format=plain > test-output.txt; then
             cat test-output.txt
             exit 1
@@ -33,5 +36,59 @@ jobs:
           cd examples
           mkdir -p lib/ci
           for file in *.lpr; do
-            fpc -Fu../src -FUlib/ci "$file"
+            fpc -B -FcUTF8 -Fu../src -FUlib/ci "$file"
           done
+
+      - name: Test README quick start from a source archive
+        run: |
+          archive_dir=$(mktemp -d)
+          git archive HEAD | tar -x -C "$archive_dir"
+          cd "$archive_dir"
+          cat > my_program.lpr <<'EOF'
+          program hello_mathlib;
+          {$mode objfpc}{$H+}
+          uses ProbabilityLib.Distributions;
+          begin
+            Writeln('P(Z <= 1.96) = ', TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
+          end.
+          EOF
+          mkdir -p lib
+          fpc -Fusrc -FUlib my_program.lpr
+          ./my_program
+
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Free Pascal 3.2.2
+        run: choco install freepascal --version=3.2.2 -y
+
+      - name: Verify Free Pascal version
+        shell: pwsh
+        run: |
+          if ((fpc -iV) -ne '3.2.2') {
+            throw "Expected FPC 3.2.2"
+          }
+
+      - name: Build and run tests
+        shell: pwsh
+        run: |
+          Set-Location tests
+          New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
+          fpc -B -FcUTF8 -Fu../src -FUlib/ci TestRunner.lpr
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./TestRunner.exe -a --format=plain
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build examples
+        shell: pwsh
+        run: |
+          Set-Location examples
+          New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
+          Get-ChildItem *.lpr | ForEach-Object {
+            fpc -B -FcUTF8 -Fu../src -FUlib/ci $_.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

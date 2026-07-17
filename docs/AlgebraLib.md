@@ -134,8 +134,8 @@ function IsColumnVector: Boolean;
 | `LU` | `TLUDecomposition` | PA = LU with partial pivoting |
 | `QR` | `TQRDecomposition` | A = QR via Gram-Schmidt |
 | `EigenDecomposition` | `TEigenDecomposition` | Real symmetric matrices use Jacobi rotations; real 2×2 nonsymmetric matrices are handled analytically |
-| `SVDecompose` | `TSVD` | A = USVᵀ |
-| `CholeskyDecompose` | `TCholeskyDecomposition` | A = LLᵀ; symmetric positive-definite matrices only |
+| `SVD` | `TSVD` | A = USVᵀ |
+| `Cholesky` | `TCholeskyDecomposition` | A = LLᵀ; symmetric positive-definite matrices only |
 
 ### Linear System Solvers
 
@@ -143,7 +143,7 @@ function IsColumnVector: Boolean;
 |--------|-----------|-------------|
 | `SolveLinear` | `B: IMatrix` | Direct solve Ax = B via LU decomposition |
 | `SolveIterative` | `B: IMatrix; Method: TIterativeMethod; MaxIter, Tol` | Iterative solve; method selected by enum |
-| `LeastSquares` | `B: IMatrix` | Min ‖Ax − B‖ via pseudoinverse |
+| `PseudoInverse` | none | Moore-Penrose pseudoinverse; use `A.PseudoInverse.Multiply(B)` for least-squares solutions |
 
 ### Vector Operations (single-row or single-column matrices)
 
