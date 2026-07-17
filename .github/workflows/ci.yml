@@ -63,14 +63,19 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install Free Pascal 3.2.2
-        run: choco install freepascal --version=3.2.2 -y
+      - name: Install Lazarus and Free Pascal
+        uses: gcarreno/setup-lazarus@v3
+        with:
+          lazarus-version: stable
+          with-cache: false
 
       - name: Verify Free Pascal version
         shell: pwsh
         run: |
-          if ((fpc -iV) -ne '3.2.2') {
-            throw "Expected FPC 3.2.2"
+          $version = (fpc -iV).Trim()
+          Write-Host "Free Pascal version: $version"
+          if ($version -ne '3.2.2') {
+            throw "Expected FPC 3.2.2, found $version"
           }
 
       - name: Build and run tests
