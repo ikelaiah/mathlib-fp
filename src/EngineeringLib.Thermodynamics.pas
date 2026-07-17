@@ -114,11 +114,11 @@ type
       SpecificHeatRatio: Double): Double; static;
     
     { Compressible Flow }
-    // Critical pressure ratio for choked flow
+    // Critical static-to-stagnation pressure ratio p*/p0 for choked flow
     class function CriticalPressureRatio(SpecificHeatRatio: Double): Double; static;
-    // Mach number from pressure ratio
+    // Mach number from the static-to-stagnation pressure ratio p/p0
     class function MachNumberFromPressureRatio(PressureRatio: Double; SpecificHeatRatio: Double): Double; static;
-    // Isentropic flow relations
+    // Isentropic flow ratios: T0/T, p/p0, and rho/rho0 respectively
     class function IsentropicTemperatureRatio(MachNumber: Double; SpecificHeatRatio: Double): Double; static;
     class function IsentropicPressureRatio(MachNumber: Double; SpecificHeatRatio: Double): Double; static;
     class function IsentropicDensityRatio(MachNumber: Double; SpecificHeatRatio: Double): Double; static;
@@ -126,9 +126,9 @@ type
     { Psychrometrics }
     // Relative humidity = (Actual vapor pressure / Saturated vapor pressure) * 100%
     class function RelativeHumidity(ActualVaporPressure: Double; SaturatedVaporPressure: Double): Double; static;
-    // Saturated vapor pressure calculated using Antoine equation
+    // Saturated vapor pressure of water in Pa using Antoine equation (1-100°C)
     class function SaturatedVaporPressure(TemperatureC: Double): Double; static;
-    // Humidity ratio (or specific humidity)
+    // Humidity ratio (kg water/kg dry air): 0.622*Pv/(P-Pv), 0 <= Pv < P
     class function HumidityRatio(VaporPressure: Double; AtmosphericPressure: Double): Double; static;
     // Dew point temperature
     class function DewPointTemperature(TemperatureC: Double; RelativeHumidityPercent: Double): Double; static;
@@ -342,6 +342,8 @@ class function TThermodynamicsKit.AdiabaticPressure(
 begin
   if (InitialPressure <= 0) or (InitialVolume <= 0) or (FinalVolume <= 0) then
     raise EThermodynamicsError.Create('Pressure and volumes must be positive for adiabatic process calculation.');
+  if SpecificHeatRatio <= 1 then
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := InitialPressure * Power(InitialVolume / FinalVolume, SpecificHeatRatio);
 end;
 
@@ -351,6 +353,8 @@ class function TThermodynamicsKit.AdiabaticVolume(
 begin
   if (InitialPressure <= 0) or (InitialVolume <= 0) or (FinalPressure <= 0) then
     raise EThermodynamicsError.Create('Pressure and volume must be positive for adiabatic process calculation.');
+  if SpecificHeatRatio <= 1 then
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := InitialVolume * Power(InitialPressure / FinalPressure, 1/SpecificHeatRatio);
 end;
 
@@ -360,6 +364,8 @@ class function TThermodynamicsKit.AdiabaticTemperature(
 begin
   if (InitialTemp <= 0) or (InitialVolume <= 0) or (FinalVolume <= 0) then
     raise EThermodynamicsError.Create('Temperature and volumes must be positive for adiabatic process calculation.');
+  if SpecificHeatRatio <= 1 then
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := InitialTemp * Power(InitialVolume / FinalVolume, SpecificHeatRatio - 1);
 end;
 
@@ -369,6 +375,8 @@ class function TThermodynamicsKit.AdiabaticTemperatureFromPressure(
 begin
   if (InitialTemp <= 0) or (InitialPressure <= 0) or (FinalPressure <= 0) then
     raise EThermodynamicsError.Create('Temperature and pressures must be positive for adiabatic process calculation.');
+  if SpecificHeatRatio <= 1 then
+    raise EThermodynamicsError.Create('Specific heat ratio must be greater than 1.');
   Result := InitialTemp * Power(FinalPressure / InitialPressure, (SpecificHeatRatio - 1) / SpecificHeatRatio);
 end;
 
@@ -444,15 +452,20 @@ end;
 
 class function TThermodynamicsKit.HumidityRatio(VaporPressure: Double; AtmosphericPressure: Double): Double;
 begin
-  if (VaporPressure < 0) or (AtmosphericPressure <= 0) then
-    raise EThermodynamicsError.Create('Vapor pressure must be non-negative and atmospheric pressure must be positive.');
+  if VaporPressure < 0 then
+    raise EThermodynamicsError.Create('Vapor pressure must be non-negative.');
+  if AtmosphericPressure <= 0 then
+    raise EThermodynamicsError.Create('Atmospheric pressure must be positive.');
+  if VaporPressure >= AtmosphericPressure then
+    raise EThermodynamicsError.Create(
+      'Vapor pressure must be less than atmospheric pressure.');
   // w = 0.622 * (Pv / (P - Pv))
   Result := 0.622 * (VaporPressure / (AtmosphericPressure - VaporPressure));
 end;
 
 class function TThermodynamicsKit.DewPointTemperature(TemperatureC: Double; RelativeHumidityPercent: Double): Double;
 var
-  A, B, C: Double; // Magnus formula constants
+  A, B: Double; // Magnus formula constants
   Alpha: Double;
 begin
   if (RelativeHumidityPercent <= 0) or (RelativeHumidityPercent > 100) then
@@ -477,6 +490,9 @@ end;
 
 class function TThermodynamicsKit.CelsiusToKelvin(TempC: Double): Double;
 begin
+  if TempC < -273.15 then
+    raise EThermodynamicsError.Create(
+      'Celsius temperature cannot be below absolute zero (-273.15°C).');
   Result := TempC + 273.15;
 end;
 

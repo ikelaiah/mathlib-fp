@@ -22,6 +22,7 @@ type
 
   TTimeUnit = (tuSecond, tuMinute, tuHour, tuDay, tuWeek, tuMonth, tuYear,
                tuMillisecond, tuMicrosecond, tuNanosecond);
+  { tuMonth is the fixed average 365/12-day duration; tuYear is 365 days. }
 
   TTemperatureUnit = (tpKelvin, tpCelsius, tpFahrenheit, tpRankine, tpReaumur);
 
@@ -111,7 +112,7 @@ type
     { Frequency conversions }
     class function ConvertFrequency(Value: Double; FromUnit, ToUnit: TFrequencyUnit): Double; static;
 
-    { Get unit name as string }
+    { Get the canonical, case-sensitive unit symbol used by string APIs. }
     class function GetLengthUnitName(Unit_: TLengthUnit): string; static;
     class function GetMassUnitName(Unit_: TMassUnit): string; static;
     class function GetTimeUnitName(Unit_: TTimeUnit): string; static;
@@ -129,17 +130,17 @@ type
     class function GetElectricalPotentialUnitName(Unit_: TElectricalPotentialUnit): string; static;
     class function GetFrequencyUnitName(Unit_: TFrequencyUnit): string; static;
 
-    { Helper functions }
+    { Fixed-point formatting; Decimals must be non-negative. }
     class function FormatWithUnit(Value: Double; AUnitName: string; Decimals: Integer = 2): string; static;
 
-    { Advanced formatting functions }
+    { Scientific formatting and rounding; SignificantDigits must be >= 1. }
     class function FormatWithScientificNotation(
       Value: Double;
       AUnitName: string;
       SignificantDigits: Integer = 3): string; static;
     class function RoundToSignificantDigits(Value: Double; SignificantDigits: Integer): Double; static;
 
-    { String-based unit conversion functions }
+    { String-based conversion using exact, case-sensitive canonical symbols. }
     class function TryConvertByUnitName(
       Value: Double;
       FromAUnitName, ToAUnitName: string;
@@ -168,7 +169,7 @@ type
       out Unit_: TElectricalPotentialUnit): Boolean; static;
     class function TryGetFrequencyUnitFromName(AUnitName: string; out Unit_: TFrequencyUnit): Boolean; static;
 
-    { String parsing functions }
+    { String parsing uses the process's current numeric locale. }
     class function TryParseValueWithUnit(
       const ValueStr: string;
       out Value: Double;
@@ -648,6 +649,8 @@ end;
 
 class function TUnitConversionKit.FormatWithUnit(Value: Double; AUnitName: string; Decimals: Integer): string;
 begin
+  if Decimals < 0 then
+    raise EUnitConversionError.Create('Decimal places cannot be negative.');
   Result := Format('%.*f %s', [Decimals, Value, AUnitName]);
 end;
 
@@ -659,6 +662,8 @@ var
   Exponent: Integer;
   Mantissa: Double;
 begin
+  if SignificantDigits < 1 then
+    raise EUnitConversionError.Create('Significant digits must be at least 1.');
   if Value = 0 then
     Result := '0 ' + AUnitName
   else
@@ -682,6 +687,8 @@ class function TUnitConversionKit.RoundToSignificantDigits(Value: Double; Signif
 var
   Factor: Double;
 begin
+  if SignificantDigits < 1 then
+    raise EUnitConversionError.Create('Significant digits must be at least 1.');
   if Value = 0 then
     Result := 0
   else

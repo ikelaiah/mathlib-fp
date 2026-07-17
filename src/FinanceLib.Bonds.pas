@@ -3,9 +3,11 @@ unit FinanceLib.Bonds;
 {-----------------------------------------------------------------------------
  FinanceLib.Bonds
 
- Re-exports bond-related functionality from FinanceLib.Interest.
+ Focused entry point for bond-related functionality implemented by
+ FinanceLib.Interest. This unit intentionally contains aliases rather than a
+ second copy of the financial formulas.
 
- Bond methods on TFinanceKit:
+ Intended methods on TBondKit:
    BondPrice              — fair price from coupon rate + YTM
    BondYieldToMaturity    — YTM from market price
    ModifiedDuration       — price sensitivity to yield change
@@ -19,10 +21,14 @@ interface
 uses
   FinanceLib.Interest;
 
-{ Re-export the main class and exception under Bond-oriented aliases. }
+{ TBondKit is a type alias, so it has the same methods as TFinanceKit. The
+  TBondPayment and TBondSchedule aliases make the amortization result types
+  directly nameable by callers that import only this focused unit. }
 type
-  TBondKit    = TFinanceKit;
-  EBondError  = EFinanceError;
+  TBondKit      = TFinanceKit;
+  EBondError    = EFinanceError;
+  TBondPayment  = TFinanceKit.TAmortizationPayment;
+  TBondSchedule = TFinanceKit.TAmortizationArray;
 
 implementation
 

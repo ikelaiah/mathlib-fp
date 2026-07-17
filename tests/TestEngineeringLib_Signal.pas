@@ -21,7 +21,7 @@ interface
 uses
   Classes, SysUtils, Math,
   fpcunit, testutils, testregistry,
-  EngineeringLib.Common, EngineeringLib.Signal;
+  MathBase.SharedTypes, EngineeringLib.Common, EngineeringLib.Signal;
 
 type
   TTestSignalKit = class(TTestCase)
@@ -40,8 +40,10 @@ type
     procedure DoApplyWindowWithMismatchedSizes;
     procedure DoFFT_NotPow2;
     procedure DoFFT_MismatchedArrays;
+    procedure DoCalculateIFFT_MismatchedArrays;
     procedure DoFIR_LP_BadCutoff_High;
     procedure DoFIR_LP_BadCutoff_Low;
+    procedure DoFIR_LP_OrderTooSmall;
     procedure DoFIR_BP_SwappedCutoffs;
 
   published
@@ -77,6 +79,8 @@ type
     procedure TestFFT_NyquistFrequency;
     procedure TestFFT_NotPow2Raises;
     procedure TestFFT_MismatchedArraysRaises;
+    procedure TestCalculateIFFT_MismatchedArraysRaises;
+    procedure TestCalculateFFT_Empty;
     procedure TestFFT_Length1;
     procedure TestFFT_Length2;
 
@@ -91,12 +95,18 @@ type
     procedure TestFIR_HighPass_DCGain;
     procedure TestFIR_HighPass_NyquistGain;
     procedure TestFIR_HighPass_Symmetry;
+    procedure TestFIR_HighPass_OddOrderSymmetry;
     procedure TestFIR_BandPass_Length;
     procedure TestFIR_BandPass_Symmetry;
     procedure TestFIR_BandStop_DCGain;
+    procedure TestFIR_BandStop_OddOrderSymmetry;
     procedure TestFIR_BadCutoffHighRaises;
     procedure TestFIR_BadCutoffLowRaises;
     procedure TestFIR_BandPass_SwappedRaises;
+    procedure TestFIR_OrderTooSmallRaises;
+
+    { --- Shared types --- }
+    procedure TestUsesMathBaseDoubleArray;
 
     { --- ApplyFIRFilter --- }
     procedure TestApplyFIR_Impulse;
@@ -173,6 +183,14 @@ begin
   TSignalKit.FFT(Re, Im);
 end;
 
+procedure TTestSignalKit.DoCalculateIFFT_MismatchedArrays;
+var Re, Im, OutputSignal: TDoubleArray;
+begin
+  SetLength(Re, 4);
+  SetLength(Im, 2);
+  TSignalKit.CalculateIFFT(Re, Im, OutputSignal);
+end;
+
 procedure TTestSignalKit.DoFIR_LP_BadCutoff_High;
 begin
   TSignalKit.DesignFIRLowPass(0.5, 32);
@@ -181,6 +199,11 @@ end;
 procedure TTestSignalKit.DoFIR_LP_BadCutoff_Low;
 begin
   TSignalKit.DesignFIRLowPass(0.0, 32);
+end;
+
+procedure TTestSignalKit.DoFIR_LP_OrderTooSmall;
+begin
+  TSignalKit.DesignFIRLowPass(0.25, 1);
 end;
 
 procedure TTestSignalKit.DoFIR_BP_SwappedCutoffs;
@@ -483,6 +506,20 @@ begin
     @DoFFT_MismatchedArrays);
 end;
 
+procedure TTestSignalKit.TestCalculateIFFT_MismatchedArraysRaises;
+begin
+  AssertException('CalculateIFFT mismatched arrays raises ESignalError',
+    ESignalError, @DoCalculateIFFT_MismatchedArrays);
+end;
+
+procedure TTestSignalKit.TestCalculateFFT_Empty;
+var Re, Im: TDoubleArray;
+begin
+  TSignalKit.CalculateFFT(nil, Re, Im);
+  AssertEquals('Empty FFT real length', 0, Length(Re));
+  AssertEquals('Empty FFT imaginary length', 0, Length(Im));
+end;
+
 procedure TTestSignalKit.TestFFT_Length1;
 var Re, Im: TDoubleArray;
 begin
@@ -607,6 +644,17 @@ begin
       Format('HP symmetry coeff[%d]', [I]));
 end;
 
+procedure TTestSignalKit.TestFIR_HighPass_OddOrderSymmetry;
+var C: TDoubleArray;
+    I: Integer;
+begin
+  C := TSignalKit.DesignFIRHighPass(0.25, 31);
+  AssertEquals('Odd HP order is incremented to length 33', 33, Length(C));
+  for I := 0 to High(C) div 2 do
+    AssertNear(C[I], C[High(C) - I], 1E-12,
+      Format('Odd-order HP symmetry coeff[%d]', [I]));
+end;
+
 procedure TTestSignalKit.TestFIR_BandPass_Length;
 var C: TDoubleArray;
 begin
@@ -632,6 +680,17 @@ begin
   AssertNear(1.0, SumArray(C), TOL_FILTER, 'BS DC gain = 1');
 end;
 
+procedure TTestSignalKit.TestFIR_BandStop_OddOrderSymmetry;
+var C: TDoubleArray;
+    I: Integer;
+begin
+  C := TSignalKit.DesignFIRBandStop(0.1, 0.3, 31);
+  AssertEquals('Odd BS order is incremented to length 33', 33, Length(C));
+  for I := 0 to High(C) div 2 do
+    AssertNear(C[I], C[High(C) - I], 1E-12,
+      Format('Odd-order BS symmetry coeff[%d]', [I]));
+end;
+
 procedure TTestSignalKit.TestFIR_BadCutoffHighRaises;
 begin
   AssertException('LP cutoff >= 0.5 raises', ESignalError,
@@ -648,6 +707,24 @@ procedure TTestSignalKit.TestFIR_BandPass_SwappedRaises;
 begin
   AssertException('BP low>high raises', ESignalError,
     @DoFIR_BP_SwappedCutoffs);
+end;
+
+procedure TTestSignalKit.TestFIR_OrderTooSmallRaises;
+begin
+  AssertException('FIR order below 2 raises', ESignalError,
+    @DoFIR_LP_OrderTooSmall);
+end;
+
+procedure TTestSignalKit.TestUsesMathBaseDoubleArray;
+var
+  SharedArray: MathBase.SharedTypes.TDoubleArray;
+  SignalArray: EngineeringLib.Signal.TDoubleArray;
+begin
+  SharedArray := MathBase.SharedTypes.TDoubleArray.Create(1.0, 2.0, 3.0);
+  SignalArray := SharedArray;
+  SharedArray := SignalArray;
+  AssertEquals('Signal array is the shared MathBase type', 3,
+    Length(SharedArray));
 end;
 
 { =========================================================================

@@ -3,11 +3,13 @@ unit FinanceLib.NPV;
 {-----------------------------------------------------------------------------
  FinanceLib.NPV
 
- Re-exports NPV / capital-budgeting functionality from FinanceLib.Interest.
+ Focused entry point for NPV and IRR functionality implemented by
+ FinanceLib.Interest. This unit intentionally contains aliases rather than a
+ second copy of the financial formulas.
 
- Relevant methods on TFinanceKit:
+ Intended methods on TNPVKit:
    NetPresentValue        — NPV of a cash-flow series
-   InternalRateOfReturn   — IRR (secant method)
+   InternalRateOfReturn   — IRR (bracketed bisection)
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -15,12 +17,16 @@ unit FinanceLib.NPV;
 interface
 
 uses
+  MathBase.SharedTypes,
   FinanceLib.Interest;
 
-{ Re-export the main class and exception under NPV-oriented aliases. }
+{ TNPVKit is a type alias, so it has the same methods as TFinanceKit.
+  TNPVCashFlows makes the required array type directly nameable by callers
+  that import only this focused unit. }
 type
-  TNPVKit    = TFinanceKit;
-  ENPVError  = EFinanceError;
+  TNPVKit       = TFinanceKit;
+  ENPVError     = EFinanceError;
+  TNPVCashFlows = TDoubleArray;
 
 implementation
 

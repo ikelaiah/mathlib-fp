@@ -753,9 +753,9 @@ var
   CashFlows: TDoubleArray;
   Result: Double;
 begin
-  CashFlows := TDoubleArray.Create(110, 121, 133.1);
+  CashFlows := TDoubleArray.Create(120);
   Result := TFinanceKit.InternalRateOfReturn(100, CashFlows, 4);
-  AssertTrue('IRR calculation failed', Abs(Result - 0.1) < FINANCE_EPSILON);
+  AssertFinanceEquals(0.2, Result, 'IRR calculation failed');
 end;
 
 procedure TTestCaseFinance.Test07_Depreciation;

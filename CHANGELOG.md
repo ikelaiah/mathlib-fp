@@ -20,8 +20,12 @@ No changes yet.
   changing global random state.
 - `PolynomialFeatures(..., IncludeBias)` overload so callers can omit the bias
   column when fitting models that already estimate an intercept.
-- Edge, property, residual, deterministic-randomness, rounding, UTF-8, and
-  parallel-multiplication coverage, bringing the suite to 720 tests.
+- Edge, property, residual, deterministic-randomness, FinanceLib focused-unit,
+  rounding, UTF-8, and parallel-multiplication coverage, bringing the suite to
+  747 tests.
+- Focused `EngineeringLib.Velocity` and `EngineeringLib.Pressure` entry units
+  now expose directly nameable exception aliases and have direct compilation
+  and runtime coverage.
 
 ### Changed
 
@@ -35,8 +39,14 @@ No changes yet.
   thread manager.
 - ML entry points consistently reject empty, ragged, non-finite, mismatched,
   or out-of-range inputs with `EMLError`.
-- Financial methods that expose `ADecimals` now apply it consistently, and
-  ratio/depreciation denominators are validated.
+- Financial methods that expose `ADecimals` now apply it consistently. NPV
+  rounds only its final result, and amortization schedules use the requested
+  precision for payment amounts.
+- Undefined financial ratios now raise `EFinanceError` when a required
+  denominator is zero instead of returning a fabricated zero.
+- `FinanceLib.Bonds` and `FinanceLib.NPV` remain lightweight focused entry
+  units and now export directly nameable supporting aliases for their cash-flow
+  and amortization types.
 - Random-producing library functions no longer call `Randomize` internally.
 - The test runner installs `cthreads` first on Unix and verbose algebra-test
   output is opt-in through `MATHLIB_TEST_VERBOSE`.
@@ -44,6 +54,10 @@ No changes yet.
   exception unit.
 - The Lazarus package and registration unit are now named `mathlib_fp` to match
   the mathlib-fp project name.
+- `EngineeringLib.Signal.TDoubleArray` now aliases the shared
+  `MathBase.SharedTypes.TDoubleArray` type.
+- `TFluidDynamicsKit.PumpHead` now accepts explicit inlet and outlet velocities
+  and implements the Bernoulli velocity-head term `(v2²-v1²)/(2g)`.
 
 ### Fixed
 
@@ -51,6 +65,19 @@ No changes yet.
   intercept, which previously caused a singular regression system.
 - Unknown unit names no longer silently default to length. Non-`Try` APIs raise
   `EUnitConversionError`; `Try...` APIs retain their `False` contract.
+- Fixed `InternalRateOfReturn`, which previously returned its initial 10% guess
+  without iterating. It now brackets and bisects positive or negative rates and
+  reports invalid or unbracketable cash-flow inputs with `EFinanceError`.
+- Corrected FinanceLib signatures, result-type scope, numeric examples, and
+  exception contracts in the API guide and source comments.
+- Corrected odd-order high-pass and band-stop FIR centre indexing, added safe
+  FFT/IFFT empty and mismatched-array handling, and documented the complete
+  N-bin spectral outputs.
+- Humidity-ratio and adiabatic calculations now reject invalid pressure and
+  specific-heat-ratio domains with `EThermodynamicsError`.
+- Engineering comments and API documentation now cover focused aliases,
+  formula domains, signal shapes, every UnitConversion public API, exact unit
+  names, fixed-duration time conventions, and locale-sensitive parsing.
 - Removed all compiler warnings from clean normal and UTF-8 builds.
 - Fixed broken source links, stale API names, version text, and random/bootstrap
   contracts across the documentation.
@@ -101,7 +128,7 @@ A complete numerical methods library with no external dependencies.
 - `FFT(var RealPart, ImagPart; Inverse)` — in-place FFT/IFFT; length must be a power of 2
 - `CalculateFFT` — real input → complex spectrum; auto-pads to next power of 2
 - `CalculateIFFT` — complex spectrum → real signal
-- `CalculateFFTMagnitudePhase` — one-sided magnitude and phase spectra
+- `CalculateFFTMagnitudePhase` — complete N-bin magnitude and phase spectra
 
 ##### FIR Filter Design (windowed-sinc)
 
@@ -111,7 +138,8 @@ A complete numerical methods library with no external dependencies.
 - `DesignFIRBandStop(LowCutoff, HighCutoff, Order, WindowType)` — notch/band-reject filter
 - `ApplyFIRFilter(Signal, Coeffs)` — direct-form convolution; output length = N + M − 1
 
-All FIR designs produce symmetric (linear-phase) coefficients normalised to unit DC gain (low-pass/band-stop) or unit Nyquist gain (high-pass).
+All FIR designs produce symmetric (linear-phase) coefficients. Low-pass is
+normalised to unit DC gain; high-pass and band-stop use spectral inversion.
 
 ##### Signal test coverage
 
