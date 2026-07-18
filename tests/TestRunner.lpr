@@ -16,13 +16,15 @@ uses
   , TestEngineeringLib_Signal
   , TestEngineeringLib_Thermodynamics
   , TestEngineeringLib_UnitConversion
+  , TestEngineeringLib_Aliases
   , TestNumericsLib
   , TestProbabilityLib
   , TestCombinatoricsLib
   , TestOptimizationLib
   , TestTimeSeriesLib
   , TestMLLib
-  , TestGeometryLib;
+  , TestGeometryLib
+  , TestPublicAPI;
 
 type
 

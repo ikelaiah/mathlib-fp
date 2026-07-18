@@ -6,7 +6,7 @@ unit GeometryLib.Geometry;
  2-D and 3-D computational geometry for Free Pascal.
  No external dependencies — only MathBase and the RTL.
 
- What this library gives you
+ What this domain unit gives you
  ---------------------------
  2-D Primitives
    TPoint2D      — (X, Y) with helper methods

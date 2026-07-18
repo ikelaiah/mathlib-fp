@@ -19,13 +19,13 @@
 
 ## ✨ Why mathlib-fp?
 
-- **Broad:** 12 focused libraries, from matrices and probability to geometry and ARIMA.
+- **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
-- **Ready to explore:** reference docs, runnable examples, and 788 passing tests.
+- **Ready to explore:** reference docs, runnable examples, and 789 passing tests.
 
 > [!NOTE]
-> **1.2.0 is the first public release.** The library follows semantic versioning;
+> **1.2.0 is the first public release.** The project follows semantic versioning;
 > read the [release notes](docs/RELEASE_NOTES_1.2.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
@@ -65,7 +65,7 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 
 ## 🧰 What's included
 
-| Library | Highlights |
+| Domain (unit family) | Highlights |
 | --- | --- |
 | [MathBase](docs/MathBase.md) | Shared types, constants, precision, trigonometry |
 | [AlgebraLib](docs/AlgebraLib.md) | Matrices, decompositions, linear solvers |
@@ -80,12 +80,15 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 | [MLLib](docs/MLLib.md) | Preprocessing, regression, classification, clustering, PCA |
 | [GeometryLib](docs/GeometryLib.md) | 2-D and 3-D computational geometry |
 
-All public units live in `src/`; the libraries can be used independently unless their documentation says otherwise.
+All public units live in `src/`; the domains can be used independently unless
+their documentation says otherwise. See the
+[terminology and API naming inventory](docs/index.md#terminology) for the
+difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
 The [`examples/`](examples/) directory contains 12 small walkthroughs covering
-the major library workflows. Compile one in seconds:
+the major domain workflows. Compile one in seconds:
 
 ```bash
 cd examples

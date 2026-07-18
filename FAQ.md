@@ -1,14 +1,15 @@
 # Frequently Asked Questions (FAQ)
 
-**Q1: What is the overall design philosophy of mathlib-fp' API?**
+**Q1: What is the overall design philosophy of mathlib-fp's API?**
 
-A1: mathlib-fp aims for simplicity and directness. All libraries expose
-**static class methods** — no instance creation required. This suits the
-stateless nature of mathematical calculations.
+A1: mathlib-fp aims for simplicity and directness. Most calculation APIs are
+grouped in **Kit classes** with static class methods, so no instance creation is
+required. Supporting units may instead expose types, constants, exceptions, or
+low-level functions. `TMatrixKit` also implements `IMatrix` for matrix objects.
 
 **Q2: Is the API stable?**
 
-A2: The library follows semantic versioning. Within the 1.x series, existing
+A2: The project follows semantic versioning. Within the 1.x series, existing
 public signatures are preserved where practical and new behavior is normally
 introduced through overloads. Correctness fixes may tighten validation or
 replace mathematically invalid output with a typed exception. Check
@@ -29,15 +30,16 @@ A4: `AlgebraLib.Matrices` already uses a class/interface pattern
 (`TMatrixKit`/`IMatrix`). This provides automatic reference counting and
 value semantics for matrix operations, and is considered stable.
 
-**Q5: Where did the non-math modules go (Strings, FS, DateTime, etc.)?**
+**Q5: Where did the non-math units go (Strings, FS, DateTime, etc.)?**
 
-A5: Those modules remain in the original
+A5: Those units remain in the original
 [tidykit-fp](https://github.com/ikelaiah/tidykit-fp) repository.
-mathlib-fp is a focused monorepo containing only the math, statistics,
-finance, and engineering libraries.
+mathlib-fp contains focused mathematical and engineering domains. See the
+[terminology guide](docs/index.md#terminology) for the distinction between a
+domain, Pascal unit, unit family, and Kit class.
 
 **Q6: What are the future goals?**
 
 A6: Near-term work focuses on numerical correctness, cross-platform validation,
 reference datasets, performance benchmarks, and clearer API documentation.
-Data-frame functionality remains outside this focused mathematics library.
+Data-frame functionality remains outside this focused mathematics project.

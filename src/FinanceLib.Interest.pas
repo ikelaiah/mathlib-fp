@@ -3,7 +3,7 @@ unit FinanceLib.Interest;
 {-----------------------------------------------------------------------------
  FinanceLib.Interest
 
- A library for financial mathematics and analysis in Free Pascal
+ The core financial mathematics and analysis unit for mathlib-fp
  
  This unit provides:
  - Time Value of Money (PV, FV, Payment, NPV, IRR, Compound Interest, Effective Annual Rate)

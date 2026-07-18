@@ -1,6 +1,7 @@
 # AlgebraLib
 
-Linear algebra library providing dense matrix operations, decompositions, iterative solvers, and vector operations for Free Pascal.
+Linear algebra domain providing dense matrix operations, decompositions,
+iterative solvers, and vector operations for Free Pascal.
 
 Depends on: **MathBase**
 

@@ -1,6 +1,6 @@
 # MathBase
 
-Foundation layer for the mathlib-fp monorepo. All other libraries depend on this package.
+Foundation domain for mathlib-fp. All other domains depend on its units.
 
 ## Units
 
@@ -15,7 +15,7 @@ Foundation layer for the mathlib-fp monorepo. All other libraries depend on this
 
 ## MathBase.SharedTypes
 
-Common numeric array types and a helper record shared by all libraries.
+Common numeric array types and a helper record shared by all domains.
 
 ### Types
 
@@ -206,4 +206,4 @@ end.
 
 ## Dependencies
 
-None. `MathBase` has no dependencies on other libraries in this monorepo.
+None. `MathBase` has no dependencies on other domains in mathlib-fp.

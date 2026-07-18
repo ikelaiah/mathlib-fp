@@ -96,7 +96,7 @@ type
 implementation
 
 { -------------------------------------------------------------------------
-  Plain global functions (no closures in FPC — use module-level functions)
+  Plain global functions (no closures in FPC — use unit-level functions)
   These are the mathematical functions passed to the numerical routines.
   ------------------------------------------------------------------------- }
 

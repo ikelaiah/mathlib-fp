@@ -3,7 +3,7 @@ unit NumericsLib.Numerics;
 {-----------------------------------------------------------------------------
  NumericsLib.Numerics
 
- Numerical methods library — no external dependencies beyond MathBase.
+ Numerical methods domain unit — no external dependencies beyond MathBase.
 
  Provides:
    Root Finding

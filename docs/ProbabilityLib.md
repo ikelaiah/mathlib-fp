@@ -33,7 +33,7 @@ No object creation needed — all methods are **class static**.
 | Out-of-domain X | returns 0 (PDF/PMF) or clamped (CDF) instead of raising |
 | Invalid params | All entry points raise `EProbabilityError` for non-finite real inputs or parameters outside the documented distribution domain |
 
-At the support boundary, `GammaPDF` and `BetaPDF` use the library convention of
+At the support boundary, `GammaPDF` and `BetaPDF` use the project convention of
 returning zero rather than representing finite or infinite limiting densities.
 
 ---

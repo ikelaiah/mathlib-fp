@@ -4,15 +4,15 @@
 **Release status:** First public release
 
 mathlib-fp 1.2.0 is the first public release of the standalone mathlib-fp
-project. It provides native Free Pascal libraries for scientific, statistical,
+project. It provides native Free Pascal units for scientific, statistical,
 financial, engineering, numerical, optimization, time-series,
 machine-learning, and geometry work without third-party runtime dependencies.
 
 ## What is included
 
-The release contains 12 focused library areas:
+The release contains 12 focused domains:
 
-| Library | Highlights |
+| Domain (unit family) | Highlights |
 | --- | --- |
 | MathBase | Shared types, constants, precision helpers, and trigonometry |
 | AlgebraLib | Dense matrices, decompositions, vectors, and linear solvers |
@@ -118,7 +118,7 @@ Lazarus users can install
 - The user-facing project and release name remains **mathlib-fp**; the
   underscore is used only where Pascal identifiers cannot contain a hyphen.
 - On Unix, include `cthreads` before other units in applications that require
-  threaded matrix multiplication. The library falls back to non-threaded
+  threaded matrix multiplication. The implementation falls back to non-threaded
   execution when a thread manager is unavailable.
 
 ## Validation

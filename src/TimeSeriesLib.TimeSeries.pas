@@ -6,7 +6,7 @@ unit TimeSeriesLib.TimeSeries;
  Time series analysis for Free Pascal.
  No external dependencies — only MathBase and the RTL.
 
- What this library gives you
+ What this domain unit gives you
  ---------------------------
  Smoothing & Filtering
    SimpleMovingAverage    — equal-weight rolling window

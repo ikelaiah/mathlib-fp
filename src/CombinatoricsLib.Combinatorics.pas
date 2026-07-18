@@ -6,7 +6,7 @@ unit CombinatoricsLib.Combinatorics;
  Discrete mathematics and combinatorics for Free Pascal.
  Depends on MathBase plus the standard RTL.
 
- What this library gives you
+ What this domain unit gives you
  ---------------------------
  Counting & combinations
    Factorial          — n!

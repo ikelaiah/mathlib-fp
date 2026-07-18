@@ -3,7 +3,7 @@ unit MathBase.MathConstants;
 {-----------------------------------------------------------------------------
  MathBase.MathConstants
 
- Mathematical and physical constants used across the library.
+ Mathematical and physical constants used across mathlib-fp.
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}

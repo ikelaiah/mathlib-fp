@@ -41,7 +41,7 @@ uses
   Classes, SysUtils, Math, MathBase.SharedTypes, EngineeringLib.Common;
 
 type
-  { Keep the familiar EngineeringLib.Signal name while sharing the library-wide
+  { Keep the familiar EngineeringLib.Signal name while sharing the project-wide
     dynamic-array type from MathBase. }
   TDoubleArray = MathBase.SharedTypes.TDoubleArray;
 

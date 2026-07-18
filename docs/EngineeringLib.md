@@ -1,6 +1,7 @@
 # EngineeringLib
 
-Engineering mathematics library covering fluid dynamics, thermodynamics, signal processing, and comprehensive unit conversion for Free Pascal.
+Engineering mathematics domain covering fluid dynamics, thermodynamics,
+signal processing, and comprehensive unit conversion for Free Pascal.
 
 Depends on: **MathBase**
 

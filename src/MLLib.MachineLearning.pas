@@ -6,7 +6,7 @@ unit MLLib.MachineLearning;
  Machine learning primitives for Free Pascal.
  No external dependencies — only MathBase and the RTL.
 
- What this library gives you
+ What this domain unit gives you
  ---------------------------
  Preprocessing
    Normalise           — scale each feature to [0, 1]

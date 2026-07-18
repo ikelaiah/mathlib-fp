@@ -6,7 +6,7 @@ unit OptimizationLib.Optimization;
  Mathematical optimization for Free Pascal.
  Finds minima (or maxima) of functions — no external dependencies.
 
- What this library gives you
+ What this domain unit gives you
  ---------------------------
  Unconstrained single-variable
    GoldenSection      — bracket minimum of f(x) on [a,b], derivative-free

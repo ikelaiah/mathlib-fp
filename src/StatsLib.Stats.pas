@@ -3,7 +3,7 @@ unit StatsLib.Stats;
 {-----------------------------------------------------------------------------
  StatsLib.Stats
 
- A library for statistical analysis in Free Pascal
+ The core statistical analysis unit for mathlib-fp
  
  This unit provides:
  - Descriptive statistics (mean, median, variance, stddev, skewness, kurtosis, etc.)

@@ -1,6 +1,7 @@
 # NumericsLib
 
-Numerical methods library for Free Pascal — root finding, quadrature, ODE solvers, and interpolation.
+Numerical methods domain for Free Pascal — root finding, quadrature, ODE
+solvers, and interpolation.
 
 Depends on: **MathBase**
 
@@ -306,7 +307,7 @@ end.
 ## Design Notes
 
 - All functions are **class-static** — pass function pointers, not method pointers.
-  In FPC, module-level `function` declarations are compatible with `TScalarFunc` / `TODEFunc`.
+  In FPC, unit-level `function` declarations are compatible with `TScalarFunc` / `TODEFunc`.
 - The cubic spline uses **natural boundary conditions** (S''(x₀) = S''(xₙ) = 0).
   This is the standard choice when no derivative information is available at the boundaries.
 - `GaussLegendre5` performs only **5 function evaluations** regardless of the smoothness

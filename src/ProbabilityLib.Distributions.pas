@@ -3,9 +3,9 @@ unit ProbabilityLib.Distributions;
 {-----------------------------------------------------------------------------
  ProbabilityLib.Distributions
 
- A beginner-friendly probability distributions library for Free Pascal.
+ A beginner-friendly probability distributions unit for Free Pascal.
 
- What this library gives you
+ What this domain unit gives you
  ---------------------------
  For each supported distribution you get five things:
    PDF  — probability density (continuous) or mass (discrete) at a point

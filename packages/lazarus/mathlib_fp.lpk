@@ -20,7 +20,7 @@
         <CustomOptions Value="-FcUTF8"/>
       </Other>
     </CompilerOptions>
-    <Description Value="mathlib-fp: Free Pascal libraries for scientific, engineering, statistical, financial, numerical, machine-learning, and geometry work."/>
+    <Description Value="mathlib-fp: Free Pascal units for scientific, engineering, statistical, financial, numerical, machine-learning, and geometry work."/>
     <License Value="MIT License
 
 Copyright (c) 2025-2026 ikelaiah

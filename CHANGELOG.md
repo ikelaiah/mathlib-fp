@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No changes yet.
+### Documentation
+
+- Defined consistent terminology for the mathlib-fp project, domains, Pascal
+  unit families, units, Kit classes, focused aliases, and the Lazarus package.
+- Added a public API naming inventory and aligned guides, source headers, and
+  contributor guidance with it without renaming existing public identifiers.
+
+### Tests
+
+- Added compile-time smoke coverage for every documented Kit class and focused
+  alias, and registered the existing Engineering focused-alias tests in the
+  main test runner, bringing the current suite to 789 tests.
 
 ## [1.2.0] - 2026-07-18
 

@@ -1,6 +1,8 @@
 # StatsLib
 
-Statistical analysis library for Free Pascal covering descriptive statistics, hypothesis testing, correlation, normality tests, robust methods, bootstrap, and non-parametric tests.
+Statistical analysis domain for Free Pascal covering descriptive statistics,
+hypothesis testing, correlation, normality tests, robust methods, bootstrap,
+and non-parametric tests.
 
 Depends on: **MathBase**
 

@@ -36,7 +36,7 @@ contributing to this project as easy and transparent as possible.
 
 - Use Conventional Commit subjects: `type(scope): concise description`
 - Common types are `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, and `build`
-- Use a library name such as `algebra`, `stats`, or `engineering` as the scope
+- Use a domain name such as `algebra`, `stats`, or `engineering` as the scope
 - Reference issues in the body when relevant
 
 Example:
@@ -68,6 +68,18 @@ fpc -B -FcUTF8 -Fu../src -FUlib TestRunner.lpr
 - Add/update API documentation
 - Include examples for new features
 - Update changelog
+
+Use the project terminology defined in the
+[documentation index](docs/index.md#terminology):
+
+- **domain** for a functional area such as finance or geometry
+- **unit family** for a prefix such as `FinanceLib`
+- **unit** for a Pascal unit such as `FinanceLib.Interest`
+- **Kit class** only for a public type such as `TFinanceKit`
+- **package** for the optional Lazarus package
+
+Do not add empty wrapper units or Kit classes solely to make names look
+symmetrical. New public identifiers must describe a useful API boundary.
 
 ## 📋 Pull Request Process
 

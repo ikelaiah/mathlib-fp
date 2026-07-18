@@ -1,6 +1,7 @@
 # FinanceLib
 
-Financial mathematics library covering time value of money, bonds, NPV/IRR, depreciation, option pricing, ratio analysis, and risk metrics.
+Financial mathematics domain covering time value of money, bonds, NPV/IRR,
+depreciation, option pricing, ratio analysis, and risk metrics.
 
 Depends on: **MathBase**
 

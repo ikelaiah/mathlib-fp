@@ -6,7 +6,7 @@ unit AlgebraLib.Matrices;
 {-----------------------------------------------------------------------------
  AlgebraLib.Matrices
 
- A comprehensive matrix algebra library for Free Pascal
+ The core matrix algebra unit for the mathlib-fp algebra domain
  
  This unit provides:
  - Basic matrix operations (addition, subtraction, multiplication)
