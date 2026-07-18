@@ -3,11 +3,13 @@ program MatrixOperations;
 {-----------------------------------------------------------------------------
   03_matrix_operations.lpr
 
-  Demonstrates matrix creation, arithmetic, decompositions, and solving
-  linear systems using AlgebraLib.
+  Introduces matrix creation, immutable-style arithmetic, common properties,
+  inversion, and LU/QR decompositions. IMatrix values are reference-counted,
+  so these local variables need no manual Free call.
 
   Build (FPC command line):
-    fpc -Fu../src 03_matrix_operations.lpr
+    mkdir lib
+    fpc -Fu../src -FUlib 03_matrix_operations.lpr
 
   Build (Lazarus):
     Add ../src to:

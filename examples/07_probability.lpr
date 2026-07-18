@@ -7,7 +7,8 @@ program example07_probability;
  Each section introduces one distribution, explains what it models, and shows
  the five standard calls: PDF/PMF, CDF, Survival, Mean, Variance.
 
- Compile:  fpc -Fu../src -FUlib 07_probability.lpr
+ Compile:  mkdir lib
+           fpc -Fu../src -FUlib 07_probability.lpr
  Run:      ./07_probability  (Linux/macOS)
            07_probability.exe  (Windows)
 -----------------------------------------------------------------------------}

@@ -3,10 +3,13 @@ program HypothesisTest;
 {-----------------------------------------------------------------------------
   02_hypothesis_test.lpr
 
-  Demonstrates hypothesis testing and non-parametric tests using StatsLib.
+  Compares two small groups with parametric and non-parametric tests. It shows
+  how to read a p-value alongside an effect size; the tests are alternatives
+  chosen from study design and assumptions, not a checklist to run blindly.
 
   Build (FPC command line):
-    fpc -Fu../src 02_hypothesis_test.lpr
+    mkdir lib
+    fpc -Fu../src -FUlib 02_hypothesis_test.lpr
 
   Build (Lazarus):
     Add ../src to:
@@ -20,7 +23,8 @@ uses
   MathBase.SharedTypes,
   StatsLib.Stats;
 
-// Helper: print a p-value decision at alpha = 0.05
+// Helper for this example's preselected alpha of 0.05. A p-value is evidence
+// against a null hypothesis, not the probability that the null is true.
 procedure PrintDecision(const TestName: string; const Stat, PValue: Double);
 begin
   Write(Format('  %-28s stat = %7.4f   p = %.4f   ', [TestName, Stat, PValue]));
@@ -51,7 +55,9 @@ begin
   WriteLn('Group B scores: 80 78 85 76 82 79 84 77 83 81');
   WriteLn;
 
-  // ── 1. Normality checks (required before choosing parametric vs non-parametric)
+  // ── 1. Normality checks ─────────────────────────────────────────────────
+  // These checks can inform method choice, but a non-significant result does
+  // not prove normality—especially with a sample this small.
   WriteLn('=== Normality Tests ===');
   ShapW := TStatsKit.ShapiroWilkTest(GroupA, ShapP);
   WriteLn(Format('  Group A  Shapiro-Wilk W = %.4f   p = %.4f', [ShapW, ShapP]));
@@ -91,7 +97,8 @@ begin
   G := TStatsKit.HedgesG(GroupA, GroupB);
   WriteLn(Format('  Cohen''s d  = %.4f', [D]));
   WriteLn(Format('  Hedges'' g  = %.4f', [G]));
-  WriteLn('  |d| < 0.2 small, 0.2-0.5 medium, > 0.8 large');
+  WriteLn('  Rough benchmarks for |d|: 0.2 small, 0.5 medium, 0.8 large');
+  WriteLn('  Effect size describes magnitude; p-value alone does not.');
   WriteLn;
 
   WriteLn('Done. Press Enter to exit.');

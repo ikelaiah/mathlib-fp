@@ -7,7 +7,8 @@ program example12_geometry;
  Each section introduces one concept with plain-English explanation
  and a concrete, runnable example.
 
- Compile:  fpc -Fu../src -FUlib 12_geometry.lpr
+ Compile:  mkdir lib
+           fpc -Fu../src -FUlib 12_geometry.lpr
  Run:      ./12_geometry   (Linux/macOS)
            12_geometry.exe (Windows)
 -----------------------------------------------------------------------------}
@@ -286,12 +287,11 @@ end;
 ============================================================ }
 procedure Demo3D;
 var
-  A, B, C: TPoint3D;
+  A, B: TPoint3D;
   V1, V2, Cx: TVector3D;
   Plane: TPlane3D;
   Sphere: TSphere3D;
   P, Closest: TPoint3D;
-  T: Double;
 begin
   WriteLn;
   WriteLn('=== 3-D GEOMETRY ===');
@@ -319,7 +319,6 @@ begin
 
   { Triangle area in 3-D }
   WriteLn;
-  C := TPoint3D.Create(4,0,0);
   WriteLn('  3-D triangle (0,0,0),(4,0,0),(0,3,0):');
   WriteLn(Format('    Area = %.4f  (= 6)', [TGeometryKit.TriangleArea3D(
     TPoint3D.Create(0,0,0), TPoint3D.Create(4,0,0), TPoint3D.Create(0,3,0))]));

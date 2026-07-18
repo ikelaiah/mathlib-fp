@@ -60,14 +60,12 @@ fpc -B -Cr -Co -Ct -Sa -FcUTF8 -Fu../src -FUlib/checked TestRunner.lpr
 fpc -B -gh -gl -FcUTF8 -Fu../src -FUlib/heap TestRunner.lpr
 ./TestRunner -a --format=plain
 
-cd ../examples
-mkdir -p lib/release
-for file in *.lpr; do
-  fpc -B -FcUTF8 -Fu../src -FUlib/release "$file"
-  "./${file%.lpr}" > /dev/null
+cd ..
+sh ./build-examples.sh
+for file in examples/*.lpr; do
+  "./example-bin/$(basename "${file%.lpr}")" > /dev/null
 done
 
-cd ..
 mkdir -p benchmarks/lib/release
 fpc -B -O3 -FcUTF8 -Fusrc -FUbenchmarks/lib/release \
   -FEbenchmarks/lib/release benchmarks/BenchmarkRunner.lpr

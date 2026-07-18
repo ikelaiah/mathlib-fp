@@ -5,10 +5,12 @@ program FluidDynamics;
 
   Demonstrates fluid-mechanics calculations using EngineeringLib.
   Covers Reynolds number, Bernoulli's equation, pipe friction, and
-  basic aerodynamics — with unit conversions mixed in for context.
+  basic aerodynamics. Every call labels its expected SI units; one velocity
+  conversion shows how to prepare non-SI input safely.
 
   Build (FPC command line):
-    fpc -Fu../src 06_fluid_dynamics.lpr
+    mkdir lib
+    fpc -Fu../src -FUlib 06_fluid_dynamics.lpr
 
   Build (Lazarus):
     Add ../src to:
@@ -26,7 +28,7 @@ var
   Re: Double;
   P2, V2: Double;
   HeadLoss, FrictionFactor: Double;
-  Fr, Ma, We: Double;
+  Fr, Ma: Double;
   Lift, Drag, DynP: Double;
   FlowRate, MassFlow: Double;
   SpeedKmh: Double;

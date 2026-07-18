@@ -5,10 +5,12 @@ program UnitConversion;
 
   Demonstrates physical unit conversions using EngineeringLib.
   This is the gentlest entry point into EngineeringLib — no physics
-  knowledge required, just call ConvertXxx(value, fromUnit, toUnit).
+  knowledge required. Each ConvertXxx call takes a value, a typed source-unit
+  enum, and a typed destination-unit enum, which prevents mixing dimensions.
 
   Build (FPC command line):
-    fpc -Fu../src 05_unit_conversion.lpr
+    mkdir lib
+    fpc -Fu../src -FUlib 05_unit_conversion.lpr
 
   Build (Lazarus):
     Add ../src to:
@@ -22,6 +24,9 @@ uses
   EngineeringLib.UnitConversion;  // TUnitConversionKit + all unit enums
 
 begin
+  // The pattern is the same in every section:
+  //   ConvertDimension(Value, FromUnit, ToUnit)
+  // Unit enum names are listed in docs/EngineeringLib.md.
   WriteLn('=== Length ===');
   WriteLn(Format('  1 mile         = %.4f km',      [TUnitConversionKit.ConvertLength(1, luMile, luKilometer)]));
   WriteLn(Format('  100 m          = %.4f ft',       [TUnitConversionKit.ConvertLength(100, luMeter, luFoot)]));

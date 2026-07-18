@@ -1355,6 +1355,7 @@ type
 
       @param Data The original array of Double values.
       @param Iterations The number of bootstrap samples to generate.
+      @param Seed A local seed for reproducible sampling when using the seeded overload.
 
       @returns An array containing the means calculated from each bootstrap sample.
 
@@ -1368,12 +1369,11 @@ type
         MyData, BootMeans: TDoubleArray;
         I: Integer;
       begin
-        Randomize;
         SetLength(MyData, 10);
         // Fill MyData with values...
         MyData[0] := 10.1; MyData[1] := 9.8; MyData[2] := 10.3; MyData[3] := 11.0; MyData[4] := 9.5;
         MyData[5] := 10.0; MyData[6] := 10.2; MyData[7] := 9.9; MyData[8] := 10.5; MyData[9] := 9.7;
-        BootMeans := TStatsKit.BootstrapMean(MyData, 1000);
+        BootMeans := TStatsKit.BootstrapMean(MyData, 1000, 2026);
         // BootMeans now contains 1000 mean values from bootstrap samples
         WriteLn('First 5 bootstrap means:');
         for I := 0 to 4 do WriteLn(BootMeans[I]:0:4);
@@ -1393,6 +1393,7 @@ type
       @param Data The original array of Double values.
       @param Alpha The significance level (e.g., 0.05 for a 95% CI). Default is 0.05.
       @param Iterations The number of bootstrap samples to generate. Default is 1000.
+      @param Seed A local seed for reproducible sampling when using the seeded overload.
 
       @returns A TDoublePair record where Lower is the lower bound and Upper is the upper bound of the confidence interval.
 
@@ -1408,7 +1409,6 @@ type
         MyData: TDoubleArray;
         CI: TDoublePair;
       begin
-        Randomize;
         SetLength(MyData, 20);
         // Fill MyData with values...
         MyData[0] := 10.1; MyData[1] := 9.8; MyData[2] := 10.3; MyData[3] := 11.0; MyData[4] := 9.5;
@@ -1416,7 +1416,7 @@ type
         MyData[10] := 10.1; MyData[11] := 9.8; MyData[12] := 10.3; MyData[13] := 11.0; MyData[14] := 9.5;
         MyData[15] := 10.0; MyData[16] := 10.2; MyData[17] := 9.9; MyData[18] := 10.5; MyData[19] := 9.7;
 
-        CI := TStatsKit.BootstrapConfidenceInterval(MyData, 0.05, 2000); // 95% CI, 2000 iterations
+        CI := TStatsKit.BootstrapConfidenceInterval(MyData, 0.05, 2000, 2026); // reproducible 95% CI
         WriteLn('95% Bootstrap CI for Mean: [', CI.Lower:0:4, ', ', CI.Upper:0:4, ']');
       end;
     }

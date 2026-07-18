@@ -3,11 +3,13 @@ program FinanceNpvIrr;
 {-----------------------------------------------------------------------------
   04_finance_npv_irr.lpr
 
-  Demonstrates time-value-of-money calculations, NPV/IRR analysis, and
-  loan amortization using FinanceLib.
+  Demonstrates time-value-of-money calculations, project NPV/IRR, and loan
+  amortization. Rates always match the period: annual rates for annual cash
+  flows, and annual-rate/12 for monthly payments.
 
   Build (FPC command line):
-    fpc -Fu../src 04_finance_npv_irr.lpr
+    mkdir lib
+    fpc -Fu../src -FUlib 04_finance_npv_irr.lpr
 
   Build (Lazarus):
     Add ../src to:
