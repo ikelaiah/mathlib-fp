@@ -5,6 +5,8 @@ source tree and distribution.
 
 ## Releases
 
+- [mathlib-fp 1.2.1 release notes](RELEASE_NOTES_1.2.1.md) — terminology and
+  public API naming consistency.
 - [mathlib-fp 1.2.0 release notes](RELEASE_NOTES_1.2.0.md) — first public
   release.
 
@@ -14,7 +16,7 @@ mathlib-fp uses the following terms consistently:
 
 | Term | Meaning | Example |
 |------|---------|---------|
-| Project or distribution | The complete versioned source release | mathlib-fp 1.2.0 |
+| Project or distribution | The complete versioned source release | mathlib-fp 1.2.1 |
 | Domain | A functional area within mathlib-fp | Finance, algebra, geometry |
 | Unit family | The shared prefix of related Pascal units | `FinanceLib`, `AlgebraLib` |
 | Unit | A Pascal compilation unit named in a `uses` clause | `FinanceLib.Interest` |
