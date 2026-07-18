@@ -17,7 +17,6 @@ unit TimeSeriesLib.TimeSeries;
 
  Decomposition
    Decompose              — additive/multiplicative trend+seasonal+residual
-   STLDecompose           — simplified STL: loess trend + seasonal extraction
 
  Differencing & Stationarity
    Difference             — d-th order differencing
@@ -44,8 +43,8 @@ unit TimeSeriesLib.TimeSeries;
  Trend & Seasonality Utilities
    LinearTrend            — fit y = a + b*t by OLS; return slope + intercept
    DetrendLinear          — subtract the fitted linear trend
-   SeasonalStrength       — var(seasonal) / (var(seasonal) + var(residual))
-   PeriodogramPeak        — dominant period from FFT power spectrum
+   SeasonalStrength       — max(0, 1 - var(residual)/var(seasonal+residual))
+   PeriodogramPeak        — dominant-period estimate from FFT power spectrum
 
  Result records
    TDecomposition         — Trend, Seasonal, Residual arrays
@@ -63,8 +62,7 @@ interface
 
 uses
   Classes, SysUtils, Math,
-  MathBase.SharedTypes,
-  MathBase.Precision;
+  MathBase.SharedTypes;
 
 type
   { Raised for invalid time series inputs }
@@ -73,7 +71,7 @@ type
   { Additive or multiplicative decomposition type }
   TDecompType = (dtAdditive, dtMultiplicative);
 
-  { Result of Decompose / STLDecompose }
+  { Result of Decompose }
   TDecomposition = record
     Trend:    TDoubleArray;  { smoothed trend component }
     Seasonal: TDoubleArray;  { repeating seasonal component }
@@ -225,7 +223,7 @@ type
 
     { Invert differencing given the original first D values (initial conditions).
       Undifference(Diff1, [Y[0]], 1) reconstructs the original series.
-      InitVals must have length D. }
+      InitVals must have at least D elements; extra values are ignored. }
     class function Undifference(
       const DiffY: TDoubleArray;
       const InitVals: TDoubleArray;
@@ -272,7 +270,8 @@ type
 
     { h-step forecast from AR coefficients.
       Simulates the AR recursion forward H steps from the end of History.
-      History should be the original (or differenced) series. }
+      History should be the original (or differenced) series. Model dimensions,
+      finite inputs, and the forecast horizon are validated. }
     class function ARForecast(const Model: TARIMAModel; const History: TDoubleArray; H: Integer): TDoubleArray; static;
 
     { Fit MA(q) model using innovations algorithm (approximate).
@@ -287,7 +286,9 @@ type
     class function ARIMAFit(const Y: TDoubleArray; P, D, Q: Integer): TARIMAModel; static;
 
     { H-step ahead ARIMA forecast.
-      Undifferences the AR forecast back to the original scale.
+      Reconstructs in-sample innovations, includes the known MA innovations in
+      early forecasts, assumes future innovations are zero, and integrates each
+      differencing order from the last observed state.
       Returns array of length H. }
     class function ARIMAForecast(
       const Model: TARIMAModel;
@@ -337,22 +338,33 @@ type
       Values near 1 indicate strong seasonality; near 0 means weak. }
     class function SeasonalStrength(const Decomp: TDecomposition): Double; static;
 
-    { Find the dominant period in Y using FFT power spectrum.
+    { Find the dominant period in Y using an FFT power spectrum.
       Returns the period (in samples) corresponding to the largest spectral peak,
       excluding the DC component (lag 0).
-      MinPeriod / MaxPeriod: search range (default 2 .. N/2). }
+      MinPeriod / MaxPeriod: search range (default 2 .. N/2). Frequency-bin
+      conversion uses the actual zero-padded FFT length. }
     class function PeriodogramPeak(
       const Y: TDoubleArray;
       MinPeriod: Integer = 2;
       MaxPeriod: Integer = 0): Integer; static;
 
-    { Compute the power spectral density (periodogram) of Y.
-      Returns N/2+1 values corresponding to frequencies 0, 1/N, 2/N, ..., 0.5. }
+    { Compute a one-sided power spectrum of Y after zero-padding to NPow, the
+      next power of two. Returns NPow/2+1 bins; bin k has frequency k/NPow. }
     class function Periodogram(const Y: TDoubleArray): TDoubleArray; static;
 
   end;
 
 implementation
+
+procedure RequireFiniteSeries(const Y: TDoubleArray; const Operation: string);
+var
+  I: Integer;
+begin
+  for I := 0 to High(Y) do
+    if IsNan(Y[I]) or IsInfinite(Y[I]) then
+      raise ETimeSeriesError.CreateFmt('%s: non-finite value at index %d',
+        [Operation, I]);
+end;
 
 { ---------------------------------------------------------------------------
   Private helpers
@@ -1043,6 +1055,14 @@ begin
   N := Length(History);
   P := Model.P;
   if H < 1 then raise ETimeSeriesError.Create('ARForecast: H must be >= 1');
+  if P < 0 then raise ETimeSeriesError.Create('ARForecast: model P must be >= 0');
+  if Length(Model.ARCoeffs) <> P then raise ETimeSeriesError.Create(
+    'ARForecast: AR coefficient count does not match model P');
+  if N < P then raise ETimeSeriesError.Create('ARForecast: history is shorter than model P');
+  if IsNan(Model.Mu) or IsInfinite(Model.Mu) then raise ETimeSeriesError.Create(
+    'ARForecast: model mean must be finite');
+  RequireFiniteSeries(History, 'ARForecast');
+  RequireFiniteSeries(Model.ARCoeffs, 'ARForecast coefficients');
 
   { Extend History buffer to hold forecasts }
   SetLength(Buf, N + H);
@@ -1074,6 +1094,8 @@ var
 begin
   N       := Length(Y);
   if Q < 1 then raise ETimeSeriesError.Create('MAFit: Q must be >= 1');
+  if N <= Q then raise ETimeSeriesError.Create('MAFit: series must be longer than Q');
+  RequireFiniteSeries(Y, 'MAFit');
   AcfVals := ACF(Y, Q);
 
   { Innovations algorithm (simplified): theta_(k,k) = acf[k] / v_(k-1) }
@@ -1088,6 +1110,8 @@ begin
     Sum := AcfVals[I] * (N-1) / (N-0) * V[0]; { approximate cov }
     for J := 1 to I-1 do
       Sum := Sum - ThetaMat[I][I-J] * ThetaMat[J][J] * V[I-J];
+    if Abs(V[I-1]) < 1E-15 then
+      raise ETimeSeriesError.Create('MAFit: innovations variance became zero');
     ThetaMat[I][I] := Sum / V[I-1];
     V[I] := V[I-1] * (1 - ThetaMat[I][I] * ThetaMat[I][I]);
     if V[I] < 0 then V[I] := 0;
@@ -1112,7 +1136,11 @@ var
   N, I, J: Integer;
   Resid: TDoubleArray;
 begin
-  if D < 0 then raise ETimeSeriesError.Create('ARIMAFit: D must be >= 0');
+  if (P < 0) or (D < 0) or (Q < 0) then
+    raise ETimeSeriesError.Create('ARIMAFit: P, D, and Q must be >= 0');
+  if Length(Y) <= D + Max(P, Q) then
+    raise ETimeSeriesError.Create('ARIMAFit: series is too short for requested orders');
+  RequireFiniteSeries(Y, 'ARIMAFit');
 
   { Step 1: difference D times }
   Z := Difference(Y, D);
@@ -1161,30 +1189,92 @@ class function TTimeSeriesKit.ARIMAForecast(
   const OriginalY: TDoubleArray;
   H: Integer): TDoubleArray;
 var
-  Z, ZFcast: TDoubleArray;
-  InitVals: TDoubleArray;
-  I, D, N: Integer;
+  Z, ZFcast, Buffer, Residual, States, Current: TDoubleArray;
+  I, J, D, N, P, Q, TimeIndex, ResidualIndex, Ord: Integer;
+  Prediction, Value: Double;
 begin
   D := Model.D;
   N := Length(OriginalY);
+  P := Model.P;
+  Q := Model.Q;
+  if H < 1 then raise ETimeSeriesError.Create('ARIMAForecast: H must be >= 1');
+  if (P < 0) or (Q < 0) or (D < 0) then raise ETimeSeriesError.Create(
+    'ARIMAForecast: model orders must be >= 0');
+  if Length(Model.ARCoeffs) <> P then raise ETimeSeriesError.Create(
+    'ARIMAForecast: AR coefficient count does not match model P');
+  if Length(Model.MACoeffs) <> Q then raise ETimeSeriesError.Create(
+    'ARIMAForecast: MA coefficient count does not match model Q');
+  if N <= D then raise ETimeSeriesError.Create(
+    'ARIMAForecast: series is too short for differencing order');
+  if IsNan(Model.Mu) or IsInfinite(Model.Mu) then raise ETimeSeriesError.Create(
+    'ARIMAForecast: model mean must be finite');
+  RequireFiniteSeries(OriginalY, 'ARIMAForecast');
+  RequireFiniteSeries(Model.ARCoeffs, 'ARIMAForecast AR coefficients');
+  RequireFiniteSeries(Model.MACoeffs, 'ARIMAForecast MA coefficients');
 
-  { Reconstruct differenced series }
   Z := Difference(OriginalY, D);
+  if Length(Z) < P then raise ETimeSeriesError.Create(
+    'ARIMAForecast: differenced history is shorter than model P');
 
-  { AR forecast on differenced series }
-  ZFcast := ARForecast(Model, Z, H);
-
-  { Undifference back: need last D values of OriginalY as seeds }
-  if D > 0 then
+  { Recover the innovations under the supplied ARMA model. }
+  SetLength(Buffer, Length(Z) + H);
+  SetLength(Residual, Length(Z) + H);
+  for I := 0 to High(Z) do Buffer[I] := Z[I];
+  for I := 0 to High(Z) do
   begin
-    SetLength(InitVals, D);
-    for I := 0 to D-1 do InitVals[I] := OriginalY[N - D + I];
-    Result := Undifference(ZFcast, InitVals, D);
-    { Undifference returns length H+D; trim to H }
-    SetLength(Result, H);
-  end
-  else
-    Result := ZFcast;
+    Prediction := Model.Mu;
+    for J := 0 to P - 1 do
+      if I - J - 1 >= 0 then
+        Prediction := Prediction + Model.ARCoeffs[J] *
+          (Buffer[I - J - 1] - Model.Mu);
+    for J := 0 to Q - 1 do
+      if I - J - 1 >= 0 then
+        Prediction := Prediction + Model.MACoeffs[J] * Residual[I - J - 1];
+    Residual[I] := Buffer[I] - Prediction;
+  end;
+
+  SetLength(ZFcast, H);
+  for I := 0 to H - 1 do
+  begin
+    TimeIndex := Length(Z) + I;
+    Prediction := Model.Mu;
+    for J := 0 to P - 1 do
+      if TimeIndex - J - 1 >= 0 then
+        Prediction := Prediction + Model.ARCoeffs[J] *
+          (Buffer[TimeIndex - J - 1] - Model.Mu);
+    for J := 0 to Q - 1 do
+    begin
+      ResidualIndex := TimeIndex - J - 1;
+      if (ResidualIndex >= 0) and (ResidualIndex < Length(Z)) then
+        Prediction := Prediction + Model.MACoeffs[J] * Residual[ResidualIndex];
+    end;
+    Buffer[TimeIndex] := Prediction;
+    Residual[TimeIndex] := 0.0;
+    ZFcast[I] := Prediction;
+  end;
+
+  if D = 0 then
+    Exit(ZFcast);
+
+  { States[k] is the last observed value at differencing order k. }
+  SetLength(States, D);
+  Current := Copy(OriginalY);
+  for Ord := 0 to D - 1 do
+  begin
+    States[Ord] := Current[High(Current)];
+    Current := Difference(Current, 1);
+  end;
+  SetLength(Result, H);
+  for I := 0 to H - 1 do
+  begin
+    Value := ZFcast[I];
+    for Ord := D - 1 downto 0 do
+    begin
+      States[Ord] := States[Ord] + Value;
+      Value := States[Ord];
+    end;
+    Result[I] := Value;
+  end;
 end;
 
 { ---------------------------------------------------------------------------
@@ -1349,17 +1439,20 @@ begin
 end;
 
 class function TTimeSeriesKit.Periodogram(const Y: TDoubleArray): TDoubleArray;
-{ Power spectrum via FFT: |X[k]|^2 / N, one-sided (0..N/2) }
+{ Power spectrum via zero-padded FFT: |X[k]|^2 / NPow, one-sided subset. }
 var
   N, NF, I, J, K, NPow, Len: Integer;
   Re, Im: TDoubleArray;
   Angle, WR, WI, Ur, Ui, TR, TI, Tmp: Double;
 begin
   N  := Length(Y);
-  NF := N div 2 + 1;
+  if N < 2 then raise ETimeSeriesError.Create(
+    'Periodogram: at least two observations are required');
+  RequireFiniteSeries(Y, 'Periodogram');
   { Pad to power of 2 }
   NPow := 1;
   while NPow < N do NPow := NPow shl 1;
+  NF := NPow div 2 + 1;
   SetLength(Re, NPow);
   SetLength(Im, NPow);
   for I := 0 to N-1 do Re[I] := Y[I];
@@ -1409,28 +1502,33 @@ begin
 end;
 
 class function TTimeSeriesKit.PeriodogramPeak(const Y: TDoubleArray; MinPeriod, MaxPeriod: Integer): Integer;
-{ Find frequency bin k with highest power; period = N/k }
+{ Find frequency bin k with highest power; period = NPow/k. }
 var
-  N, NF, I, KMin, KMax, BestK: Integer;
+  N, NF, NPow, I, KMin, KMax, BestK: Integer;
   Psd: TDoubleArray;
   BestPow: Double;
 begin
   N  := Length(Y);
-  NF := N div 2 + 1;
+  if N < 4 then raise ETimeSeriesError.Create(
+    'PeriodogramPeak: at least four observations are required');
   if MaxPeriod <= 0 then MaxPeriod := N div 2;
-  if MinPeriod < 2  then MinPeriod := 2;
+  if (MinPeriod < 2) or (MaxPeriod < MinPeriod) or (MaxPeriod > N) then
+    raise ETimeSeriesError.Create('PeriodogramPeak: invalid period bounds');
 
   Psd := Periodogram(Y);
+  NF := Length(Psd);
+  NPow := 2 * (NF - 1);
 
-  { Convert period bounds to frequency bin bounds (k = N / period) }
-  KMin := Max(1, N div MaxPeriod);
-  KMax := Min(NF-1, N div MinPeriod);
+  KMin := Max(1, (NPow + MaxPeriod - 1) div MaxPeriod);
+  KMax := Min(NF-1, NPow div MinPeriod);
+  if KMin > KMax then raise ETimeSeriesError.Create(
+    'PeriodogramPeak: period bounds contain no FFT bins');
 
   BestPow := -1; BestK := KMin;
   for I := KMin to KMax do
     if Psd[I] > BestPow then begin BestPow := Psd[I]; BestK := I; end;
 
-  Result := IfThen(BestK > 0, N div BestK, 0);
+  Result := IfThen(BestK > 0, Round(NPow / BestK), 0);
 end;
 
 end.

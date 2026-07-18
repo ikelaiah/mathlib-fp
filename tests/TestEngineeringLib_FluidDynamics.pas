@@ -21,6 +21,8 @@ type
     procedure ReynoldsNumberKinematicTest;
     procedure LaminarFrictionFactorTest;
     procedure TurbulentFrictionFactorTest;
+    procedure ZeroTurbulentToleranceTest;
+    procedure ZeroTurbulentIterationsTest;
     procedure BlasiusFrictionFactorLowTest;
     procedure BlasiusFrictionFactorHighTest;
     procedure ZeroDiameterHeadLossTest;
@@ -34,6 +36,8 @@ type
     procedure GammaEqualsOneSpeedOfSoundTest;
     procedure ZeroMachNumberAreaRatioTest;
     procedure ZeroEfficiencyPumpPowerTest;
+    procedure NegativeFlowPumpPowerTest;
+    procedure NegativeFlowTurbinePowerTest;
     procedure ZeroRPMSpecificSpeedTest;
     procedure ZeroFlowRateSpecificSpeedTest;
     procedure ZeroHeadSpecificSpeedTest;
@@ -94,6 +98,9 @@ type
     
     // Tests for edge cases in new functions
     procedure Test39_NewFunctionsEdgeCases;
+    procedure Test40_TurbulentSolverValidation;
+    procedure Test41_BlasiusBoundaryValues;
+    procedure Test42_PowerFlowValidation;
   end;
 
 implementation
@@ -131,6 +138,16 @@ end;
 procedure TTestFluidDynamicsKit.TurbulentFrictionFactorTest;
 begin
   TFluidDynamicsKit.TurbulentFrictionFactor(3000.0, 0.0001);
+end;
+
+procedure TTestFluidDynamicsKit.ZeroTurbulentToleranceTest;
+begin
+  TFluidDynamicsKit.TurbulentFrictionFactor(100000.0, 0.0001, 0.0, 100);
+end;
+
+procedure TTestFluidDynamicsKit.ZeroTurbulentIterationsTest;
+begin
+  TFluidDynamicsKit.TurbulentFrictionFactor(100000.0, 0.0001, 1E-6, 0);
 end;
 
 procedure TTestFluidDynamicsKit.BlasiusFrictionFactorLowTest;
@@ -196,6 +213,16 @@ end;
 procedure TTestFluidDynamicsKit.ZeroEfficiencyPumpPowerTest;
 begin
   TFluidDynamicsKit.PumpPower(997.0, 0.05, 10.0, 0.0);
+end;
+
+procedure TTestFluidDynamicsKit.NegativeFlowPumpPowerTest;
+begin
+  TFluidDynamicsKit.PumpPower(DensityWater, -0.1, 10.0, 0.8);
+end;
+
+procedure TTestFluidDynamicsKit.NegativeFlowTurbinePowerTest;
+begin
+  TFluidDynamicsKit.TurbinePower(0.8, DensityWater, -0.1, 10.0);
 end;
 
 procedure TTestFluidDynamicsKit.ZeroRPMSpecificSpeedTest;
@@ -573,15 +600,17 @@ end;
 
 procedure TTestFluidDynamicsKit.Test32_PumpHead;
 var
-  dP, rho, dV, dh: Double;
+  dP, rho, v1, v2, dh: Double;
   expectedHead: Double;
 begin
   dP := 200000.0; // Pa (pressure difference)
   rho := DensityWater; // kg/m³
-  dV := 5.0; // m/s (velocity difference)
+  v1 := 1.0; // m/s (inlet velocity)
+  v2 := 4.0; // m/s (outlet velocity)
   dh := 5.0; // m (height difference)
-  expectedHead := dP/(rho*Gravity) + Sqr(dV)/(2*Gravity) + dh;
-  AssertEquals('Pump Head', expectedHead, TFluidDynamicsKit.PumpHead(dP, rho, dV, dh), Tolerance);
+  expectedHead := dP/(rho*Gravity) + (Sqr(v2)-Sqr(v1))/(2*Gravity) + dh;
+  AssertEquals('Pump Head', expectedHead,
+    TFluidDynamicsKit.PumpHead(dP, rho, v1, v2, dh), Tolerance);
 end;
 
 procedure TTestFluidDynamicsKit.Test33_PumpSpecificSpeed;
@@ -669,6 +698,30 @@ begin
   // Open channel flow edge cases
   AssertException('Zero Chezy coefficient', EFluidDynamicsError, @ZeroChezyCoeffientTest);
   AssertException('Zero depth Froude number', EFluidDynamicsError, @ZeroDepthFroudeNumberTest);
+end;
+
+procedure TTestFluidDynamicsKit.Test40_TurbulentSolverValidation;
+begin
+  AssertException('Turbulent friction factor rejects zero tolerance',
+    EFluidDynamicsError, @ZeroTurbulentToleranceTest);
+  AssertException('Turbulent friction factor rejects zero iterations',
+    EFluidDynamicsError, @ZeroTurbulentIterationsTest);
+end;
+
+procedure TTestFluidDynamicsKit.Test41_BlasiusBoundaryValues;
+begin
+  AssertEquals('Blasius accepts Re=4000', 0.316/Power(4000.0, 0.25),
+    TFluidDynamicsKit.BlasiusFrictionFactor(4000.0), Tolerance);
+  AssertEquals('Blasius accepts Re=100000', 0.316/Power(100000.0, 0.25),
+    TFluidDynamicsKit.BlasiusFrictionFactor(100000.0), Tolerance);
+end;
+
+procedure TTestFluidDynamicsKit.Test42_PowerFlowValidation;
+begin
+  AssertException('Pump power rejects negative flow rate',
+    EFluidDynamicsError, @NegativeFlowPumpPowerTest);
+  AssertException('Turbine power rejects negative flow rate',
+    EFluidDynamicsError, @NegativeFlowTurbinePowerTest);
 end;
 
 initialization

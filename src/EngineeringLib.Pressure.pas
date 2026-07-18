@@ -12,7 +12,7 @@ unit EngineeringLib.Pressure;
    FrictionHeadLoss / HazenWilliamsHeadLoss               — pipe head loss
    LaminarFrictionFactor / TurbulentFrictionFactor        — Darcy friction factors
    BlasiusFrictionFactor                                   — Blasius approximation
-   StagnationPressureRatio / IsentropicPressureRatio       — compressible flow
+   StagnationPressureRatio                                 — compressible flow
    EulerNumber / WeberNumber                               — dimensionless groups
    PumpPower                                               — hydraulic power
 -----------------------------------------------------------------------------}
@@ -22,9 +22,11 @@ unit EngineeringLib.Pressure;
 interface
 
 uses
-  EngineeringLib.FluidDynamics;
+  EngineeringLib.Common, EngineeringLib.FluidDynamics;
 
 type
+  { Focused exception name for callers that import only this unit. }
+  EPressureError = EngineeringLib.Common.EFluidDynamicsError;
   TPressureKit = TFluidDynamicsKit;
 
 implementation

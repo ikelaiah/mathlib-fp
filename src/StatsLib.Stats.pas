@@ -22,7 +22,8 @@ unit StatsLib.Stats;
  - Uses TDoubleArray from MathBase.SharedTypes for data input
  - Provides TDescriptiveStats record for comprehensive summary output
  - Includes basic error handling for invalid inputs (e.g., empty arrays)
- - StdDev calculates sample standard deviation (using n-1 denominator), not population standard deviation
+ - StandardDeviation and TDescriptiveStats.StdDev use the population (n)
+   denominator; SampleStandardDeviation uses the sample (n-1) denominator
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -707,7 +708,7 @@ type
 
       @param Data The array of Double values to sort. The array is modified directly.
 
-      @warning Modifies the input array Data. Uses a simple bubble sort implementation.
+      @warning Modifies the input array Data. Uses a stable O(n log n) merge sort; NaN values, if present, are placed last.
 
       @example
       var
@@ -1024,13 +1025,13 @@ type
 
       @param X The array of Double values for the first group.
       @param Y The array of Double values for the second group.
-      @param UPValue Output parameter: The calculated approximate two-tailed p-value using normal approximation (only for large samples).
+      @param UPValue Output parameter: The calculated two-tailed p-value. Small samples without ties use the exact distribution; tied or larger samples use a tie-corrected normal approximation with continuity correction.
 
       @returns The calculated Mann-Whitney U statistic (the minimum of U1 and U2).
 
       @references https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test
 
-      @warning Raises EStatsError if either group has less than 2 values. P-value calculation (UPValue) uses normal approximation, which is only accurate for larger sample sizes (e.g., N > 10 in both groups); otherwise, it defaults to 1. Exact p-value calculation for small samples is not implemented. Handles ties by assigning average ranks.
+      @warning Raises EStatsError if either group has less than 2 values or contains a non-finite value. Handles ties by assigning average ranks.
 
       @example
       var
@@ -1042,26 +1043,25 @@ type
         GroupY[0] := 6; GroupY[1] := 2; GroupY[2] := 4; GroupY[3] := 9; GroupY[4] := 10; GroupY[5] := 11;
         UStat := TStatsKit.MannWhitneyU(GroupX, GroupY, PValApprox);
         WriteLn('U Statistic: ', UStat:0:1);
-        WriteLn('Approx P-Value: ', PValApprox:0:3); // Note: Approximation might be poor for small N
+        WriteLn('P-Value: ', PValApprox:0:3);
         // UStat will be 8.0
-        // PValApprox will be 1.0 (since N <= 10)
       end;
     }
     class function MannWhitneyU(const X, Y: TDoubleArray; out UPValue: Double): Double; static;
 
     {
-      @description Performs the one-sample Kolmogorov-Smirnov test for normality (Lilliefors modification implied by estimating mean/stddev from data).
+      @description Computes the one-sample Kolmogorov-Smirnov distance from a normal CDF whose mean and standard deviation are estimated from the sample.
 
       @usage Use to test the null hypothesis that the data comes from a normally distributed population, when the mean and standard deviation are estimated from the sample.
 
       @param Data An array of Double values.
-      @param KSPValue Output parameter: The calculated Kolmogorov-Smirnov test statistic (maximum absolute difference between empirical and theoretical CDFs). Note: This is the statistic, not the p-value itself.
+      @param KSPValue Output parameter: An asymptotic two-sided p-value approximation.
 
-      @returns The calculated Kolmogorov-Smirnov test statistic (same as KSPValue).
+      @returns The calculated Kolmogorov-Smirnov D statistic.
 
       @references https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test, https://en.wikipedia.org/wiki/Lilliefors_test
 
-      @warning Raises EStatsError if the array has less than 5 values. The test assumes the mean and standard deviation are estimated from the data (Lilliefors correction). The function returns the test statistic D, not a p-value. KSPValue output parameter also holds the statistic D. Comparing D to critical values is needed for hypothesis testing (e.g., using approximation like 0.886 / Sqrt(N) for alpha=0.05, or more accurate tables/formulas).
+      @warning Raises EStatsError if the array has less than 5 values, contains non-finite data, or has zero variance. Because parameters are fitted, the returned standard K-S asymptotic p-value is diagnostic rather than a calibrated Lilliefors p-value.
 
       @example
       var
@@ -1074,8 +1074,7 @@ type
         MyData[5] := 10.0; MyData[6] := 10.2; MyData[7] := 9.9; MyData[8] := 10.5; MyData[9] := 9.7;
         KSStat := TStatsKit.KolmogorovSmirnovTest(MyData, KSStatOut);
         WriteLn('K-S Statistic: ', KSStat:0:4);
-        // KSStat and KSStatOut will hold the calculated D statistic.
-        // Further steps needed to compare D to critical value for significance.
+        // KSStat is D; KSStatOut is the approximate p-value.
       end;
     }
     class function KolmogorovSmirnovTest(const Data: TDoubleArray; out KSPValue: Double): Double; static;
@@ -1083,16 +1082,16 @@ type
     { Distribution Tests }
 
     {
-      @description Tests if data likely comes from a normal distribution using the Kolmogorov-Smirnov test statistic.
+      @description Tests whether normality is rejected using the approximate K-S p-value.
 
-      @usage A simplified check for normality based on a fixed critical value approximation for the K-S test.
+      @usage Returns true when the approximate p-value is at least Alpha.
 
       @param Data An array of Double values.
-      @param Alpha The significance level (default 0.05). This is used in the comparison logic but the underlying K-S test implementation doesn't directly use it for p-value calculation.
+      @param Alpha The significance level in the open interval (0, 1), default 0.05.
 
-      @returns True if the K-S test statistic is greater than or equal to Alpha (which seems inverted logic - typically K-S statistic < critical value means normality cannot be rejected), False otherwise.
+      @returns True when normality is not rejected at Alpha, false otherwise.
 
-      @warning Raises EStatsError if the array has less than 5 values. The comparison logic `KSPValue >= Alpha` seems incorrect for a standard K-S test interpretation where small statistic values support the null hypothesis (normality). It might be comparing the statistic directly to alpha instead of a critical value derived from alpha. Use with caution and consider the result interpretation carefully.
+      @warning This is a convenience diagnostic; see KolmogorovSmirnovTest regarding fitted-parameter p-value calibration.
 
       @example
       var
@@ -1115,14 +1114,14 @@ type
 
       @usage Use as a powerful test to determine if a sample likely came from a normally distributed population. Generally preferred over K-S test for normality testing, especially for smaller samples.
 
-      @param Data An array of Double values. Sample size must be between 3 and 50.
+      @param Data An array of finite Double values. Sample size must be between 3 and 5000.
       @param WPValue Output parameter: The calculated approximate p-value.
 
       @returns The calculated Shapiro-Wilk W statistic.
 
       @references https://en.wikipedia.org/wiki/Shapiro%E2%80%93Wilk_test
 
-      @warning Raises EStatsError if the sample size N is not within the range [3, 50]. Uses an approximation for weights and p-value calculation, which may have limited accuracy. Returns W=0 if variance is zero.
+      @warning Raises EStatsError for sample sizes outside [3, 5000], non-finite values, or zero variance. P-values use Royston's approximation and are always clamped to [0, 1].
 
       @example
       var
@@ -1146,7 +1145,7 @@ type
     {
       @description Calculates Cohen's d effect size for two independent groups.
 
-      @usage Use to measure the standardized difference between two means. Indicates the magnitude of the difference, independent of sample size. Uses population standard deviation in calculation.
+      @usage Use to measure the standardized difference between two means using the pooled sample standard deviation.
 
       @param X The array of Double values for the first group.
       @param Y The array of Double values for the second group.
@@ -1155,7 +1154,7 @@ type
 
       @references https://en.wikipedia.org/wiki/Effect_size#Cohen's_d
 
-      @warning Raises EStatsError if either group has less than 2 values. Assumes equal variances (uses pooled standard deviation based on population standard deviations). Uses population standard deviation (n denominator) for SDX and SDY.
+      @warning Raises EStatsError if either group has less than 2 values or the pooled sample variance is zero. Assumes equal variances.
 
       @example
       var
@@ -1359,7 +1358,10 @@ type
 
       @returns An array containing the means calculated from each bootstrap sample.
 
-      @warning Requires the random number generator to be seeded (e.g., using Randomize). The number of iterations should be sufficiently large (e.g., 1000 or more) for stable results.
+      @warning The unseeded overload uses caller-managed global random state;
+      call Randomize once in the application if nondeterministic samples are
+      wanted. The Seed overload uses local reproducible state and does not
+      change RandSeed. More iterations generally produce a stabler estimate.
 
       @example
       var
@@ -1396,7 +1398,10 @@ type
 
       @references https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Bootstrap_percentile_interval
 
-      @warning Requires the random number generator to be seeded. Accuracy depends on the number of iterations. Raises errors from underlying functions (BootstrapMean, Percentile) if conditions aren't met.
+      @warning The compatibility overload uses caller-managed global random
+      state. The Seed overload is locally reproducible and does not change
+      RandSeed. Accuracy depends on the number of iterations; invalid input is
+      rejected by BootstrapMean and Percentile.
 
       @example
       var
@@ -1427,6 +1432,192 @@ type
   end;
 
 implementation
+
+type
+  TIndexedValue = record
+    Value: Double;
+    Index: Integer;
+  end;
+  TIndexedValueArray = array of TIndexedValue;
+
+  TMannWhitneyItem = record
+    Value: Double;
+    Group: Integer;
+    Rank: Double;
+  end;
+  TMannWhitneyItemArray = array of TMannWhitneyItem;
+
+function DoubleComesFirst(const A, B: Double): Boolean; inline;
+begin
+  if IsNan(A) then
+    Result := IsNan(B)
+  else if IsNan(B) then
+    Result := True
+  else
+    Result := A <= B;
+end;
+
+procedure MergeSortDoubles(var Data: TDoubleArray);
+var
+  Work: TDoubleArray;
+
+  procedure SortRange(const Left, Right: Integer);
+  var
+    Middle, I, J, K: Integer;
+  begin
+    if Left >= Right then Exit;
+    Middle := Left + (Right - Left) div 2;
+    SortRange(Left, Middle);
+    SortRange(Middle + 1, Right);
+    I := Left;
+    J := Middle + 1;
+    K := Left;
+    while (I <= Middle) and (J <= Right) do
+    begin
+      if DoubleComesFirst(Data[I], Data[J]) then
+      begin
+        Work[K] := Data[I];
+        Inc(I);
+      end
+      else
+      begin
+        Work[K] := Data[J];
+        Inc(J);
+      end;
+      Inc(K);
+    end;
+    while I <= Middle do begin Work[K] := Data[I]; Inc(I); Inc(K); end;
+    while J <= Right do begin Work[K] := Data[J]; Inc(J); Inc(K); end;
+    for K := Left to Right do Data[K] := Work[K];
+  end;
+
+begin
+  if Length(Data) < 2 then Exit;
+  SetLength(Work, Length(Data));
+  SortRange(0, High(Data));
+end;
+
+procedure MergeSortIndexed(var Data: TIndexedValueArray);
+var
+  Work: TIndexedValueArray;
+
+  procedure SortRange(const Left, Right: Integer);
+  var
+    Middle, I, J, K: Integer;
+  begin
+    if Left >= Right then Exit;
+    Middle := Left + (Right - Left) div 2;
+    SortRange(Left, Middle);
+    SortRange(Middle + 1, Right);
+    I := Left; J := Middle + 1; K := Left;
+    while (I <= Middle) and (J <= Right) do
+    begin
+      if DoubleComesFirst(Data[I].Value, Data[J].Value) then
+      begin Work[K] := Data[I]; Inc(I); end
+      else begin Work[K] := Data[J]; Inc(J); end;
+      Inc(K);
+    end;
+    while I <= Middle do begin Work[K] := Data[I]; Inc(I); Inc(K); end;
+    while J <= Right do begin Work[K] := Data[J]; Inc(J); Inc(K); end;
+    for K := Left to Right do Data[K] := Work[K];
+  end;
+
+begin
+  if Length(Data) < 2 then Exit;
+  SetLength(Work, Length(Data));
+  SortRange(0, High(Data));
+end;
+
+procedure MergeSortMannWhitney(var Data: TMannWhitneyItemArray);
+var
+  Work: TMannWhitneyItemArray;
+
+  procedure SortRange(const Left, Right: Integer);
+  var
+    Middle, I, J, K: Integer;
+  begin
+    if Left >= Right then Exit;
+    Middle := Left + (Right - Left) div 2;
+    SortRange(Left, Middle);
+    SortRange(Middle + 1, Right);
+    I := Left; J := Middle + 1; K := Left;
+    while (I <= Middle) and (J <= Right) do
+    begin
+      if DoubleComesFirst(Data[I].Value, Data[J].Value) then
+      begin Work[K] := Data[I]; Inc(I); end
+      else begin Work[K] := Data[J]; Inc(J); end;
+      Inc(K);
+    end;
+    while I <= Middle do begin Work[K] := Data[I]; Inc(I); Inc(K); end;
+    while J <= Right do begin Work[K] := Data[J]; Inc(J); Inc(K); end;
+    for K := Left to Right do Data[K] := Work[K];
+  end;
+
+begin
+  if Length(Data) < 2 then Exit;
+  SetLength(Work, Length(Data));
+  SortRange(0, High(Data));
+end;
+
+function InverseStandardNormal(const P: Double): Double;
+const
+  A1 = -3.969683028665376E+01; A2 = 2.209460984245205E+02;
+  A3 = -2.759285104469687E+02; A4 = 1.383577518672690E+02;
+  A5 = -3.066479806614716E+01; A6 = 2.506628277459239E+00;
+  B1 = -5.447609879822406E+01; B2 = 1.615858368580409E+02;
+  B3 = -1.556989798598866E+02; B4 = 6.680131188771972E+01;
+  B5 = -1.328068155288572E+01;
+  C1 = -7.784894002430293E-03; C2 = -3.223964580411365E-01;
+  C3 = -2.400758277161838E+00; C4 = -2.549732539343734E+00;
+  C5 = 4.374664141464968E+00; C6 = 2.938163982698783E+00;
+  D1 = 7.784695709041462E-03; D2 = 3.224671290700398E-01;
+  D3 = 2.445134137142996E+00; D4 = 3.754408661907416E+00;
+  PLow = 0.02425;
+var
+  Q, R: Double;
+begin
+  if (P <= 0.0) or (P >= 1.0) then
+    raise EStatsError.Create('Normal quantile requires probability in (0, 1)');
+  if P < PLow then
+  begin
+    Q := Sqrt(-2.0 * Ln(P));
+    Result := (((((C1*Q+C2)*Q+C3)*Q+C4)*Q+C5)*Q+C6) /
+      ((((D1*Q+D2)*Q+D3)*Q+D4)*Q+1.0);
+  end
+  else if P > 1.0 - PLow then
+  begin
+    Q := Sqrt(-2.0 * Ln(1.0 - P));
+    Result := -(((((C1*Q+C2)*Q+C3)*Q+C4)*Q+C5)*Q+C6) /
+      ((((D1*Q+D2)*Q+D3)*Q+D4)*Q+1.0);
+  end
+  else
+  begin
+    Q := P - 0.5;
+    R := Q * Q;
+    Result := (((((A1*R+A2)*R+A3)*R+A4)*R+A5)*R+A6)*Q /
+      (((((B1*R+B2)*R+B3)*R+B4)*R+B5)*R+1.0);
+  end;
+end;
+
+function Polynomial(const Coefficients: array of Double;
+  const X: Double): Double;
+var
+  I: Integer;
+begin
+  Result := 0.0;
+  for I := High(Coefficients) downto 0 do
+    Result := Result * X + Coefficients[I];
+end;
+
+procedure RequireFiniteData(const Data: TDoubleArray; const Name: string);
+var
+  I: Integer;
+begin
+  for I := 0 to High(Data) do
+    if IsNan(Data[I]) or IsInfinite(Data[I]) then
+      raise EStatsError.CreateFmt('%s contains a non-finite value at index %d',
+        [Name, I]);
+end;
 
 { TStatsKit }
 
@@ -1700,39 +1891,27 @@ end;
 
 class function TStatsKit.SpearmanCorrelation(const X, Y: TDoubleArray): Double;
 var
-  N, I: Integer;
+  N: Integer;
   RankX, RankY: TDoubleArray;
-  TempValue: Double;  // Temp variable for GetRanks swap
-  TempGroup: Integer; // Temp variable for GetRanks swap
 
   function GetRanks(const Data: TDoubleArray): TDoubleArray;
   var
     I, J, TieCount: Integer;
-    SortedIndices: array of Integer;
-    SortedData: TDoubleArray;
+    Sorted: TIndexedValueArray;
     TieRankSum: Double;
     AverageRank: Double; // Added for clarity in tie handling
   begin
     Result := nil;
-    SetLength(SortedIndices, Length(Data));
-    SetLength(SortedData, Length(Data));
+    SetLength(Sorted, Length(Data));
     SetLength(Result, Length(Data));
 
     // Initialize indices and copy data
     for I := 0 to High(Data) do
     begin
-      SortedIndices[I] := I;
-      SortedData[I] := Data[I];
+      Sorted[I].Index := I;
+      Sorted[I].Value := Data[I];
     end;
-
-    // Sort indices based on data values using original Exchange helpers
-    for I := 0 to High(Data) - 1 do
-      for J := I + 1 to High(Data) do
-        if SortedData[J] < SortedData[I] then
-        begin
-          Exchange(SortedData[I], SortedData[J]);
-          ExchangeInt(SortedIndices[I], SortedIndices[J]);
-        end;
+    MergeSortIndexed(Sorted);
 
     // Assign ranks, handling ties (restored original logic)
     I := 0;
@@ -1742,7 +1921,7 @@ var
       TieRankSum := I + 1;
 
       // Count ties (original condition)
-      while (I < High(Data)) and (SortedData[I] = SortedData[I + 1]) do
+      while (I < High(Data)) and (Sorted[I].Value = Sorted[I + 1].Value) do
       begin
         Inc(I);
         Inc(TieCount);
@@ -1754,10 +1933,10 @@ var
       begin
         AverageRank := TieRankSum / TieCount; // Calculate average rank
         for J := I - TieCount + 1 to I do
-          Result[SortedIndices[J]] := AverageRank;
+          Result[Sorted[J].Index] := AverageRank;
       end
       else
-        Result[SortedIndices[I]] := I + 1; // Assign rank if no tie
+        Result[Sorted[I].Index] := I + 1; // Assign rank if no tie
 
       Inc(I);
     end;
@@ -1769,6 +1948,8 @@ begin
     raise EStatsError.Create('Arrays must have equal length for Spearman correlation');
   if N < 2 then
     raise EStatsError.Create('Cannot calculate correlation with less than 2 values');
+  RequireFiniteData(X, 'X');
+  RequireFiniteData(Y, 'Y');
 
   // Get ranks for both arrays
   RankX := GetRanks(X);
@@ -1840,18 +2021,8 @@ begin
 end;
 
 class procedure TStatsKit.Sort(var Data: TDoubleArray);
-var
-  I, J: Integer;
-  Temp: Double;
 begin
-  for I := 0 to High(Data) - 1 do
-    for J := I + 1 to High(Data) do
-      if Data[J] < Data[I] then
-      begin
-        Temp := Data[I];
-        Data[I] := Data[J];
-        Data[J] := Temp;
-      end;
+  MergeSortDoubles(Data);
 end;
 
 class function TStatsKit.Describe(const Data: TDoubleArray): TDescriptiveStats;
@@ -2198,28 +2369,28 @@ end;
 
 class function TStatsKit.MannWhitneyU(const X, Y: TDoubleArray; out UPValue: Double): Double;
 var
-  NX, NY, I, J: Integer;
+  NX, NY, N, I, J, RankIndex, Chosen, RankSumIndex: Integer;
   RankSum: Double;
-  AllData: array of record
-    Value: Double;
-    Group: Integer;  // 1 for X, 2 for Y
-    Rank: Double;
-  end;
+  AllData: TMannWhitneyItemArray;
   U1, U2: Double;
   TieCount: Integer;
-  TieSum: Double;
+  TieSum, TieCorrectionSum: Double;
   AverageRank: Double;
-  TempValue: Double;
-  TempGroup: Integer;
-  TempRank: Double;
   ExpectedMean: Double;
   DistVariance: Double;
   Z: Double;
+  HasTies: Boolean;
+  Counts: array of array of Extended;
+  TotalCount, TailCount: Extended;
+  MinRankSum, MaxRankSum, TargetRankSum, MaxChosen: Integer;
 begin
   NX := Length(X);
   NY := Length(Y);
   if (NX < 2) or (NY < 2) then
     raise EStatsError.Create('Mann-Whitney U test requires at least 2 values in each group');
+  RequireFiniteData(X, 'X');
+  RequireFiniteData(Y, 'Y');
+  N := NX + NY;
     
   // Initialize managed type
   SetLength(AllData, NX + NY);
@@ -2238,29 +2409,12 @@ begin
     AllData[NX + I].Rank := 0;  // Initialize rank
   end;
   
-  // Sort by value
-  for I := 0 to High(AllData) - 1 do
-    for J := I + 1 to High(AllData) do
-      if AllData[J].Value < AllData[I].Value then
-      begin
-        // Store temporary values
-        TempValue := AllData[I].Value;
-        TempGroup := AllData[I].Group;
-        TempRank := AllData[I].Rank;
-        
-        // Copy J to I
-        AllData[I].Value := AllData[J].Value;
-        AllData[I].Group := AllData[J].Group;
-        AllData[I].Rank := AllData[J].Rank;
-        
-        // Copy temp to J
-        AllData[J].Value := TempValue;
-        AllData[J].Group := TempGroup;
-        AllData[J].Rank := TempRank;
-      end;
-      
+  MergeSortMannWhitney(AllData);
+
   // Assign ranks (handling ties)
   I := 0;
+  HasTies := False;
+  TieCorrectionSum := 0.0;
   while I <= High(AllData) do
   begin
     TieCount := 1;
@@ -2274,6 +2428,11 @@ begin
     end;
     
     AverageRank := TieSum / TieCount;
+    if TieCount > 1 then
+    begin
+      HasTies := True;
+      TieCorrectionSum := TieCorrectionSum + Sqr(TieCount) * TieCount - TieCount;
+    end;
     for J := I - TieCount + 1 to I do
       AllData[J].Rank := AverageRank;
       
@@ -2290,31 +2449,66 @@ begin
   U2 := NX * NY - U1;
   
   Result := Min(U1, U2);
-  
-  // Approximate p-value using normal distribution for large samples
-  if (NX > 10) and (NY > 10) then
+
+  { Exact two-sided distribution for small untied samples. Counts[c,s] is
+    the number of ways to choose c ranks whose sum is s. }
+  if (not HasTies) and (N <= 50) then
   begin
-    ExpectedMean := NX * NY / 2;
-    DistVariance := (NX * NY * (NX + NY + 1)) / 12;
-    Z := (Result - ExpectedMean) / Sqrt(DistVariance);
-    UPValue := 2 * (1 - NormalCDF(Abs(Z)));
+    MinRankSum := NX * (NX + 1) div 2;
+    MaxRankSum := NX * (2 * N - NX + 1) div 2;
+    TargetRankSum := MinRankSum + Round(Result);
+    SetLength(Counts, NX + 1);
+    for Chosen := 0 to NX do
+      SetLength(Counts[Chosen], MaxRankSum + 1);
+    Counts[0][0] := 1.0;
+    for RankIndex := 1 to N do
+    begin
+      MaxChosen := Min(RankIndex, NX);
+      for Chosen := MaxChosen downto 1 do
+        for RankSumIndex := MaxRankSum downto RankIndex do
+          Counts[Chosen][RankSumIndex] := Counts[Chosen][RankSumIndex] +
+            Counts[Chosen - 1][RankSumIndex - RankIndex];
+    end;
+    TotalCount := 0.0;
+    TailCount := 0.0;
+    for RankSumIndex := MinRankSum to MaxRankSum do
+    begin
+      TotalCount := TotalCount + Counts[NX][RankSumIndex];
+      if RankSumIndex <= TargetRankSum then
+        TailCount := TailCount + Counts[NX][RankSumIndex];
+    end;
+    UPValue := Min(1.0, Double(2.0 * TailCount / TotalCount));
   end
   else
-    UPValue := 1;  // Exact p-value calculation not implemented
+  begin
+    ExpectedMean := NX * NY / 2.0;
+    DistVariance := (NX * NY / 12.0) *
+      ((N + 1.0) - TieCorrectionSum / (N * (N - 1.0)));
+    if DistVariance <= 0.0 then
+      raise EStatsError.Create('Mann-Whitney U variance is zero');
+    Z := (Abs(U1 - ExpectedMean) - 0.5) / Sqrt(DistVariance);
+    if Z < 0.0 then Z := 0.0;
+    UPValue := 2.0 * (1.0 - NormalCDF(Z));
+    UPValue := Max(0.0, Min(1.0, UPValue));
+  end;
 end;
 
 class function TStatsKit.KolmogorovSmirnovTest(const Data: TDoubleArray; out KSPValue: Double): Double;
 var
-  N, I: Integer;
-  MaxDiff: Double;
+  N, I, K: Integer;
+  MaxDiff, MeanValue, StdDevValue: Double;
   SortedData: TDoubleArray;
-  ObservedCDF: Double;
   ExpectedCDF: Double;
-  CriticalValue: Double;
+  DPlus, DMinus, Lambda, Term, SeriesSum: Double;
 begin
   N := Length(Data);
   if N < 5 then
     raise EStatsError.Create('K-S test requires at least 5 values');
+  RequireFiniteData(Data, 'Data');
+  MeanValue := Mean(Data);
+  StdDevValue := StandardDeviation(Data);
+  if StdDevValue = 0.0 then
+    raise EStatsError.Create('K-S normality test requires non-constant data');
     
   SortedData := Copy(Data);
   Sort(SortedData);
@@ -2322,22 +2516,34 @@ begin
   MaxDiff := 0;
   for I := 0 to High(SortedData) do
   begin
-    ObservedCDF := (I + 1) / N;
-    ExpectedCDF := NormalCDF((SortedData[I] - Mean(Data)) / StandardDeviation(Data));
-    MaxDiff := Max(MaxDiff, Abs(ObservedCDF - ExpectedCDF));
+    ExpectedCDF := NormalCDF((SortedData[I] - MeanValue) / StdDevValue);
+    DPlus := (I + 1.0) / N - ExpectedCDF;
+    DMinus := ExpectedCDF - I / N;
+    MaxDiff := Max(MaxDiff, Max(DPlus, DMinus));
   end;
   
   Result := MaxDiff;
-  
-  // Critical value at α = 0.05
-  CriticalValue := 0.886 / Sqrt(N);
-  KSPValue := MaxDiff;  // Return the actual statistic value, not the boolean comparison
+
+  Lambda := (Sqrt(N) + 0.12 + 0.11 / Sqrt(N)) * MaxDiff;
+  SeriesSum := 0.0;
+  for K := 1 to 100 do
+  begin
+    Term := 2.0 * Exp(-2.0 * Sqr(K * Lambda));
+    if Odd(K) then
+      SeriesSum := SeriesSum + Term
+    else
+      SeriesSum := SeriesSum - Term;
+    if Term < 1E-15 then Break;
+  end;
+  KSPValue := Max(0.0, Min(1.0, SeriesSum));
 end;
 
 class function TStatsKit.IsNormal(const Data: TDoubleArray; const Alpha: Double): Boolean;
 var
   KSPValue: Double;
 begin
+  if IsNan(Alpha) or IsInfinite(Alpha) or (Alpha <= 0.0) or (Alpha >= 1.0) then
+    raise EStatsError.Create('Alpha must be in the open interval (0, 1)');
   KolmogorovSmirnovTest(Data, KSPValue);
   Result := KSPValue >= Alpha;
 end;
@@ -2346,21 +2552,52 @@ class function TStatsKit.ShapiroWilkTest(const Data: TDoubleArray; out WPValue: 
 var
   N, I: Integer;
   SortedData: TDoubleArray;
-  DataMean, S2: Double;
-  B, W: Double;
+  DataMean, S2, B, W, SumM2, ScaleFactor, RSN, A1, A2: Double;
+  Y, Mu, Sigma, Z: Double;
   Weights: array of Double;
+const
+  C1: array[0..5] of Double =
+    (0.0, 0.221157, -0.147981, -2.07119, 4.434685, -2.706056);
+  C2: array[0..5] of Double =
+    (0.0, 0.042981, -0.293762, -1.752461, 5.682633, -3.582633);
+  C3: array[0..3] of Double = (0.5440, -0.39978, 0.025054, -0.0006714);
+  C4: array[0..3] of Double = (1.3822, -0.77857, 0.062767, -0.0020322);
+  C5: array[0..3] of Double = (-1.5861, -0.31082, -0.083751, 0.0038915);
+  C6: array[0..2] of Double = (-0.4803, -0.082676, 0.0030302);
+  G: array[0..1] of Double = (-2.273, 0.459);
 begin
   N := Length(Data);
-  if (N < 3) or (N > 50) then
-    raise EStatsError.Create('Shapiro-Wilk test requires 3-50 values');
+  if (N < 3) or (N > 5000) then
+    raise EStatsError.Create('Shapiro-Wilk test requires 3-5000 values');
+  RequireFiniteData(Data, 'Data');
     
   SortedData := Copy(Data);
   Sort(SortedData);
   
-  // Calculate weights (approximation)
+  { Expected normal order statistics with Royston's endpoint corrections. }
   SetLength(Weights, N div 2);
+  SumM2 := 0.0;
   for I := 0 to High(Weights) do
-    Weights[I] := 0.7071 * (1 - (2 * I) / (N - 1));
+  begin
+    Weights[I] := InverseStandardNormal((I + 1.0 - 0.375) / (N + 0.25));
+    SumM2 := SumM2 + 2.0 * Sqr(Weights[I]);
+  end;
+  ScaleFactor := Sqrt(SumM2);
+  RSN := 1.0 / Sqrt(N);
+  A1 := Polynomial(C1, RSN) - Weights[0] / ScaleFactor;
+  if N > 5 then
+  begin
+    A2 := Polynomial(C2, RSN) - Weights[1] / ScaleFactor;
+    ScaleFactor := Sqrt((SumM2 - 2.0 * Sqr(Weights[0]) -
+      2.0 * Sqr(Weights[1])) / (1.0 - 2.0 * Sqr(A1) - 2.0 * Sqr(A2)));
+    Weights[1] := A2;
+  end
+  else
+    ScaleFactor := Sqrt((SumM2 - 2.0 * Sqr(Weights[0])) /
+      (1.0 - 2.0 * Sqr(A1)));
+  Weights[0] := A1;
+  for I := 2 - Ord(N <= 5) to High(Weights) do
+    Weights[I] := -Weights[I] / ScaleFactor;
   
   DataMean := Mean(SortedData);
   S2 := 0;
@@ -2374,35 +2611,58 @@ begin
   
   B := Sqr(B);
   if S2 = 0 then
-    W := 0
-  else
-    W := B / S2;
+    raise EStatsError.Create('Shapiro-Wilk test requires non-constant data');
+  W := B / S2;
     
   Result := Max(0, Min(1, W));  // Ensure W is between 0 and 1
   
-  // Approximate p-value
-  if W >= 1 then
+  if Result >= 1.0 - 1E-15 then
     WPValue := 1
+  else if N = 3 then
+    WPValue := (6.0 / Pi) * (ArcSin(Sqrt(Result)) - Pi / 3.0)
   else
-    WPValue := Exp(-0.5 * Ln(1 - W) * (5.0 + N));
+  begin
+    Y := Ln(1.0 - Result);
+    if N <= 11 then
+    begin
+      Z := Polynomial(G, N);
+      if Y >= Z then
+        WPValue := 0.0
+      else
+      begin
+        Y := -Ln(Z - Y);
+        Mu := Polynomial(C3, N);
+        Sigma := Exp(Polynomial(C4, N));
+        WPValue := 1.0 - NormalCDF((Y - Mu) / Sigma);
+      end;
+    end
+    else
+    begin
+      Z := Ln(N);
+      Mu := Polynomial(C5, Z);
+      Sigma := Exp(Polynomial(C6, Z));
+      WPValue := 1.0 - NormalCDF((Y - Mu) / Sigma);
+    end;
+  end;
+  WPValue := Max(0.0, Min(1.0, WPValue));
 end;
 
 class function TStatsKit.CohensD(const X, Y: TDoubleArray): Double;
 var
-  MeanX, MeanY, SDX, SDY: Double;
-  PooledSD: Double;
+  MeanX, MeanY, PooledVariance, PooledSD: Double;
 begin
   if (Length(X) < 2) or (Length(Y) < 2) then
     raise EStatsError.Create('Cohen''s d requires at least 2 values in each group');
     
   MeanX := Mean(X);
   MeanY := Mean(Y);
-  SDX := StandardDeviation(X);
-  SDY := StandardDeviation(Y);
-  
-  // Pooled standard deviation
-  PooledSD := Sqrt(((Length(X) - 1) * Sqr(SDX) + (Length(Y) - 1) * Sqr(SDY)) / 
-               (Length(X) + Length(Y) - 2));
+  RequireFiniteData(X, 'X');
+  RequireFiniteData(Y, 'Y');
+  PooledVariance := ((Length(X) - 1) * Variance(X) +
+    (Length(Y) - 1) * Variance(Y)) / (Length(X) + Length(Y) - 2);
+  if PooledVariance <= 0.0 then
+    raise EStatsError.Create('Cohen''s d requires non-zero pooled variance');
+  PooledSD := Sqrt(PooledVariance);
                    
   Result := (MeanX - MeanY) / PooledSD;
 end;

@@ -44,16 +44,33 @@ end;
 ## Root Finding
 
 All methods find x such that f(x) ≈ 0. Tolerance parameters control convergence.
+Each scalar-returning method has a corresponding `...Result` overload returning:
+
+```pascal
+TRootResult = record
+  Root: Double;
+  Residual: Double;
+  Iterations: Integer;
+  Converged: Boolean;
+end;
+```
+
+Use the detailed result when iteration counts or explicit convergence reporting
+matter. Scalar methods raise `ENumericsConvergenceError` when their iteration
+limit is exhausted.
 
 ### `Bisection`
 
 ```pascal
 class function Bisection(F: TScalarFunc; A, B: Double;
   Tol: Double = 1E-10; MaxIter: Integer = 100): Double;
+class function BisectionResult(F: TScalarFunc; A, B: Double;
+  Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult;
 ```
 
-Guaranteed convergence for bracketed roots. Requires f(A) · f(B) < 0.
-Raises `EInvalidArgument` if the bracket is invalid.
+Guaranteed convergence for bracketed roots. Requires opposite endpoint signs,
+unless either endpoint is itself a root, in which case it is returned
+immediately. Raises `EInvalidArgument` if the bracket is invalid.
 
 **Best for:** when robustness matters more than speed; verifying root existence.
 
@@ -62,6 +79,8 @@ Raises `EInvalidArgument` if the bracket is invalid.
 ```pascal
 class function NewtonRaphson(F, DF: TScalarFunc; X0: Double;
   Tol: Double = 1E-10; MaxIter: Integer = 100): Double;
+class function NewtonRaphsonResult(F, DF: TScalarFunc; X0: Double;
+  Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult;
 ```
 
 Quadratic convergence near the root using f and its derivative df/dx.
@@ -74,6 +93,8 @@ Raises `EInvalidArgument` if df/dx is near zero (flat region).
 ```pascal
 class function Brent(F: TScalarFunc; A, B: Double;
   Tol: Double = 1E-10; MaxIter: Integer = 100): Double;
+class function BrentResult(F: TScalarFunc; A, B: Double;
+  Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult;
 ```
 
 Hybrid method combining bisection, secant, and inverse-quadratic interpolation.
@@ -87,6 +108,8 @@ Raises `EInvalidArgument` if f(A) · f(B) > 0.
 ```pascal
 class function Secant(F: TScalarFunc; X0, X1: Double;
   Tol: Double = 1E-10; MaxIter: Integer = 100): Double;
+class function SecantResult(F: TScalarFunc; X0, X1: Double;
+  Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult;
 ```
 
 Derivative-free quasi-Newton using two initial guesses. Superlinear convergence
@@ -114,7 +137,8 @@ class function SimpsonRule(F: TScalarFunc; A, B: Double;
   N: Integer = 1000): Double;
 ```
 
-Composite Simpson's 1/3 rule with N sub-intervals (N is auto-incremented to even if odd).
+Composite Simpson's 1/3 rule with N sub-intervals. Values below 2 are rejected,
+and an odd N is incremented to the next even value.
 Error O(h⁴). Exact for polynomials of degree ≤ 3.
 
 ### `GaussLegendre5`
@@ -180,6 +204,10 @@ class function LinearInterp(const XKnots, YKnots: TDoubleArray; X: Double): Doub
 Piecewise linear interpolation between sorted knots using binary search.
 Clamps to endpoint values outside the knot range.
 
+`XKnots` must be strictly increasing and the two arrays must have equal,
+non-zero length. Array lengths, finite values, ordering, and duplicate knots
+are validated.
+
 ### `LagrangeInterp`
 
 ```pascal
@@ -187,6 +215,9 @@ class function LagrangeInterp(const XKnots, YKnots: TDoubleArray; X: Double): Do
 ```
 
 Global Lagrange polynomial interpolation through all N knots. Exact at every knot.
+
+The arrays must have equal, non-zero length and finite values, and X knots must
+be distinct. These conditions are validated before interpolation.
 
 > **Warning:** ill-conditioned for N > ~10 (Runge phenomenon). Prefer `CubicSplineBuild` for larger datasets.
 
@@ -200,6 +231,11 @@ class function CubicSplineEval(const S: TCubicSpline; X: Double): Double;
 Natural cubic spline (zero second-derivative boundary conditions) solved via the
 Thomas tridiagonal algorithm. Exact at every knot; smooth C² between knots.
 Clamps to endpoint values outside the knot range.
+
+Spline construction requires equal-length arrays with at least two strictly
+increasing finite knots. Dimensions, ordering, duplicates, and finite values
+are validated during construction; evaluation also validates spline dimensions
+and its finite query value.
 
 ---
 
@@ -242,7 +278,7 @@ begin
   XK := TDoubleArray.Create(0, 1, 2, 3, 4);
   YK := TDoubleArray.Create(0, 1, 4, 9, 16);
   Spline := TNumericsKit.CubicSplineBuild(XK, YK);
-  Writeln('Spline(1.5) = ', TNumericsKit.CubicSplineEval(Spline, 1.5):0:4);  // ≈ 2.25
+  Writeln('Spline(1.5) = ', TNumericsKit.CubicSplineEval(Spline, 1.5):0:4);  // ≈ 2.2321
 end.
 ```
 
@@ -256,9 +292,14 @@ end.
 | NewtonRaphson: derivative near zero | `EInvalidArgument` |
 | Secant: f(x₁) ≈ f(x₀) (division by near-zero) | `EInvalidArgument` |
 | TrapezoidalRule: N < 1 | `EInvalidArgument` |
+| SimpsonRule: N < 2 | `EInvalidArgument` |
 | EulerSolve / RK4Solve: N < 1 | `EInvalidArgument` |
 | LinearInterp / LagrangeInterp: empty arrays | `EInvalidArgument` |
+| Interpolation: X/Y array lengths differ | `EInvalidArgument` |
 | CubicSplineBuild: fewer than 2 knots | `EInvalidArgument` |
+| CubicSplineEval: empty spline | `EInvalidArgument` |
+| Scalar root wrapper exhausts MaxIter | `ENumericsConvergenceError` |
+| Nil callbacks, non-finite values/results, or non-positive controls | `EInvalidArgument` |
 
 ---
 
@@ -270,4 +311,12 @@ end.
   This is the standard choice when no derivative information is available at the boundaries.
 - `GaussLegendre5` performs only **5 function evaluations** regardless of the smoothness
   of f. For oscillatory functions, use `SimpsonRule` with a large N instead.
-- `TODESolution` arrays are **1-indexed from 0**: `Sol.T[0] = T0`, `Sol.T[N] = T1`.
+- `TODESolution` arrays are **zero-indexed**: `Sol.T[0] = T0`, `Sol.T[N] = T1`.
+- Root `...Result` methods expose root, residual, iteration count, and a
+  convergence flag. Scalar wrappers raise `ENumericsConvergenceError` on
+  exhaustion.
+- Root, integration, ODE, and interpolation entry points validate callbacks,
+  finite inputs and callback outputs, positive controls, array dimensions, and
+  strictly increasing/distinct interpolation knots as applicable.
+- Bracketed solvers return endpoint roots immediately and reject brackets that
+  contain no sign change.

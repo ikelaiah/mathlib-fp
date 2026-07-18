@@ -28,6 +28,10 @@ EEngineeringError
 └── EUnitConversionError
 ```
 
+The focused alias units also export `EVelocityError = EFluidDynamicsError` and
+`EPressureError = EFluidDynamicsError`, so an application importing only one
+focused unit can catch its domain error without importing `EngineeringLib.Common`.
+
 Catch a specific subtype when recovering from one engineering domain, or
 `EEngineeringError` when a caller handles all EngineeringLib validation
 errors uniformly. `Try...` unit-name APIs continue to return `False` for
@@ -79,8 +83,8 @@ class function ReynoldsNumberKinematic(Velocity, CharacteristicLength, Kinematic
 | `FrictionHeadLoss(f, L, D, v)` | Darcy-Weisbach: hf = f·(L/D)·(v²/2g) |
 | `HazenWilliamsHeadLoss(L, D, Q, CHW)` | Hazen-Williams formula for water pipes |
 | `LaminarFrictionFactor(Re)` | f = 64/Re (laminar flow) |
-| `TurbulentFrictionFactor(Re, ε/D [, Tol, MaxIter])` | Colebrook-White equation (iterative) |
-| `BlasiusFrictionFactor(Re)` | f = 0.316/Re^0.25 (smooth pipes, 4000 < Re < 10⁵) |
+| `TurbulentFrictionFactor(Re, ε/D [, Tol, MaxIter])` | Colebrook-White equation; `Re >= 4000`, `Tol > 0`, `MaxIter > 0` |
+| `BlasiusFrictionFactor(Re)` | f = 0.316/Re^0.25 (smooth pipes, 4000 ≤ Re ≤ 10⁵) |
 
 ### Dimensionless Numbers
 
@@ -117,10 +121,16 @@ class function IsentropicAreaRatio(MachNumber, SpecificHeatRatio: Double): Doubl
 
 ```pascal
 class function PumpPower(Density, FlowRate, Head, Efficiency: Double): Double;    // P = ρgQH/η
-class function PumpHead(PressureDiff, Density, VelocityDiff, HeightDiff: Double): Double;
+class function PumpHead(PressureDiff, Density, InletVelocity,
+  OutletVelocity, HeightDiff: Double): Double;
 class function PumpSpecificSpeed(RPM, FlowRate, Head: Double): Double;             // Ns = N√Q/H^(3/4)
 class function TurbinePower(Efficiency, Density, FlowRate, Head: Double): Double;  // P = η·ρgQH
 ```
+
+`PumpHead` uses the Bernoulli energy-head relation
+`ΔP/(ρg) + (v₂²-v₁²)/(2g) + Δz`. `PressureDiff` and `HeightDiff` are signed
+outlet-minus-inlet differences. Pump/turbine flow rate and head must be
+non-negative, density must be positive, and efficiency must be in `(0, 1]`.
 
 ### Open Channel Flow
 
@@ -207,6 +217,9 @@ class function CoefficientOfPerformanceHeatPump(Q_hot, WorkInput: Double): Doubl
 
 ### Adiabatic Process
 
+All pressures, volumes, and absolute temperatures supplied here must be
+positive, and the specific-heat ratio `γ` must be greater than 1.
+
 ```pascal
 class function AdiabaticPressure(P1, V1, V2, γ: Double): Double;        // P1·V1^γ = P2·V2^γ
 class function AdiabaticVolume(P1, V1, P2, γ: Double): Double;
@@ -224,12 +237,17 @@ class function IsentropicPressureRatio(MachNumber, SpecificHeatRatio: Double): D
 class function IsentropicDensityRatio(MachNumber, SpecificHeatRatio: Double): Double;
 ```
 
+`CriticalPressureRatio`, `MachNumberFromPressureRatio`,
+`IsentropicPressureRatio`, and `IsentropicDensityRatio` use static-to-stagnation
+ratios (`p/p₀` or `ρ/ρ₀`), which lie in `(0, 1]`. By contrast,
+`TFluidDynamicsKit.StagnationPressureRatio` returns `p₀/p`, which is at least 1.
+
 ### Psychrometrics
 
 ```pascal
 class function RelativeHumidity(ActualVaporPressure, SaturatedVaporPressure: Double): Double;
-class function SaturatedVaporPressure(TemperatureC: Double): Double;  // Antoine equation
-class function HumidityRatio(VaporPressure, AtmosphericPressure: Double): Double;
+class function SaturatedVaporPressure(TemperatureC: Double): Double;  // Pa; water, 1-100°C
+class function HumidityRatio(VaporPressure, AtmosphericPressure: Double): Double; // 0 <= Pv < P
 class function DewPointTemperature(TemperatureC, RelativeHumidityPercent: Double): Double;
 class function MoistAirEnthalpy(TemperatureC, HumidityRatioValue: Double): Double;
 ```
@@ -242,6 +260,9 @@ class function KelvinToCelsius(TempK: Double): Double;
 class function BarToPascal(Bar: Double): Double;
 class function PascalToBar(Pascal: Double): Double;
 ```
+
+`CelsiusToKelvin` rejects values below −273.15 °C, and `KelvinToCelsius`
+rejects negative Kelvin values.
 
 ---
 
@@ -273,25 +294,31 @@ class function ApplyWindow(const InputSignal, Window: TDoubleArray): TDoubleArra
 
 ### FFT / Spectral Analysis
 
-Cooley-Tukey radix-2 DIT FFT. Input length must be a power of 2.
+Cooley-Tukey radix-2 DIT FFT. The in-place `FFT` input length must be a power
+of 2, and its real and imaginary arrays must have equal lengths.
 
 ```pascal
 { In-place FFT/IFFT — modifies RealPart and ImagPart in place }
 class procedure FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean = False);
 
-{ Convenience wrapper: real input → complex spectrum.
-  Auto-pads with zeros to the next power of 2. }
+{ Convenience wrapper: real input → complete N-bin complex spectrum.
+  Zero-pads to the next power of 2; never truncates. }
 class procedure CalculateFFT(const InputSignal: TDoubleArray;
   out OutRealPart, OutImagPart: TDoubleArray);
 
-{ Inverse FFT: complex spectrum → real-valued signal }
+{ Inverse FFT: equal-length complete spectrum → real-valued signal }
 class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray;
   out OutputSignal: TDoubleArray);
 
-{ One-sided magnitude and phase spectra }
+{ Complete N-bin magnitude and phase spectra }
 class procedure CalculateFFTMagnitudePhase(const InputSignal: TDoubleArray;
   out Magnitude, Phase: TDoubleArray);
 ```
+
+`CalculateFFT(nil, ...)` returns two empty arrays. Passing two empty arrays to
+`CalculateIFFT` returns an empty array. Mismatched real/imaginary input lengths
+raise `ESignalError`. For a real input signal, callers wanting a one-sided view
+can consume bins `0..N div 2` from the complete returned spectrum.
 
 **Key properties verified by the test suite:**
 
@@ -303,7 +330,9 @@ class procedure CalculateFFTMagnitudePhase(const InputSignal: TDoubleArray;
 ### FIR Filter Design (windowed-sinc)
 
 All cutoff frequencies are **normalised**: 0 < fc < 0.5, where 0.5 = Nyquist frequency.
-All designs produce **symmetric (linear-phase)** coefficients. `Order` must be even (auto-incremented if odd).
+All designs produce **symmetric (linear-phase)** coefficients. `Order` must be
+at least 2. An odd order is incremented to the next even value, so the returned
+coefficient count is `adjusted order + 1`.
 
 ```pascal
 { Low-pass: passes frequencies below CutoffFreq }
@@ -357,7 +386,11 @@ class function RootMeanSquare(const InputSignal: TDoubleArray): Double;
 
 ### Supported Quantity Types
 
-`TUnitType`: Length, Mass, Time, Temperature, Force, Energy, Power, Pressure, Velocity, Area, Volume, Angle, Density, ElectricalCurrent, ElectricalPotential, Frequency.
+```pascal
+TUnitType = (utLength, utMass, utTime, utTemperature, utForce, utEnergy,
+  utPower, utPressure, utVelocity, utArea, utVolume, utAngle, utDensity,
+  utElectricalCurrent, utElectricalPotential, utFrequency);
+```
 
 ### Conversion Methods
 
@@ -380,15 +413,124 @@ class function RootMeanSquare(const InputSignal: TDoubleArray): Double;
 | `ConvertElectricalPotential(Value, FromUnit, ToUnit)` | `TElectricalPotentialUnit` |
 | `ConvertFrequency(Value, FromUnit, ToUnit)` | `TFrequencyUnit` |
 
-### Selected Unit Enumerations
+All enum-based conversions first convert through the category's base unit. A
+negative value is preserved mathematically; the converter does not impose a
+physical-domain policy. Temperature conversions are affine rather than simple
+scale-factor conversions.
 
-**Length** (`TLengthUnit`): `luMeter`, `luKilometer`, `luCentimeter`, `luMillimeter`, `luMicrometer`, `luNanometer`, `luMile`, `luYard`, `luFoot`, `luInch`, `luNauticalMile`, `luAngstrom`, `luLightYear`
+Time conversions use fixed-duration conventions: `tuMonth` is 2,628,000
+seconds (365/12 days) and `tuYear` is 31,536,000 seconds (365 days). They are
+duration conversions, not calendar arithmetic.
 
-**Temperature** (`TTemperatureUnit`): `tpKelvin`, `tpCelsius`, `tpFahrenheit`, `tpRankine`, `tpReaumur`
+### Unit Enumerations
 
-**Pressure** (`TPressureUnit`): `prPascal`, `prKilopascal`, `prBar`, `prAtmosphere`, `prTorr`, `prPSI`
+- `TLengthUnit`: `luMeter`, `luKilometer`, `luCentimeter`, `luMillimeter`, `luMicrometer`, `luNanometer`, `luMile`, `luYard`, `luFoot`, `luInch`, `luNauticalMile`, `luAngstrom`, `luLightYear`
+- `TMassUnit`: `muKilogram`, `muGram`, `muMilligram`, `muMicrogram`, `muTonne`, `muPound`, `muOunce`, `muStone`, `muUSton`, `muImperialTon`
+- `TTimeUnit`: `tuSecond`, `tuMinute`, `tuHour`, `tuDay`, `tuWeek`, `tuMonth`, `tuYear`, `tuMillisecond`, `tuMicrosecond`, `tuNanosecond`
+- `TTemperatureUnit`: `tpKelvin`, `tpCelsius`, `tpFahrenheit`, `tpRankine`, `tpReaumur`
+- `TForceUnit`: `fuNewton`, `fuKilonewton`, `fuPoundForce`, `fuDyne`, `fuKilogramForce`
+- `TEnergyUnit`: `euJoule`, `euKilojoule`, `euCalorie`, `euKilocalorie`, `euWattHour`, `euKilowattHour`, `euElectronvolt`, `euBTU`, `euTherm`, `euFootPound`
+- `TPowerUnit`: `puWatt`, `puKilowatt`, `puMegawatt`, `puHorsepower`, `puBTUPerHour`
+- `TPressureUnit`: `prPascal`, `prKilopascal`, `prBar`, `prAtmosphere`, `prTorr`, `prPSI`
+- `TVelocityUnit`: `vuMeterPerSecond`, `vuKilometerPerHour`, `vuMilePerHour`, `vuFootPerSecond`, `vuKnot`
+- `TAreaUnit`: `auSquareMeter`, `auSquareKilometer`, `auHectare`, `auAre`, `auSquareMile`, `auAcre`, `auSquareYard`, `auSquareFoot`, `auSquareInch`
+- `TVolumeUnit`: `voLiter`, `voCubicMeter`, `voMilliliter`, `voCubicCentimeter`, `voGallonUS`, `voGallonUK`, `voFluidOunceUS`, `voFluidOunceUK`, `voCubicFoot`, `voCubicInch`
+- `TAngleUnit`: `anDegree`, `anRadian`, `anGradian`, `anMinuteOfArc`, `anSecondOfArc`, `anRevolution`
+- `TDensityUnit`: `deKilogramPerCubicMeter`, `deGramPerCubicCentimeter`, `dePoundPerCubicFoot`, `dePoundPerCubicInch`
+- `TElectricalCurrentUnit`: `ecAmpere`, `ecMilliampere`, `ecMicroampere`
+- `TElectricalPotentialUnit`: `epVolt`, `epKilovolt`, `epMillivolt`, `epMicrovolt`
+- `TFrequencyUnit`: `frHertz`, `frKilohertz`, `frMegahertz`, `frGigahertz`, `frCyclePerSecond`
 
-**Angle** (`TAngleUnit`): `anDegree`, `anRadian`, `anGradian`, `anMinuteOfArc`, `anSecondOfArc`, `anRevolution`
+### Unit Names and Formatting
+
+Each category has a matching name function:
+
+```pascal
+GetLengthUnitName       GetMassUnitName          GetTimeUnitName
+GetTemperatureUnitName  GetForceUnitName         GetEnergyUnitName
+GetPowerUnitName        GetPressureUnitName      GetVelocityUnitName
+GetAreaUnitName         GetVolumeUnitName        GetAngleUnitName
+GetDensityUnitName      GetElectricalCurrentUnitName
+GetElectricalPotentialUnitName                   GetFrequencyUnitName
+```
+
+They return canonical symbols such as `m`, `kg`, `°C`, `m/s`, `m²`, `L`, and
+`Hz`. Formatting helpers are:
+
+```pascal
+class function FormatWithUnit(Value: Double; AUnitName: string;
+  Decimals: Integer = 2): string;
+class function FormatWithScientificNotation(Value: Double; AUnitName: string;
+  SignificantDigits: Integer = 3): string;
+class function RoundToSignificantDigits(Value: Double;
+  SignificantDigits: Integer): Double;
+```
+
+`Decimals` must be non-negative and `SignificantDigits` must be between 1 and
+15; otherwise `EUnitConversionError` is raised. Values must be finite.
+Significant-digit ties use round-half-to-even consistently on 32- and 64-bit
+targets. Formatting uses the process's current Free Pascal locale settings,
+including its decimal separator.
+
+### String-Based Conversion and Parsing
+
+```pascal
+class function TryConvertByUnitName(Value: Double;
+  FromAUnitName, ToAUnitName: string; out ConvertedValue: Double): Boolean;
+class function GetUnitTypeFromUnitName(AUnitName: string): TUnitType;
+class function TryParseValueWithUnit(const ValueStr: string;
+  out Value: Double; out AUnitName: string): Boolean;
+class function TryParseAndConvert(const ValueStr, ToAUnitName: string;
+  out ConvertedValue: Double): Boolean;
+```
+
+Unit-name matching is exact and case-sensitive: use the canonical strings
+returned by the `Get*UnitName` functions. The `Try...` APIs return `False` for
+unknown, malformed, or incompatible input. `GetUnitTypeFromUnitName` raises
+`EUnitConversionError` for an unknown name. Numeric parsing follows the
+process's current locale.
+
+The 16 category-specific parsers are:
+
+```pascal
+TryGetLengthUnitFromName       TryGetMassUnitFromName
+TryGetTimeUnitFromName         TryGetTemperatureUnitFromName
+TryGetForceUnitFromName        TryGetEnergyUnitFromName
+TryGetPowerUnitFromName        TryGetPressureUnitFromName
+TryGetVelocityUnitFromName     TryGetAreaUnitFromName
+TryGetVolumeUnitFromName       TryGetAngleUnitFromName
+TryGetDensityUnitFromName      TryGetElectricalCurrentUnitFromName
+TryGetElectricalPotentialUnitFromName
+TryGetFrequencyUnitFromName
+```
+
+Each returns `True` and writes the corresponding enum value when the symbol is
+known; otherwise it returns `False`.
+
+### Compatibility, Enumeration, and Base Units
+
+```pascal
+class function AreUnitsCompatible(UnitType1, UnitType2: TUnitType): Boolean;
+class function AreUnitNamesCompatible(AUnitName1, AUnitName2: string): Boolean;
+class function GetAllUnitsOfType(UnitType: TUnitType): TStringArray;
+class function GetAllUnitTypes: TStringArray;
+class function GetBaseUnit(UnitType: TUnitType): string;
+```
+
+`GetAllUnitsOfType` returns canonical symbols. `GetAllUnitTypes` returns the
+display names `Length`, `Mass`, and so on. Base units are `m`, `kg`, `s`, `K`,
+`N`, `J`, `W`, `Pa`, `m/s`, `m²`, `m³`, `rad`, `kg/m³`, `A`, `V`, and `Hz`.
+
+### Common Shortcuts
+
+```pascal
+class function MilesToKilometers(Miles: Double): Double;
+class function KilometersToMiles(Kilometers: Double): Double;
+class function PoundsToKilograms(Pounds: Double): Double;
+class function KilogramsToPounds(Kilograms: Double): Double;
+class function CelsiusToFahrenheit(Celsius: Double): Double;
+class function FahrenheitToCelsius(Fahrenheit: Double): Double;
+```
 
 ---
 
@@ -418,10 +560,16 @@ end.
 
 ```pascal
 // EngineeringLib.Velocity:
+EVelocityError = EFluidDynamicsError;
 TVelocityKit = TFluidDynamicsKit;
 
 // EngineeringLib.Pressure:
+EPressureError = EFluidDynamicsError;
 TPressureKit = TFluidDynamicsKit;
 ```
 
-Add these focused units to your `uses` clause when your code is specifically about velocity or pressure calculations.
+Add these focused units to your `uses` clause when your code is specifically
+about velocity or pressure calculations. They intentionally contain aliases,
+not duplicate implementations. `TVelocityKit` and `TPressureKit` expose the
+relevant `TFluidDynamicsKit` calculations; physical unit conversions remain in
+`TUnitConversionKit.ConvertVelocity` and `ConvertPressure`.

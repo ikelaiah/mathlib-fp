@@ -22,9 +22,11 @@ unit EngineeringLib.Velocity;
 interface
 
 uses
-  EngineeringLib.FluidDynamics;
+  EngineeringLib.Common, EngineeringLib.FluidDynamics;
 
 type
+  { Focused exception name for callers that import only this unit. }
+  EVelocityError = EngineeringLib.Common.EFluidDynamicsError;
   TVelocityKit = TFluidDynamicsKit;
 
 implementation

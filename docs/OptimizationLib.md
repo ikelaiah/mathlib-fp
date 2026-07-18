@@ -45,11 +45,15 @@ TOptResult = record
   Converged: Boolean;       { True if convergence criterion was met }
 end;
 
+TLPStatus = (lpsOptimal, lpsUnbounded, lpsIterationLimit,
+  lpsUnsupportedStart);
+
 TLPResult = record
   X:        TDoubleArray;
   ObjVal:   Double;
   Feasible: Boolean;
   Iters:    Integer;
+  Status:   TLPStatus;
 end;
 ```
 
@@ -66,7 +70,7 @@ end;
 | ML / deep learning style | `Adam` | Adaptive rates, handles noise |
 | Non-convex, many local minima | `SimulatedAnnealing` | Global search |
 | Constrained problems | `PenaltyMethod` + `NelderMead` | Easy to set up |
-| Linear programming | `SimplexLP` | Exact, polynomial-time |
+| Small standard-form linear programs | `SimplexLP` | Tableau simplex with an immediately feasible slack basis |
 
 ---
 
@@ -160,8 +164,8 @@ Probabilistic global search. Accepts worse solutions with probability `exp(-ΔE/
 - `Seed` — RNG seed for reproducibility (default 42)
 
 **Tuning tips:**
-- If the solver misses the global minimum: increase `T0` or decrease `CoolRate`
-- If convergence is slow: increase `CoolRate` closer to 1
+- If the solver misses the global minimum: increase `T0` or increase `CoolRate` closer to 1
+- If cooling is too slow: decrease `CoolRate`
 - For higher-dimensional problems: increase `MaxIter`
 
 ---
@@ -212,21 +216,34 @@ if lp.Feasible then
   WriteLn('Optimal: ', lp.ObjVal);
 ```
 
-**Standard form requirements:**
-- All right-hand sides `b[i] >= 0` (multiply any negative constraint by -1)
-- Variables implicitly >= 0
+`Feasible` is retained as a compatibility flag and is `True` only when
+`Status = lpsOptimal`. Inspect `Status` to distinguish an unbounded model, an
+iteration limit, and an unsupported negative-right-hand-side starting basis.
 
-**Example — classic diet problem:**
+**Standard form requirements:**
+
+- All right-hand sides `b[i] >= 0`, so the added slack variables form the
+  initial feasible basis
+- Variables implicitly >= 0
+- Only `<=` constraints are supported; there is no Phase I procedure for
+  `>=`, equality, or a non-obvious initial feasible basis
+
+**Example — capacity-constrained production:**
+
 ```pascal
-// minimise   cost = 3*food1 + 2*food2
-// subject to food1 + 2*food2 >= 4   → -food1 - 2*food2 <= -4
-//            food1 >= 0, food2 >= 0
+// maximise x1+x2 by minimising -x1-x2
+// subject to x1+x2 <= 4, x1 <= 3, x2 <= 3, and x >= 0
 
 lp := TOptimizationKit.SimplexLP(
-  TDoubleArray.Create(3, 2),
-  [TDoubleArray.Create(-1, -2)],
-  TDoubleArray.Create(-4));
+  TDoubleArray.Create(-1, -1),
+  [TDoubleArray.Create(1, 1),
+   TDoubleArray.Create(1, 0),
+   TDoubleArray.Create(0, 1)],
+  TDoubleArray.Create(4, 3, 3));
 ```
+
+`Feasible = False` is also used for an unbounded tableau, so the result does
+not distinguish infeasibility from unboundedness.
 
 ---
 
@@ -269,9 +286,18 @@ Numerical gradients are slightly slower (~2N function evaluations per gradient) 
 ## Error Handling
 
 `EOptimizationError` is raised for:
+
 - `GoldenSection` / `BrentMinimize`: B <= A
 - Any multi-variable solver: empty `X0`
 - `SimplexLP`: no constraints or no variables provided
+- nil callbacks, non-finite inputs or callback results, and gradient dimension mismatches
+- non-positive tolerances or iteration counts and invalid solver hyperparameters
+- ragged or mismatched linear-program dimensions
+- scalar solvers exhausting their iteration limit
+
+`PenaltyMethod` and `Maximize` use unit-level callback state to bridge Free
+Pascal procedure-variable restrictions. Calls through these adapters are
+serialized so overlapping threads cannot corrupt the shared callback state.
 
 ---
 

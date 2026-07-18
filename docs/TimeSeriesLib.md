@@ -135,6 +135,9 @@ fcast := TTimeSeriesKit.HoltWintersForecast(Y, Alpha, Beta, Gamma, Period, H);
 ```
 
 Projects H steps ahead using the Holt-Winters state at the end of Y. Returns array of length H.
+Pass `Period >= 2`, at least two full seasons, `H >= 1`, and smoothing
+parameters in `(0,1]`. `TripleExponentialSmoothing` validates these controls;
+`HoltWintersForecast` does not currently validate all of them.
 
 ---
 
@@ -153,6 +156,9 @@ Classical decomposition:
 3. Residual = Y − Trend − Seasonal (additive) or Y / (Trend × Seasonal) (multiplicative)
 
 Edge values in Trend are NaN (cannot centre the window at the boundaries).
+Residual calculation substitutes the observed value for an undefined edge
+trend. Pass `Period >= 2` and at least two complete periods; period validity is
+otherwise a caller requirement.
 
 ---
 
@@ -173,7 +179,9 @@ Output length = N − d. Used to convert a non-stationary series to stationary b
 orig := TTimeSeriesKit.Undifference(DiffY, InitVals, D);
 ```
 
-Inverts differencing. `InitVals` must contain the first `D` values of the original series (needed to reconstruct the integration constants).
+Inverts differencing. `InitVals` must contain at least the first `D` values of
+the original series (needed to reconstruct the integration constants). Extra
+values are ignored.
 
 ### AugmentedDickeyFuller
 
@@ -279,6 +287,10 @@ fcast := TTimeSeriesKit.ARIMAForecast(model, OriginalY, H);
 ```
 
 Forecasts H steps ahead and undifferences the result back to original scale.
+Historical AR residuals are reconstructed to seed the MA terms; unknown future
+innovations are set to zero, as in the standard conditional-mean forecast.
+Integrated models retain the last required difference states and return exactly
+`H` forecasts on the original scale for any supported `D`.
 
 ---
 
@@ -352,34 +364,44 @@ period := TTimeSeriesKit.PeriodogramPeak(Y);
 period := TTimeSeriesKit.PeriodogramPeak(Y, MinPeriod, MaxPeriod);
 ```
 
-FFT-based dominant period detection. Returns the period (in samples) of the largest spectral peak, excluding the DC component.
+FFT-based dominant period detection. Returns the period (in samples) of the
+largest spectral peak, excluding the DC component. Non-power-of-two inputs are
+zero-padded to `NPow`, and period conversion uses that FFT length, so the same
+frequency-bin mapping applies to every input length.
 
 ### Periodogram
 
 ```pascal
 psd := TTimeSeriesKit.Periodogram(Y);
-// psd[k] = power at frequency k/N, for k = 0..N/2
+// psd[k] = power at frequency k/NPow, where NPow is the next power of two
 ```
 
-Full power spectral density (one-sided).
+One-sided power spectrum. The input is zero-padded to `NPow`, the next power of
+two. Returned bin `k` therefore corresponds to `k / NPow`, not `k / N`; the
+result contains `NPow div 2 + 1` bins, including DC and Nyquist.
 
 ---
 
 ## Error Handling
 
-`ETimeSeriesError` is raised for:
-- Empty input array
-- Window or order parameter ≤ 0 (where not meaningful)
-- AR/PACF order ≥ N
-- ACF MaxLag ≥ N
-- Difference D < 0
-- Undifference InitVals length ≠ D
+`ETimeSeriesError` is raised by the relevant methods for:
+
+- empty input in SMA, WMA, and exponential smoothing
+- insufficient observations for Holt smoothing, decomposition, ADF, ACF, AR,
+  CUSUM, or linear trend
+- invalid smoothing parameters in exponential, double, and triple smoothing
+- invalid positive window/order/horizon controls where explicitly checked
+- `ACF` with `MaxLag >= N`
+- `Difference` with `D < 0` or an order too large for the series
+- `Undifference` with fewer than `D` initial values
+- non-finite observations or coefficients in model fitting and forecasting
+- incompatible AR/MA/ARIMA orders, history lengths, or non-positive horizons
+- invalid period bounds or series too short to contain a searchable FFT bin
 
 ---
 
 ## Dependencies
 
 - `MathBase.SharedTypes` — `TDoubleArray`, `TIntegerArray`
-- `MathBase.Precision` — `GammaLn`, `Erf` (used internally)
 
 No other external libraries required.

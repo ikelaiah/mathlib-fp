@@ -88,6 +88,9 @@ type
     procedure Test37_CubicSpline_QuadraticData_Accurate;
     procedure Test38_CubicSpline_Clamp;
     procedure Test39_CubicSpline_TooFewKnots_Raises;
+    procedure Test40_BisectionEndpointRootRegression;
+    procedure Test41_RootConvergenceIsReported;
+    procedure Test42_InterpolationRejectsUnorderedKnots;
   end;
 
 implementation
@@ -115,6 +118,9 @@ begin Result := 3*X*X - 1; end;
 { f(x) = cos(x) - x  →  Dottie number ≈ 0.7390851 }
 function FX_CosX_MinusX(X: Double): Double;
 begin Result := Cos(X) - X; end;
+
+function FX_Identity(X: Double): Double;
+begin Result := X; end;
 
 function DFX_CosX_MinusX(X: Double): Double;
 begin Result := -Sin(X) - 1; end;
@@ -545,6 +551,46 @@ procedure TTestNumericsLib.Test39_CubicSpline_TooFewKnots_Raises;
 begin
   AssertException('Spline 1 knot must raise',
     EInvalidArgument, @DoSplineTooFewKnots);
+end;
+
+procedure TTestNumericsLib.Test40_BisectionEndpointRootRegression;
+var
+  Outcome: TRootResult;
+begin
+  Outcome := TNumericsKit.BisectionResult(@FX_Identity, 0.0, 1.0, 1E-12, 50);
+  AssertTrue('endpoint result converged', Outcome.Converged);
+  AssertEquals('left endpoint root', 0.0, Outcome.Root, 0.0);
+  AssertEquals('endpoint takes no iterations', 0, Outcome.Iterations);
+end;
+
+procedure TTestNumericsLib.Test41_RootConvergenceIsReported;
+var
+  Outcome: TRootResult;
+begin
+  Outcome := TNumericsKit.BisectionResult(@FX_XSq_Minus2, 0.0, 2.0,
+    1E-15, 1);
+  AssertFalse('one step cannot meet tight tolerance', Outcome.Converged);
+  AssertEquals('iteration count is reported', 1, Outcome.Iterations);
+  try
+    TNumericsKit.Bisection(@FX_XSq_Minus2, 0.0, 2.0, 1E-15, 1);
+    Fail('scalar compatibility API must raise on non-convergence');
+  except
+    on E: ENumericsConvergenceError do { expected };
+  end;
+end;
+
+procedure TTestNumericsLib.Test42_InterpolationRejectsUnorderedKnots;
+var
+  X, Y: TDoubleArray;
+begin
+  X := TDoubleArray.Create(0.0, 2.0, 1.0);
+  Y := TDoubleArray.Create(0.0, 4.0, 1.0);
+  try
+    TNumericsKit.LinearInterp(X, Y, 0.5);
+    Fail('unordered knots must be rejected');
+  except
+    on E: EInvalidArgument do { expected };
+  end;
 end;
 
 initialization

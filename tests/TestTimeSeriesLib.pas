@@ -108,6 +108,10 @@ type
     procedure TestDifference_NegativeD_RaisesError;
     procedure TestACF_MaxLagTooLargeRaisesError;
     procedure TestARFit_OrderTooLargeRaisesError;
+    procedure TestPeriodogramNonPowerOfTwoRegression;
+    procedure TestARIMAIntegratedForecastAlignment;
+    procedure TestARIMAForecastUsesMAInnovations;
+    procedure TestARIMASecondDifferenceIntegration;
   end;
 
 implementation
@@ -863,6 +867,64 @@ procedure TTestTimeSeriesLib.TestARFit_OrderTooLargeRaisesError;
 begin
   GErrY := TDoubleArray.Create(1, 2, 3);
   AssertTSError('ARFit P >= N', @ErrARFitOrderTooLarge);
+end;
+
+procedure TTestTimeSeriesLib.TestPeriodogramNonPowerOfTwoRegression;
+var
+  Y, Spectrum: TDoubleArray;
+  I: Integer;
+begin
+  SetLength(Y, 100);
+  for I := 0 to High(Y) do Y[I] := Sin(2.0 * Pi * I / 10.0);
+  Spectrum := TTimeSeriesKit.Periodogram(Y);
+  AssertEquals('128-point padded one-sided spectrum', 65, Length(Spectrum));
+  AssertEquals('period ten survives zero-padding conversion', 10,
+    TTimeSeriesKit.PeriodogramPeak(Y, 2, 50));
+end;
+
+procedure TTestTimeSeriesLib.TestARIMAIntegratedForecastAlignment;
+var
+  Y, Forecast: TDoubleArray;
+  Model: TARIMAModel;
+begin
+  Y := TDoubleArray.Create(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  Model := Default(TARIMAModel);
+  Model.D := 1;
+  Model.Mu := 1.0;
+  Forecast := TTimeSeriesKit.ARIMAForecast(Model, Y, 3);
+  AssertNear('first integrated forecast', 11.0, Forecast[0], 1E-12);
+  AssertNear('second integrated forecast', 12.0, Forecast[1], 1E-12);
+  AssertNear('third integrated forecast', 13.0, Forecast[2], 1E-12);
+end;
+
+procedure TTestTimeSeriesLib.TestARIMAForecastUsesMAInnovations;
+var
+  Y, Forecast: TDoubleArray;
+  Model: TARIMAModel;
+begin
+  Y := TDoubleArray.Create(1.0, 0.0);
+  Model := Default(TARIMAModel);
+  Model.Q := 1;
+  Model.MACoeffs := TDoubleArray.Create(0.5);
+  Forecast := TTimeSeriesKit.ARIMAForecast(Model, Y, 2);
+  AssertNear('known last innovation affects first forecast', -0.25,
+    Forecast[0], 1E-12);
+  AssertNear('future innovations have zero expectation', 0.0,
+    Forecast[1], 1E-12);
+end;
+
+procedure TTestTimeSeriesLib.TestARIMASecondDifferenceIntegration;
+var
+  Y, Forecast: TDoubleArray;
+  Model: TARIMAModel;
+begin
+  Y := TDoubleArray.Create(1, 4, 9, 16, 25);
+  Model := Default(TARIMAModel);
+  Model.D := 2;
+  Model.Mu := 2.0;
+  Forecast := TTimeSeriesKit.ARIMAForecast(Model, Y, 2);
+  AssertNear('quadratic next value', 36.0, Forecast[0], 1E-12);
+  AssertNear('quadratic second value', 49.0, Forecast[1], 1E-12);
 end;
 
 initialization

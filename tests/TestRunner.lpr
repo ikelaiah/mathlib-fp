@@ -9,6 +9,7 @@ uses
   , TestMathBase
   , TestAlgebraLib
   , TestFinanceLib
+  , TestFinanceAliases
   , TestStatsLib
   , TestEngineeringLib
   , TestEngineeringLib_FluidDynamics

@@ -4,34 +4,213 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  linux:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install Free Pascal
         run: |
           sudo apt-get update
           sudo apt-get install -y fp-compiler fp-units-fcl
 
+      - name: Verify Free Pascal version
+        run: test "$(fpc -iV)" = "3.2.2"
+
       - name: Build and run tests
         run: |
           cd tests
           mkdir -p lib/ci
-          fpc -Fu../src -FUlib/ci TestRunner.lpr
+          fpc -B -FcUTF8 -Fu../src -FUlib/ci TestRunner.lpr
           if ! ./TestRunner -a --format=plain > test-output.txt; then
             cat test-output.txt
             exit 1
           fi
           tail -n 20 test-output.txt
 
-      - name: Build examples
+      - name: Build and run examples
         run: |
           cd examples
           mkdir -p lib/ci
           for file in *.lpr; do
-            fpc -Fu../src -FUlib/ci "$file"
+            fpc -B -FcUTF8 -Fu../src -FUlib/ci "$file"
+            "./${file%.lpr}" > /dev/null
           done
+
+      - name: Compile representative benchmarks
+        run: |
+          mkdir -p benchmarks/lib/ci
+          fpc -B -O3 -FcUTF8 -Fusrc -FUbenchmarks/lib/ci \
+            -FEbenchmarks/lib/ci benchmarks/BenchmarkRunner.lpr
+
+      - name: Test README quick start from a source archive
+        run: |
+          archive_dir=$(mktemp -d)
+          git archive HEAD | tar -x -C "$archive_dir"
+          cd "$archive_dir"
+          cat > my_program.lpr <<'EOF'
+          program hello_mathlib;
+          {$mode objfpc}{$H+}
+          uses ProbabilityLib.Distributions;
+          begin
+            Writeln('P(Z <= 1.96) = ', TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
+          end.
+          EOF
+          mkdir -p lib
+          fpc -Fusrc -FUlib my_program.lpr
+          ./my_program
+
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install Lazarus 4.8 and Free Pascal 3.2.2
+        shell: pwsh
+        run: |
+          $installers = @(
+            @{
+              Name = 'lazarus-4.8-fpc-3.2.2-win64.exe'
+              Url = 'https://download.lazarus-ide.org/' + `
+                'Lazarus%20Windows%2064%20bits/Lazarus%204.8/' + `
+                'lazarus-4.8-fpc-3.2.2-win64.exe'
+              Hash = `
+                'ED25EE171D55E23CF14E0633159FDD2325EFBA56E186F8AB817AD3BF97D267D7'
+              Root = Join-Path $env:RUNNER_TEMP 'lazarus-win64'
+              Cpu = 'x86_64-win64'
+            }
+            @{
+              Name = 'lazarus-4.8-fpc-3.2.2-win32.exe'
+              Url = 'https://download.lazarus-ide.org/' + `
+                'Lazarus%20Windows%2032%20bits/Lazarus%204.8/' + `
+                'lazarus-4.8-fpc-3.2.2-win32.exe'
+              Hash = `
+                '81DA36A9AEAFEE55EAE29AAA636CCDB009F2BCEEE3215A87EC99F6F3F81B709E'
+              Root = Join-Path $env:RUNNER_TEMP 'lazarus-win32'
+              Cpu = 'i386-win32'
+            }
+          )
+
+          foreach ($item in $installers) {
+            $installer = Join-Path $env:RUNNER_TEMP $item.Name
+            Invoke-WebRequest -Uri $item.Url -OutFile $installer
+            $actualHash = (Get-FileHash -Algorithm SHA256 $installer).Hash
+            if ($actualHash -ne $item.Hash) {
+              throw "$($item.Name) checksum mismatch: $actualHash"
+            }
+
+            $install = Start-Process -FilePath $installer -ArgumentList @(
+              '/VERYSILENT'
+              '/SUPPRESSMSGBOXES'
+              '/NORESTART'
+              '/SP-'
+              "/DIR=$($item.Root)"
+            ) -Wait -PassThru
+            if ($install.ExitCode -ne 0) {
+              throw "$($item.Name) installer exited with $($install.ExitCode)"
+            }
+
+            $fpc = Join-Path $item.Root `
+              "fpc/3.2.2/bin/$($item.Cpu)/fpc.exe"
+            $lazbuild = Join-Path $item.Root 'lazbuild.exe'
+            if (-not (Test-Path $fpc) -or -not (Test-Path $lazbuild)) {
+              throw "Lazarus was not installed under $($item.Root)"
+            }
+            $version = (& $fpc '-iV').Trim()
+            if ($version -ne '3.2.2') {
+              throw "Expected $($item.Cpu) FPC 3.2.2, found $version"
+            }
+          }
+
+          $fpc64 = Join-Path $installers[0].Root `
+            'fpc/3.2.2/bin/x86_64-win64/fpc.exe'
+          $fpc386 = Join-Path $installers[1].Root `
+            'fpc/3.2.2/bin/i386-win32/fpc.exe'
+          $lazbuild64 = Join-Path $installers[0].Root 'lazbuild.exe'
+          $lazbuild386 = Join-Path $installers[1].Root 'lazbuild.exe'
+          @(
+            "FPC_WIN64=$fpc64"
+            "FPC_WIN32=$fpc386"
+            "LAZBUILD_WIN64=$lazbuild64"
+            "LAZBUILD_WIN32=$lazbuild386"
+          ) | Out-File `
+            -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Verify Free Pascal version
+        shell: pwsh
+        run: |
+          $version = (& $env:FPC_WIN64 '-iV').Trim()
+          Write-Host "Free Pascal version: $version"
+          if ($version -ne '3.2.2') {
+            throw "Expected FPC 3.2.2, found $version"
+          }
+
+      - name: Build and run tests
+        shell: pwsh
+        run: |
+          Set-Location tests
+          New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
+          & $env:FPC_WIN64 '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
+            'TestRunner.lpr'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ./TestRunner.exe '-a' '--format=plain'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build and run examples
+        shell: pwsh
+        run: |
+          Set-Location examples
+          New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
+          Get-ChildItem *.lpr | ForEach-Object {
+            & $env:FPC_WIN64 '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
+              $_.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $executable = Join-Path $_.DirectoryName ($_.BaseName + '.exe')
+            & $executable | Out-Null
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Compile representative benchmarks
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path benchmarks/lib/ci | Out-Null
+          & $env:FPC_WIN64 '-B' '-O3' '-FcUTF8' '-Fusrc' `
+            '-FUbenchmarks/lib/ci' `
+            '-FEbenchmarks/lib/ci' 'benchmarks/BenchmarkRunner.lpr'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build Lazarus package (Win64 and Win32)
+        shell: pwsh
+        run: |
+          $config64 = Join-Path $env:RUNNER_TEMP 'lazarus-config-win64'
+          New-Item -ItemType Directory -Force -Path $config64 | Out-Null
+          & $env:LAZBUILD_WIN64 "--pcp=$config64" '--build-all' `
+            'packages/lazarus/mathlib_fp.lpk'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $config386 = Join-Path $env:RUNNER_TEMP 'lazarus-config-win32'
+          New-Item -ItemType Directory -Force -Path $config386 | Out-Null
+          & $env:LAZBUILD_WIN32 "--pcp=$config386" '--build-all' `
+            'packages/lazarus/mathlib_fp.lpk'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          New-Item -ItemType Directory -Force `
+            -Path tests/lib/ci-i386 | Out-Null
+          & $env:FPC_WIN32 '-B' '-O2' '-FcUTF8' '-Fusrc' `
+            '-FUtests/lib/ci-i386' '-FEtests/lib/ci-i386' `
+            'tests/TestRunner.lpr'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ./tests/lib/ci-i386/TestRunner.exe '-a' '--format=plain'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

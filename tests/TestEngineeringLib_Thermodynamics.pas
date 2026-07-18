@@ -32,6 +32,13 @@ type
     procedure ZeroRHDewPointTest;
     procedure HighRHDewPointTest;
     procedure NegativeHumidityRatioTest;
+    procedure EqualHumidityPressuresTest;
+    procedure VaporPressureAboveAtmosphericTest;
+    procedure LowGammaAdiabaticPressureTest;
+    procedure LowGammaAdiabaticVolumeTest;
+    procedure LowGammaAdiabaticTemperatureTest;
+    procedure LowGammaAdiabaticTemperatureFromPressureTest;
+    procedure BelowAbsoluteZeroCelsiusTest;
   published
     // Original tests with renamed numbering scheme
     procedure Test01_HeatConductionRate;
@@ -89,6 +96,9 @@ type
     
     // Tests for edge cases in new functions
     procedure Test41_NewFunctionsEdgeCases;
+    procedure Test42_AdiabaticGammaValidation;
+    procedure Test43_HumidityRatioPressureBounds;
+    procedure Test44_CelsiusAbsoluteZeroValidation;
   end;
 
 implementation
@@ -180,6 +190,42 @@ end;
 procedure TTestThermodynamicsKit.NegativeHumidityRatioTest;
 begin
   TThermodynamicsKit.MoistAirEnthalpy(25.0, -0.01);
+end;
+
+procedure TTestThermodynamicsKit.EqualHumidityPressuresTest;
+begin
+  TThermodynamicsKit.HumidityRatio(101325.0, 101325.0);
+end;
+
+procedure TTestThermodynamicsKit.VaporPressureAboveAtmosphericTest;
+begin
+  TThermodynamicsKit.HumidityRatio(102000.0, 101325.0);
+end;
+
+procedure TTestThermodynamicsKit.LowGammaAdiabaticPressureTest;
+begin
+  TThermodynamicsKit.AdiabaticPressure(101325.0, 1.0, 0.5, 1.0);
+end;
+
+procedure TTestThermodynamicsKit.LowGammaAdiabaticVolumeTest;
+begin
+  TThermodynamicsKit.AdiabaticVolume(101325.0, 1.0, 202650.0, 1.0);
+end;
+
+procedure TTestThermodynamicsKit.LowGammaAdiabaticTemperatureTest;
+begin
+  TThermodynamicsKit.AdiabaticTemperature(300.0, 1.0, 0.5, 1.0);
+end;
+
+procedure TTestThermodynamicsKit.LowGammaAdiabaticTemperatureFromPressureTest;
+begin
+  TThermodynamicsKit.AdiabaticTemperatureFromPressure(
+    300.0, 101325.0, 202650.0, 1.0);
+end;
+
+procedure TTestThermodynamicsKit.BelowAbsoluteZeroCelsiusTest;
+begin
+  TThermodynamicsKit.CelsiusToKelvin(-273.16);
 end;
 
 // Original test procedures
@@ -632,6 +678,34 @@ begin
   
   // Unit conversion edge cases
   AssertException('Kelvin negative temperature', EThermodynamicsError, @NegativeTempKelvinTest);
+end;
+
+procedure TTestThermodynamicsKit.Test42_AdiabaticGammaValidation;
+begin
+  AssertException('Adiabatic pressure rejects gamma <= 1',
+    EThermodynamicsError, @LowGammaAdiabaticPressureTest);
+  AssertException('Adiabatic volume rejects gamma <= 1',
+    EThermodynamicsError, @LowGammaAdiabaticVolumeTest);
+  AssertException('Adiabatic temperature rejects gamma <= 1',
+    EThermodynamicsError, @LowGammaAdiabaticTemperatureTest);
+  AssertException('Adiabatic temperature-pressure rejects gamma <= 1',
+    EThermodynamicsError, @LowGammaAdiabaticTemperatureFromPressureTest);
+end;
+
+procedure TTestThermodynamicsKit.Test43_HumidityRatioPressureBounds;
+begin
+  AssertException('Humidity ratio rejects equal pressures',
+    EThermodynamicsError, @EqualHumidityPressuresTest);
+  AssertException('Humidity ratio rejects vapor pressure above atmosphere',
+    EThermodynamicsError, @VaporPressureAboveAtmosphericTest);
+end;
+
+procedure TTestThermodynamicsKit.Test44_CelsiusAbsoluteZeroValidation;
+begin
+  AssertEquals('Absolute zero Celsius converts to zero Kelvin', 0.0,
+    TThermodynamicsKit.CelsiusToKelvin(-273.15), Tolerance);
+  AssertException('Celsius below absolute zero is rejected',
+    EThermodynamicsError, @BelowAbsoluteZeroCelsiusTest);
 end;
 
 initialization

@@ -171,6 +171,10 @@ type
     procedure Test69_PowerSet_N3;
     procedure Test70_PowerSet_EmptySet;
     procedure Test71_PowerSet_TooLarge_Raises;
+    procedure Test72_DerangementOverflowRegression;
+    procedure Test73_Fibonacci92NoIntermediateOverflow;
+    procedure Test74_ModPowLargeModulusReference;
+    procedure Test75_ModPowNegativeExponentRaises;
 
   end;
 
@@ -803,6 +807,42 @@ end;
 procedure TTestCombinatoricsLib.Test71_PowerSet_TooLarge_Raises;
 begin
   AssertException('PowerSet(25)', ECombinatoricsError, @DoPowerSet_TooLarge);
+end;
+
+procedure TTestCombinatoricsLib.Test72_DerangementOverflowRegression;
+begin
+  AssertEquals('D20 exact', Int64(895014631192902121),
+    TCombinatoricsKit.DerangementCount(20));
+  try
+    TCombinatoricsKit.DerangementCount(21);
+    Fail('D21 must raise instead of wrapping Int64');
+  except
+    on E: ECombinatoricsError do { expected };
+  end;
+end;
+
+procedure TTestCombinatoricsLib.Test73_Fibonacci92NoIntermediateOverflow;
+begin
+  AssertEquals('F92 exact', Int64(7540113804746346429),
+    TCombinatoricsKit.Fibonacci(92));
+end;
+
+procedure TTestCombinatoricsLib.Test74_ModPowLargeModulusReference;
+begin
+  AssertEquals('large modular exponentiation reference',
+    Int64(7275136038911759928),
+    TCombinatoricsKit.ModPow(9223372036854775000, 1234567,
+      9223372036854775783));
+end;
+
+procedure TTestCombinatoricsLib.Test75_ModPowNegativeExponentRaises;
+begin
+  try
+    TCombinatoricsKit.ModPow(2, -1, 5);
+    Fail('negative modular exponent must raise');
+  except
+    on E: ECombinatoricsError do { expected };
+  end;
 end;
 
 initialization

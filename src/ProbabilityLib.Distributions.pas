@@ -52,7 +52,8 @@ unit ProbabilityLib.Distributions;
  - All methods are class static: call TProbabilityKit.XXX directly.
  - Parameters follow the convention (x, distribution params...).
  - Optional ADecimals rounds the result (default = -1 means no rounding).
- - Raises EProbabilityError for invalid parameters (e.g. negative variance).
+ - Every public entry point validates finite real parameters and the documented
+   distribution domain, raising EProbabilityError on invalid input.
  - Depends only on MathBase.Precision and MathBase.SharedTypes.
 -----------------------------------------------------------------------------}
 
@@ -84,6 +85,13 @@ type
 
     { Internal: ln of binomial coefficient C(n,k) }
     class function LogBinomCoeff(N, K: Integer): Double; static;
+
+    class procedure RequireFinite(const V: Double; const Name: string); static;
+    class procedure RequirePositive(const V: Double; const Name: string); static;
+    class procedure RequireProbability(const P: Double; AllowZero: Boolean;
+      const Name: string); static;
+    class procedure ValidateHypergeometric(PopSize, SuccPop,
+      SampleN: Integer; const Name: string); static;
 
   public
 
@@ -568,6 +576,45 @@ begin
   Result := LogFactorial(N) - LogFactorial(K) - LogFactorial(N - K);
 end;
 
+class procedure TProbabilityKit.RequireFinite(const V: Double;
+  const Name: string);
+begin
+  if IsNan(V) or IsInfinite(V) then
+    raise EProbabilityError.Create(Name + ' must be finite');
+end;
+
+class procedure TProbabilityKit.RequirePositive(const V: Double;
+  const Name: string);
+begin
+  RequireFinite(V, Name);
+  if V <= 0 then
+    raise EProbabilityError.Create(Name + ' must be > 0');
+end;
+
+class procedure TProbabilityKit.RequireProbability(const P: Double;
+  AllowZero: Boolean; const Name: string);
+begin
+  RequireFinite(P, Name);
+  if AllowZero then
+  begin
+    if (P < 0) or (P > 1) then
+      raise EProbabilityError.Create(Name + ' must be in [0,1]');
+  end
+  else if (P <= 0) or (P > 1) then
+    raise EProbabilityError.Create(Name + ' must be in (0,1]');
+end;
+
+class procedure TProbabilityKit.ValidateHypergeometric(PopSize, SuccPop,
+  SampleN: Integer; const Name: string);
+begin
+  if PopSize < 1 then
+    raise EProbabilityError.Create(Name + ': PopSize must be >= 1');
+  if (SuccPop < 0) or (SuccPop > PopSize) then
+    raise EProbabilityError.Create(Name + ': SuccPop must be in [0, PopSize]');
+  if (SampleN < 0) or (SampleN > PopSize) then
+    raise EProbabilityError.Create(Name + ': SampleN must be in [0, PopSize]');
+end;
+
 { ---------------------------------------------------------------------------
   NORMAL
 --------------------------------------------------------------------------- }
@@ -576,16 +623,18 @@ class function TProbabilityKit.NormalPDF(const X, Mu, Sigma: Double; ADecimals: 
 var
   Z: Double;
 begin
-  if Sigma <= 0 then
-    raise EProbabilityError.Create('NormalPDF: Sigma must be > 0');
+  RequireFinite(X, 'NormalPDF: X');
+  RequireFinite(Mu, 'NormalPDF: Mu');
+  RequirePositive(Sigma, 'NormalPDF: Sigma');
   Z      := (X - Mu) / Sigma;
   Result := RoundResult(Exp(-0.5 * Z * Z) / (Sigma * Sqrt(2 * Pi)), ADecimals);
 end;
 
 class function TProbabilityKit.NormalCDF(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
-  if Sigma <= 0 then
-    raise EProbabilityError.Create('NormalCDF: Sigma must be > 0');
+  RequireFinite(X, 'NormalCDF: X');
+  RequireFinite(Mu, 'NormalCDF: Mu');
+  RequirePositive(Sigma, 'NormalCDF: Sigma');
   { Reuse MathBase.Precision.NormalCDF which computes Φ((x-mu)/sigma) }
   Result := RoundResult(MathBase.Precision.NormalCDF((X - Mu) / Sigma), ADecimals);
 end;
@@ -597,13 +646,15 @@ end;
 
 class function TProbabilityKit.NormalMean(const Mu, Sigma: Double): Double;
 begin
+  RequireFinite(Mu, 'NormalMean: Mu');
+  RequirePositive(Sigma, 'NormalMean: Sigma');
   Result := Mu;
 end;
 
 class function TProbabilityKit.NormalVariance(const Mu, Sigma: Double): Double;
 begin
-  if Sigma <= 0 then
-    raise EProbabilityError.Create('NormalVariance: Sigma must be > 0');
+  RequireFinite(Mu, 'NormalVariance: Mu');
+  RequirePositive(Sigma, 'NormalVariance: Sigma');
   Result := Sigma * Sigma;
 end;
 
@@ -615,8 +666,9 @@ class function TProbabilityKit.LogNormalPDF(const X, Mu, Sigma: Double; ADecimal
 var
   LnX, Z: Double;
 begin
-  if Sigma <= 0 then
-    raise EProbabilityError.Create('LogNormalPDF: Sigma must be > 0');
+  RequireFinite(X, 'LogNormalPDF: X');
+  RequireFinite(Mu, 'LogNormalPDF: Mu');
+  RequirePositive(Sigma, 'LogNormalPDF: Sigma');
   if X <= 0 then
     Exit(RoundResult(0, ADecimals));
   LnX    := Ln(X);
@@ -626,8 +678,9 @@ end;
 
 class function TProbabilityKit.LogNormalCDF(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
-  if Sigma <= 0 then
-    raise EProbabilityError.Create('LogNormalCDF: Sigma must be > 0');
+  RequireFinite(X, 'LogNormalCDF: X');
+  RequireFinite(Mu, 'LogNormalCDF: Mu');
+  RequirePositive(Sigma, 'LogNormalCDF: Sigma');
   if X <= 0 then
     Exit(RoundResult(0, ADecimals));
   { CDF(x) = Φ((ln(x) - mu) / sigma) }
@@ -641,15 +694,23 @@ end;
 
 class function TProbabilityKit.LogNormalMean(const Mu, Sigma: Double): Double;
 begin
+  RequireFinite(Mu, 'LogNormalMean: Mu');
+  RequirePositive(Sigma, 'LogNormalMean: Sigma');
   Result := Exp(Mu + 0.5 * Sigma * Sigma);
+  if IsInfinite(Result) or IsNan(Result) then
+    raise EProbabilityError.Create('LogNormalMean: result is not representable');
 end;
 
 class function TProbabilityKit.LogNormalVariance(const Mu, Sigma: Double): Double;
 var
   S2: Double;
 begin
+  RequireFinite(Mu, 'LogNormalVariance: Mu');
+  RequirePositive(Sigma, 'LogNormalVariance: Sigma');
   S2     := Sigma * Sigma;
   Result := (Exp(S2) - 1) * Exp(2 * Mu + S2);
+  if IsInfinite(Result) or IsNan(Result) then
+    raise EProbabilityError.Create('LogNormalVariance: result is not representable');
 end;
 
 { ---------------------------------------------------------------------------
@@ -658,8 +719,8 @@ end;
 
 class function TProbabilityKit.ExponentialPDF(const X, Lambda: Double; ADecimals: Integer): Double;
 begin
-  if Lambda <= 0 then
-    raise EProbabilityError.Create('ExponentialPDF: Lambda must be > 0');
+  RequireFinite(X, 'ExponentialPDF: X');
+  RequirePositive(Lambda, 'ExponentialPDF: Lambda');
   if X < 0 then
     Exit(RoundResult(0, ADecimals));
   Result := RoundResult(Lambda * Exp(-Lambda * X), ADecimals);
@@ -667,8 +728,8 @@ end;
 
 class function TProbabilityKit.ExponentialCDF(const X, Lambda: Double; ADecimals: Integer): Double;
 begin
-  if Lambda <= 0 then
-    raise EProbabilityError.Create('ExponentialCDF: Lambda must be > 0');
+  RequireFinite(X, 'ExponentialCDF: X');
+  RequirePositive(Lambda, 'ExponentialCDF: Lambda');
   if X < 0 then
     Exit(RoundResult(0, ADecimals));
   Result := RoundResult(1.0 - Exp(-Lambda * X), ADecimals);
@@ -676,8 +737,8 @@ end;
 
 class function TProbabilityKit.ExponentialSurvival(const X, Lambda: Double; ADecimals: Integer): Double;
 begin
-  if Lambda <= 0 then
-    raise EProbabilityError.Create('ExponentialSurvival: Lambda must be > 0');
+  RequireFinite(X, 'ExponentialSurvival: X');
+  RequirePositive(Lambda, 'ExponentialSurvival: Lambda');
   if X < 0 then
     Exit(RoundResult(1, ADecimals));
   Result := RoundResult(Exp(-Lambda * X), ADecimals);
@@ -685,15 +746,13 @@ end;
 
 class function TProbabilityKit.ExponentialMean(const Lambda: Double): Double;
 begin
-  if Lambda <= 0 then
-    raise EProbabilityError.Create('ExponentialMean: Lambda must be > 0');
+  RequirePositive(Lambda, 'ExponentialMean: Lambda');
   Result := 1.0 / Lambda;
 end;
 
 class function TProbabilityKit.ExponentialVariance(const Lambda: Double): Double;
 begin
-  if Lambda <= 0 then
-    raise EProbabilityError.Create('ExponentialVariance: Lambda must be > 0');
+  RequirePositive(Lambda, 'ExponentialVariance: Lambda');
   Result := 1.0 / (Lambda * Lambda);
 end;
 
@@ -708,12 +767,13 @@ end;
   Uses series for x < a+1, continued fraction otherwise. }
 function RegIncGamma(const A, X: Double): Double;
 const
-  MaxIter = 200;
-  Eps     = 3e-7;
+  MaxIter = 10000;
+  Eps     = 1e-14;
   FPMin   = 1e-300;
 var
   LnGamA, AP, Sum, Del, B, C, D, H, An, Del2: Double;
   N: Integer;
+  Converged: Boolean;
 begin
   if X < 0 then raise EProbabilityError.Create('RegIncGamma: X must be >= 0');
   if X = 0 then Exit(0);
@@ -726,13 +786,20 @@ begin
     AP  := A;
     Del := 1.0 / A;
     Sum := Del;
+    Converged := False;
     for N := 1 to MaxIter do
     begin
       AP  := AP + 1;
       Del := Del * X / AP;
       Sum := Sum + Del;
-      if Abs(Del) < Abs(Sum) * Eps then Break;
+      if Abs(Del) < Abs(Sum) * Eps then
+      begin
+        Converged := True;
+        Break;
+      end;
     end;
+    if not Converged then
+      raise EProbabilityError.Create('RegIncGamma: series did not converge');
     Result := Sum * Exp(-X + A * Ln(X) - LnGamA);
   end
   else
@@ -742,6 +809,7 @@ begin
     C := 1.0 / FPMin;
     D := 1.0 / B;
     H := D;
+    Converged := False;
     for N := 1 to MaxIter do
     begin
       An   := -N * (N - A);
@@ -753,16 +821,23 @@ begin
       D    := 1.0 / D;
       Del2 := D * C;
       H    := H * Del2;
-      if Abs(Del2 - 1) < Eps then Break;
+      if Abs(Del2 - 1) < Eps then
+      begin
+        Converged := True;
+        Break;
+      end;
     end;
+    if not Converged then
+      raise EProbabilityError.Create('RegIncGamma: continued fraction did not converge');
     Result := 1.0 - Exp(-X + A * Ln(X) - LnGamA) * H;
   end;
 end;
 
 class function TProbabilityKit.GammaPDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
-  if Alpha <= 0 then raise EProbabilityError.Create('GammaPDF: Alpha must be > 0');
-  if Beta  <= 0 then raise EProbabilityError.Create('GammaPDF: Beta must be > 0');
+  RequireFinite(X, 'GammaPDF: X');
+  RequirePositive(Alpha, 'GammaPDF: Alpha');
+  RequirePositive(Beta, 'GammaPDF: Beta');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   { f(x) = Beta^Alpha * x^(Alpha-1) * exp(-Beta*x) / Gamma(Alpha) }
   Result := RoundResult(
@@ -772,8 +847,9 @@ end;
 
 class function TProbabilityKit.GammaCDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
-  if Alpha <= 0 then raise EProbabilityError.Create('GammaCDF: Alpha must be > 0');
-  if Beta  <= 0 then raise EProbabilityError.Create('GammaCDF: Beta must be > 0');
+  RequireFinite(X, 'GammaCDF: X');
+  RequirePositive(Alpha, 'GammaCDF: Alpha');
+  RequirePositive(Beta, 'GammaCDF: Beta');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   { CDF = P(Alpha, Beta*x) — regularised incomplete gamma }
   Result := RoundResult(RegIncGamma(Alpha, Beta * X), ADecimals);
@@ -786,13 +862,15 @@ end;
 
 class function TProbabilityKit.GammaMean(const Alpha, Beta: Double): Double;
 begin
-  if Beta <= 0 then raise EProbabilityError.Create('GammaMean: Beta must be > 0');
+  RequirePositive(Alpha, 'GammaMean: Alpha');
+  RequirePositive(Beta, 'GammaMean: Beta');
   Result := Alpha / Beta;
 end;
 
 class function TProbabilityKit.GammaVariance(const Alpha, Beta: Double): Double;
 begin
-  if Beta <= 0 then raise EProbabilityError.Create('GammaVariance: Beta must be > 0');
+  RequirePositive(Alpha, 'GammaVariance: Alpha');
+  RequirePositive(Beta, 'GammaVariance: Beta');
   Result := Alpha / (Beta * Beta);
 end;
 
@@ -802,8 +880,9 @@ end;
 
 class function TProbabilityKit.BetaPDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
-  if Alpha <= 0 then raise EProbabilityError.Create('BetaPDF: Alpha must be > 0');
-  if Beta  <= 0 then raise EProbabilityError.Create('BetaPDF: Beta must be > 0');
+  RequireFinite(X, 'BetaPDF: X');
+  RequirePositive(Alpha, 'BetaPDF: Alpha');
+  RequirePositive(Beta, 'BetaPDF: Beta');
   if (X <= 0) or (X >= 1) then Exit(RoundResult(0, ADecimals));
   { f(x) = x^(Alpha-1) * (1-x)^(Beta-1) / B(Alpha, Beta) }
   Result := RoundResult(
@@ -814,8 +893,9 @@ end;
 
 class function TProbabilityKit.BetaCDF(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
-  if Alpha <= 0 then raise EProbabilityError.Create('BetaCDF: Alpha must be > 0');
-  if Beta  <= 0 then raise EProbabilityError.Create('BetaCDF: Beta must be > 0');
+  RequireFinite(X, 'BetaCDF: X');
+  RequirePositive(Alpha, 'BetaCDF: Alpha');
+  RequirePositive(Beta, 'BetaCDF: Beta');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   if X >= 1 then Exit(RoundResult(1, ADecimals));
   { Uses MathBase.Precision.BetaInc — the regularised incomplete beta I_x(a,b) }
@@ -829,6 +909,8 @@ end;
 
 class function TProbabilityKit.BetaMean(const Alpha, Beta: Double): Double;
 begin
+  RequirePositive(Alpha, 'BetaMean: Alpha');
+  RequirePositive(Beta, 'BetaMean: Beta');
   Result := Alpha / (Alpha + Beta);
 end;
 
@@ -836,6 +918,8 @@ class function TProbabilityKit.BetaVariance(const Alpha, Beta: Double): Double;
 var
   S: Double;
 begin
+  RequirePositive(Alpha, 'BetaVariance: Alpha');
+  RequirePositive(Beta, 'BetaVariance: Beta');
   S      := Alpha + Beta;
   Result := (Alpha * Beta) / (S * S * (S + 1));
 end;
@@ -847,12 +931,14 @@ end;
 class function TProbabilityKit.ChiSquaredPDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('ChiSquaredPDF: DF must be >= 1');
+  RequireFinite(X, 'ChiSquaredPDF: X');
   Result := GammaPDF(X, DF / 2.0, 0.5, ADecimals);
 end;
 
 class function TProbabilityKit.ChiSquaredCDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('ChiSquaredCDF: DF must be >= 1');
+  RequireFinite(X, 'ChiSquaredCDF: X');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   Result := RoundResult(RegIncGamma(DF / 2.0, X / 2.0), ADecimals);
 end;
@@ -864,11 +950,13 @@ end;
 
 class function TProbabilityKit.ChiSquaredMean(DF: Integer): Double;
 begin
+  if DF < 1 then raise EProbabilityError.Create('ChiSquaredMean: DF must be >= 1');
   Result := DF;
 end;
 
 class function TProbabilityKit.ChiSquaredVariance(DF: Integer): Double;
 begin
+  if DF < 1 then raise EProbabilityError.Create('ChiSquaredVariance: DF must be >= 1');
   Result := 2.0 * DF;
 end;
 
@@ -881,6 +969,7 @@ var
   Nu, LogC: Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('StudentTPDF: DF must be >= 1');
+  RequireFinite(X, 'StudentTPDF: X');
   Nu    := DF;
   { f(x) = Γ((ν+1)/2) / (√(νπ) Γ(ν/2)) * (1 + x²/ν)^(-(ν+1)/2) }
   LogC  := GammaLn((Nu + 1) / 2) - GammaLn(Nu / 2) - 0.5 * Ln(Nu * Pi);
@@ -892,6 +981,7 @@ var
   Nu, BetaX: Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('StudentTCDF: DF must be >= 1');
+  RequireFinite(X, 'StudentTCDF: X');
   Nu    := DF;
   { Use the incomplete beta relationship:
     CDF(x) = I_t(DF/2, 1/2)/2 where t = DF/(DF+x²), adjusted for sign }
@@ -937,6 +1027,7 @@ var
 begin
   if DF1 < 1 then raise EProbabilityError.Create('FPDF: DF1 must be >= 1');
   if DF2 < 1 then raise EProbabilityError.Create('FPDF: DF2 must be >= 1');
+  RequireFinite(X, 'FPDF: X');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   D1 := DF1;
   D2 := DF2;
@@ -957,6 +1048,7 @@ var
 begin
   if DF1 < 1 then raise EProbabilityError.Create('FCDF: DF1 must be >= 1');
   if DF2 < 1 then raise EProbabilityError.Create('FCDF: DF2 must be >= 1');
+  RequireFinite(X, 'FCDF: X');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   D1 := DF1;
   D2 := DF2;
@@ -972,6 +1064,8 @@ end;
 
 class function TProbabilityKit.FMean(DF1, DF2: Integer): Double;
 begin
+  if DF1 < 1 then
+    raise EProbabilityError.Create('FMean: DF1 must be >= 1');
   if DF2 <= 2 then
     raise EProbabilityError.Create('FMean: Mean undefined for DF2 <= 2');
   Result := DF2 / (DF2 - 2);
@@ -981,6 +1075,8 @@ class function TProbabilityKit.FVariance(DF1, DF2: Integer): Double;
 var
   D1, D2: Double;
 begin
+  if DF1 < 1 then
+    raise EProbabilityError.Create('FVariance: DF1 must be >= 1');
   if DF2 <= 4 then
     raise EProbabilityError.Create('FVariance: Variance undefined for DF2 <= 4');
   D1 := DF1;
@@ -995,8 +1091,9 @@ end;
 
 class function TProbabilityKit.WeibullPDF(const X, K, Lambda: Double; ADecimals: Integer): Double;
 begin
-  if K      <= 0 then raise EProbabilityError.Create('WeibullPDF: K must be > 0');
-  if Lambda <= 0 then raise EProbabilityError.Create('WeibullPDF: Lambda must be > 0');
+  RequireFinite(X, 'WeibullPDF: X');
+  RequirePositive(K, 'WeibullPDF: K');
+  RequirePositive(Lambda, 'WeibullPDF: Lambda');
   if X < 0 then Exit(RoundResult(0, ADecimals));
   if X = 0 then
   begin
@@ -1013,24 +1110,26 @@ end;
 
 class function TProbabilityKit.WeibullCDF(const X, K, Lambda: Double; ADecimals: Integer): Double;
 begin
-  if K      <= 0 then raise EProbabilityError.Create('WeibullCDF: K must be > 0');
-  if Lambda <= 0 then raise EProbabilityError.Create('WeibullCDF: Lambda must be > 0');
+  RequireFinite(X, 'WeibullCDF: X');
+  RequirePositive(K, 'WeibullCDF: K');
+  RequirePositive(Lambda, 'WeibullCDF: Lambda');
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   Result := RoundResult(1.0 - Exp(-Power(X / Lambda, K)), ADecimals);
 end;
 
 class function TProbabilityKit.WeibullSurvival(const X, K, Lambda: Double; ADecimals: Integer): Double;
 begin
-  if K      <= 0 then raise EProbabilityError.Create('WeibullSurvival: K must be > 0');
-  if Lambda <= 0 then raise EProbabilityError.Create('WeibullSurvival: Lambda must be > 0');
+  RequireFinite(X, 'WeibullSurvival: X');
+  RequirePositive(K, 'WeibullSurvival: K');
+  RequirePositive(Lambda, 'WeibullSurvival: Lambda');
   if X <= 0 then Exit(RoundResult(1, ADecimals));
   Result := RoundResult(Exp(-Power(X / Lambda, K)), ADecimals);
 end;
 
 class function TProbabilityKit.WeibullMean(const K, Lambda: Double): Double;
 begin
-  if K      <= 0 then raise EProbabilityError.Create('WeibullMean: K must be > 0');
-  if Lambda <= 0 then raise EProbabilityError.Create('WeibullMean: Lambda must be > 0');
+  RequirePositive(K, 'WeibullMean: K');
+  RequirePositive(Lambda, 'WeibullMean: Lambda');
   Result := Lambda * Exp(GammaLn(1.0 + 1.0 / K));
 end;
 
@@ -1038,8 +1137,8 @@ class function TProbabilityKit.WeibullVariance(const K, Lambda: Double): Double;
 var
   G1, G2: Double;
 begin
-  if K      <= 0 then raise EProbabilityError.Create('WeibullVariance: K must be > 0');
-  if Lambda <= 0 then raise EProbabilityError.Create('WeibullVariance: Lambda must be > 0');
+  RequirePositive(K, 'WeibullVariance: K');
+  RequirePositive(Lambda, 'WeibullVariance: Lambda');
   G1 := Exp(GammaLn(1.0 + 1.0 / K));
   G2 := Exp(GammaLn(1.0 + 2.0 / K));
   Result := Lambda * Lambda * (G2 - G1 * G1);
@@ -1051,6 +1150,9 @@ end;
 
 class function TProbabilityKit.UniformPDF(const X, A, B: Double; ADecimals: Integer): Double;
 begin
+  RequireFinite(X, 'UniformPDF: X');
+  RequireFinite(A, 'UniformPDF: A');
+  RequireFinite(B, 'UniformPDF: B');
   if B <= A then raise EProbabilityError.Create('UniformPDF: B must be > A');
   if (X < A) or (X > B) then
     Result := RoundResult(0, ADecimals)
@@ -1060,6 +1162,9 @@ end;
 
 class function TProbabilityKit.UniformCDF(const X, A, B: Double; ADecimals: Integer): Double;
 begin
+  RequireFinite(X, 'UniformCDF: X');
+  RequireFinite(A, 'UniformCDF: A');
+  RequireFinite(B, 'UniformCDF: B');
   if B <= A then raise EProbabilityError.Create('UniformCDF: B must be > A');
   if X <= A then Result := RoundResult(0, ADecimals)
   else if X >= B then Result := RoundResult(1, ADecimals)
@@ -1073,11 +1178,16 @@ end;
 
 class function TProbabilityKit.UniformMean(const A, B: Double): Double;
 begin
+  RequireFinite(A, 'UniformMean: A');
+  RequireFinite(B, 'UniformMean: B');
+  if B <= A then raise EProbabilityError.Create('UniformMean: B must be > A');
   Result := (A + B) / 2;
 end;
 
 class function TProbabilityKit.UniformVariance(const A, B: Double): Double;
 begin
+  RequireFinite(A, 'UniformVariance: A');
+  RequireFinite(B, 'UniformVariance: B');
   if B <= A then raise EProbabilityError.Create('UniformVariance: B must be > A');
   Result := (B - A) * (B - A) / 12.0;
 end;
@@ -1089,7 +1199,7 @@ end;
 class function TProbabilityKit.BinomialPMF(const K, N: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if N < 1  then raise EProbabilityError.Create('BinomialPMF: N must be >= 1');
-  if (P < 0) or (P > 1) then raise EProbabilityError.Create('BinomialPMF: P must be in [0,1]');
+  RequireProbability(P, True, 'BinomialPMF: P');
   if (K < 0) or (K > N) then Exit(RoundResult(0, ADecimals));
   if P = 0 then Exit(RoundResult(IfThen(K = 0, 1.0, 0.0), ADecimals));
   if P = 1 then Exit(RoundResult(IfThen(K = N, 1.0, 0.0), ADecimals));
@@ -1105,7 +1215,7 @@ var
   Sum: Double;
 begin
   if N < 1  then raise EProbabilityError.Create('BinomialCDF: N must be >= 1');
-  if (P < 0) or (P > 1) then raise EProbabilityError.Create('BinomialCDF: P must be in [0,1]');
+  RequireProbability(P, True, 'BinomialCDF: P');
   if K < 0 then Exit(RoundResult(0, ADecimals));
   if K >= N then Exit(RoundResult(1, ADecimals));
   { CDF = I_(1-p)(n-k, k+1) via incomplete beta; or sum for small N }
@@ -1129,11 +1239,15 @@ end;
 
 class function TProbabilityKit.BinomialMean(const N: Integer; const P: Double): Double;
 begin
+  if N < 1 then raise EProbabilityError.Create('BinomialMean: N must be >= 1');
+  RequireProbability(P, True, 'BinomialMean: P');
   Result := N * P;
 end;
 
 class function TProbabilityKit.BinomialVariance(const N: Integer; const P: Double): Double;
 begin
+  if N < 1 then raise EProbabilityError.Create('BinomialVariance: N must be >= 1');
+  RequireProbability(P, True, 'BinomialVariance: P');
   Result := N * P * (1 - P);
 end;
 
@@ -1143,7 +1257,7 @@ end;
 
 class function TProbabilityKit.PoissonPMF(const K: Integer; const Lambda: Double; ADecimals: Integer): Double;
 begin
-  if Lambda <= 0 then raise EProbabilityError.Create('PoissonPMF: Lambda must be > 0');
+  RequirePositive(Lambda, 'PoissonPMF: Lambda');
   if K < 0 then Exit(RoundResult(0, ADecimals));
   { P(X=k) = exp(-lambda) * lambda^k / k!  — use log form }
   Result := RoundResult(
@@ -1156,7 +1270,7 @@ var
   I: Integer;
   Sum: Double;
 begin
-  if Lambda <= 0 then raise EProbabilityError.Create('PoissonCDF: Lambda must be > 0');
+  RequirePositive(Lambda, 'PoissonCDF: Lambda');
   if K < 0 then Exit(RoundResult(0, ADecimals));
   Sum := 0;
   for I := 0 to K do
@@ -1171,11 +1285,13 @@ end;
 
 class function TProbabilityKit.PoissonMean(const Lambda: Double): Double;
 begin
+  RequirePositive(Lambda, 'PoissonMean: Lambda');
   Result := Lambda;
 end;
 
 class function TProbabilityKit.PoissonVariance(const Lambda: Double): Double;
 begin
+  RequirePositive(Lambda, 'PoissonVariance: Lambda');
   Result := Lambda;
 end;
 
@@ -1185,8 +1301,7 @@ end;
 
 class function TProbabilityKit.GeometricPMF(const K: Integer; const P: Double; ADecimals: Integer): Double;
 begin
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('GeometricPMF: P must be in (0,1]');
+  RequireProbability(P, False, 'GeometricPMF: P');
   if K < 1 then Exit(RoundResult(0, ADecimals));
   { P(X=k) = (1-p)^(k-1) * p }
   Result := RoundResult(Power(1 - P, K - 1) * P, ADecimals);
@@ -1194,8 +1309,7 @@ end;
 
 class function TProbabilityKit.GeometricCDF(const K: Integer; const P: Double; ADecimals: Integer): Double;
 begin
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('GeometricCDF: P must be in (0,1]');
+  RequireProbability(P, False, 'GeometricCDF: P');
   if K < 1 then Exit(RoundResult(0, ADecimals));
   { CDF = 1 - (1-p)^k }
   Result := RoundResult(1.0 - Power(1 - P, K), ADecimals);
@@ -1203,23 +1317,20 @@ end;
 
 class function TProbabilityKit.GeometricSurvival(const K: Integer; const P: Double; ADecimals: Integer): Double;
 begin
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('GeometricSurvival: P must be in (0,1]');
+  RequireProbability(P, False, 'GeometricSurvival: P');
   if K < 1 then Exit(RoundResult(1, ADecimals));
   Result := RoundResult(Power(1 - P, K), ADecimals);
 end;
 
 class function TProbabilityKit.GeometricMean(const P: Double): Double;
 begin
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('GeometricMean: P must be in (0,1]');
+  RequireProbability(P, False, 'GeometricMean: P');
   Result := 1.0 / P;
 end;
 
 class function TProbabilityKit.GeometricVariance(const P: Double): Double;
 begin
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('GeometricVariance: P must be in (0,1]');
+  RequireProbability(P, False, 'GeometricVariance: P');
   Result := (1 - P) / (P * P);
 end;
 
@@ -1230,9 +1341,9 @@ end;
 class function TProbabilityKit.NegBinomialPMF(const K, R: Integer; const P: Double; ADecimals: Integer): Double;
 begin
   if R < 1 then raise EProbabilityError.Create('NegBinomialPMF: R must be >= 1');
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('NegBinomialPMF: P must be in (0,1]');
+  RequireProbability(P, False, 'NegBinomialPMF: P');
   if K < R then Exit(RoundResult(0, ADecimals));
+  if P = 1 then Exit(RoundResult(IfThen(K = R, 1.0, 0.0), ADecimals));
   { P(X=k) = C(k-1, r-1) * p^r * (1-p)^(k-r) }
   Result := RoundResult(
     Exp(LogBinomCoeff(K - 1, R - 1) + R * Ln(P) + (K - R) * Ln(1 - P)),
@@ -1245,9 +1356,9 @@ var
   Sum: Double;
 begin
   if R < 1 then raise EProbabilityError.Create('NegBinomialCDF: R must be >= 1');
-  if (P <= 0) or (P > 1) then
-    raise EProbabilityError.Create('NegBinomialCDF: P must be in (0,1]');
+  RequireProbability(P, False, 'NegBinomialCDF: P');
   if K < R then Exit(RoundResult(0, ADecimals));
+  if P = 1 then Exit(RoundResult(1, ADecimals));
   Sum := 0;
   for I := R to K do
     Sum := Sum + NegBinomialPMF(I, R, P);
@@ -1256,11 +1367,15 @@ end;
 
 class function TProbabilityKit.NegBinomialMean(const R: Integer; const P: Double): Double;
 begin
+  if R < 1 then raise EProbabilityError.Create('NegBinomialMean: R must be >= 1');
+  RequireProbability(P, False, 'NegBinomialMean: P');
   Result := R / P;
 end;
 
 class function TProbabilityKit.NegBinomialVariance(const R: Integer; const P: Double): Double;
 begin
+  if R < 1 then raise EProbabilityError.Create('NegBinomialVariance: R must be >= 1');
+  RequireProbability(P, False, 'NegBinomialVariance: P');
   Result := R * (1 - P) / (P * P);
 end;
 
@@ -1272,9 +1387,7 @@ class function TProbabilityKit.HypergeometricPMF(
   const K, PopSize, SuccPop, SampleN: Integer;
   ADecimals: Integer): Double;
 begin
-  if PopSize < 1 then raise EProbabilityError.Create('HypergeometricPMF: PopSize must be >= 1');
-  if SuccPop > PopSize then raise EProbabilityError.Create('HypergeometricPMF: SuccPop must be <= PopSize');
-  if SampleN > PopSize then raise EProbabilityError.Create('HypergeometricPMF: SampleN must be <= PopSize');
+  ValidateHypergeometric(PopSize, SuccPop, SampleN, 'HypergeometricPMF');
   { k must be in [max(0, n+K-N), min(n, K)] }
   if (K < 0) or (K > Min(SampleN, SuccPop)) or (K < Max(0, SampleN + SuccPop - PopSize)) then
     Exit(RoundResult(0, ADecimals));
@@ -1290,18 +1403,23 @@ class function TProbabilityKit.HypergeometricCDF(
   const K, PopSize, SuccPop, SampleN: Integer;
   ADecimals: Integer): Double;
 var
-  I: Integer;
+  I, MinK, MaxK: Integer;
   Sum: Double;
 begin
-  if PopSize < 1 then raise EProbabilityError.Create('HypergeometricCDF: PopSize must be >= 1');
+  ValidateHypergeometric(PopSize, SuccPop, SampleN, 'HypergeometricCDF');
+  MinK := Max(0, SampleN + SuccPop - PopSize);
+  MaxK := Min(SampleN, SuccPop);
+  if K < MinK then Exit(RoundResult(0, ADecimals));
+  if K >= MaxK then Exit(RoundResult(1, ADecimals));
   Sum := 0;
-  for I := 0 to K do
+  for I := MinK to K do
     Sum := Sum + HypergeometricPMF(I, PopSize, SuccPop, SampleN);
   Result := RoundResult(Sum, ADecimals);
 end;
 
 class function TProbabilityKit.HypergeometricMean(PopSize, SuccPop, SampleN: Integer): Double;
 begin
+  ValidateHypergeometric(PopSize, SuccPop, SampleN, 'HypergeometricMean');
   Result := SampleN * SuccPop / PopSize;
 end;
 
@@ -1309,6 +1427,8 @@ class function TProbabilityKit.HypergeometricVariance(PopSize, SuccPop, SampleN:
 var
   N, K, N_: Double;
 begin
+  ValidateHypergeometric(PopSize, SuccPop, SampleN, 'HypergeometricVariance');
+  if PopSize = 1 then Exit(0.0);
   N  := PopSize;
   K  := SuccPop;
   N_ := SampleN;

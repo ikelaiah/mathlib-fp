@@ -15,7 +15,8 @@ uses
   TestEngineeringLib_FluidDynamics,
   TestEngineeringLib_Thermodynamics,
   TestEngineeringLib_UnitConversion,
-  TestEngineeringLib_Signal;
+  TestEngineeringLib_Signal,
+  TestEngineeringLib_Aliases;
 
 implementation
 

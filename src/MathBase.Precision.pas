@@ -20,14 +20,15 @@ uses
   Classes, SysUtils, Math;
 
 { Natural logarithm of the gamma function (Lanczos approximation).
-  Input X must be positive. }
+  Caller must supply X > 0; this low-level helper does not validate it. }
 function GammaLn(const X: Double): Double;
 
-{ Beta function B(z,w) = Γ(z)Γ(w)/Γ(z+w). }
+{ Beta function B(z,w) = Γ(z)Γ(w)/Γ(z+w).
+  Caller must supply positive parameters; they are not validated. }
 function Beta(const Z, W: Double): Double;
 
 { Regularised incomplete beta function I_x(a,b).
-  X must be in [0,1]. }
+  X is clamped to the endpoint results; caller must supply A, B > 0. }
 function BetaInc(const A, B, X: Double): Double;
 
 { Error function (Horner polynomial approximation, max error < 1.5e-7). }
@@ -36,8 +37,9 @@ function Erf(const X: Double): Double;
 { Standard normal CDF: Φ(x) = 0.5 * (1 + Erf(x / √2)). }
 function NormalCDF(const X: Double): Double;
 
-{ Student's t cumulative distribution function.
-  DF = degrees of freedom (must be >= 1). }
+{ Student's t cumulative distribution helper for X >= 0.
+  Caller must supply DF >= 1. Negative-X symmetry is not applied here; use
+  ProbabilityLib.Distributions.StudentTCDF for a complete signed CDF. }
 function StudentT(const DF: Integer; const X: Double): Double;
 
 implementation

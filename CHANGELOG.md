@@ -7,14 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-...
+No changes yet.
 
-
-## [1.2.0] - 2026-07-17
+## [1.2.0] - 2026-07-18
 
 ### Added
 
-- `fpmake.pp` package metadata for FPMake/FPPKG command-line workflows.
 - `EngineeringLib.Common` with `EEngineeringError` and domain-specific
   exceptions for fluid dynamics, thermodynamics, signals, and unit conversion.
 - Seeded `CreateRandom`, `BootstrapMean`, and
@@ -22,8 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changing global random state.
 - `PolynomialFeatures(..., IncludeBias)` overload so callers can omit the bias
   column when fitting models that already estimate an intercept.
-- Edge, property, residual, deterministic-randomness, rounding, UTF-8, and
-  parallel-multiplication coverage, bringing the suite to 720 tests.
+- Edge, property, residual, deterministic-randomness, FinanceLib focused-unit,
+  rounding, UTF-8, parallel-multiplication, and numerical reference coverage,
+  bringing the suite to 788 tests.
+- Representative performance benchmarks for statistics sorting, convex hulls,
+  and dense matrix multiplication, with CI compilation coverage.
+- Focused `EngineeringLib.Velocity` and `EngineeringLib.Pressure` entry units
+  now expose directly nameable exception aliases and have direct compilation
+  and runtime coverage.
 
 ### Changed
 
@@ -37,13 +41,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   thread manager.
 - ML entry points consistently reject empty, ragged, non-finite, mismatched,
   or out-of-range inputs with `EMLError`.
-- Financial methods that expose `ADecimals` now apply it consistently, and
-  ratio/depreciation denominators are validated.
+- Financial methods that expose `ADecimals` now apply it consistently. NPV
+  rounds only its final result, and amortization schedules use the requested
+  precision for payment amounts.
+- Undefined financial ratios now raise `EFinanceError` when a required
+  denominator is zero instead of returning a fabricated zero.
+- `FinanceLib.Bonds` and `FinanceLib.NPV` remain lightweight focused entry
+  units and now export directly nameable supporting aliases for their cash-flow
+  and amortization types.
 - Random-producing library functions no longer call `Randomize` internally.
 - The test runner installs `cthreads` first on Unix and verbose algebra-test
   output is opt-in through `MATHLIB_TEST_VERBOSE`.
 - The Lazarus package version is now 1.2.0 and includes the shared engineering
   exception unit.
+- The Lazarus package and registration unit are now named `mathlib_fp` to match
+  the mathlib-fp project name.
+- Lazarus 4.8 is the minimum supported Lazarus version; CI validates the
+  package against that baseline.
+- `EngineeringLib.Signal.TDoubleArray` now aliases the shared
+  `MathBase.SharedTypes.TDoubleArray` type.
+- `TFluidDynamicsKit.PumpHead` now accepts explicit inlet and outlet velocities
+  and implements the Bernoulli velocity-head term `(v2²-v1²)/(2g)`.
+- General-purpose statistics and geometry sorts now use O(n log n) algorithms
+  instead of quadratic insertion sorts.
+- Root finders expose detailed convergence records, iterative matrix and scalar
+  solvers report exhaustion explicitly, PCA records per-component iterations,
+  and linear programming exposes a precise termination status.
+- Linear regression now uses centered Householder QR instead of normal
+  equations, improving behavior for high-offset and ill-scaled data.
 
 ### Fixed
 
@@ -51,9 +76,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   intercept, which previously caused a singular regression system.
 - Unknown unit names no longer silently default to length. Non-`Try` APIs raise
   `EUnitConversionError`; `Try...` APIs retain their `False` contract.
+- Significant-digit formatting now uses stable round-half-to-even behavior on
+  both Win32 extended-precision and Win64 targets.
+- Fixed `InternalRateOfReturn`, which previously returned its initial 10% guess
+  without iterating. It now brackets and bisects positive or negative rates and
+  reports invalid or unbracketable cash-flow inputs with `EFinanceError`.
+- Corrected FinanceLib signatures, result-type scope, numeric examples, and
+  exception contracts in the API guide and source comments.
+- Corrected odd-order high-pass and band-stop FIR centre indexing, added safe
+  FFT/IFFT empty and mismatched-array handling, and documented the complete
+  N-bin spectral outputs.
+- Humidity-ratio and adiabatic calculations now reject invalid pressure and
+  specific-heat-ratio domains with `EThermodynamicsError`.
+- Engineering comments and API documentation now cover focused aliases,
+  formula domains, signal shapes, every UnitConversion public API, exact unit
+  names, fixed-duration time conventions, and locale-sensitive parsing.
 - Removed all compiler warnings from clean normal and UTF-8 builds.
 - Fixed broken source links, stale API names, version text, and random/bootstrap
   contracts across the documentation.
+- Corrected matrix inverse permutation handling, LU row swaps, scale-relative
+  rank/singularity decisions, exact triangular cleanup, and large-norm matrix
+  exponentials, including architecture-independent overflow reporting.
+- Corrected forward ray-circle semantics, polygon-boundary classification,
+  non-negative radius validation, and zero-vector angle handling.
+- Corrected exact small-sample Mann-Whitney p-values, K-S D/p-value semantics,
+  Shapiro-Wilk normal scores, and pooled-variance Cohen's d.
+- Corrected FFT period-bin mapping and ARIMA MA/integration forecasts.
+- Added checked combinatorics overflow paths and overflow-safe modular
+  exponentiation, a Win32-safe sieve index path, plus stable hyperbolic and
+  hypotenuse calculations.
+- Strengthened finite-value, dimension, domain, and callback validation across
+  numerical, optimization, time-series, matrix, geometry, and ML entry points.
 
 ---
 
@@ -101,7 +154,7 @@ A complete numerical methods library with no external dependencies.
 - `FFT(var RealPart, ImagPart; Inverse)` — in-place FFT/IFFT; length must be a power of 2
 - `CalculateFFT` — real input → complex spectrum; auto-pads to next power of 2
 - `CalculateIFFT` — complex spectrum → real signal
-- `CalculateFFTMagnitudePhase` — one-sided magnitude and phase spectra
+- `CalculateFFTMagnitudePhase` — complete N-bin magnitude and phase spectra
 
 ##### FIR Filter Design (windowed-sinc)
 
@@ -111,7 +164,8 @@ A complete numerical methods library with no external dependencies.
 - `DesignFIRBandStop(LowCutoff, HighCutoff, Order, WindowType)` — notch/band-reject filter
 - `ApplyFIRFilter(Signal, Coeffs)` — direct-form convolution; output length = N + M − 1
 
-All FIR designs produce symmetric (linear-phase) coefficients normalised to unit DC gain (low-pass/band-stop) or unit Nyquist gain (high-pass).
+All FIR designs produce symmetric (linear-phase) coefficients. Low-pass is
+normalised to unit DC gain; high-pass and band-stop use spectral inversion.
 
 ##### Signal test coverage
 

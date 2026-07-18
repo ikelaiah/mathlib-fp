@@ -31,7 +31,10 @@ No object creation needed — all methods are **class static**.
 | Parameter order | `(x, distribution_params...)` |
 | Optional rounding | last param `ADecimals: Integer = -1`; pass e.g. `4` to round to 4 d.p. |
 | Out-of-domain X | returns 0 (PDF/PMF) or clamped (CDF) instead of raising |
-| Invalid params | raises `EProbabilityError` with a descriptive message |
+| Invalid params | All entry points raise `EProbabilityError` for non-finite real inputs or parameters outside the documented distribution domain |
+
+At the support boundary, `GammaPDF` and `BetaPDF` use the library convention of
+returning zero rather than representing finite or infinite limiting densities.
 
 ---
 
@@ -65,6 +68,9 @@ TProbabilityKit.NormalVariance(Mu, Sigma)  // = Sigma²
 |-----------|---------|-----------|
 | `Mu` | Mean (centre) | any real |
 | `Sigma` | Standard deviation | > 0 |
+
+Every Normal entry point, including the moment helpers, requires finite `Mu`
+and positive finite `Sigma`.
 
 **When to use:** heights, measurement errors, test scores — any quantity that is the sum of many small independent effects.
 
@@ -144,6 +150,8 @@ TProbabilityKit.BetaVariance(Alpha, Beta)
 
 **Special case:** `Beta(1,1)` = `Uniform(0,1)`
 
+Both shape parameters must be positive.
+
 ---
 
 ### Chi-Squared (χ²)
@@ -193,6 +201,9 @@ TProbabilityKit.FVariance(DF1, DF2)      // (DF2 > 4)
 ```
 
 **When to use:** ANOVA (comparing group means), regression model significance, Levene's test for equal variances.
+
+`DF1` and `DF2` must both be at least 1. The mean exists only for `DF2 > 2`,
+and the variance only for `DF2 > 4`.
 
 ---
 
@@ -247,6 +258,9 @@ TProbabilityKit.BinomialVariance(N, P)    // = N*P*(1-P)
 | `N` | Number of trials | >= 1 |
 | `P` | Success probability per trial | [0, 1] |
 | `K` | Number of successes | 0..N |
+
+For PMF/CDF calls, values of K outside `0..N` return a clamped zero/one tail
+rather than raising.
 
 **Example:** probability of at most 2 defects in a batch of 20 items, where each item has a 5% defect rate:
 ```pascal
@@ -310,6 +324,9 @@ TProbabilityKit.HypergeometricVariance(PopSize, SuccPop, SampleN)
 | `SuccPop` | Number of successes in the population K |
 | `SampleN` | Sample size drawn n |
 
+Constraints are `PopSize >= 1`, `0 <= SuccPop <= PopSize`, and
+`0 <= SampleN <= PopSize`.
+
 **Example:** a box has 20 items, 7 are defective. You draw 5. What is P(exactly 2 are defective)?
 ```pascal
 p := TProbabilityKit.HypergeometricPMF(2, 20, 7, 5);  // ≈ 0.388
@@ -328,13 +345,21 @@ except
 end;
 ```
 
-`EProbabilityError` is raised when:
+`EProbabilityError` is raised by the validating entry points when:
+
 - A scale/rate/shape parameter that must be positive is zero or negative
 - `DF < 1` for Chi-Squared, Student's t, or F distributions
 - `N < 1` or `P` outside [0,1] for Binomial
 - `B <= A` for Uniform
 - `R < 1` for Negative Binomial
 - `SuccPop > PopSize` or `SampleN > PopSize` for Hypergeometric
+- negative population, success, or sample counts for Hypergeometric
+- NaN or infinite real inputs and parameters
+
+The same domain validation applies consistently to PDF/PMF, CDF, survival,
+mean, and variance helpers. The regularised incomplete-gamma evaluator reports
+failure to converge with `EProbabilityError` rather than returning a partial
+iterate.
 
 ---
 
@@ -379,6 +404,6 @@ reliability := TProbabilityKit.WeibullSurvival(800, 2, 1000);
 ## Dependencies
 
 - `MathBase.SharedTypes` — `TDoubleArray`, `TDoublePair`
-- `MathBase.Precision` — `GammaLn`, `BetaInc`, `NormalCDF` (re-exported)
+- `MathBase.Precision` — `GammaLn`, `BetaInc`, and `NormalCDF` used internally
 
 No other external libraries required.

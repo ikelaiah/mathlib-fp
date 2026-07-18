@@ -342,7 +342,7 @@ type
 
       @returns A new IMatrix representing A raised to the power p.
 
-      @warning Requires a square matrix. For non-integer exponents, uses SVD and computes U * S^p * V^T. For negative integer exponents, computes powers of the inverse. Raises EMatrixError if inversion fails for negative exponents.
+      @warning Requires a square matrix. Non-integer powers require a symmetric positive-definite matrix and use its eigendecomposition. Negative integer powers use the inverse. Raises EMatrixError when these requirements are not met.
 
       @example
         var MatrixSquared, MatrixSqrt, MatrixInv: IMatrix;
@@ -360,7 +360,8 @@ type
 
       @returns The determinant value (Double).
 
-      @warning Raises EMatrixError if the matrix is not square. Uses recursive cofactor expansion for calculation, which can be computationally expensive (O(n!)) for large matrices. LU decomposition is generally preferred for larger matrices.
+      @warning Raises EMatrixError if the matrix is not square. Matrices of
+      size 3 and above use LU decomposition; singular matrices return zero.
 
       @example
         var Det: Double;
@@ -393,7 +394,7 @@ type
 
       @references Uses Gaussian elimination to find row echelon form.
 
-      @warning Uses a tolerance (1E-12) for numerical stability when checking for zero rows. Rank might be sensitive to this tolerance.
+      @warning Uses a matrix-scale-relative tolerance based on machine precision. Numerically borderline matrices can still have application-dependent rank.
 
       @example
         var Rnk: Integer;
@@ -470,12 +471,12 @@ type
 
       @returns True if the matrix is symmetric and positive definite, False otherwise.
 
-      @warning Requires a square matrix. Current implementation only checks if determinant > 0 and diagonal elements > 0, which is NOT a sufficient condition for positive definiteness. A more robust check (e.g., via Cholesky decomposition attempt or eigenvalues) is needed for guaranteed accuracy.
+      @warning Requires a square, symmetric matrix. The implementation verifies positive definiteness by attempting a Cholesky decomposition.
 
       @example
-        // Warning: Current implementation is not fully reliable.
+        // Positive definiteness is checked through Cholesky decomposition.
         if MyMatrix.IsPositiveDefinite then
-           // Matrix might be positive definite (based on limited check)
+           // Matrix is symmetric positive definite.
     }
     function IsPositiveDefinite: Boolean;
 
@@ -486,12 +487,12 @@ type
 
       @returns True if the matrix is symmetric and positive semidefinite, False otherwise.
 
-      @warning Requires a square matrix. Current implementation only checks if determinant >= 0 and diagonal elements >= 0, which is NOT a sufficient condition for positive semidefiniteness. A more robust check is needed.
+      @warning Requires a square, symmetric matrix. Eigenvalues within 1E-9 of zero are treated as zero.
 
       @example
-        // Warning: Current implementation is not fully reliable.
+        // Positive semidefiniteness is checked from the real eigenvalues.
         if MyMatrix.IsPositiveSemidefinite then
-          // Matrix might be positive semidefinite (based on limited check)
+          // Matrix has no eigenvalue below the negative tolerance.
     }
     function IsPositiveSemidefinite: Boolean;
 
@@ -819,7 +820,7 @@ type
 
       @references Cholesky–Banachiewicz algorithm.
 
-      @warning Raises EMatrixError if the matrix is not square or not positive definite (check fails during computation, e.g., sqrt of negative). Relies on IsPositiveDefinite check which might be unreliable.
+      @warning Raises EMatrixError if the matrix is not square, symmetric, or positive definite.
 
       @example
         var CholResult: TCholeskyDecomposition;
@@ -845,7 +846,7 @@ type
 
       @returns An IMatrix (column vector) representing the approximate solution x.
 
-      @warning Requires a square matrix A. B must be a column vector with matching rows. Convergence is not guaranteed for all matrices or methods (especially Jacobi and Gauss-Seidel). Conjugate Gradient requires A to be symmetric positive definite for guaranteed convergence. Raises EMatrixError if diagonal elements are near zero for Jacobi/Gauss-Seidel. Returns the current approximation if MaxIterations is reached without convergence.
+      @warning Requires a square matrix A. B must be a column vector with matching rows. Convergence is not guaranteed for all matrices or methods (especially Jacobi and Gauss-Seidel). Conjugate Gradient requires A to be symmetric positive definite for guaranteed convergence. Raises EMatrixError if diagonal elements are near zero for Jacobi/Gauss-Seidel or if MaxIterations is reached without convergence.
 
       @example
         var X, B: IMatrix;
@@ -957,7 +958,7 @@ type
 
       @returns A new IMatrix containing the element-wise division result.
 
-      @warning Raises EMatrixError if matrix dimensions do not match or if any element in the Other matrix is zero (division by zero). Uses tolerance 1E-12 to check for zero.
+      @warning Raises EMatrixError if matrix dimensions do not match or if any element in the Other matrix is exactly zero.
 
       @example
         var ElementWiseQuotient: IMatrix;
@@ -1095,7 +1096,7 @@ type
 
       @returns A dynamic array of Double representing the solution vector x.
 
-      @warning Assumes Upper is indeed upper triangular and square, and dimensions match b. Does not check for division by zero on the diagonal (assumes non-singular U).
+      @warning Assumes Upper is upper triangular and square and dimensions match b. Raises EMatrixError for a scale-relative near-zero diagonal pivot.
 
       @example (Internal) X := Self.BackSubstitution(LUResult.U, Y); // Where Y = L^-1 * b
     }
@@ -1111,7 +1112,7 @@ type
 
       @returns A dynamic array of Double representing the solution vector x.
 
-      @warning Assumes Lower is indeed lower triangular and square, and dimensions match b. Does not check for division by zero on the diagonal (assumes non-singular L).
+      @warning Assumes Lower is lower triangular and square and dimensions match b. Raises EMatrixError for a scale-relative near-zero diagonal pivot.
 
       @example (Internal) Y := Self.ForwardSubstitution(LUResult.L, PermutedB);
     }
@@ -1468,7 +1469,9 @@ type
 
       @returns A new IMatrix representing A^p.
 
-      @warning Requires square matrix. Uses direct multiplication for positive integers, inverse for negative integers, SVD for non-integers.
+      @warning Requires a square matrix. Integer exponents use exponentiation
+      by squaring (and inverse for negative integers). Non-integer exponents use
+      symmetric eigendecomposition and require strictly positive eigenvalues.
 
       @example See IMatrix.Power example.
     }
@@ -1481,7 +1484,7 @@ type
 
       @returns The determinant value.
 
-      @warning Requires square matrix. Uses recursive cofactor expansion (inefficient for large matrices).
+      @warning Requires a square matrix. Sizes 3 and above use LU decomposition.
 
       @example See IMatrix.Determinant example.
     }
@@ -1585,7 +1588,7 @@ type
 
       @returns TCholeskyDecomposition record.
 
-      @warning Requires symmetric positive definite matrix. Raises EMatrixError otherwise. Relies on IsPositiveDefinite check.
+      @warning Requires a symmetric positive-definite matrix. Raises EMatrixError otherwise.
 
       @example See IMatrix.Cholesky example.
     }
@@ -1679,14 +1682,14 @@ type
 
       @example
         var
-          UpperData: TMatrixArray;
+          LowerData: TMatrixArray;
           SymMatrix: IMatrix;
         begin
-          SetLength(UpperData, 3, 3);
-          UpperData[0, 0] := 1; UpperData[0, 1] := 2; UpperData[0, 2] := 3;
-          UpperData[1, 1] := 4; UpperData[1, 2] := 5; // Lower part ignored by this specific implementation logic
-          UpperData[2, 2] := 6;
-          SymMatrix := TMatrixKit.CreateSymmetric(UpperData);
+          SetLength(LowerData, 3, 3);
+          LowerData[0, 0] := 1;
+          LowerData[1, 0] := 2; LowerData[1, 1] := 4;
+          LowerData[2, 0] := 3; LowerData[2, 1] := 5; LowerData[2, 2] := 6;
+          SymMatrix := TMatrixKit.CreateSymmetric(LowerData);
           // Result: [[1, 2, 3], [2, 4, 5], [3, 5, 6]]
         end;
     }
@@ -1958,7 +1961,7 @@ type
 
       @returns True if potentially positive definite, False otherwise.
 
-      @warning Requires square matrix. Current check (Det>0, Diag>0) is insufficient and unreliable. Use Cholesky attempt for a better check.
+      @warning Requires a square, symmetric matrix. Returns False when Cholesky decomposition fails.
 
       @example See IMatrix.IsPositiveDefinite example.
     }
@@ -1971,7 +1974,7 @@ type
 
       @returns True if potentially positive semidefinite, False otherwise.
 
-      @warning Requires square matrix. Current check (Det>=0, Diag>=0) is insufficient and unreliable.
+      @warning Requires a square, symmetric matrix. Uses eigenvalue tolerance 1E-9.
 
       @example See IMatrix.IsPositiveSemidefinite example.
     }
@@ -2643,12 +2646,10 @@ end;
 
 function TMatrixKit.Rank: Integer;
 var
-  I, J, K, PivotRow: Integer;
-  Factor: Double;
-  Tolerance: Double;
+  I, J, K, PivotRow, CurrentRow: Integer;
+  Factor, Tolerance, Scale: Double;
   RowEchelon: TMatrixKit;
   MaxVal: Double;
-  IsZeroRow: Boolean;
 begin
   Result := 0;
   if (GetRows = 0) or (GetCols = 0) then
@@ -2662,51 +2663,48 @@ begin
       for J := 0 to GetCols - 1 do
         RowEchelon.FData[I, J] := FData[I, J];
 
-    Tolerance := 1E-12;
+    Scale := 0.0;
+    for I := 0 to GetRows - 1 do
+      for J := 0 to GetCols - 1 do
+        Scale := Max(Scale, Abs(FData[I, J]));
+    if Scale = 0.0 then
+      Exit(0);
+    Tolerance := 2.2204460492503131E-16 * Max(GetRows, GetCols) * Scale;
     
-    // Convert to row echelon form using Gaussian elimination
-    for I := 0 to Min(GetRows - 1, GetCols - 1) do
+    // Convert to row echelon form. The pivot row is independent of the column,
+    // which is required when an early column contains no usable pivot.
+    CurrentRow := 0;
+    for K := 0 to GetCols - 1 do
     begin
+      if CurrentRow >= GetRows then
+        Break;
       // Find maximum element in this column
-      MaxVal := Abs(RowEchelon.FData[I, I]);
-      PivotRow := I;
-      for J := I + 1 to GetRows - 1 do
-        if Abs(RowEchelon.FData[J, I]) > MaxVal then
+      MaxVal := Abs(RowEchelon.FData[CurrentRow, K]);
+      PivotRow := CurrentRow;
+      for I := CurrentRow + 1 to GetRows - 1 do
+        if Abs(RowEchelon.FData[I, K]) > MaxVal then
         begin
-          MaxVal := Abs(RowEchelon.FData[J, I]);
-          PivotRow := J;
+          MaxVal := Abs(RowEchelon.FData[I, K]);
+          PivotRow := I;
         end;
 
-      // Swap rows if necessary
-      if PivotRow <> I then
-        RowEchelon.SwapRows(I, PivotRow);
-
-      // Skip if the pivot is effectively zero
       if MaxVal <= Tolerance then
         Continue;
+      if PivotRow <> CurrentRow then
+        RowEchelon.SwapRows(CurrentRow, PivotRow);
 
       // Eliminate column elements
-      for J := I + 1 to GetRows - 1 do
+      for I := CurrentRow + 1 to GetRows - 1 do
       begin
-        Factor := RowEchelon.FData[J, I] / RowEchelon.FData[I, I];
-        for K := I to GetCols - 1 do
-          RowEchelon.FData[J, K] := RowEchelon.FData[J, K] - Factor * RowEchelon.FData[I, K];
+        Factor := RowEchelon.FData[I, K] / RowEchelon.FData[CurrentRow, K];
+        RowEchelon.FData[I, K] := 0.0;
+        for J := K + 1 to GetCols - 1 do
+          RowEchelon.FData[I, J] := RowEchelon.FData[I, J] -
+            Factor * RowEchelon.FData[CurrentRow, J];
       end;
+      Inc(CurrentRow);
     end;
-
-    // Count non-zero rows
-    for I := 0 to GetRows - 1 do
-    begin
-      IsZeroRow := True;
-      for J := 0 to GetCols - 1 do
-        if Abs(RowEchelon.FData[I, J]) > Tolerance then
-        begin
-          IsZeroRow := False;
-          Break;
-        end;
-      if not IsZeroRow then
-        Inc(Result);
-    end;
+    Result := CurrentRow;
   finally
     RowEchelon.Free;
   end;
@@ -2716,16 +2714,13 @@ function TMatrixKit.Inverse: IMatrix;
 var
   I, J: Integer;
   LUDecomp: TLUDecomposition;
-  B: array of Double;
+  B, PermutedB: array of Double;
   X: array of Double;
   InvMatrix: TMatrixKit;
 begin
   if not IsSquare then
     raise EMatrixError.Create('Matrix must be square to calculate inverse');
     
-  if Abs(Determinant) < 1E-12 then
-    raise EMatrixError.Create('Matrix is singular, cannot calculate inverse');
-
   // Get LU decomposition
   LUDecomp := LU;
   
@@ -2735,6 +2730,7 @@ begin
   
   // Solve for each column of the inverse
   SetLength(B, GetRows);
+  SetLength(PermutedB, GetRows);
   for J := 0 to GetRows - 1 do
   begin
     // Set up unit vector
@@ -2744,8 +2740,10 @@ begin
       else
         B[I] := 0;
         
-    // Solve LUx = b
-    X := ForwardSubstitution(LUDecomp.L, B);
+    // LU stores P*A = L*U, so solve L*U*x = P*b.
+    for I := 0 to GetRows - 1 do
+      PermutedB[I] := B[LUDecomp.P[I]];
+    X := ForwardSubstitution(LUDecomp.L, PermutedB);
     X := BackSubstitution(LUDecomp.U, X);
     
     // Fill column of inverse
@@ -2784,16 +2782,13 @@ end;
 function TMatrixKit.LU: TLUDecomposition;
 var
   I, J, K, PivotRow: Integer;
-  Factor, MaxVal: Double;
+  Factor, MaxVal, Scale, TempValue: Double;
   L, U: TMatrixKit;
   Tolerance: Double;
 begin
   Result := Default(TLUDecomposition);
   if not IsSquare then
     raise EMatrixError.Create('LU decomposition requires square matrix');
-
-  { Numerical tolerance for detecting singular matrices }
-  Tolerance := 1E-12;
 
   { Initialize L as identity and U as copy of input matrix }
   L := TMatrixKit.Create(GetRows, GetRows);
@@ -2808,6 +2803,18 @@ begin
   for I := 0 to GetRows - 1 do
     for J := 0 to GetRows - 1 do
       U.FData[I, J] := FData[I, J];
+
+  Scale := 0.0;
+  for I := 0 to GetRows - 1 do
+    for J := 0 to GetRows - 1 do
+      Scale := Max(Scale, Abs(U.FData[I, J]));
+  if Scale = 0.0 then
+  begin
+    L.Free;
+    U.Free;
+    raise EMatrixError.Create('Matrix is singular');
+  end;
+  Tolerance := 2.2204460492503131E-16 * Max(1, GetRows) * Scale;
 
   { Initialize L with identity matrix (unit diagonal) }
   for I := 0 to GetRows - 1 do
@@ -2838,6 +2845,13 @@ begin
     if PivotRow <> K then
     begin
       U.SwapRows(K, PivotRow);
+      { Previously computed multipliers must follow the same row exchange. }
+      for J := 0 to K - 1 do
+      begin
+        TempValue := L.FData[K, J];
+        L.FData[K, J] := L.FData[PivotRow, J];
+        L.FData[PivotRow, J] := TempValue;
+      end;
       { Update permutation array to track row exchanges }
       J := Result.P[K];
       Result.P[K] := Result.P[PivotRow];
@@ -2852,7 +2866,8 @@ begin
       L.FData[I, K] := Factor;
       
       { Eliminate elements below pivot in U matrix }
-      for J := K to GetRows - 1 do
+      U.FData[I, K] := 0.0;
+      for J := K + 1 to GetRows - 1 do
         U.FData[I, J] := U.FData[I, J] - Factor * U.FData[K, J];
     end;
   end;
@@ -3136,17 +3151,26 @@ function TMatrixKit.BackSubstitution(const Upper: IMatrix; const b: TDoubleArray
 var
   I, J: Integer;
   N: Integer;
+  Scale, Tolerance, Diagonal: Double;
 begin
   N := Length(b);
   Result := nil;
   SetLength(Result, N);
+  Scale := 0.0;
+  for I := 0 to Upper.Rows - 1 do
+    for J := 0 to Upper.Cols - 1 do
+      Scale := Max(Scale, Abs(Upper.GetValue(I, J)));
+  Tolerance := 2.2204460492503131E-16 * Max(1, N) * Scale;
   
   for I := N - 1 downto 0 do
   begin
     Result[I] := b[I];
     for J := I + 1 to N - 1 do
       Result[I] := Result[I] - Upper.GetValue(I, J) * Result[J];
-    Result[I] := Result[I] / Upper.GetValue(I, I);
+    Diagonal := Upper.GetValue(I, I);
+    if Abs(Diagonal) <= Tolerance then
+      raise EMatrixError.Create('Singular upper-triangular system');
+    Result[I] := Result[I] / Diagonal;
   end;
 end;
 
@@ -3154,17 +3178,26 @@ function TMatrixKit.ForwardSubstitution(const Lower: IMatrix; const b: TDoubleAr
 var
   I, J: Integer;
   N: Integer;
+  Scale, Tolerance, Diagonal: Double;
 begin
   N := Length(b);
   Result := nil;
   SetLength(Result, N);
+  Scale := 0.0;
+  for I := 0 to Lower.Rows - 1 do
+    for J := 0 to Lower.Cols - 1 do
+      Scale := Max(Scale, Abs(Lower.GetValue(I, J)));
+  Tolerance := 2.2204460492503131E-16 * Max(1, N) * Scale;
   
   for I := 0 to N - 1 do
   begin
     Result[I] := b[I];
     for J := 0 to I - 1 do
       Result[I] := Result[I] - Lower.GetValue(I, J) * Result[J];
-    Result[I] := Result[I] / Lower.GetValue(I, I);
+    Diagonal := Lower.GetValue(I, I);
+    if Abs(Diagonal) <= Tolerance then
+      raise EMatrixError.Create('Singular lower-triangular system');
+    Result[I] := Result[I] / Diagonal;
   end;
 end;
 
@@ -3518,7 +3551,7 @@ begin
         DivisorValue := Other.GetValue(I, J);
         
         // Check for division by zero
-        if Abs(DivisorValue) < 1E-12 then
+        if DivisorValue = 0.0 then
           raise EMatrixError.Create('Division by zero in element-wise division');
           
         Matrix.FData[I, J] := FData[I, J] / DivisorValue;
@@ -3874,9 +3907,8 @@ function TMatrixKit.SolveIterative(
 var
   X, R, P, AP, Temp: IMatrix;
   Alpha, Beta, RDotR, OldRDotR, NormB, ResidualNorm, PDotAP: Double;
-  D, LInv, UInv: IMatrix;
   DiagA: IMatrix;
-  I, J, K, Iter: Integer;
+  I, J, Iter: Integer;
   Converged: Boolean;
 begin
   if not IsSquare then
@@ -3887,6 +3919,10 @@ begin
     
   if GetRows <> B.GetRows then
     raise EMatrixError.Create('Matrix and right-hand side dimensions do not match');
+  if MaxIterations <= 0 then
+    raise EMatrixError.Create('Iterative solver requires MaxIterations > 0');
+  if (Tolerance <= 0.0) or IsNan(Tolerance) or IsInfinite(Tolerance) then
+    raise EMatrixError.Create('Iterative solver requires a finite positive tolerance');
   
   // Initialize solution vector X with zeros
   X := TMatrixKit.Zeros(GetRows, 1);
@@ -3900,7 +3936,8 @@ begin
   // If B is zero, return zero solution
   if Abs(NormB) < 1E-15 then
     Exit(X);
-  
+
+  Converged := False;
   case Method of
     imConjugateGradient:
     begin
@@ -3935,7 +3972,7 @@ begin
           PDotAP := PDotAP + P.GetValue(I, 0) * AP.GetValue(I, 0);
         
         if Abs(PDotAP) < 1E-15 then
-          Break; // Avoid division by zero
+          raise EMatrixError.Create('Conjugate-gradient iteration broke down');
           
         Alpha := RDotR / PDotAP;
         
@@ -4058,6 +4095,10 @@ begin
       end;
     end;
   end;
+
+  if not Converged then
+    raise EMatrixError.CreateFmt(
+      'Iterative solver did not converge after %d iterations', [MaxIterations]);
   
   Result := X;
 end;
@@ -4373,15 +4414,14 @@ function TMatrixKit.SVD: TSVD;
 var
   I, J, K, L, M, Iter: Integer;
   MaxIter: Integer;
-  Tolerance: Double;
   A, S, V: TMatrixKit;  // Removed U from here since we use A as U
   C, F, G, H, S1, X, Y, Z: Double;
   RV1: array of Double;
-  Anorm, Scale, Shift: Double;
+  Anorm, Scale: Double;
   Flag: Boolean;
 begin
   MaxIter := 50;  // Usually converges in fewer iterations
-  Tolerance := 1E-12;
+  L := 0;
   
   // Initialize matrices
   A := TMatrixKit.Create(GetRows, GetCols);
@@ -4762,36 +4802,68 @@ end;
 
 function TMatrixKit.Exp: IMatrix;
 var
-  I, J, K, N: Integer;
-  Factorial: Double;
-  Term, Sum: IMatrix;
+  I, J, K, Squarings: Integer;
+  MatrixNorm, ScaleFactor, TermNorm, SumNorm: Double;
+  Scaled, Term, NextTerm, Sum: IMatrix;
+  Converged: Boolean;
 begin
   if not IsSquare then
     raise EMatrixError.Create('Matrix exponential requires square matrix');
   
-  // Initialize result to identity matrix
-  Result := TMatrixKit.Identity(GetRows);
-  
-  // Initialize first term (A^1 / 1!)
-  Term := Self;
-  
-  // Use Taylor series: e^A = I + A + A^2/2! + A^3/3! + ...
-  N := 20;  // Number of terms in the series
-  
-  for K := 1 to N do
+  for I := 0 to GetRows - 1 do
+    for J := 0 to GetCols - 1 do
+      if IsNan(FData[I, J]) or IsInfinite(FData[I, J]) then
+        raise EMatrixError.Create('Matrix exponential requires finite elements');
+
+  { Scaling and squaring keeps the Taylor argument small. Terms are generated
+    recursively, and convergence is tested relative to the accumulated sum. }
+  MatrixNorm := NormInf;
+  ScaleFactor := 1.0;
+  Squarings := 0;
+  while MatrixNorm / ScaleFactor > 0.5 do
   begin
-    // Compute factorial
-    Factorial := 1.0;
-    for I := 2 to K do
-      Factorial := Factorial * I;
-    
-    // Add term to sum
-    Sum := Term.ScalarMultiply(1.0 / Factorial);
-    Result := Result.Add(Sum);
-    
-    // Compute next term: A^(k+1)
-    if K < N then
-      Term := Term.Multiply(Self);
+    if ScaleFactor > MaxDouble / 2.0 then
+      raise EMatrixError.Create('Matrix exponential scaling overflow');
+    ScaleFactor := ScaleFactor * 2.0;
+    Inc(Squarings);
+  end;
+  Scaled := ScalarMultiply(1.0 / ScaleFactor);
+  Sum := TMatrixKit.Identity(GetRows);
+  Term := TMatrixKit.Identity(GetRows);
+  Converged := MatrixNorm = 0.0;
+  for K := 1 to 100 do
+  begin
+    { The explicit Double cast avoids FPC treating an isolated real/integer
+      quotient as a lower-precision Real expression on some targets. }
+    NextTerm := Term.Multiply(Scaled).ScalarMultiply(Double(1.0) / K);
+    Term := NextTerm;
+    Sum := Sum.Add(Term);
+    TermNorm := Term.NormInf;
+    SumNorm := Sum.NormInf;
+    if TermNorm <= 1E-15 * Max(1.0, SumNorm) then
+    begin
+      Converged := True;
+      Break;
+    end;
+  end;
+  if not Converged then
+    raise EMatrixError.Create('Matrix exponential series did not converge');
+  try
+    for K := 1 to Squarings do
+    begin
+      Sum := Sum.Multiply(Sum);
+      for I := 0 to GetRows - 1 do
+        for J := 0 to GetCols - 1 do
+          if IsNan(Sum.GetValue(I, J)) or IsInfinite(Sum.GetValue(I, J)) then
+            raise EMatrixError.Create('Matrix exponential result overflowed');
+    end;
+    Result := Sum;
+  except
+    on E: EMatrixError do raise;
+    on E: EOverflow do
+      raise EMatrixError.Create('Matrix exponential result overflowed');
+    on E: EInvalidOp do
+      raise EMatrixError.Create('Matrix exponential result overflowed');
   end;
 end;
 

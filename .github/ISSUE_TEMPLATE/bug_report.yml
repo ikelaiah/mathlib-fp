@@ -1,0 +1,73 @@
+name: Bug report
+description: Report incorrect behaviour or a regression in mathlib-fp
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve mathlib-fp. For security issues, use the private reporting route in SECURITY.md.
+  - type: dropdown
+    id: library
+    attributes:
+      label: Affected library
+      options:
+        - MathBase
+        - AlgebraLib
+        - FinanceLib
+        - StatsLib
+        - EngineeringLib
+        - NumericsLib
+        - ProbabilityLib
+        - CombinatoricsLib
+        - OptimizationLib
+        - TimeSeriesLib
+        - MLLib
+        - GeometryLib
+        - Lazarus package or build
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: mathlib-fp version or commit
+      placeholder: v1.2.0 or a commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the operating system, FPC version, and Lazarus version if used.
+      placeholder: Windows 11, FPC 3.2.2, Lazarus 4.8
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed and expected behaviour.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide a small Pascal program, inputs, and exact build command.
+      render: Pascal
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Compiler or runtime output
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: This report does not contain private vulnerability details.
+          required: true

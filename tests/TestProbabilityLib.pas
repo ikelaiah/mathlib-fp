@@ -64,6 +64,14 @@ type
     procedure DoGeometricPMF_BadP;
     procedure DoNegBinomialPMF_BadR;
     procedure DoHypergeometricPMF_BadPop;
+    procedure DoNormalMean_BadSigma;
+    procedure DoGammaMean_BadAlpha;
+    procedure DoUniformMean_BadBounds;
+    procedure DoBinomialMean_BadN;
+    procedure DoPoissonMean_BadLambda;
+    procedure DoNegBinomialMean_BadR;
+    procedure DoHypergeometricMean_Negative;
+    procedure DoNormalCDF_NonFinite;
 
   published
     { -----------------------------------------------------------------------
@@ -206,6 +214,13 @@ type
     ----------------------------------------------------------------------- }
     procedure Test76_NormalCDF_Rounded;
     procedure Test77_BinomialPMF_Rounded;
+    procedure Test78_ContinuousCDFSurvivalIdentities;
+    procedure Test79_SymmetricDistributionProperties;
+    procedure Test80_BinomialPMFSumsToOne;
+    procedure Test81_PoissonPMFSumsToOne;
+    procedure Test82_HypergeometricPMFSumsToOne;
+    procedure Test83_MomentValidationRegression;
+    procedure Test84_DiscreteBoundaryRegression;
 
   end;
 
@@ -272,6 +287,30 @@ begin TProbabilityKit.NegBinomialPMF(3, 0, 0.5); end;
 
 procedure TTestProbabilityLib.DoHypergeometricPMF_BadPop;
 begin TProbabilityKit.HypergeometricPMF(1, 0, 0, 0); end;
+
+procedure TTestProbabilityLib.DoNormalMean_BadSigma;
+begin TProbabilityKit.NormalMean(0, 0); end;
+
+procedure TTestProbabilityLib.DoGammaMean_BadAlpha;
+begin TProbabilityKit.GammaMean(0, 1); end;
+
+procedure TTestProbabilityLib.DoUniformMean_BadBounds;
+begin TProbabilityKit.UniformMean(2, 1); end;
+
+procedure TTestProbabilityLib.DoBinomialMean_BadN;
+begin TProbabilityKit.BinomialMean(0, 0.5); end;
+
+procedure TTestProbabilityLib.DoPoissonMean_BadLambda;
+begin TProbabilityKit.PoissonMean(0); end;
+
+procedure TTestProbabilityLib.DoNegBinomialMean_BadR;
+begin TProbabilityKit.NegBinomialMean(0, 0.5); end;
+
+procedure TTestProbabilityLib.DoHypergeometricMean_Negative;
+begin TProbabilityKit.HypergeometricMean(10, -1, 2); end;
+
+procedure TTestProbabilityLib.DoNormalCDF_NonFinite;
+begin TProbabilityKit.NormalCDF(NaN, 0, 1); end;
 
 { ===========================================================================
   NORMAL
@@ -828,6 +867,115 @@ begin
   Raw     := TProbabilityKit.BinomialPMF(3, 10, 0.5);
   Rounded := TProbabilityKit.BinomialPMF(3, 10, 0.5, 3);
   AssertNear(Raw, Rounded, 0.0005, 'Binomial PMF rounding');
+end;
+
+procedure TTestProbabilityLib.Test78_ContinuousCDFSurvivalIdentities;
+var
+  X, Prev, CDFValue: Double;
+  I: Integer;
+begin
+  Prev := 0.0;
+  for I := 0 to 20 do
+  begin
+    X := -4.0 + 0.4 * I;
+    CDFValue := TProbabilityKit.NormalCDF(X, 0, 1);
+    AssertNear(1.0, CDFValue + TProbabilityKit.NormalSurvival(X, 0, 1),
+      2E-15, 'normal CDF + survival');
+    AssertTrue('normal CDF monotone', CDFValue >= Prev);
+    Prev := CDFValue;
+  end;
+  for I := 0 to 20 do
+  begin
+    X := I * 0.5;
+    AssertNear(1.0, TProbabilityKit.GammaCDF(X, 2.5, 1.3) +
+      TProbabilityKit.GammaSurvival(X, 2.5, 1.3), 2E-12,
+      'gamma CDF + survival');
+  end;
+  for I := 0 to 20 do
+  begin
+    X := I / 20.0;
+    AssertNear(1.0, TProbabilityKit.BetaCDF(X, 2.0, 5.0) +
+      TProbabilityKit.BetaSurvival(X, 2.0, 5.0), 2E-12,
+      'beta CDF + survival');
+  end;
+end;
+
+procedure TTestProbabilityLib.Test79_SymmetricDistributionProperties;
+var
+  X: Double;
+  I: Integer;
+begin
+  for I := 0 to 10 do
+  begin
+    X := I / 3.0;
+    AssertNear(1.0, TProbabilityKit.NormalCDF(X, 0, 1) +
+      TProbabilityKit.NormalCDF(-X, 0, 1), 2E-9, 'normal symmetry');
+    AssertNear(1.0, TProbabilityKit.StudentTCDF(X, 9) +
+      TProbabilityKit.StudentTCDF(-X, 9), 2E-12, 'Student t symmetry');
+  end;
+end;
+
+procedure TTestProbabilityLib.Test80_BinomialPMFSumsToOne;
+var
+  K: Integer;
+  Total: Double;
+begin
+  Total := 0.0;
+  for K := 0 to 20 do Total := Total + TProbabilityKit.BinomialPMF(K, 20, 0.37);
+  AssertNear(1.0, Total, 1E-10, 'binomial normalization');
+end;
+
+procedure TTestProbabilityLib.Test81_PoissonPMFSumsToOne;
+var
+  K: Integer;
+  Total: Double;
+begin
+  Total := 0.0;
+  for K := 0 to 100 do Total := Total + TProbabilityKit.PoissonPMF(K, 7.0);
+  AssertNear(1.0, Total, 1E-12, 'Poisson normalization');
+end;
+
+procedure TTestProbabilityLib.Test82_HypergeometricPMFSumsToOne;
+var
+  K: Integer;
+  Total: Double;
+begin
+  Total := 0.0;
+  for K := 0 to 12 do
+    Total := Total + TProbabilityKit.HypergeometricPMF(K, 40, 12, 15);
+  AssertNear(1.0, Total, 5E-12, 'hypergeometric normalization');
+end;
+
+procedure TTestProbabilityLib.Test83_MomentValidationRegression;
+begin
+  AssertException('normal mean validates sigma', EProbabilityError,
+    @DoNormalMean_BadSigma);
+  AssertException('gamma mean validates alpha', EProbabilityError,
+    @DoGammaMean_BadAlpha);
+  AssertException('uniform mean validates bounds', EProbabilityError,
+    @DoUniformMean_BadBounds);
+  AssertException('binomial mean validates N', EProbabilityError,
+    @DoBinomialMean_BadN);
+  AssertException('Poisson mean validates lambda', EProbabilityError,
+    @DoPoissonMean_BadLambda);
+  AssertException('negative-binomial mean validates R', EProbabilityError,
+    @DoNegBinomialMean_BadR);
+  AssertException('hypergeometric mean validates negative counts',
+    EProbabilityError, @DoHypergeometricMean_Negative);
+  AssertException('distribution inputs must be finite', EProbabilityError,
+    @DoNormalCDF_NonFinite);
+end;
+
+procedure TTestProbabilityLib.Test84_DiscreteBoundaryRegression;
+begin
+  AssertNear(1.0, TProbabilityKit.NegBinomialPMF(3, 3, 1.0), EPS,
+    'negative binomial P=1 at K=R');
+  AssertNear(0.0, TProbabilityKit.NegBinomialPMF(4, 3, 1.0), EPS,
+    'negative binomial P=1 after K=R');
+  AssertNear(1.0, TProbabilityKit.NegBinomialCDF(3, 3, 1.0), EPS,
+    'negative binomial CDF P=1');
+  AssertNear(0.0, TProbabilityKit.HypergeometricVariance(1, 1, 1), EPS,
+    'single-item hypergeometric variance');
 end;
 
 initialization

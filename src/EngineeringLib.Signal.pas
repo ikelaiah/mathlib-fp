@@ -18,7 +18,7 @@ unit EngineeringLib.Signal;
      IFFT             — inverse FFT
      CalculateFFT     — convenience wrapper: real input → complex output arrays
      CalculateIFFT    — inverse: complex arrays → real output
-     CalculateFFTMagnitudePhase — magnitude and phase spectra
+     CalculateFFTMagnitudePhase — complete magnitude and phase spectra
 
    FIR Filter Design (windowed-sinc)
      DesignFIRLowPass   — low-pass FIR coefficients
@@ -38,10 +38,12 @@ unit EngineeringLib.Signal;
 interface
 
 uses
-  Classes, SysUtils, Math, EngineeringLib.Common;
+  Classes, SysUtils, Math, MathBase.SharedTypes, EngineeringLib.Common;
 
 type
-  TDoubleArray = array of Double;
+  { Keep the familiar EngineeringLib.Signal name while sharing the library-wide
+    dynamic-array type from MathBase. }
+  TDoubleArray = MathBase.SharedTypes.TDoubleArray;
 
   TWindowType = (wtRectangular, wtHamming, wtHann, wtBlackman);
 
@@ -63,25 +65,28 @@ type
       Set Inverse=True for IFFT (includes the 1/N scaling). }
     class procedure FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean = False); static;
 
-    { Convenience wrapper: real-valued input signal → complex spectrum.
-      Pads or truncates to the nearest power-of-2 length automatically.
-      OutRealPart[0..N/2] and OutImagPart[0..N/2] are the one-sided spectrum. }
+    { Convenience wrapper: real-valued input signal → complete complex spectrum.
+      Zero-pads to the next power-of-2 length automatically; it never truncates.
+      Empty input produces two empty output arrays. }
     class procedure CalculateFFT(
       const InputSignal: TDoubleArray;
       out OutRealPart, OutImagPart: TDoubleArray); overload; static;
 
-    { Inverse FFT: complex spectrum → real-valued signal. }
+    { Inverse FFT: complete complex spectrum → real-valued signal.
+      The real and imaginary arrays must have equal, power-of-2 lengths.
+      Two empty input arrays produce an empty output array. }
     class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray; out OutputSignal: TDoubleArray); static;
 
-    { Magnitude and phase spectra (one-sided, 0..N/2). }
+    { Complete N-bin magnitude and phase spectra. }
     class procedure CalculateFFTMagnitudePhase(
       const InputSignal: TDoubleArray;
       out Magnitude, Phase: TDoubleArray); static;
 
     { --- FIR Filter Design (windowed-sinc) ---
       CutoffFreq is normalised: 0 < fc < 0.5 (where 0.5 = Nyquist).
-      Order is the filter order (number of coefficients = Order+1; must be even
-      for symmetric linear-phase FIR).
+      Order is the filter order (number of coefficients = Order+1). It must be
+      at least 2; odd orders are incremented to the next even order so every
+      design remains a symmetric, odd-length linear-phase FIR.
       WindowType selects the window used to taper the ideal sinc kernel. }
 
     class function DesignFIRLowPass(
@@ -295,6 +300,13 @@ class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray; out Out
 var
   N, I: Integer;
 begin
+  if Length(InputSignal) = 0 then
+  begin
+    OutRealPart := nil;
+    OutImagPart := nil;
+    Exit;
+  end;
+
   N := NextPow2(Length(InputSignal));
   SetLength(OutRealPart, N);
   SetLength(OutImagPart, N);
@@ -313,6 +325,15 @@ var
   N, I: Integer;
 begin
   N := Length(InRealPart);
+  if N <> Length(InImagPart) then
+    raise ESignalError.Create(
+      'CalculateIFFT: real and imaginary parts must have the same length.');
+  if N = 0 then
+  begin
+    OutputSignal := nil;
+    Exit;
+  end;
+
   SetLength(Re, N);
   SetLength(Im, N);
   for I := 0 to N - 1 do begin Re[I] := InRealPart[I]; Im[I] := InImagPart[I]; end;
@@ -383,7 +404,8 @@ class function TSignalKit.DesignFIRLowPass(CutoffFreq: Double; Order: Integer; W
 begin
   if (CutoffFreq <= 0) or (CutoffFreq >= 0.5) then
     raise ESignalError.Create('DesignFIRLowPass: CutoffFreq must be in (0, 0.5).');
-  if Order < 2 then Order := 2;
+  if Order < 2 then
+    raise ESignalError.Create('DesignFIRLowPass: Order must be at least 2.');
   if Odd(Order) then Inc(Order);
   Result := SincKernel(Order, CutoffFreq, WindowType);
   NormaliseCoeffs(Result);
@@ -400,7 +422,7 @@ begin
   SetLength(Result, Length(LP));
   for I := 0 to High(LP) do
     Result[I] := -LP[I];
-  Result[Order div 2] := Result[Order div 2] + 1.0;
+  Result[High(Result) div 2] := Result[High(Result) div 2] + 1.0;
 end;
 
 class function TSignalKit.DesignFIRBandPass(
@@ -436,7 +458,7 @@ begin
   SetLength(Result, Length(BP));
   for I := 0 to High(BP) do
     Result[I] := -BP[I];
-  Result[Order div 2] := Result[Order div 2] + 1.0;
+  Result[High(Result) div 2] := Result[High(Result) div 2] + 1.0;
 end;
 
 class function TSignalKit.ApplyFIRFilter(const Signal, Coeffs: TDoubleArray): TDoubleArray;

@@ -85,7 +85,7 @@ type
       RelativeRoughness: Double;
       Tolerance: Double = 1E-6;
       MaxIterations: Integer = 100): Double; static;
-    // Simplified Blasius correlation for smooth pipes: f = 0.316/Re^0.25 (valid for 4000 < Re < 10⁵)
+    // Simplified Blasius correlation for smooth pipes: f = 0.316/Re^0.25 (valid for 4000 <= Re <= 10⁵)
     class function BlasiusFrictionFactor(ReynoldsNumberValue: Double): Double; static;
 
     { Dimensional Analysis - Non-dimensional numbers }
@@ -155,7 +155,8 @@ type
     class function PumpHead(
       PressureDiff: Double;
       Density: Double;
-      VelocityDiff: Double;
+      InletVelocity: Double;
+      OutletVelocity: Double;
       HeightDiff: Double): Double; static;
     // Specific speed of pumps: Ns = N*sqrt(Q)/H^(3/4), where N is RPM
     class function PumpSpecificSpeed(RPM: Double; FlowRate: Double; Head: Double): Double; static;
@@ -336,7 +337,11 @@ begin
   if RelativeRoughness < 0 then
     raise EFluidDynamicsError.Create('Relative roughness cannot be negative.');
   if ReynoldsNumberValue < 4000 then
-    raise EFluidDynamicsError.Create('Turbulent friction factor applies only for Reynolds numbers above 4000.');
+    raise EFluidDynamicsError.Create('Turbulent friction factor requires a Reynolds number of at least 4000.');
+  if Tolerance <= 0 then
+    raise EFluidDynamicsError.Create('Tolerance must be positive for friction factor calculation.');
+  if MaxIterations <= 0 then
+    raise EFluidDynamicsError.Create('Maximum iterations must be positive for friction factor calculation.');
   
   // Initial guess using Haaland equation
   f_old := Power(1 / (-1.8 * Log10(Power(RelativeRoughness / 3.7, 1.11) + 6.9 / ReynoldsNumberValue)), 2);
@@ -533,8 +538,10 @@ end;
 
 class function TFluidDynamicsKit.PumpPower(Density: Double; FlowRate: Double; Head: Double; Efficiency: Double): Double;
 begin
-  if (Density <= 0) or (Head < 0) or (Efficiency <= 0) or (Efficiency > 1) then
-    raise EFluidDynamicsError.Create('Density and efficiency must be positive; efficiency must be between 0 and 1.');
+  if (Density <= 0) or (FlowRate < 0) or (Head < 0) or
+     (Efficiency <= 0) or (Efficiency > 1) then
+    raise EFluidDynamicsError.Create(
+      'Density must be positive; flow rate and head must be non-negative; efficiency must be in (0, 1].');
   
   Result := Density * GravityAcceleration * FlowRate * Head / Efficiency;
 end;
@@ -542,14 +549,16 @@ end;
 class function TFluidDynamicsKit.PumpHead(
   PressureDiff: Double;
   Density: Double;
-  VelocityDiff: Double;
+  InletVelocity: Double;
+  OutletVelocity: Double;
   HeightDiff: Double): Double;
 begin
   if Density <= 0 then
     raise EFluidDynamicsError.Create('Density must be positive for pump head calculation.');
   
-  Result := PressureDiff / (Density * GravityAcceleration) + 
-            Power(VelocityDiff, 2) / (2 * GravityAcceleration) + HeightDiff;
+  Result := PressureDiff / (Density * GravityAcceleration) +
+            (Power(OutletVelocity, 2) - Power(InletVelocity, 2)) /
+              (2 * GravityAcceleration) + HeightDiff;
 end;
 
 class function TFluidDynamicsKit.PumpSpecificSpeed(RPM: Double; FlowRate: Double; Head: Double): Double;
@@ -566,8 +575,10 @@ class function TFluidDynamicsKit.TurbinePower(
   FlowRate: Double;
   Head: Double): Double;
 begin
-  if (Efficiency <= 0) or (Efficiency > 1) or (Density <= 0) or (Head < 0) then
-    raise EFluidDynamicsError.Create('Efficiency must be between 0 and 1; density must be positive.');
+  if (Efficiency <= 0) or (Efficiency > 1) or (Density <= 0) or
+     (FlowRate < 0) or (Head < 0) then
+    raise EFluidDynamicsError.Create(
+      'Efficiency must be in (0, 1]; density must be positive; flow rate and head must be non-negative.');
   
   Result := Efficiency * Density * GravityAcceleration * FlowRate * Head;
 end;

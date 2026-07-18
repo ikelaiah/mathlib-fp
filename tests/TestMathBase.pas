@@ -181,6 +181,7 @@ type
     procedure Test49_VectorAngle45;
     procedure Test50_VectorAngle90;
     procedure Test51_VectorAngle180;
+    procedure Test52_LargeArgumentStability;
   end;
 
 
@@ -622,7 +623,9 @@ begin
   KSStat := TStatsKit.KolmogorovSmirnovTest(Data, KSPValue);
   
   AssertTrue('KS statistic should be between 0 and 1', (KSStat >= 0) and (KSStat <= 1));
-  AssertTrue('KS test should indicate normality for normal-like data', KSPValue < 0.886 / Sqrt(Length(Data)));
+  AssertTrue('KS p-value should be between 0 and 1',
+    (KSPValue >= 0.0) and (KSPValue <= 1.0));
+  AssertTrue('KS test should not reject normal-like data', KSPValue >= 0.05);
 end;
 
 procedure TTestCaseStats.Test40_ShapiroWilk;
@@ -753,9 +756,9 @@ var
   CashFlows: TDoubleArray;
   Result: Double;
 begin
-  CashFlows := TDoubleArray.Create(110, 121, 133.1);
+  CashFlows := TDoubleArray.Create(120);
   Result := TFinanceKit.InternalRateOfReturn(100, CashFlows, 4);
-  AssertTrue('IRR calculation failed', Abs(Result - 0.1) < FINANCE_EPSILON);
+  AssertFinanceEquals(0.2, Result, 'IRR calculation failed');
 end;
 
 procedure TTestCaseFinance.Test07_Depreciation;
@@ -1272,6 +1275,23 @@ end;
 procedure TTestCaseTrig.Test51_VectorAngle180;
 begin
   AssertEquals(Pi, TTrigKit.VectorAngle(0, 0, -1, 0), 'VectorAngle 180° failed');
+end;
+
+procedure TTestCaseTrig.Test52_LargeArgumentStability;
+var
+  Angle, H: Double;
+begin
+  Angle := TTrigKit.NormalizeAngle(1E300);
+  AssertTrue('huge normalized angle is in range',
+    (Angle >= 0.0) and (Angle < 2.0 * Pi));
+  AssertTrue('infinite angle returns NaN',
+    IsNan(TTrigKit.NormalizeAngle(Infinity)));
+  AssertEquals('stable positive tanh saturation', 1.0, TTrigKit.Tanh(1000.0), 0.0);
+  AssertEquals('stable negative tanh saturation', -1.0, TTrigKit.Tanh(-1000.0), 0.0);
+  AssertTrue('large asinh remains finite', not IsInfinite(TTrigKit.ArcSinh(1E300)));
+  H := TTrigKit.Hypotenuse(1E308, 1E308);
+  AssertTrue('scaled hypot remains finite', not IsInfinite(H));
+  AssertEquals('scaled hypot reference', Sqrt(2.0), H / 1E308, 1E-15);
 end;
 
 

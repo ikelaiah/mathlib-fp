@@ -170,6 +170,8 @@ type
       @returns The future value of the investment, rounded to ADecimals places
       
       @references CFA Institute's Financial Mathematics
+
+      @warning Raises EFinanceError if APeriods is negative.
       
       @example
         var
@@ -177,7 +179,7 @@ type
         begin
           // Calculate the future value of $1000 invested for 5 years at 8% annual interest
           FV := TFinanceKit.FutureValue(1000, 0.08, 5);
-          // Returns approximately 1469.3282
+          // Returns approximately 1469.3281
         end;
     }
     class function FutureValue(
@@ -204,6 +206,8 @@ type
                rounded to ADecimals places
       
       @references Financial Mathematics for Actuaries
+
+      @warning Raises EFinanceError if APeriods is negative.
       
       @example
         var
@@ -211,7 +215,7 @@ type
         begin
           // Calculate the compound interest earned on $1000 invested for 5 years at 8% annual interest
           Interest := TFinanceKit.CompoundInterest(1000, 0.08, 5);
-          // Returns approximately 469.3282 (the difference between future value and principal)
+          // Returns approximately 469.3281 (the difference between future value and principal)
         end;
     }
     class function CompoundInterest(
@@ -253,7 +257,7 @@ type
           // Calculate the monthly payment for a $200,000 30-year mortgage at 4.5% annual interest
           // (note: convert annual rate to monthly by dividing by 12)
           Payment := TFinanceKit.Payment(200000, 0.045/12, 30*12);
-          // Returns approximately 1013.3721 per month
+          // Returns approximately 1013.3706 per month
         end;
     }
     class function Payment(
@@ -312,13 +316,11 @@ type
     
     {
       @description IRR is the discount rate that makes NPV = 0.
-                   Found by solving: 0 = -I + Σ(CFt / (1+IRR)^t)
-                   
-                   Implementation uses the Secant Method with dampening:
-                   1. Start with initial guess
-                   2. Use secant method: r_new = r - NPV * (r - r_last)/(NPV - NPV_last)
-                   3. Apply dampening to improve convergence
-                   4. Repeat until |NPV| < tolerance
+                   Found by solving: 0 = -I + Σ(CFt / (1+IRR)^t).
+
+                   The implementation brackets a sign change around zero and
+                   then uses bisection. Positive-rate brackets are expanded as
+                   needed; negative rates are searched down towards -100%.
       
       @usage Use to find the rate of return of an investment based on its cash flows
       
@@ -326,13 +328,15 @@ type
       @param ACashFlows Array of future cash flows (typically positive values)
       @param ADecimals Number of decimal places to round to (default: 4)
       
-      @returns The internal rate of return, rounded to ADecimals places
+      @returns A bracketed internal rate of return, rounded to ADecimals places
       
       @references Financial Mathematics for Actuaries
       
-      @warning Returns NaN if no convergence is achieved or if the problem has no solution.
-               No IRR exists if the cash flow series does not change sign at least once.
-               Multiple IRRs can exist mathematically if there are multiple sign changes in the cash flows.
+      @warning Raises EFinanceError when the cash-flow array is empty, the
+               initial investment is not positive, no positive future cash
+               flow exists, or a root cannot be bracketed or converged.
+               Multiple IRRs can exist when the cash-flow signs change more
+               than once; in that case IRR is inherently ambiguous.
       
       @example
         var
@@ -348,7 +352,7 @@ type
           
           // Calculate IRR of a $100,000 investment with the above cash flows
           IRR := TFinanceKit.InternalRateOfReturn(100000, CashFlows);
-          // Returns approximately 0.1797 (17.97%) if convergence is reached
+          // Returns approximately 0.1345 (13.45%)
         end;
     }
     class function InternalRateOfReturn(
@@ -370,6 +374,9 @@ type
       @returns The annual depreciation expense, rounded to ADecimals places
       
       @references IFRS IAS 16
+
+      @warning Raises EFinanceError if ALife is not positive or if ACost is
+               less than ASalvage.
       
       @example
         var
@@ -441,6 +448,8 @@ type
       @returns The return on investment as a decimal (multiply by 100 for percentage)
       
       @references Corporate Finance Institute
+
+      @warning Raises EFinanceError if ACost is zero.
       
       @example
         var
@@ -466,6 +475,8 @@ type
       @returns The return on equity as a decimal (multiply by 100 for percentage)
       
       @references Corporate Finance Institute
+
+      @warning Raises EFinanceError if AShareholdersEquity is zero.
       
       @example
         var
@@ -512,7 +523,7 @@ type
           // Calculate the price of a $1000 face value bond with 6% annual coupon (paid semi-annually)
           // with 4.5% yield to maturity and 10 years to maturity
           Price := TFinanceKit.BondPrice(1000, 0.06, 0.045, 2, 10);
-          // Returns approximately 1123.2526
+          // Returns approximately 1119.7278
         end;
     }
     class function BondPrice(
@@ -537,7 +548,8 @@ type
       
       @references CFA Institute's Fixed Income Analysis
       
-      @warning Raises EFinanceError if calculation does not converge after maximum iterations.
+      @warning Raises EFinanceError if the payment frequency or maturity is
+               invalid, or if calculation does not converge after maximum iterations.
                The implementation uses Newton-Raphson method with dampening for better convergence.
       
       @example
@@ -555,7 +567,7 @@ type
       const APeriodsPerYear, AYearsToMaturity: Integer;
       const ADecimals: Integer = 4): Double; static;
 
-    { ArmotizationPayment type for calculating amortization schedule}
+    { Amortization payment types used by AmortizationSchedule. }
     type
       TAmortizationPayment = record
         PaymentNumber: Integer;
@@ -674,7 +686,8 @@ type
     
       @references CFA Institute's Fixed Income Analysis
     
-      @warning Higher duration indicates greater sensitivity to interest rate changes.
+      @warning Raises EFinanceError if the payment frequency or maturity is
+               invalid. Higher duration indicates greater sensitivity to interest rate changes.
                For a small change in yield (Δy), the percentage price change ≈ -ModDur × Δy
       
       @example
@@ -747,10 +760,13 @@ type
       @returns TWorkingCapitalRatios - Record containing working capital ratios
       
       @references Corporate Finance Institute
+
+      @warning Raises EFinanceError if current liabilities or working capital
+               is zero, because one or more returned ratios would be undefined.
       
       @example
         var
-          Ratios: TFinanceKit.TWorkingCapitalRatios;
+          Ratios: TWorkingCapitalRatios;
         begin
           // Calculate working capital ratios for a company with:
           // - Current assets: $1,000,000
@@ -786,10 +802,13 @@ type
       @returns TLeverageRatios - Record containing financial leverage ratios
       
       @references Corporate Finance Institute
+
+      @warning Raises EFinanceError if total assets, total equity, or interest
+               expense is zero.
       
       @example
         var
-          Ratios: TFinanceKit.TLeverageRatios;
+          Ratios: TLeverageRatios;
         begin
           // Calculate financial leverage ratios for a company with:
           // - Total debt: $500,000
@@ -846,7 +865,7 @@ type
           // - Volatility: 20%
           // - Time to maturity: 1 year
           Price := TFinanceKit.BlackScholes(50, 50, 0.05, 0.20, 1, otCall);
-          // Returns approximately 7.94
+          // Returns approximately 5.2253
         end;
     }
     class function BlackScholes(
@@ -873,10 +892,13 @@ type
       @returns TRiskMetrics - Record containing risk-adjusted return measures
       
       @references CFA Institute's Portfolio Management
+
+      @warning Raises EFinanceError if portfolio standard deviation, beta, or
+               tracking error is zero.
       
       @example
         var
-          Metrics: TFinanceKit.TRiskMetrics;
+          Metrics: TRiskMetrics;
         begin
           // Calculate risk-adjusted return metrics for a portfolio with:
           // - Portfolio return: 10%
@@ -888,9 +910,9 @@ type
           // - Tracking error: 5%
           Metrics := TFinanceKit.RiskMetrics(0.10, 0.02, 0.08, 1.2, 0.15, 0.07, 0.05);
           // Metrics.SharpeRatio = 0.53
-          // Metrics.TreynorRatio = 0.05
+          // Metrics.TreynorRatio = 0.0667
           // Metrics.JensenAlpha = 0.01
-          // Metrics.InformationRatio = 0.20
+          // Metrics.InformationRatio = 0.60
         end;
     }
     class function RiskMetrics(
@@ -914,10 +936,12 @@ type
       @returns TDuPontAnalysis - Record containing DuPont Analysis components
       
       @references Corporate Finance Institute
+
+      @warning Raises EFinanceError if sales, total assets, or total equity is zero.
       
       @example
         var
-          Analysis: TFinanceKit.TDuPontAnalysis;
+          Analysis: TDuPontAnalysis;
         begin
           // Calculate DuPont Analysis for a company with:
           // - Net income: $100,000
@@ -957,10 +981,13 @@ type
       @returns TOperatingLeverage - Record containing operating leverage measures
       
       @references Financial Management: Theory and Practice
+
+      @warning Raises EFinanceError if price is not greater than variable cost
+               or if EBIT is zero at the supplied sales quantity.
       
       @example
         var
-          Leverage: TFinanceKit.TOperatingLeverage;
+          Leverage: TOperatingLeverage;
         begin
           // Calculate operating leverage for a company with:
           // - Quantity: 10,000 units
@@ -968,9 +995,9 @@ type
           // - Variable cost: $5 per unit
           // - Fixed costs: $20,000
           Leverage := TFinanceKit.OperatingLeverage(10000, 10, 5, 20000);
-          // Leverage.DOL = 2.00
+          // Leverage.DOL = 1.6667
           // Leverage.BreakEvenPoint = 4000 units
-          // Leverage.OperatingLeverage = 2.00
+          // Leverage.OperatingLeverage = 1.6667
         end;
     }
     class function OperatingLeverage(
@@ -995,10 +1022,13 @@ type
       @returns TProfitabilityRatios - Record containing profitability ratios
       
       @references Corporate Finance Institute
+
+      @warning Raises EFinanceError if revenue, total assets, or capital
+               employed (total assets minus current liabilities) is zero.
       
       @example
         var
-          Ratios: TFinanceKit.TProfitabilityRatios;
+          Ratios: TProfitabilityRatios;
         begin
           // Calculate profitability ratios for a company with:
           // - Revenue: $1,000,000
@@ -1012,7 +1042,7 @@ type
           // Ratios.OperatingMargin = 0.20
           // Ratios.NetProfitMargin = 0.10
           // Ratios.ROA = 0.05
-          // Ratios.ROCE = 0.10
+          // Ratios.ROCE = 0.1333
         end;
     }
     class function ProfitabilityRatios(
@@ -1121,7 +1151,8 @@ type
     
       @references CFA Institute's Portfolio Management
     
-      @warning Raises EFinanceError if beta value is unreasonably high (>10) or low (<-10).
+      @warning Raises EFinanceError if the risk-free rate is outside [0, 1]
+               or beta is unreasonably high (>10) or low (<-10).
                A beta of 1 indicates the asset moves with the market.
                A beta > 1 indicates higher volatility than the market.
                A beta < 1 indicates lower volatility than the market.
@@ -1161,9 +1192,11 @@ type
     
       @references CFA Institute's Equity Analysis
     
-      @warning Raises EFinanceError if growth rate is greater than or equal to required return rate,
-               as the model is only valid when r > g. For high-growth companies, a multi-stage
-               dividend discount model would be more appropriate.
+      @warning Raises EFinanceError if the dividend, growth rate, or required
+               return is negative, or if growth is greater than or equal to
+               required return. The model is valid only when r > g. For
+               high-growth companies, a multi-stage dividend discount model
+               would be more appropriate.
     
       @example
         var
@@ -1230,7 +1263,7 @@ begin
   if APeriods < 0 then
     raise EFinanceError.Create('Number of periods must be non-negative');
   if Abs(ARate) < 1E-10 then
-    Result := AFutureValue
+    Result := SimpleRoundTo(AFutureValue, -ADecimals)
   else
     Result := SimpleRoundTo(AFutureValue / Power(1 + ARate, APeriods), -ADecimals);
 end;
@@ -1240,7 +1273,9 @@ class function TFinanceKit.FutureValue(
   const APeriods: Integer;
   const ADecimals: Integer = 4): Double;
 begin
-  Result := SimpleRoundTo(APresentValue * Power(1 + ARate, APeriods), -ADecimals);  // Use ADecimals decimals with bankers' rounding
+  if APeriods < 0 then
+    raise EFinanceError.Create('Number of periods must be non-negative');
+  Result := SimpleRoundTo(APresentValue * Power(1 + ARate, APeriods), -ADecimals);
 end;
 
 class function TFinanceKit.CompoundInterest(
@@ -1248,7 +1283,9 @@ class function TFinanceKit.CompoundInterest(
   const APeriods: Integer;
   const ADecimals: Integer = 4): Double;
 begin
-  Result := SimpleRoundTo(APrincipal * (Power(1 + ARate, APeriods) - 1), -ADecimals);  // Use ADecimals decimals with bankers' rounding
+  if APeriods < 0 then
+    raise EFinanceError.Create('Number of periods must be non-negative');
+  Result := SimpleRoundTo(APrincipal * (Power(1 + ARate, APeriods) - 1), -ADecimals);
 end;
 
 class function TFinanceKit.Payment(
@@ -1291,7 +1328,7 @@ begin
   for I := 0 to High(ACashFlows) do
   begin
     Divisor := Power(1 + Rate, I + 1);
-    NPV := NPV + SimpleRoundTo(ACashFlows[I] / Divisor, -ADecimals);
+    NPV := NPV + ACashFlows[I] / Divisor;
   end;
   
   Result := SimpleRoundTo(NPV, -ADecimals);
@@ -1302,76 +1339,115 @@ class function TFinanceKit.InternalRateOfReturn(
   const ACashFlows: TDoubleArray;
   const ADecimals: Integer = 4): Double;
 const
-  TOLERANCE = 1E-6;
-  MAX_ITERATIONS = 100;
-  MIN_RATE = -0.999999;
-  MAX_RATE = 1.0;  // Reduced maximum rate
+  NPV_TOLERANCE = 1E-10;
+  RATE_TOLERANCE = 1E-12;
+  MAX_ITERATIONS = 256;
+  MAX_POSITIVE_RATE = 1E6;
+  MIN_NEGATIVE_RATE = -0.999999;
 var
-  Rate, NPV, LastRate, LastNPV, NewRate: Double;
+  LowRate, HighRate, MidRate: Double;
+  LowNPV, HighNPV, MidNPV: Double;
+  SearchDistance: Double;
   I, Iteration: Integer;
-  HasPositive, HasNegative: Boolean;
+  HasPositiveCashFlow, Converged: Boolean;
+
+  function EvaluateNPV(const ARate: Double): Double;
+  var
+    J: Integer;
+  begin
+    Result := -AInitialInvestment;
+    for J := 0 to High(ACashFlows) do
+      Result := Result + ACashFlows[J] / Power(1 + ARate, J + 1);
+  end;
+
+  function OppositeSigns(const A, B: Double): Boolean;
+  begin
+    Result := ((A < 0) and (B > 0)) or ((A > 0) and (B < 0));
+  end;
+
 begin
   if Length(ACashFlows) = 0 then
     raise EFinanceError.Create('Cash flows array cannot be empty');
-    
-  // Check if IRR calculation is possible
-  HasPositive := False;
-  HasNegative := AInitialInvestment > 0;
+  if AInitialInvestment <= 0 then
+    raise EFinanceError.Create('Initial investment must be positive');
+
+  HasPositiveCashFlow := False;
   for I := 0 to High(ACashFlows) do
-  begin
     if ACashFlows[I] > 0 then
-      HasPositive := True
-    else if ACashFlows[I] < 0 then
-      HasNegative := True;
+      HasPositiveCashFlow := True;
+  if not HasPositiveCashFlow then
+    raise EFinanceError.Create('At least one future cash flow must be positive');
+
+  MidNPV := EvaluateNPV(0);
+  if Abs(MidNPV) <= NPV_TOLERANCE then
+  begin
+    Result := 0;
+    Exit;
   end;
-  
-  if not (HasPositive and HasNegative) then
-    raise EFinanceError.Create('Cash flows must have both positive and negative values for IRR calculation');
-    
-  Rate := 0.1; // Initial guess
-  LastRate := 0.05; // Start with a different rate
-  LastNPV := 0;
-  Iteration := 0;
-  
-  repeat
-    NPV := -AInitialInvestment;
-    for I := 0 to High(ACashFlows) do
-      NPV := NPV + ACashFlows[I] / Power(1 + Rate, I + 1);
-      
-    if Iteration > 0 then
+
+  if MidNPV > 0 then
+  begin
+    LowRate := 0;
+    LowNPV := MidNPV;
+    HighRate := 0.1;
+    HighNPV := EvaluateNPV(HighRate);
+    while (not OppositeSigns(LowNPV, HighNPV)) and
+      (HighRate < MAX_POSITIVE_RATE) do
     begin
-      // Use secant method with dampening
-      if Abs(NPV) < TOLERANCE then
-        Break;
-        
-      if Abs(NPV - LastNPV) < 1E-10 then
-        Break;
-        
-      NewRate := Rate - NPV * (Rate - LastRate) / (NPV - LastNPV);
-      
-      // Stronger dampening for better stability
-      if Abs(NewRate - Rate) > 0.001 then
-        NewRate := Rate + 0.001 * Sign(NewRate - Rate);
-        
-      LastRate := Rate;
-      Rate := NewRate;
+      HighRate := HighRate * 2 + 0.1;
+      HighNPV := EvaluateNPV(HighRate);
     end;
-    
-    LastNPV := NPV;
-    Inc(Iteration);
-    
-    // Keep rate within reasonable bounds
-    if Rate < MIN_RATE then
-      Rate := MIN_RATE
-    else if Rate > MAX_RATE then
-      Rate := MAX_RATE;
-      
-  until (Abs(NPV) < TOLERANCE) or (Iteration >= MAX_ITERATIONS);
-  
-  if Iteration >= MAX_ITERATIONS then
+  end
+  else
+  begin
+    HighRate := 0;
+    HighNPV := MidNPV;
+    SearchDistance := 0.1;
+    LowRate := -SearchDistance;
+    LowNPV := EvaluateNPV(LowRate);
+    while (not OppositeSigns(LowNPV, HighNPV)) and
+      (LowRate > MIN_NEGATIVE_RATE) do
+    begin
+      SearchDistance := SearchDistance * 2;
+      if SearchDistance > -MIN_NEGATIVE_RATE then
+        SearchDistance := -MIN_NEGATIVE_RATE;
+      LowRate := -SearchDistance;
+      LowNPV := EvaluateNPV(LowRate);
+    end;
+  end;
+
+  if not OppositeSigns(LowNPV, HighNPV) then
+    raise EFinanceError.Create('Unable to bracket an internal rate of return');
+
+  Converged := False;
+  MidRate := 0;
+  for Iteration := 1 to MAX_ITERATIONS do
+  begin
+    MidRate := (LowRate + HighRate) / 2;
+    MidNPV := EvaluateNPV(MidRate);
+    if (Abs(MidNPV) <= NPV_TOLERANCE) or
+      (Abs(HighRate - LowRate) <= RATE_TOLERANCE) then
+    begin
+      Converged := True;
+      Break;
+    end;
+
+    if OppositeSigns(LowNPV, MidNPV) then
+    begin
+      HighRate := MidRate;
+      HighNPV := MidNPV;
+    end
+    else
+    begin
+      LowRate := MidRate;
+      LowNPV := MidNPV;
+    end;
+  end;
+
+  if not Converged then
     raise EFinanceError.Create('IRR calculation did not converge');
-    
-  Result := SimpleRoundTo(Rate, -ADecimals);  // Round to ADecimals decimals
+
+  Result := SimpleRoundTo(MidRate, -ADecimals);
 end;
 
 class function TFinanceKit.StraightLineDepreciation(
@@ -1528,7 +1604,8 @@ begin
     
   SetLength(Result, ANumberOfPayments);
   Balance := ALoanAmount;
-  PaymentAmount := TFinanceKit.Payment(ALoanAmount, ARate, ANumberOfPayments);
+  PaymentAmount := TFinanceKit.Payment(
+    ALoanAmount, ARate, ANumberOfPayments, ADecimals);
   
   for I := 0 to ANumberOfPayments - 1 do
   begin
@@ -1638,9 +1715,9 @@ begin
   // Working Capital Turnover
   WorkingCapital := ACurrentAssets - ACurrentLiabilities;
   if Abs(WorkingCapital) < 1E-10 then
-    Result.WorkingCapitalTurnover := 0  // Undefined case
-  else
-    Result.WorkingCapitalTurnover := SimpleRoundTo(ASales / WorkingCapital, -ADecimals);
+    raise EFinanceError.Create('Working capital must be non-zero');
+  Result.WorkingCapitalTurnover := SimpleRoundTo(
+    ASales / WorkingCapital, -ADecimals);
 end;
 
 class function TFinanceKit.LeverageRatios(
@@ -1663,9 +1740,9 @@ begin
   
   // Times Interest Earned
   if Abs(AInterestExpense) < 1E-10 then
-    Result.TimesInterestEarned := 0  // Undefined case
-  else
-    Result.TimesInterestEarned := SimpleRoundTo(AEBIT / AInterestExpense, -ADecimals);
+    raise EFinanceError.Create('Interest expense must be non-zero');
+  Result.TimesInterestEarned := SimpleRoundTo(
+    AEBIT / AInterestExpense, -ADecimals);
 end;
 
 class function TFinanceKit.BlackScholes(
@@ -1719,17 +1796,20 @@ class function TFinanceKit.RiskMetrics(
   const APortfolioReturn, ARiskFreeRate, AMarketReturn, ABeta, APortfolioStdDev, ABenchmarkReturn, ATrackingError: Double;
   const ADecimals: Integer = 4): TRiskMetrics;
 begin
-  // Sharpe Ratio
   if Abs(APortfolioStdDev) < 1E-10 then
-    Result.SharpeRatio := 0
-  else
-    Result.SharpeRatio := SimpleRoundTo((APortfolioReturn - ARiskFreeRate) / APortfolioStdDev, -ADecimals);
+    raise EFinanceError.Create('Portfolio standard deviation must be non-zero');
+  if Abs(ABeta) < 1E-10 then
+    raise EFinanceError.Create('Portfolio beta must be non-zero');
+  if Abs(ATrackingError) < 1E-10 then
+    raise EFinanceError.Create('Tracking error must be non-zero');
+
+  // Sharpe Ratio
+  Result.SharpeRatio := SimpleRoundTo(
+    (APortfolioReturn - ARiskFreeRate) / APortfolioStdDev, -ADecimals);
   
   // Treynor Ratio
-  if Abs(ABeta) < 1E-10 then
-    Result.TreynorRatio := 0
-  else
-    Result.TreynorRatio := SimpleRoundTo((APortfolioReturn - ARiskFreeRate) / ABeta, -ADecimals);
+  Result.TreynorRatio := SimpleRoundTo(
+    (APortfolioReturn - ARiskFreeRate) / ABeta, -ADecimals);
   
   // Jensen's Alpha
   Result.JensenAlpha := SimpleRoundTo(
@@ -1738,13 +1818,10 @@ begin
   );
   
   // Information Ratio
-  if Abs(ATrackingError) < 1E-10 then
-    Result.InformationRatio := 0
-  else
-    Result.InformationRatio := SimpleRoundTo(
-      (APortfolioReturn - ABenchmarkReturn) / ATrackingError,
-      -ADecimals
-    );
+  Result.InformationRatio := SimpleRoundTo(
+    (APortfolioReturn - ABenchmarkReturn) / ATrackingError,
+    -ADecimals
+  );
 end;
 
 class function TFinanceKit.DuPontAnalysis(
@@ -1783,12 +1860,12 @@ begin
   TotalRevenue := AQuantity * APricePerUnit;
   TotalVariableCosts := AQuantity * AVariableCostPerUnit;
   EBIT := TotalRevenue - TotalVariableCosts - AFixedCosts;
+  if Abs(EBIT) < 1E-10 then
+    raise EFinanceError.Create('EBIT must be non-zero for operating leverage');
   
   // Degree of Operating Leverage (DOL)
-  if Abs(EBIT) < 1E-10 then
-    Result.DOL := 0
-  else
-    Result.DOL := SimpleRoundTo((AQuantity * ContributionMargin) / EBIT, -ADecimals);
+  Result.DOL := SimpleRoundTo(
+    (AQuantity * ContributionMargin) / EBIT, -ADecimals);
   
   // Break-even point in units
   Result.BreakEvenPoint := SimpleRoundTo(AFixedCosts / ContributionMargin, -ADecimals);
@@ -1805,6 +1882,8 @@ begin
     raise EFinanceError.Create('Revenue must be non-zero');
   if Abs(ATotalAssets) < 1E-10 then
     raise EFinanceError.Create('Total assets must be non-zero');
+  if Abs(ATotalAssets - ACurrentLiabilities) < 1E-10 then
+    raise EFinanceError.Create('Capital employed must be non-zero');
     
   // Gross Margin
   Result.GrossMargin := SimpleRoundTo((ARevenue - ACOGS) / ARevenue, -ADecimals);
@@ -1819,10 +1898,8 @@ begin
   Result.ROA := SimpleRoundTo(ANetIncome / ATotalAssets, -ADecimals);
   
   // Return on Capital Employed (ROCE)
-  if Abs(ATotalAssets - ACurrentLiabilities) < 1E-10 then
-    Result.ROCE := 0
-  else
-    Result.ROCE := SimpleRoundTo(AEBIT / (ATotalAssets - ACurrentLiabilities), -ADecimals);
+  Result.ROCE := SimpleRoundTo(
+    AEBIT / (ATotalAssets - ACurrentLiabilities), -ADecimals);
 end;
 
 class function TFinanceKit.BreakEvenRevenue(

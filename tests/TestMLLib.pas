@@ -112,6 +112,10 @@ type
     procedure TestRaggedMatrixRaises;
     procedure TestNonFiniteFeatureRaises;
     procedure TestMetricLengthMismatchRaises;
+    procedure TestPCAAntiCorrelatedDirectionRegression;
+    procedure TestPCAComponentsAreOrthonormal;
+    procedure TestPCAConstantDataRaises;
+    procedure TestLinearRegressionHighOffsetQRReference;
   end;
 
 implementation
@@ -942,6 +946,102 @@ begin
   GErrY := TDoubleArray.Create(1, 2, 3);
   GErrY2 := TDoubleArray.Create(1, 2);
   AssertMLError('metric vector length mismatch', @ErrMSELengthMismatch);
+end;
+
+procedure TTestMLLib.TestPCAAntiCorrelatedDirectionRegression;
+var
+  X: TDoubleMatrix;
+  R: TPCAResult;
+  I: Integer;
+begin
+  SetLength(X, 5);
+  for I := 0 to 4 do
+  begin
+    SetLength(X[I], 2);
+    X[I][0] := I + 1;
+    X[I][1] := -(I + 1);
+  end;
+  R := TMLKit.PCA(X, 1);
+  AssertTrue('component entries have opposite signs',
+    R.Components[0][0] * R.Components[0][1] < 0.0);
+  AssertEquals('anti-correlated direction magnitude x', 1.0 / Sqrt(2.0),
+    Abs(R.Components[0][0]), 1E-10);
+  AssertEquals('anti-correlated direction magnitude y', 1.0 / Sqrt(2.0),
+    Abs(R.Components[0][1]), 1E-10);
+  AssertEquals('rank-one data explains all variance', 1.0,
+    R.ExplainedRatio[0], 1E-12);
+  AssertTrue('iteration count is reported', R.Iterations[0] > 0);
+end;
+
+procedure TTestMLLib.TestPCAComponentsAreOrthonormal;
+var
+  X: TDoubleMatrix;
+  R: TPCAResult;
+  I, J, K: Integer;
+  DotValue: Double;
+begin
+  SetLength(X, 40);
+  for I := 0 to High(X) do
+  begin
+    SetLength(X[I], 3);
+    X[I][0] := I;
+    X[I][1] := Sin(I * 0.3) + 0.1 * I;
+    X[I][2] := Cos(I * 0.2) - 0.05 * I;
+  end;
+  R := TMLKit.PCA(X, 3);
+  for I := 0 to 2 do
+    for J := 0 to 2 do
+    begin
+      DotValue := 0.0;
+      for K := 0 to 2 do
+        DotValue := DotValue + R.Components[I][K] * R.Components[J][K];
+      if I = J then AssertEquals('component unit norm', 1.0, DotValue, 1E-10)
+      else AssertEquals('components orthogonal', 0.0, DotValue, 1E-10);
+    end;
+end;
+
+procedure TTestMLLib.TestPCAConstantDataRaises;
+var
+  X: TDoubleMatrix;
+  I: Integer;
+begin
+  SetLength(X, 4);
+  for I := 0 to 3 do
+  begin
+    SetLength(X[I], 2);
+    X[I][0] := 7.0;
+    X[I][1] := -2.0;
+  end;
+  try
+    TMLKit.PCA(X, 1);
+    Fail('constant PCA data must raise');
+  except
+    on E: EMLError do { expected };
+  end;
+end;
+
+procedure TTestMLLib.TestLinearRegressionHighOffsetQRReference;
+var
+  X: TDoubleMatrix;
+  Y: TDoubleArray;
+  Model: TLinearModel;
+  I: Integer;
+  Base: Double;
+begin
+  Base := 1000000000.0;
+  SetLength(X, 8);
+  SetLength(Y, 8);
+  for I := 0 to 7 do
+  begin
+    SetLength(X[I], 1);
+    X[I][0] := Base + I;
+    Y[I] := 2.0 + 3.0 * I;
+  end;
+  Model := TMLKit.LinearRegression(X, Y);
+  AssertEquals('QR slope with large offset', 3.0, Model.Coefficients[0], 1E-7);
+  AssertEquals('QR intercept with large offset', 2.0 - 3.0 * Base,
+    Model.Intercept, 100.0);
+  AssertEquals('QR high-offset fit R squared', 1.0, Model.RSquared, 1E-12);
 end;
 
 initialization

@@ -7,6 +7,7 @@ interface
 uses
   Classes
   , SysUtils
+  , Math
   , fpcunit
   , testregistry
   , MathBase.SharedTypes
@@ -56,6 +57,12 @@ type
     procedure Test39_SolveIterative;
     procedure Test40_SparseMatrix;
     procedure Test41_RandomMatrixSeeding;
+    procedure Test42_InverseScaleAndPivotRegression;
+    procedure Test43_MatrixExponentialReference;
+    procedure Test44_MatrixExponentialInverseProperty;
+    procedure Test45_LUPermutationReconstruction;
+    procedure Test46_RankWithLeadingZeroColumn;
+    procedure Test47_MatrixExponentialOverflow;
   end;
 
 implementation
@@ -1862,6 +1869,99 @@ begin
     end;
   
   if VerboseTests then WriteLn('Completed Test40_SparseMatrix');
+end;
+
+procedure TMatrixTest.Test42_InverseScaleAndPivotRegression;
+var
+  Tiny, Pivoted, Inv, Product: IMatrix;
+begin
+  Tiny := TMatrixKit.CreateFromArray([[1E-13]]);
+  Inv := Tiny.Inverse;
+  AssertEquals('tiny well-conditioned inverse', 1E13, Inv.GetValue(0, 0), 1.0);
+
+  Pivoted := TMatrixKit.CreateFromArray([[0.0, 1.0], [2.0, 3.0]]);
+  Inv := Pivoted.Inverse;
+  Product := Pivoted.Multiply(Inv);
+  AssertEquals('pivoted inverse identity 00', 1.0, Product.GetValue(0, 0), 1E-12);
+  AssertEquals('pivoted inverse identity 01', 0.0, Product.GetValue(0, 1), 1E-12);
+  AssertEquals('pivoted inverse identity 10', 0.0, Product.GetValue(1, 0), 1E-12);
+  AssertEquals('pivoted inverse identity 11', 1.0, Product.GetValue(1, 1), 1E-12);
+end;
+
+procedure TMatrixTest.Test43_MatrixExponentialReference;
+var
+  A, E: IMatrix;
+  Expected: Double;
+begin
+  A := TMatrixKit.CreateFromArray([[100.0]]);
+  E := A.Exp;
+  Expected := System.Exp(100.0);
+  AssertEquals('exp([100]) reference', Expected, E.GetValue(0, 0),
+    Expected * 1E-13);
+end;
+
+procedure TMatrixTest.Test44_MatrixExponentialInverseProperty;
+var
+  A, NegA, Product: IMatrix;
+  I, J: Integer;
+begin
+  A := TMatrixKit.CreateFromArray([[0.2, -0.4], [0.7, 0.1]]);
+  NegA := A.ScalarMultiply(-1.0);
+  Product := A.Exp.Multiply(NegA.Exp);
+  for I := 0 to 1 do
+    for J := 0 to 1 do
+      if I = J then
+        AssertEquals('exp(A)exp(-A) diagonal', 1.0, Product.GetValue(I, J), 1E-12)
+      else
+        AssertEquals('exp(A)exp(-A) off diagonal', 0.0, Product.GetValue(I, J), 1E-12);
+end;
+
+procedure TMatrixTest.Test45_LUPermutationReconstruction;
+var
+  A, PA, LUProduct: IMatrix;
+  Decomp: TLUDecomposition;
+  I, J: Integer;
+begin
+  A := TMatrixKit.CreateFromArray([
+    [0.0, 2.0, 1.0],
+    [1.0, 1.0, 0.0],
+    [2.0, 0.0, 1.0]
+  ]);
+  Decomp := A.LU;
+  PA := TMatrixKit.Zeros(3, 3);
+  for I := 0 to 2 do
+    for J := 0 to 2 do
+      PA.SetValue(I, J, A.GetValue(Decomp.P[I], J));
+  LUProduct := Decomp.L.Multiply(Decomp.U);
+  for I := 0 to 2 do
+    for J := 0 to 2 do
+      AssertEquals('P*A = L*U', PA.GetValue(I, J),
+        LUProduct.GetValue(I, J), 1E-12);
+end;
+
+procedure TMatrixTest.Test46_RankWithLeadingZeroColumn;
+var
+  A: IMatrix;
+begin
+  A := TMatrixKit.CreateFromArray([[0.0, 1.0], [0.0, 2.0]]);
+  AssertEquals('rank does not require diagonal pivot', 1, A.Rank);
+end;
+
+procedure TMatrixTest.Test47_MatrixExponentialOverflow;
+var
+  A: IMatrix;
+  RaisedExpected: Boolean;
+begin
+  A := TMatrixKit.CreateFromArray([[1000.0]]);
+  RaisedExpected := False;
+  try
+    A.Exp;
+  except
+    on EMatrixError do
+      RaisedExpected := True;
+  end;
+  AssertTrue('non-representable matrix exponential must report overflow',
+    RaisedExpected);
 end;
 
 procedure TMatrixTest.Test41_RandomMatrixSeeding;

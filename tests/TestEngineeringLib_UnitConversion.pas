@@ -13,6 +13,10 @@ type
   { TTestUnitConversionKit }
 
   TTestUnitConversionKit = class(TTestCase)
+  private
+    procedure FormatWithNegativeDecimalsTest;
+    procedure ScientificNotationWithZeroDigitsTest;
+    procedure RoundWithZeroDigitsTest;
   published
     procedure Test01_LengthConversion;
     procedure Test02_MassConversion;
@@ -45,12 +49,31 @@ type
     procedure Test27_ConversionShortcuts;
     procedure Test28_TryGetUnitFromName;
     procedure Test29_UnknownUnitNameRaises;
+    procedure Test30_FormatWithUnit;
+    procedure Test31_AllUnitNameParsers;
+    procedure Test32_FormattingValidation;
+    procedure Test33_TimeConventions;
   end;
 
 implementation
 
 const
   Tolerance = 1E-6;
+
+procedure TTestUnitConversionKit.FormatWithNegativeDecimalsTest;
+begin
+  TUnitConversionKit.FormatWithUnit(1.0, 'm', -1);
+end;
+
+procedure TTestUnitConversionKit.ScientificNotationWithZeroDigitsTest;
+begin
+  TUnitConversionKit.FormatWithScientificNotation(1.0, 'm', 0);
+end;
+
+procedure TTestUnitConversionKit.RoundWithZeroDigitsTest;
+begin
+  TUnitConversionKit.RoundToSignificantDigits(1.0, 0);
+end;
 
 procedure TTestUnitConversionKit.Test01_LengthConversion;
 begin
@@ -214,6 +237,9 @@ begin
     
   AssertEquals('Round up', 1.2, 
     TUnitConversionKit.RoundToSignificantDigits(1.15, 2), Tolerance);
+
+  AssertEquals('Round negative away from zero', -1.2,
+    TUnitConversionKit.RoundToSignificantDigits(-1.15, 2), Tolerance);
 end;
 
 procedure TTestUnitConversionKit.Test20_TryConvertByUnitName;
@@ -387,6 +413,69 @@ begin
   except
     on E: EUnitConversionError do { expected };
   end;
+end;
+
+procedure TTestUnitConversionKit.Test30_FormatWithUnit;
+begin
+  AssertEquals('Fixed-point value with unit', '12.35 m',
+    TUnitConversionKit.FormatWithUnit(12.345, 'm', 2));
+  AssertEquals('Zero decimal places', '12 kg',
+    TUnitConversionKit.FormatWithUnit(12.0, 'kg', 0));
+end;
+
+procedure TTestUnitConversionKit.Test31_AllUnitNameParsers;
+var
+  LengthUnit: TLengthUnit;
+  MassUnit: TMassUnit;
+  TimeUnit: TTimeUnit;
+  TemperatureUnit: TTemperatureUnit;
+  ForceUnit: TForceUnit;
+  EnergyUnit: TEnergyUnit;
+  PowerUnit: TPowerUnit;
+  PressureUnit: TPressureUnit;
+  VelocityUnit: TVelocityUnit;
+  AreaUnit: TAreaUnit;
+  VolumeUnit: TVolumeUnit;
+  AngleUnit: TAngleUnit;
+  DensityUnit: TDensityUnit;
+  CurrentUnit: TElectricalCurrentUnit;
+  PotentialUnit: TElectricalPotentialUnit;
+  FrequencyUnit: TFrequencyUnit;
+begin
+  AssertTrue('Length parser', TUnitConversionKit.TryGetLengthUnitFromName('m', LengthUnit));
+  AssertTrue('Mass parser', TUnitConversionKit.TryGetMassUnitFromName('kg', MassUnit));
+  AssertTrue('Time parser', TUnitConversionKit.TryGetTimeUnitFromName('s', TimeUnit));
+  AssertTrue('Temperature parser', TUnitConversionKit.TryGetTemperatureUnitFromName('K', TemperatureUnit));
+  AssertTrue('Force parser', TUnitConversionKit.TryGetForceUnitFromName('N', ForceUnit));
+  AssertTrue('Energy parser', TUnitConversionKit.TryGetEnergyUnitFromName('J', EnergyUnit));
+  AssertTrue('Power parser', TUnitConversionKit.TryGetPowerUnitFromName('W', PowerUnit));
+  AssertTrue('Pressure parser', TUnitConversionKit.TryGetPressureUnitFromName('Pa', PressureUnit));
+  AssertTrue('Velocity parser', TUnitConversionKit.TryGetVelocityUnitFromName('m/s', VelocityUnit));
+  AssertTrue('Area parser', TUnitConversionKit.TryGetAreaUnitFromName('m²', AreaUnit));
+  AssertTrue('Volume parser', TUnitConversionKit.TryGetVolumeUnitFromName('L', VolumeUnit));
+  AssertTrue('Angle parser', TUnitConversionKit.TryGetAngleUnitFromName('°', AngleUnit));
+  AssertTrue('Density parser', TUnitConversionKit.TryGetDensityUnitFromName('kg/m³', DensityUnit));
+  AssertTrue('Current parser', TUnitConversionKit.TryGetElectricalCurrentUnitFromName('A', CurrentUnit));
+  AssertTrue('Potential parser', TUnitConversionKit.TryGetElectricalPotentialUnitFromName('V', PotentialUnit));
+  AssertTrue('Frequency parser', TUnitConversionKit.TryGetFrequencyUnitFromName('Hz', FrequencyUnit));
+end;
+
+procedure TTestUnitConversionKit.Test32_FormattingValidation;
+begin
+  AssertException('Negative decimal places raise EUnitConversionError',
+    EUnitConversionError, @FormatWithNegativeDecimalsTest);
+  AssertException('Zero significant digits in formatting raise EUnitConversionError',
+    EUnitConversionError, @ScientificNotationWithZeroDigitsTest);
+  AssertException('Zero significant digits in rounding raise EUnitConversionError',
+    EUnitConversionError, @RoundWithZeroDigitsTest);
+end;
+
+procedure TTestUnitConversionKit.Test33_TimeConventions;
+begin
+  AssertEquals('Month uses 365/12 average days', 30.4166666666667,
+    TUnitConversionKit.ConvertTime(1.0, tuMonth, tuDay), Tolerance);
+  AssertEquals('Year uses 365 days', 365.0,
+    TUnitConversionKit.ConvertTime(1.0, tuYear, tuDay), Tolerance);
 end;
 
 initialization

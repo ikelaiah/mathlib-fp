@@ -3,6 +3,11 @@
 A collection of focused Free Pascal mathematics libraries organised as a
 single source tree.
 
+## Releases
+
+- [mathlib-fp 1.2.0 release notes](RELEASE_NOTES_1.2.0.md) — first public
+  release.
+
 ## Libraries
 
 | Library | Description | Depends on |

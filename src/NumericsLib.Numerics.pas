@@ -13,8 +13,8 @@ unit NumericsLib.Numerics;
      Secant           — derivative-free quasi-Newton
 
    Numerical Integration (quadrature)
-     TrapezoidalRule  — 1st-order composite rule
-     SimpsonRule      — 3rd-order composite rule (n must be even)
+     TrapezoidalRule  — composite rule with O(h^2) global error
+     SimpsonRule      — composite rule with O(h^4) global error (n even)
      GaussLegendre5   — 5-point Gauss-Legendre on [a,b]
 
    ODE Solvers (initial-value problems)
@@ -24,7 +24,8 @@ unit NumericsLib.Numerics;
    Interpolation
      LinearInterp     — piecewise linear between sorted knots
      LagrangeInterp   — global Lagrange polynomial (small n)
-     CubicSplineNat   — natural cubic spline (clamped ends = 0 slope)
+     CubicSplineBuild / CubicSplineEval — natural cubic spline
+                         (zero second derivatives at both ends)
 
  All functions are class-static (no instantiation required):
    result := TNumericsKit.Bisection(f, a, b);
@@ -39,6 +40,9 @@ uses
   MathBase.SharedTypes;
 
 type
+  ENumericsError = class(Exception);
+  ENumericsConvergenceError = class(EInvalidArgument);
+
   { Function pointer types }
   TScalarFunc  = function(X: Double): Double;           // f(x)
   TODEFunc     = function(T, Y: Double): Double;        // dy/dt = f(t,y)
@@ -47,6 +51,15 @@ type
   TODESolution = record
     T: TDoubleArray;   // time/independent variable values
     Y: TDoubleArray;   // solution values
+  end;
+
+  { Detailed root-finder outcome. The existing scalar-returning entry points
+    raise ENumericsConvergenceError when Converged is False. }
+  TRootResult = record
+    Root: Double;
+    Residual: Double;
+    Iterations: Integer;
+    Converged: Boolean;
   end;
 
   { Result record for cubic spline (internal coefficients) }
@@ -65,11 +78,15 @@ type
       Root Finding
     ----------------------------------------------------------------------- }
 
-    { Bisection method: find root of f in [A, B] where f(A)*f(B) < 0.
+    { Bisection method: find root of f in [A, B] where the endpoint values
+      have opposite signs. Endpoint roots are returned immediately.
       MaxIter: maximum iterations (default 100).
       Tol: absolute tolerance on the interval width (default 1e-10).
-      Raises EInvalidArgument if f(A)*f(B) >= 0. }
+      Raises EInvalidArgument for invalid controls or a bad bracket, and
+      ENumericsConvergenceError if MaxIter is exhausted. }
     class function Bisection(F: TScalarFunc; A, B: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function BisectionResult(F: TScalarFunc; A, B: Double;
+      Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult; static;
 
     { Newton-Raphson: find root starting from X0 using f and df/dx.
       Tol: tolerance on |f(x)| (default 1e-10).
@@ -79,16 +96,23 @@ type
       X0: Double;
       Tol: Double = 1E-10;
       MaxIter: Integer = 100): Double; static;
+    class function NewtonRaphsonResult(
+      F, DF: TScalarFunc; X0: Double; Tol: Double = 1E-10;
+      MaxIter: Integer = 100): TRootResult; static;
 
     { Brent's method: robust bracketed root-finding combining bisection,
       secant, and inverse-quadratic interpolation.
       Requires f(A)*f(B) <= 0. }
     class function Brent(F: TScalarFunc; A, B: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function BrentResult(F: TScalarFunc; A, B: Double;
+      Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult; static;
 
     { Secant method: derivative-free, requires two initial guesses X0, X1.
       Tol: tolerance on |f(x)| (default 1e-10).
       MaxIter: max iterations (default 100). }
     class function Secant(F: TScalarFunc; X0, X1: Double; Tol: Double = 1E-10; MaxIter: Integer = 100): Double; static;
+    class function SecantResult(F: TScalarFunc; X0, X1: Double;
+      Tol: Double = 1E-10; MaxIter: Integer = 100): TRootResult; static;
 
     { -----------------------------------------------------------------------
       Numerical Integration
@@ -138,7 +162,7 @@ type
     class function LagrangeInterp(const XKnots, YKnots: TDoubleArray; X: Double): Double; static;
 
     { Build a natural cubic spline through the given knots (XKnots sorted asc).
-      Returns a TCubicSpline that can be evaluated with SplineEval. }
+      Returns a TCubicSpline that can be evaluated with CubicSplineEval. }
     class function CubicSplineBuild(const XKnots, YKnots: TDoubleArray): TCubicSpline; static;
 
     { Evaluate a previously built TCubicSpline at point X.
@@ -152,24 +176,119 @@ implementation
   Root Finding
   ========================================================================= }
 
-class function TNumericsKit.Bisection(F: TScalarFunc; A, B: Double; Tol: Double; MaxIter: Integer): Double;
+procedure ValidateRootControls(const MethodName: String; F: TScalarFunc;
+  const Tol: Double; const MaxIter: Integer);
+begin
+  if not Assigned(F) then
+    raise EInvalidArgument.Create(MethodName + ': function callback is nil.');
+  if (Tol <= 0) or IsNan(Tol) or IsInfinite(Tol) then
+    raise EInvalidArgument.Create(MethodName + ': Tol must be finite and positive.');
+  if MaxIter <= 0 then
+    raise EInvalidArgument.Create(MethodName + ': MaxIter must be positive.');
+end;
+
+function EvaluateFinite(const MethodName: String; F: TScalarFunc;
+  const X: Double): Double;
+begin
+  Result := F(X);
+  if IsNan(Result) or IsInfinite(Result) then
+    raise ENumericsError.Create(MethodName + ': callback returned a non-finite value.');
+end;
+
+function SameNonZeroSign(const A, B: Double): Boolean; inline;
+begin
+  Result := ((A > 0) and (B > 0)) or ((A < 0) and (B < 0));
+end;
+
+procedure ValidateFiniteArray(const Values: TDoubleArray; const Name: String);
+var
+  I: Integer;
+begin
+  for I := 0 to High(Values) do
+    if IsNan(Values[I]) or IsInfinite(Values[I]) then
+      raise EInvalidArgument.CreateFmt('%s contains a non-finite value at index %d.',
+        [Name, I]);
+end;
+
+function EvaluateFiniteODE(F: TODEFunc; const T, Y: Double;
+  const MethodName: String): Double;
+begin
+  Result := F(T, Y);
+  if IsNan(Result) or IsInfinite(Result) then
+    raise ENumericsError.Create(MethodName + ': derivative returned a non-finite value.');
+end;
+
+procedure ValidateFiniteInterval(F: TScalarFunc; const A, B: Double;
+  const MethodName: String);
+begin
+  if not Assigned(F) then
+    raise EInvalidArgument.Create(MethodName + ': function callback must be assigned.');
+  if IsNan(A) or IsInfinite(A) or IsNan(B) or IsInfinite(B) then
+    raise EInvalidArgument.Create(MethodName + ': interval endpoints must be finite.');
+end;
+
+procedure ValidateKnots(const XKnots, YKnots: TDoubleArray;
+  const MethodName: String; const RequireIncreasing: Boolean);
+var
+  I, J: Integer;
+begin
+  ValidateFiniteArray(XKnots, MethodName + ' XKnots');
+  ValidateFiniteArray(YKnots, MethodName + ' YKnots');
+  if RequireIncreasing then
+  begin
+    for I := 1 to High(XKnots) do
+      if XKnots[I] <= XKnots[I - 1] then
+        raise EInvalidArgument.Create(MethodName +
+          ': XKnots must be strictly increasing.');
+  end
+  else
+    for I := 0 to High(XKnots) - 1 do
+      for J := I + 1 to High(XKnots) do
+        if XKnots[I] = XKnots[J] then
+          raise EInvalidArgument.Create(MethodName +
+            ': XKnots must be distinct.');
+end;
+
+class function TNumericsKit.BisectionResult(F: TScalarFunc; A, B: Double;
+  Tol: Double; MaxIter: Integer): TRootResult;
 var
   FA, FB, FMid, Mid: Double;
   Iter: Integer;
 begin
-  FA := F(A);
-  FB := F(B);
-  if FA * FB > 0 then
+  Result := Default(TRootResult);
+  ValidateRootControls('Bisection', F, Tol, MaxIter);
+  if IsNan(A) or IsInfinite(A) or IsNan(B) or IsInfinite(B) or (A >= B) then
+    raise EInvalidArgument.Create('Bisection: require finite A < B.');
+
+  FA := EvaluateFinite('Bisection', F, A);
+  FB := EvaluateFinite('Bisection', F, B);
+  if Abs(FA) <= Tol then
+  begin
+    Result.Root := A; Result.Residual := Abs(FA); Result.Converged := True;
+    Exit;
+  end;
+  if Abs(FB) <= Tol then
+  begin
+    Result.Root := B; Result.Residual := Abs(FB); Result.Converged := True;
+    Exit;
+  end;
+  if SameNonZeroSign(FA, FB) then
     raise EInvalidArgument.Create(
       'Bisection: f(A) and f(B) must have opposite signs.');
 
   for Iter := 1 to MaxIter do
   begin
-    Mid  := (A + B) / 2;
-    FMid := F(Mid);
-    if (Abs(FMid) < Tol) or ((B - A) / 2 < Tol) then
-      Exit(Mid);
-    if FA * FMid < 0 then
+    Mid  := A + (B - A) / 2;
+    FMid := EvaluateFinite('Bisection', F, Mid);
+    Result.Root := Mid;
+    Result.Residual := Abs(FMid);
+    Result.Iterations := Iter;
+    if (Result.Residual <= Tol) or (Abs(B - A) / 2 <= Tol) then
+    begin
+      Result.Converged := True;
+      Exit;
+    end;
+    if not SameNonZeroSign(FA, FMid) then
     begin
       B  := Mid;
       FB := FMid;
@@ -180,38 +299,96 @@ begin
       FA := FMid;
     end;
   end;
-  Result := (A + B) / 2;
+  Result.Root := A + (B - A) / 2;
+  Result.Residual := Abs(EvaluateFinite('Bisection', F, Result.Root));
 end;
 
-class function TNumericsKit.NewtonRaphson(F, DF: TScalarFunc; X0: Double; Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.Bisection(F: TScalarFunc; A, B: Double;
+  Tol: Double; MaxIter: Integer): Double;
+var
+  Outcome: TRootResult;
+begin
+  Outcome := BisectionResult(F, A, B, Tol, MaxIter);
+  if not Outcome.Converged then
+    raise ENumericsConvergenceError.CreateFmt(
+      'Bisection did not converge after %d iterations (residual %.6g).',
+      [Outcome.Iterations, Outcome.Residual]);
+  Result := Outcome.Root;
+end;
+
+class function TNumericsKit.NewtonRaphsonResult(F, DF: TScalarFunc;
+  X0: Double; Tol: Double; MaxIter: Integer): TRootResult;
 var
   X, FX, DFX: Double;
   Iter: Integer;
 begin
+  Result := Default(TRootResult);
+  ValidateRootControls('NewtonRaphson', F, Tol, MaxIter);
+  if not Assigned(DF) then
+    raise EInvalidArgument.Create('NewtonRaphson: derivative callback is nil.');
+  if IsNan(X0) or IsInfinite(X0) then
+    raise EInvalidArgument.Create('NewtonRaphson: X0 must be finite.');
   X := X0;
   for Iter := 1 to MaxIter do
   begin
-    FX  := F(X);
-    if Abs(FX) < Tol then
-      Exit(X);
-    DFX := DF(X);
+    FX := EvaluateFinite('NewtonRaphson', F, X);
+    Result.Root := X;
+    Result.Residual := Abs(FX);
+    Result.Iterations := Iter;
+    if Result.Residual <= Tol then
+    begin
+      Result.Converged := True;
+      Exit;
+    end;
+    DFX := EvaluateFinite('NewtonRaphson derivative', DF, X);
     if Abs(DFX) < 1E-300 then
       raise EInvalidArgument.Create('NewtonRaphson: derivative too small (near-zero).');
     X := X - FX / DFX;
+    if IsNan(X) or IsInfinite(X) then
+      raise ENumericsError.Create('NewtonRaphson: iteration became non-finite.');
   end;
-  Result := X;
+  Result.Root := X;
+  Result.Residual := Abs(EvaluateFinite('NewtonRaphson', F, X));
 end;
 
-class function TNumericsKit.Brent(F: TScalarFunc; A, B: Double; Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.NewtonRaphson(F, DF: TScalarFunc; X0: Double;
+  Tol: Double; MaxIter: Integer): Double;
 var
-  FA, FB, FC, C, D, S: Double;
+  Outcome: TRootResult;
+begin
+  Outcome := NewtonRaphsonResult(F, DF, X0, Tol, MaxIter);
+  if not Outcome.Converged then
+    raise ENumericsConvergenceError.CreateFmt(
+      'NewtonRaphson did not converge after %d iterations (residual %.6g).',
+      [Outcome.Iterations, Outcome.Residual]);
+  Result := Outcome.Root;
+end;
+
+class function TNumericsKit.BrentResult(F: TScalarFunc; A, B: Double;
+  Tol: Double; MaxIter: Integer): TRootResult;
+var
+  FA, FB, FC, FS, C, D, S: Double;
   Tmp: Double;
   Iter: Integer;
   MFlag: Boolean;
 begin
-  FA := F(A);
-  FB := F(B);
-  if FA * FB > 0 then
+  Result := Default(TRootResult);
+  ValidateRootControls('Brent', F, Tol, MaxIter);
+  if IsNan(A) or IsInfinite(A) or IsNan(B) or IsInfinite(B) or (A >= B) then
+    raise EInvalidArgument.Create('Brent: require finite A < B.');
+  FA := EvaluateFinite('Brent', F, A);
+  FB := EvaluateFinite('Brent', F, B);
+  if Abs(FA) <= Tol then
+  begin
+    Result.Root := A; Result.Residual := Abs(FA); Result.Converged := True;
+    Exit;
+  end;
+  if Abs(FB) <= Tol then
+  begin
+    Result.Root := B; Result.Residual := Abs(FB); Result.Converged := True;
+    Exit;
+  end;
+  if SameNonZeroSign(FA, FB) then
     raise EInvalidArgument.Create(
       'Brent: f(A) and f(B) must have opposite signs.');
 
@@ -228,10 +405,14 @@ begin
 
   for Iter := 1 to MaxIter do
   begin
-    if Abs(FB) < Tol then
-      Exit(B);
-    if Abs(B - A) < Tol then
-      Exit(B);
+    Result.Root := B;
+    Result.Residual := Abs(FB);
+    Result.Iterations := Iter;
+    if (Result.Residual <= Tol) or (Abs(B - A) <= Tol) then
+    begin
+      Result.Converged := True;
+      Exit;
+    end;
 
     if (FA <> FC) and (FB <> FC) then
     begin
@@ -266,16 +447,17 @@ begin
     D  := C;
     C  := B;
     FC := FB;
+    FS := EvaluateFinite('Brent', F, S);
 
-    if FA * F(S) < 0 then
+    if not SameNonZeroSign(FA, FS) then
     begin
       B  := S;
-      FB := F(S);
+      FB := FS;
     end
     else
     begin
       A  := S;
-      FA := F(S);
+      FA := FS;
     end;
 
     if Abs(FA) < Abs(FB) then
@@ -285,27 +467,68 @@ begin
     end;
 
   end;
-  Result := B;
+  Result.Root := B;
+  Result.Residual := Abs(FB);
 end;
 
-class function TNumericsKit.Secant(F: TScalarFunc; X0, X1: Double; Tol: Double; MaxIter: Integer): Double;
+class function TNumericsKit.Brent(F: TScalarFunc; A, B: Double;
+  Tol: Double; MaxIter: Integer): Double;
+var
+  Outcome: TRootResult;
+begin
+  Outcome := BrentResult(F, A, B, Tol, MaxIter);
+  if not Outcome.Converged then
+    raise ENumericsConvergenceError.CreateFmt(
+      'Brent did not converge after %d iterations (residual %.6g).',
+      [Outcome.Iterations, Outcome.Residual]);
+  Result := Outcome.Root;
+end;
+
+class function TNumericsKit.SecantResult(F: TScalarFunc; X0, X1: Double;
+  Tol: Double; MaxIter: Integer): TRootResult;
 var
   F0, F1, X2: Double;
   Iter: Integer;
 begin
-  F0 := F(X0);
-  F1 := F(X1);
+  Result := Default(TRootResult);
+  ValidateRootControls('Secant', F, Tol, MaxIter);
+  if IsNan(X0) or IsInfinite(X0) or IsNan(X1) or IsInfinite(X1) or (X0 = X1) then
+    raise EInvalidArgument.Create('Secant: require distinct finite initial guesses.');
+  F0 := EvaluateFinite('Secant', F, X0);
+  F1 := EvaluateFinite('Secant', F, X1);
   for Iter := 1 to MaxIter do
   begin
-    if Abs(F1) < Tol then
-      Exit(X1);
+    Result.Root := X1;
+    Result.Residual := Abs(F1);
+    Result.Iterations := Iter;
+    if Result.Residual <= Tol then
+    begin
+      Result.Converged := True;
+      Exit;
+    end;
     if Abs(F1 - F0) < 1E-300 then
       raise EInvalidArgument.Create('Secant: division by near-zero (f(x1) ≈ f(x0)).');
     X2 := X1 - F1 * (X1 - X0) / (F1 - F0);
+    if IsNan(X2) or IsInfinite(X2) then
+      raise ENumericsError.Create('Secant: iteration became non-finite.');
     X0 := X1; F0 := F1;
-    X1 := X2; F1 := F(X1);
+    X1 := X2; F1 := EvaluateFinite('Secant', F, X1);
   end;
-  Result := X1;
+  Result.Root := X1;
+  Result.Residual := Abs(F1);
+end;
+
+class function TNumericsKit.Secant(F: TScalarFunc; X0, X1: Double;
+  Tol: Double; MaxIter: Integer): Double;
+var
+  Outcome: TRootResult;
+begin
+  Outcome := SecantResult(F, X0, X1, Tol, MaxIter);
+  if not Outcome.Converged then
+    raise ENumericsConvergenceError.CreateFmt(
+      'Secant did not converge after %d iterations (residual %.6g).',
+      [Outcome.Iterations, Outcome.Residual]);
+  Result := Outcome.Root;
 end;
 
 { =========================================================================
@@ -317,12 +540,14 @@ var
   H, Sum: Double;
   I: Integer;
 begin
+  ValidateFiniteInterval(F, A, B, 'TrapezoidalRule');
   if N < 1 then
     raise EInvalidArgument.Create('TrapezoidalRule: N must be >= 1.');
   H   := (B - A) / N;
-  Sum := (F(A) + F(B)) / 2;
+  Sum := (EvaluateFinite('TrapezoidalRule', F, A) +
+    EvaluateFinite('TrapezoidalRule', F, B)) / 2;
   for I := 1 to N - 1 do
-    Sum := Sum + F(A + I * H);
+    Sum := Sum + EvaluateFinite('TrapezoidalRule', F, A + I * H);
   Result := H * Sum;
 end;
 
@@ -331,16 +556,19 @@ var
   H, Sum: Double;
   I: Integer;
 begin
-  if N < 2 then N := 2;
+  ValidateFiniteInterval(F, A, B, 'SimpsonRule');
+  if N < 2 then
+    raise EInvalidArgument.Create('SimpsonRule: N must be >= 2.');
   if Odd(N) then Inc(N);  { must be even }
   H   := (B - A) / N;
-  Sum := F(A) + F(B);
+  Sum := EvaluateFinite('SimpsonRule', F, A) +
+    EvaluateFinite('SimpsonRule', F, B);
   for I := 1 to N - 1 do
   begin
     if Odd(I) then
-      Sum := Sum + 4 * F(A + I * H)
+      Sum := Sum + 4 * EvaluateFinite('SimpsonRule', F, A + I * H)
     else
-      Sum := Sum + 2 * F(A + I * H);
+      Sum := Sum + 2 * EvaluateFinite('SimpsonRule', F, A + I * H);
   end;
   Result := H * Sum / 3;
 end;
@@ -357,12 +585,15 @@ const
 var
   Mid, HalfLen: Double;
 begin
+  ValidateFiniteInterval(F, A, B, 'GaussLegendre5');
   Mid     := (A + B) / 2;
   HalfLen := (B - A) / 2;
   Result  := HalfLen * (
-    W1 * (F(Mid - HalfLen * X1) + F(Mid + HalfLen * X1)) +
-    W2 * (F(Mid - HalfLen * X2) + F(Mid + HalfLen * X2)) +
-    W3 *  F(Mid));
+    W1 * (EvaluateFinite('GaussLegendre5', F, Mid - HalfLen * X1) +
+          EvaluateFinite('GaussLegendre5', F, Mid + HalfLen * X1)) +
+    W2 * (EvaluateFinite('GaussLegendre5', F, Mid - HalfLen * X2) +
+          EvaluateFinite('GaussLegendre5', F, Mid + HalfLen * X2)) +
+    W3 * EvaluateFinite('GaussLegendre5', F, Mid));
 end;
 
 { =========================================================================
@@ -371,7 +602,13 @@ end;
 
 class function TNumericsKit.EulerStep(F: TODEFunc; T0, Y0, H: Double): Double;
 begin
-  Result := Y0 + H * F(T0, Y0);
+  if not Assigned(F) then raise EInvalidArgument.Create('EulerStep: function callback is nil.');
+  if IsNan(T0) or IsInfinite(T0) or IsNan(Y0) or IsInfinite(Y0) or
+     IsNan(H) or IsInfinite(H) then
+    raise EInvalidArgument.Create('EulerStep: T0, Y0, and H must be finite.');
+  Result := Y0 + H * EvaluateFiniteODE(F, T0, Y0, 'EulerStep');
+  if IsNan(Result) or IsInfinite(Result) then
+    raise ENumericsError.Create('EulerStep: step produced a non-finite value.');
 end;
 
 class function TNumericsKit.EulerSolve(F: TODEFunc; T0, Y0, T1: Double; N: Integer): TODESolution;
@@ -380,6 +617,10 @@ var
   I: Integer;
 begin
   Result := Default(TODESolution);
+  if not Assigned(F) then raise EInvalidArgument.Create('EulerSolve: function callback is nil.');
+  if IsNan(T0) or IsInfinite(T0) or IsNan(Y0) or IsInfinite(Y0) or
+     IsNan(T1) or IsInfinite(T1) then
+    raise EInvalidArgument.Create('EulerSolve: T0, Y0, and T1 must be finite.');
   if N < 1 then
     raise EInvalidArgument.Create('EulerSolve: N must be >= 1.');
   H := (T1 - T0) / N;
@@ -401,11 +642,17 @@ class function TNumericsKit.RK4Step(F: TODEFunc; T0, Y0, H: Double): Double;
 var
   K1, K2, K3, K4: Double;
 begin
-  K1 := F(T0,           Y0);
-  K2 := F(T0 + H / 2,   Y0 + H * K1 / 2);
-  K3 := F(T0 + H / 2,   Y0 + H * K2 / 2);
-  K4 := F(T0 + H,        Y0 + H * K3);
+  if not Assigned(F) then raise EInvalidArgument.Create('RK4Step: function callback is nil.');
+  if IsNan(T0) or IsInfinite(T0) or IsNan(Y0) or IsInfinite(Y0) or
+     IsNan(H) or IsInfinite(H) then
+    raise EInvalidArgument.Create('RK4Step: T0, Y0, and H must be finite.');
+  K1 := EvaluateFiniteODE(F, T0, Y0, 'RK4Step');
+  K2 := EvaluateFiniteODE(F, T0 + H / 2, Y0 + H * K1 / 2, 'RK4Step');
+  K3 := EvaluateFiniteODE(F, T0 + H / 2, Y0 + H * K2 / 2, 'RK4Step');
+  K4 := EvaluateFiniteODE(F, T0 + H, Y0 + H * K3, 'RK4Step');
   Result := Y0 + H * (K1 + 2*K2 + 2*K3 + K4) / 6;
+  if IsNan(Result) or IsInfinite(Result) then
+    raise ENumericsError.Create('RK4Step: step produced a non-finite value.');
 end;
 
 class function TNumericsKit.RK4Solve(F: TODEFunc; T0, Y0, T1: Double; N: Integer): TODESolution;
@@ -414,6 +661,10 @@ var
   I: Integer;
 begin
   Result := Default(TODESolution);
+  if not Assigned(F) then raise EInvalidArgument.Create('RK4Solve: function callback is nil.');
+  if IsNan(T0) or IsInfinite(T0) or IsNan(Y0) or IsInfinite(Y0) or
+     IsNan(T1) or IsInfinite(T1) then
+    raise EInvalidArgument.Create('RK4Solve: T0, Y0, and T1 must be finite.');
   if N < 1 then
     raise EInvalidArgument.Create('RK4Solve: N must be >= 1.');
   H := (T1 - T0) / N;
@@ -445,6 +696,9 @@ begin
     raise EInvalidArgument.Create('LinearInterp: empty knot arrays.');
   if N <> Length(YKnots) then
     raise EInvalidArgument.Create('LinearInterp: XKnots and YKnots must have the same length.');
+  ValidateKnots(XKnots, YKnots, 'LinearInterp', True);
+  if IsNan(X) or IsInfinite(X) then
+    raise EInvalidArgument.Create('LinearInterp: X must be finite.');
   if N = 1 then
     Exit(YKnots[0]);
 
@@ -475,6 +729,9 @@ begin
     raise EInvalidArgument.Create('LagrangeInterp: empty knot arrays.');
   if N <> Length(YKnots) then
     raise EInvalidArgument.Create('LagrangeInterp: XKnots and YKnots must have the same length.');
+  ValidateKnots(XKnots, YKnots, 'LagrangeInterp', False);
+  if IsNan(X) or IsInfinite(X) then
+    raise EInvalidArgument.Create('LagrangeInterp: X must be finite.');
 
   Sum := 0;
   for I := 0 to N - 1 do
@@ -504,6 +761,7 @@ begin
     raise EInvalidArgument.Create('CubicSplineBuild: need at least 2 knots.');
   if N <> Length(YKnots) then
     raise EInvalidArgument.Create('CubicSplineBuild: XKnots and YKnots must have the same length.');
+  ValidateKnots(XKnots, YKnots, 'CubicSplineBuild', True);
 
   SetLength(H,     N - 1);
   SetLength(Alpha, N - 1);
@@ -559,6 +817,15 @@ begin
   N := Length(S.X);
   if N = 0 then
     raise EInvalidArgument.Create('CubicSplineEval: spline has no knots.');
+  if (Length(S.A) <> N) or (Length(S.B) <> N - 1) or
+     (Length(S.C) <> N) or (Length(S.D) <> N - 1) then
+    raise EInvalidArgument.Create('CubicSplineEval: invalid spline coefficient dimensions.');
+  ValidateKnots(S.X, S.A, 'CubicSplineEval', True);
+  ValidateFiniteArray(S.B, 'CubicSplineEval B');
+  ValidateFiniteArray(S.C, 'CubicSplineEval C');
+  ValidateFiniteArray(S.D, 'CubicSplineEval D');
+  if IsNan(X) or IsInfinite(X) then
+    raise EInvalidArgument.Create('CubicSplineEval: X must be finite.');
 
   { Clamp }
   if X <= S.X[0] then Exit(S.A[0]);
