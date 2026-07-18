@@ -1,6 +1,6 @@
 # Releasing mathlib-fp
 
-Use this checklist for the 1.2.0 first public release and later releases.
+Use this checklist for every mathlib-fp release.
 
 ## Before tagging
 
@@ -80,10 +80,10 @@ lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 
 1. Merge the release commit into the default branch and confirm its required
    CI checks are green.
-2. Open **Releases → Draft a new release** and create tag `v1.2.0` from that
-   exact commit.
-3. Use `mathlib-fp 1.2.0` as the release title and copy the 1.2.0 changelog
-   entries into the release notes.
+2. Open **Releases → Draft a new release** and create tag `vX.Y.Z` from that
+   exact commit, replacing `X.Y.Z` with the version being published.
+3. Use `mathlib-fp X.Y.Z` as the release title and copy that version's
+   changelog entries into the release notes.
 4. Mark it as the latest release, leave **pre-release** unchecked, and publish.
    GitHub automatically provides source `.zip` and `.tar.gz` downloads for the
    tag; no separately generated source archive is needed.
