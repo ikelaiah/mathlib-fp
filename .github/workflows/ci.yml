@@ -80,7 +80,7 @@ jobs:
       - name: Install Lazarus and Free Pascal
         uses: gcarreno/setup-lazarus@3ee9d77e0c771b37c1069f218cb68bd5ce7c30fe # v3
         with:
-          lazarus-version: 4.0
+          lazarus-version: "4.0"
           with-cache: false
 
       - name: Install Win32 cross compiler
