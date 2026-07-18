@@ -56,7 +56,7 @@ No changes yet.
   exception unit.
 - The Lazarus package and registration unit are now named `mathlib_fp` to match
   the mathlib-fp project name.
-- Lazarus 4.0 is the minimum supported Lazarus version; CI validates the
+- Lazarus 4.8 is the minimum supported Lazarus version; CI validates the
   package against that baseline.
 - `EngineeringLib.Signal.TDoubleArray` now aliases the shared
   `MathBase.SharedTypes.TDoubleArray` type.

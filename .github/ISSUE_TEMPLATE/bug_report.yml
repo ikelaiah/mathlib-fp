@@ -39,7 +39,7 @@ body:
     attributes:
       label: Environment
       description: Include the operating system, FPC version, and Lazarus version if used.
-      placeholder: Windows 11, FPC 3.2.2, Lazarus 4.0
+      placeholder: Windows 11, FPC 3.2.2, Lazarus 4.8
     validations:
       required: true
   - type: textarea

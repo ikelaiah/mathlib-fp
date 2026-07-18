@@ -77,62 +77,81 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Install Lazarus and Free Pascal
-        uses: gcarreno/setup-lazarus@3ee9d77e0c771b37c1069f218cb68bd5ce7c30fe # v3
-        with:
-          lazarus-version: "4.0"
-          with-cache: false
-
-      - name: Install Win32 cross compiler
+      - name: Install Lazarus 4.8 and Free Pascal 3.2.2
         shell: pwsh
         run: |
-          $installerName = `
-            'lazarus-4.0-fpc-3.2.2-cross-i386-win32-win64.exe'
-          $downloadUrl = `
-            'https://download.lazarus-ide.org/' + `
-            'Lazarus%20Windows%2064%20bits/Lazarus%204.0/' + `
-            $installerName
-          $expectedHash = `
-            '6A4E3D37D32E3B356F70385BDF5146EBE07E0A0530359AB2FB5CE20CC58BEEAF'
-          $installer = Join-Path $env:RUNNER_TEMP $installerName
+          $installers = @(
+            @{
+              Name = 'lazarus-4.8-fpc-3.2.2-win64.exe'
+              Url = 'https://sourceforge.net/projects/lazarus/files/' + `
+                'Lazarus%20Windows%2064%20bits/Lazarus%204.8/' + `
+                'lazarus-4.8-fpc-3.2.2-win64.exe/download'
+              Hash = `
+                'ED25EE171D55E23CF14E0633159FDD2325EFBA56E186F8AB817AD3BF97D267D7'
+              Root = Join-Path $env:RUNNER_TEMP 'lazarus-win64'
+              Cpu = 'x86_64-win64'
+            }
+            @{
+              Name = 'lazarus-4.8-fpc-3.2.2-win32.exe'
+              Url = 'https://sourceforge.net/projects/lazarus/files/' + `
+                'Lazarus%20Windows%2032%20bits/Lazarus%204.8/' + `
+                'lazarus-4.8-fpc-3.2.2-win32.exe/download'
+              Hash = `
+                '81DA36A9AEAFEE55EAE29AAA636CCDB009F2BCEEE3215A87EC99F6F3F81B709E'
+              Root = Join-Path $env:RUNNER_TEMP 'lazarus-win32'
+              Cpu = 'i386-win32'
+            }
+          )
 
-          $fpcPath = (Get-Command fpc).Source
-          $binRoot = Split-Path (Split-Path $fpcPath -Parent) -Parent
-          $versionRoot = Split-Path $binRoot -Parent
-          $fpcRoot = Split-Path $versionRoot -Parent
-          $lazarusRoot = Split-Path $fpcRoot -Parent
+          foreach ($item in $installers) {
+            $installer = Join-Path $env:RUNNER_TEMP $item.Name
+            Invoke-WebRequest -Uri $item.Url -OutFile $installer
+            $actualHash = (Get-FileHash -Algorithm SHA256 $installer).Hash
+            if ($actualHash -ne $item.Hash) {
+              throw "$($item.Name) checksum mismatch: $actualHash"
+            }
 
-          Invoke-WebRequest -Uri $downloadUrl -OutFile $installer
-          $actualHash = (Get-FileHash -Algorithm SHA256 $installer).Hash
-          if ($actualHash -ne $expectedHash) {
-            throw "Win32 cross-compiler checksum mismatch: $actualHash"
+            $install = Start-Process -FilePath $installer -ArgumentList @(
+              '/VERYSILENT'
+              '/SUPPRESSMSGBOXES'
+              '/NORESTART'
+              '/SP-'
+              "/DIR=$($item.Root)"
+            ) -Wait -PassThru
+            if ($install.ExitCode -ne 0) {
+              throw "$($item.Name) installer exited with $($install.ExitCode)"
+            }
+
+            $fpc = Join-Path $item.Root `
+              "fpc/3.2.2/bin/$($item.Cpu)/fpc.exe"
+            $lazbuild = Join-Path $item.Root 'lazbuild.exe'
+            if (-not (Test-Path $fpc) -or -not (Test-Path $lazbuild)) {
+              throw "Lazarus was not installed under $($item.Root)"
+            }
+            $version = (& $fpc '-iV').Trim()
+            if ($version -ne '3.2.2') {
+              throw "Expected $($item.Cpu) FPC 3.2.2, found $version"
+            }
           }
 
-          $install = Start-Process -FilePath $installer -ArgumentList @(
-            '/VERYSILENT'
-            '/SUPPRESSMSGBOXES'
-            '/NORESTART'
-            '/SP-'
-            "/DIR=$lazarusRoot"
-          ) -Wait -PassThru
-          if ($install.ExitCode -ne 0) {
-            throw "Win32 cross-compiler installer exited with $($install.ExitCode)"
-          }
-
-          $fpc386 = Join-Path $binRoot 'i386-win32/fpc.exe'
-          $ppc386 = Join-Path $binRoot 'i386-win32/ppc386.exe'
-          if (-not (Test-Path $fpc386) -or -not (Test-Path $ppc386)) {
-            throw "Win32 cross compiler was not installed under $binRoot"
-          }
-          $version386 = (& $fpc386 '-iV').Trim()
-          if ($version386 -ne '3.2.2') {
-            throw "Expected Win32 FPC 3.2.2, found $version386"
-          }
+          $fpc64 = Join-Path $installers[0].Root `
+            'fpc/3.2.2/bin/x86_64-win64/fpc.exe'
+          $fpc386 = Join-Path $installers[1].Root `
+            'fpc/3.2.2/bin/i386-win32/fpc.exe'
+          $lazbuild64 = Join-Path $installers[0].Root 'lazbuild.exe'
+          $lazbuild386 = Join-Path $installers[1].Root 'lazbuild.exe'
+          @(
+            "FPC_WIN64=$fpc64"
+            "FPC_WIN32=$fpc386"
+            "LAZBUILD_WIN64=$lazbuild64"
+            "LAZBUILD_WIN32=$lazbuild386"
+          ) | Out-File `
+            -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Verify Free Pascal version
         shell: pwsh
         run: |
-          $version = (fpc -iV).Trim()
+          $version = (& $env:FPC_WIN64 '-iV').Trim()
           Write-Host "Free Pascal version: $version"
           if ($version -ne '3.2.2') {
             throw "Expected FPC 3.2.2, found $version"
@@ -143,7 +162,8 @@ jobs:
         run: |
           Set-Location tests
           New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
-          & fpc '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' 'TestRunner.lpr'
+          & $env:FPC_WIN64 '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
+            'TestRunner.lpr'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & ./TestRunner.exe '-a' '--format=plain'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -154,7 +174,8 @@ jobs:
           Set-Location examples
           New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
           Get-ChildItem *.lpr | ForEach-Object {
-            & fpc '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' $_.FullName
+            & $env:FPC_WIN64 '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
+              $_.FullName
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             $executable = Join-Path $_.DirectoryName ($_.BaseName + '.exe')
             & $executable | Out-Null
@@ -165,36 +186,29 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path benchmarks/lib/ci | Out-Null
-          & fpc '-B' '-O3' '-FcUTF8' '-Fusrc' '-FUbenchmarks/lib/ci' `
+          & $env:FPC_WIN64 '-B' '-O3' '-FcUTF8' '-Fusrc' `
+            '-FUbenchmarks/lib/ci' `
             '-FEbenchmarks/lib/ci' 'benchmarks/BenchmarkRunner.lpr'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build Lazarus package (Win64 and Win32)
         shell: pwsh
         run: |
-          & lazbuild '--build-all' 'packages/lazarus/mathlib_fp.lpk'
+          $config64 = Join-Path $env:RUNNER_TEMP 'lazarus-config-win64'
+          New-Item -ItemType Directory -Force -Path $config64 | Out-Null
+          & $env:LAZBUILD_WIN64 "--pcp=$config64" '--build-all' `
+            'packages/lazarus/mathlib_fp.lpk'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $fpcPath = (Get-Command fpc).Source
-          $binRoot = Split-Path (Split-Path $fpcPath -Parent) -Parent
-          $ppc386 = Join-Path $binRoot 'i386-win32/ppc386.exe'
-          $fpc386 = Join-Path $binRoot 'i386-win32/fpc.exe'
-          if (-not (Test-Path $ppc386) -or -not (Test-Path $fpc386)) {
-            throw "Win32 compiler toolchain not found under $binRoot"
-          }
-          $versionRoot = Split-Path $binRoot -Parent
-          $fpcRoot = Split-Path $versionRoot -Parent
-          $lazarusRoot = Split-Path $fpcRoot -Parent
-          $packagerUnits = Join-Path $lazarusRoot 'packager/units/i386-win32'
-          New-Item -ItemType Directory -Force `
-            -Path packages/lazarus/lib/ci-i386 | Out-Null
-          & $ppc386 '-B' '-MObjFPC' '-Scghi' '-O2' '-FcUTF8' '-Fusrc' `
-            '-Fupackages/lazarus' "-Fu$packagerUnits" `
-            '-FUpackages/lazarus/lib/ci-i386' `
-            'packages/lazarus/mathlib_fp.pas'
+
+          $config386 = Join-Path $env:RUNNER_TEMP 'lazarus-config-win32'
+          New-Item -ItemType Directory -Force -Path $config386 | Out-Null
+          & $env:LAZBUILD_WIN32 "--pcp=$config386" '--build-all' `
+            'packages/lazarus/mathlib_fp.lpk'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
           New-Item -ItemType Directory -Force `
             -Path tests/lib/ci-i386 | Out-Null
-          & $fpc386 '-B' '-O2' '-FcUTF8' '-Fusrc' `
+          & $env:FPC_WIN32 '-B' '-O2' '-FcUTF8' '-Fusrc' `
             '-FUtests/lib/ci-i386' '-FEtests/lib/ci-i386' `
             'tests/TestRunner.lpr'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
