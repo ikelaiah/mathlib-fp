@@ -41,8 +41,8 @@ not a domain, Pascal unit, or Lazarus package.
 - All 12 examples compile and run.
 - The representative benchmark runner compiles and completes.
 - The `mathlib_fp` Lazarus package builds with Lazarus 4.8.
-- The release PR must pass the Linux, Win64, and Win32 CI matrix before the
-  `v1.2.1` tag is created.
+- Linux and Windows CI pass with Free Pascal 3.2.2; Windows CI runs all 789
+  tests and builds the Lazarus 4.8 package on native Win64 and Win32 toolchains.
 
 For the complete change list, see the
 [changelog](../CHANGELOG.md#121---2026-07-18).
