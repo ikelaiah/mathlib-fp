@@ -83,9 +83,9 @@ jobs:
           $installers = @(
             @{
               Name = 'lazarus-4.8-fpc-3.2.2-win64.exe'
-              Url = 'https://sourceforge.net/projects/lazarus/files/' + `
+              Url = 'https://download.lazarus-ide.org/' + `
                 'Lazarus%20Windows%2064%20bits/Lazarus%204.8/' + `
-                'lazarus-4.8-fpc-3.2.2-win64.exe/download'
+                'lazarus-4.8-fpc-3.2.2-win64.exe'
               Hash = `
                 'ED25EE171D55E23CF14E0633159FDD2325EFBA56E186F8AB817AD3BF97D267D7'
               Root = Join-Path $env:RUNNER_TEMP 'lazarus-win64'
@@ -93,9 +93,9 @@ jobs:
             }
             @{
               Name = 'lazarus-4.8-fpc-3.2.2-win32.exe'
-              Url = 'https://sourceforge.net/projects/lazarus/files/' + `
+              Url = 'https://download.lazarus-ide.org/' + `
                 'Lazarus%20Windows%2032%20bits/Lazarus%204.8/' + `
-                'lazarus-4.8-fpc-3.2.2-win32.exe/download'
+                'lazarus-4.8-fpc-3.2.2-win32.exe'
               Hash = `
                 '81DA36A9AEAFEE55EAE29AAA636CCDB009F2BCEEE3215A87EC99F6F3F81B709E'
               Root = Join-Path $env:RUNNER_TEMP 'lazarus-win32'
