@@ -93,7 +93,7 @@ For the complete list of additions and fixes, see the
 ## Requirements and installation
 
 - Free Pascal 3.2.2 or later.
-- Lazarus 3.6 or later when using the optional Lazarus package.
+- Lazarus 4.0 or later when using the optional Lazarus package.
 - No third-party runtime dependencies.
 
 Download a source archive from the GitHub release, or clone the repository.
@@ -131,6 +131,8 @@ Windows:
 - All 12 example programs compile and run.
 - The README quick-start builds and runs successfully.
 - The `mathlib_fp` Lazarus package builds successfully for Win64 and Win32.
+- The package and all 788 tests also pass on Windows 11 with Lazarus 4.8 and
+  its bundled Free Pascal compiler.
 - The benchmark runner compiles and completes representative workloads.
 - A clean source-archive installation repeats the tests, examples, quick-start,
   benchmark compilation, and Lazarus-package build.

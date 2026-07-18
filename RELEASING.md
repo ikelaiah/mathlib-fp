@@ -10,7 +10,8 @@ Use this checklist for the 1.2.0 first public release and later releases.
   README badge, and `CHANGELOG.md`.
 - [ ] Confirm the release section has the publication date and **Unreleased**
   contains only changes made after that release.
-- [ ] Confirm CI passes with FPC 3.2.2 on Linux and Windows.
+- [ ] Confirm CI passes with FPC 3.2.2 on Linux and Windows and builds with the
+  minimum supported Lazarus 4.0 on Windows.
 - [ ] Confirm CI compiles and runs every example and builds the Lazarus package.
 - [ ] Run normal, optimized, runtime-checked, and heap-traced test builds; verify
   the heap-traced run reports zero unfreed blocks.

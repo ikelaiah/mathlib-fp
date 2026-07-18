@@ -80,8 +80,54 @@ jobs:
       - name: Install Lazarus and Free Pascal
         uses: gcarreno/setup-lazarus@3ee9d77e0c771b37c1069f218cb68bd5ce7c30fe # v3
         with:
-          lazarus-version: 3.6
+          lazarus-version: 4.0
           with-cache: false
+
+      - name: Install Win32 cross compiler
+        shell: pwsh
+        run: |
+          $installerName = `
+            'lazarus-4.0-fpc-3.2.2-cross-i386-win32-win64.exe'
+          $downloadUrl = `
+            'https://download.lazarus-ide.org/' + `
+            'Lazarus%20Windows%2064%20bits/Lazarus%204.0/' + `
+            $installerName
+          $expectedHash = `
+            '6A4E3D37D32E3B356F70385BDF5146EBE07E0A0530359AB2FB5CE20CC58BEEAF'
+          $installer = Join-Path $env:RUNNER_TEMP $installerName
+
+          $fpcPath = (Get-Command fpc).Source
+          $binRoot = Split-Path (Split-Path $fpcPath -Parent) -Parent
+          $versionRoot = Split-Path $binRoot -Parent
+          $fpcRoot = Split-Path $versionRoot -Parent
+          $lazarusRoot = Split-Path $fpcRoot -Parent
+
+          Invoke-WebRequest -Uri $downloadUrl -OutFile $installer
+          $actualHash = (Get-FileHash -Algorithm SHA256 $installer).Hash
+          if ($actualHash -ne $expectedHash) {
+            throw "Win32 cross-compiler checksum mismatch: $actualHash"
+          }
+
+          $install = Start-Process -FilePath $installer -ArgumentList @(
+            '/VERYSILENT'
+            '/SUPPRESSMSGBOXES'
+            '/NORESTART'
+            '/SP-'
+            "/DIR=$lazarusRoot"
+          ) -Wait -PassThru
+          if ($install.ExitCode -ne 0) {
+            throw "Win32 cross-compiler installer exited with $($install.ExitCode)"
+          }
+
+          $fpc386 = Join-Path $binRoot 'i386-win32/fpc.exe'
+          $ppc386 = Join-Path $binRoot 'i386-win32/ppc386.exe'
+          if (-not (Test-Path $fpc386) -or -not (Test-Path $ppc386)) {
+            throw "Win32 cross compiler was not installed under $binRoot"
+          }
+          $version386 = (& $fpc386 '-iV').Trim()
+          if ($version386 -ne '3.2.2') {
+            throw "Expected Win32 FPC 3.2.2, found $version386"
+          }
 
       - name: Verify Free Pascal version
         shell: pwsh
