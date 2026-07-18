@@ -1,6 +1,6 @@
 # mathlib-fp 1.2.0 release notes
 
-**Release date:** 2027-07-18  
+**Release date:** 2026-07-18
 **Release status:** First public release
 
 mathlib-fp 1.2.0 is the first public release of the standalone mathlib-fp
@@ -64,9 +64,31 @@ See the [documentation index](index.md) for the API guides and the
   APIs raise `EUnitConversionError`, while `Try...` APIs return `False`. Its
   formatting, parsing, enumeration, base-unit, and shortcut APIs are fully
   documented, including exact symbols and fixed month/year durations.
+- Matrix inverse, LU, rank, and exponential paths have scale-aware correctness
+  fixes backed by reference, reconstruction, and algebraic property tests.
+- Statistics sorting and convex-hull point ordering use O(n log n) algorithms;
+  a representative benchmark runner covers both paths and dense multiplication.
+- Statistical inference now returns exact small untied Mann-Whitney p-values,
+  calibrated approximate K-S and Shapiro-Wilk p-values, and pooled-variance
+  Cohen's d, with published/reference-value regression tests.
+- Time-series frequency bins and ARIMA MA/integration forecasts have corrected
+  mappings and reconstruction, including non-power-of-two and differenced
+  polynomial reference cases.
+- Linear regression uses centered Householder QR, while PCA reports iteration
+  counts, enforces convergence, re-orthogonalises components, and handles
+  rank-deficient covariance deterministically.
+- Numerical root finders offer detailed convergence records; scalar root and
+  optimization solvers raise on iteration exhaustion instead of silently
+  returning an unconverged estimate. Linear programming reports a termination
+  status in addition to its compatibility `Feasible` flag.
+- Geometry, combinatorics, trigonometry, interpolation, distributions, and
+  optimizer validation received focused correctness and domain regression tests.
+- Win32-specific release validation corrected sieve index portability,
+  significant-digit tie rounding, LU triangular cleanup, and deferred
+  floating-point overflow reporting.
 
 For the complete list of additions and fixes, see the
-[changelog](../CHANGELOG.md#120---2027-07-18).
+[changelog](../CHANGELOG.md#120---2026-07-18).
 
 ## Requirements and installation
 
@@ -104,10 +126,14 @@ Lazarus users can install
 The release candidate was validated with Free Pascal 3.2.2 on Linux and
 Windows:
 
-- 747 automated tests pass with zero failures.
+- 788 automated tests pass with zero failures on both Win64 and Win32.
+- Normal, optimized, checked, and heap-traced test builds pass.
 - All 12 example programs compile and run.
 - The README quick-start builds and runs successfully.
-- The `mathlib_fp` Lazarus package builds successfully.
+- The `mathlib_fp` Lazarus package builds successfully for Win64 and Win32.
+- The benchmark runner compiles and completes representative workloads.
+- A clean source-archive installation repeats the tests, examples, quick-start,
+  benchmark compilation, and Lazarus-package build.
 - Clean normal and UTF-8 builds complete without compiler warnings.
 
 ## Support, security, and license

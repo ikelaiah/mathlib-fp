@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
-## [1.2.0] - 2027-07-18
+## [1.2.0] - 2026-07-18
 
 ### Added
 
@@ -21,8 +21,10 @@ No changes yet.
 - `PolynomialFeatures(..., IncludeBias)` overload so callers can omit the bias
   column when fitting models that already estimate an intercept.
 - Edge, property, residual, deterministic-randomness, FinanceLib focused-unit,
-  rounding, UTF-8, and parallel-multiplication coverage, bringing the suite to
-  747 tests.
+  rounding, UTF-8, parallel-multiplication, and numerical reference coverage,
+  bringing the suite to 788 tests.
+- Representative performance benchmarks for statistics sorting, convex hulls,
+  and dense matrix multiplication, with CI compilation coverage.
 - Focused `EngineeringLib.Velocity` and `EngineeringLib.Pressure` entry units
   now expose directly nameable exception aliases and have direct compilation
   and runtime coverage.
@@ -58,6 +60,13 @@ No changes yet.
   `MathBase.SharedTypes.TDoubleArray` type.
 - `TFluidDynamicsKit.PumpHead` now accepts explicit inlet and outlet velocities
   and implements the Bernoulli velocity-head term `(v2²-v1²)/(2g)`.
+- General-purpose statistics and geometry sorts now use O(n log n) algorithms
+  instead of quadratic insertion sorts.
+- Root finders expose detailed convergence records, iterative matrix and scalar
+  solvers report exhaustion explicitly, PCA records per-component iterations,
+  and linear programming exposes a precise termination status.
+- Linear regression now uses centered Householder QR instead of normal
+  equations, improving behavior for high-offset and ill-scaled data.
 
 ### Fixed
 
@@ -65,6 +74,8 @@ No changes yet.
   intercept, which previously caused a singular regression system.
 - Unknown unit names no longer silently default to length. Non-`Try` APIs raise
   `EUnitConversionError`; `Try...` APIs retain their `False` contract.
+- Significant-digit formatting now uses stable round-half-to-even behavior on
+  both Win32 extended-precision and Win64 targets.
 - Fixed `InternalRateOfReturn`, which previously returned its initial 10% guess
   without iterating. It now brackets and bisects positive or negative rates and
   reports invalid or unbracketable cash-flow inputs with `EFinanceError`.
@@ -81,6 +92,19 @@ No changes yet.
 - Removed all compiler warnings from clean normal and UTF-8 builds.
 - Fixed broken source links, stale API names, version text, and random/bootstrap
   contracts across the documentation.
+- Corrected matrix inverse permutation handling, LU row swaps, scale-relative
+  rank/singularity decisions, exact triangular cleanup, and large-norm matrix
+  exponentials, including architecture-independent overflow reporting.
+- Corrected forward ray-circle semantics, polygon-boundary classification,
+  non-negative radius validation, and zero-vector angle handling.
+- Corrected exact small-sample Mann-Whitney p-values, K-S D/p-value semantics,
+  Shapiro-Wilk normal scores, and pooled-variance Cohen's d.
+- Corrected FFT period-bin mapping and ARIMA MA/integration forecasts.
+- Added checked combinatorics overflow paths and overflow-safe modular
+  exponentiation, a Win32-safe sieve index path, plus stable hyperbolic and
+  hypotenuse calculations.
+- Strengthened finite-value, dimension, domain, and callback validation across
+  numerical, optimization, time-series, matrix, geometry, and ML entry points.
 
 ---
 

@@ -110,9 +110,9 @@ class function NormalizeAngle(const Angle: Double): Double;    // → [0, 2π)
 class function NormalizeAngleDeg(const Angle: Double): Double; // → [0, 360)
 ```
 
-The normalisation routines use repeated addition/subtraction. Pass finite,
-ordinary-sized angles; Infinity does not terminate and very large magnitudes
-can require many iterations.
+The normalisation routines use constant-time floating-point reduction, including
+for very large finite magnitudes. NaN and either infinity return NaN rather than
+looping.
 
 ### Basic Trigonometry
 

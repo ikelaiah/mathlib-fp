@@ -129,6 +129,10 @@ type
     procedure TestConvexHull_TooFewRaises;
     procedure TestBoundingBox2D_EmptyRaises;
     procedure TestPlane3D_CollinearRaises;
+    procedure TestRayCircleRejectsIntersectionsBehindOrigin;
+    procedure TestRayCircleFromInsideHasOneForwardHit;
+    procedure TestPointInPolygonBoundaryIsInside;
+    procedure TestConvexHullLargeInputProperties;
   end;
 
 implementation
@@ -897,6 +901,57 @@ end;
 procedure TTestGeometryLib.TestPlane3D_CollinearRaises;
 begin
   AssertGeoError('Plane from collinear points', @ErrPlaneCollinear);
+end;
+
+procedure TTestGeometryLib.TestRayCircleRejectsIntersectionsBehindOrigin;
+var
+  C: TCircle2D;
+  T1, T2: Double;
+begin
+  C := TCircle2D.Create(TPoint2D.Create(0, 0), 1.0);
+  AssertEquals('supporting-line hits behind a ray are excluded', 0,
+    TGeometryKit.RayCircleIntersect(TPoint2D.Create(5, 0),
+      TPoint2D.Create(1, 0), C, T1, T2));
+end;
+
+procedure TTestGeometryLib.TestRayCircleFromInsideHasOneForwardHit;
+var
+  C: TCircle2D;
+  T1, T2: Double;
+begin
+  C := TCircle2D.Create(TPoint2D.Create(0, 0), 2.0);
+  AssertEquals('inside ray has one forward exit', 1,
+    TGeometryKit.RayCircleIntersect(TPoint2D.Create(0, 0),
+      TPoint2D.Create(1, 0), C, T1, T2));
+  AssertNear('forward exit parameter', 2.0, T1);
+end;
+
+procedure TTestGeometryLib.TestPointInPolygonBoundaryIsInside;
+var
+  P: TPolygon2D;
+begin
+  SetLength(P, 4);
+  P[0] := TPoint2D.Create(0, 0); P[1] := TPoint2D.Create(2, 0);
+  P[2] := TPoint2D.Create(2, 2); P[3] := TPoint2D.Create(0, 2);
+  AssertTrue('edge point counts as inside',
+    TGeometryKit.PointInPolygon(TPoint2D.Create(1, 0), P));
+  AssertTrue('vertex counts as inside',
+    TGeometryKit.PointInPolygon(TPoint2D.Create(2, 2), P));
+end;
+
+procedure TTestGeometryLib.TestConvexHullLargeInputProperties;
+var
+  Points, Hull: TPolygon2D;
+  I: Integer;
+begin
+  SetLength(Points, 10000);
+  for I := 0 to High(Points) do
+    Points[I] := TPoint2D.Create((I * 7919) mod 1009,
+      (I * I + 17 * I) mod 1013);
+  Hull := TGeometryKit.ConvexHull(Points);
+  AssertTrue('non-degenerate hull has at least three points', Length(Hull) >= 3);
+  AssertTrue('hull cannot contain more points than input', Length(Hull) <= Length(Points));
+  AssertTrue('large hull result is convex', TGeometryKit.IsConvex(Hull));
 end;
 
 initialization

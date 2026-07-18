@@ -133,7 +133,8 @@ type
     { Fixed-point formatting; Decimals must be non-negative. }
     class function FormatWithUnit(Value: Double; AUnitName: string; Decimals: Integer = 2): string; static;
 
-    { Scientific formatting and rounding; SignificantDigits must be >= 1. }
+    { Scientific formatting and round-half-to-even significant-digit rounding.
+      SignificantDigits must be in [1, 15]. }
     class function FormatWithScientificNotation(
       Value: Double;
       AUnitName: string;
@@ -654,6 +655,51 @@ begin
   Result := Format('%.*f %s', [Decimals, Value, AUnitName]);
 end;
 
+function ScaleByPowerOfTen(Value: Double; Exponent: Integer): Double;
+const
+  MaxStep = 100;
+var
+  Step: Integer;
+begin
+  Result := Value;
+  while Exponent > 0 do
+  begin
+    Step := Min(Exponent, MaxStep);
+    Result := Result * Power(10.0, Step);
+    Dec(Exponent, Step);
+  end;
+  while Exponent < 0 do
+  begin
+    Step := Min(-Exponent, MaxStep);
+    Result := Result / Power(10.0, Step);
+    Inc(Exponent, Step);
+  end;
+end;
+
+function RoundHalfToEvenStable(Value: Double): Double;
+const
+  DoubleEpsilon = 2.2204460492503131E-16;
+var
+  AbsValue, Whole, Fraction, TieTolerance, RoundedAbs: Double;
+  WholeInt: Int64;
+begin
+  AbsValue := Abs(Value);
+  Whole := Floor(AbsValue);
+  Fraction := AbsValue - Whole;
+  TieTolerance := 8.0 * DoubleEpsilon * Max(1.0, AbsValue);
+  if Abs(Fraction - 0.5) <= TieTolerance then
+  begin
+    WholeInt := Trunc(Whole);
+    if Odd(WholeInt) then
+      RoundedAbs := Whole + 1.0
+    else
+      RoundedAbs := Whole;
+  end
+  else
+    RoundedAbs := Floor(AbsValue + 0.5);
+  if Value < 0 then Result := -RoundedAbs else Result := RoundedAbs;
+end;
+
 class function TUnitConversionKit.FormatWithScientificNotation(
   Value: Double;
   AUnitName: string;
@@ -662,14 +708,16 @@ var
   Exponent: Integer;
   Mantissa: Double;
 begin
-  if SignificantDigits < 1 then
-    raise EUnitConversionError.Create('Significant digits must be at least 1.');
+  if (SignificantDigits < 1) or (SignificantDigits > 15) then
+    raise EUnitConversionError.Create('Significant digits must be between 1 and 15.');
+  if IsNan(Value) or IsInfinite(Value) then
+    raise EUnitConversionError.Create('Value must be finite.');
   if Value = 0 then
     Result := '0 ' + AUnitName
   else
   begin
     Exponent := Floor(Log10(Abs(Value)));
-    Mantissa := Value / Power(10, Exponent);
+    Mantissa := ScaleByPowerOfTen(Value, -Exponent);
     Mantissa := RoundToSignificantDigits(Mantissa, SignificantDigits);
     
     // Adjust if rounding caused mantissa to equal 10
@@ -685,16 +733,24 @@ end;
 
 class function TUnitConversionKit.RoundToSignificantDigits(Value: Double; SignificantDigits: Integer): Double;
 var
-  Factor: Double;
+  DecimalExponent, ScaleExponent: Integer;
+  Scaled: Double;
 begin
-  if SignificantDigits < 1 then
-    raise EUnitConversionError.Create('Significant digits must be at least 1.');
+  if (SignificantDigits < 1) or (SignificantDigits > 15) then
+    raise EUnitConversionError.Create('Significant digits must be between 1 and 15.');
+  if IsNan(Value) or IsInfinite(Value) then
+    raise EUnitConversionError.Create('Value must be finite.');
   if Value = 0 then
     Result := 0
   else
   begin
-    Factor := Power(10, SignificantDigits - 1 - Floor(Log10(Abs(Value))));
-    Result := Round(Value * Factor) / Factor;
+    DecimalExponent := Floor(Log10(Abs(Value)));
+    ScaleExponent := SignificantDigits - 1 - DecimalExponent;
+    Scaled := ScaleByPowerOfTen(Value, ScaleExponent);
+    Scaled := RoundHalfToEvenStable(Scaled);
+    Result := ScaleByPowerOfTen(Scaled, -ScaleExponent);
+    if IsNan(Result) or IsInfinite(Result) then
+      raise EUnitConversionError.Create('Rounded result is not representable.');
   end;
 end;
 

@@ -466,9 +466,11 @@ class function RoundToSignificantDigits(Value: Double;
   SignificantDigits: Integer): Double;
 ```
 
-`Decimals` must be non-negative and `SignificantDigits` must be at least 1;
-otherwise `EUnitConversionError` is raised. Formatting uses the process's
-current Free Pascal locale settings, including its decimal separator.
+`Decimals` must be non-negative and `SignificantDigits` must be between 1 and
+15; otherwise `EUnitConversionError` is raised. Values must be finite.
+Significant-digit ties use round-half-to-even consistently on 32- and 64-bit
+targets. Formatting uses the process's current Free Pascal locale settings,
+including its decimal separator.
 
 ### String-Based Conversion and Parsing
 

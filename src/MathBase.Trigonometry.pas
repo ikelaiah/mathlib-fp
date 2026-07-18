@@ -37,11 +37,11 @@ type
     class function RadToGrad(const Radians: Double): Double; static;
 
     { ---- Angle normalisation ---- }
-    { Normalise a finite, ordinary-sized angle to [0, 2π) using repeated
-      addition/subtraction. Infinity does not terminate. }
+    { Normalise a finite angle to [0, 2π) in constant time. Returns NaN for
+      NaN or Infinity. }
     class function NormalizeAngle(const Angle: Double): Double; static;
-    { Normalise a finite, ordinary-sized angle to [0, 360) using repeated
-      addition/subtraction. Infinity does not terminate. }
+    { Normalise a finite angle to [0, 360) in constant time. Returns NaN for
+      NaN or Infinity. }
     class function NormalizeAngleDeg(const Angle: Double): Double; static;
 
     { ---- Basic trig ---- }
@@ -130,20 +130,24 @@ end;
 
 class function TTrigKit.NormalizeAngle(const Angle: Double): Double;
 begin
-  Result := Angle;
-  while Result < 0 do
+  if IsNan(Angle) or IsInfinite(Angle) then
+    Exit(NaN);
+  Result := Frac(Angle / (2 * Pi)) * (2 * Pi);
+  if Result < 0 then
     Result := Result + 2 * Pi;
-  while Result >= 2 * Pi do
-    Result := Result - 2 * Pi;
+  if Result >= 2 * Pi then
+    Result := 0;
 end;
 
 class function TTrigKit.NormalizeAngleDeg(const Angle: Double): Double;
 begin
-  Result := Angle;
-  while Result < 0 do
+  if IsNan(Angle) or IsInfinite(Angle) then
+    Exit(NaN);
+  Result := Frac(Angle / 360) * 360;
+  if Result < 0 then
     Result := Result + 360;
-  while Result >= 360 do
-    Result := Result - 360;
+  if Result >= 360 then
+    Result := 0;
 end;
 
 { ---- Basic trig ---- }
@@ -199,20 +203,37 @@ end;
 
 class function TTrigKit.Tanh(const X: Double): Double;
 begin
-  Result := Sinh(X) / Cosh(X);
+  if X > 20 then
+    Result := 1
+  else if X < -20 then
+    Result := -1
+  else
+    Result := (System.Exp(2 * X) - 1) / (System.Exp(2 * X) + 1);
 end;
 
 { ---- Inverse hyperbolic ---- }
 
 class function TTrigKit.ArcSinh(const X: Double): Double;
+var
+  AX: Double;
 begin
-  Result := System.Ln(X + System.Sqrt(System.Sqr(X) + 1));
+  if IsNan(X) or IsInfinite(X) then
+    Exit(X);
+  AX := Abs(X);
+  if AX > 1E150 then
+    Result := Ln(AX) + Ln(2.0)
+  else
+    Result := Ln(AX + Sqrt(Sqr(AX) + 1));
+  if X < 0 then
+    Result := -Result;
 end;
 
 class function TTrigKit.ArcCosh(const X: Double): Double;
 begin
   if X < 1 then
     Result := NaN
+  else if X > 1E150 then
+    Result := Ln(X) + Ln(2.0)
   else
     Result := System.Ln(X + System.Sqrt(System.Sqr(X) - 1));
 end;
@@ -245,8 +266,18 @@ end;
 { ---- Triangle calculations ---- }
 
 class function TTrigKit.Hypotenuse(const A, B: Double): Double;
+var
+  X, Y, Temp: Double;
 begin
-  Result := System.Sqrt(System.Sqr(A) + System.Sqr(B));
+  X := Abs(A);
+  Y := Abs(B);
+  if X < Y then
+  begin
+    Temp := X; X := Y; Y := Temp;
+  end;
+  if X = 0 then
+    Exit(0);
+  Result := X * Sqrt(1 + Sqr(Y / X));
 end;
 
 class function TTrigKit.TriangleArea(const Base, Height: Double): Double;

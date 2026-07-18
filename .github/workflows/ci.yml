@@ -47,6 +47,12 @@ jobs:
             "./${file%.lpr}" > /dev/null
           done
 
+      - name: Compile representative benchmarks
+        run: |
+          mkdir -p benchmarks/lib/ci
+          fpc -B -O3 -FcUTF8 -Fusrc -FUbenchmarks/lib/ci \
+            -FEbenchmarks/lib/ci benchmarks/BenchmarkRunner.lpr
+
       - name: Test README quick start from a source archive
         run: |
           archive_dir=$(mktemp -d)
@@ -109,8 +115,42 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
-      - name: Build Lazarus package
+      - name: Compile representative benchmarks
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path benchmarks/lib/ci | Out-Null
+          & fpc '-B' '-O3' '-FcUTF8' '-Fusrc' '-FUbenchmarks/lib/ci' `
+            '-FEbenchmarks/lib/ci' 'benchmarks/BenchmarkRunner.lpr'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build Lazarus package (Win64 and Win32)
         shell: pwsh
         run: |
           & lazbuild '--build-all' 'packages/lazarus/mathlib_fp.lpk'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $fpcPath = (Get-Command fpc).Source
+          $binRoot = Split-Path (Split-Path $fpcPath -Parent) -Parent
+          $ppc386 = Join-Path $binRoot 'i386-win32/ppc386.exe'
+          $fpc386 = Join-Path $binRoot 'i386-win32/fpc.exe'
+          if (-not (Test-Path $ppc386) -or -not (Test-Path $fpc386)) {
+            throw "Win32 compiler toolchain not found under $binRoot"
+          }
+          $versionRoot = Split-Path $binRoot -Parent
+          $fpcRoot = Split-Path $versionRoot -Parent
+          $lazarusRoot = Split-Path $fpcRoot -Parent
+          $packagerUnits = Join-Path $lazarusRoot 'packager/units/i386-win32'
+          New-Item -ItemType Directory -Force `
+            -Path packages/lazarus/lib/ci-i386 | Out-Null
+          & $ppc386 '-B' '-MObjFPC' '-Scghi' '-O2' '-FcUTF8' '-Fusrc' `
+            '-Fupackages/lazarus' "-Fu$packagerUnits" `
+            '-FUpackages/lazarus/lib/ci-i386' `
+            'packages/lazarus/mathlib_fp.pas'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force `
+            -Path tests/lib/ci-i386 | Out-Null
+          & $fpc386 '-B' '-O2' '-FcUTF8' '-Fusrc' `
+            '-FUtests/lib/ci-i386' '-FEtests/lib/ci-i386' `
+            'tests/TestRunner.lpr'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ./tests/lib/ci-i386/TestRunner.exe '-a' '--format=plain'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

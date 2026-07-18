@@ -185,13 +185,15 @@ end;
 - `ModPow` with M <= 0
 - `PrimeFactors(N <= 1)`
 - `Sieve(Limit < 2)`
+- `Sieve` limits that exceed the platform's addressable dynamic-array size
 - `PowerSet(N > 24)`
 
-`ModPow` also requires a non-negative exponent, although a negative exponent is
-not currently rejected. Its `Int64` multiplications can overflow for large
-moduli; it is not an arbitrary-precision modular arithmetic routine. Likewise,
-`LCM`, Stirling/derangement recurrences, and some sequence builders do not all
-perform explicit overflow checks.
+`ModPow` rejects negative exponents and uses overflow-safe modular
+multiplication across the accepted `Int64` modulus range. `LCM`, multinomial,
+Stirling, derangement, Fibonacci, Lucas, and prime-bound arithmetic perform
+explicit overflow checks and raise `ECombinatoricsError` rather than wrapping.
+These APIs still return fixed-width integers; they are not arbitrary-precision
+arithmetic routines.
 
 ---
 

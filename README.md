@@ -22,7 +22,7 @@
 - **Broad:** 12 focused libraries, from matrices and probability to geometry and ARIMA.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
-- **Ready to explore:** reference docs, runnable examples, and 747 passing tests.
+- **Ready to explore:** reference docs, runnable examples, and 788 passing tests.
 
 > [!NOTE]
 > **1.2.0 is the first public release.** The library follows semantic versioning;

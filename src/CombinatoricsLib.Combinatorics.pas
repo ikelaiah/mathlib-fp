@@ -158,7 +158,8 @@ type
 
     { D_n — number of derangements: permutations of N with no fixed points.
       D_0=1, D_1=0, D_2=1, D_3=2, D_4=9, D_5=44 ...
-       Recurrence: D_n = (n-1) * (D_(n-1) + D_(n-2)) }
+      Recurrence: D_n = (n-1) * (D_(n-1) + D_(n-2)).
+      Raises ECombinatoricsError when the result exceeds Int64. }
     class function DerangementCount(N: Integer): Int64; static;
 
     { =======================================================================
@@ -201,9 +202,9 @@ type
       equations. }
     class function ExtendedGCD(A, B: Int64; out X, Y: Int64): Int64; static;
 
-    { A^B mod M — fast modular exponentiation (square-and-multiply).
+    { A^B mod M — overflow-safe modular exponentiation.
       Handles large exponents efficiently: O(log B) multiplications.
-      M must be > 0.  Returns 1 when B = 0 (by convention). }
+      B must be >= 0 and M must be > 0. Returns 1 when B = 0. }
     class function ModPow(A, B, M: Int64): Int64; static;
 
     { Modular multiplicative inverse of A mod M.
@@ -265,32 +266,49 @@ implementation
   Private helpers
 --------------------------------------------------------------------------- }
 
+function CheckedAddNonNegative(const A, B: Int64;
+  const Context: String): Int64;
+begin
+  if (A < 0) or (B < 0) or (A > High(Int64) - B) then
+    raise ECombinatoricsError.Create(Context + ': result overflows Int64');
+  Result := A + B;
+end;
+
+function CheckedMultiplyNonNegative(const A, B: Int64;
+  const Context: String): Int64;
+begin
+  if (A < 0) or (B < 0) or ((A <> 0) and (B > High(Int64) div A)) then
+    raise ECombinatoricsError.Create(Context + ': result overflows Int64');
+  Result := A * B;
+end;
+
+function AddMod64(const A, B, M: Int64): Int64; inline;
+begin
+  if A >= M - B then
+    Result := A - (M - B)
+  else
+    Result := A + B;
+end;
+
+function MulMod64(A, B, M: Int64): Int64;
+begin
+  Result := 0;
+  A := A mod M;
+  if A < 0 then A := A + M;
+  while B > 0 do
+  begin
+    if Odd(B) then Result := AddMod64(Result, A, M);
+    A := AddMod64(A, A, M);
+    B := B shr 1;
+  end;
+end;
+
 class function TCombinatoricsKit.MillerRabinWitness(const N, A: Int64): Boolean;
 { Returns True if A is a witness to N being composite (i.e. N is NOT prime).
-  Modular multiplication uses repeated doubling in Int64. }
+  Modular multiplication uses overflow-safe repeated doubling. }
 var
   D, R, X, Y: Int64;
   I: Integer;
-
-  { Multiply A*B mod M with the "Russian peasant" binary method. This avoids
-    the direct product, but its additions still require representable Int64
-    intermediate values. }
-  function MulMod(AA, BB, MM: Int64): Int64;
-  var
-    Res: Int64;
-  begin
-    Res := 0;
-    AA  := AA mod MM;
-    while BB > 0 do
-    begin
-      if Odd(BB) then
-        Res := (Res + AA) mod MM;
-      AA := (AA + AA) mod MM;
-      BB := BB shr 1;
-    end;
-    Result := Res;
-  end;
-
 begin
   { Write N-1 = 2^R * D }
   D := N - 1;
@@ -306,8 +324,8 @@ begin
   Y := A mod N;
   while D > 0 do
   begin
-    if Odd(D) then X := MulMod(X, Y, N);
-    Y := MulMod(Y, Y, N);
+    if Odd(D) then X := MulMod64(X, Y, N);
+    Y := MulMod64(Y, Y, N);
     D := D shr 1;
   end;
 
@@ -315,7 +333,7 @@ begin
 
   for I := 1 to R - 1 do
   begin
-    X := MulMod(X, X, N);
+    X := MulMod64(X, X, N);
     if X = N - 1 then Exit(False);
   end;
   Result := True;  { composite }
@@ -449,7 +467,8 @@ begin
   for I := 0 to High(K) do
   begin
     Sum := Sum + K[I];
-    R   := R * Combination(Sum, K[I]);
+    R := CheckedMultiplyNonNegative(R, Combination(Sum, K[I]),
+      'Multinomial');
   end;
   Result := R;
 end;
@@ -503,7 +522,10 @@ begin
   Table[0][0] := 1;
   for I := 1 to N do
     for J := 1 to I do
-      Table[I][J] := Table[I-1][J-1] + (I-1) * Table[I-1][J];
+      Table[I][J] := CheckedAddNonNegative(
+        Table[I-1][J-1],
+        CheckedMultiplyNonNegative(I - 1, Table[I-1][J], 'StirlingFirst'),
+        'StirlingFirst');
   Result := Table[N][K];
 end;
 
@@ -521,7 +543,9 @@ begin
   Table[0][0] := 1;
   for I := 1 to N do
     for J := 1 to I do
-      Table[I][J] := J * Table[I-1][J] + Table[I-1][J-1];
+      Table[I][J] := CheckedAddNonNegative(
+        CheckedMultiplyNonNegative(J, Table[I-1][J], 'StirlingSecond'),
+        Table[I-1][J-1], 'StirlingSecond');
   Result := Table[N][K];
 end;
 
@@ -538,7 +562,9 @@ begin
   A := 1; B := 0;  { D_0, D_1 }
   for I := 2 to N do
   begin
-    C := (I - 1) * (A + B);
+    C := CheckedMultiplyNonNegative(I - 1,
+      CheckedAddNonNegative(A, B, 'DerangementCount'),
+      'DerangementCount');
     A := B;
     B := C;
   end;
@@ -555,9 +581,11 @@ class function TCombinatoricsKit.Fibonacci(N: Integer): Int64;
   F(2k+1) = F(k)^2 + F(k+1)^2
   O(log N) multiplications. }
 var
-  A, B, C, D, E: Int64;
+  Value, NextValue: QWord;
 
-  procedure FibDouble(K: Integer; out FK, FK1: Int64);
+  procedure FibDouble(K: Integer; out FK, FK1: QWord);
+  var
+    A, B, C, D: QWord;
   begin
     if K = 0 then begin FK := 0; FK1 := 1; Exit; end;
     FibDouble(K div 2, A, B);
@@ -571,16 +599,21 @@ begin
   if N < 0 then raise ECombinatoricsError.Create('Fibonacci: N must be >= 0');
   if N > 92 then raise ECombinatoricsError.Create(
     'Fibonacci: N > 92 overflows Int64');
-  FibDouble(N, Result, E);
+  { F(93), returned as the companion value for N=92, exceeds Int64 but fits
+    QWord. Keeping the internal pair unsigned avoids intermediate overflow. }
+  FibDouble(N, Value, NextValue);
+  Result := Int64(Value);
 end;
 
 class function TCombinatoricsKit.Lucas(N: Integer): Int64;
  { L_n = F_(n-1) + F_(n+1) (identity relating Lucas to Fibonacci) }
 begin
   if N < 0 then raise ECombinatoricsError.Create('Lucas: N must be >= 0');
+  if N > 90 then raise ECombinatoricsError.Create(
+    'Lucas: N > 90 overflows Int64');
   if N = 0 then Exit(2);
   if N = 1 then Exit(1);
-  Result := Fibonacci(N - 1) + Fibonacci(N + 1);
+  Result := CheckedAddNonNegative(Fibonacci(N - 1), Fibonacci(N + 1), 'Lucas');
 end;
 
 class function TCombinatoricsKit.PascalRow(N: Integer): TPascalRow;
@@ -616,6 +649,8 @@ class function TCombinatoricsKit.GCD(A, B: Int64): Int64;
 { Euclidean algorithm }
 var T: Int64;
 begin
+  if (A = Low(Int64)) or (B = Low(Int64)) then
+    raise ECombinatoricsError.Create('GCD: absolute value exceeds Int64');
   A := Abs(A); B := Abs(B);
   while B <> 0 do
   begin
@@ -627,9 +662,15 @@ begin
 end;
 
 class function TCombinatoricsKit.LCM(A, B: Int64): Int64;
+var
+  Reduced, AbsB: Int64;
 begin
   if (A = 0) or (B = 0) then Exit(0);
-  Result := Abs(A) div GCD(A, B) * Abs(B);
+  if (A = Low(Int64)) or (B = Low(Int64)) then
+    raise ECombinatoricsError.Create('LCM: result overflows Int64');
+  Reduced := Abs(A) div GCD(A, B);
+  AbsB := Abs(B);
+  Result := CheckedMultiplyNonNegative(Reduced, AbsB, 'LCM');
 end;
 
 class function TCombinatoricsKit.ExtendedGCD(A, B: Int64; out X, Y: Int64): Int64;
@@ -658,13 +699,15 @@ var
   R: Int64;
 begin
   if M <= 0 then raise ECombinatoricsError.Create('ModPow: M must be > 0');
+  if B < 0 then raise ECombinatoricsError.Create('ModPow: B must be >= 0');
   if M = 1  then Exit(0);
-  R := 1;
+  R := 1 mod M;
   A := A mod M;
+  if A < 0 then A := A + M;
   while B > 0 do
   begin
-    if Odd(B) then R := (R * A) mod M;
-    A := (A * A) mod M;
+    if Odd(B) then R := MulMod64(R, A, M);
+    A := MulMod64(A, A, M);
     B := B shr 1;
   end;
   Result := R;
@@ -708,9 +751,15 @@ begin
   { Return N itself if it is already prime }
   if IsPrime(N) then Exit(N);
   { Advance to the next odd candidate }
+  if N >= High(Int64) - 2 then
+    raise ECombinatoricsError.Create('NextPrime: no representable candidate');
   if not Odd(N) then Inc(N) else Inc(N, 2);
   while not IsPrime(N) do
+  begin
+    if N > High(Int64) - 2 then
+      raise ECombinatoricsError.Create('NextPrime: no representable candidate');
     Inc(N, 2);
+  end;
   Result := N;
 end;
 
@@ -727,7 +776,7 @@ begin
   SetLength(Result, 0);
   Len := 0;
   D   := 2;
-  while D * D <= N do
+  while D <= N div D do
   begin
     if N mod D = 0 then
     begin
@@ -756,20 +805,23 @@ class function TCombinatoricsKit.Sieve(Limit: Int64): TPascalRow;
 { Classic Boolean-array sieve; returns primes as a dynamic array }
 var
   IsComposite: array of Boolean;
-  I, J, Count, Idx: Int64;
+  I, J, Count, Idx, LocalLimit: SizeInt;
 begin
   if Limit < 2 then raise ECombinatoricsError.Create('Sieve: Limit must be >= 2');
-  SetLength(IsComposite, Limit + 1);
-  FillChar(IsComposite[0], Limit + 1, 0);
+  if Limit >= High(SizeInt) then
+    raise ECombinatoricsError.Create('Sieve: Limit exceeds addressable array size');
+  LocalLimit := SizeInt(Limit);
+  SetLength(IsComposite, LocalLimit + 1);
+  FillChar(IsComposite[0], LocalLimit + 1, 0);
   IsComposite[0] := True;
   IsComposite[1] := True;
   I := 2;
-  while I * I <= Limit do
+  while I <= LocalLimit div I do
   begin
     if not IsComposite[I] then
     begin
       J := I * I;
-      while J <= Limit do
+      while J <= LocalLimit do
       begin
         IsComposite[J] := True;
         J := J + I;
@@ -778,12 +830,12 @@ begin
     Inc(I);
   end;
   Count := 0;
-  for I := 2 to Limit do
+  for I := 2 to LocalLimit do
     if not IsComposite[I] then Inc(Count);
   Result := nil;
   SetLength(Result, Count);
   Idx := 0;
-  for I := 2 to Limit do
+  for I := 2 to LocalLimit do
     if not IsComposite[I] then
     begin
       Result[Idx] := I;

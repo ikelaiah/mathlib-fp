@@ -147,11 +147,14 @@ class function IsNormal(const Data: TDoubleArray; const Alpha: Double = 0.05): B
 class function ShapiroWilkTest(const Data: TDoubleArray; out WPValue: Double): Double;
 ```
 
-These are lightweight approximations. `KolmogorovSmirnovTest` requires at least
-five values and currently writes the D statistic (not a calibrated p-value) to
-`KSPValue`. `ShapiroWilkTest` accepts 3 through 50 values and returns an
-approximate W and heuristic `WPValue`. Do not use `IsNormal` or these approximate
-p-values for publication-grade inference without independent validation.
+`KolmogorovSmirnovTest` requires at least five values, returns the one-sample D
+statistic, and writes an asymptotic two-sided p-value to `KSPValue`. Parameters
+of the comparison normal distribution are estimated from the sample, so this
+is an approximate diagnostic rather than an exact Lilliefors test.
+`ShapiroWilkTest` accepts 3 through 5000 values, returns W, and writes a
+Royston-approximation p-value. P-values are clamped to `[0, 1]`; use specialist
+software when a regulatory or publication workflow requires independently
+certified inference.
 
 ### Non-Parametric Tests
 
@@ -159,7 +162,7 @@ p-values for publication-grade inference without independent validation.
 |--------|-------------|
 | `SignTest(X, Y)` | Proportion of non-tied pairs for which `X[i] > Y[i]` |
 | `WilcoxonSignedRank(Data1, Data2)` | Wilcoxon signed-rank W statistic |
-| `MannWhitneyU(Data1, Data2, out PValue)` | Smaller Mann-Whitney U and a normal-approximation p-value only when both groups have more than 10 values; otherwise p-value is 1 |
+| `MannWhitneyU(Data1, Data2, out PValue)` | Smaller Mann-Whitney U; exact two-sided p-value for untied samples with total N <= 50, otherwise tie-corrected normal approximation with continuity correction |
 | `KendallTau(X, Y)` | Kendall's τ correlation |
 
 ### Robust Statistics
@@ -181,7 +184,8 @@ class function CohensD(const Data1, Data2: TDoubleArray): Double;   // Cohen's d
 class function HedgesG(const Data1, Data2: TDoubleArray): Double;   // Hedges' g (bias-corrected)
 ```
 
-Interpretation: 0.2 = small, 0.5 = medium, 0.8 = large.
+`CohensD` uses the pooled sample variance. Interpretation: 0.2 = small, 0.5 =
+medium, 0.8 = large.
 
 ### Bootstrap Methods
 
@@ -241,7 +245,7 @@ end.
 - `StandardDeviation` uses the **n** (population) denominator; use `SampleStandardDeviation` for the n − 1 version.
 - `Skewness` uses the population standard deviation; `Kurtosis` uses the sample standard deviation.
 - Percentile uses **method R-7** (linear interpolation), matching Excel's `PERCENTILE` and R's default.
-- `Sum`, `SumOfSquares`, and `Sort` accept empty arrays; the sums return zero and sorting is a no-op. `Sort` modifies its argument in place.
-- The normality-test implementations are approximations; in particular, the K-S out parameter is the statistic rather than a p-value.
+- `Sum`, `SumOfSquares`, and `Sort` accept empty arrays; the sums return zero and sorting is a no-op. `Sort` is a stable O(n log n) merge sort, modifies its argument in place, and orders NaNs after finite values.
+- Normality-test p-values are approximations: K-S uses the asymptotic distribution despite estimating normal parameters from the sample, and Shapiro-Wilk uses Royston's approximation.
 - Prefer the seeded bootstrap overloads for reproducible tests and analyses. Use `Randomize` once in the application only when intentionally using the global-RNG overloads.
 - `EStatsError` is raised for empty arrays, arrays too small for a given statistic, or out-of-range parameters.

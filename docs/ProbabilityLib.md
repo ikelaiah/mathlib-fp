@@ -31,11 +31,9 @@ No object creation needed — all methods are **class static**.
 | Parameter order | `(x, distribution_params...)` |
 | Optional rounding | last param `ADecimals: Integer = -1`; pass e.g. `4` to round to 4 d.p. |
 | Out-of-domain X | returns 0 (PDF/PMF) or clamped (CDF) instead of raising |
-| Invalid params | Distribution constraints remain caller requirements; density/CDF methods and many helpers raise `EProbabilityError`, but validation is not uniform across moment helpers |
+| Invalid params | All entry points raise `EProbabilityError` for non-finite real inputs or parameters outside the documented distribution domain |
 
-Always satisfy the constraints in this guide even when a particular `Mean` or
-`Variance` helper does not currently validate every unused parameter. At the
-support boundary, `GammaPDF` and `BetaPDF` use the library convention of
+At the support boundary, `GammaPDF` and `BetaPDF` use the library convention of
 returning zero rather than representing finite or infinite limiting densities.
 
 ---
@@ -71,8 +69,8 @@ TProbabilityKit.NormalVariance(Mu, Sigma)  // = Sigma²
 | `Mu` | Mean (centre) | any real |
 | `Sigma` | Standard deviation | > 0 |
 
-`NormalMean` returns `Mu` without inspecting `Sigma`; other Normal operations
-that use the scale require a positive value.
+Every Normal entry point, including the moment helpers, requires finite `Mu`
+and positive finite `Sigma`.
 
 **When to use:** heights, measurement errors, test scores — any quantity that is the sum of many small independent effects.
 
@@ -355,11 +353,13 @@ end;
 - `B <= A` for Uniform
 - `R < 1` for Negative Binomial
 - `SuccPop > PopSize` or `SampleN > PopSize` for Hypergeometric
+- negative population, success, or sample counts for Hypergeometric
+- NaN or infinite real inputs and parameters
 
-Validation is method-specific in 1.2.0. In particular, several moment helpers
-compute their formula directly, and the Hypergeometric implementation does not
-consistently reject negative population counts. Treat every documented
-constraint as part of the public contract instead of relying on an exception.
+The same domain validation applies consistently to PDF/PMF, CDF, survival,
+mean, and variance helpers. The regularised incomplete-gamma evaluator reports
+failure to converge with `EProbabilityError` rather than returning a partial
+iterate.
 
 ---
 

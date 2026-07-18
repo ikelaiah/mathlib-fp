@@ -89,6 +89,7 @@ type
     ExplainedVariance: TDoubleArray;   { variance explained by each component }
     ExplainedRatio:    TDoubleArray;   { fraction of total variance }
     Mean:              TDoubleArray;   { per-feature mean (needed to transform new data) }
+    Iterations:        TIntegerArray;  { power iterations used per component }
   end;
 
   { Confusion matrix }
@@ -116,6 +117,9 @@ type
     class function MatAddIdentity(const A: TDoubleMatrix; Lambda: Double): TDoubleMatrix; static;
     { Solve A*x = b for symmetric positive-definite A (Cholesky-like Gauss elim) }
     class function SolveLinear(const A: TDoubleMatrix; const B: TDoubleArray): TDoubleArray; static;
+    { Solve overdetermined least squares with Householder QR }
+    class function SolveLeastSquaresQR(const A: TDoubleMatrix;
+      const B: TDoubleArray): TDoubleArray; static;
     { Euclidean distance between two vectors }
     class function EuclidDist(const A, B: TDoubleArray): Double; static;
     { Dot product }
@@ -127,7 +131,8 @@ type
       const M: TDoubleMatrix;
       MaxIter: Integer;
       Tol: Double;
-      out EigenVal: Double): TDoubleArray; static;
+      out EigenVal: Double;
+      out Iterations: Integer): TDoubleArray; static;
     { Deflate matrix: remove contribution of one eigenvector }
     class procedure Deflate(var M: TDoubleMatrix; const V: TDoubleArray; EigenVal: Double); static;
     { Region query for DBSCAN: return indices within Eps of point }
@@ -185,7 +190,8 @@ type
     ======================================================================= }
 
     { Ordinary Least Squares linear regression.
-      Solves: beta = inverse(X'X) X'y (normal equations, augmented with intercept).
+      Centres predictors and targets, solves the slope system using Householder
+      QR, then recovers the intercept. This avoids condition-number squaring.
       X: NSamples × NFeatures  (do NOT include a bias column — added internally)
       Y: NSamples target values
 
@@ -317,7 +323,8 @@ type
       MaxIter:     power iteration steps per component (default 1000)
       Tol:         convergence tolerance (default 1e-8)
 
-      Returns components, explained variance, and per-feature mean.
+      Returns components, explained variance, per-feature mean, and the power
+      iteration count for every component. Raises EMLError on non-convergence.
 
       To project new data:
         Xtransformed := TMLKit.PCATransform(pca, Xnew); }
@@ -544,26 +551,139 @@ begin
   end;
 end;
 
+{ Householder QR least-squares solve for M-by-N A, M >= N. }
+class function TMLKit.SolveLeastSquaresQR(const A: TDoubleMatrix;
+  const B: TDoubleArray): TDoubleArray;
+var
+  M, N, I, J, K: Integer;
+  R: TDoubleMatrix;
+  QtB, V: TDoubleArray;
+  MatrixScale, Scale, SSQ, AbsValue, ColumnNorm: Double;
+  Alpha, Beta, Tau, DotValue, Tolerance: Double;
+begin
+  Result := nil;
+  M := Length(A);
+  N := Length(A[0]);
+  if (M < N) or (Length(B) <> M) then
+    raise EMLError.Create('Least-squares QR requires rows >= columns and matching targets');
+  SetLength(R, M);
+  MatrixScale := 0.0;
+  for I := 0 to M - 1 do
+  begin
+    SetLength(R[I], N);
+    for J := 0 to N - 1 do
+    begin
+      R[I][J] := A[I][J];
+      MatrixScale := Max(MatrixScale, Abs(A[I][J]));
+    end;
+  end;
+  if MatrixScale = 0.0 then
+    raise EMLError.Create('Least-squares design matrix has zero rank');
+  Tolerance := 2.2204460492503131E-16 * Max(M, N) * MatrixScale;
+  QtB := Copy(B);
+
+  for K := 0 to N - 1 do
+  begin
+    Scale := 0.0;
+    SSQ := 1.0;
+    for I := K to M - 1 do
+    begin
+      AbsValue := Abs(R[I][K]);
+      if AbsValue <> 0.0 then
+      begin
+        if Scale < AbsValue then
+        begin
+          SSQ := 1.0 + SSQ * Sqr(Scale / AbsValue);
+          Scale := AbsValue;
+        end
+        else
+          SSQ := SSQ + Sqr(AbsValue / Scale);
+      end;
+    end;
+    if Scale = 0.0 then ColumnNorm := 0.0
+    else ColumnNorm := Scale * Sqrt(SSQ);
+    if ColumnNorm <= Tolerance then
+      raise EMLError.CreateFmt(
+        'LinearRegression: rank-deficient design matrix at column %d (norm=%g, tolerance=%g)',
+        [K, ColumnNorm, Tolerance]);
+
+    Alpha := R[K][K];
+    if Alpha >= 0.0 then Beta := -ColumnNorm else Beta := ColumnNorm;
+    Tau := (Beta - Alpha) / Beta;
+    SetLength(V, M - K);
+    V[0] := 1.0;
+    for I := K + 1 to M - 1 do
+      V[I - K] := R[I][K] / (Alpha - Beta);
+    R[K][K] := Beta;
+    for I := K + 1 to M - 1 do R[I][K] := 0.0;
+
+    for J := K + 1 to N - 1 do
+    begin
+      DotValue := R[K][J];
+      for I := K + 1 to M - 1 do
+        DotValue := DotValue + V[I - K] * R[I][J];
+      DotValue := Tau * DotValue;
+      R[K][J] := R[K][J] - DotValue;
+      for I := K + 1 to M - 1 do
+        R[I][J] := R[I][J] - V[I - K] * DotValue;
+    end;
+    DotValue := QtB[K];
+    for I := K + 1 to M - 1 do
+      DotValue := DotValue + V[I - K] * QtB[I];
+    DotValue := Tau * DotValue;
+    QtB[K] := QtB[K] - DotValue;
+    for I := K + 1 to M - 1 do
+      QtB[I] := QtB[I] - V[I - K] * DotValue;
+  end;
+
+  SetLength(Result, N);
+  for I := N - 1 downto 0 do
+  begin
+    Result[I] := QtB[I];
+    for J := I + 1 to N - 1 do
+      Result[I] := Result[I] - R[I][J] * Result[J];
+    if Abs(R[I][I]) <= Tolerance then
+      raise EMLError.CreateFmt(
+        'LinearRegression: rank-deficient triangular factor at column %d', [I]);
+    Result[I] := Result[I] / R[I][I];
+  end;
+end;
+
 { Power iteration: find dominant eigenvector of symmetric matrix M.
   Returns unit-length eigenvector; sets EigenVal. }
 class function TMLKit.PowerIter(
   const M: TDoubleMatrix;
   MaxIter: Integer;
   Tol: Double;
-  out EigenVal: Double): TDoubleArray;
+  out EigenVal: Double;
+  out Iterations: Integer): TDoubleArray;
 var
-  N, I, J, Iter: Integer;
-  Norm, Delta: Double;
+  N, I, J, Iter, StartIndex: Integer;
+  Norm, DeltaPlus, DeltaMinus, MatrixScale, DiagonalSize: Double;
   V, Mv: TDoubleArray;
+  Converged: Boolean;
 begin
   N := Length(M);
   SetLength(V, N);
-  { Initialise to ones }
-  for I := 0 to N - 1 do V[I] := 1.0;
-  Norm := Sqrt(N);
-  for I := 0 to N - 1 do V[I] := V[I] / Norm;
+  MatrixScale := 0.0;
+  StartIndex := 0;
+  DiagonalSize := -1.0;
+  for I := 0 to N - 1 do
+  begin
+    if Abs(M[I][I]) > DiagonalSize then
+    begin
+      DiagonalSize := Abs(M[I][I]);
+      StartIndex := I;
+    end;
+    for J := 0 to N - 1 do
+      MatrixScale := Max(MatrixScale, Abs(M[I][J]));
+  end;
+  V[StartIndex] := 1.0;
 
   EigenVal := 0;
+  Iterations := 0;
+  if MatrixScale = 0.0 then Exit(V);
+  Converged := False;
   for Iter := 0 to MaxIter - 1 do
   begin
     { Mv = M * v }
@@ -579,13 +699,37 @@ begin
     Norm := 0;
     for I := 0 to N - 1 do Norm := Norm + Sqr(Mv[I]);
     Norm := Sqrt(Norm);
-    if Norm < 1e-14 then Break;
-    { Convergence check }
-    Delta := 0;
-    for I := 0 to N - 1 do Delta := Delta + Sqr(Mv[I]/Norm - V[I]);
+    if Norm <= 2.2204460492503131E-16 * N * MatrixScale then
+    begin
+      Converged := True;
+      Iterations := Iter + 1;
+      Break;
+    end;
+    { Eigenvectors are sign-indeterminate, so accept convergence to v or -v. }
+    DeltaPlus := 0;
+    DeltaMinus := 0;
+    for I := 0 to N - 1 do
+    begin
+      DeltaPlus := DeltaPlus + Sqr(Mv[I]/Norm - V[I]);
+      DeltaMinus := DeltaMinus + Sqr(Mv[I]/Norm + V[I]);
+    end;
     for I := 0 to N - 1 do V[I] := Mv[I] / Norm;
-    if Sqrt(Delta) < Tol then Break;
+    Iterations := Iter + 1;
+    if Sqrt(Min(DeltaPlus, DeltaMinus)) < Tol then
+    begin
+      Converged := True;
+      Break;
+    end;
   end;
+  if not Converged then
+    raise EMLError.CreateFmt('PCA power iteration did not converge after %d iterations',
+      [MaxIter]);
+  for I := 0 to N - 1 do
+  begin
+    Mv[I] := 0.0;
+    for J := 0 to N - 1 do Mv[I] := Mv[I] + M[I][J] * V[J];
+  end;
+  EigenVal := Dot(V, Mv);
   Result := V;
 end;
 
@@ -760,16 +904,15 @@ end;
   REGRESSION
 --------------------------------------------------------------------------- }
 
-{ Build augmented X with intercept column prepended, solve normal equations }
+{ Centre X and y, solve slopes by Householder QR, then recover the intercept. }
 class function TMLKit.LinearRegression(const X: TDoubleMatrix; const Y: TDoubleArray): TLinearModel;
 var
-  NSamples, NFeatures, I, J, K: Integer;
-  XA: TDoubleMatrix;  { augmented X: [1 | X] }
-  XAt, XAtXA: TDoubleMatrix;
-  XAtY: TDoubleArray;
-  Beta: TDoubleArray;
+  NSamples, NFeatures, I, J: Integer;
+  XC: TDoubleMatrix;
+  YC, FeatureMeans, Beta: TDoubleArray;
   YMean, SSTot, SSRes, YHat: Double;
 begin
+  Result := Default(TLinearModel);
   ValidateMatrix(X, 'LinearRegression');
   ValidateDoubleVector(Y, 'LinearRegression targets');
   NSamples  := Length(X);
@@ -779,36 +922,38 @@ begin
   if NSamples <= NFeatures then
     raise EMLError.Create('LinearRegression: need more samples than features');
 
-  { Augment X with bias column }
-  SetLength(XA, NSamples);
-  for I := 0 to NSamples - 1 do
+  SetLength(FeatureMeans, NFeatures);
+  for J := 0 to NFeatures - 1 do
   begin
-    SetLength(XA[I], NFeatures + 1);
-    XA[I][0] := 1.0;
-    for J := 0 to NFeatures - 1 do XA[I][J + 1] := X[I][J];
+    for I := 0 to NSamples - 1 do
+      FeatureMeans[J] := FeatureMeans[J] + X[I][J];
+    FeatureMeans[J] := FeatureMeans[J] / NSamples;
   end;
-
-  XAt   := MatTranspose(XA);
-  XAtXA := MatMul(XAt, XA);
-
-  { XAt * y }
-  SetLength(XAtY, NFeatures + 1);
-  for I := 0 to NFeatures do
-  begin
-    XAtY[I] := 0;
-    for K := 0 to NSamples - 1 do XAtY[I] := XAtY[I] + XAt[I][K] * Y[K];
-  end;
-
-  Beta := SolveLinear(XAtXA, XAtY);
-
-  Result.Intercept := Beta[0];
-  SetLength(Result.Coefficients, NFeatures);
-  for J := 0 to NFeatures - 1 do Result.Coefficients[J] := Beta[J + 1];
-
-  { R² }
-  YMean := 0;
+  YMean := 0.0;
   for I := 0 to NSamples - 1 do YMean := YMean + Y[I];
   YMean := YMean / NSamples;
+
+  SetLength(XC, NSamples);
+  SetLength(YC, NSamples);
+  for I := 0 to NSamples - 1 do
+  begin
+    SetLength(XC[I], NFeatures);
+    for J := 0 to NFeatures - 1 do
+      XC[I][J] := X[I][J] - FeatureMeans[J];
+    YC[I] := Y[I] - YMean;
+  end;
+
+  Beta := SolveLeastSquaresQR(XC, YC);
+
+  SetLength(Result.Coefficients, NFeatures);
+  Result.Intercept := YMean;
+  for J := 0 to NFeatures - 1 do
+  begin
+    Result.Coefficients[J] := Beta[J];
+    Result.Intercept := Result.Intercept - Beta[J] * FeatureMeans[J];
+  end;
+
+  { R² }
   SSTot := 0; SSRes := 0;
   for I := 0 to NSamples - 1 do
   begin
@@ -1332,13 +1477,14 @@ end;
 
 class function TMLKit.PCA(const X: TDoubleMatrix; NComponents: Integer; MaxIter: Integer; Tol: Double): TPCAResult;
 var
-  NSamples, NFeatures, I, J, K: Integer;
+  NSamples, NFeatures, I, J, K, Previous, Candidate, UsedIterations: Integer;
   Mu: TDoubleArray;
   Xc: TDoubleMatrix;  { centred X }
   Cov: TDoubleMatrix; { covariance matrix NFeatures × NFeatures }
-  EigenVal, TotalVar: Double;
+  EigenVal, TotalVar, Projection, ComponentNorm: Double;
   Component: TDoubleArray;
   CovCopy: TDoubleMatrix;
+  FoundDirection: Boolean;
 begin
   Result := Default(TPCAResult);
   ValidateMatrix(X, 'PCA');
@@ -1383,9 +1529,15 @@ begin
     end;
   end;
 
+  TotalVar := 0.0;
+  for I := 0 to NFeatures - 1 do TotalVar := TotalVar + Cov[I][I];
+  if TotalVar <= 0.0 then
+    raise EMLError.Create('PCA: total variance is zero');
+
   { Extract NComponents dominant eigenvectors by power iteration + deflation }
   SetLength(Result.Components,        NComponents);
   SetLength(Result.ExplainedVariance, NComponents);
+  SetLength(Result.Iterations,        NComponents);
 
   { Work on a copy of Cov for deflation }
   SetLength(CovCopy, NFeatures);
@@ -1397,15 +1549,51 @@ begin
 
   for K := 0 to NComponents - 1 do
   begin
-    Component := PowerIter(CovCopy, MaxIter, Tol, EigenVal);
+    Component := PowerIter(CovCopy, MaxIter, Tol, EigenVal, UsedIterations);
+    for Previous := 0 to K - 1 do
+    begin
+      Projection := Dot(Component, Result.Components[Previous]);
+      for I := 0 to NFeatures - 1 do
+        Component[I] := Component[I] - Projection * Result.Components[Previous][I];
+    end;
+    ComponentNorm := Sqrt(Dot(Component, Component));
+    if ComponentNorm <= 1E-12 then
+    begin
+      FoundDirection := False;
+      for Candidate := 0 to NFeatures - 1 do
+      begin
+        for I := 0 to NFeatures - 1 do Component[I] := 0.0;
+        Component[Candidate] := 1.0;
+        for Previous := 0 to K - 1 do
+        begin
+          Projection := Dot(Component, Result.Components[Previous]);
+          for I := 0 to NFeatures - 1 do
+            Component[I] := Component[I] -
+              Projection * Result.Components[Previous][I];
+        end;
+        ComponentNorm := Sqrt(Dot(Component, Component));
+        if ComponentNorm > 1E-12 then
+        begin
+          FoundDirection := True;
+          Break;
+        end;
+      end;
+      if not FoundDirection then
+        raise EMLError.Create('PCA: could not construct an orthogonal component');
+    end;
+    for I := 0 to NFeatures - 1 do Component[I] := Component[I] / ComponentNorm;
+
+    EigenVal := 0.0;
+    for I := 0 to NFeatures - 1 do
+      for J := 0 to NFeatures - 1 do
+        EigenVal := EigenVal + Component[I] * Cov[I][J] * Component[J];
+    if (EigenVal < 0.0) and (Abs(EigenVal) <= 1E-12 * TotalVar) then
+      EigenVal := 0.0;
     Result.Components[K]        := Component;
     Result.ExplainedVariance[K] := EigenVal;
+    Result.Iterations[K]        := UsedIterations;
     Deflate(CovCopy, Component, EigenVal);
   end;
-
-  { Total variance = trace of original covariance matrix }
-  TotalVar := 0;
-  for I := 0 to NFeatures - 1 do TotalVar := TotalVar + Cov[I][I];
 
   SetLength(Result.ExplainedRatio, NComponents);
   for K := 0 to NComponents - 1 do

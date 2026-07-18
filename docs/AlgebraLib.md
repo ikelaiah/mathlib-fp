@@ -111,7 +111,7 @@ sparse implementation also exposes mutating storage methods.
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `Exp` | — | Matrix exponential e^A via Taylor series (N = 20 terms); square matrices only |
+| `Exp` | — | Matrix exponential e^A via adaptive scaling-and-squaring Taylor series; square finite matrices only; raises if the result cannot be represented |
 | `Power` | `Exponent: Double` | Integer powers use exponentiation by squaring; fractional powers use the symmetric eigendecomposition and require a positive-definite matrix |
 
 ### Matrix Properties (scalar results)
@@ -120,7 +120,7 @@ sparse implementation also exposes mutating storage methods.
 |--------|---------|-------|
 | `Determinant` | `Double` | LU-based determinant; square matrices only |
 | `Trace` | `Double` | Sum of diagonal elements; square matrices only |
-| `Rank` | `Integer` | Via Gaussian elimination; tolerance 10⁻¹² |
+| `Rank` | `Integer` | Via pivoted Gaussian elimination with a matrix-scale-relative tolerance |
 | `NormOne` | `Double` | Maximum absolute column sum |
 | `NormInf` | `Double` | Maximum absolute row sum |
 | `NormFrobenius` | `Double` | Square root of the sum of squared elements |
@@ -160,8 +160,8 @@ function IsColumnVector: Boolean;
 
 There is no public direct `SolveLinear` method. For a direct solve, multiply the
 right-hand side by `A.Inverse`, or use `A.PseudoInverse` for least squares.
-`SolveIterative` returns its last iterate if the convergence tolerance is not
-reached; it does not return a convergence-status record.
+`SolveIterative` raises `EMatrixError` if the selected method exhausts
+`MaxIterations`; it never silently returns an unconverged last iterate.
 
 ### Vector Operations (single-row or single-column matrices)
 
@@ -190,6 +190,8 @@ function PowerMethod(MaxIterations: Integer = 100;
 
 All indices are zero-based. `SetSubMatrix` mutates the receiving matrix.
 `PowerMethod` returns the dominant real eigenpair and requires a square matrix.
+It validates positive controls and raises `EMatrixError` if normalization or
+convergence fails.
 
 ---
 
@@ -263,6 +265,7 @@ end.
   the explicitly named setters mutate their receiver.
 - **Interface-based** — depend on `IMatrix`, not on `TMatrixKit`, for flexibility.
 - **Cache-aware blocking** — matrix multiplication uses cache-aware blocking and bounded parallel workers when the operation count justifies thread startup. Unix callers without an installed thread manager automatically use the serial path.
-- **Numerically stable** — LU uses partial pivoting; tolerances guard against near-zero pivots.
+- **Numerically stable** — LU uses partial pivoting and preserves prior L multipliers across row swaps; singularity and rank tolerances are relative to matrix scale.
+- **Explicit convergence** — iterative solves and matrix exponential evaluation raise `EMatrixError` when they cannot converge or produce a finite representable result.
 - **Real eigensystem contract** — the API raises `EMatrixError` for complex spectra, defective matrices, and unsupported nonsymmetric matrices larger than 2×2 instead of returning misleading real approximations.
 - **Reproducible random matrices** — the seeded `CreateRandom` overload uses local state and does not change the process-wide `RandSeed`; the compatibility overload uses caller-managed global state and never calls `Randomize`.

@@ -62,6 +62,7 @@ TPCAResult = record
   ExplainedVariance: TDoubleArray;
   ExplainedRatio:    TDoubleArray;    { fraction of total variance }
   Mean:              TDoubleArray;    { training mean, needed to transform new data }
+  Iterations:         TIntegerArray;   { power iterations used per component }
 end;
 
 { DBSCAN result }
@@ -152,9 +153,10 @@ model := TMLKit.LinearRegression(X, Y);
 // model.RSquared      — training R²
 ```
 
-Solves the normal equations: β = (X'X)⁻¹ X'y. Intercept is fitted internally — do **not** add a bias column to X.
-
-**Limitation:** requires NSamples > NFeatures; sensitive to multicollinearity.
+Uses centered Householder QR rather than forming `X'X`, avoiding the condition-
+number squaring of normal equations. The intercept is fitted internally — do
+**not** add a bias column to X. At least as many samples as features are
+required; rank-deficient designs raise `EMLError`.
 
 ### RidgeRegression
 
@@ -289,9 +291,16 @@ Xr  := TMLKit.PCATransform(R, Xnew);
 // R.ExplainedVariance   — eigenvalue of each component
 // R.ExplainedRatio[k]   — fraction of total variance explained by component k
 // R.Mean                — training mean (subtracted before projection)
+// R.Iterations[k]       — iterations used for component k
 ```
 
-Extracts the `NComponents` directions of maximum variance using **power iteration + deflation** (no LAPACK needed).
+Extracts the `NComponents` directions of maximum variance using **power
+iteration + deflation** (no LAPACK needed). Each component is re-orthogonalised,
+and convergence is sign-invariant. If power iteration exhausts its iteration
+limit, `EMLError` is raised instead of returning an unconverged component.
+Rank-deficient covariance matrices receive a deterministic orthogonal
+completion with zero explained variance; a completely zero-variance dataset is
+rejected.
 
 **Steps:**
 1. Standardise X before calling PCA
@@ -341,7 +350,8 @@ application needs a different convention.
 - K > number of training samples (KNN, KMeans)
 - NComponents > NFeatures (PCA)
 - Negative or out-of-range labels, and non-binary logistic-regression labels
-- NSamples ≤ NFeatures (LinearRegression — singular normal equations)
+- too few samples or a rank-deficient design in `LinearRegression`
+- a zero-variance PCA dataset or exhausted PCA power iteration
 - Invalid fractions, iteration counts, tolerances, learning rates, radii, or regularisation parameters
 
 `PCATransform` is an exception to the general empty-matrix rule: it returns

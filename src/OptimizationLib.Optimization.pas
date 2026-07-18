@@ -75,12 +75,16 @@ type
     Converged: Boolean;       { True if convergence criterion was met }
   end;
 
+  TLPStatus = (lpsOptimal, lpsUnbounded, lpsIterationLimit,
+    lpsUnsupportedStart);
+
   { Result of SimplexLP }
   TLPResult = record
     X:        TDoubleArray;  { primal solution }
     ObjVal:   Double;        { c'x at solution }
-    Feasible: Boolean;       { False if problem is infeasible or unbounded }
+    Feasible: Boolean;       { compatibility flag: True only when Status=optimal }
     Iters:    Integer;
+    Status:   TLPStatus;     { precise termination reason }
   end;
 
   { TOptimizationKit — all methods are class static }
@@ -285,8 +289,8 @@ type
         Tol         — (default 1e-6)
         MaxIter     — per inner solve (default 5000)
 
-      Tip: start with a feasible X0. If the solution violates constraints
-      significantly, increase Mu or MaxIter. }
+      Tip: start with a feasible X0. Calls are serialized through the internal
+      callback adapter, so concurrent callers cannot corrupt shared state. }
     class function PenaltyMethod(
       F: TMultivarFunc;
       const Constraints: array of TConstraintFunc;
@@ -311,7 +315,9 @@ type
              implementation does not include a Phase I procedure.
 
       Result
-        TLPResult.Feasible = False  →  infeasible or unbounded
+        TLPResult.Status   →  optimal, unbounded, iteration limit, or an
+                              unsupported negative-RHS starting basis
+        TLPResult.Feasible = True only for an optimal result
         TLPResult.X        →  optimal primal solution
         TLPResult.ObjVal   →  c' x at optimum
 
@@ -368,21 +374,56 @@ type
 var
   GPenalty:  TPenaltyState;
   GMaximizeF: TMultivarFunc;
+  GPenaltyLock, GMaximizeLock: TRTLCriticalSection;
+
+procedure RequireFiniteVector(const X: TDoubleArray; const Operation: string);
+var
+  I: Integer;
+begin
+  for I := 0 to High(X) do
+    if IsNan(X[I]) or IsInfinite(X[I]) then
+      raise EOptimizationError.CreateFmt('%s: non-finite value at index %d',
+        [Operation, I]);
+end;
+
+procedure RequirePositiveFinite(const Value: Double; const Name: string);
+begin
+  if (Value <= 0.0) or IsNan(Value) or IsInfinite(Value) then
+    raise EOptimizationError.Create(Name + ' must be finite and > 0');
+end;
+
+function EvaluateUnivariate(F: TUnivarFunc; const X: Double;
+  const Operation: string): Double;
+begin
+  Result := F(X);
+  if IsNan(Result) or IsInfinite(Result) then
+    raise EOptimizationError.Create(Operation + ': objective returned a non-finite value');
+end;
+
+function EvaluateMultivariate(F: TMultivarFunc; const X: TDoubleArray;
+  const Operation: string): Double;
+begin
+  Result := F(X);
+  if IsNan(Result) or IsInfinite(Result) then
+    raise EOptimizationError.Create(Operation + ': objective returned a non-finite value');
+end;
 
 function PenaltyObjective(const X: TDoubleArray): Double;
 var J: Integer; Viol: Double;
 begin
-  Result := GPenalty.F(X);
+  Result := EvaluateMultivariate(GPenalty.F, X, 'PenaltyMethod');
   for J := 0 to GPenalty.NC - 1 do
   begin
     Viol := GPenalty.Constrs[J](X);
+    if IsNan(Viol) or IsInfinite(Viol) then
+      raise EOptimizationError.Create('PenaltyMethod: constraint returned a non-finite value');
     if Viol > 0 then Result := Result + GPenalty.Mu * Viol * Viol;
   end;
 end;
 
 function NegObjective(const X: TDoubleArray): Double;
 begin
-  Result := -GMaximizeF(X);
+  Result := -EvaluateMultivariate(GMaximizeF, X, 'Maximize');
 end;
 
 { ---------------------------------------------------------------------------
@@ -395,6 +436,9 @@ var
   I, N: Integer;
   XFwd, XBwd: TDoubleArray;
 begin
+  if not Assigned(F) then raise EOptimizationError.Create('NumericalGradient: objective is nil');
+  RequirePositiveFinite(H, 'NumericalGradient step');
+  RequireFiniteVector(X, 'NumericalGradient');
   N := Length(X);
   Result := nil;
   SetLength(Result, N);
@@ -404,7 +448,8 @@ begin
   begin
     XFwd[I] := X[I] + H;
     XBwd[I] := X[I] - H;
-    Result[I] := (F(XFwd) - F(XBwd)) / (2 * H);
+    Result[I] := (EvaluateMultivariate(F, XFwd, 'NumericalGradient') -
+      EvaluateMultivariate(F, XBwd, 'NumericalGradient')) / (2 * H);
     XFwd[I] := X[I];
     XBwd[I] := X[I];
   end;
@@ -469,7 +514,7 @@ begin
   for I := 0 to 50 do
   begin
     XNew := VecAdd(X, Dir, Alpha);
-    if F(XNew) <= FX + C1 * Alpha * GradDot then
+    if EvaluateMultivariate(F, XNew, 'LineSearch') <= FX + C1 * Alpha * GradDot then
       Break;
     Alpha := Alpha * Rho;
   end;
@@ -487,30 +532,40 @@ const
 var
   C, D, FC, FD: Double;
   Iter: Integer;
+  Converged: Boolean;
 begin
+  if not Assigned(F) then raise EOptimizationError.Create('GoldenSection: objective is nil');
+  if IsNan(A) or IsInfinite(A) or IsNan(B) or IsInfinite(B) then
+    raise EOptimizationError.Create('GoldenSection: interval endpoints must be finite');
   if B <= A then raise EOptimizationError.Create('GoldenSection: B must be > A');
+  RequirePositiveFinite(Tol, 'GoldenSection tolerance');
+  if MaxIter <= 0 then raise EOptimizationError.Create('GoldenSection: MaxIter must be > 0');
   C  := B - Phi * (B - A);
   D  := A + Phi * (B - A);
-  FC := F(C);
-  FD := F(D);
+  FC := EvaluateUnivariate(F, C, 'GoldenSection');
+  FD := EvaluateUnivariate(F, D, 'GoldenSection');
+  Converged := False;
   for Iter := 1 to MaxIter do
   begin
-    if (B - A) < Tol then Break;
+    if (B - A) < Tol then begin Converged := True; Break; end;
     if FC < FD then
     begin
       B  := D;
       D  := C;  FD := FC;
       C  := B - Phi * (B - A);
-      FC := F(C);
+      FC := EvaluateUnivariate(F, C, 'GoldenSection');
     end
     else
     begin
       A  := C;
       C  := D;  FC := FD;
       D  := A + Phi * (B - A);
-      FD := F(D);
+      FD := EvaluateUnivariate(F, D, 'GoldenSection');
     end;
   end;
+  if not Converged then
+    raise EOptimizationError.CreateFmt(
+      'GoldenSection did not converge after %d iterations', [MaxIter]);
   Result := (A + B) / 2;
 end;
 
@@ -527,19 +582,27 @@ var
   V, W, X, U, FU, FV, FW, FX: Double;
   E, D, P, Q, R, Tol1, Tol2, XM: Double;
   Iter: Integer;
+  Converged: Boolean;
 begin
+  if not Assigned(F) then raise EOptimizationError.Create('BrentMinimize: objective is nil');
+  if IsNan(A) or IsInfinite(A) or IsNan(B) or IsInfinite(B) then
+    raise EOptimizationError.Create('BrentMinimize: interval endpoints must be finite');
   if B <= A then raise EOptimizationError.Create('BrentMinimize: B must be > A');
+  RequirePositiveFinite(Tol, 'BrentMinimize tolerance');
+  if MaxIter <= 0 then raise EOptimizationError.Create('BrentMinimize: MaxIter must be > 0');
   V  := A + CGold * (B - A);
   W  := V;  X  := V;
-  FV := F(V); FW := FV; FX := FV;
+  FV := EvaluateUnivariate(F, V, 'BrentMinimize'); FW := FV; FX := FV;
   E  := 0;  D  := 0;
+  Converged := False;
 
   for Iter := 1 to MaxIter do
   begin
     XM   := 0.5 * (A + B);
     Tol1 := Tol * Abs(X) + ZEps;
     Tol2 := 2 * Tol1;
-    if Abs(X - XM) <= Tol2 - 0.5*(B-A) then Break;
+    if Abs(X - XM) <= Tol2 - 0.5*(B-A) then
+    begin Converged := True; Break; end;
 
     if Abs(E) > Tol1 then
     begin
@@ -570,7 +633,7 @@ begin
     end;
 
     U  := X + IfThen(Abs(D) >= Tol1, D, IfThen(D > 0, Tol1, -Tol1));
-    FU := F(U);
+    FU := EvaluateUnivariate(F, U, 'BrentMinimize');
 
     if FU <= FX then
     begin
@@ -593,6 +656,9 @@ begin
       end;
     end;
   end;
+  if not Converged then
+    raise EOptimizationError.CreateFmt(
+      'BrentMinimize did not converge after %d iterations', [MaxIter]);
   Result := X;
 end;
 
@@ -612,16 +678,24 @@ var
   FX, Alpha: Double;
   Iter: Integer;
 begin
+  if not Assigned(F) then raise EOptimizationError.Create('GradientDescent: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('GradientDescent: X0 must not be empty');
+  RequireFiniteVector(X0, 'GradientDescent');
+  RequirePositiveFinite(LR, 'GradientDescent learning rate');
+  RequirePositiveFinite(Tol, 'GradientDescent tolerance');
+  if MaxIter <= 0 then raise EOptimizationError.Create('GradientDescent: MaxIter must be > 0');
   X   := VecCopy(X0);
-  FX  := F(X);
+  FX  := EvaluateMultivariate(F, X, 'GradientDescent');
   Result.Converged := False;
 
   for Iter := 1 to MaxIter do
   begin
     if Assigned(Grad) then G := Grad(X)
     else G := NumericalGradient(F, X);
+    if Length(G) <> Length(X) then
+      raise EOptimizationError.Create('GradientDescent: gradient dimension mismatch');
+    RequireFiniteVector(G, 'GradientDescent gradient');
 
     if VecNorm(G) < Tol then
     begin
@@ -633,7 +707,7 @@ begin
     Dir   := VecScale(G, -1);
     Alpha := LineSearch(F, X, Dir, FX, LR);
     X     := VecAdd(X, Dir, Alpha);
-    FX    := F(X);
+    FX    := EvaluateMultivariate(F, X, 'GradientDescent');
   end;
 
   Result.X     := X;
@@ -656,8 +730,17 @@ var
   FX, MHat, VHat, B1t, B2t: Double;
   I, Iter, N: Integer;
 begin
+  if not Assigned(F) then raise EOptimizationError.Create('Adam: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('Adam: X0 must not be empty');
+  RequireFiniteVector(X0, 'Adam');
+  RequirePositiveFinite(LR, 'Adam learning rate');
+  RequirePositiveFinite(Eps, 'Adam epsilon');
+  RequirePositiveFinite(Tol, 'Adam tolerance');
+  if IsNan(Beta1) or IsInfinite(Beta1) or (Beta1 <= 0.0) or (Beta1 >= 1.0) or
+     IsNan(Beta2) or IsInfinite(Beta2) or (Beta2 <= 0.0) or (Beta2 >= 1.0) then
+    raise EOptimizationError.Create('Adam: Beta1 and Beta2 must be in (0, 1)');
+  if MaxIter <= 0 then raise EOptimizationError.Create('Adam: MaxIter must be > 0');
   N   := Length(X0);
   X   := VecCopy(X0);
   SetLength(M, N);  { 1st moment (mean) }
@@ -665,13 +748,16 @@ begin
   FillChar(M[0], N * SizeOf(Double), 0);
   FillChar(V[0], N * SizeOf(Double), 0);
   B1t := 1;  B2t := 1;
-  FX  := F(X);
+  FX  := EvaluateMultivariate(F, X, 'Adam');
   Result.Converged := False;
 
   for Iter := 1 to MaxIter do
   begin
     if Assigned(Grad) then G := Grad(X)
     else G := NumericalGradient(F, X);
+    if Length(G) <> N then raise EOptimizationError.Create(
+      'Adam: gradient dimension mismatch');
+    RequireFiniteVector(G, 'Adam gradient');
 
     if VecNorm(G) < Tol then
     begin
@@ -690,7 +776,7 @@ begin
       VHat := V[I] / (1 - B2t);
       X[I] := X[I] - LR * MHat / (Sqrt(VHat) + Eps);
     end;
-    FX := F(X);
+    FX := EvaluateMultivariate(F, X, 'Adam');
   end;
 
   Result.X     := X;
@@ -718,13 +804,20 @@ var
   RhoBuf: TDoubleArray;
   FX, Alpha, Beta, GammaScale, Sy, Yy, SStep: Double;
 begin
+  if not Assigned(F) then raise EOptimizationError.Create('LBFGS: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('LBFGS: X0 must not be empty');
+  RequireFiniteVector(X0, 'LBFGS');
+  if M <= 0 then raise EOptimizationError.Create('LBFGS: history size M must be > 0');
+  RequirePositiveFinite(Tol, 'LBFGS tolerance');
+  if MaxIter <= 0 then raise EOptimizationError.Create('LBFGS: MaxIter must be > 0');
   N  := Length(X0);
   X  := VecCopy(X0);
-  FX := F(X);
+  FX := EvaluateMultivariate(F, X, 'LBFGS');
   if Assigned(Grad) then G := Grad(X)
   else G := NumericalGradient(F, X);
+  if Length(G) <> N then raise EOptimizationError.Create('LBFGS: gradient dimension mismatch');
+  RequireFiniteVector(G, 'LBFGS gradient');
 
   SetLength(SBuf,    M);
   SetLength(YBuf,    M);
@@ -784,11 +877,14 @@ begin
     { Update X }
     S    := VecScale(S, Alpha);   { s_k = step taken }
     X    := VecAdd(X, S, 1);
-    FX   := F(X);
+    FX   := EvaluateMultivariate(F, X, 'LBFGS');
 
     { Compute new gradient }
     if Assigned(Grad) then GNew := Grad(X)
     else GNew := NumericalGradient(F, X);
+    if Length(GNew) <> N then raise EOptimizationError.Create(
+      'LBFGS: gradient dimension mismatch');
+    RequireFiniteVector(GNew, 'LBFGS gradient');
 
     { Store (s_k, y_k) in circular buffer }
     Y      := VecAdd(GNew, G, -1);  { y_k = g_(k+1) - g_k }
@@ -832,7 +928,12 @@ var
 begin
   N   := Length(X0);
   NP1 := N + 1;
+  if not Assigned(F) then raise EOptimizationError.Create('NelderMead: objective is nil');
   if N = 0 then raise EOptimizationError.Create('NelderMead: X0 must not be empty');
+  RequireFiniteVector(X0, 'NelderMead');
+  RequirePositiveFinite(Scale, 'NelderMead scale');
+  RequirePositiveFinite(Tol, 'NelderMead tolerance');
+  if MaxIter <= 0 then raise EOptimizationError.Create('NelderMead: MaxIter must be > 0');
 
   { Build initial simplex: vertex 0 = X0, vertex i = X0 + Scale*e_i }
   SetLength(Simplex, NP1);
@@ -841,7 +942,7 @@ begin
   begin
     Simplex[I] := VecCopy(X0);
     if I > 0 then Simplex[I][I-1] := Simplex[I][I-1] + Scale;
-    FVals[I] := F(Simplex[I]);
+    FVals[I] := EvaluateMultivariate(F, Simplex[I], 'NelderMead');
   end;
 
   Result.Converged := False;
@@ -885,13 +986,13 @@ begin
 
     { Reflection }
     XR := VecAdd(Centroid, VecAdd(Centroid, Simplex[Worst], -1), Alpha);
-    FR := F(XR);
+    FR := EvaluateMultivariate(F, XR, 'NelderMead');
 
     if (FR < FVals[Best]) then
     begin
       { Expansion }
       XE := VecAdd(Centroid, VecAdd(XR, Centroid, -1), Gamma);
-      FE := F(XE);
+      FE := EvaluateMultivariate(F, XE, 'NelderMead');
       if FE < FR then begin Simplex[Worst] := XE; FVals[Worst] := FE; end
       else            begin Simplex[Worst] := XR; FVals[Worst] := FR; end;
     end
@@ -907,7 +1008,7 @@ begin
         XC := VecAdd(Centroid, VecAdd(XR, Centroid, -1), Rho)
       else
         XC := VecAdd(Centroid, VecAdd(Simplex[Worst], Centroid, -1), Rho);
-      FC := F(XC);
+      FC := EvaluateMultivariate(F, XC, 'NelderMead');
       if FC < Min(FR, FVals[Worst]) then
       begin
         Simplex[Worst] := XC;
@@ -921,7 +1022,7 @@ begin
           begin
             Simplex[I] := VecAdd(Simplex[Best],
               VecAdd(Simplex[I], Simplex[Best], -1), Sigma);
-            FVals[I] := F(Simplex[I]);
+            FVals[I] := EvaluateMultivariate(F, Simplex[I], 'NelderMead');
           end;
       end;
     end;
@@ -968,12 +1069,25 @@ var
   end;
 
 begin
+  if not Assigned(F) then raise EOptimizationError.Create(
+    'SimulatedAnnealing: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('SimulatedAnnealing: X0 must not be empty');
+  RequireFiniteVector(X0, 'SimulatedAnnealing');
+  RequirePositiveFinite(T0, 'SimulatedAnnealing T0');
+  RequirePositiveFinite(TMin, 'SimulatedAnnealing Tmin');
+  RequirePositiveFinite(StepSize, 'SimulatedAnnealing step size');
+  if TMin >= T0 then raise EOptimizationError.Create(
+    'SimulatedAnnealing: Tmin must be less than T0');
+  if IsNan(CoolRate) or IsInfinite(CoolRate) or
+     (CoolRate <= 0.0) or (CoolRate >= 1.0) then
+    raise EOptimizationError.Create('SimulatedAnnealing: CoolRate must be in (0, 1)');
+  if MaxIter <= 0 then raise EOptimizationError.Create(
+    'SimulatedAnnealing: MaxIter must be > 0');
   N         := Length(X0);
   X         := VecCopy(X0);
   XBest     := VecCopy(X0);
-  FX        := F(X);
+  FX        := EvaluateMultivariate(F, X, 'SimulatedAnnealing');
   FBest     := FX;
   T         := T0;
   RandState := DWord(Seed);
@@ -990,7 +1104,7 @@ begin
     { Random neighbour }
     XNew := VecCopy(X);
     for I := 0 to N-1 do XNew[I] := X[I] + StepSize * LCGSigned;
-    FNew := F(XNew);
+    FNew := EvaluateMultivariate(F, XNew, 'SimulatedAnnealing');
 
     { Accept or reject }
     Delta := FNew - FX;
@@ -1028,25 +1142,58 @@ class function TOptimizationKit.PenaltyMethod(
 var
   Round, I: Integer;
   XCur: TDoubleArray;
-  Mu_k: Double;
+  Mu_k, Violation, MaxViolation: Double;
+  AllInnerConverged: Boolean;
+  TotalIterations: Integer;
 begin
-  GPenalty.F  := F;
-  GPenalty.NC := Length(Constraints);
-  SetLength(GPenalty.Constrs, GPenalty.NC);
-  for I := 0 to GPenalty.NC - 1 do GPenalty.Constrs[I] := Constraints[I];
+  if not Assigned(F) then raise EOptimizationError.Create('PenaltyMethod: objective is nil');
+  if Length(X0) = 0 then raise EOptimizationError.Create('PenaltyMethod: X0 must not be empty');
+  RequireFiniteVector(X0, 'PenaltyMethod');
+  RequirePositiveFinite(Mu, 'PenaltyMethod penalty');
+  RequirePositiveFinite(Tol, 'PenaltyMethod tolerance');
+  if MaxIter <= 0 then raise EOptimizationError.Create('PenaltyMethod: MaxIter must be > 0');
+  for I := 0 to High(Constraints) do
+    if not Assigned(Constraints[I]) then
+      raise EOptimizationError.CreateFmt('PenaltyMethod: constraint %d is nil', [I]);
 
-  XCur := VecCopy(X0);
-  Mu_k := Mu;
+  EnterCriticalSection(GPenaltyLock);
+  try
+    GPenalty.F  := F;
+    GPenalty.NC := Length(Constraints);
+    SetLength(GPenalty.Constrs, GPenalty.NC);
+    for I := 0 to GPenalty.NC - 1 do GPenalty.Constrs[I] := Constraints[I];
 
-  for Round := 1 to 10 do  { outer penalty loop }
-  begin
-    GPenalty.Mu := Mu_k;
-    Result := NelderMead(@PenaltyObjective, XCur, 1.0, Tol / Mu_k, MaxIter);
-    XCur   := Result.X;
-    Mu_k   := Mu_k * 10;   { increase penalty each round }
+    XCur := VecCopy(X0);
+    Mu_k := Mu;
+    AllInnerConverged := True;
+    TotalIterations := 0;
+    for Round := 1 to 10 do
+    begin
+      GPenalty.Mu := Mu_k;
+      Result := NelderMead(@PenaltyObjective, XCur, 1.0, Tol / Mu_k, MaxIter);
+      AllInnerConverged := AllInnerConverged and Result.Converged;
+      Inc(TotalIterations, Result.Iters);
+      XCur := Result.X;
+      Mu_k := Mu_k * 10;
+    end;
+    Result.FVal := EvaluateMultivariate(F, Result.X, 'PenaltyMethod');
+    MaxViolation := 0.0;
+    for I := 0 to GPenalty.NC - 1 do
+    begin
+      Violation := GPenalty.Constrs[I](Result.X);
+      if IsNan(Violation) or IsInfinite(Violation) then
+        raise EOptimizationError.Create(
+          'PenaltyMethod: constraint returned a non-finite value');
+      MaxViolation := Max(MaxViolation, Violation);
+    end;
+    Result.Converged := AllInnerConverged and (MaxViolation <= Tol);
+    Result.Iters := TotalIterations;
+  finally
+    GPenalty.F := nil;
+    SetLength(GPenalty.Constrs, 0);
+    GPenalty.NC := 0;
+    LeaveCriticalSection(GPenaltyLock);
   end;
-  { Recompute true objective at solution }
-  Result.FVal := F(Result.X);
 end;
 
 { ---------------------------------------------------------------------------
@@ -1066,11 +1213,12 @@ var
   Basis: TIntegerArray;
   MinVal, Ratio, MinRatio, PivElem: Double;
   Iter: Integer;
-  Feasible: Boolean;
+  LPStatus: TLPStatus;
 const
   MaxIter = 10000;
   Eps     = 1E-9;
 begin
+  Result := Default(TLPResult);
   M    := Length(A);
   N    := Length(C);
   Rows := M + 1;
@@ -1078,6 +1226,16 @@ begin
 
   if M = 0 then raise EOptimizationError.Create('SimplexLP: no constraints');
   if N = 0 then raise EOptimizationError.Create('SimplexLP: no variables');
+  if Length(B) <> M then raise EOptimizationError.Create(
+    'SimplexLP: B length must equal the number of constraint rows');
+  RequireFiniteVector(C, 'SimplexLP cost vector');
+  RequireFiniteVector(B, 'SimplexLP right-hand side');
+  for I := 0 to M - 1 do
+  begin
+    if Length(A[I]) <> N then raise EOptimizationError.CreateFmt(
+      'SimplexLP: row %d has the wrong number of columns', [I]);
+    RequireFiniteVector(A[I], 'SimplexLP constraint row');
+  end;
 
   { Build tableau }
   SetLength(Tab, Rows);
@@ -1097,6 +1255,7 @@ begin
     begin
       Result.Feasible := False;
       Result.ObjVal   := 0;
+      Result.Status   := lpsUnsupportedStart;
       Exit;
     end;
   end;
@@ -1108,7 +1267,7 @@ begin
   SetLength(Basis, M);
   for I := 0 to M-1 do Basis[I] := N + I;
 
-  Feasible := True;
+  LPStatus := lpsIterationLimit;
   for Iter := 1 to MaxIter do
   begin
     { Find pivot column: most negative reduced cost }
@@ -1116,7 +1275,11 @@ begin
     MinVal  := -Eps;
     for J := 0 to Cols-2 do
       if Tab[M][J] < MinVal then begin MinVal := Tab[M][J]; PivCol := J; end;
-    if PivCol = -1 then Break;  { optimal }
+    if PivCol = -1 then
+    begin
+      LPStatus := lpsOptimal;
+      Break;
+    end;
 
     { Find pivot row: minimum ratio test }
     PivRow   := -1;
@@ -1127,7 +1290,11 @@ begin
         Ratio := Tab[I][Cols-1] / Tab[I][PivCol];
         if Ratio < MinRatio then begin MinRatio := Ratio; PivRow := I; end;
       end;
-    if PivRow = -1 then begin Feasible := False; Break; end;  { unbounded }
+    if PivRow = -1 then
+    begin
+      LPStatus := lpsUnbounded;
+      Break;
+    end;
 
     { Pivot }
     PivElem := Tab[PivRow][PivCol];
@@ -1152,7 +1319,8 @@ begin
 
   Result.ObjVal   := 0;
   for J := 0 to N-1 do Result.ObjVal := Result.ObjVal + C[J] * Result.X[J];
-  Result.Feasible := Feasible;
+  Result.Status   := LPStatus;
+  Result.Feasible := LPStatus = lpsOptimal;
   Result.Iters    := Iter;
 end;
 
@@ -1172,9 +1340,24 @@ class function TOptimizationKit.Maximize(
   MaxIter: Integer): TOptResult;
 { Minimise -F via unit-level NegObjective to avoid nested-function pointer issue }
 begin
-  GMaximizeF  := F;
-  Result      := NelderMead(@NegObjective, X0, Scale, Tol, MaxIter);
-  Result.FVal := -Result.FVal;
+  if not Assigned(F) then raise EOptimizationError.Create('Maximize: objective is nil');
+  EnterCriticalSection(GMaximizeLock);
+  try
+    GMaximizeF  := F;
+    Result      := NelderMead(@NegObjective, X0, Scale, Tol, MaxIter);
+    Result.FVal := -Result.FVal;
+  finally
+    GMaximizeF := nil;
+    LeaveCriticalSection(GMaximizeLock);
+  end;
 end;
+
+initialization
+  InitCriticalSection(GPenaltyLock);
+  InitCriticalSection(GMaximizeLock);
+
+finalization
+  DoneCriticalSection(GMaximizeLock);
+  DoneCriticalSection(GPenaltyLock);
 
 end.

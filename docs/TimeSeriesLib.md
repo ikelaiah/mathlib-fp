@@ -287,10 +287,10 @@ fcast := TTimeSeriesKit.ARIMAForecast(model, OriginalY, H);
 ```
 
 Forecasts H steps ahead and undifferences the result back to original scale.
-
-For integrated models (`D > 0`), verify forecasts against a known series before
-production use: the current reconstruction path includes integration seeds in
-the intermediate output and is retained for 1.2.0 compatibility.
+Historical AR residuals are reconstructed to seed the MA terms; unknown future
+innovations are set to zero, as in the standard conditional-mean forecast.
+Integrated models retain the last required difference states and return exactly
+`H` forecasts on the original scale for any supported `D`.
 
 ---
 
@@ -365,10 +365,9 @@ period := TTimeSeriesKit.PeriodogramPeak(Y, MinPeriod, MaxPeriod);
 ```
 
 FFT-based dominant period detection. Returns the period (in samples) of the
-largest spectral peak, excluding the DC component. For non-power-of-two input
-lengths the FFT is zero-padded, while the current period conversion still uses
-the original length. Consequently, period values are reliable only for
-power-of-two-length series in 1.2.0.
+largest spectral peak, excluding the DC component. Non-power-of-two inputs are
+zero-padded to `NPow`, and period conversion uses that FFT length, so the same
+frequency-bin mapping applies to every input length.
 
 ### Periodogram
 
@@ -379,7 +378,7 @@ psd := TTimeSeriesKit.Periodogram(Y);
 
 One-sided power spectrum. The input is zero-padded to `NPow`, the next power of
 two. Returned bin `k` therefore corresponds to `k / NPow`, not `k / N`; the
-result currently contains `N div 2 + 1` bins.
+result contains `NPow div 2 + 1` bins, including DC and Nyquist.
 
 ---
 
@@ -395,11 +394,9 @@ result currently contains `N div 2 + 1` bins.
 - `ACF` with `MaxLag >= N`
 - `Difference` with `D < 0` or an order too large for the series
 - `Undifference` with fewer than `D` initial values
-
-Validation is not uniform. `ZScoreAnomalies`, `Periodogram`, `PeriodogramPeak`,
-`HoltWintersForecast`, `Decompose`, and several model/forecast paths assume
-non-empty arrays and valid controls. Negative lags and thresholds are also not
-consistently rejected.
+- non-finite observations or coefficients in model fitting and forecasting
+- incompatible AR/MA/ARIMA orders, history lengths, or non-positive horizons
+- invalid period bounds or series too short to contain a searchable FFT bin
 
 ---
 

@@ -45,11 +45,15 @@ TOptResult = record
   Converged: Boolean;       { True if convergence criterion was met }
 end;
 
+TLPStatus = (lpsOptimal, lpsUnbounded, lpsIterationLimit,
+  lpsUnsupportedStart);
+
 TLPResult = record
   X:        TDoubleArray;
   ObjVal:   Double;
   Feasible: Boolean;
   Iters:    Integer;
+  Status:   TLPStatus;
 end;
 ```
 
@@ -212,6 +216,10 @@ if lp.Feasible then
   WriteLn('Optimal: ', lp.ObjVal);
 ```
 
+`Feasible` is retained as a compatibility flag and is `True` only when
+`Status = lpsOptimal`. Inspect `Status` to distinguish an unbounded model, an
+iteration limit, and an unsupported negative-right-hand-side starting basis.
+
 **Standard form requirements:**
 
 - All right-hand sides `b[i] >= 0`, so the added slack variables form the
@@ -278,18 +286,18 @@ Numerical gradients are slightly slower (~2N function evaluations per gradient) 
 ## Error Handling
 
 `EOptimizationError` is raised for:
+
 - `GoldenSection` / `BrentMinimize`: B <= A
 - Any multi-variable solver: empty `X0`
 - `SimplexLP`: no constraints or no variables provided
-
-Other dimensions and numeric controls are not comprehensively validated.
-Callers must supply rectangular `A`, matching `A`/`B` lengths, matching row and
-cost-vector widths, non-nil objective functions, positive tolerances and
-iteration counts, and meaningful solver hyperparameters.
+- nil callbacks, non-finite inputs or callback results, and gradient dimension mismatches
+- non-positive tolerances or iteration counts and invalid solver hyperparameters
+- ragged or mismatched linear-program dimensions
+- scalar solvers exhausting their iteration limit
 
 `PenaltyMethod` and `Maximize` use unit-level callback state to bridge Free
-Pascal procedure-variable restrictions. Do not run overlapping calls to those
-methods from multiple threads.
+Pascal procedure-variable restrictions. Calls through these adapters are
+serialized so overlapping threads cannot corrupt the shared callback state.
 
 ---
 

@@ -198,10 +198,9 @@ if TGeometryKit.SegmentCircleIntersect(P, Q, C) then ...
 N := TGeometryKit.RayCircleIntersect(Origin, Dir, C, T1, T2);
 ```
 
-`Direction` is normalised internally, so the returned `T` values are signed
-distances. The current implementation returns both roots of the supporting
-line and does not discard negative values behind the ray origin. Count only
-roots with `T >= 0` when forward-ray semantics are required.
+`Direction` is normalised internally, so the returned `T` values are forward
+distances along the ray. Intersections behind the origin are discarded. A ray
+starting inside the circle has one forward hit; a tangent has one hit.
 
 ---
 
@@ -222,9 +221,9 @@ if TGeometryKit.PointInPolygon(P, Poly) then
   WriteLn('Inside');
 ```
 
-Uses ray casting and works for concave simple polygons. Self-intersecting
-polygons and polygons with holes are unsupported. Boundary-point classification
-is not defined; test the boundary separately if it matters.
+Uses ray casting and works for concave simple polygons. Points on an edge or
+vertex are classified as inside. Self-intersecting polygons and polygons with
+holes are unsupported.
 
 ### Convexity & Convex Hull
 
@@ -237,10 +236,9 @@ Hull := TGeometryKit.ConvexHull(Points);
 // Hull vertices are in CCW order
 ```
 
-The current point sort is insertion sort, so total worst-case complexity is
-O(n²), despite the linear hull scan. Collinear interior boundary points are
-discarded. At least three input points are required; all-collinear input is not
-explicitly rejected and can produce a two-point result.
+Points are ordered in O(n log n) average time before the linear monotone-chain
+scan. Collinear interior boundary points are discarded. At least three input
+points are required; all-collinear input produces the two extreme endpoints.
 
 ---
 
@@ -279,8 +277,8 @@ BB := TGeometryKit.BoundingBox2D(Points);
 // BB.MinX, BB.MaxX, BB.MinY, BB.MaxY, BB.Width, BB.Height, BB.Area
 ```
 
-Angle helpers do not reject zero vectors. A zero-vector 3-D input currently
-produces `Pi/2`; treat the angle as undefined and validate magnitudes first.
+Angle helpers reject zero-length vectors because their mutual angle is
+undefined.
 
 ---
 
@@ -295,10 +293,8 @@ produces `Pi/2`; treat the angle as undefined and validate magnitudes first.
 - `BoundingBox2D` with an empty point set
 - `PolygonCentroid` on a degenerate (zero-area) polygon
 - `RayCircleIntersect` with a zero-length direction
-
-Circle and sphere constructors do not validate non-negative radii. Their area,
-volume, containment, and intersection methods operate on the stored value, so
-callers should enforce `Radius >= 0`.
+- Circle or sphere construction with a negative or non-finite radius
+- `AngleBetween2D` / `AngleBetween3D` with a zero-length vector
 
 ---
 

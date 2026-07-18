@@ -74,6 +74,8 @@ function ObjSimple(const X: TDoubleArray): Double;
 { Penalty constraint 2: x[0] <= 1 }
 function ConstrX1(const X: TDoubleArray): Double;
 
+function WrongSizeGradient(const X: TDoubleArray): TDoubleArray;
+
 type
   TTestOptimizationLib = class(TTestCase)
   private
@@ -162,6 +164,9 @@ type
     ----------------------------------------------------------------------- }
     procedure Test30_NumGrad_Quadratic;
     procedure Test31_Maximize_Paraboloid;
+    procedure Test32_ScalarNonConvergenceRaises;
+    procedure Test33_SimplexReportsUnboundedStatus;
+    procedure Test34_GradientDimensionValidation;
 
   end;
 
@@ -218,6 +223,11 @@ begin Result := Sqr(X[0]) + Sqr(X[1]); end;
 
 function ConstrX1(const X: TDoubleArray): Double;
 begin Result := X[0] - 1; end;
+
+function WrongSizeGradient(const X: TDoubleArray): TDoubleArray;
+begin
+  Result := TDoubleArray.Create(1.0);
+end;
 
 { ---------------------------------------------------------------------------
   Test class helpers
@@ -574,6 +584,42 @@ begin
   AssertNear(1.0, R.X[0], EPS_MED, 'Maximize x[0]');
   AssertNear(2.0, R.X[1], EPS_MED, 'Maximize x[1]');
   AssertNear(5.0, R.FVal, EPS_MED, 'Maximize fval');
+end;
+
+procedure TTestOptimizationLib.Test32_ScalarNonConvergenceRaises;
+begin
+  try
+    TOptimizationKit.GoldenSection(@Parabola1D, 0.0, 10.0, 1E-30, 1);
+    Fail('GoldenSection must report iteration exhaustion');
+  except
+    on E: EOptimizationError do { expected };
+  end;
+end;
+
+procedure TTestOptimizationLib.Test33_SimplexReportsUnboundedStatus;
+var
+  C, B: TDoubleArray;
+  A: array of TDoubleArray;
+  R: TLPResult;
+begin
+  C := TDoubleArray.Create(-1.0);
+  B := TDoubleArray.Create(1.0);
+  SetLength(A, 1);
+  A[0] := TDoubleArray.Create(0.0);
+  R := TOptimizationKit.SimplexLP(C, A, B);
+  AssertEquals('unbounded status', Ord(lpsUnbounded), Ord(R.Status));
+  AssertFalse('unbounded result is not feasible/optimal', R.Feasible);
+end;
+
+procedure TTestOptimizationLib.Test34_GradientDimensionValidation;
+begin
+  try
+    TOptimizationKit.GradientDescent(@QuadraticBowl, @WrongSizeGradient,
+      TDoubleArray.Create(0.0, 0.0));
+    Fail('wrong gradient dimension must raise');
+  except
+    on E: EOptimizationError do { expected };
+  end;
 end;
 
 initialization

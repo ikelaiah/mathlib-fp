@@ -12,6 +12,12 @@ Use this checklist for the 1.2.0 first public release and later releases.
   contains only changes made after that release.
 - [ ] Confirm CI passes with FPC 3.2.2 on Linux and Windows.
 - [ ] Confirm CI compiles and runs every example and builds the Lazarus package.
+- [ ] Run normal, optimized, runtime-checked, and heap-traced test builds; verify
+  the heap-traced run reports zero unfreed blocks.
+- [ ] Compile and run `benchmarks/BenchmarkRunner.lpr` with `-O3`; record results
+  for comparison without treating machine-specific timings as pass thresholds.
+- [ ] Confirm the Lazarus package and complete test suite compile and pass for
+  both Win64 and Win32.
 - [ ] Install `packages/lazarus/mathlib_fp.lpk` in a clean Lazarus profile and
   compile a small consumer project.
 - [ ] Check all Markdown links and compare documented public names with the
@@ -40,8 +46,17 @@ Recommended commands:
 git diff --check
 
 cd tests
-mkdir -p lib/release
+mkdir -p lib/release lib/optimized lib/checked lib/heap
 fpc -B -FcUTF8 -Fu../src -FUlib/release TestRunner.lpr
+./TestRunner -a --format=plain
+
+fpc -B -O2 -FcUTF8 -Fu../src -FUlib/optimized TestRunner.lpr
+./TestRunner -a --format=plain
+
+fpc -B -Cr -Co -Ct -Sa -FcUTF8 -Fu../src -FUlib/checked TestRunner.lpr
+./TestRunner -a --format=plain
+
+fpc -B -gh -gl -FcUTF8 -Fu../src -FUlib/heap TestRunner.lpr
 ./TestRunner -a --format=plain
 
 cd ../examples
@@ -52,6 +67,11 @@ for file in *.lpr; do
 done
 
 cd ..
+mkdir -p benchmarks/lib/release
+fpc -B -O3 -FcUTF8 -Fusrc -FUbenchmarks/lib/release \
+  -FEbenchmarks/lib/release benchmarks/BenchmarkRunner.lpr
+./benchmarks/lib/release/BenchmarkRunner
+
 lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 ```
 

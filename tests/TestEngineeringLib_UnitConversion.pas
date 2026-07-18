@@ -237,6 +237,9 @@ begin
     
   AssertEquals('Round up', 1.2, 
     TUnitConversionKit.RoundToSignificantDigits(1.15, 2), Tolerance);
+
+  AssertEquals('Round negative away from zero', -1.2,
+    TUnitConversionKit.RoundToSignificantDigits(-1.15, 2), Tolerance);
 end;
 
 procedure TTestUnitConversionKit.Test20_TryConvertByUnitName;

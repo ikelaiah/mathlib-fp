@@ -37,7 +37,7 @@ unit GeometryLib.Geometry;
    SegmentIntersect2D     — find the actual intersection point
    LineIntersect2D        — intersection of two infinite lines
    SegmentCircleIntersect — does segment intersect a circle?
-   RayCircleIntersect     — signed supporting-line/circle roots
+   RayCircleIntersect     — forward ray/circle intersections
 
  Polygon & Convex Hull
    PolygonArea            — signed area (positive = CCW)
@@ -45,7 +45,7 @@ unit GeometryLib.Geometry;
    PolygonCentroid        — area-weighted centroid
    PointInPolygon         — ray-casting test for simple concave polygons
    IsConvex               — test convexity
-   ConvexHull             — monotone-chain scan after insertion sorting
+   ConvexHull             — O(n log n) monotone-chain hull
 
  Geometric Transformations
    Translate2D            — shift all points by (dx, dy)
@@ -246,9 +246,9 @@ type
     { Returns True if segment (P,Q) intersects or is inside circle C }
     class function SegmentCircleIntersect(const P, Q: TPoint2D; const C: TCircle2D): Boolean; static;
 
-    { Supporting line from Origin in Direction intersects circle.
-      Returns the two signed roots without filtering negative values behind the
-      origin. Callers needing ray semantics must keep only t >= 0. }
+    { Intersect the forward ray from Origin in Direction with a circle.
+      Returns 0, 1, or 2 and reports only non-negative distances along the
+      normalised direction. }
     class function RayCircleIntersect(
       const Origin, Direction: TPoint2D;
       const C: TCircle2D;
@@ -268,16 +268,15 @@ type
     { Area-weighted centroid of a simple polygon }
     class function PolygonCentroid(const Poly: TPolygon2D): TPoint2D; static;
 
-    { Point-in-polygon test using ray casting.
-      Works for concave simple polygons; boundary classification is undefined.
+    { Point-in-polygon test using ray casting. Boundary points count as inside.
+      Works for concave simple polygons.
       Does not handle holes or self-intersecting polygons. }
     class function PointInPolygon(const P: TPoint2D; const Poly: TPolygon2D): Boolean; static;
 
     { Returns True if polygon is convex (all cross-products same sign) }
     class function IsConvex(const Poly: TPolygon2D): Boolean; static;
 
-    { Convex hull of a point set using a monotone-chain scan after an O(n^2)
-      insertion sort.
+    { Convex hull of a point set using an O(n log n) monotone-chain algorithm.
       Returns the hull vertices in CCW order.
       Input must have at least 3 non-collinear points. }
     class function ConvexHull(const Points: TPolygon2D): TPolygon2D; static;
@@ -418,7 +417,12 @@ end;
 --------------------------------------------------------------------------- }
 
 class function TCircle2D.Create(const ACentre: TPoint2D; ARadius: Double): TCircle2D;
-begin Result.Centre := ACentre; Result.Radius := ARadius; end;
+begin
+  if IsNan(ARadius) or IsInfinite(ARadius) or (ARadius < 0) then
+    raise EGeometryError.Create('TCircle2D.Create: radius must be finite and non-negative');
+  Result.Centre := ACentre;
+  Result.Radius := ARadius;
+end;
 
 function TCircle2D.Area: Double;
 begin Result := Pi * Radius * Radius; end;
@@ -536,7 +540,12 @@ end;
 --------------------------------------------------------------------------- }
 
 class function TSphere3D.Create(const ACentre: TPoint3D; ARadius: Double): TSphere3D;
-begin Result.Centre := ACentre; Result.Radius := ARadius; end;
+begin
+  if IsNan(ARadius) or IsInfinite(ARadius) or (ARadius < 0) then
+    raise EGeometryError.Create('TSphere3D.Create: radius must be finite and non-negative');
+  Result.Centre := ACentre;
+  Result.Radius := ARadius;
+end;
 
 function TSphere3D.Volume: Double;
 begin Result := (4/3) * Pi * Power(Radius, 3); end;
@@ -726,14 +735,39 @@ begin
   B  := 2*(OX*DX + OY*DY);
   Disc := Sqr(B) - 4*A*(OX*OX + OY*OY - Sqr(C.Radius));
   T1 := 0; T2 := 0;
-  if Disc < 0 then begin Result := 0; Exit; end;
-  if Disc < GEO_EPS then
+  if IsNan(C.Radius) or IsInfinite(C.Radius) or (C.Radius < 0) then
+    raise EGeometryError.Create('RayCircleIntersect: radius must be finite and non-negative');
+  if Disc < -GEO_EPS then begin Result := 0; Exit; end;
+  if Abs(Disc) <= GEO_EPS then
   begin
-    T1 := -B / (2*A); T2 := T1; Result := 1; Exit;
+    T1 := -B / (2*A);
+    if T1 < -GEO_EPS then
+    begin
+      T1 := 0; Result := 0;
+    end
+    else
+    begin
+      if T1 < 0 then T1 := 0;
+      T2 := T1; Result := 1;
+    end;
+    Exit;
   end;
   T1 := (-B - Sqrt(Disc)) / (2*A);
   T2 := (-B + Sqrt(Disc)) / (2*A);
-  Result := 2;
+  if T2 < -GEO_EPS then
+  begin
+    T1 := 0; T2 := 0; Result := 0;
+  end
+  else if T1 < -GEO_EPS then
+  begin
+    T1 := Max(0, T2); T2 := T1; Result := 1;
+  end
+  else
+  begin
+    if T1 < 0 then T1 := 0;
+    if T2 < 0 then T2 := 0;
+    Result := 2;
+  end;
 end;
 
 { ---------------------------------------------------------------------------
@@ -783,12 +817,17 @@ begin
 end;
 
 class function TGeometryKit.PointInPolygon(const P: TPoint2D; const Poly: TPolygon2D): Boolean;
-var I, J, N: Integer;
+var I, J, N: Integer; T: Double;
 begin
-  N := Length(Poly); Result := False;
+  N := Length(Poly);
+  if N < 3 then
+    raise EGeometryError.Create('PointInPolygon: need at least 3 vertices');
+  Result := False;
   J := N - 1;
   for I := 0 to N - 1 do
   begin
+    if PointToSegment2D(P, Poly[J], Poly[I], T) <= GEO_EPS then
+      Exit(True);
     if ((Poly[I].Y > P.Y) <> (Poly[J].Y > P.Y)) and
        (P.X < (Poly[J].X - Poly[I].X) * (P.Y - Poly[I].Y) /
               (Poly[J].Y - Poly[I].Y) + Poly[I].X) then
@@ -828,17 +867,31 @@ var
     else Result := 0;
   end;
 
-  procedure SortPoints;
-  var I, J: Integer; Tmp: TPoint2D;
+  procedure QuickSort(const Left, Right: Integer);
+  var
+    I, J: Integer;
+    Pivot, Tmp: TPoint2D;
   begin
-    { Insertion sort for correctness; input sizes are usually small }
-    for I := 1 to N - 1 do
-    begin
-      Tmp := Sorted[I]; J := I - 1;
-      while (J >= 0) and (Cmp(Sorted[J], Tmp) > 0) do
-      begin Sorted[J+1] := Sorted[J]; Dec(J); end;
-      Sorted[J+1] := Tmp;
-    end;
+    I := Left;
+    J := Right;
+    Pivot := Sorted[Left + (Right - Left) div 2];
+    repeat
+      while Cmp(Sorted[I], Pivot) < 0 do Inc(I);
+      while Cmp(Sorted[J], Pivot) > 0 do Dec(J);
+      if I <= J then
+      begin
+        Tmp := Sorted[I]; Sorted[I] := Sorted[J]; Sorted[J] := Tmp;
+        Inc(I); Dec(J);
+      end;
+    until I > J;
+    if Left < J then QuickSort(Left, J);
+    if I < Right then QuickSort(I, Right);
+  end;
+
+  procedure SortPoints;
+  begin
+    if N > 1 then
+      QuickSort(0, N - 1);
   end;
 
 begin
@@ -919,13 +972,17 @@ end;
 
 class function TGeometryKit.AngleBetween2D(const V1, V2: TVector2D): Double;
 begin
+  if (V1.Magnitude < GEO_EPS) or (V2.Magnitude < GEO_EPS) then
+    raise EGeometryError.Create('AngleBetween2D: angle is undefined for a zero vector');
   Result := ArcTan2(V1.Cross(V2), V1.Dot(V2));
 end;
 
 class function TGeometryKit.AngleBetween3D(const V1, V2: TVector3D): Double;
 var CosA: Double;
 begin
-  CosA := V1.Dot(V2) / Max(GEO_EPS, V1.Magnitude * V2.Magnitude);
+  if (V1.Magnitude < GEO_EPS) or (V2.Magnitude < GEO_EPS) then
+    raise EGeometryError.Create('AngleBetween3D: angle is undefined for a zero vector');
+  CosA := V1.Dot(V2) / (V1.Magnitude * V2.Magnitude);
   Result := ArcCos(Max(-1, Min(1, CosA)));
 end;
 
