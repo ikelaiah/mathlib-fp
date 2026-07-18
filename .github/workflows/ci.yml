@@ -40,11 +40,9 @@ jobs:
 
       - name: Build and run examples
         run: |
-          cd examples
-          mkdir -p lib/ci
-          for file in *.lpr; do
-            fpc -B -FcUTF8 -Fu../src -FUlib/ci "$file"
-            "./${file%.lpr}" > /dev/null
+          sh ./build-examples.sh
+          for file in examples/*.lpr; do
+            "./example-bin/$(basename "${file%.lpr}")" > /dev/null
           done
 
       - name: Compile representative benchmarks
@@ -171,13 +169,9 @@ jobs:
       - name: Build and run examples
         shell: pwsh
         run: |
-          Set-Location examples
-          New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
-          Get-ChildItem *.lpr | ForEach-Object {
-            & $env:FPC_WIN64 '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
-              $_.FullName
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-            $executable = Join-Path $_.DirectoryName ($_.BaseName + '.exe')
+          & ./build-examples.ps1 -Compiler $env:FPC_WIN64
+          Get-ChildItem examples/*.lpr | ForEach-Object {
+            $executable = Join-Path example-bin ($_.BaseName + '.exe')
             & $executable | Out-Null
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }

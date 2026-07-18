@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [1.2.2] - 2026-07-18
+
+### Documentation
+
+- Added newcomer-oriented MathBase and NumericsLib walkthroughs, giving every
+  documented domain a runnable example, plus an indexed learning path for all
+  14 examples.
+- Reviewed all examples for concise purpose, input, interpretation, and method-
+  selection guidance; corrected the statistics walkthrough to use a local,
+  reproducible bootstrap seed and clarify p-value interpretation.
+- Added 1.2.2 release notes and updated version and release references.
+
+### Tooling
+
+- Added shell and PowerShell entry points that compile every example into an
+  ignored `example-bin/` directory, and made CI exercise both the scripts and
+  the resulting programs on their native platforms.
+
 ## [1.2.1] - 2026-07-18
 
 ### Documentation

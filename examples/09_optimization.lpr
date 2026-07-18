@@ -7,7 +7,8 @@ program example09_optimization;
  Each section introduces one optimizer with a plain-English explanation
  of what it does, when to use it, and a concrete example.
 
- Compile:  fpc -Fu../src -FUlib 09_optimization.lpr
+ Compile:  mkdir lib
+           fpc -Fu../src -FUlib 09_optimization.lpr
  Run:      ./09_optimization   (Linux/macOS)
            09_optimization.exe (Windows)
 -----------------------------------------------------------------------------}

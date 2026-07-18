@@ -7,7 +7,8 @@ program example11_machinelearning;
  Each section introduces one technique with a plain-English explanation,
  a concrete toy dataset, and guidance on when to use it.
 
- Compile:  fpc -Fu../src -FUlib 11_machinelearning.lpr
+ Compile:  mkdir lib
+           fpc -Fu../src -FUlib 11_machinelearning.lpr
  Run:      ./11_machinelearning   (Linux/macOS)
            11_machinelearning.exe (Windows)
 -----------------------------------------------------------------------------}
@@ -330,7 +331,7 @@ end;
 ============================================================ }
 procedure DemoDBSCAN;
 var
-  X: TDoubleMatrix; R: TDBSCANResult; I: Integer;
+  X: TDoubleMatrix; R: TDBSCANResult;
 begin
   WriteLn;
   WriteLn('=== DBSCAN CLUSTERING ===');

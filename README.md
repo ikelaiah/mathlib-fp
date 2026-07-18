@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.2.1" src="https://img.shields.io/badge/version-1.2.1-orange.svg">
+  <img alt="Version 1.2.2" src="https://img.shields.io/badge/version-1.2.2-orange.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -25,9 +25,9 @@
 - **Ready to explore:** reference docs, runnable examples, and 789 passing tests.
 
 > [!NOTE]
-> **1.2.1 is the current release; 1.2.0 was the first public release.** The
+> **1.2.2 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.2.1.md) and
+> [release notes](docs/RELEASE_NOTES_1.2.2.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
@@ -88,17 +88,24 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 12 small walkthroughs covering
-the major domain workflows. Compile one in seconds:
+The [`examples/`](examples/) directory contains 14 commented walkthroughs with
+at least one runnable program for every domain. Newcomers can follow the
+[example index and suggested learning path](examples/README.md). Compile one in
+seconds:
 
 ```bash
 cd examples
 mkdir -p lib
-fpc -Fu../src -FUlib 05_unit_conversion.lpr
-./05_unit_conversion
+fpc -Fu../src -FUlib 00_getting_started.lpr
+./00_getting_started
 ```
 
 On Windows, run the generated `.exe` instead. Start with the [documentation index](docs/index.md) for the full API tour.
+
+To compile all examples into `example-bin/` from the repository root, run
+`sh ./build-examples.sh` or `.\build-examples.ps1`. See the
+[example guide](examples/README.md#compile-every-example) for compiler-path
+options.
 
 ## 🤝 Contributing
 

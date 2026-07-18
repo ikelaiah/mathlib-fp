@@ -46,6 +46,7 @@
 # FPC/Lazarus default output directory pattern
 lib/
 backup/
+example-bin/
 
 # -----------------------------------------------------------------------------
 # Test runner artefacts

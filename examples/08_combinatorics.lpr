@@ -7,7 +7,8 @@ program example08_combinatorics;
  Each section introduces one concept with a plain-English explanation
  and shows the corresponding function call.
 
- Compile:  fpc -Fu../src -FUlib 08_combinatorics.lpr
+ Compile:  mkdir lib
+           fpc -Fu../src -FUlib 08_combinatorics.lpr
  Run:      ./08_combinatorics   (Linux/macOS)
            08_combinatorics.exe (Windows)
 -----------------------------------------------------------------------------}

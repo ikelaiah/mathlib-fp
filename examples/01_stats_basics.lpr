@@ -3,10 +3,13 @@ program StatsBasics;
 {-----------------------------------------------------------------------------
   01_stats_basics.lpr
 
-  Demonstrates basic descriptive statistics using StatsLib.
+  Demonstrates the usual first steps with a dataset: create a TDoubleArray,
+  summarise it, inspect individual measures, compare two series, and estimate
+  a reproducible bootstrap confidence interval.
 
   Build (FPC command line):
-    fpc -Fu../src 01_stats_basics.lpr
+    mkdir lib
+    fpc -Fu../src -FUlib 01_stats_basics.lpr
 
   Build (Lazarus):
     Add ../src to:
@@ -64,8 +67,9 @@ begin
   WriteLn;
 
   // ── 6. Bootstrap 95 %% confidence interval for the mean ─────────────────
-  Randomize; // seed the RNG — required by bootstrap
-  CI := TStatsKit.BootstrapConfidenceInterval(Data, 0.05, 1000);
+  // The final argument is a fixed seed. It makes this teaching example
+  // repeatable and does not change Pascal's process-wide random state.
+  CI := TStatsKit.BootstrapConfidenceInterval(Data, 0.05, 1000, 2026);
   WriteLn('--- 95%% Bootstrap CI for the mean ---');
   WriteLn(Format('Lower : %.4f', [CI.Lower]));
   WriteLn(Format('Upper : %.4f', [CI.Upper]));

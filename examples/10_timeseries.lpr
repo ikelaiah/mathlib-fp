@@ -7,7 +7,8 @@ program example10_timeseries;
  Each section introduces one technique with a plain-English explanation,
  a concrete example, and guidance on when to use it.
 
- Compile:  fpc -Fu../src -FUlib 10_timeseries.lpr
+ Compile:  mkdir lib
+           fpc -Fu../src -FUlib 10_timeseries.lpr
  Run:      ./10_timeseries   (Linux/macOS)
            10_timeseries.exe (Windows)
 -----------------------------------------------------------------------------}
@@ -114,6 +115,7 @@ begin
   Fcast  := TTimeSeriesKit.HoltWintersForecast(Y, 0.3, 0.1, 0.4, 12, 6);
 
   WriteLn(Format('  Last observed value: %.3f', [Y[High(Y)]]));
+  WriteLn(Format('  Last fitted value:   %.3f', [Fitted[High(Fitted)]]));
   ShowVec('6-step forecast', Fcast, 6);
   WriteLn;
   WriteLn('  When to use: monthly sales, electricity demand, anything with');
