@@ -2498,7 +2498,7 @@ var
   N, I, K: Integer;
   MaxDiff, MeanValue, StdDevValue: Double;
   SortedData: TDoubleArray;
-  ExpectedCDF: Double;
+  EmpiricalLower, EmpiricalUpper, ExpectedCDF: Double;
   DPlus, DMinus, Lambda, Term, SeriesSum: Double;
 begin
   N := Length(Data);
@@ -2517,8 +2517,12 @@ begin
   for I := 0 to High(SortedData) do
   begin
     ExpectedCDF := NormalCDF((SortedData[I] - MeanValue) / StdDevValue);
-    DPlus := (I + 1.0) / N - ExpectedCDF;
-    DMinus := ExpectedCDF - I / N;
+    { Explicit Double casts avoid compiler-dependent single-precision
+      evaluation of an integer combined with an untyped real literal. }
+    EmpiricalUpper := Double(I + 1) / Double(N);
+    EmpiricalLower := Double(I) / Double(N);
+    DPlus := EmpiricalUpper - ExpectedCDF;
+    DMinus := ExpectedCDF - EmpiricalLower;
     MaxDiff := Max(MaxDiff, Max(DPlus, DMinus));
   end;
   
