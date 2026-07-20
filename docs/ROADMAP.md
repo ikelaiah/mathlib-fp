@@ -1,27 +1,29 @@
 # Roadmap
 
-mathlib-fp aims to become a comprehensive, freely available numerical-computing library implemented directly in Free Pascal.
+mathlib-fp aims to become a comprehensive, freely available numerical-
+computing library implemented directly in Free Pascal.
 
 The project is built on the following non-negotiable foundations:
 
-* MIT-licensed source code that compiles with Free Pascal;
-* native Object Pascal implementations rather than wrappers around implementations written in another language;
-* no required DLLs, binary SDKs, or third-party runtime libraries;
-* correct, portable implementations before architecture-specific optimisation;
-* independently usable units rather than a mandatory monolithic import.
+- MIT-licensed source code that compiles with Free Pascal;
+- native Object Pascal implementations rather than wrappers around
+  implementations written in another language;
+- no required DLLs, binary SDKs, or third-party runtime libraries;
+- correct, portable implementations before architecture-specific optimisation;
+- independently usable units rather than a mandatory monolithic import.
 
 
-## Current priority: 1.2.3
+## Current release: 1.2.3
 
 Version 1.2.3 is a correctness and robustness release. It does not add a new
-domain. Work is concentrated on the operations already exposed:
+domain. It concentrates on the operations already exposed:
 
-- improve special-function accuracy, convergence handling, and tail behavior;
-- remove overflow, underflow, and cancellation from representable results;
-- correct formulas whose happy-path tests masked mathematical defects;
-- expand reference-value, identity, residual, property, and extreme-scale
+- improved special-function accuracy, convergence handling, and tail behavior;
+- removed overflow, underflow, and cancellation from representable results;
+- corrected formulas whose happy-path tests masked mathematical defects;
+- expanded reference-value, identity, residual, property, and extreme-scale
   tests;
-- keep public signatures source-compatible wherever correctness permits.
+- kept public signatures source-compatible wherever correctness permits.
 
 ## Development order
 

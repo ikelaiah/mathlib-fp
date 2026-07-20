@@ -8,7 +8,7 @@ native Free Pascal numerical package.
 
 ## Releases
 
-- [Draft mathlib-fp 1.2.3 release notes](RELEASE_NOTES_1.2.3.md) — numerical
+- [mathlib-fp 1.2.3 release notes](RELEASE_NOTES_1.2.3.md) — numerical
   correctness, special-function accuracy, and robust probability tails.
 - [mathlib-fp 1.2.2 release notes](RELEASE_NOTES_1.2.2.md) — complete
   newcomer example coverage and cross-platform example builds.
@@ -23,7 +23,7 @@ mathlib-fp uses the following terms consistently:
 
 | Term | Meaning | Example |
 |------|---------|---------|
-| Project or distribution | The complete versioned source release | mathlib-fp 1.2.2 |
+| Project or distribution | The complete versioned source release | mathlib-fp 1.2.3 |
 | Domain | A functional area within mathlib-fp | Finance, algebra, geometry |
 | Unit family | The shared prefix of related Pascal units | `FinanceLib`, `AlgebraLib` |
 | Unit | A Pascal compilation unit named in a `uses` clause | `FinanceLib.Interest` |

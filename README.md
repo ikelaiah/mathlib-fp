@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.2.2" src="https://img.shields.io/badge/version-1.2.2-orange.svg">
+  <img alt="Version 1.2.3" src="https://img.shields.io/badge/version-1.2.3-orange.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -25,10 +25,9 @@
 - **Ready to explore:** reference docs, runnable examples, and 798 passing tests.
 
 > [!NOTE]
-> **1.2.2 is the current stable release; 1.2.3 is in development and currently
-> passes 798 tests.** The project follows semantic versioning; read the
-> [1.2.2 release notes](docs/RELEASE_NOTES_1.2.2.md),
-> [draft 1.2.3 release notes](docs/RELEASE_NOTES_1.2.3.md), and
+> **1.2.3 is the current release; 1.2.0 was the first public release.** The
+> project follows semantic versioning; read the
+> [release notes](docs/RELEASE_NOTES_1.2.3.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start

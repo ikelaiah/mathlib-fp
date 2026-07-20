@@ -2,7 +2,7 @@
 
 ## Summary
 
-This change begins the 1.2.3 correctness and robustness release by hardening
+This change implements the 1.2.3 correctness and robustness release by hardening
 the existing scalar numerical kernel and the probability and statistics APIs
 that depend on it. It fixes a confirmed Student-t formula defect, improves
 special-function accuracy and convergence handling, and preserves small
@@ -56,6 +56,8 @@ fix belongs in the numerical foundation rather than in individual callers.
 - Use direct normal tails in Mann-Whitney and Shapiro-Wilk approximations.
 - Update the Kolmogorov-Smirnov reference expectation to the full-precision
   normal CDF.
+- Calculate Kolmogorov-Smirnov empirical CDF steps explicitly as `Double` to
+  avoid target-dependent single-precision evaluation by FPC.
 
 ### Elementary operations
 
@@ -90,16 +92,22 @@ fix belongs in the numerical foundation rather than in individual callers.
 - Overflow-resistant vector magnitude.
 - Eight-sigma normal and lognormal tails.
 - Tiny beta upper tails and extreme Student-t/Cauchy and F tails.
+- Cross-platform regressions that pin complement inputs to `Double` before
+  constructing extreme beta-tail reference values.
 
 The registered suite grows from 789 to 798 tests.
 
 ## Verification
 
-- [x] Release test runner builds successfully.
-- [x] All 798 Release tests pass with zero errors and zero failures.
-- [x] A direct UTF-8 build passes all 798 tests.
-- [x] All 14 examples compile through `build-examples.ps1`.
-- [x] The Lazarus `mathlib_fp` package compiles.
+- [x] Normal, optimized, runtime-checked, and heap-traced Win64 builds pass all
+  798 tests with zero errors and zero failures.
+- [x] The heap-traced run reports zero unfreed memory blocks.
+- [x] The native Win32 build passes all 798 tests.
+- [x] All 14 examples compile and run through `build-examples.ps1`.
+- [x] The representative benchmark runner compiles and completes.
+- [x] The Lazarus `mathlib_fp` package compiles for Win64 and Win32.
+- [x] The package metadata reports version 1.2.3.
+- [x] All local Markdown targets resolve.
 - [x] `git diff --check` reports no whitespace errors.
 - [x] No generated compiler artifacts remain in `src/`.
 

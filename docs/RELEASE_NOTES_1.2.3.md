@@ -1,8 +1,8 @@
 # mathlib-fp 1.2.3 release notes
 
-**Release date:** TBD
+**Release date:** 2026-07-21
 
-**Release status:** Draft patch release
+**Release status:** Patch release
 
 mathlib-fp 1.2.3 improves the correctness and numerical robustness of existing
 operations. It does not introduce a new mathematical domain or require a
@@ -29,6 +29,8 @@ wrapper, DLL, binary SDK, or third-party runtime library.
   and iterative kernels do not silently return unconverged partial results.
 - Normal-tail approximations used by statistical tests follow the same direct-
   tail path as the probability-distribution APIs.
+- Kolmogorov-Smirnov empirical CDF steps now use explicit double-precision
+  fractions, avoiding compiler-dependent single-precision evaluation.
 
 ## Numerical behaviour changes
 
@@ -62,18 +64,23 @@ previous numerical approximations.
 
 ## Quality assurance
 
-- The full Release suite passes all 798 tests with zero errors and zero
-  failures.
-- A separate UTF-8 source build passes the same 798 tests.
-- All 14 runnable examples compile.
-- The `mathlib_fp` Lazarus package compiles successfully.
+- Normal, optimized, runtime-checked, and heap-traced Win64 builds pass all 798
+  tests with zero errors and zero failures; the heap-traced run reports zero
+  unfreed memory blocks.
+- The complete 798-test suite also passes with the native Win32 compiler.
+- All 14 runnable examples compile and run.
+- The representative benchmark runner compiles and completes.
+- The `mathlib_fp` Lazarus package compiles for Win64 and Win32.
+- The Lazarus package metadata reports version 1.2.3.
 - New tests cover published reference values, symmetry and complement
   identities, invalid inputs, convergence outcomes, tiny arguments, very large
-  vector components, and representable extreme distribution tails.
-- `git diff --check` reports no whitespace errors.
+  vector components, representable extreme distribution tails, and portable
+  `Double` evaluation across FPC targets.
+- All local Markdown targets resolve, and `git diff --check` reports no
+  whitespace errors.
 
 For the complete change list, see the
-[Unreleased changelog](../CHANGELOG.md#unreleased). The broader native Free
+[1.2.3 changelog](../CHANGELOG.md#123---2026-07-21). The broader native Free
 Pascal numerical-computing direction is described in the
 [project roadmap](ROADMAP.md).
 

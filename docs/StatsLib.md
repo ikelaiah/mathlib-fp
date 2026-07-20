@@ -152,7 +152,9 @@ class function ShapiroWilkTest(const Data: TDoubleArray; out WPValue: Double): D
 `KolmogorovSmirnovTest` requires at least five values, returns the one-sample D
 statistic, and writes an asymptotic two-sided p-value to `KSPValue`. Parameters
 of the comparison normal distribution are estimated from the sample, so this
-is an approximate diagnostic rather than an exact Lilliefors test.
+is an approximate diagnostic rather than an exact Lilliefors test. Its
+empirical CDF steps are evaluated explicitly as `Double` values so FPC targets
+do not reduce them to single precision through untyped-literal evaluation.
 `ShapiroWilkTest` accepts 3 through 5000 values, returns W, and writes a
 Royston-approximation p-value. P-values are clamped to `[0, 1]`; use specialist
 software when a regulatory or publication workflow requires independently
