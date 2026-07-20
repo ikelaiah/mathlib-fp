@@ -8,6 +8,8 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [Draft mathlib-fp 1.2.3 release notes](RELEASE_NOTES_1.2.3.md) — numerical
+  correctness, special-function accuracy, and robust probability tails.
 - [mathlib-fp 1.2.2 release notes](RELEASE_NOTES_1.2.2.md) — complete
   newcomer example coverage and cross-platform example builds.
 - [mathlib-fp 1.2.1 release notes](RELEASE_NOTES_1.2.1.md) — terminology and

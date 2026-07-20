@@ -25,9 +25,10 @@
 - **Ready to explore:** reference docs, runnable examples, and 798 passing tests.
 
 > [!NOTE]
-> **1.2.2 is the current release; 1.2.0 was the first public release.** The
-> project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.2.2.md) and
+> **1.2.2 is the current stable release; 1.2.3 is in development and currently
+> passes 798 tests.** The project follows semantic versioning; read the
+> [1.2.2 release notes](docs/RELEASE_NOTES_1.2.2.md),
+> [draft 1.2.3 release notes](docs/RELEASE_NOTES_1.2.3.md), and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
