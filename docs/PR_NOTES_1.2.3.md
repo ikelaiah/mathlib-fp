@@ -118,7 +118,7 @@ been calculated.
 ## Out of scope
 
 - Adding a new mathematical domain.
-- Adding wrappers around ALGLIB, BLAS, LAPACK, or another library.
+- Adding wrappers around BLAS, LAPACK, or another library.
 - Requiring a DLL, binary SDK, or third-party runtime component.
 - Introducing a new matrix/vector storage model or architecture-specific fast
   path in this patch.
