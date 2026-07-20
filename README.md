@@ -22,7 +22,7 @@
 - **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
-- **Ready to explore:** reference docs, runnable examples, and 789 passing tests.
+- **Ready to explore:** reference docs, runnable examples, and 798 passing tests.
 
 > [!NOTE]
 > **1.2.2 is the current release; 1.2.0 was the first public release.** The
@@ -119,6 +119,8 @@ fpc -Fu../src -FUlib TestRunner.lpr
 ```
 
 Maintainers preparing a distribution should follow the [release checklist](RELEASING.md).
+The [project roadmap](docs/ROADMAP.md) describes the quality-first path toward
+a comprehensive native Free Pascal numerical package.
 
 ## 📄 License
 

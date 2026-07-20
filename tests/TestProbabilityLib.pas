@@ -221,6 +221,7 @@ type
     procedure Test82_HypergeometricPMFSumsToOne;
     procedure Test83_MomentValidationRegression;
     procedure Test84_DiscreteBoundaryRegression;
+    procedure Test85_ContinuousTailRobustness;
 
   end;
 
@@ -976,6 +977,40 @@ begin
     'negative binomial CDF P=1');
   AssertNear(0.0, TProbabilityKit.HypergeometricVariance(1, 1, 1), EPS,
     'single-item hypergeometric variance');
+end;
+
+procedure TTestProbabilityLib.Test85_ContinuousTailRobustness;
+var
+  Epsilon, Expected, Got: Double;
+begin
+  Expected := 6.2209605742718194E-16;
+  Got := TProbabilityKit.NormalSurvival(8.0, 0.0, 1.0);
+  AssertTrue('normal survival retains the 8-sigma tail', Got > 0.0);
+  AssertTrue('normal 8-sigma tail reference',
+    Abs(Got - Expected) <= Expected * 3E-13);
+
+  Got := TProbabilityKit.LogNormalSurvival(Exp(8.0), 0.0, 1.0);
+  AssertTrue('lognormal tail uses the stable normal survival',
+    Abs(Got - Expected) <= Expected * 3E-13);
+
+  Epsilon := 1.0 - (1.0 - 1.0E-10);
+  Expected := 6.0 * Power(Epsilon, 5) - 5.0 * Power(Epsilon, 6);
+  Got := TProbabilityKit.BetaSurvival(1.0 - 1.0E-10, 2.0, 5.0);
+  AssertTrue('beta survival retains a small upper tail', Got > 0.0);
+  AssertTrue('beta upper-tail polynomial reference',
+    Abs(Got - Expected) <= Expected * 3E-13);
+
+  Expected := ArcTan(1.0E-300) / Pi;
+  Got := TProbabilityKit.StudentTSurvival(1.0E300, 1);
+  AssertTrue('Cauchy survival retains an extreme tail', Got > 0.0);
+  AssertTrue('Cauchy extreme-tail reference',
+    Abs(Got - Expected) <= Expected * 3E-15);
+
+  Expected := 2.0 * ArcTan(1.0 / Sqrt(1.0E300)) / Pi;
+  Got := TProbabilityKit.FSurvival(1.0E300, 1, 1);
+  AssertTrue('F survival avoids d1*x overflow and CDF cancellation', Got > 0.0);
+  AssertTrue('F(1,1) extreme-tail reference',
+    Abs(Got - Expected) <= Expected * 3E-13);
 end;
 
 initialization

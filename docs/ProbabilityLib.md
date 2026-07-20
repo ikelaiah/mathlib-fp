@@ -46,9 +46,14 @@ For each distribution you get:
 |----------|----------------|
 | `PDF` / `PMF` | Probability density (continuous) or mass (discrete) at a single point |
 | `CDF` | Cumulative probability P(X ≤ x) |
-| `Survival` | Upper-tail probability P(X > x) = 1 − CDF |
+| `Survival` | Upper-tail probability P(X > x), mathematically 1 − CDF |
 | `Mean` | Expected value |
 | `Variance` | Spread (σ²) |
+
+Survival functions use a direct upper-tail identity where one is available.
+In particular, normal/lognormal symmetry, incomplete-beta symmetry, and direct
+Student-t/F beta arguments avoid rounding a small representable tail to zero by
+subtracting a CDF that has already rounded to one.
 
 ---
 

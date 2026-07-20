@@ -3,6 +3,9 @@
 A collection of focused Free Pascal mathematics domains organised as a single
 source tree and distribution.
 
+See the [roadmap](ROADMAP.md) for the quality-first path toward a comprehensive
+native Free Pascal numerical package.
+
 ## Releases
 
 - [mathlib-fp 1.2.2 release notes](RELEASE_NOTES_1.2.2.md) — complete
