@@ -104,6 +104,28 @@ type
 
 implementation
 
+function Log1PAccurate(const X: Double): Double;
+var
+  Y: Double;
+begin
+  Y := 1.0 + X;
+  if Y = 1.0 then
+    Exit(X);
+  Result := Ln(Y) * X / (Y - 1.0);
+end;
+
+function ExpM1Accurate(const X: Double): Double;
+var
+  X2: Double;
+begin
+  if Abs(X) < 1.0E-5 then
+  begin
+    X2 := X * X;
+    Exit(X * (1.0 + X / 2.0 + X2 / 6.0 + X2 * X / 24.0));
+  end;
+  Result := Exp(X) - 1.0;
+end;
+
 { ---- Angle conversions ---- }
 
 class function TTrigKit.DegToRad(const Degrees: Double): Double;
@@ -192,23 +214,54 @@ end;
 { ---- Hyperbolic ---- }
 
 class function TTrigKit.Sinh(const X: Double): Double;
+var
+  AX, E: Double;
 begin
-  Result := (System.Exp(X) - System.Exp(-X)) / 2;
+  if IsNan(X) or IsInfinite(X) then
+    Exit(X);
+  AX := Abs(X);
+  if AX > 20.0 then
+    Result := 0.5 * Exp(AX)
+  else
+  begin
+    E := ExpM1Accurate(AX);
+    Result := 0.5 * (E + E / (E + 1.0));
+  end;
+  if X < 0.0 then
+    Result := -Result;
 end;
 
 class function TTrigKit.Cosh(const X: Double): Double;
+var
+  AX, E: Double;
 begin
-  Result := (System.Exp(X) + System.Exp(-X)) / 2;
+  if IsNan(X) then
+    Exit(NaN);
+  if IsInfinite(X) then
+    Exit(Infinity);
+  AX := Abs(X);
+  if AX < 1.0E-5 then
+    Exit(1.0 + 0.5 * AX * AX);
+  E := Exp(AX);
+  Result := 0.5 * (E + 1.0 / E);
 end;
 
 class function TTrigKit.Tanh(const X: Double): Double;
+var
+  AX, E: Double;
 begin
-  if X > 20 then
-    Result := 1
-  else if X < -20 then
-    Result := -1
+  if IsNan(X) then
+    Exit(NaN);
+  AX := Abs(X);
+  if AX > 20.0 then
+    Result := 1.0
   else
-    Result := (System.Exp(2 * X) - 1) / (System.Exp(2 * X) + 1);
+  begin
+    E := ExpM1Accurate(2.0 * AX);
+    Result := E / (E + 2.0);
+  end;
+  if X < 0.0 then
+    Result := -Result;
 end;
 
 { ---- Inverse hyperbolic ---- }
@@ -220,10 +273,13 @@ begin
   if IsNan(X) or IsInfinite(X) then
     Exit(X);
   AX := Abs(X);
-  if AX > 1E150 then
+  if AX < 1.0E-8 then
+    Exit(X)
+  else if AX > 1E150 then
     Result := Ln(AX) + Ln(2.0)
   else
-    Result := Ln(AX + Sqrt(Sqr(AX) + 1));
+    Result := Log1PAccurate(AX + Sqr(AX) /
+      (1.0 + Sqrt(1.0 + Sqr(AX))));
   if X < 0 then
     Result := -Result;
 end;
@@ -235,7 +291,8 @@ begin
   else if X > 1E150 then
     Result := Ln(X) + Ln(2.0)
   else
-    Result := System.Ln(X + System.Sqrt(System.Sqr(X) - 1));
+    Result := Log1PAccurate((X - 1.0) +
+      Sqrt((X - 1.0) * (X + 1.0)));
 end;
 
 class function TTrigKit.ArcTanh(const X: Double): Double;
@@ -243,7 +300,7 @@ begin
   if (X <= -1) or (X >= 1) then
     Result := NaN
   else
-    Result := 0.5 * System.Ln((1 + X) / (1 - X));
+    Result := 0.5 * (Log1PAccurate(X) - Log1PAccurate(-X));
 end;
 
 { ---- Reciprocal trig ---- }
@@ -334,7 +391,7 @@ end;
 
 class function TTrigKit.VectorMagnitude(const X, Y: Double): Double;
 begin
-  Result := System.Sqrt(System.Sqr(X) + System.Sqr(Y));
+  Result := Hypotenuse(X, Y);
 end;
 
 class function TTrigKit.VectorAngle(const X1, Y1, X2, Y2: Double): Double;

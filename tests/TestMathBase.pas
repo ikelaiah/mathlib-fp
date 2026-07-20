@@ -24,6 +24,20 @@ type
     procedure AssertFinanceEquals(const Expected, Actual: Double; const Msg: String = ''); overload;
   end;
 
+  { Reference and edge-case coverage for shared special functions. }
+  TTestCasePrecision = class(TTestCase)
+  protected
+    procedure AssertNearRelative(const Expected, Actual, RelativeTolerance,
+      AbsoluteTolerance: Double; const Msg: String);
+  published
+    procedure Test01_GammaLnReferences;
+    procedure Test02_BetaReferencesAndScale;
+    procedure Test03_BetaIncReferencesAndSymmetry;
+    procedure Test04_ErfAndNormalTailReferences;
+    procedure Test05_StudentTCDFReferences;
+    procedure Test06_InvalidAndEndpointContracts;
+  end;
+
   { Test cases for statistical operations }
   TTestCaseStats = class(TTestCaseMathBase)
   published
@@ -182,10 +196,97 @@ type
     procedure Test50_VectorAngle90;
     procedure Test51_VectorAngle180;
     procedure Test52_LargeArgumentStability;
+    procedure Test53_SmallArgumentStability;
+    procedure Test54_VectorMagnitudeLarge;
   end;
 
 
 implementation
+
+{ TTestCasePrecision }
+
+procedure TTestCasePrecision.AssertNearRelative(const Expected, Actual,
+  RelativeTolerance, AbsoluteTolerance: Double; const Msg: String);
+var
+  AllowedError, Scale: Double;
+begin
+  Scale := Max(Abs(Expected), Abs(Actual));
+  AllowedError := Max(AbsoluteTolerance, RelativeTolerance * Scale);
+  AssertTrue(Msg + Format(' (expected %.17g, got %.17g)', [Expected, Actual]),
+    Abs(Expected - Actual) <= AllowedError);
+end;
+
+procedure TTestCasePrecision.Test01_GammaLnReferences;
+begin
+  AssertNearRelative(2.2527126517342055, GammaLn(0.1), 3E-15, 2E-15,
+    'GammaLn(0.1)');
+  AssertNearRelative(0.5723649429247004, GammaLn(0.5), 3E-15, 2E-15,
+    'GammaLn(0.5)');
+  AssertNearRelative(3.1780538303479458, GammaLn(5.0), 3E-15, 2E-15,
+    'GammaLn(5)');
+  AssertNearRelative(359.1342053695754, GammaLn(100.0), 3E-15, 2E-13,
+    'GammaLn(100)');
+end;
+
+procedure TTestCasePrecision.Test02_BetaReferencesAndScale;
+begin
+  AssertNearRelative(Pi, Beta(0.5, 0.5), 5E-15, 2E-15,
+    'Beta(0.5,0.5)');
+  AssertNearRelative(2.2087606931994364E-61, Beta(100.0, 100.0),
+    2E-13, 0.0, 'Beta(100,100)');
+  AssertNearRelative(1.0E-100, Beta(1.0, 1.0E100), 2E-14, 0.0,
+    'Beta(1,large) avoids log-gamma cancellation');
+end;
+
+procedure TTestCasePrecision.Test03_BetaIncReferencesAndSymmetry;
+var
+  Left, Right: Double;
+begin
+  AssertNearRelative(0.6875, BetaInc(2.0, 3.0, 0.5), 2E-14, 2E-15,
+    'BetaInc integer-shape reference');
+  AssertNearRelative(0.5, BetaInc(1000.0, 1000.0, 0.5), 0.0, 0.0,
+    'BetaInc symmetric midpoint');
+  Left := BetaInc(2.5, 7.25, 0.37);
+  Right := BetaInc(7.25, 2.5, 0.63);
+  AssertNearRelative(1.0, Left + Right, 0.0, 3E-14,
+    'BetaInc complement symmetry');
+end;
+
+procedure TTestCasePrecision.Test04_ErfAndNormalTailReferences;
+begin
+  AssertNearRelative(0.8427007929497149, Erf(1.0), 2E-14, 2E-15,
+    'Erf(1)');
+  AssertNearRelative(1.1283791670955126E-12, Erf(1.0E-12), 2E-14,
+    1E-27, 'Erf tiny argument');
+  AssertNearRelative(0.9750021048517795, NormalCDF(1.96), 2E-14, 2E-15,
+    'NormalCDF(1.96)');
+  AssertNearRelative(6.2209605742718194E-16, NormalCDF(-8.0), 3E-13,
+    1E-29, 'NormalCDF negative tail');
+end;
+
+procedure TTestCasePrecision.Test05_StudentTCDFReferences;
+begin
+  AssertNearRelative(0.75, StudentT(1, 1.0), 2E-14, 2E-15,
+    'StudentT Cauchy reference');
+  AssertNearRelative(0.7886751345948129, StudentT(2, 1.0), 2E-14, 2E-15,
+    'StudentT df=2 reference');
+  AssertNearRelative(0.9633059826146297, StudentT(10, 2.0), 2E-14, 2E-15,
+    'StudentT df=10 reference');
+end;
+
+procedure TTestCasePrecision.Test06_InvalidAndEndpointContracts;
+begin
+  AssertTrue('GammaLn rejects zero', IsNan(GammaLn(0.0)));
+  AssertTrue('GammaLn(+Infinity) is +Infinity', IsInfinite(GammaLn(Infinity)));
+  AssertTrue('Beta rejects negative shape', IsNan(Beta(-1.0, 2.0)));
+  AssertTrue('BetaInc rejects zero shape', IsNan(BetaInc(0.0, 2.0, 0.5)));
+  AssertEquals('BetaInc clamps below zero', 0.0, BetaInc(2.0, 3.0, -1.0), 0.0);
+  AssertEquals('BetaInc clamps above one', 1.0, BetaInc(2.0, 3.0, 2.0), 0.0);
+  AssertTrue('StudentT rejects bad DF', IsNan(StudentT(0, 1.0)));
+  AssertTrue('StudentT rejects negative X', IsNan(StudentT(5, -1.0)));
+  AssertEquals('StudentT at zero', 0.5, StudentT(5, 0.0), 0.0);
+  AssertEquals('StudentT at +Infinity', 1.0, StudentT(5, Infinity), 0.0);
+end;
 
 { TTestCaseMathBase }
 
@@ -1294,8 +1395,35 @@ begin
   AssertEquals('scaled hypot reference', Sqrt(2.0), H / 1E308, 1E-15);
 end;
 
+procedure TTestCaseTrig.Test53_SmallArgumentStability;
+const
+  Tiny = 1.0E-12;
+begin
+  AssertEquals('sinh preserves tiny argument', Tiny, TTrigKit.Sinh(Tiny),
+    1E-27);
+  AssertEquals('tanh preserves tiny argument', Tiny, TTrigKit.Tanh(Tiny),
+    1E-27);
+  AssertEquals('asinh preserves tiny argument', Tiny, TTrigKit.ArcSinh(Tiny),
+    1E-27);
+  AssertEquals('atanh preserves tiny argument', Tiny, TTrigKit.ArcTanh(Tiny),
+    1E-27);
+  AssertEquals('acosh remains accurate near one', Sqrt(2.0E-12),
+    TTrigKit.ArcCosh(1.0 + 1.0E-12), 2E-10);
+end;
+
+procedure TTestCaseTrig.Test54_VectorMagnitudeLarge;
+var
+  Magnitude: Double;
+begin
+  Magnitude := TTrigKit.VectorMagnitude(1.0E308, 1.0E308);
+  AssertTrue('large vector magnitude remains finite', not IsInfinite(Magnitude));
+  AssertEquals('large vector magnitude reference', Sqrt(2.0),
+    Magnitude / 1.0E308, 1E-15);
+end;
+
 
 initialization
+  RegisterTest(TTestCasePrecision);
   RegisterTest(TTestCaseStats);
   RegisterTest(TTestCaseFinance);
   RegisterTest(TTestCaseTrig);

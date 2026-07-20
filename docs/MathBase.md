@@ -70,23 +70,29 @@ Compile-time constants for commonly needed mathematical and physical values.
 
 ## MathBase.Precision
 
-Low-level special functions used as building blocks by `StatsLib` and `FinanceLib`.
+Low-level special functions used as building blocks by higher-level domains.
 
 ### Functions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `GammaLn` | `(X: Double): Double` | ln(Γ(x)) via Lanczos approximation; caller must supply X > 0 |
-| `Beta` | `(Z, W: Double): Double` | Beta function B(z,w); caller must supply Z, W > 0 |
-| `BetaInc` | `(A, B, X: Double): Double` | Regularised incomplete beta I_x(a,b); clamps X outside [0,1], while A and B must be positive |
-| `Erf` | `(X: Double): Double` | Error function, Horner polynomial, max error < 1.5 × 10⁻⁷ |
-| `NormalCDF` | `(X: Double): Double` | Φ(x) = 0.5 × (1 + Erf(x / √2)) |
-| `StudentT` | `(DF: Integer; X: Double): Double` | Student's t CDF helper for non-negative X; caller must supply DF ≥ 1 |
+| `GammaLn` | `(X: Double): Double` | ln(Γ(x)) via a double-precision Lanczos approximation for X > 0 |
+| `Beta` | `(Z, W: Double): Double` | Beta function B(z,w), with a cancellation-resistant large-parameter log form |
+| `BetaInc` | `(A, B, X: Double): Double` | Regularised incomplete beta I_x(a,b), using a convergence-checked continued fraction |
+| `Erf` | `(X: Double): Double` | Error function, evaluated through regularised incomplete-gamma ratios |
+| `NormalCDF` | `(X: Double): Double` | Standard normal Φ(x), with the negative tail evaluated directly |
+| `StudentT` | `(DF: Integer; X: Double): Double` | Student's t CDF helper for X ≥ 0 and DF ≥ 1 |
 
-These low-level functions do not validate their shape/domain parameters.
-Invalid values can yield NaN, Infinity, or a floating-point exception. The
-`StudentT` helper in this unit does not apply the negative-X symmetry; use
-`TProbabilityKit.StudentTCDF` when a complete signed t CDF is required.
+`GammaLn` and `Beta` require positive shape arguments. `BetaInc` requires
+finite positive A and B and clamps X outside [0,1] to the corresponding
+endpoint. Invalid shape arguments and failure to converge return NaN rather
+than an unchecked partial iterate. Representable `Beta` underflow and overflow
+return 0 and +Infinity respectively.
+
+`StudentT` intentionally covers only the non-negative half of the distribution
+and returns NaN for negative X. Use `TProbabilityKit.StudentTCDF` for a complete
+signed CDF. Its formula uses I(df/(df+x²); df/2, 1/2); the `df/2` shape is
+important for correct t-test p-values.
 
 ---
 
@@ -147,6 +153,10 @@ class function ArcCosh(const X: Double): Double;  // X >= 1; returns NaN otherwi
 class function ArcTanh(const X: Double): Double;  // X in (-1, 1); returns NaN otherwise
 ```
 
+The hyperbolic and inverse-hyperbolic implementations use small-argument and
+large-argument forms to avoid losing tiny inputs through subtraction and to
+avoid avoidable intermediate overflow.
+
 ### Reciprocal Trigonometry
 
 ```pascal
@@ -179,13 +189,12 @@ class function Cot(const X: Double): Double;
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `VectorMagnitude` | `X, Y` | Euclidean magnitude √(X² + Y²) |
+| `VectorMagnitude` | `X, Y` | Scaled Euclidean magnitude √(X² + Y²), avoiding intermediate square overflow |
 | `VectorAngle` | `X1, Y1, X2, Y2` | Angle in radians ∈ [−π, π] from (X1,Y1) to (X2,Y2) |
 
-The triangle, circle, reciprocal-trigonometric, and vector helpers are direct
-formula evaluators. They do not reject negative dimensions, invalid triangle
-sides, zero divisors, or other degenerate geometry; validate such inputs in the
-calling application.
+The triangle, circle, reciprocal-trigonometric, and vector helpers do not
+reject negative dimensions, invalid triangle sides, zero divisors, or other
+degenerate geometry; validate such inputs in the calling application.
 
 ---
 

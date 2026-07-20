@@ -92,7 +92,8 @@ begin
     -0.5244005127, -0.2533471031, 0.0, 0.2533471031,
     0.5244005127, 0.8416212336, 1.2815515655);
   D := TStatsKit.KolmogorovSmirnovTest(Data, P);
-  AssertEquals('reference D', 0.0845332474, D, 2E-8);
+  { Reference recomputed with a full-precision standard normal CDF. }
+  AssertEquals('reference D', 0.0845331704616380, D, 2E-14);
   AssertTrue('p is probability', (P >= 0.0) and (P <= 1.0));
   AssertTrue('normal scores are not rejected', TStatsKit.IsNormal(Data, 0.05));
 end;

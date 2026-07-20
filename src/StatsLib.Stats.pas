@@ -2488,7 +2488,7 @@ begin
       raise EStatsError.Create('Mann-Whitney U variance is zero');
     Z := (Abs(U1 - ExpectedMean) - 0.5) / Sqrt(DistVariance);
     if Z < 0.0 then Z := 0.0;
-    UPValue := 2.0 * (1.0 - NormalCDF(Z));
+    UPValue := 2.0 * NormalCDF(-Z);
     UPValue := Max(0.0, Min(1.0, UPValue));
   end;
 end;
@@ -2498,7 +2498,7 @@ var
   N, I, K: Integer;
   MaxDiff, MeanValue, StdDevValue: Double;
   SortedData: TDoubleArray;
-  ExpectedCDF: Double;
+  EmpiricalLower, EmpiricalUpper, ExpectedCDF: Double;
   DPlus, DMinus, Lambda, Term, SeriesSum: Double;
 begin
   N := Length(Data);
@@ -2517,8 +2517,12 @@ begin
   for I := 0 to High(SortedData) do
   begin
     ExpectedCDF := NormalCDF((SortedData[I] - MeanValue) / StdDevValue);
-    DPlus := (I + 1.0) / N - ExpectedCDF;
-    DMinus := ExpectedCDF - I / N;
+    { Explicit Double casts avoid compiler-dependent single-precision
+      evaluation of an integer combined with an untyped real literal. }
+    EmpiricalUpper := Double(I + 1) / Double(N);
+    EmpiricalLower := Double(I) / Double(N);
+    DPlus := EmpiricalUpper - ExpectedCDF;
+    DMinus := ExpectedCDF - EmpiricalLower;
     MaxDiff := Max(MaxDiff, Max(DPlus, DMinus));
   end;
   
@@ -2633,7 +2637,7 @@ begin
         Y := -Ln(Z - Y);
         Mu := Polynomial(C3, N);
         Sigma := Exp(Polynomial(C4, N));
-        WPValue := 1.0 - NormalCDF((Y - Mu) / Sigma);
+        WPValue := NormalCDF((Mu - Y) / Sigma);
       end;
     end
     else
@@ -2641,7 +2645,7 @@ begin
       Z := Ln(N);
       Mu := Polynomial(C5, Z);
       Sigma := Exp(Polynomial(C6, Z));
-      WPValue := 1.0 - NormalCDF((Y - Mu) / Sigma);
+      WPValue := NormalCDF((Mu - Y) / Sigma);
     end;
   end;
   WPValue := Max(0.0, Min(1.0, WPValue));

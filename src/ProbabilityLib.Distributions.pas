@@ -615,6 +615,65 @@ begin
     raise EProbabilityError.Create(Name + ': SampleN must be in [0, PopSize]');
 end;
 
+function StudentTUpperTail(const AbsX, Nu: Double): Double;
+var
+  BetaX, InvScaled, Scaled: Double;
+begin
+  if AbsX = 0.0 then
+    Exit(0.5);
+  { The Cauchy case has a simple form which preserves tails even when the
+    beta-function argument would underflow after squaring 1/X. }
+  if Nu = 1.0 then
+  begin
+    if AbsX > 1.0 then
+      Exit(ArcTan(1.0 / AbsX) / Pi);
+    Exit(0.5 - ArcTan(AbsX) / Pi);
+  end;
+
+  Scaled := AbsX / Sqrt(Nu);
+  if Scaled <= 1.0 then
+    BetaX := 1.0 / (1.0 + Scaled * Scaled)
+  else
+  begin
+    InvScaled := 1.0 / Scaled;
+    BetaX := Sqr(InvScaled) / (1.0 + Sqr(InvScaled));
+  end;
+  Result := 0.5 * BetaInc(Nu / 2.0, 0.5, BetaX);
+end;
+
+function LogOnePlusSquare(const X: Double): Double;
+const
+  SqrtMaxDouble = 1.3407807929942596E154;
+var
+  AX: Double;
+begin
+  AX := Abs(X);
+  if AX > SqrtMaxDouble then
+    Result := 2.0 * Ln(AX)
+  else
+    Result := Ln(1.0 + AX * AX);
+end;
+
+procedure FDistributionArguments(const X, D1, D2: Double;
+  out CDFArgument, SurvivalArgument: Double);
+var
+  Ratio, Scale: Double;
+begin
+  Scale := D2 / D1;
+  if X >= Scale then
+  begin
+    Ratio := Scale / X;
+    SurvivalArgument := Ratio / (1.0 + Ratio);
+    CDFArgument := 1.0 - SurvivalArgument;
+  end
+  else
+  begin
+    Ratio := X / Scale;
+    CDFArgument := Ratio / (1.0 + Ratio);
+    SurvivalArgument := 1.0 - CDFArgument;
+  end;
+end;
+
 { ---------------------------------------------------------------------------
   NORMAL
 --------------------------------------------------------------------------- }
@@ -641,7 +700,11 @@ end;
 
 class function TProbabilityKit.NormalSurvival(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
-  Result := RoundResult(1.0 - NormalCDF(X, Mu, Sigma), ADecimals);
+  RequireFinite(X, 'NormalSurvival: X');
+  RequireFinite(Mu, 'NormalSurvival: Mu');
+  RequirePositive(Sigma, 'NormalSurvival: Sigma');
+  Result := RoundResult(MathBase.Precision.NormalCDF((Mu - X) / Sigma),
+    ADecimals);
 end;
 
 class function TProbabilityKit.NormalMean(const Mu, Sigma: Double): Double;
@@ -689,7 +752,13 @@ end;
 
 class function TProbabilityKit.LogNormalSurvival(const X, Mu, Sigma: Double; ADecimals: Integer): Double;
 begin
-  Result := RoundResult(1.0 - LogNormalCDF(X, Mu, Sigma), ADecimals);
+  RequireFinite(X, 'LogNormalSurvival: X');
+  RequireFinite(Mu, 'LogNormalSurvival: Mu');
+  RequirePositive(Sigma, 'LogNormalSurvival: Sigma');
+  if X <= 0 then
+    Exit(RoundResult(1.0, ADecimals));
+  Result := RoundResult(MathBase.Precision.NormalCDF((Mu - Ln(X)) / Sigma),
+    ADecimals);
 end;
 
 class function TProbabilityKit.LogNormalMean(const Mu, Sigma: Double): Double;
@@ -904,7 +973,13 @@ end;
 
 class function TProbabilityKit.BetaSurvival(const X, Alpha, Beta: Double; ADecimals: Integer): Double;
 begin
-  Result := RoundResult(1.0 - BetaCDF(X, Alpha, Beta), ADecimals);
+  RequireFinite(X, 'BetaSurvival: X');
+  RequirePositive(Alpha, 'BetaSurvival: Alpha');
+  RequirePositive(Beta, 'BetaSurvival: Beta');
+  if X <= 0 then Exit(RoundResult(1.0, ADecimals));
+  if X >= 1 then Exit(RoundResult(0.0, ADecimals));
+  { 1-I_x(a,b) = I_(1-x)(b,a), evaluated without CDF subtraction. }
+  Result := RoundResult(BetaInc(Beta, Alpha, 1.0 - X), ADecimals);
 end;
 
 class function TProbabilityKit.BetaMean(const Alpha, Beta: Double): Double;
@@ -973,28 +1048,36 @@ begin
   Nu    := DF;
   { f(x) = Γ((ν+1)/2) / (√(νπ) Γ(ν/2)) * (1 + x²/ν)^(-(ν+1)/2) }
   LogC  := GammaLn((Nu + 1) / 2) - GammaLn(Nu / 2) - 0.5 * Ln(Nu * Pi);
-  Result := RoundResult(Exp(LogC - ((Nu + 1) / 2) * Ln(1 + X * X / Nu)), ADecimals);
+  Result := RoundResult(Exp(LogC - ((Nu + 1) / 2) *
+    LogOnePlusSquare(X / Sqrt(Nu))), ADecimals);
 end;
 
 class function TProbabilityKit.StudentTCDF(const X: Double; DF: Integer; ADecimals: Integer): Double;
 var
-  Nu, BetaX: Double;
+  Nu, Tail: Double;
 begin
   if DF < 1 then raise EProbabilityError.Create('StudentTCDF: DF must be >= 1');
   RequireFinite(X, 'StudentTCDF: X');
   Nu    := DF;
-  { Use the incomplete beta relationship:
-    CDF(x) = I_t(DF/2, 1/2)/2 where t = DF/(DF+x²), adjusted for sign }
-  BetaX := Nu / (Nu + X * X);
+  Tail := StudentTUpperTail(Abs(X), Nu);
   if X >= 0 then
-    Result := RoundResult(1.0 - 0.5 * BetaInc(Nu / 2, 0.5, BetaX), ADecimals)
+    Result := RoundResult(1.0 - Tail, ADecimals)
   else
-    Result := RoundResult(0.5 * BetaInc(Nu / 2, 0.5, BetaX), ADecimals);
+    Result := RoundResult(Tail, ADecimals);
 end;
 
 class function TProbabilityKit.StudentTSurvival(const X: Double; DF: Integer; ADecimals: Integer): Double;
+var
+  Nu, Tail: Double;
 begin
-  Result := RoundResult(1.0 - StudentTCDF(X, DF), ADecimals);
+  if DF < 1 then raise EProbabilityError.Create('StudentTSurvival: DF must be >= 1');
+  RequireFinite(X, 'StudentTSurvival: X');
+  Nu := DF;
+  Tail := StudentTUpperTail(Abs(X), Nu);
+  if X >= 0 then
+    Result := RoundResult(Tail, ADecimals)
+  else
+    Result := RoundResult(1.0 - Tail, ADecimals);
 end;
 
 class function TProbabilityKit.StudentTTwoTail(const X: Double; DF: Integer; ADecimals: Integer): Double;
@@ -1044,7 +1127,7 @@ end;
 
 class function TProbabilityKit.FCDF(const X: Double; DF1, DF2: Integer; ADecimals: Integer): Double;
 var
-  D1, D2, T: Double;
+  D1, D2, SurvivalArgument, T: Double;
 begin
   if DF1 < 1 then raise EProbabilityError.Create('FCDF: DF1 must be >= 1');
   if DF2 < 1 then raise EProbabilityError.Create('FCDF: DF2 must be >= 1');
@@ -1052,14 +1135,24 @@ begin
   if X <= 0 then Exit(RoundResult(0, ADecimals));
   D1 := DF1;
   D2 := DF2;
-  { CDF = I_t(d1/2, d2/2) where t = d1*x / (d1*x + d2) }
-  T      := D1 * X / (D1 * X + D2);
+  { CDF = I_t(d1/2, d2/2), forming t without overflowing d1*x. }
+  FDistributionArguments(X, D1, D2, T, SurvivalArgument);
   Result := RoundResult(BetaInc(D1 / 2, D2 / 2, T), ADecimals);
 end;
 
 class function TProbabilityKit.FSurvival(const X: Double; DF1, DF2: Integer; ADecimals: Integer): Double;
+var
+  CDFArgument, D1, D2, SurvivalArgument: Double;
 begin
-  Result := RoundResult(1.0 - FCDF(X, DF1, DF2), ADecimals);
+  if DF1 < 1 then raise EProbabilityError.Create('FSurvival: DF1 must be >= 1');
+  if DF2 < 1 then raise EProbabilityError.Create('FSurvival: DF2 must be >= 1');
+  RequireFinite(X, 'FSurvival: X');
+  if X <= 0 then Exit(RoundResult(1.0, ADecimals));
+  D1 := DF1;
+  D2 := DF2;
+  FDistributionArguments(X, D1, D2, CDFArgument, SurvivalArgument);
+  Result := RoundResult(BetaInc(D2 / 2.0, D1 / 2.0,
+    SurvivalArgument), ADecimals);
 end;
 
 class function TProbabilityKit.FMean(DF1, DF2: Integer): Double;

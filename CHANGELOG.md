@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [1.2.3] - 2026-07-21
+
+### Changed
+
+- Reworked `MathBase.Precision` around a higher-accuracy Lanczos log-gamma,
+  cancellation-resistant beta evaluation, convergence-checked incomplete-beta
+  fractions, and direct incomplete-gamma normal tails.
+- Normal, lognormal, beta, Student-t, and F survival functions now evaluate
+  upper tails directly instead of subtracting a rounded CDF; F-distribution
+  arguments avoid overflowing `d1*x`. Normal-tail approximations in statistics
+  use the same direct-tail path.
+- Hyperbolic and inverse-hyperbolic helpers preserve tiny arguments and avoid
+  unstable exponential/logarithmic cancellation. Two-dimensional vector
+  magnitude now uses the scaled hypotenuse kernel.
+
+### Fixed
+
+- Corrected `MathBase.Precision.StudentT` to use the required `df/2`
+  incomplete-beta shape parameter instead of `(df+1)/2`, fixing t-test
+  p-values built on the shared helper.
+- Invalid low-level special-function shape parameters now return NaN
+  predictably, and iterative special functions no longer return an
+  unconverged partial result.
+- Rebased the K-S normality reference on the full-precision normal CDF instead
+  of the previous low-accuracy error-function approximation, and made its
+  empirical CDF fractions explicitly double precision across FPC targets.
+
+### Tests
+
+- Added special-function reference, symmetry, invalid-input, small-argument,
+  large-vector, and representable extreme-tail regressions, bringing the suite
+  to 798 tests. Cross-platform cases now pin complement inputs and empirical
+  fractions to `Double` before comparing extreme-tail and K-S references.
+
 ## [1.2.2] - 2026-07-18
 
 ### Documentation
