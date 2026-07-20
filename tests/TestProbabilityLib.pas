@@ -981,7 +981,7 @@ end;
 
 procedure TTestProbabilityLib.Test85_ContinuousTailRobustness;
 var
-  Epsilon, Expected, Got: Double;
+  Epsilon, Expected, Got, X: Double;
 begin
   Expected := 6.2209605742718194E-16;
   Got := TProbabilityKit.NormalSurvival(8.0, 0.0, 1.0);
@@ -993,9 +993,13 @@ begin
   AssertTrue('lognormal tail uses the stable normal survival',
     Abs(Got - Expected) <= Expected * 3E-13);
 
-  Epsilon := 1.0 - (1.0 - 1.0E-10);
+  { Store X first so platforms where Extended is wider than Double do not
+    constant-fold the expected epsilon at a different precision from the
+    Double argument received by BetaSurvival. }
+  X := 1.0 - 1.0E-10;
+  Epsilon := 1.0 - X;
   Expected := 6.0 * Power(Epsilon, 5) - 5.0 * Power(Epsilon, 6);
-  Got := TProbabilityKit.BetaSurvival(1.0 - 1.0E-10, 2.0, 5.0);
+  Got := TProbabilityKit.BetaSurvival(X, 2.0, 5.0);
   AssertTrue('beta survival retains a small upper tail', Got > 0.0);
   AssertTrue('beta upper-tail polynomial reference',
     Abs(Got - Expected) <= Expected * 3E-13);
