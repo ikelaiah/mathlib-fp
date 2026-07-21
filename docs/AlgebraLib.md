@@ -52,12 +52,28 @@ All records expose a `ToString: string` method for easy debugging.
 TIterativeMethod = (imConjugateGradient, imGaussSeidel, imJacobi);
 ```
 
-### Vector Aliases (`AlgebraLib.Vectors`)
+### Vector APIs (`AlgebraLib.Vectors`)
 
 ```pascal
 IVector = IMatrix;     // A vector is a 1-row or 1-column IMatrix
 TVector = TMatrixKit;  // Concrete type for construction
 ```
+
+The matrix-vector API remains the compatibility-oriented API. For contiguous
+real or complex arrays, `AlgebraLib.Vectors` also re-exports:
+
+```pascal
+TRealVector = TDoubleArray;
+TComplexVector = TComplexArray;
+TVectorKit = class;
+```
+
+`TVectorKit` provides allocation-returning `Add`, `Subtract`, `Scale`, and
+`Axpy` operations, plus `Dot`, stable `Norm2`, and `Normalize` for real
+vectors. Its complex overloads add non-conjugating `Dot` and Hermitian
+`DotConjugate`. Inputs must be finite and paired vectors must have equal
+length; empty-vector dot products and norms are zero, while zero-vector
+normalization raises `EVectorError`.
 
 ### Decomposition Entry Point (`AlgebraLib.Determinants`)
 

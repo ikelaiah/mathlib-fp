@@ -56,8 +56,8 @@ artificial Kit class.
 
 | Domain | Primary units | Public Kit classes |
 |--------|---------------|--------------------|
-| Math foundation | `MathBase.SharedTypes`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry` | `TTrigKit` |
-| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants` | `TMatrixKit` |
+| Math foundation | `MathBase.SharedTypes`, `MathBase.Complex`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry` | `TTrigKit` |
+| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants` | `TMatrixKit`, `TVectorKit` |
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
 | Statistics | `StatsLib.Stats` | `TStatsKit` |
 | Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
@@ -96,6 +96,7 @@ TDoubleArray   = array of Double;
 TSingleArray   = array of Single;
 TExtendedArray = array of Extended;
 TDoublePair    = record Lower, Upper: Double; end;
+TComplexArray  = array of TComplex;  // MathBase.Complex
 ```
 
 ## Design Principles

@@ -21,7 +21,8 @@ interface
 uses
   Classes, SysUtils, Math,
   fpcunit, testutils, testregistry,
-  MathBase.SharedTypes, EngineeringLib.Common, EngineeringLib.Signal;
+  MathBase.SharedTypes, MathBase.Complex, EngineeringLib.Common,
+  EngineeringLib.Signal;
 
 type
   TTestSignalKit = class(TTestCase)
@@ -83,6 +84,8 @@ type
     procedure TestCalculateFFT_Empty;
     procedure TestFFT_Length1;
     procedure TestFFT_Length2;
+    procedure TestFFT_ComplexArrayRoundTrip;
+    procedure TestCalculateFFT_ComplexArrayBridge;
 
     { --- Magnitude / Phase --- }
     procedure TestMagnitudePhase_Impulse;
@@ -541,6 +544,42 @@ begin
   AssertNear(0.0, Re[1], TOL_FFT, 'FFT length-2 X[1]');
   AssertNear(0.0, Im[0], TOL_FFT, 'FFT length-2 Im[0]');
   AssertNear(0.0, Im[1], TOL_FFT, 'FFT length-2 Im[1]');
+end;
+
+procedure TTestSignalKit.TestFFT_ComplexArrayRoundTrip;
+var
+  Original, Data: TComplexArray;
+  I: Integer;
+begin
+  Original := TComplexArray.Create(TComplex.Create(1.0, 0.0),
+    TComplex.Create(2.0, -1.0), TComplex.Create(-3.0, 2.0),
+    TComplex.Create(4.0, 0.5));
+  Data := Copy(Original);
+  TSignalKit.FFT(Data);
+  TSignalKit.FFT(Data, True);
+  for I := 0 to High(Data) do
+  begin
+    AssertNear(Original[I].Re, Data[I].Re, TOL_FFT,
+      Format('complex round-trip real[%d]', [I]));
+    AssertNear(Original[I].Im, Data[I].Im, TOL_FFT,
+      Format('complex round-trip imaginary[%d]', [I]));
+  end;
+end;
+
+procedure TTestSignalKit.TestCalculateFFT_ComplexArrayBridge;
+var
+  Signal, Inverse: TDoubleArray;
+  Spectrum: TComplexArray;
+  I: Integer;
+begin
+  Signal := TDoubleArray.Create(1.0, 2.0, 3.0);
+  TSignalKit.CalculateFFT(Signal, Spectrum);
+  AssertEquals('complex spectrum zero-padded length', 4, Length(Spectrum));
+  TSignalKit.CalculateIFFT(Spectrum, Inverse);
+  for I := 0 to High(Signal) do
+    AssertNear(Signal[I], Inverse[I], TOL_FFT,
+      Format('complex bridge inverse[%d]', [I]));
+  AssertNear(0.0, Inverse[3], TOL_FFT, 'complex bridge padded sample');
 end;
 
 { =========================================================================

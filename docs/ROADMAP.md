@@ -13,6 +13,38 @@ The project is built on the following non-negotiable foundations:
 - independently usable units rather than a mandatory monolithic import.
 
 
+## Development branch: 1.3.0
+
+Version 1.3.0 establishes the complex-number and vector foundation required by
+the next generation of algebra and signal-processing features. It preserves
+the existing matrix-as-vector API: an `IMatrix` with one row or one column
+remains an `IVector` and keeps its `DotProduct`, `CrossProduct`, and
+`Normalize` methods.
+
+The new foundation adds a complementary, allocation-light array API rather
+than replacing matrices:
+
+- `MathBase.Complex` supplies the scalar `TComplex` type, stable elementary
+  operations, principal-value functions, and `TComplexArray`;
+- `AlgebraLib.VectorKernels` supplies real and complex array-vector kernels
+  (dot products, stable norms, scaling, AXPY-style combination, and
+  normalization);
+- `AlgebraLib.Vectors` remains the compatibility-oriented entry unit and
+  re-exports the new array-vector types and kernel facade;
+- signal processing gains complex-array overloads while keeping its existing
+  split real/imaginary FFT procedures source-compatible.
+
+### 1.3.0 completion criteria
+
+- Complex arithmetic has documented branch, zero, non-finite, and
+  overflow-resistance behavior with reference and identity tests.
+- Vector kernels validate dimensions and finite input, define empty-vector
+  results, and use scale-safe norm accumulation.
+- Every new public unit has API documentation, a runnable example, package
+  registration, and tests on every supported CI target.
+- Existing `IMatrix` vector behavior remains source-compatible and covered by
+  the existing algebra test suite.
+
 ## Current release: 1.2.3
 
 Version 1.2.3 is a correctness and robustness release. It does not add a new

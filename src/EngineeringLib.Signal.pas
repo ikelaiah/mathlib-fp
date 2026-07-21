@@ -38,7 +38,8 @@ unit EngineeringLib.Signal;
 interface
 
 uses
-  Classes, SysUtils, Math, MathBase.SharedTypes, EngineeringLib.Common;
+  Classes, SysUtils, Math, MathBase.SharedTypes, MathBase.Complex,
+  EngineeringLib.Common;
 
 type
   { Keep the familiar EngineeringLib.Signal name while sharing the project-wide
@@ -65,6 +66,10 @@ type
       Set Inverse=True for IFFT (includes the 1/N scaling). }
     class procedure FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean = False); static;
 
+    { In-place complex-array FFT. This is a source-compatible companion to
+      the split-array overload above and has the same power-of-two contract. }
+    class procedure FFT(var Data: TComplexArray; Inverse: Boolean = False); overload; static;
+
     { Convenience wrapper: real-valued input signal → complete complex spectrum.
       Zero-pads to the next power-of-2 length automatically; it never truncates.
       Empty input produces two empty output arrays. }
@@ -72,10 +77,20 @@ type
       const InputSignal: TDoubleArray;
       out OutRealPart, OutImagPart: TDoubleArray); overload; static;
 
+    { Convenience wrapper: real-valued input signal → complete complex
+      spectrum. It has the same zero-padding and empty-input behavior as the
+      split-array overload. }
+    class procedure CalculateFFT(const InputSignal: TDoubleArray;
+      out OutputSpectrum: TComplexArray); overload; static;
+
     { Inverse FFT: complete complex spectrum → real-valued signal.
       The real and imaginary arrays must have equal, power-of-2 lengths.
       Two empty input arrays produce an empty output array. }
     class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray; out OutputSignal: TDoubleArray); static;
+
+    { Inverse FFT from a complete complex spectrum → real-valued signal. }
+    class procedure CalculateIFFT(const InputSpectrum: TComplexArray;
+      out OutputSignal: TDoubleArray); overload; static;
 
     { Complete N-bin magnitude and phase spectra. }
     class procedure CalculateFFTMagnitudePhase(
@@ -296,6 +311,23 @@ begin
     end;
 end;
 
+class procedure TSignalKit.FFT(var Data: TComplexArray; Inverse: Boolean);
+var
+  I: Integer;
+  RealPart, ImagPart: TDoubleArray;
+begin
+  SetLength(RealPart, Length(Data));
+  SetLength(ImagPart, Length(Data));
+  for I := 0 to High(Data) do
+  begin
+    RealPart[I] := Data[I].Re;
+    ImagPart[I] := Data[I].Im;
+  end;
+  FFT(RealPart, ImagPart, Inverse);
+  for I := 0 to High(Data) do
+    Data[I] := TComplex.Create(RealPart[I], ImagPart[I]);
+end;
+
 class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray; out OutRealPart, OutImagPart: TDoubleArray);
 var
   N, I: Integer;
@@ -317,6 +349,19 @@ begin
   for I := 0 to N - 1 do
     OutImagPart[I] := 0;
   FFT(OutRealPart, OutImagPart, False);
+end;
+
+class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray;
+  out OutputSpectrum: TComplexArray);
+var
+  I: Integer;
+  RealPart, ImagPart: TDoubleArray;
+begin
+  CalculateFFT(InputSignal, RealPart, ImagPart);
+  OutputSpectrum := nil;
+  SetLength(OutputSpectrum, Length(RealPart));
+  for I := 0 to High(RealPart) do
+    OutputSpectrum[I] := TComplex.Create(RealPart[I], ImagPart[I]);
 end;
 
 class procedure TSignalKit.CalculateIFFT(const InRealPart, InImagPart: TDoubleArray; out OutputSignal: TDoubleArray);
@@ -341,6 +386,22 @@ begin
   SetLength(OutputSignal, N);
   for I := 0 to N - 1 do
     OutputSignal[I] := Re[I];
+end;
+
+class procedure TSignalKit.CalculateIFFT(const InputSpectrum: TComplexArray;
+  out OutputSignal: TDoubleArray);
+var
+  I: Integer;
+  RealPart, ImagPart: TDoubleArray;
+begin
+  SetLength(RealPart, Length(InputSpectrum));
+  SetLength(ImagPart, Length(InputSpectrum));
+  for I := 0 to High(InputSpectrum) do
+  begin
+    RealPart[I] := InputSpectrum[I].Re;
+    ImagPart[I] := InputSpectrum[I].Im;
+  end;
+  CalculateIFFT(RealPart, ImagPart, OutputSignal);
 end;
 
 class procedure TSignalKit.CalculateFFTMagnitudePhase(

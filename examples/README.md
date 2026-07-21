@@ -24,6 +24,7 @@ closest to your project.
 | `11_machinelearning.lpr` | MLLib | Preprocessing, models, clustering, PCA, and metrics |
 | `12_geometry.lpr` | GeometryLib | 2-D/3-D geometry, intersections, hulls, and transforms |
 | `13_numerical_methods.lpr` | NumericsLib | Roots, integration, ODEs, interpolation, and errors |
+| `14_complex_vectors.lpr` | MathBase / AlgebraLib / EngineeringLib | Complex arithmetic, array-vector kernels, and complex FFTs |
 
 ## Build and run
 

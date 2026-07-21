@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No changes yet.
+### Added
+
+- Started the 1.3.0 complex and vector foundation with `MathBase.Complex`:
+  the double-precision `TComplex` record, stable arithmetic and magnitude,
+  principal elementary functions, and `TComplexArray`.
+- Added `AlgebraLib.VectorKernels` and its `TVectorKit` facade for finite,
+  contiguous real and complex array-vector arithmetic, including scale-safe
+  norms and conjugating complex dot products. `AlgebraLib.Vectors` continues
+  to preserve the existing matrix-as-vector aliases while re-exporting the new
+  array-vector API.
+- Added `TComplexArray` FFT/IFFT overloads that preserve the existing
+  split-real/imaginary signal API, documentation, a runnable complex-vector
+  example, and 9 new focused tests.
 
 ## [1.2.3] - 2026-07-21
 
