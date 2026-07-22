@@ -1,7 +1,7 @@
 program StatsBasics;
 
 {-----------------------------------------------------------------------------
-  01_stats_basics.lpr
+  01_stats_basics.pas
 
   Demonstrates the usual first steps with a dataset: create a TDoubleArray,
   summarise it, inspect individual measures, compare two series, and estimate
@@ -9,7 +9,7 @@ program StatsBasics;
 
   Build (FPC command line):
     mkdir lib
-    fpc -Fu../src -FUlib 01_stats_basics.lpr
+    fpc -Fu../src -FUlib 01_stats_basics.pas
 
   Build (Lazarus):
     Add ../src to:

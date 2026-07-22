@@ -1,7 +1,7 @@
 program GettingStarted;
 
 {-----------------------------------------------------------------------------
-  00_getting_started.lpr
+  00_getting_started.pas
 
   A first mathlib-fp program for readers who are new to both the library and
   Free Pascal. It introduces the four small units in the MathBase foundation
@@ -10,7 +10,7 @@ program GettingStarted;
   From this directory, compile with:
 
     mkdir lib
-    fpc -Fu../src -FUlib 00_getting_started.lpr
+    fpc -Fu../src -FUlib 00_getting_started.pas
 
   Then run:
 

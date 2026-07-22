@@ -44,7 +44,7 @@ git clone https://github.com/ikelaiah/mathlib-fp.git
 cd mathlib-fp
 ```
 
-Save this as `my_program.lpr`:
+Save this as `my_program.pas`:
 
 ```pascal
 program hello_mathlib;
@@ -63,7 +63,7 @@ Compile it with `src/` on the unit search path:
 
 ```bash
 mkdir -p lib
-fpc -Fusrc -FUlib my_program.lpr
+fpc -Fusrc -FUlib my_program.pas
 ./my_program
 ```
 
@@ -93,7 +93,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 14 commented walkthroughs with
+The [`examples/`](examples/) directory contains 15 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:
@@ -101,7 +101,7 @@ seconds:
 ```bash
 cd examples
 mkdir -p lib
-fpc -Fu../src -FUlib 00_getting_started.lpr
+fpc -Fu../src -FUlib 00_getting_started.pas
 ./00_getting_started
 ```
 

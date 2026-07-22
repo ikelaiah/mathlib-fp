@@ -45,7 +45,7 @@ array-vector APIs are additive.
 
 See [MathBase](MathBase.md), [AlgebraLib](AlgebraLib.md), and
 [EngineeringLib](EngineeringLib.md) for API details, or run
-[`examples/14_complex_vectors.lpr`](../examples/14_complex_vectors.lpr) for a
+[`examples/14_complex_vectors.pas`](../examples/14_complex_vectors.pas) for a
 compact end-to-end example.
 
 ## Validation

@@ -1,7 +1,7 @@
 program UnitConversion;
 
 {-----------------------------------------------------------------------------
-  05_unit_conversion.lpr
+  05_unit_conversion.pas
 
   Demonstrates physical unit conversions using EngineeringLib.
   This is the gentlest entry point into EngineeringLib — no physics
@@ -10,7 +10,7 @@ program UnitConversion;
 
   Build (FPC command line):
     mkdir lib
-    fpc -Fu../src -FUlib 05_unit_conversion.lpr
+    fpc -Fu../src -FUlib 05_unit_conversion.pas
 
   Build (Lazarus):
     Add ../src to:

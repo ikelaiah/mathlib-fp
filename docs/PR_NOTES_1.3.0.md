@@ -82,7 +82,7 @@ core. This PR supplies that foundation without replacing established APIs.
 
 - Registers `MathBase.Complex` and `AlgebraLib.VectorKernels` in the Lazarus
   package and sets package metadata to version 1.3.0.
-- Adds `examples/14_complex_vectors.lpr` and lists it in the examples guide.
+- Adds `examples/14_complex_vectors.pas` and lists it in the examples guide.
 - Extends the benchmark runner with deterministic complex arithmetic, vector
   AXPY-plus-dot, and native complex FFT cases.
 - Updates the public API smoke test for `TVectorKit` and `CAsin`.

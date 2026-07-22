@@ -62,8 +62,8 @@ fpc -B -gh -gl -FcUTF8 -Fu../src -FUlib/heap TestRunner.lpr
 
 cd ..
 sh ./build-examples.sh
-for file in examples/*.lpr; do
-  "./example-bin/$(basename "${file%.lpr}")" > /dev/null
+for file in examples/*.pas; do
+  "./example-bin/$(basename "${file%.pas}")" > /dev/null
 done
 
 mkdir -p benchmarks/lib/release

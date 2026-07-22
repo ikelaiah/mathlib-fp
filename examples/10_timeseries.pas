@@ -8,7 +8,7 @@ program example10_timeseries;
  a concrete example, and guidance on when to use it.
 
  Compile:  mkdir lib
-           fpc -Fu../src -FUlib 10_timeseries.lpr
+           fpc -Fu../src -FUlib 10_timeseries.pas
  Run:      ./10_timeseries   (Linux/macOS)
            10_timeseries.exe (Windows)
 -----------------------------------------------------------------------------}

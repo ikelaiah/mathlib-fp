@@ -8,7 +8,7 @@ program example11_machinelearning;
  a concrete toy dataset, and guidance on when to use it.
 
  Compile:  mkdir lib
-           fpc -Fu../src -FUlib 11_machinelearning.lpr
+           fpc -Fu../src -FUlib 11_machinelearning.pas
  Run:      ./11_machinelearning   (Linux/macOS)
            11_machinelearning.exe (Windows)
 -----------------------------------------------------------------------------}

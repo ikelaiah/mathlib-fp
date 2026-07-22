@@ -1,14 +1,14 @@
 program ComplexVectors;
 
 {-----------------------------------------------------------------------------
-  14_complex_vectors.lpr
+  14_complex_vectors.pas
 
   Introduces the v1.3 complex and contiguous-array vector foundation. The
   established IMatrix vector API remains available; this example demonstrates
   the complementary TRealVector / TComplexVector kernels for numeric arrays.
 
   Build from examples/:
-    fpc -Fu../src -FUlib 14_complex_vectors.lpr
+    fpc -Fu../src -FUlib 14_complex_vectors.pas
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}

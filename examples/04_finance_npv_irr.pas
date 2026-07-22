@@ -1,7 +1,7 @@
 program FinanceNpvIrr;
 
 {-----------------------------------------------------------------------------
-  04_finance_npv_irr.lpr
+  04_finance_npv_irr.pas
 
   Demonstrates time-value-of-money calculations, project NPV/IRR, and loan
   amortization. Rates always match the period: annual rates for annual cash
@@ -9,7 +9,7 @@ program FinanceNpvIrr;
 
   Build (FPC command line):
     mkdir lib
-    fpc -Fu../src -FUlib 04_finance_npv_irr.lpr
+    fpc -Fu../src -FUlib 04_finance_npv_irr.pas
 
   Build (Lazarus):
     Add ../src to:

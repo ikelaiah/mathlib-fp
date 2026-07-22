@@ -8,7 +8,7 @@ program example07_probability;
  the five standard calls: PDF/PMF, CDF, Survival, Mean, Variance.
 
  Compile:  mkdir lib
-           fpc -Fu../src -FUlib 07_probability.lpr
+           fpc -Fu../src -FUlib 07_probability.pas
  Run:      ./07_probability  (Linux/macOS)
            07_probability.exe  (Windows)
 -----------------------------------------------------------------------------}
