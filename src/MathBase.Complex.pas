@@ -103,6 +103,62 @@ begin
   Result := Ln(Y) * X / (Y - 1.0);
 end;
 
+function ComplexLogMagnitude(const ARe, AIm: Double): Double;
+var
+  X, Y, Temp, Ratio: Double;
+begin
+  X := Abs(ARe);
+  Y := Abs(AIm);
+  if IsInfinite(X) or IsInfinite(Y) then
+    Exit(Infinity);
+  if IsNan(X) or IsNan(Y) then
+    Exit(NaN);
+  if X < Y then
+  begin
+    Temp := X;
+    X := Y;
+    Y := Temp;
+  end;
+  if X = 0.0 then
+    Exit(-Infinity);
+  Ratio := Y / X;
+  Result := Ln(X) + 0.5 * Log1PAccurate(Ratio * Ratio);
+end;
+
+function RealArcSinhStable(const X: Double): Double;
+var
+  AbsoluteX, Value: Double;
+begin
+  if IsNan(X) or IsInfinite(X) then
+    Exit(X);
+  AbsoluteX := Abs(X);
+  if AbsoluteX < 1.0E-8 then
+    Exit(X)
+  else if AbsoluteX > 1.0E150 then
+    Value := Ln(AbsoluteX) + Ln(2.0)
+  else
+    Value := Log1PAccurate(AbsoluteX + AbsoluteX * AbsoluteX /
+      (1.0 + Sqrt(1.0 + AbsoluteX * AbsoluteX)));
+  if X < 0.0 then
+    Result := -Value
+  else
+    Result := Value;
+end;
+
+function RealArcCoshStable(const X: Double): Double;
+begin
+  if IsNan(X) or (X < 1.0) then
+    Exit(NaN);
+  if IsInfinite(X) then
+    Exit(Infinity);
+  if X = 1.0 then
+    Exit(0.0);
+  if X > 1.0E150 then
+    Exit(Ln(X) + Ln(2.0));
+  Result := Log1PAccurate((X - 1.0) +
+    Sqrt((X - 1.0) * (X + 1.0)));
+end;
+
 function IsNegativeZero(const Value: Double): Boolean;
 var
   Bits: QWord;
@@ -314,7 +370,7 @@ end;
 
 function CLog(const Z: TComplex): TComplex;
 begin
-  Result := TComplex.Create(Ln(Z.Magnitude), Z.Argument);
+  Result := TComplex.Create(ComplexLogMagnitude(Z.Re, Z.Im), Z.Argument);
 end;
 
 function CSqrt(const Z: TComplex): TComplex;
@@ -427,13 +483,13 @@ function CAsinh(const Z: TComplex): TComplex;
 const
   LargeThreshold = 1.0E150;
 var
-  AbsImaginary, RealPart: Double;
-  Root, ZSquared: TComplex;
+  A, AbsB, B, Cosine, MaxComponent, RMinus, RPlus, RealPart: Double;
 begin
   if IsNan(Z.Re) or IsNan(Z.Im) then
     Exit(ComplexNaN);
 
-  if Max(Abs(Z.Re), Abs(Z.Im)) >= LargeThreshold then
+  MaxComponent := Max(Abs(Z.Re), Abs(Z.Im));
+  if MaxComponent >= LargeThreshold then
   begin
     { asinh(z) ~ log(2z).  Reflect through the origin on the left
       half-plane so the principal branch and signed-zero side are kept. }
@@ -446,13 +502,11 @@ begin
   if Z.Re = 0.0 then
   begin
     { The imaginary axis outside [-i,i] is the asinh branch cut.  Handle it
-      explicitly because ordinary zero arithmetic need not retain enough sign
-      information through z*z to select the requested side. }
-    AbsImaginary := Abs(Z.Im);
-    if AbsImaginary <= 1.0 then
+      explicitly so signed zero selects the requested side. }
+    A := Abs(Z.Im);
+    if A <= 1.0 then
       Exit(TComplex.Create(Z.Re, ArcSin(Z.Im)));
-    RealPart := Ln(AbsImaginary +
-      Sqrt((AbsImaginary - 1.0) * (AbsImaginary + 1.0)));
+    RealPart := RealArcCoshStable(A);
     if IsNegativeZero(Z.Re) then
       RealPart := -RealPart;
     if Z.Im < 0.0 then
@@ -461,9 +515,30 @@ begin
       Exit(TComplex.Create(RealPart, Pi / 2.0));
   end;
 
-  ZSquared := Z * Z;
-  Root := CSqrt(TComplex.One + ZSquared);
-  Result := ComplexLog1P(Z + ZSquared / (TComplex.One + Root));
+  { Let A = (|z+i| + |z-i|)/2 = cosh(Re(asinh(z))) and
+    B = Im(z)/A = sin(Im(asinh(z))).  This component form avoids z*z,
+    whose equal large components can cancel differently across targets. }
+  RPlus := ComplexMagnitude(Z.Re, Z.Im + 1.0);
+  RMinus := ComplexMagnitude(Z.Re, Z.Im - 1.0);
+  A := 0.5 * RPlus + 0.5 * RMinus;
+  if A < 1.0 then
+    A := 1.0;
+  B := Z.Im / A;
+  if B > 1.0 then
+    B := 1.0
+  else if B < -1.0 then
+    B := -1.0;
+  AbsB := Abs(B);
+  Cosine := Sqrt(Max(0.0, (1.0 - AbsB) * (1.0 + AbsB)));
+  if Cosine = 0.0 then
+  begin
+    RealPart := RealArcCoshStable(A);
+    if Z.Re < 0.0 then
+      RealPart := -RealPart;
+  end
+  else
+    RealPart := RealArcSinhStable(Z.Re / Cosine);
+  Result := TComplex.Create(RealPart, ArcSin(B));
 end;
 
 function CAcosh(const Z: TComplex): TComplex;
@@ -478,14 +553,14 @@ end;
 
 function CAtanh(const Z: TComplex): TComplex;
 const
-  LargeThreshold = 1.0E150;
+  AsymptoticThreshold = 1.0E8;
 var
   BranchImaginary: Double;
 begin
   if IsNan(Z.Re) or IsNan(Z.Im) then
     Exit(ComplexNaN);
 
-  if Max(Abs(Z.Re), Abs(Z.Im)) >= LargeThreshold then
+  if Max(Abs(Z.Re), Abs(Z.Im)) >= AsymptoticThreshold then
   begin
     if (Z.Im < 0.0) or IsNegativeZero(Z.Im) then
       BranchImaginary := -Pi / 2.0

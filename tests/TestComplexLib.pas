@@ -202,6 +202,9 @@ const
   Tiny = 1.0E-20;
   Huge = 1.0E308;
 var
+  ExpectedImaginary, Scale: Double;
+  I: Integer;
+  Scales: array[0..2] of Double;
   Z: TComplex;
 begin
   AssertComplexNear(TComplex.Create(Pi / 6.0, 0.0),
@@ -255,6 +258,30 @@ begin
   Z := CAtan(TComplex.Create(1.0E150, 1.0E150));
   AssertEquals('large complex atan real', Pi / 2.0, Z.Re, 1E-15);
   AssertEquals('large complex atan imaginary', 5.0E-151, Z.Im, 1E-164);
+
+  Scales[0] := 1.0E20;
+  Scales[1] := 1.0E100;
+  Scales[2] := 1.0E149;
+  for I := Low(Scales) to High(Scales) do
+  begin
+    Scale := Scales[I];
+    Z := CAsin(TComplex.Create(Scale, Scale));
+    AssertEquals('large-scale asin real', Pi / 4.0, Z.Re, 2E-15);
+    ExpectedImaginary := Ln(Scale) + 1.5 * Ln(2.0);
+    AssertEquals('large-scale asin imaginary', ExpectedImaginary, Z.Im,
+      2E-12);
+
+    Z := CAtan(TComplex.Create(Scale, Scale));
+    AssertEquals('large-scale atan real', Pi / 2.0, Z.Re, 2E-15);
+    ExpectedImaginary := 0.5 / Scale;
+    AssertEquals('large-scale atan imaginary', ExpectedImaginary, Z.Im,
+      ExpectedImaginary * 2E-15);
+  end;
+
+  Z := CLog(TComplex.Create(Huge, Huge));
+  AssertEquals('overflow-safe complex log magnitude',
+    Ln(Huge) + 0.5 * Ln(2.0), Z.Re, 1E-12);
+  AssertEquals('overflow-safe complex log argument', Pi / 4.0, Z.Im, 1E-15);
 end;
 
 procedure TTestComplexFoundation.Test09_RealVectorKernels;

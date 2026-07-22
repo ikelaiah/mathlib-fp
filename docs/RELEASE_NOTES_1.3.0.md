@@ -32,9 +32,10 @@ result is representable. Complex magnitude, exponential, and square root
 functions handle tested infinity and NaN limits without avoidable invalid
 operations. Principal `CLog`, `CSqrt`, and inverse functions distinguish branch
 sides through signed zero. Inverse functions preserve tiny first-order values
-and use overflow-resistant large-input forms. Tests cover reference values,
-extreme scales, branches, NaN/infinity behavior, array kernels, and complex FFT
-round trips.
+and use scaled component or asymptotic large-input forms that avoid
+target-sensitive `z*z` cancellation. Tests cover reference values, extreme
+scales, branches, NaN/infinity behavior, array kernels, and complex FFT round
+trips.
 
 For a full complex inverse transform, call `FFT(Data, True)` on a
 `TComplexArray`. The `CalculateIFFT` convenience overloads continue to return
@@ -57,9 +58,10 @@ in-place complex FFT/IFFT round trip.
 
 ## Validation
 
-The release candidate contains 819 passing tests in normal, optimized,
-runtime-checked, and heap-traced local builds, with zero unfreed blocks. The
-Lazarus package builds, all 15 examples compile and run, and representative
-benchmarks cover complex arithmetic, vector kernels, and the native complex
-FFT. Cross-platform CI and the remaining publication gates are listed in
+The release candidate contains 819 passing tests in Win64 normal, optimized,
+runtime-checked, and heap-traced local builds, with zero unfreed blocks; the
+optimized Win32 suite also passes. The Lazarus package builds for Win64 and
+Win32, all 15 examples compile and run, and representative benchmarks cover
+complex arithmetic, vector kernels, and the native complex FFT. Cross-platform
+CI and the remaining publication gates are listed in
 [`RELEASING.md`](../RELEASING.md).

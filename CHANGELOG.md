@@ -30,8 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Preserved tiny `CAsinh`/`CAtanh` inputs and avoided intermediate overflow in
-  inverse complex functions at very large finite inputs.
+- Preserved tiny `CAsinh`/`CAtanh` inputs and replaced target-sensitive
+  `z*z` cancellation with scaled component formulas for large inverse complex
+  functions.
 - Defined infinity/NaN behavior for complex magnitude, exponential, and square
   root calculations, and retained signed-zero branch sides for inverse
   hyperbolic functions.

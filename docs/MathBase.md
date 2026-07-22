@@ -63,8 +63,8 @@ produces zero.
 
 `Argument`, `CLog`, and `CSqrt` preserve the upper/lower branch distinction on
 the negative real axis, including signed-zero imaginary components. The
-inverse functions preserve first-order tiny inputs, use asymptotic forms rather
-than overflowing intermediate squares at very large inputs, and retain the
+inverse functions preserve first-order tiny inputs, use scaled component and
+asymptotic forms rather than squaring large complex inputs, and retain the
 signed-zero side of their principal branch cuts. `CExp(+Infinity + 0i)` and
 square roots with infinite components return their defined limiting values;
 an indeterminate infinite imaginary angle or a NaN component returns a NaN

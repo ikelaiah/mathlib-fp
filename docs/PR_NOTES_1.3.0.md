@@ -39,8 +39,9 @@ core. This PR supplies that foundation without replacing established APIs.
 - Uses scale-normalised complex division and magnitude calculations to avoid
   avoidable intermediate overflow and underflow for finite representable
   results.
-- Preserves tiny inverse-function inputs and uses large-input asymptotic or
-  product-free forms to avoid cancellation and intermediate overflow.
+- Preserves tiny inverse-function inputs and uses scaled component,
+  large-input asymptotic, or product-free forms to avoid target-sensitive
+  cancellation and intermediate overflow.
 - Preserves signed-zero distinction on the negative real axis for `Argument`,
   `CLog`, and `CSqrt`, so the upper and lower principal branches remain
   distinguishable.
@@ -124,10 +125,12 @@ of catch-all methods. Coverage includes:
 
 ## Verification performed locally
 
-- [x] Compiled and ran the complete 819-test FPC suite in normal, `-O2`,
-  runtime-checked (`-Cr -Co -Ct -Sa`), and heap-traced (`-gh -gl`) modes:
-  zero errors, zero failures, and zero unfreed blocks.
-- [x] Built the Lazarus `mathlib_fp` package successfully.
+- [x] Compiled and ran the complete 819-test FPC suite on Win64 in normal,
+  `-O2`, runtime-checked (`-Cr -Co -Ct -Sa`), and heap-traced (`-gh -gl`)
+  modes: zero errors, zero failures, and zero unfreed blocks.
+- [x] Compiled and ran the complete 819-test suite on Win32 with `-O2`: zero
+  errors and zero failures.
+- [x] Built the Lazarus `mathlib_fp` package successfully for Win64 and Win32.
 - [x] Compiled and executed all 15 examples with `build-examples.ps1`.
 - [x] Compiled with `-O3` and ran `benchmarks/BenchmarkRunner.lpr`.
 - [x] Checked all local Markdown link targets.
@@ -139,8 +142,7 @@ This PR prepares `release/v1.3.0`; it does not publish the release. Before
 publication, follow [`RELEASING.md`](../RELEASING.md), including:
 
 - [ ] Green Linux and Windows CI on the exact default-branch release commit.
-- [ ] Win32 package and full-suite verification, plus clean-profile Lazarus
-  package installation and a consumer build.
+- [ ] Clean-profile Lazarus package installation and a consumer build.
 - [ ] Merge the validated release branch into the default branch.
 - [ ] On `main`, finalize the README version/current-release text, changelog
   heading/date, release-note status, documentation index/roadmap, and supported
