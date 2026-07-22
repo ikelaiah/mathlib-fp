@@ -1,7 +1,8 @@
 # mathlib-fp 1.3.0 release notes
 
-> Status: release candidate on `release/v1.3.0`. The release becomes current
-> when its final checklist and tag are complete.
+> Status: release candidate on `release/v1.3.0`. Complete the final checklist,
+> merge this branch, then tag the resulting default-branch commit to publish
+> the release.
 
 ## Highlights
 

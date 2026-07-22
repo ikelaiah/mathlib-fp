@@ -50,7 +50,8 @@ than replacing matrices:
 
 The implementation is ready for the release checklist in
 [`RELEASING.md`](../RELEASING.md): final cross-platform CI, clean-profile
-package installation, release-mode and runtime-checked test runs, and tagging.
+package installation, release-mode and runtime-checked test runs, then merging
+the release branch and tagging the resulting default-branch commit.
 
 ## Current published release: 1.2.3
 
