@@ -39,12 +39,15 @@ core. This PR supplies that foundation without replacing established APIs.
 - Uses scale-normalised complex division and magnitude calculations to avoid
   avoidable intermediate overflow and underflow for finite representable
   results.
+- Preserves tiny inverse-function inputs and uses large-input asymptotic or
+  product-free forms to avoid cancellation and intermediate overflow.
 - Preserves signed-zero distinction on the negative real axis for `Argument`,
   `CLog`, and `CSqrt`, so the upper and lower principal branches remain
   distinguishable.
-- Defines explicit non-finite behavior for the tested cases: a NaN component
-  propagates to a NaN complex result, and a finite numerator divided by an
-  infinite complex value produces zero.
+- Defines explicit non-finite behavior for the tested cases: infinity dominates
+  magnitude, indeterminate inputs propagate a NaN complex result, square roots
+  preserve limiting signs, and a finite numerator divided by an infinite
+  complex value produces zero.
 
 ### Array-vector kernels (`AlgebraLib.VectorKernels`)
 
@@ -82,7 +85,9 @@ core. This PR supplies that foundation without replacing established APIs.
 
 - Registers `MathBase.Complex` and `AlgebraLib.VectorKernels` in the Lazarus
   package and sets package metadata to version 1.3.0.
-- Adds `examples/14_complex_vectors.pas` and lists it in the examples guide.
+- Adds `examples/14_complex_vectors.pas` with inverse-function, elementwise,
+  destination-reuse, Hermitian-dot, and FFT/IFFT demonstrations, and lists it
+  in the examples guide.
 - Extends the benchmark runner with deterministic complex arithmetic, vector
   AXPY-plus-dot, and native complex FFT cases.
 - Updates the public API smoke test for `TVectorKit` and `CAsin`.
@@ -109,7 +114,7 @@ of catch-all methods. Coverage includes:
 - complex arithmetic, conjugation, polar form, and stable magnitude;
 - extreme-scale division;
 - signed-zero branch cuts and NaN/infinity behavior;
-- known values for inverse complex functions;
+- ordinary, tiny, and extreme-scale values for inverse complex functions;
 - real and complex vector arithmetic, compensated reductions, stable norms,
   conjugate dot products, validation, empty vectors, and destination-buffer
   resizing/aliasing;
@@ -119,11 +124,13 @@ of catch-all methods. Coverage includes:
 
 ## Verification performed locally
 
-- [x] Compiled and ran the complete FPC test suite: 819 tests, zero errors,
-  zero failures.
+- [x] Compiled and ran the complete 819-test FPC suite in normal, `-O2`,
+  runtime-checked (`-Cr -Co -Ct -Sa`), and heap-traced (`-gh -gl`) modes:
+  zero errors, zero failures, and zero unfreed blocks.
 - [x] Built the Lazarus `mathlib_fp` package successfully.
-- [x] Compiled all 15 examples with `build-examples.ps1`.
-- [x] Compiled and ran `benchmarks/BenchmarkRunner.lpr`.
+- [x] Compiled and executed all 15 examples with `build-examples.ps1`.
+- [x] Compiled with `-O3` and ran `benchmarks/BenchmarkRunner.lpr`.
+- [x] Checked all local Markdown link targets.
 - [x] Ran `git diff --check` without whitespace errors.
 
 ## Release gates still required
@@ -131,14 +138,13 @@ of catch-all methods. Coverage includes:
 This PR prepares `release/v1.3.0`; it does not publish the release. Before
 publication, follow [`RELEASING.md`](../RELEASING.md), including:
 
-- [ ] Green Linux and Windows CI on the exact merge commit.
-- [ ] Optimized, runtime-checked, and heap-traced test runs with the required
-  memory check.
+- [ ] Green Linux and Windows CI on the exact default-branch release commit.
 - [ ] Win32 package and full-suite verification, plus clean-profile Lazarus
   package installation and a consumer build.
-- [ ] Final version/date and changelog review.
-- [ ] Merge the validated release branch into the default branch and tag that
-  resulting commit as `v1.3.0`.
+- [ ] Merge the validated release branch into the default branch.
+- [ ] On `main`, finalize the README version/current-release text, changelog
+  heading/date, release-note status, documentation index/roadmap, and supported
+  version policy; verify CI on that exact commit, then tag it as `v1.3.0`.
 
 ## Risk and review notes
 

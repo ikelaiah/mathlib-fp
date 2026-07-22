@@ -76,6 +76,12 @@ var
 begin
   X := Abs(ARe);
   Y := Abs(AIm);
+  { Match hypot-style IEEE-754 behavior and avoid Inf / Inf invalid
+    operations in the scaled calculation below. }
+  if IsInfinite(X) or IsInfinite(Y) then
+    Exit(Infinity);
+  if IsNan(X) or IsNan(Y) then
+    Exit(NaN);
   if X < Y then
   begin
     Temp := X;
@@ -85,6 +91,16 @@ begin
   if X = 0.0 then
     Exit(0.0);
   Result := X * Sqrt(1.0 + Sqr(Y / X));
+end;
+
+function Log1PAccurate(const X: Double): Double;
+var
+  Y: Double;
+begin
+  Y := 1.0 + X;
+  if Y = 1.0 then
+    Exit(X);
+  Result := Ln(Y) * X / (Y - 1.0);
 end;
 
 function IsNegativeZero(const Value: Double): Boolean;
@@ -99,6 +115,26 @@ end;
 function ComplexNaN: TComplex;
 begin
   Result := TComplex.Create(NaN, NaN);
+end;
+
+function ComplexLog1P(const Z: TComplex): TComplex;
+var
+  OnePlusReal, RadiusSquaredMinusOne: Double;
+begin
+  if IsNan(Z.Re) or IsNan(Z.Im) then
+    Exit(ComplexNaN);
+
+  OnePlusReal := 1.0 + Z.Re;
+  if (Abs(Z.Re) < 0.5) and (Abs(Z.Im) < 0.5) then
+  begin
+    { |1+z|^2 = 1 + 2 Re(z) + |z|^2.  log1p retains the
+      first-order term when 1+Re(z) itself rounds to one. }
+    RadiusSquaredMinusOne := 2.0 * Z.Re + Z.Re * Z.Re + Z.Im * Z.Im;
+    Result.Re := 0.5 * Log1PAccurate(RadiusSquaredMinusOne);
+  end
+  else
+    Result.Re := Ln(ComplexMagnitude(OnePlusReal, Z.Im));
+  Result.Im := ArcTan2(Z.Im, OnePlusReal);
 end;
 
 class function TComplex.Create(const ARe, AIm: Double): TComplex;
@@ -268,6 +304,10 @@ function CExp(const Z: TComplex): TComplex;
 var
   Scale: Double;
 begin
+  if IsNan(Z.Re) or IsNan(Z.Im) or IsInfinite(Z.Im) then
+    Exit(ComplexNaN);
+  if IsInfinite(Z.Re) and (Z.Re > 0.0) and (Z.Im = 0.0) then
+    Exit(TComplex.Create(Infinity, Z.Im));
   Scale := Exp(Z.Re);
   Result := TComplex.Create(Scale * Cos(Z.Im), Scale * Sin(Z.Im));
 end;
@@ -281,6 +321,20 @@ function CSqrt(const Z: TComplex): TComplex;
 var
   M, T: Double;
 begin
+  if IsInfinite(Z.Im) then
+    Exit(TComplex.Create(Infinity, Z.Im));
+  if IsInfinite(Z.Re) then
+  begin
+    if Z.Re > 0.0 then
+      Exit(TComplex.Create(Infinity, Z.Im * 0.0));
+    if (Z.Im < 0.0) or IsNegativeZero(Z.Im) then
+      Exit(TComplex.Create(0.0, -Infinity))
+    else
+      Exit(TComplex.Create(0.0, Infinity));
+  end;
+  if IsNan(Z.Re) or IsNan(Z.Im) then
+    Exit(ComplexNaN);
+
   if Z.Im = 0.0 then
   begin
     if Z.Re >= 0.0 then
@@ -353,7 +407,7 @@ var
   IUnit: TComplex;
 begin
   IUnit := TComplex.ImaginaryUnit;
-  Result := -IUnit * CLog(IUnit * Z + CSqrt(TComplex.One - Z * Z));
+  Result := -IUnit * CAsinh(IUnit * Z);
 end;
 
 function CAcos(const Z: TComplex): TComplex;
@@ -366,23 +420,82 @@ var
   IUnit: TComplex;
 begin
   IUnit := TComplex.ImaginaryUnit;
-  Result := 0.5 * IUnit *
-    (CLog(TComplex.One - IUnit * Z) - CLog(TComplex.One + IUnit * Z));
+  Result := -IUnit * CAtanh(IUnit * Z);
 end;
 
 function CAsinh(const Z: TComplex): TComplex;
+const
+  LargeThreshold = 1.0E150;
+var
+  AbsImaginary, RealPart: Double;
+  Root, ZSquared: TComplex;
 begin
-  Result := CLog(Z + CSqrt(Z * Z + TComplex.One));
+  if IsNan(Z.Re) or IsNan(Z.Im) then
+    Exit(ComplexNaN);
+
+  if Max(Abs(Z.Re), Abs(Z.Im)) >= LargeThreshold then
+  begin
+    { asinh(z) ~ log(2z).  Reflect through the origin on the left
+      half-plane so the principal branch and signed-zero side are kept. }
+    if (Z.Re < 0.0) or IsNegativeZero(Z.Re) then
+      Exit(-(CLog(-Z) + Ln(2.0)))
+    else
+      Exit(CLog(Z) + Ln(2.0));
+  end;
+
+  if Z.Re = 0.0 then
+  begin
+    { The imaginary axis outside [-i,i] is the asinh branch cut.  Handle it
+      explicitly because ordinary zero arithmetic need not retain enough sign
+      information through z*z to select the requested side. }
+    AbsImaginary := Abs(Z.Im);
+    if AbsImaginary <= 1.0 then
+      Exit(TComplex.Create(Z.Re, ArcSin(Z.Im)));
+    RealPart := Ln(AbsImaginary +
+      Sqrt((AbsImaginary - 1.0) * (AbsImaginary + 1.0)));
+    if IsNegativeZero(Z.Re) then
+      RealPart := -RealPart;
+    if Z.Im < 0.0 then
+      Exit(TComplex.Create(RealPart, -Pi / 2.0))
+    else
+      Exit(TComplex.Create(RealPart, Pi / 2.0));
+  end;
+
+  ZSquared := Z * Z;
+  Root := CSqrt(TComplex.One + ZSquared);
+  Result := ComplexLog1P(Z + ZSquared / (TComplex.One + Root));
 end;
 
 function CAcosh(const Z: TComplex): TComplex;
 begin
-  Result := CLog(Z + CSqrt(Z + TComplex.One) * CSqrt(Z - TComplex.One));
+  if IsNan(Z.Re) or IsNan(Z.Im) then
+    Exit(ComplexNaN);
+  { This equivalent principal-value formula avoids multiplying two square
+    roots, which can overflow even when acosh(z) is representable. }
+  Result := 2.0 * CLog(CSqrt(0.5 * (Z + TComplex.One)) +
+    CSqrt(0.5 * (Z - TComplex.One)));
 end;
 
 function CAtanh(const Z: TComplex): TComplex;
+const
+  LargeThreshold = 1.0E150;
+var
+  BranchImaginary: Double;
 begin
-  Result := 0.5 * (CLog(TComplex.One + Z) - CLog(TComplex.One - Z));
+  if IsNan(Z.Re) or IsNan(Z.Im) then
+    Exit(ComplexNaN);
+
+  if Max(Abs(Z.Re), Abs(Z.Im)) >= LargeThreshold then
+  begin
+    if (Z.Im < 0.0) or IsNegativeZero(Z.Im) then
+      BranchImaginary := -Pi / 2.0
+    else
+      BranchImaginary := Pi / 2.0;
+    Result := TComplex.One / Z + TComplex.Create(0.0, BranchImaginary);
+    Exit;
+  end;
+
+  Result := 0.5 * (ComplexLog1P(Z) - ComplexLog1P(-Z));
 end;
 
 end.

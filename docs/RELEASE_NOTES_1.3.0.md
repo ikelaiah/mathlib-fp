@@ -1,8 +1,8 @@
 # mathlib-fp 1.3.0 release notes
 
 > Status: release candidate on `release/v1.3.0`. Complete the final checklist,
-> merge this branch, then tag the resulting default-branch commit to publish
-> the release.
+> merge this branch, finalize publication metadata on `main`, then verify and
+> tag that exact default-branch commit to publish the release.
 
 ## Highlights
 
@@ -28,10 +28,13 @@ have equal lengths. Empty sums, dots, and norms are zero; `Mean`, `Min`,
 ## Numerical behavior
 
 Complex division is scale-safe for finite extreme-scale operands whenever the
-result is representable. Principal `CLog` and `CSqrt` distinguish the upper and
-lower negative-real-axis branches through signed zero. Tests cover extreme
-scales, branches, NaN/infinity behavior, inverse functions, array kernels, and
-complex FFT round trips.
+result is representable. Complex magnitude, exponential, and square root
+functions handle tested infinity and NaN limits without avoidable invalid
+operations. Principal `CLog`, `CSqrt`, and inverse functions distinguish branch
+sides through signed zero. Inverse functions preserve tiny first-order values
+and use overflow-resistant large-input forms. Tests cover reference values,
+extreme scales, branches, NaN/infinity behavior, array kernels, and complex FFT
+round trips.
 
 For a full complex inverse transform, call `FFT(Data, True)` on a
 `TComplexArray`. The `CalculateIFFT` convenience overloads continue to return
@@ -48,9 +51,15 @@ See [MathBase](MathBase.md), [AlgebraLib](AlgebraLib.md), and
 [`examples/14_complex_vectors.pas`](../examples/14_complex_vectors.pas) for a
 compact end-to-end example.
 
+The example shows inverse complex functions, elementwise real-vector
+arithmetic, `AxpyInto` destination reuse, a Hermitian dot product, and an
+in-place complex FFT/IFFT round trip.
+
 ## Validation
 
-The release candidate contains 819 passing tests, a Lazarus package build,
-15 compiling examples, and representative benchmarks for complex arithmetic,
-vector kernels, and the native complex FFT. Remaining publication gates are
-listed in [`RELEASING.md`](../RELEASING.md).
+The release candidate contains 819 passing tests in normal, optimized,
+runtime-checked, and heap-traced local builds, with zero unfreed blocks. The
+Lazarus package builds, all 15 examples compile and run, and representative
+benchmarks cover complex arithmetic, vector kernels, and the native complex
+FFT. Cross-platform CI and the remaining publication gates are listed in
+[`RELEASING.md`](../RELEASING.md).

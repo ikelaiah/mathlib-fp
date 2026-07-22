@@ -100,6 +100,11 @@ begin
   Z := TComplex.Create(1.0E308, 1.0E308);
   AssertTrue('large magnitude remains finite', not IsInfinite(Z.Magnitude));
   AssertEquals('large magnitude reference', Sqrt(2.0), Z.Magnitude / 1.0E308, 1E-15);
+  AssertTrue('infinite real magnitude',
+    IsInfinite(TComplex.Create(Infinity, 1.0).Magnitude));
+  AssertTrue('infinity dominates NaN in magnitude',
+    IsInfinite(TComplex.Create(Infinity, NaN).Magnitude));
+  AssertTrue('NaN magnitude', IsNan(TComplex.Create(NaN, 1.0).Magnitude));
   Z := TComplex.FromPolar(2.0, Pi / 6.0);
   AssertEquals('polar real', Sqrt(3.0), Z.Re, 1E-15);
   AssertEquals('polar imaginary', 1.0, Z.Im, 1E-15);
@@ -157,6 +162,16 @@ begin
   Z := CSqrt(TComplex.Create(-4.0, NegativeZero));
   AssertEquals('sqrt lower branch magnitude', 2.0, Abs(Z.Im), 1E-15);
   AssertTrue('sqrt lower branch sign', Z.Im < 0.0);
+  Z := CAsinh(TComplex.Create(PositiveZero, -2.0));
+  AssertEquals('asinh lower cut right side real', Ln(2.0 + Sqrt(3.0)),
+    Z.Re, 1E-15);
+  AssertEquals('asinh lower cut right side imaginary', -Pi / 2.0,
+    Z.Im, 1E-15);
+  Z := CAsinh(TComplex.Create(NegativeZero, -2.0));
+  AssertEquals('asinh lower cut left side real', -Ln(2.0 + Sqrt(3.0)),
+    Z.Re, 1E-15);
+  AssertEquals('asinh lower cut left side imaginary', -Pi / 2.0,
+    Z.Im, 1E-15);
 end;
 
 procedure TTestComplexFoundation.Test07_NonFiniteComplexArithmetic;
@@ -169,9 +184,25 @@ begin
   Z := TComplex.Create(NaN, 0.0) / TComplex.One;
   AssertTrue('NaN division real', IsNan(Z.Re));
   AssertTrue('NaN division imaginary', IsNan(Z.Im));
+
+  Z := CExp(TComplex.Create(Infinity, 0.0));
+  AssertTrue('exp positive infinity real', IsInfinite(Z.Re));
+  AssertEquals('exp positive infinity imaginary', 0.0, Z.Im, 0.0);
+  Z := CSqrt(TComplex.Create(-Infinity, NegativeZero));
+  AssertEquals('sqrt negative infinity real', 0.0, Z.Re, 0.0);
+  AssertTrue('sqrt negative infinity imaginary magnitude', IsInfinite(Z.Im));
+  AssertTrue('sqrt negative infinity lower side', Z.Im < 0.0);
+  Z := CSqrt(TComplex.Create(1.0, Infinity));
+  AssertTrue('sqrt infinite imaginary real', IsInfinite(Z.Re));
+  AssertTrue('sqrt infinite imaginary imaginary', IsInfinite(Z.Im));
 end;
 
 procedure TTestComplexFoundation.Test08_InverseComplexFunctions;
+const
+  Tiny = 1.0E-20;
+  Huge = 1.0E308;
+var
+  Z: TComplex;
 begin
   AssertComplexNear(TComplex.Create(Pi / 6.0, 0.0),
     CAsin(TComplex.Create(0.5, 0.0)), 1E-15, 'asin');
@@ -185,6 +216,45 @@ begin
     CAcosh(TComplex.Create(2.0, 0.0)), 1E-15, 'acosh');
   AssertComplexNear(TComplex.Create(0.5 * Ln(3.0), 0.0),
     CAtanh(TComplex.Create(0.5, 0.0)), 1E-15, 'atanh');
+
+  Z := TComplex.Create(-2.0, 3.0);
+  AssertComplexNear(TComplex.Create(-0.5706527843210994,
+    1.9833870299165355), CAsin(Z), 5E-14, 'complex asin reference');
+  AssertComplexNear(TComplex.Create(2.1414491111159960,
+    -1.9833870299165355), CAcos(Z), 5E-14, 'complex acos reference');
+  AssertComplexNear(TComplex.Create(-1.4099210495965755,
+    0.2290726829685388), CAtan(Z), 5E-14, 'complex atan reference');
+  AssertComplexNear(TComplex.Create(-1.9686379257930964,
+    0.9646585044076028), CAsinh(Z), 5E-14, 'complex asinh reference');
+  AssertComplexNear(TComplex.Create(1.9833870299165355,
+    2.1414491111159960), CAcosh(Z), 5E-14, 'complex acosh reference');
+  AssertComplexNear(TComplex.Create(-0.1469466662255298,
+    1.3389725222944935), CAtanh(Z), 5E-14, 'complex atanh reference');
+
+  AssertComplexNear(TComplex.Create(Tiny, -Tiny),
+    CAsinh(TComplex.Create(Tiny, -Tiny)), 1E-35,
+    'asinh preserves tiny components');
+  AssertComplexNear(TComplex.Create(Tiny, -Tiny),
+    CAtanh(TComplex.Create(Tiny, -Tiny)), 1E-35,
+    'atanh preserves tiny components');
+
+  Z := CAsinh(TComplex.Create(Huge, 0.0));
+  AssertEquals('large asinh real', Ln(Huge) + Ln(2.0), Z.Re, 1E-12);
+  AssertEquals('large asinh imaginary', 0.0, Z.Im, 0.0);
+  Z := CAcosh(TComplex.Create(Huge, 0.0));
+  AssertEquals('large acosh real', Ln(Huge) + Ln(2.0), Z.Re, 1E-12);
+  AssertEquals('large acosh imaginary', 0.0, Z.Im, 0.0);
+  Z := CAtanh(TComplex.Create(Huge, 0.0));
+  AssertEquals('large atanh real asymptote', 1.0E-308, Z.Re, 1.0E-322);
+  AssertEquals('large atanh upper branch', Pi / 2.0, Z.Im, 1E-15);
+
+  Z := CAsin(TComplex.Create(1.0E150, 1.0E150));
+  AssertEquals('large complex asin real', Pi / 4.0, Z.Re, 1E-15);
+  AssertEquals('large complex asin imaginary',
+    Ln(1.0E150) + 1.5 * Ln(2.0), Z.Im, 1E-12);
+  Z := CAtan(TComplex.Create(1.0E150, 1.0E150));
+  AssertEquals('large complex atan real', Pi / 2.0, Z.Re, 1E-15);
+  AssertEquals('large complex atan imaginary', 5.0E-151, Z.Im, 1E-164);
 end;
 
 procedure TTestComplexFoundation.Test09_RealVectorKernels;

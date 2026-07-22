@@ -102,7 +102,7 @@ separate directory:
 
 ```bash
 mkdir -p lib
-fpc -Fusrc -FUlib my_program.lpr
+fpc -Fusrc -FUlib my_program.pas
 ```
 
 Lazarus users can install

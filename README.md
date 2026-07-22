@@ -32,8 +32,8 @@
 
 > The [1.3.0 release candidate](docs/RELEASE_NOTES_1.3.0.md) is available on
 > `release/v1.3.0`; 1.2.3 remains the latest published release until the
-> validated release branch is merged and that resulting default-branch commit
-> is tagged.
+> validated release branch is merged, the publication metadata is finalized
+> on `main`, and that exact default-branch commit is tagged.
 
 ## 🚀 Quick start
 

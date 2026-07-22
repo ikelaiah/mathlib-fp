@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Started the 1.3.0 complex and vector foundation with `MathBase.Complex`:
+- Added the 1.3.0 complex and vector foundation with `MathBase.Complex`:
   the double-precision `TComplex` record, stable arithmetic and magnitude,
   principal elementary functions, and `TComplexArray`.
 - Added `AlgebraLib.VectorKernels` and its `TVectorKit` facade for finite,
@@ -27,6 +27,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   allocation-avoiding `...Into` destination-buffer procedures.
 - Added representative complex, vector, and FFT benchmarks plus public API
   smoke coverage.
+
+### Fixed
+
+- Preserved tiny `CAsinh`/`CAtanh` inputs and avoided intermediate overflow in
+  inverse complex functions at very large finite inputs.
+- Defined infinity/NaN behavior for complex magnitude, exponential, and square
+  root calculations, and retained signed-zero branch sides for inverse
+  hyperbolic functions.
+- Updated CI to compile and execute the standalone `.pas` examples after their
+  rename from `.lpr`.
 
 ## [1.2.3] - 2026-07-21
 

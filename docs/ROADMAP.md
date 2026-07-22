@@ -42,7 +42,7 @@ than replacing matrices:
 - Vector kernels validate dimensions and finite input, define empty-vector
   results, and use scale-safe norm accumulation.
 - Every new public unit has API documentation, a runnable example, package
-  registration, and tests on every supported CI target.
+  registration, focused tests, and Linux/Win64/Win32 CI coverage configured.
 - Complex arithmetic, vector kernels, and FFTs have representative benchmarks
   and public API smoke coverage.
 - Existing `IMatrix` vector behavior remains source-compatible and covered by
@@ -50,8 +50,9 @@ than replacing matrices:
 
 The implementation is ready for the release checklist in
 [`RELEASING.md`](../RELEASING.md): final cross-platform CI, clean-profile
-package installation, release-mode and runtime-checked test runs, then merging
-the release branch and tagging the resulting default-branch commit.
+package installation, and release-mode/runtime-checked test runs. Publication
+then merges the release branch, finalizes release metadata on `main`, verifies
+that exact commit, and tags it.
 
 ## Current published release: 1.2.3
 

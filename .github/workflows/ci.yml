@@ -41,8 +41,8 @@ jobs:
       - name: Build and run examples
         run: |
           sh ./build-examples.sh
-          for file in examples/*.lpr; do
-            "./example-bin/$(basename "${file%.lpr}")" > /dev/null
+          for file in examples/*.pas; do
+            "./example-bin/$(basename "${file%.pas}")" > /dev/null
           done
 
       - name: Compile representative benchmarks
@@ -56,7 +56,7 @@ jobs:
           archive_dir=$(mktemp -d)
           git archive HEAD | tar -x -C "$archive_dir"
           cd "$archive_dir"
-          cat > my_program.lpr <<'EOF'
+          cat > my_program.pas <<'EOF'
           program hello_mathlib;
           {$mode objfpc}{$H+}
           uses ProbabilityLib.Distributions;
@@ -65,7 +65,7 @@ jobs:
           end.
           EOF
           mkdir -p lib
-          fpc -Fusrc -FUlib my_program.lpr
+          fpc -Fusrc -FUlib my_program.pas
           ./my_program
 
   windows:
@@ -170,7 +170,7 @@ jobs:
         shell: pwsh
         run: |
           & ./build-examples.ps1 -Compiler $env:FPC_WIN64
-          Get-ChildItem examples/*.lpr | ForEach-Object {
+          Get-ChildItem examples/*.pas | ForEach-Object {
             $executable = Join-Path example-bin ($_.BaseName + '.exe')
             & $executable | Out-Null
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
