@@ -22,13 +22,16 @@
 - **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
-- **Ready to explore:** reference docs, runnable examples, and 815 passing tests.
+- **Ready to explore:** reference docs, runnable examples, and 819 passing tests.
 
 > [!NOTE]
 > **1.2.3 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
 > [release notes](docs/RELEASE_NOTES_1.2.3.md) and
 > [changelog](CHANGELOG.md) when upgrading.
+
+> The [1.3.0 release candidate](docs/RELEASE_NOTES_1.3.0.md) is available on
+> `release/v1.3.0`; 1.2.3 remains the latest published release until tagging.
 
 ## 🚀 Quick start
 

@@ -1,7 +1,7 @@
 # mathlib-fp 1.3.0 release notes
 
-> Status: development branch `release/v1.3.0`; this document will be finalised
-> when the release is tagged.
+> Status: release candidate on `release/v1.3.0`. The release becomes current
+> when its final checklist and tag are complete.
 
 ## Highlights
 
@@ -38,6 +38,7 @@ array-vector APIs are additive.
 
 ## Validation
 
-The development branch contains 815 passing tests, a Lazarus package build,
+The release candidate contains 819 passing tests, a Lazarus package build,
 15 compiling examples, and representative benchmarks for complex arithmetic,
-vector kernels, and the native complex FFT.
+vector kernels, and the native complex FFT. Remaining publication gates are
+listed in [`RELEASING.md`](../RELEASING.md).

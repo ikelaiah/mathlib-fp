@@ -13,7 +13,7 @@ The project is built on the following non-negotiable foundations:
 - independently usable units rather than a mandatory monolithic import.
 
 
-## Development branch: 1.3.0
+## Release candidate: 1.3.0
 
 Version 1.3.0 establishes the complex-number and vector foundation required by
 the next generation of algebra and signal-processing features. It preserves
@@ -35,7 +35,7 @@ than replacing matrices:
 - signal processing uses `TComplexArray` as the FFT core while retaining its
   existing split real/imaginary procedures as source-compatible adapters.
 
-### 1.3.0 completion criteria
+### Completed 1.3.0 scope
 
 - Complex arithmetic has documented branch, zero, non-finite, and
   overflow-resistance behavior with reference and identity tests.
@@ -48,7 +48,11 @@ than replacing matrices:
 - Existing `IMatrix` vector behavior remains source-compatible and covered by
   the existing algebra test suite.
 
-## Current release: 1.2.3
+The implementation is ready for the release checklist in
+[`RELEASING.md`](../RELEASING.md): final cross-platform CI, clean-profile
+package installation, release-mode and runtime-checked test runs, and tagging.
+
+## Current published release: 1.2.3
 
 Version 1.2.3 is a correctness and robustness release. It does not add a new
 domain. It concentrates on the operations already exposed:
