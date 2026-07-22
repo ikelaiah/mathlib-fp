@@ -21,7 +21,9 @@ Real vectors now provide elementwise multiplication/division, compensated
 `Sum` and `Dot`, `Mean`, `Min`, `Max`, stable `Norm2`, and normalization.
 Complex vectors provide non-conjugating and Hermitian dot products. Allocating
 transformations have `...Into` variants so callers can reuse destination
-buffers in repeated computation.
+buffers in repeated computation. Inputs must be finite and paired vectors must
+have equal lengths. Empty sums, dots, and norms are zero; `Mean`, `Min`,
+`Max`, and normalization of a zero vector raise `EVectorError`.
 
 ## Numerical behavior
 
@@ -31,11 +33,20 @@ lower negative-real-axis branches through signed zero. Tests cover extreme
 scales, branches, NaN/infinity behavior, inverse functions, array kernels, and
 complex FFT round trips.
 
+For a full complex inverse transform, call `FFT(Data, True)` on a
+`TComplexArray`. The `CalculateIFFT` convenience overloads continue to return
+real-valued output arrays by design.
+
 ## Compatibility
 
 No existing public identifier was removed or renamed. `IVector = IMatrix` and
 the split real/imaginary FFT procedures remain supported. The new complex and
 array-vector APIs are additive.
+
+See [MathBase](MathBase.md), [AlgebraLib](AlgebraLib.md), and
+[EngineeringLib](EngineeringLib.md) for API details, or run
+[`examples/14_complex_vectors.lpr`](../examples/14_complex_vectors.lpr) for a
+compact end-to-end example.
 
 ## Validation
 
