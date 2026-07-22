@@ -13,13 +13,13 @@ The project is built on the following non-negotiable foundations:
 - independently usable units rather than a mandatory monolithic import.
 
 
-## Release candidate: 1.3.0
+## Current release: 1.3.0
 
-Version 1.3.0 establishes the complex-number and vector foundation required by
-the next generation of algebra and signal-processing features. It preserves
-the existing matrix-as-vector API: an `IMatrix` with one row or one column
-remains an `IVector` and keeps its `DotProduct`, `CrossProduct`, and
-`Normalize` methods.
+Released on 2026-07-23, version 1.3.0 establishes the complex-number and vector
+foundation required by the next generation of algebra and signal-processing
+features. It preserves the existing matrix-as-vector API: an `IMatrix` with
+one row or one column remains an `IVector` and keeps its `DotProduct`,
+`CrossProduct`, and `Normalize` methods.
 
 The new foundation adds a complementary, allocation-light array API rather
 than replacing matrices:
@@ -48,13 +48,12 @@ than replacing matrices:
 - Existing `IMatrix` vector behavior remains source-compatible and covered by
   the existing algebra test suite.
 
-The implementation is ready for the release checklist in
-[`RELEASING.md`](../RELEASING.md): final cross-platform CI, clean-profile
-package installation, and release-mode/runtime-checked test runs. Publication
-then merges the release branch, finalizes release metadata on `main`, verifies
-that exact commit, and tags it.
+The release passed Linux and Windows CI, Win64 normal, optimized,
+runtime-checked, and heap-traced test runs, and the optimized Win32 suite. See
+the [1.3.0 release notes](RELEASE_NOTES_1.3.0.md) for the delivered API and
+validation summary.
 
-## Current published release: 1.2.3
+## Previous release: 1.2.3
 
 Version 1.2.3 is a correctness and robustness release. It does not add a new
 domain. It concentrates on the operations already exposed:

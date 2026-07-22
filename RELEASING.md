@@ -76,13 +76,14 @@ lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 
 ## Publish
 
-1. Merge the validated release branch into the default branch. Do not tag the
+1. On the validated release branch, finalize publication metadata: move the
+   release entries out of **Unreleased**, add the date, update the README badge
+   and current-release text, remove release-candidate wording, and update
+   `SECURITY.md` to the maintained release line. Commit these changes and
+   confirm the branch CI remains green.
+2. Merge the validated release branch into the default branch. Do not tag the
    release branch.
-2. On the default branch, finalize publication-only metadata: move the release
-   entries out of **Unreleased**, add the date, update the README badge and
-   current-release text, remove release-candidate wording, and update
-   `SECURITY.md` to the maintained release line. Commit these changes.
-3. Confirm the exact default-branch metadata commit has green required CI.
+3. Confirm the resulting exact default-branch commit has green required CI.
 4. Open **Releases → Draft a new release** and create tag `vX.Y.Z` from that
    exact commit, replacing `X.Y.Z` with the version being published.
 5. Use `mathlib-fp X.Y.Z` as the release title and copy that version's

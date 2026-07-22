@@ -40,9 +40,9 @@ domain, Pascal unit, unit family, and Kit class.
 
 **Q6: What are the future goals?**
 
-A6: Version 1.2.3 strengthens numerical correctness and robustness without
-adding a new domain. Future work will grow the native Free Pascal scalar,
-matrix/vector, fitting, DSP, statistics, optimization, and solver foundations;
-it will not depend on wrappers or required DLLs. See the
-[roadmap](docs/ROADMAP.md). Data-frame functionality remains outside this
-focused mathematics project.
+A6: Version 1.3.0 establishes native complex-number, contiguous-array vector,
+and complex FFT foundations while preserving the existing matrix-as-vector
+API. Future work will grow the native Free Pascal matrix, solver, fitting,
+DSP, statistics, and optimization capabilities; it will not depend on wrappers
+or required DLLs. See the [roadmap](docs/ROADMAP.md). Data-frame functionality
+remains outside this focused mathematics project.

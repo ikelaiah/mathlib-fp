@@ -108,7 +108,7 @@ core. This PR supplies that foundation without replacing established APIs.
 
 ## Tests added and refined
 
-The suite grows from 798 tests in 1.2.3 to 819 tests in this release candidate.
+The suite grows from 798 tests in 1.2.3 to 819 tests in 1.3.0.
 The complex/vector foundation has 16 focused tests rather than a small number
 of catch-all methods. Coverage includes:
 
@@ -141,12 +141,14 @@ of catch-all methods. Coverage includes:
 This PR prepares `release/v1.3.0`; it does not publish the release. Before
 publication, follow [`RELEASING.md`](../RELEASING.md), including:
 
-- [ ] Green Linux and Windows CI on the exact default-branch release commit.
+- [x] Green Linux and Windows CI on the validated release branch.
 - [ ] Clean-profile Lazarus package installation and a consumer build.
 - [ ] Merge the validated release branch into the default branch.
-- [ ] On `main`, finalize the README version/current-release text, changelog
-  heading/date, release-note status, documentation index/roadmap, and supported
-  version policy; verify CI on that exact commit, then tag it as `v1.3.0`.
+- [x] Finalize the README version/current-release text, changelog heading/date,
+  release-note status, documentation index/roadmap, and supported-version
+  policy for the 2026-07-23 release.
+- [ ] Verify CI on the resulting exact default-branch commit, then tag it as
+  `v1.3.0`.
 
 ## Risk and review notes
 

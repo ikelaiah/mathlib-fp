@@ -1,8 +1,6 @@
 # mathlib-fp 1.3.0 release notes
 
-> Status: release candidate on `release/v1.3.0`. Complete the final checklist,
-> merge this branch, finalize publication metadata on `main`, then verify and
-> tag that exact default-branch commit to publish the release.
+**Release date:** 2026-07-23
 
 ## Highlights
 
@@ -58,10 +56,13 @@ in-place complex FFT/IFFT round trip.
 
 ## Validation
 
-The release candidate contains 819 passing tests in Win64 normal, optimized,
+The release contains 819 passing tests in Win64 normal, optimized,
 runtime-checked, and heap-traced local builds, with zero unfreed blocks; the
 optimized Win32 suite also passes. The Lazarus package builds for Win64 and
 Win32, all 15 examples compile and run, and representative benchmarks cover
-complex arithmetic, vector kernels, and the native complex FFT. Cross-platform
-CI and the remaining publication gates are listed in
+complex arithmetic, vector kernels, and the native complex FFT. Linux and
+Windows CI both pass. The reusable release process is documented in
 [`RELEASING.md`](../RELEASING.md).
+
+See the [1.3.0 changelog](../CHANGELOG.md#130---2026-07-23) for the complete
+release entry.

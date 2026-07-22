@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.2.3" src="https://img.shields.io/badge/version-1.2.3-orange.svg">
+  <img alt="Version 1.3.0" src="https://img.shields.io/badge/version-1.3.0-orange.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -25,15 +25,10 @@
 - **Ready to explore:** reference docs, runnable examples, and 819 passing tests.
 
 > [!NOTE]
-> **1.2.3 is the current release; 1.2.0 was the first public release.** The
+> **1.3.0 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.2.3.md) and
+> [release notes](docs/RELEASE_NOTES_1.3.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
-
-> The [1.3.0 release candidate](docs/RELEASE_NOTES_1.3.0.md) is available on
-> `release/v1.3.0`; 1.2.3 remains the latest published release until the
-> validated release branch is merged, the publication metadata is finalized
-> on `main`, and that exact default-branch commit is tagged.
 
 ## 🚀 Quick start
 
