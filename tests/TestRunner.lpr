@@ -7,6 +7,7 @@ uses
   Classes
   , consoletestrunner
   , TestMathBase
+  , TestComplexLib
   , TestAlgebraLib
   , TestFinanceLib
   , TestFinanceAliases

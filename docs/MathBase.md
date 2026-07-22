@@ -7,9 +7,68 @@ Foundation domain for mathlib-fp. All other domains depend on its units.
 | Unit | File |
 |------|------|
 | `MathBase.SharedTypes` | [MathBase.SharedTypes.pas](../src/MathBase.SharedTypes.pas) |
+| `MathBase.Complex` | [MathBase.Complex.pas](../src/MathBase.Complex.pas) |
 | `MathBase.MathConstants` | [MathBase.MathConstants.pas](../src/MathBase.MathConstants.pas) |
 | `MathBase.Precision` | [MathBase.Precision.pas](../src/MathBase.Precision.pas) |
 | `MathBase.Trigonometry` | [MathBase.Trigonometry.pas](../src/MathBase.Trigonometry.pas) |
+
+---
+
+## MathBase.Complex
+
+Portable double-precision complex arithmetic. `TComplex` is a value record
+with `Re` and `Im` fields; its operators never mutate either operand.
+
+```pascal
+uses MathBase.Complex;
+
+var
+  Z, Root: TComplex;
+begin
+  Z := TComplex.Create(3.0, 4.0);
+  Root := CSqrt(TComplex.Create(-4.0, 0.0));  // 0 + 2i
+  Writeln(Z.Magnitude:0:1);                   // 5.0
+end;
+```
+
+### Type and operations
+
+```pascal
+type
+  TComplex = record
+    Re, Im: Double;
+    class function Create(ARe, AIm: Double): TComplex; static;
+    class function FromPolar(Radius, Angle: Double): TComplex; static;
+    function Conjugate: TComplex;
+    function SqrMagnitude, Magnitude, Argument: Double;
+    function IsFinite: Boolean;
+  end;
+
+  TComplexArray = array of TComplex;
+```
+
+`TComplex` supports addition, subtraction, multiplication, division, unary
+negation, and real-scalar variants. Division and magnitude use scaled forms to
+avoid avoidable intermediate overflow and underflow. `CLog`, `CSqrt`,
+`CPow`, `CAsin`, `CAcos`, `CAtan`, `CAsinh`, `CAcosh`, and `CAtanh` return
+principal values; `CExp`, `CSin`, `CCos`, `CTan`, `CSinh`, `CCosh`, and
+`CTanh` are also provided.
+
+For finite complex inputs, finite representable quotient results are preserved
+at extreme scales. Magnitude calculations return infinity when either
+component is infinite (including infinity paired with NaN) without performing
+an invalid infinity/infinity operation. A NaN component otherwise produces a
+NaN complex result; dividing a finite value by an infinite complex value
+produces zero.
+
+`Argument`, `CLog`, and `CSqrt` preserve the upper/lower branch distinction on
+the negative real axis, including signed-zero imaginary components. The
+inverse functions preserve first-order tiny inputs, use scaled component and
+asymptotic forms rather than squaring large complex inputs, and retain the
+signed-zero side of their principal branch cuts. `CExp(+Infinity + 0i)` and
+square roots with infinite components return their defined limiting values;
+an indeterminate infinite imaginary angle or a NaN component returns a NaN
+complex value.
 
 ---
 

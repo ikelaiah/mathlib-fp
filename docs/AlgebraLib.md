@@ -52,12 +52,43 @@ All records expose a `ToString: string` method for easy debugging.
 TIterativeMethod = (imConjugateGradient, imGaussSeidel, imJacobi);
 ```
 
-### Vector Aliases (`AlgebraLib.Vectors`)
+### Vector APIs (`AlgebraLib.Vectors`)
 
 ```pascal
 IVector = IMatrix;     // A vector is a 1-row or 1-column IMatrix
 TVector = TMatrixKit;  // Concrete type for construction
 ```
+
+The matrix-vector API remains the compatibility-oriented API. For contiguous
+real or complex arrays, `AlgebraLib.Vectors` also re-exports:
+
+```pascal
+TRealVector = TDoubleArray;
+TComplexVector = TComplexArray;
+TVectorKit = class;
+```
+
+`TVectorKit` provides allocation-returning `Add`, `Subtract`,
+`ElementWiseMultiply`, `ElementWiseDivide`, `Scale`, and `Axpy` operations,
+plus compensated `Sum`/`Dot`, `Mean`, `Min`, `Max`, stable `Norm2`, and
+`Normalize` for real vectors. Its complex overloads add non-conjugating `Dot`
+and Hermitian `DotConjugate`.
+
+Every allocating transform also has an `...Into` variant, for example:
+
+```pascal
+var Destination: TRealVector;
+begin
+  SetLength(Destination, Length(A));
+  TVectorKit.AxpyInto(0.5, A, B, Destination); // Destination := 0.5*A + B
+end;
+```
+
+`Destination` is a `var` parameter so a correctly sized existing dynamic array
+is reused rather than replaced. Elementwise `...Into` transforms may use one
+of their inputs as the destination. Inputs must be finite and paired vectors
+must have equal length; empty-vector sums, dots, and norms are zero, while
+`Mean`, `Min`, `Max`, and zero-vector normalization raise `EVectorError`.
 
 ### Decomposition Entry Point (`AlgebraLib.Determinants`)
 

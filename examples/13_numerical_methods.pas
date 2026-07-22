@@ -1,7 +1,7 @@
 program NumericalMethods;
 
 {-----------------------------------------------------------------------------
-  13_numerical_methods.lpr
+  13_numerical_methods.pas
 
   A guided tour of NumericsLib for newcomers. It demonstrates the four main
   numerical workflows:
@@ -14,7 +14,7 @@ program NumericalMethods;
   From this directory, compile with:
 
     mkdir lib
-    fpc -Fu../src -FUlib 13_numerical_methods.lpr
+    fpc -Fu../src -FUlib 13_numerical_methods.pas
 
   Then run ./13_numerical_methods (or 13_numerical_methods.exe on Windows).
 -----------------------------------------------------------------------------}

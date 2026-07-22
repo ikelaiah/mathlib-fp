@@ -1,7 +1,7 @@
 program HypothesisTest;
 
 {-----------------------------------------------------------------------------
-  02_hypothesis_test.lpr
+  02_hypothesis_test.pas
 
   Compares two small groups with parametric and non-parametric tests. It shows
   how to read a p-value alongside an effect size; the tests are alternatives
@@ -9,7 +9,7 @@ program HypothesisTest;
 
   Build (FPC command line):
     mkdir lib
-    fpc -Fu../src -FUlib 02_hypothesis_test.lpr
+    fpc -Fu../src -FUlib 02_hypothesis_test.pas
 
   Build (Lazarus):
     Add ../src to:

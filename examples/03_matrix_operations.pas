@@ -1,7 +1,7 @@
 program MatrixOperations;
 
 {-----------------------------------------------------------------------------
-  03_matrix_operations.lpr
+  03_matrix_operations.pas
 
   Introduces matrix creation, immutable-style arithmetic, common properties,
   inversion, and LU/QR decompositions. IMatrix values are reference-counted,
@@ -9,7 +9,7 @@ program MatrixOperations;
 
   Build (FPC command line):
     mkdir lib
-    fpc -Fu../src -FUlib 03_matrix_operations.lpr
+    fpc -Fu../src -FUlib 03_matrix_operations.pas
 
   Build (Lazarus):
     Add ../src to:

@@ -20,9 +20,9 @@ FPC_BIN=${FPC:-fpc}
 mkdir -p "$UNIT_DIR"
 
 count=0
-for example in "$EXAMPLE_DIR"/*.lpr; do
+for example in "$EXAMPLE_DIR"/*.pas; do
   if [ ! -f "$example" ]; then
-    echo "No .lpr examples found in $EXAMPLE_DIR" >&2
+    echo "No .pas examples found in $EXAMPLE_DIR" >&2
     exit 1
   fi
 

@@ -8,7 +8,7 @@ program example08_combinatorics;
  and shows the corresponding function call.
 
  Compile:  mkdir lib
-           fpc -Fu../src -FUlib 08_combinatorics.lpr
+           fpc -Fu../src -FUlib 08_combinatorics.pas
  Run:      ./08_combinatorics   (Linux/macOS)
            08_combinatorics.exe (Windows)
 -----------------------------------------------------------------------------}

@@ -1,7 +1,7 @@
 program FluidDynamics;
 
 {-----------------------------------------------------------------------------
-  06_fluid_dynamics.lpr
+  06_fluid_dynamics.pas
 
   Demonstrates fluid-mechanics calculations using EngineeringLib.
   Covers Reynolds number, Bernoulli's equation, pipe friction, and
@@ -10,7 +10,7 @@ program FluidDynamics;
 
   Build (FPC command line):
     mkdir lib
-    fpc -Fu../src -FUlib 06_fluid_dynamics.lpr
+    fpc -Fu../src -FUlib 06_fluid_dynamics.pas
 
   Build (Lazarus):
     Add ../src to:

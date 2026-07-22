@@ -302,13 +302,22 @@ of 2, and its real and imaginary arrays must have equal lengths.
 { In-place FFT/IFFT — modifies RealPart and ImagPart in place }
 class procedure FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean = False);
 
+{ Equivalent in-place operation on MathBase.Complex.TComplexArray. }
+class procedure FFT(var Data: TComplexArray; Inverse: Boolean = False);
+
 { Convenience wrapper: real input → complete N-bin complex spectrum.
   Zero-pads to the next power of 2; never truncates. }
 class procedure CalculateFFT(const InputSignal: TDoubleArray;
   out OutRealPart, OutImagPart: TDoubleArray);
 
+class procedure CalculateFFT(const InputSignal: TDoubleArray;
+  out OutputSpectrum: TComplexArray);
+
 { Inverse FFT: equal-length complete spectrum → real-valued signal }
 class procedure CalculateIFFT(const InRealPart, InImagPart: TDoubleArray;
+  out OutputSignal: TDoubleArray);
+
+class procedure CalculateIFFT(const InputSpectrum: TComplexArray;
   out OutputSignal: TDoubleArray);
 
 { Complete N-bin magnitude and phase spectra }
@@ -320,6 +329,11 @@ class procedure CalculateFFTMagnitudePhase(const InputSignal: TDoubleArray;
 `CalculateIFFT` returns an empty array. Mismatched real/imaginary input lengths
 raise `ESignalError`. For a real input signal, callers wanting a one-sided view
 can consume bins `0..N div 2` from the complete returned spectrum.
+
+`TComplexArray` is the FFT implementation's native representation. The
+split-array overloads remain source-compatible adapters. Both forms preserve
+the same length, zero-padding, and inverse-scaling rules while making complex
+signal code easier to compose with `MathBase.Complex` and `AlgebraLib.Vectors`.
 
 **Key properties verified by the test suite:**
 

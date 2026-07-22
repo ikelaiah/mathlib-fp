@@ -14,10 +14,10 @@ $unitDir = Join-Path $outputDir 'units'
 
 New-Item -ItemType Directory -Force -Path $unitDir | Out-Null
 
-$examples = @(Get-ChildItem -LiteralPath $exampleDir -Filter '*.lpr' |
+$examples = @(Get-ChildItem -LiteralPath $exampleDir -Filter '*.pas' |
   Sort-Object Name)
 if ($examples.Count -eq 0) {
-  throw "No .lpr examples found in $exampleDir"
+  throw "No .pas examples found in $exampleDir"
 }
 
 foreach ($example in $examples) {

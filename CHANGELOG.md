@@ -7,7 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No changes yet.
+## [1.3.0] - 2026-07-23
+
+### Added
+
+- Added the 1.3.0 complex and vector foundation with `MathBase.Complex`:
+  the double-precision `TComplex` record, stable arithmetic and magnitude,
+  principal elementary functions, and `TComplexArray`.
+- Added `AlgebraLib.VectorKernels` and its `TVectorKit` facade for finite,
+  contiguous real and complex array-vector arithmetic, including scale-safe
+  norms and conjugating complex dot products. `AlgebraLib.Vectors` continues
+  to preserve the existing matrix-as-vector aliases while re-exporting the new
+  array-vector API.
+- Added `TComplexArray` FFT/IFFT overloads that preserve the existing
+  split-real/imaginary signal API, documentation, a runnable complex-vector
+  example, and focused tests.
+- Hardened complex division and principal branch behavior, added inverse
+  complex trigonometric and hyperbolic functions, and made `TComplexArray` the
+  native FFT representation.
+- Expanded vector kernels with stable reductions, elementwise arithmetic, and
+  allocation-avoiding `...Into` destination-buffer procedures.
+- Added representative complex, vector, and FFT benchmarks plus public API
+  smoke coverage.
+
+### Fixed
+
+- Preserved tiny `CAsinh`/`CAtanh` inputs and replaced target-sensitive
+  `z*z` cancellation with scaled component formulas for large inverse complex
+  functions.
+- Defined infinity/NaN behavior for complex magnitude, exponential, and square
+  root calculations, and retained signed-zero branch sides for inverse
+  hyperbolic functions.
+- Updated CI to compile and execute the standalone `.pas` examples after their
+  rename from `.lpr`.
 
 ## [1.2.3] - 2026-07-21
 

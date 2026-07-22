@@ -11,10 +11,12 @@ uses
   { MathBase }
   MathBase.MathConstants,
   MathBase.SharedTypes,
+  MathBase.Complex,
   MathBase.Precision,
   MathBase.Trigonometry,
   { AlgebraLib }
   AlgebraLib.Matrices,
+  AlgebraLib.VectorKernels,
   AlgebraLib.Vectors,
   AlgebraLib.Determinants,
   { FinanceLib }

@@ -8,7 +8,7 @@ program example12_geometry;
  and a concrete, runnable example.
 
  Compile:  mkdir lib
-           fpc -Fu../src -FUlib 12_geometry.lpr
+           fpc -Fu../src -FUlib 12_geometry.pas
  Run:      ./12_geometry   (Linux/macOS)
            12_geometry.exe (Windows)
 -----------------------------------------------------------------------------}
