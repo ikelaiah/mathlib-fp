@@ -61,6 +61,12 @@ function CTan(const Z: TComplex): TComplex;
 function CSinh(const Z: TComplex): TComplex;
 function CCosh(const Z: TComplex): TComplex;
 function CTanh(const Z: TComplex): TComplex;
+function CAsin(const Z: TComplex): TComplex;
+function CAcos(const Z: TComplex): TComplex;
+function CAtan(const Z: TComplex): TComplex;
+function CAsinh(const Z: TComplex): TComplex;
+function CAcosh(const Z: TComplex): TComplex;
+function CAtanh(const Z: TComplex): TComplex;
 
 implementation
 
@@ -79,6 +85,20 @@ begin
   if X = 0.0 then
     Exit(0.0);
   Result := X * Sqrt(1.0 + Sqr(Y / X));
+end;
+
+function IsNegativeZero(const Value: Double): Boolean;
+var
+  Bits: QWord;
+begin
+  Bits := 0;
+  Move(Value, Bits, SizeOf(Value));
+  Result := (Value = 0.0) and ((Bits and QWord($8000000000000000)) <> 0);
+end;
+
+function ComplexNaN: TComplex;
+begin
+  Result := TComplex.Create(NaN, NaN);
 end;
 
 class function TComplex.Create(const ARe, AIm: Double): TComplex;
@@ -161,22 +181,33 @@ end;
 
 class operator TComplex./(const A, B: TComplex): TComplex;
 var
-  Ratio, Denominator: Double;
+  Scale, BR, BI, AR, AI, Denominator: Double;
 begin
-  if Abs(B.Re) >= Abs(B.Im) then
+  if IsNan(A.Re) or IsNan(A.Im) or IsNan(B.Re) or IsNan(B.Im) then
+    Exit(ComplexNaN);
+
+  if IsInfinite(B.Re) or IsInfinite(B.Im) then
   begin
-    Ratio := B.Im / B.Re;
-    Denominator := B.Re + B.Im * Ratio;
-    Result := Create((A.Re + A.Im * Ratio) / Denominator,
-      (A.Im - A.Re * Ratio) / Denominator);
-  end
-  else
-  begin
-    Ratio := B.Re / B.Im;
-    Denominator := B.Im + B.Re * Ratio;
-    Result := Create((A.Re * Ratio + A.Im) / Denominator,
-      (A.Im * Ratio - A.Re) / Denominator);
+    if A.IsFinite then
+      Exit(Create(0.0, 0.0))
+    else
+      Exit(ComplexNaN);
   end;
+
+  Scale := Max(Abs(B.Re), Abs(B.Im));
+  if Scale = 0.0 then
+  begin
+    Result := Create(A.Re / Scale, A.Im / Scale);
+    Exit;
+  end;
+
+  BR := B.Re / Scale;
+  BI := B.Im / Scale;
+  AR := A.Re / Scale;
+  AI := A.Im / Scale;
+  Denominator := BR * BR + BI * BI;
+  Result := Create((AR * BR + AI * BI) / Denominator,
+    (AI * BR - AR * BI) / Denominator);
 end;
 
 class operator TComplex./(const A: TComplex; const B: Double): TComplex;
@@ -216,7 +247,15 @@ end;
 
 function TComplex.Argument: Double;
 begin
-  Result := ArcTan2(Im, Re);
+  if (Im = 0.0) and (Re < 0.0) then
+  begin
+    if IsNegativeZero(Im) then
+      Result := -Pi
+    else
+      Result := Pi;
+  end
+  else
+    Result := ArcTan2(Im, Re);
 end;
 
 function TComplex.IsFinite: Boolean;
@@ -246,7 +285,7 @@ begin
   begin
     if Z.Re >= 0.0 then
       Exit(TComplex.Create(Sqrt(Z.Re), Z.Im))
-    else if Z.Im < 0.0 then
+    else if IsNegativeZero(Z.Im) then
       Exit(TComplex.Create(0.0, -Sqrt(-Z.Re)))
     else
       Exit(TComplex.Create(0.0, Sqrt(-Z.Re)));
@@ -307,6 +346,43 @@ end;
 function CTanh(const Z: TComplex): TComplex;
 begin
   Result := CSinh(Z) / CCosh(Z);
+end;
+
+function CAsin(const Z: TComplex): TComplex;
+var
+  IUnit: TComplex;
+begin
+  IUnit := TComplex.ImaginaryUnit;
+  Result := -IUnit * CLog(IUnit * Z + CSqrt(TComplex.One - Z * Z));
+end;
+
+function CAcos(const Z: TComplex): TComplex;
+begin
+  Result := TComplex.Create(Pi / 2.0, 0.0) - CAsin(Z);
+end;
+
+function CAtan(const Z: TComplex): TComplex;
+var
+  IUnit: TComplex;
+begin
+  IUnit := TComplex.ImaginaryUnit;
+  Result := 0.5 * IUnit *
+    (CLog(TComplex.One - IUnit * Z) - CLog(TComplex.One + IUnit * Z));
+end;
+
+function CAsinh(const Z: TComplex): TComplex;
+begin
+  Result := CLog(Z + CSqrt(Z * Z + TComplex.One));
+end;
+
+function CAcosh(const Z: TComplex): TComplex;
+begin
+  Result := CLog(Z + CSqrt(Z + TComplex.One) * CSqrt(Z - TComplex.One));
+end;
+
+function CAtanh(const Z: TComplex): TComplex;
+begin
+  Result := 0.5 * (CLog(TComplex.One + Z) - CLog(TComplex.One - Z));
 end;
 
 end.

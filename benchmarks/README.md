@@ -1,9 +1,10 @@
 # Representative benchmarks
 
 `BenchmarkRunner.lpr` measures the general-purpose statistics sort, geometry
-convex hull, and dense matrix multiplication on deterministic inputs. The first
-two cases guard the release's replacement of quadratic sorting paths with
-O(n log n) algorithms.
+convex hull, dense matrix multiplication, complex arithmetic, vector kernels,
+and a native complex FFT on deterministic inputs. The vector benchmark uses a
+reusable destination array through `AxpyInto`, so it measures the kernel rather
+than repeated dynamic-array allocation.
 
 Compile and run from the repository root:
 

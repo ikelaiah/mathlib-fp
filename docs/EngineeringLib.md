@@ -330,10 +330,10 @@ class procedure CalculateFFTMagnitudePhase(const InputSignal: TDoubleArray;
 raise `ESignalError`. For a real input signal, callers wanting a one-sided view
 can consume bins `0..N div 2` from the complete returned spectrum.
 
-The `TComplexArray` overloads are a source-compatible bridge to the existing
-FFT implementation. They preserve the same length, zero-padding, and inverse
-scaling rules while making complex signal code easier to compose with
-`MathBase.Complex` and `AlgebraLib.Vectors`.
+`TComplexArray` is the FFT implementation's native representation. The
+split-array overloads remain source-compatible adapters. Both forms preserve
+the same length, zero-padding, and inverse-scaling rules while making complex
+signal code easier to compose with `MathBase.Complex` and `AlgebraLib.Vectors`.
 
 **Key properties verified by the test suite:**
 

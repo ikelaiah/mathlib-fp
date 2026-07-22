@@ -49,10 +49,16 @@ type
 
 `TComplex` supports addition, subtraction, multiplication, division, unary
 negation, and real-scalar variants. Division and magnitude use scaled forms to
-avoid avoidable intermediate overflow. `CLog`, `CSqrt`, and `CPow` use their
+avoid avoidable intermediate overflow and underflow. `CLog`, `CSqrt`,
+`CPow`, `CAsin`, `CAcos`, `CAtan`, `CAsinh`, `CAcosh`, and `CAtanh` return
 principal values; `CExp`, `CSin`, `CCos`, `CTan`, `CSinh`, `CCosh`, and
-`CTanh` are also provided. Non-finite scalar values propagate under the RTL's
-IEEE arithmetic rules.
+`CTanh` are also provided.
+
+For finite complex inputs, finite representable quotient results are preserved
+at extreme scales. A NaN component produces a NaN complex result; dividing a
+finite value by an infinite complex value produces zero. `Argument`, `CLog`,
+and `CSqrt` preserve the upper/lower branch distinction on the negative real
+axis, including signed zero imaginary components.
 
 ---
 

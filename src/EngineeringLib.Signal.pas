@@ -260,19 +260,54 @@ end;
 
 class procedure TSignalKit.FFT(var RealPart, ImagPart: TDoubleArray; Inverse: Boolean);
 var
-  N, Len, I, J, K: Integer;
-  Angle, WR, WI, Ur, Ui, TR, TI: Double;
-  Sign: Double;
+  N, I: Integer;
+  Data: TComplexArray;
 begin
   N := Length(RealPart);
   if N <> Length(ImagPart) then
     raise ESignalError.Create('FFT: RealPart and ImagPart must have the same length.');
+  Data := nil;
+  SetLength(Data, N);
+  for I := 0 to N - 1 do
+    Data[I] := TComplex.Create(RealPart[I], ImagPart[I]);
+  FFT(Data, Inverse);
+  for I := 0 to N - 1 do
+  begin
+    RealPart[I] := Data[I].Re;
+    ImagPart[I] := Data[I].Im;
+  end;
+end;
+
+procedure BitReverseComplex(var Data: TComplexArray);
+var
+  N, I, J, K: Integer;
+  Temp: TComplex;
+begin
+  N := Length(Data);
+  J := 0;
+  for I := 1 to N - 1 do
+  begin
+    K := N shr 1;
+    while J >= K do begin J := J - K; K := K shr 1; end;
+    J := J + K;
+    if I < J then
+    begin
+      Temp := Data[I]; Data[I] := Data[J]; Data[J] := Temp;
+    end;
+  end;
+end;
+
+class procedure TSignalKit.FFT(var Data: TComplexArray; Inverse: Boolean);
+var
+  N, Len, I, J, K: Integer;
+  Angle, WR, WI, Ur, Ui, TR, TI: Double;
+  Sign: Double;
+begin
+  N := Length(Data);
   if N <= 1 then Exit;
   if (N and (N - 1)) <> 0 then
     raise ESignalError.Create('FFT: length must be a power of 2.');
-
-  BitReverse(RealPart, ImagPart);
-
+  BitReverseComplex(Data);
   Sign := IfThen(Inverse, 1.0, -1.0);
 
   Len := 1;
@@ -288,13 +323,13 @@ begin
       Ur := 1.0; Ui := 0.0;
       for J := 0 to (Len shr 1) - 1 do
       begin
-        K  := I + J + (Len shr 1);
-        TR := Ur * RealPart[K] - Ui * ImagPart[K];
-        TI := Ur * ImagPart[K] + Ui * RealPart[K];
-        RealPart[K] := RealPart[I + J] - TR;
-        ImagPart[K] := ImagPart[I + J] - TI;
-        RealPart[I + J] := RealPart[I + J] + TR;
-        ImagPart[I + J] := ImagPart[I + J] + TI;
+        K := I + J + (Len shr 1);
+        TR := Ur * Data[K].Re - Ui * Data[K].Im;
+        TI := Ur * Data[K].Im + Ui * Data[K].Re;
+        Data[K].Re := Data[I + J].Re - TR;
+        Data[K].Im := Data[I + J].Im - TI;
+        Data[I + J].Re := Data[I + J].Re + TR;
+        Data[I + J].Im := Data[I + J].Im + TI;
         TR := Ur * WR - Ui * WI;
         Ui := Ur * WI + Ui * WR;
         Ur := TR;
@@ -302,72 +337,56 @@ begin
       I := I + Len;
     end;
   end;
-
   if Inverse then
     for I := 0 to N - 1 do
     begin
-      RealPart[I] := RealPart[I] / N;
-      ImagPart[I] := ImagPart[I] / N;
+      Data[I].Re := Data[I].Re / N;
+      Data[I].Im := Data[I].Im / N;
     end;
-end;
-
-class procedure TSignalKit.FFT(var Data: TComplexArray; Inverse: Boolean);
-var
-  I: Integer;
-  RealPart, ImagPart: TDoubleArray;
-begin
-  SetLength(RealPart, Length(Data));
-  SetLength(ImagPart, Length(Data));
-  for I := 0 to High(Data) do
-  begin
-    RealPart[I] := Data[I].Re;
-    ImagPart[I] := Data[I].Im;
-  end;
-  FFT(RealPart, ImagPart, Inverse);
-  for I := 0 to High(Data) do
-    Data[I] := TComplex.Create(RealPart[I], ImagPart[I]);
 end;
 
 class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray; out OutRealPart, OutImagPart: TDoubleArray);
 var
-  N, I: Integer;
+  I: Integer;
+  Spectrum: TComplexArray;
 begin
-  if Length(InputSignal) = 0 then
+  Spectrum := nil;
+  CalculateFFT(InputSignal, Spectrum);
+  OutRealPart := nil;
+  OutImagPart := nil;
+  SetLength(OutRealPart, Length(Spectrum));
+  SetLength(OutImagPart, Length(Spectrum));
+  for I := 0 to High(Spectrum) do
   begin
-    OutRealPart := nil;
-    OutImagPart := nil;
-    Exit;
+    OutRealPart[I] := Spectrum[I].Re;
+    OutImagPart[I] := Spectrum[I].Im;
   end;
-
-  N := NextPow2(Length(InputSignal));
-  SetLength(OutRealPart, N);
-  SetLength(OutImagPart, N);
-  for I := 0 to Length(InputSignal) - 1 do
-    OutRealPart[I] := InputSignal[I];
-  for I := Length(InputSignal) to N - 1 do
-    OutRealPart[I] := 0;
-  for I := 0 to N - 1 do
-    OutImagPart[I] := 0;
-  FFT(OutRealPart, OutImagPart, False);
 end;
 
 class procedure TSignalKit.CalculateFFT(const InputSignal: TDoubleArray;
   out OutputSpectrum: TComplexArray);
 var
-  I: Integer;
-  RealPart, ImagPart: TDoubleArray;
+  N, I: Integer;
 begin
-  CalculateFFT(InputSignal, RealPart, ImagPart);
+  if Length(InputSignal) = 0 then
+  begin
+    OutputSpectrum := nil;
+    Exit;
+  end;
+  N := NextPow2(Length(InputSignal));
   OutputSpectrum := nil;
-  SetLength(OutputSpectrum, Length(RealPart));
-  for I := 0 to High(RealPart) do
-    OutputSpectrum[I] := TComplex.Create(RealPart[I], ImagPart[I]);
+  SetLength(OutputSpectrum, N);
+  for I := 0 to High(InputSignal) do
+    OutputSpectrum[I] := TComplex.Create(InputSignal[I], 0.0);
+  for I := Length(InputSignal) to N - 1 do
+    OutputSpectrum[I] := TComplex.Zero;
+  FFT(OutputSpectrum);
 end;
 
 class procedure TSignalKit.CalculateIFFT(const InRealPart, InImagPart: TDoubleArray; out OutputSignal: TDoubleArray);
 var
-  Re, Im: TDoubleArray;
   N, I: Integer;
+  Spectrum: TComplexArray;
 begin
   N := Length(InRealPart);
   if N <> Length(InImagPart) then
@@ -379,29 +398,32 @@ begin
     Exit;
   end;
 
-  SetLength(Re, N);
-  SetLength(Im, N);
-  for I := 0 to N - 1 do begin Re[I] := InRealPart[I]; Im[I] := InImagPart[I]; end;
-  FFT(Re, Im, True);
-  SetLength(OutputSignal, N);
+  Spectrum := nil;
+  SetLength(Spectrum, N);
   for I := 0 to N - 1 do
-    OutputSignal[I] := Re[I];
+    Spectrum[I] := TComplex.Create(InRealPart[I], InImagPart[I]);
+  CalculateIFFT(Spectrum, OutputSignal);
 end;
 
 class procedure TSignalKit.CalculateIFFT(const InputSpectrum: TComplexArray;
   out OutputSignal: TDoubleArray);
 var
   I: Integer;
-  RealPart, ImagPart: TDoubleArray;
+  Work: TComplexArray;
 begin
-  SetLength(RealPart, Length(InputSpectrum));
-  SetLength(ImagPart, Length(InputSpectrum));
-  for I := 0 to High(InputSpectrum) do
+  if Length(InputSpectrum) = 0 then
   begin
-    RealPart[I] := InputSpectrum[I].Re;
-    ImagPart[I] := InputSpectrum[I].Im;
+    OutputSignal := nil;
+    Exit;
   end;
-  CalculateIFFT(RealPart, ImagPart, OutputSignal);
+  Work := nil;
+  SetLength(Work, Length(InputSpectrum));
+  for I := 0 to High(InputSpectrum) do
+    Work[I] := InputSpectrum[I];
+  FFT(Work, True);
+  SetLength(OutputSignal, Length(Work));
+  for I := 0 to High(Work) do
+    OutputSignal[I] := Work[I].Re;
 end;
 
 class procedure TSignalKit.CalculateFFTMagnitudePhase(

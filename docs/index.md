@@ -8,6 +8,8 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.3.0 release notes](RELEASE_NOTES_1.3.0.md) — complex and
+  vector foundation (development branch).
 - [mathlib-fp 1.2.3 release notes](RELEASE_NOTES_1.2.3.md) — numerical
   correctness, special-function accuracy, and robust probability tails.
 - [mathlib-fp 1.2.2 release notes](RELEASE_NOTES_1.2.2.md) — complete

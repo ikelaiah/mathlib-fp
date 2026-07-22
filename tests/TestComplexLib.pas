@@ -13,6 +13,8 @@ type
   private
     procedure DoAddMismatchedRealVectors;
     procedure DoNormalizeZeroComplexVector;
+    procedure DoElementWiseDivideByZero;
+    procedure DoMeanOfEmptyVector;
     procedure AssertComplexNear(const Expected, Actual: TComplex;
       const Tolerance: Double; const MessageText: string);
   published
@@ -20,12 +22,25 @@ type
     procedure Test02_StableMagnitudeAndPolarForm;
     procedure Test03_PrincipalFunctions;
     procedure Test04_ComplexTrigonometry;
-    procedure Test05_RealVectorKernels;
-    procedure Test06_ComplexVectorKernels;
-    procedure Test07_VectorValidation;
+    procedure Test05_ComplexDivisionExtremeScales;
+    procedure Test06_BranchesAndNonFiniteValues;
+    procedure Test07_InverseComplexFunctions;
+    procedure Test08_RealVectorKernels;
+    procedure Test09_ComplexVectorKernels;
+    procedure Test10_VectorValidation;
+    procedure Test11_VectorReductionsAndDestinationBuffers;
+    procedure Test12_VectorIntoAliasingAndEmptyContracts;
   end;
 
 implementation
+
+function NegativeZero: Double;
+var
+  Bits: QWord;
+begin
+  Bits := QWord($8000000000000000);
+  Move(Bits, Result, SizeOf(Result));
+end;
 
 procedure TTestComplexFoundation.DoAddMismatchedRealVectors;
 var
@@ -42,6 +57,17 @@ var
 begin
   A := TComplexVector.Create(TComplex.Zero);
   TVectorKit.Normalize(A);
+end;
+
+procedure TTestComplexFoundation.DoElementWiseDivideByZero;
+begin
+  TVectorKit.ElementWiseDivide(TRealVector.Create(1.0),
+    TRealVector.Create(0.0));
+end;
+
+procedure TTestComplexFoundation.DoMeanOfEmptyVector;
+begin
+  TVectorKit.Mean(nil);
 end;
 
 procedure TTestComplexFoundation.AssertComplexNear(const Expected,
@@ -101,7 +127,57 @@ begin
     'tan(i)');
 end;
 
-procedure TTestComplexFoundation.Test05_RealVectorKernels;
+procedure TTestComplexFoundation.Test05_ComplexDivisionExtremeScales;
+var
+  Z: TComplex;
+begin
+  Z := TComplex.Create(1.0E308, 1.0E308) /
+    TComplex.Create(1.0E308, -1.0E308);
+  AssertComplexNear(TComplex.ImaginaryUnit, Z, 1E-15, 'large division');
+  Z := TComplex.Create(1.0E-308, 1.0E-308) /
+    TComplex.Create(1.0E-308, -1.0E-308);
+  AssertComplexNear(TComplex.ImaginaryUnit, Z, 1E-15, 'small division');
+end;
+
+procedure TTestComplexFoundation.Test06_BranchesAndNonFiniteValues;
+var
+  NegativeZero, PositiveZero: Double;
+  Z: TComplex;
+begin
+  PositiveZero := 0.0;
+  NegativeZero := TestComplexLib.NegativeZero;
+  AssertEquals('log upper branch', Pi, CLog(TComplex.Create(-1.0, PositiveZero)).Im,
+    1E-15);
+  AssertEquals('log lower branch', -Pi, CLog(TComplex.Create(-1.0, NegativeZero)).Im,
+    1E-15);
+  Z := CSqrt(TComplex.Create(-4.0, NegativeZero));
+  AssertEquals('sqrt lower branch magnitude', 2.0, Abs(Z.Im), 1E-15);
+  AssertTrue('sqrt lower branch sign', Z.Im < 0.0);
+  Z := TComplex.One / TComplex.Create(Infinity, Infinity);
+  AssertEquals('finite divided by infinity real', 0.0, Z.Re, 0.0);
+  AssertEquals('finite divided by infinity imaginary', 0.0, Z.Im, 0.0);
+  Z := TComplex.Create(NaN, 0.0) / TComplex.One;
+  AssertTrue('NaN division real', IsNan(Z.Re));
+  AssertTrue('NaN division imaginary', IsNan(Z.Im));
+end;
+
+procedure TTestComplexFoundation.Test07_InverseComplexFunctions;
+begin
+  AssertComplexNear(TComplex.Create(Pi / 6.0, 0.0),
+    CAsin(TComplex.Create(0.5, 0.0)), 1E-15, 'asin');
+  AssertComplexNear(TComplex.Create(Pi / 3.0, 0.0),
+    CAcos(TComplex.Create(0.5, 0.0)), 1E-15, 'acos');
+  AssertComplexNear(TComplex.Create(Pi / 4.0, 0.0),
+    CAtan(TComplex.One), 1E-15, 'atan');
+  AssertComplexNear(TComplex.Create(Ln(1.0 + Sqrt(2.0)), 0.0),
+    CAsinh(TComplex.One), 1E-15, 'asinh');
+  AssertComplexNear(TComplex.Create(Ln(2.0 + Sqrt(3.0)), 0.0),
+    CAcosh(TComplex.Create(2.0, 0.0)), 1E-15, 'acosh');
+  AssertComplexNear(TComplex.Create(0.5 * Ln(3.0), 0.0),
+    CAtanh(TComplex.Create(0.5, 0.0)), 1E-15, 'atanh');
+end;
+
+procedure TTestComplexFoundation.Test08_RealVectorKernels;
 var
   A, B, ResultVector: TRealVector;
 begin
@@ -117,7 +193,7 @@ begin
   AssertEquals('normalise second', 0.8, ResultVector[1], 1E-15);
 end;
 
-procedure TTestComplexFoundation.Test06_ComplexVectorKernels;
+procedure TTestComplexFoundation.Test09_ComplexVectorKernels;
 var
   A, B, ResultVector: TComplexVector;
 begin
@@ -133,11 +209,88 @@ begin
     'complex scaling');
 end;
 
-procedure TTestComplexFoundation.Test07_VectorValidation;
+procedure TTestComplexFoundation.Test10_VectorValidation;
 begin
   AssertException('mismatched real vectors', EVectorError, @DoAddMismatchedRealVectors);
   AssertException('normalise zero complex vector', EVectorError,
     @DoNormalizeZeroComplexVector);
+  AssertException('elementwise division by zero', EVectorError,
+    @DoElementWiseDivideByZero);
+end;
+
+procedure TTestComplexFoundation.Test11_VectorReductionsAndDestinationBuffers;
+var
+  A, B, Destination: TRealVector;
+  ComplexA, ComplexDestination: TComplexVector;
+begin
+  A := TRealVector.Create(1.0E16, 1.0, -1.0E16);
+  AssertEquals('compensated sum', 1.0, TVectorKit.Sum(A), 0.0);
+  AssertEquals('compensated dot', 1.0,
+    TVectorKit.Dot(A, TRealVector.Create(1.0, 1.0, 1.0)), 0.0);
+  B := TRealVector.Create(2.0, 4.0, -8.0);
+  AssertEquals('mean', Double(-2.0) / Double(3.0), TVectorKit.Mean(B), 1E-15);
+  AssertEquals('min', -8.0, TVectorKit.Min(B), 0.0);
+  AssertEquals('max', 4.0, TVectorKit.Max(B), 0.0);
+  Destination := TRealVector.Create(0.0, 0.0, 0.0);
+  TVectorKit.ElementWiseMultiplyInto(B, TRealVector.Create(3.0, 2.0, -1.0),
+    Destination);
+  AssertEquals('multiply into first', 6.0, Destination[0], 0.0);
+  AssertEquals('multiply into second', 8.0, Destination[1], 0.0);
+  AssertEquals('multiply into third', 8.0, Destination[2], 0.0);
+  Destination := TVectorKit.ElementWiseDivide(Destination,
+    TRealVector.Create(2.0, 2.0, 4.0));
+  AssertEquals('divide first', 3.0, Destination[0], 0.0);
+  AssertEquals('divide second', 4.0, Destination[1], 0.0);
+  AssertEquals('divide third', 2.0, Destination[2], 0.0);
+  Destination := TRealVector.Create(6.0, 8.0, 8.0);
+  TVectorKit.AxpyInto(0.5, B, Destination, Destination);
+  AssertEquals('alias-safe axpy into first', 7.0, Destination[0], 0.0);
+  AssertEquals('alias-safe axpy into second', 10.0, Destination[1], 0.0);
+  AssertEquals('alias-safe axpy into third', 4.0, Destination[2], 0.0);
+  ComplexA := TComplexVector.Create(TComplex.Create(3.0, 4.0));
+  ComplexDestination := TComplexVector.Create(TComplex.Zero);
+  TVectorKit.NormalizeInto(ComplexA, ComplexDestination);
+  AssertComplexNear(TComplex.Create(0.6, 0.8), ComplexDestination[0], 1E-15,
+    'complex normalize into');
+end;
+
+procedure TTestComplexFoundation.Test12_VectorIntoAliasingAndEmptyContracts;
+var
+  A, B, Destination, Empty: TRealVector;
+  ComplexA, ComplexB, ComplexDestination: TComplexVector;
+begin
+  A := TRealVector.Create(1.0, 2.0, 3.0);
+  B := TRealVector.Create(10.0, 20.0, 30.0);
+  Destination := nil;
+  TVectorKit.AddInto(A, B, Destination);
+  AssertEquals('AddInto resizes destination', 3, Length(Destination));
+  AssertEquals('AddInto first', 11.0, Destination[0], 0.0);
+  TVectorKit.SubtractInto(B, A, B);
+  AssertEquals('SubtractInto aliases source', 9.0, B[0], 0.0);
+  AssertEquals('SubtractInto aliases source last', 27.0, B[2], 0.0);
+  TVectorKit.ScaleInto(A, 2.0, A);
+  AssertEquals('ScaleInto aliases source', 2.0, A[0], 0.0);
+  AssertEquals('ScaleInto aliases source last', 6.0, A[2], 0.0);
+  TVectorKit.ElementWiseDivideInto(A, TRealVector.Create(2.0, 2.0, 2.0), A);
+  AssertEquals('DivideInto aliases numerator', 1.0, A[0], 0.0);
+  AssertEquals('DivideInto aliases numerator last', 3.0, A[2], 0.0);
+  Destination := TRealVector.Create(1.0);
+  Empty := nil;
+  TVectorKit.AddInto(Empty, Empty, Destination);
+  AssertEquals('AddInto empty result', 0, Length(Destination));
+  AssertEquals('empty sum', 0.0, TVectorKit.Sum(Empty), 0.0);
+  AssertEquals('empty norm', 0.0, TVectorKit.Norm2(Empty), 0.0);
+  AssertException('mean empty vector', EVectorError, @DoMeanOfEmptyVector);
+
+  ComplexA := TComplexVector.Create(TComplex.Create(1.0, 2.0));
+  ComplexB := TComplexVector.Create(TComplex.Create(3.0, -1.0));
+  ComplexDestination := nil;
+  TVectorKit.AddInto(ComplexA, ComplexB, ComplexDestination);
+  AssertComplexNear(TComplex.Create(4.0, 1.0), ComplexDestination[0], 1E-15,
+    'complex AddInto resizes destination');
+  TVectorKit.AxpyInto(TComplex.ImaginaryUnit, ComplexA, ComplexB, ComplexB);
+  AssertComplexNear(TComplex.Create(1.0, 0.0), ComplexB[0], 1E-15,
+    'complex AxpyInto aliases source');
 end;
 
 initialization

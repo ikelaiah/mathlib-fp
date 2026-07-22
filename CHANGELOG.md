@@ -19,7 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   array-vector API.
 - Added `TComplexArray` FFT/IFFT overloads that preserve the existing
   split-real/imaginary signal API, documentation, a runnable complex-vector
-  example, and 9 new focused tests.
+  example, and focused tests.
+- Hardened complex division and principal branch behavior, added inverse
+  complex trigonometric and hyperbolic functions, and made `TComplexArray` the
+  native FFT representation.
+- Expanded vector kernels with stable reductions, elementwise arithmetic, and
+  allocation-avoiding `...Into` destination-buffer procedures.
+- Added representative complex, vector, and FFT benchmarks plus public API
+  smoke coverage.
 
 ## [1.2.3] - 2026-07-21
 

@@ -6,9 +6,12 @@ uses
   {$IFDEF UNIX}cthreads,{$ENDIF}
   SysUtils, Math,
   MathBase.SharedTypes,
+  MathBase.Complex,
   StatsLib.Stats,
   GeometryLib.Geometry,
-  AlgebraLib.Matrices;
+  AlgebraLib.Matrices,
+  AlgebraLib.VectorKernels,
+  EngineeringLib.Signal;
 
 procedure BenchmarkSort;
 const
@@ -68,9 +71,74 @@ begin
     GetTickCount64 - Started, ' ms; checksum=', C.GetValue(0, 0):0:6);
 end;
 
+procedure BenchmarkComplexArithmetic;
+const
+  N = 2000000;
+var
+  I: Integer;
+  Z, W, Checksum: TComplex;
+  Started: QWord;
+begin
+  Z := TComplex.Create(0.125, -0.75);
+  W := TComplex.Create(0.999, 0.02);
+  Checksum := TComplex.Zero;
+  Started := GetTickCount64;
+  for I := 1 to N do
+  begin
+    Z := Z * W + TComplex.Create(0.001, -0.002);
+    Checksum := Checksum + Z;
+  end;
+  Writeln('complex arithmetic, n=', N, ': ', GetTickCount64 - Started,
+    ' ms; checksum=', Checksum.Re:0:6);
+end;
+
+procedure BenchmarkVectorKernels;
+const
+  N = 1000000;
+var
+  A, B, Destination: TRealVector;
+  I: Integer;
+  Started: QWord;
+  Checksum: Double;
+begin
+  SetLength(A, N);
+  SetLength(B, N);
+  SetLength(Destination, N);
+  for I := 0 to N - 1 do
+  begin
+    A[I] := Sin(I * 0.001);
+    B[I] := Cos(I * 0.001);
+  end;
+  Started := GetTickCount64;
+  TVectorKit.AxpyInto(0.75, A, B, Destination);
+  Checksum := TVectorKit.Dot(Destination, A);
+  Writeln('vector AXPY+dot, n=', N, ': ', GetTickCount64 - Started,
+    ' ms; checksum=', Checksum:0:6);
+end;
+
+procedure BenchmarkComplexFFT;
+const
+  N = 262144;
+var
+  Data: TComplexArray;
+  I: Integer;
+  Started: QWord;
+begin
+  SetLength(Data, N);
+  for I := 0 to N - 1 do
+    Data[I] := TComplex.Create(Sin(I * 0.01), Cos(I * 0.03));
+  Started := GetTickCount64;
+  TSignalKit.FFT(Data);
+  Writeln('complex FFT, n=', N, ': ', GetTickCount64 - Started,
+    ' ms; checksum=', Data[1].Magnitude:0:6);
+end;
+
 begin
   Writeln('mathlib-fp representative microbenchmarks');
   BenchmarkSort;
   BenchmarkConvexHull;
   BenchmarkMatrixMultiply;
+  BenchmarkComplexArithmetic;
+  BenchmarkVectorKernels;
+  BenchmarkComplexFFT;
 end.

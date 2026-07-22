@@ -24,15 +24,16 @@ remains an `IVector` and keeps its `DotProduct`, `CrossProduct`, and
 The new foundation adds a complementary, allocation-light array API rather
 than replacing matrices:
 
-- `MathBase.Complex` supplies the scalar `TComplex` type, stable elementary
-  operations, principal-value functions, and `TComplexArray`;
+- `MathBase.Complex` supplies the scalar `TComplex` type, scale-safe division,
+  signed-zero-aware principal functions (including inverse trigonometric and
+  hyperbolic functions), and `TComplexArray`;
 - `AlgebraLib.VectorKernels` supplies real and complex array-vector kernels
-  (dot products, stable norms, scaling, AXPY-style combination, and
-  normalization);
+  (compensated reductions, elementwise operations, stable norms, scaling,
+  AXPY-style combination, normalization, and reusable destination buffers);
 - `AlgebraLib.Vectors` remains the compatibility-oriented entry unit and
   re-exports the new array-vector types and kernel facade;
-- signal processing gains complex-array overloads while keeping its existing
-  split real/imaginary FFT procedures source-compatible.
+- signal processing uses `TComplexArray` as the FFT core while retaining its
+  existing split real/imaginary procedures as source-compatible adapters.
 
 ### 1.3.0 completion criteria
 
@@ -42,6 +43,8 @@ than replacing matrices:
   results, and use scale-safe norm accumulation.
 - Every new public unit has API documentation, a runnable example, package
   registration, and tests on every supported CI target.
+- Complex arithmetic, vector kernels, and FFTs have representative benchmarks
+  and public API smoke coverage.
 - Existing `IMatrix` vector behavior remains source-compatible and covered by
   the existing algebra test suite.
 

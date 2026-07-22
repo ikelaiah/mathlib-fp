@@ -86,6 +86,9 @@ type
     procedure TestFFT_Length2;
     procedure TestFFT_ComplexArrayRoundTrip;
     procedure TestCalculateFFT_ComplexArrayBridge;
+    procedure TestFFT_ComplexKnownSpectrum;
+    procedure TestFFT_ComplexParseval;
+    procedure TestFFT_ComplexAndSplitEquivalent;
 
     { --- Magnitude / Phase --- }
     procedure TestMagnitudePhase_Impulse;
@@ -580,6 +583,70 @@ begin
     AssertNear(Signal[I], Inverse[I], TOL_FFT,
       Format('complex bridge inverse[%d]', [I]));
   AssertNear(0.0, Inverse[3], TOL_FFT, 'complex bridge padded sample');
+end;
+
+procedure TTestSignalKit.TestFFT_ComplexKnownSpectrum;
+var
+  Data: TComplexArray;
+begin
+  Data := TComplexArray.Create(TComplex.Create(1.0, 0.0),
+    TComplex.Create(0.0, 1.0), TComplex.Zero, TComplex.Zero);
+  TSignalKit.FFT(Data);
+  AssertNear(1.0, Data[0].Re, TOL_FFT, 'complex spectrum bin 0 real');
+  AssertNear(1.0, Data[0].Im, TOL_FFT, 'complex spectrum bin 0 imaginary');
+  AssertNear(2.0, Data[1].Re, TOL_FFT, 'complex spectrum bin 1 real');
+  AssertNear(0.0, Data[1].Im, TOL_FFT, 'complex spectrum bin 1 imaginary');
+  AssertNear(1.0, Data[2].Re, TOL_FFT, 'complex spectrum bin 2 real');
+  AssertNear(-1.0, Data[2].Im, TOL_FFT, 'complex spectrum bin 2 imaginary');
+  AssertNear(0.0, Data[3].Re, TOL_FFT, 'complex spectrum bin 3 real');
+  AssertNear(0.0, Data[3].Im, TOL_FFT, 'complex spectrum bin 3 imaginary');
+end;
+
+procedure TTestSignalKit.TestFFT_ComplexParseval;
+var
+  Data: TComplexArray;
+  I: Integer;
+  TimeEnergy, FrequencyEnergy: Double;
+begin
+  Data := TComplexArray.Create(TComplex.Create(1.0, -2.0),
+    TComplex.Create(-3.0, 0.5), TComplex.Create(2.0, 4.0),
+    TComplex.Create(-1.0, -1.0));
+  TimeEnergy := 0.0;
+  for I := 0 to High(Data) do
+    TimeEnergy := TimeEnergy + Sqr(Data[I].Re) + Sqr(Data[I].Im);
+  TSignalKit.FFT(Data);
+  FrequencyEnergy := 0.0;
+  for I := 0 to High(Data) do
+    FrequencyEnergy := FrequencyEnergy + Sqr(Data[I].Re) + Sqr(Data[I].Im);
+  AssertNear(TimeEnergy, FrequencyEnergy / Length(Data), TOL_FFT,
+    'complex Parseval theorem');
+end;
+
+procedure TTestSignalKit.TestFFT_ComplexAndSplitEquivalent;
+var
+  Data: TComplexArray;
+  RealPart, ImagPart: TDoubleArray;
+  I: Integer;
+begin
+  Data := TComplexArray.Create(TComplex.Create(1.0, -1.0),
+    TComplex.Create(2.0, 0.5), TComplex.Create(-3.0, 1.0),
+    TComplex.Create(0.0, -2.0));
+  SetLength(RealPart, Length(Data));
+  SetLength(ImagPart, Length(Data));
+  for I := 0 to High(Data) do
+  begin
+    RealPart[I] := Data[I].Re;
+    ImagPart[I] := Data[I].Im;
+  end;
+  TSignalKit.FFT(Data);
+  TSignalKit.FFT(RealPart, ImagPart);
+  for I := 0 to High(Data) do
+  begin
+    AssertNear(Data[I].Re, RealPart[I], TOL_FFT,
+      Format('complex/split real bin %d', [I]));
+    AssertNear(Data[I].Im, ImagPart[I], TOL_FFT,
+      Format('complex/split imaginary bin %d', [I]));
+  end;
 end;
 
 { =========================================================================

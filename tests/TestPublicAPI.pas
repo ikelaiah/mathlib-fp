@@ -13,9 +13,10 @@ unit TestPublicAPI;
 interface
 
 uses
-  Classes, fpcunit, testregistry,
+  Classes, Math, fpcunit, testregistry,
+  MathBase.Complex,
   MathBase.Trigonometry,
-  AlgebraLib.Matrices,
+  AlgebraLib.Matrices, AlgebraLib.VectorKernels,
   FinanceLib.Interest, FinanceLib.Bonds, FinanceLib.NPV,
   StatsLib.Stats,
   EngineeringLib.FluidDynamics, EngineeringLib.Thermodynamics,
@@ -32,6 +33,7 @@ uses
 type
   TTrigKitClass = class of TTrigKit;
   TMatrixKitClass = class of TMatrixKit;
+  TVectorKitClass = class of TVectorKit;
   TFinanceKitClass = class of TFinanceKit;
   TBondKitClass = class of TBondKit;
   TNPVKitClass = class of TNPVKit;
@@ -61,6 +63,8 @@ procedure TTestPublicAPI.TestDocumentedKitClassesAreAccessible;
 var
   TrigKit: TTrigKitClass;
   MatrixKit: TMatrixKitClass;
+  VectorKit: TVectorKitClass;
+  ComplexValue: TComplex;
   FinanceKit: TFinanceKitClass;
   BondKit: TBondKitClass;
   NPVKit: TNPVKitClass;
@@ -81,6 +85,8 @@ var
 begin
   TrigKit := TTrigKit;
   MatrixKit := TMatrixKit;
+  VectorKit := TVectorKit;
+  ComplexValue := CAsin(TComplex.Create(0.5, 0.0));
   FinanceKit := TFinanceKit;
   BondKit := TBondKit;
   NPVKit := TNPVKit;
@@ -101,6 +107,8 @@ begin
 
   AssertTrue('TTrigKit', TrigKit <> nil);
   AssertTrue('TMatrixKit', MatrixKit <> nil);
+  AssertTrue('TVectorKit', VectorKit <> nil);
+  AssertEquals('TComplex public API', Pi / 6.0, ComplexValue.Re, 1E-15);
   AssertTrue('TFinanceKit', FinanceKit <> nil);
   AssertTrue('TBondKit', BondKit <> nil);
   AssertTrue('TNPVKit', NPVKit <> nil);
