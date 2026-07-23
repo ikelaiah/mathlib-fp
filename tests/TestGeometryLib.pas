@@ -43,6 +43,8 @@ type
   private
     procedure AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double = 1e-9);
     procedure AssertPoint2DNear(const AMsg: string; EX, EY: Double; const Got: TPoint2D; Tol: Double = 1e-9);
+    procedure AssertVector2DNear(const AMsg: string; EX, EY: Double; const Got: TVector2D; Tol: Double = 1e-9);
+    procedure AssertVector3DNear(const AMsg: string; EX, EY, EZ: Double; const Got: TVector3D; Tol: Double = 1e-9);
     procedure AssertGeoError(const AMsg: string; AProc: TProcedure);
     { Build a unit square CCW: (0,0),(1,0),(1,1),(0,1) }
     function UnitSquare: TPolygon2D;
@@ -56,6 +58,7 @@ type
     procedure TestVector2D_Dot;
     procedure TestVector2D_Cross;
     procedure TestVector2D_Perpendicular;
+    procedure TestVector2D_ArithmeticOperators;
     procedure TestSegment2D_Length;
     procedure TestSegment2D_Midpoint;
     procedure TestLine2D_Distance;
@@ -68,6 +71,10 @@ type
     procedure TestVector3D_Normalise;
     procedure TestVector3D_Dot;
     procedure TestVector3D_Cross;
+    procedure TestVector3D_ArithmeticOperators;
+    procedure TestVectorArithmetic_PropertiesAndDimensionalAgreement;
+    procedure TestVectorArithmetic_NonFiniteAndOverflow;
+    procedure TestVectorArithmetic_ZeroDivisionAndSignedZero;
     procedure TestSegment3D_Length;
     procedure TestSegment3D_Midpoint;
     procedure TestPlane3D_Distance;
@@ -143,6 +150,14 @@ implementation
 var
   GErrPts: TPolygon2D;
 
+function NegativeZero: Double;
+var
+  Bits: QWord;
+begin
+  Bits := QWord($8000000000000000);
+  Move(Bits, Result, SizeOf(Result));
+end;
+
 procedure ErrNormaliseZero;
 var V: TVector2D;
 begin V := TVector2D.Create(0, 0); V.Normalise; end;
@@ -181,6 +196,19 @@ procedure TTestGeometryLib.AssertPoint2DNear(const AMsg: string; EX, EY: Double;
 begin
   AssertNear(AMsg + ' X', EX, Got.X, Tol);
   AssertNear(AMsg + ' Y', EY, Got.Y, Tol);
+end;
+
+procedure TTestGeometryLib.AssertVector2DNear(const AMsg: string; EX, EY: Double; const Got: TVector2D; Tol: Double);
+begin
+  AssertNear(AMsg + ' X', EX, Got.X, Tol);
+  AssertNear(AMsg + ' Y', EY, Got.Y, Tol);
+end;
+
+procedure TTestGeometryLib.AssertVector3DNear(const AMsg: string; EX, EY, EZ: Double; const Got: TVector3D; Tol: Double);
+begin
+  AssertNear(AMsg + ' X', EX, Got.X, Tol);
+  AssertNear(AMsg + ' Y', EY, Got.Y, Tol);
+  AssertNear(AMsg + ' Z', EZ, Got.Z, Tol);
 end;
 
 procedure TTestGeometryLib.AssertGeoError(const AMsg: string; AProc: TProcedure);
@@ -272,6 +300,25 @@ begin
   AssertNear('Perp Y', 1.0, P.Y);
   { Dot with original = 0 }
   AssertNear('Perp dot = 0', 0.0, V.Dot(P));
+end;
+
+procedure TTestGeometryLib.TestVector2D_ArithmeticOperators;
+var
+  A, B, V: TVector2D;
+begin
+  A := TVector2D.Create(3, -4);
+  B := TVector2D.Create(-1, 2);
+  AssertVector2DNear('addition', 2, -2, A + B);
+  AssertVector2DNear('subtraction', 4, -6, A - B);
+  AssertVector2DNear('unary negation', -3, 4, -A);
+  AssertVector2DNear('vector times scalar', 6, -8, A * 2.0);
+  AssertVector2DNear('scalar times vector', 6, -8, 2.0 * A);
+  AssertVector2DNear('vector divided by scalar', 1.5, -2, A / 2.0);
+  V := A + B;
+  AssertVector2DNear('left operand remains a value', 3, -4, A);
+  AssertVector2DNear('right operand remains a value', -1, 2, B);
+  V := V + V;
+  AssertVector2DNear('self assignment is value-safe', 4, -4, V);
 end;
 
 procedure TTestGeometryLib.TestSegment2D_Length;
@@ -374,6 +421,120 @@ begin
   { Anti-commutative: V2 × V1 = -Z }
   C := V2.Cross(V1);
   AssertNear('Anti-comm Z=-1', -1.0, C.Z);
+end;
+
+procedure TTestGeometryLib.TestVector3D_ArithmeticOperators;
+var
+  A, B, V: TVector3D;
+begin
+  A := TVector3D.Create(3, -4, 5);
+  B := TVector3D.Create(-1, 2, 7);
+  AssertVector3DNear('addition', 2, -2, 12, A + B);
+  AssertVector3DNear('subtraction', 4, -6, -2, A - B);
+  AssertVector3DNear('unary negation', -3, 4, -5, -A);
+  AssertVector3DNear('vector times scalar', 6, -8, 10, A * 2.0);
+  AssertVector3DNear('scalar times vector', 6, -8, 10, 2.0 * A);
+  AssertVector3DNear('vector divided by scalar', 1.5, -2, 2.5, A / 2.0);
+  V := A + B;
+  AssertVector3DNear('left operand remains a value', 3, -4, 5, A);
+  AssertVector3DNear('right operand remains a value', -1, 2, 7, B);
+  V := V + V;
+  AssertVector3DNear('self assignment is value-safe', 4, -4, 24, V);
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_PropertiesAndDimensionalAgreement;
+var
+  A2, B2, Z2: TVector2D;
+  A3, B3, Z3: TVector3D;
+  Scale: Double;
+begin
+  A2 := TVector2D.Create(3.5, -4.25);
+  B2 := TVector2D.Create(-1.25, 2.5);
+  Z2 := TVector2D.Create(0, 0);
+  A3 := TVector3D.Create(A2.X, A2.Y, 0);
+  B3 := TVector3D.Create(B2.X, B2.Y, 0);
+  Z3 := TVector3D.Create(0, 0, 0);
+  Scale := -2.75;
+
+  AssertVector2DNear('2-D additive identity', A2.X, A2.Y, A2 + Z2);
+  AssertVector2DNear('2-D additive inverse', 0, 0, A2 + -A2);
+  AssertVector2DNear('2-D distributivity', (Scale * A2 + Scale * B2).X,
+    (Scale * A2 + Scale * B2).Y, Scale * (A2 + B2));
+  AssertVector2DNear('2-D scale inverse', A2.X, A2.Y, (A2 * Scale) / Scale);
+  AssertVector3DNear('3-D additive identity', A3.X, A3.Y, A3.Z, A3 + Z3);
+  AssertVector3DNear('3-D additive inverse', 0, 0, 0, A3 + -A3);
+  AssertVector3DNear('3-D distributivity', (Scale * A3 + Scale * B3).X,
+    (Scale * A3 + Scale * B3).Y, (Scale * A3 + Scale * B3).Z,
+    Scale * (A3 + B3));
+  AssertVector3DNear('3-D scale inverse', A3.X, A3.Y, A3.Z,
+    (A3 * Scale) / Scale);
+  AssertVector3DNear('2-D and 3-D addition agree', (A2 + B2).X,
+    (A2 + B2).Y, 0, A3 + B3);
+  AssertVector3DNear('2-D and 3-D subtraction agree', (A2 - B2).X,
+    (A2 - B2).Y, 0, A3 - B3);
+  AssertVector3DNear('2-D and 3-D scaling agree', (A2 * Scale).X,
+    (A2 * Scale).Y, 0, A3 * Scale);
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_NonFiniteAndOverflow;
+var
+  SavedMask: TFPUExceptionMask;
+  V2: TVector2D;
+  V3: TVector3D;
+begin
+  SavedMask := GetExceptionMask;
+  SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow,
+    exUnderflow, exPrecision]);
+  try
+    V2 := TVector2D.Create(Infinity, 1.0) + TVector2D.Create(-Infinity, NaN);
+    AssertTrue('2-D indeterminate infinity addition is NaN', IsNan(V2.X));
+    AssertTrue('2-D NaN propagates', IsNan(V2.Y));
+    V2 := TVector2D.Create(1E308, -1E308) * 2.0;
+    AssertTrue('2-D positive overflow is infinity', IsInfinite(V2.X) and (V2.X > 0));
+    AssertTrue('2-D negative overflow is infinity', IsInfinite(V2.Y) and (V2.Y < 0));
+
+    V3 := TVector3D.Create(Infinity, 0.0, 1.0) * 0.0;
+    AssertTrue('3-D infinity times zero is NaN', IsNan(V3.X));
+    AssertTrue('3-D zero times zero remains zero', V3.Y = 0.0);
+    AssertTrue('3-D finite times zero remains zero', V3.Z = 0.0);
+    V3 := TVector3D.Create(1E308, -1E308, 1E308) * 2.0;
+    AssertTrue('3-D positive overflow is infinity', IsInfinite(V3.X) and (V3.X > 0));
+    AssertTrue('3-D negative overflow is infinity', IsInfinite(V3.Y) and (V3.Y < 0));
+    AssertTrue('3-D positive overflow is infinity', IsInfinite(V3.Z) and (V3.Z > 0));
+  finally
+    SetExceptionMask(SavedMask);
+  end;
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_ZeroDivisionAndSignedZero;
+var
+  SavedMask: TFPUExceptionMask;
+  Negative: Double;
+  V2: TVector2D;
+  V3: TVector3D;
+begin
+  SavedMask := GetExceptionMask;
+  SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow,
+    exUnderflow, exPrecision]);
+  try
+    Negative := NegativeZero;
+    V2 := TVector2D.Create(1.0, 0.0) / Negative;
+    AssertTrue('2-D division by negative zero has negative infinity',
+      IsInfinite(V2.X) and (V2.X < 0.0));
+    AssertTrue('2-D zero divided by zero is NaN', IsNan(V2.Y));
+    V2 := TVector2D.Create(Negative, 2.0) * 1.0;
+    AssertTrue('2-D multiplication retains negative zero', (V2.X = 0.0) and
+      ((1.0 / V2.X) < 0.0));
+
+    V3 := TVector3D.Create(1.0, -1.0, 0.0) / Negative;
+    AssertTrue('3-D positive division by negative zero is negative infinity',
+      IsInfinite(V3.X) and (V3.X < 0.0));
+    AssertTrue('3-D negative division by negative zero is positive infinity',
+      IsInfinite(V3.Y) and (V3.Y > 0.0));
+    AssertTrue('3-D zero divided by zero is NaN', IsNan(V3.Z));
+  finally
+    SetExceptionMask(SavedMask);
+  end;
 end;
 
 procedure TTestGeometryLib.TestSegment3D_Length;

@@ -10,7 +10,7 @@ unit GeometryLib.Geometry;
  ---------------------------
  2-D Primitives
    TPoint2D      — (X, Y) with helper methods
-   TVector2D     — directed vector with dot, cross, magnitude, normalise
+   TVector2D     — directed vector with arithmetic, dot, cross, magnitude, normalise
    TSegment2D    — line segment [P, Q]
    TLine2D       — infinite line through two points (or ax+by+c=0)
    TCircle2D     — centre + radius
@@ -18,7 +18,7 @@ unit GeometryLib.Geometry;
 
  3-D Primitives
    TPoint3D      — (X, Y, Z)
-   TVector3D     — dot, cross, magnitude, normalise
+   TVector3D     — arithmetic, dot, cross, magnitude, normalise
    TSegment3D    — 3-D line segment
    TPlane3D      — ax+by+cz+d=0
    TSphere3D     — centre + radius
@@ -100,6 +100,17 @@ type
     function Dot(const V: TVector2D): Double;
     function Cross(const V: TVector2D): Double; { 2-D: scalar z-component }
     function Perpendicular: TVector2D; { rotate 90° CCW }
+    { Componentwise value arithmetic.  These operators do not mutate either
+      operand or allocate storage; normal IEEE-754 Double results, including
+      signed zero, NaN, and infinity, are retained.  Division by zero follows
+      IEEE-754: a non-zero finite component becomes signed infinity and zero
+      divided by zero becomes NaN. }
+    class operator +(const A, B: TVector2D): TVector2D;
+    class operator -(const A, B: TVector2D): TVector2D;
+    class operator -(const A: TVector2D): TVector2D;
+    class operator *(const A: TVector2D; const Scalar: Double): TVector2D;
+    class operator *(const Scalar: Double; const A: TVector2D): TVector2D;
+    class operator /(const A: TVector2D; const Scalar: Double): TVector2D;
     function ToString: String;
   end;
 
@@ -154,6 +165,14 @@ type
     function Normalise: TVector3D;
     function Dot(const V: TVector3D): Double;
     function Cross(const V: TVector3D): TVector3D;
+    { Componentwise value arithmetic; see TVector2D for the shared floating-
+      point, zero-division, allocation, and alias/value-semantics contract. }
+    class operator +(const A, B: TVector3D): TVector3D;
+    class operator -(const A, B: TVector3D): TVector3D;
+    class operator -(const A: TVector3D): TVector3D;
+    class operator *(const A: TVector3D; const Scalar: Double): TVector3D;
+    class operator *(const Scalar: Double; const A: TVector3D): TVector3D;
+    class operator /(const A: TVector3D; const Scalar: Double): TVector3D;
     function ToString: String;
   end;
 
@@ -360,6 +379,36 @@ begin Result := X * V.Y - Y * V.X; end;
 function TVector2D.Perpendicular: TVector2D;
 begin Result.X := -Y; Result.Y := X; end;
 
+class operator TVector2D.+(const A, B: TVector2D): TVector2D;
+begin
+  Result := Create(A.X + B.X, A.Y + B.Y);
+end;
+
+class operator TVector2D.-(const A, B: TVector2D): TVector2D;
+begin
+  Result := Create(A.X - B.X, A.Y - B.Y);
+end;
+
+class operator TVector2D.-(const A: TVector2D): TVector2D;
+begin
+  Result := Create(-A.X, -A.Y);
+end;
+
+class operator TVector2D.*(const A: TVector2D; const Scalar: Double): TVector2D;
+begin
+  Result := Create(A.X * Scalar, A.Y * Scalar);
+end;
+
+class operator TVector2D.*(const Scalar: Double; const A: TVector2D): TVector2D;
+begin
+  Result := Create(Scalar * A.X, Scalar * A.Y);
+end;
+
+class operator TVector2D./(const A: TVector2D; const Scalar: Double): TVector2D;
+begin
+  Result := Create(A.X / Scalar, A.Y / Scalar);
+end;
+
 function TVector2D.ToString: String;
 begin Result := Format('<%.6g, %.6g>', [X, Y]); end;
 
@@ -475,6 +524,36 @@ begin
   Result.X := Y*V.Z - Z*V.Y;
   Result.Y := Z*V.X - X*V.Z;
   Result.Z := X*V.Y - Y*V.X;
+end;
+
+class operator TVector3D.+(const A, B: TVector3D): TVector3D;
+begin
+  Result := Create(A.X + B.X, A.Y + B.Y, A.Z + B.Z);
+end;
+
+class operator TVector3D.-(const A, B: TVector3D): TVector3D;
+begin
+  Result := Create(A.X - B.X, A.Y - B.Y, A.Z - B.Z);
+end;
+
+class operator TVector3D.-(const A: TVector3D): TVector3D;
+begin
+  Result := Create(-A.X, -A.Y, -A.Z);
+end;
+
+class operator TVector3D.*(const A: TVector3D; const Scalar: Double): TVector3D;
+begin
+  Result := Create(A.X * Scalar, A.Y * Scalar, A.Z * Scalar);
+end;
+
+class operator TVector3D.*(const Scalar: Double; const A: TVector3D): TVector3D;
+begin
+  Result := Create(Scalar * A.X, Scalar * A.Y, Scalar * A.Z);
+end;
+
+class operator TVector3D./(const A: TVector3D; const Scalar: Double): TVector3D;
+begin
+  Result := Create(A.X / Scalar, A.Y / Scalar, A.Z / Scalar);
 end;
 
 function TVector3D.ToString: String;

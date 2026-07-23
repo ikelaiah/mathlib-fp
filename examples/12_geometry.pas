@@ -56,6 +56,34 @@ begin
 end;
 
 { ============================================================
+  SECTION 1b — Vector Arithmetic and the Theodorus Spiral
+============================================================ }
+procedure DemoVectorArithmetic;
+var
+  Radius, Step: TVector2D;
+  N: Integer;
+begin
+  WriteLn;
+  WriteLn('=== VECTOR ARITHMETIC ===');
+  WriteLn('The Theodorus spiral adds a unit perpendicular step to each radius.');
+  Sep;
+
+  Radius := TVector2D.Create(1, 0);
+  WriteLn(Format('  Radius 1 = %s, length = %.4f',
+    [Radius.ToString, Radius.Magnitude]));
+  for N := 2 to 6 do
+  begin
+    Step := Radius.Normalise.Perpendicular;
+    Radius := Radius + Step;
+    WriteLn(Format('  Radius %d = %s, length = %.4f  (= sqrt(%d))',
+      [N, Radius.ToString, Radius.Magnitude, N]));
+  end;
+
+  Radius := 0.5 * (TVector2D.Create(3, -4) + TVector2D.Create(1, 2));
+  WriteLn(Format('  0.5 * ((3,-4) + (1,2)) = %s', [Radius.ToString]));
+end;
+
+{ ============================================================
   SECTION 2 — Lines and Distances
 ============================================================ }
 procedure DemoDistances;
@@ -339,6 +367,7 @@ begin
   WriteLn('=================================');
 
   DemoPoints2D;
+  DemoVectorArithmetic;
   DemoDistances;
   DemoIntersections;
   DemoCircles;
