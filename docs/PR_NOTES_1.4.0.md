@@ -105,4 +105,6 @@ this PR.
   work.
 - Point arithmetic, coordinate-transform APIs, or implicit point/vector
   conversion.
-- Publishing or tagging the 1.4.0 release.
+- Post-merge release operations—finalizing publication metadata, creating
+  the v1.4.0 tag from the validated default-branch commit, and publishing
+  the GitHub release—are handled separately under RELEASING.md.
