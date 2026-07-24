@@ -7,8 +7,11 @@ when the release is tagged.
 
 - `GeometryLib.Geometry` now provides natural arithmetic for fixed-size
   `TVector2D` and `TVector3D` value records.
+- Vector magnitude and normalization are scale-safe for finite extreme-scale
+  components.
 - The geometry walkthrough includes a compact Theodorus-spiral construction
-  using `Radius := Radius + Step`.
+  using `Radius := Radius + Step`, symmetric 3-D arithmetic, and runnable
+  extreme-scale normalization.
 
 ## Vector arithmetic
 
@@ -27,6 +30,19 @@ The operations return independent record values, allocate no storage, and do
 not modify their operands, including when a caller assigns an expression back
 to one of its inputs.
 
+All fixed-size arithmetic and numeric vector operations are O(1), allocation-
+free on successful calls, and reentrant. Concurrent calls are safe when the
+same record storage is not being modified by another thread.
+
+## Magnitude and normalization
+
+`Magnitude` scales components before accumulating their squares, avoiding
+premature overflow and underflow for representable finite results. Infinity
+takes precedence over NaN in the magnitude, matching hypot-style behavior.
+`Normalise` now accepts finite non-zero vectors at tiny and large scales and
+returns a new value even when the unnormalised magnitude is too large for
+`Double`. It raises `EGeometryError` for exact-zero, NaN, or infinite vectors.
+
 ## Floating-point behavior
 
 The operators apply ordinary IEEE-754 `Double` arithmetic to each coordinate.
@@ -44,14 +60,20 @@ to the caller's configured FPU mode.
 This is an additive API change. Existing GeometryLib record fields, methods,
 and callers remain source-compatible. Point/vector translation operators are
 not included: points and displacement vectors continue to be distinct types
-until coordinate-transform semantics have their own documented design.
+until coordinate-transform semantics have their own documented design. The
+existing normalization API now treats small finite non-zero vectors as valid
+and reports non-finite vectors explicitly instead of returning indeterminate
+coordinates.
 
 ## Validation
 
 Focused tests cover both dimensions, ordinary arithmetic, value/alias
 semantics, additive identity and inverse, distributivity, scale inversion,
 2-D/3-D agreement, signed zero, zero-scalar division, NaN, infinity, and
-overflow. The public-API smoke suite compiles each new operator form. See the
+overflow. Extreme-scale magnitude and normalization tests cover large and tiny
+finite vectors, zero vectors, and non-finite inputs. Dot linearity and magnitude
+scaling connect the operators to the established vector methods. The public-API
+smoke suite compiles each new operator form. See the
 [GeometryLib reference](GeometryLib.md) and run
-[`examples/12_geometry.pas`](../examples/12_geometry.pas) for the complete
-example.
+[`examples/12_geometry.pas`](../examples/12_geometry.pas) for arithmetic,
+Theodorus construction, and scale-safe normalization examples.

@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   public-API smoke coverage, plus a runnable Theodorus-spiral demonstration in
   the geometry example.
 
+### Fixed
+
+- Made `TVector2D` and `TVector3D` magnitude and normalization scale-safe for
+  finite tiny and large components. Normalization now accepts every finite
+  non-zero vector and rejects exact-zero or non-finite vectors explicitly.
+
 ## [1.3.0] - 2026-07-23
 
 ### Added

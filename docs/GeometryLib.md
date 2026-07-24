@@ -171,6 +171,27 @@ corresponding `Double` operation to every coordinate. The 2-D and 3-D forms
 have the same operator set; `Perpendicular` remains the intentionally 2-D
 operation.
 
+The arithmetic operators and numeric vector methods are O(1) for these fixed
+dimensions and perform no heap allocation on successful calls. They keep no
+hidden state and are reentrant. Concurrent calls are safe provided no thread
+modifies the same record storage while another thread is reading it.
+
+### Magnitude and normalization
+
+`Magnitude` uses scaled sum-of-squares accumulation. It therefore avoids
+premature overflow and underflow when a finite 2-D or 3-D magnitude is
+representable. An infinite component makes the magnitude infinite; otherwise a
+NaN component makes it NaN.
+
+`Normalise` uses that scale-safe magnitude and accepts every finite, non-zero
+vector, including vectors whose components are much smaller than `GEO_EPS` or
+whose full magnitude is larger than `Double` can represent. It returns a new
+unit vector without changing the source. Exact-zero and non-finite vectors have
+no supported direction and raise `EGeometryError`.
+
+The runnable [GeometryLib example](../examples/12_geometry.pas) normalizes both
+tiny and near-maximum finite vectors and prints the resulting unit lengths.
+
 ### Floating-point behavior
 
 Arithmetic operators use ordinary IEEE-754 `Double` component operations and
@@ -345,7 +366,7 @@ undefined.
 ## Error Handling
 
 `EGeometryError` is raised for:
-- Normalising a zero-length vector
+- Normalising a zero-length or non-finite vector
 - `TLine2D.FromPoints` with two identical points
 - `TPlane3D.FromThreePoints` with collinear points
 - `PolygonArea`, `PolygonCentroid`, `IsConvex` with fewer than 3 vertices

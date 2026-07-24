@@ -60,7 +60,8 @@ end;
 ============================================================ }
 procedure DemoVectorArithmetic;
 var
-  Radius, Step: TVector2D;
+  Radius, Step, Extreme, UnitVector: TVector2D;
+  Average3D: TVector3D;
   N: Integer;
 begin
   WriteLn;
@@ -81,6 +82,25 @@ begin
 
   Radius := 0.5 * (TVector2D.Create(3, -4) + TVector2D.Create(1, 2));
   WriteLn(Format('  0.5 * ((3,-4) + (1,2)) = %s', [Radius.ToString]));
+
+  Average3D := (TVector3D.Create(1, 2, 3) +
+    TVector3D.Create(3, 2, 1)) / 2.0;
+  WriteLn(Format('  ((1,2,3) + (3,2,1)) / 2 = %s',
+    [Average3D.ToString]));
+
+  WriteLn;
+  WriteLn('  Scale-safe normalization of extreme finite vectors:');
+  Extreme := TVector2D.Create(3E-300, 4E-300);
+  UnitVector := Extreme.Normalise;
+  WriteLn(Format('    %s -> %s, unit length = %.4f',
+    [Extreme.ToString, UnitVector.ToString, UnitVector.Magnitude]));
+
+  { The full length of this finite vector is larger than Double can hold,
+    but its direction is still well-defined and can be normalized. }
+  Extreme := TVector2D.Create(1.7E308, 1.7E308);
+  UnitVector := Extreme.Normalise;
+  WriteLn(Format('    %s -> %s, unit length = %.4f',
+    [Extreme.ToString, UnitVector.ToString, UnitVector.Magnitude]));
 end;
 
 { ============================================================

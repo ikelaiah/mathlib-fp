@@ -40,6 +40,19 @@ The records retain value semantics: operators allocate no storage and do not
 modify either operand. Assigning an expression back to an operand, including
 `V := V + V`, is safe.
 
+The fixed-size arithmetic and numeric vector methods are O(1), allocation-free
+on successful calls, and reentrant. Concurrent calls are safe provided callers
+do not modify the same record storage from another thread.
+
+### Scale-safe magnitude and normalization
+
+`TVector2D.Magnitude` and `TVector3D.Magnitude` now scale their components
+before accumulating squares. This avoids premature overflow and underflow when
+the finite result is representable. `Normalise` uses the stable magnitude,
+accepts finite non-zero vectors at tiny and large scales even when their full
+magnitude is not representable, and raises `EGeometryError` for exact-zero,
+NaN, or infinite vectors.
+
 ### Floating-point contract
 
 The implementation applies ordinary IEEE-754 `Double` operations to each
@@ -56,9 +69,11 @@ configured FPU exception instead of a result for that operation.
 ### Documentation and release preparation
 
 - Updated the GeometryLib reference with operator declarations, value/alias
-  semantics, floating-point behavior, and the Theodorus example.
+  semantics, complexity, thread safety, scale-safe magnitude/normalization,
+  floating-point behavior, and the Theodorus example.
 - Extended `examples/12_geometry.pas` with runnable arithmetic and
-  Theodorus-spiral output.
+  Theodorus-spiral output, symmetric 3-D arithmetic, and extreme-scale
+  normalization.
 - Added 1.4.0 prepared release notes and an index entry.
 - Added an Unreleased changelog entry and advanced the Lazarus package metadata
   to 1.4.
@@ -70,20 +85,23 @@ Focused tests cover:
 - ordinary arithmetic in both dimensions and both scalar operand orders;
 - immutable value/alias behavior;
 - additive identity and inverse, distributivity, scale inversion, and 2-D/3-D
-  agreement; and
+  agreement;
 - signed zero, zero-scalar division, NaN, infinity, and overflow with the
-  IEEE status exceptions locally masked and restored by the test.
+  IEEE status exceptions locally masked and restored by the test; and
+- large and tiny representable magnitudes, extreme-scale normalization,
+  zero/non-finite rejection, dot-product linearity, and magnitude scaling.
 
 The public-API smoke test compiles every new operator form.
 
 Local verification completed:
 
-- [x] 825 tests pass on Win64 normal, optimized, runtime-checked, and
+- [x] 830 tests pass on Win64 normal, optimized, runtime-checked, and
   heap-traced configurations; heap tracing reports zero unfreed blocks.
-- [x] 825 tests pass on optimized Win32.
+- [x] 830 tests pass on optimized Win32.
 - [x] All runnable examples compile and execute; the geometry example prints
-  Theodorus radii through `sqrt(6)`.
-- [x] The Lazarus package builds successfully on Win64.
+  Theodorus radii through `sqrt(6)`, 3-D arithmetic, and unit vectors normalized
+  from tiny and near-maximum finite inputs.
+- [x] The Lazarus package builds successfully on Win64 and Win32.
 - [x] `git diff --check` passes.
 
 Linux and Windows CI remain the publication checks for the branch containing
@@ -96,8 +114,9 @@ this PR.
   displacement vectors, and coordinate transforms need a dedicated documented
   design before adding such operators.
 - The main review focus is the public numerical contract: scalar-zero division,
-  FPU exception-mask behavior, and whether componentwise value arithmetic is
-  consistently documented across 2-D and 3-D vectors.
+  FPU exception-mask behavior, scale-safe normalization, and whether
+  componentwise value arithmetic is consistently documented across 2-D and
+  3-D vectors.
 
 ## Out of scope
 

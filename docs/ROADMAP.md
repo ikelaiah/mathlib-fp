@@ -195,6 +195,12 @@ without reconstructing a vector from its individual coordinates.
   that demonstrates the motivating workflow.
 - Add public-API smoke checks and focused algebraic properties such as identity,
   inverse, distributivity, scaling, and agreement between 2-D and 3-D forms.
+- Make the existing 2-D and 3-D magnitude and normalization methods scale-safe
+  for finite tiny and large components, with explicit exact-zero and non-finite
+  normalization behavior.
+- Document that fixed-size vector arithmetic is O(1), allocation-free,
+  reentrant, and thread-safe when callers do not concurrently mutate the same
+  record storage.
 
 Point/vector translation operators are not automatically part of this change.
 They should be added only after the distinctions between points, displacement
@@ -204,6 +210,9 @@ vectors, and coordinate transforms have a documented, consistent design.
 
 - The complete operator set compiles on every supported Free Pascal target.
 - 2-D and 3-D behavior is consistent and has edge-case and property tests.
+- Magnitude and normalization avoid premature intermediate overflow and
+  underflow; normalization also works when a finite vector's magnitude exceeds
+  the representable `Double` range.
 - The motivating example can use `V1 := V1 + V2` without coordinate-by-
   coordinate reconstruction.
 - Reference documentation, code comments, example output, changelog, package

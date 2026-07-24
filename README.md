@@ -79,7 +79,7 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 | [OptimizationLib](docs/OptimizationLib.md) | Scalar, multivariate, constrained, linear optimization |
 | [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection |
 | [MLLib](docs/MLLib.md) | Preprocessing, regression, classification, clustering, PCA |
-| [GeometryLib](docs/GeometryLib.md) | 2-D and 3-D computational geometry |
+| [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms |
 
 All public units live in `src/`; the domains can be used independently unless
 their documentation says otherwise. See the

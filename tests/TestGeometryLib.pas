@@ -55,6 +55,7 @@ type
     procedure TestPoint2D_DistanceTo;
     procedure TestVector2D_Magnitude;
     procedure TestVector2D_Normalise;
+    procedure TestVector2D_ExtremeMagnitudeAndNormalise;
     procedure TestVector2D_Dot;
     procedure TestVector2D_Cross;
     procedure TestVector2D_Perpendicular;
@@ -69,10 +70,12 @@ type
     procedure TestPoint3D_DistanceTo;
     procedure TestVector3D_Magnitude;
     procedure TestVector3D_Normalise;
+    procedure TestVector3D_ExtremeMagnitudeAndNormalise;
     procedure TestVector3D_Dot;
     procedure TestVector3D_Cross;
     procedure TestVector3D_ArithmeticOperators;
     procedure TestVectorArithmetic_PropertiesAndDimensionalAgreement;
+    procedure TestVectorArithmetic_ExistingOperationProperties;
     procedure TestVectorArithmetic_NonFiniteAndOverflow;
     procedure TestVectorArithmetic_ZeroDivisionAndSignedZero;
     procedure TestSegment3D_Length;
@@ -131,6 +134,8 @@ type
     procedure TestBoundingBox2D;
     { --- Error handling ---------------------------------------------------- }
     procedure TestVector2D_NormaliseZeroRaises;
+    procedure TestVector3D_NormaliseZeroRaises;
+    procedure TestVectorNormalise_NonFiniteRaises;
     procedure TestLine2D_SamePointRaises;
     procedure TestPolygonArea_TooFewRaises;
     procedure TestConvexHull_TooFewRaises;
@@ -161,6 +166,18 @@ end;
 procedure ErrNormaliseZero;
 var V: TVector2D;
 begin V := TVector2D.Create(0, 0); V.Normalise; end;
+
+procedure ErrNormalise3DZero;
+var V: TVector3D;
+begin V := TVector3D.Create(0, 0, 0); V.Normalise; end;
+
+procedure ErrNormalise2DInfinity;
+var V: TVector2D;
+begin V := TVector2D.Create(Infinity, 1); V.Normalise; end;
+
+procedure ErrNormalise3DNaN;
+var V: TVector3D;
+begin V := TVector3D.Create(1, NaN, 2); V.Normalise; end;
 
 procedure ErrLineSamePoint;
 begin TLine2D.FromPoints(TPoint2D.Create(1,1), TPoint2D.Create(1,1)); end;
@@ -267,6 +284,29 @@ begin
   AssertNear('Normalise Mag=1', 1.0, N.Magnitude);
   AssertNear('Normalise X', 0.6, N.X);
   AssertNear('Normalise Y', 0.8, N.Y);
+end;
+
+procedure TTestGeometryLib.TestVector2D_ExtremeMagnitudeAndNormalise;
+var
+  V, N: TVector2D;
+begin
+  V := TVector2D.Create(1E308, 1E308);
+  AssertNear('large 2-D magnitude remains representable', Sqrt(2.0),
+    V.Magnitude / 1E308, 1E-15);
+  N := V.Normalise;
+  AssertNear('large 2-D normal X', 1.0 / Sqrt(2.0), N.X, 1E-15);
+  AssertNear('large 2-D normal Y', 1.0 / Sqrt(2.0), N.Y, 1E-15);
+
+  V := TVector2D.Create(1.7E308, 1.7E308);
+  N := V.Normalise;
+  AssertVector2DNear('2-D normal survives unrepresentable magnitude',
+    1.0 / Sqrt(2.0), 1.0 / Sqrt(2.0), N, 1E-15);
+
+  V := TVector2D.Create(3E-300, 4E-300);
+  AssertNear('tiny 2-D magnitude does not underflow', 5.0,
+    V.Magnitude / 1E-300, 1E-14);
+  N := V.Normalise;
+  AssertVector2DNear('tiny 2-D vector normalises', 0.6, 0.8, N, 1E-15);
 end;
 
 procedure TTestGeometryLib.TestVector2D_Dot;
@@ -403,6 +443,30 @@ begin
   AssertNear('3D norm X', 1/3, N.X);
 end;
 
+procedure TTestGeometryLib.TestVector3D_ExtremeMagnitudeAndNormalise;
+var
+  V, N: TVector3D;
+begin
+  V := TVector3D.Create(1E308, 1E308, 1E308);
+  AssertNear('large 3-D magnitude remains representable', Sqrt(3.0),
+    V.Magnitude / 1E308, 1E-15);
+  N := V.Normalise;
+  AssertVector3DNear('large 3-D vector normalises', 1.0 / Sqrt(3.0),
+    1.0 / Sqrt(3.0), 1.0 / Sqrt(3.0), N, 1E-15);
+
+  V := TVector3D.Create(1.7E308, 1.7E308, 1.7E308);
+  N := V.Normalise;
+  AssertVector3DNear('3-D normal survives unrepresentable magnitude',
+    1.0 / Sqrt(3.0), 1.0 / Sqrt(3.0), 1.0 / Sqrt(3.0), N, 1E-15);
+
+  V := TVector3D.Create(1E-300, 2E-300, 2E-300);
+  AssertNear('tiny 3-D magnitude does not underflow', 3.0,
+    V.Magnitude / 1E-300, 1E-14);
+  N := V.Normalise;
+  AssertVector3DNear('tiny 3-D vector normalises', 1.0 / Sqrt(9.0),
+    2.0 / Sqrt(9.0), 2.0 / Sqrt(9.0), N, 1E-15);
+end;
+
 procedure TTestGeometryLib.TestVector3D_Dot;
 var V1, V2: TVector3D;
 begin
@@ -474,6 +538,30 @@ begin
     (A2 - B2).Y, 0, A3 - B3);
   AssertVector3DNear('2-D and 3-D scaling agree', (A2 * Scale).X,
     (A2 * Scale).Y, 0, A3 * Scale);
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_ExistingOperationProperties;
+var
+  A2, B2, C2: TVector2D;
+  A3, B3, C3: TVector3D;
+  Scale: Double;
+begin
+  A2 := TVector2D.Create(1.25, -2.5);
+  B2 := TVector2D.Create(3.75, 0.5);
+  C2 := TVector2D.Create(-2.0, 4.0);
+  A3 := TVector3D.Create(1.25, -2.5, 0.75);
+  B3 := TVector3D.Create(3.75, 0.5, -1.25);
+  C3 := TVector3D.Create(-2.0, 4.0, 3.0);
+  Scale := -3.5;
+
+  AssertNear('2-D dot is linear over addition', A2.Dot(C2) + B2.Dot(C2),
+    (A2 + B2).Dot(C2), 1E-14);
+  AssertNear('3-D dot is linear over addition', A3.Dot(C3) + B3.Dot(C3),
+    (A3 + B3).Dot(C3), 1E-14);
+  AssertNear('2-D magnitude respects scaling', Abs(Scale) * A2.Magnitude,
+    (Scale * A2).Magnitude, 1E-14);
+  AssertNear('3-D magnitude respects scaling', Abs(Scale) * A3.Magnitude,
+    (Scale * A3).Magnitude, 1E-14);
 end;
 
 procedure TTestGeometryLib.TestVectorArithmetic_NonFiniteAndOverflow;
@@ -1032,6 +1120,17 @@ end;
 procedure TTestGeometryLib.TestVector2D_NormaliseZeroRaises;
 begin
   AssertGeoError('Normalise zero vector', @ErrNormaliseZero);
+end;
+
+procedure TTestGeometryLib.TestVector3D_NormaliseZeroRaises;
+begin
+  AssertGeoError('Normalise zero 3-D vector', @ErrNormalise3DZero);
+end;
+
+procedure TTestGeometryLib.TestVectorNormalise_NonFiniteRaises;
+begin
+  AssertGeoError('Normalise infinite 2-D vector', @ErrNormalise2DInfinity);
+  AssertGeoError('Normalise NaN 3-D vector', @ErrNormalise3DNaN);
 end;
 
 procedure TTestGeometryLib.TestLine2D_SamePointRaises;

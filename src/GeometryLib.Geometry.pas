@@ -95,14 +95,15 @@ type
     class function Create(AX, AY: Double): TVector2D; static;
     { From P → Q }
     class function FromPoints(const P, Q: TPoint2D): TVector2D; static;
-    function Magnitude: Double;
-    function Normalise: TVector2D; { unit vector; raises if zero }
+    function Magnitude: Double; { scale-safe Euclidean length }
+    function Normalise: TVector2D; { unit vector; raises if zero or non-finite }
     function Dot(const V: TVector2D): Double;
     function Cross(const V: TVector2D): Double; { 2-D: scalar z-component }
     function Perpendicular: TVector2D; { rotate 90° CCW }
-    { Componentwise value arithmetic.  These operators do not mutate either
-      operand or allocate storage; normal IEEE-754 Double results, including
-      signed zero, NaN, and infinity, are retained.  Division by zero follows
+    { Componentwise value arithmetic.  These O(1), reentrant operators do not
+      mutate either operand or allocate storage; concurrent calls are safe
+      unless another thread mutates the same record.  Normal IEEE-754 results,
+      including signed zero, NaN, and infinity, are retained.  Division by zero follows
       IEEE-754: a non-zero finite component becomes signed infinity and zero
       divided by zero becomes NaN. }
     class operator +(const A, B: TVector2D): TVector2D;
@@ -161,8 +162,8 @@ type
     X, Y, Z: Double;
     class function Create(AX, AY, AZ: Double): TVector3D; static;
     class function FromPoints(const P, Q: TPoint3D): TVector3D; static;
-    function Magnitude: Double;
-    function Normalise: TVector3D;
+    function Magnitude: Double; { scale-safe Euclidean length }
+    function Normalise: TVector3D; { unit vector; raises if zero or non-finite }
     function Dot(const V: TVector3D): Double;
     function Cross(const V: TVector3D): TVector3D;
     { Componentwise value arithmetic; see TVector2D for the shared floating-
@@ -336,6 +337,51 @@ type
 
 implementation
 
+{ Scale before squaring so finite small and large components do not underflow
+  or overflow prematurely.  Infinity takes precedence over NaN, matching the
+  usual hypot convention.  The open-array temporaries for the fixed 2-D/3-D
+  calls are stack values and require no heap allocation. }
+function StableMagnitude(const Components: array of Double): Double;
+var
+  I: Integer;
+  AbsoluteValue, Ratio, Scale, SumSquares: Double;
+begin
+  for I := 0 to High(Components) do
+    if IsInfinite(Components[I]) then
+      Exit(Infinity);
+  for I := 0 to High(Components) do
+    if IsNan(Components[I]) then
+      Exit(NaN);
+
+  Scale := 0.0;
+  SumSquares := 0.0;
+  for I := 0 to High(Components) do
+  begin
+    AbsoluteValue := Abs(Components[I]);
+    if AbsoluteValue = 0.0 then
+      Continue;
+    if Scale < AbsoluteValue then
+    begin
+      if Scale = 0.0 then
+        SumSquares := 1.0
+      else
+      begin
+        Ratio := Scale / AbsoluteValue;
+        SumSquares := 1.0 + SumSquares * Sqr(Ratio);
+      end;
+      Scale := AbsoluteValue;
+    end
+    else
+    begin
+      Ratio := AbsoluteValue / Scale;
+      SumSquares := SumSquares + Sqr(Ratio);
+    end;
+  end;
+  if Scale = 0.0 then
+    Exit(0.0);
+  Result := Scale * Sqrt(SumSquares);
+end;
+
 { ---------------------------------------------------------------------------
   TPoint2D
 --------------------------------------------------------------------------- }
@@ -360,14 +406,19 @@ class function TVector2D.FromPoints(const P, Q: TPoint2D): TVector2D;
 begin Result.X := Q.X - P.X; Result.Y := Q.Y - P.Y; end;
 
 function TVector2D.Magnitude: Double;
-begin Result := Sqrt(X*X + Y*Y); end;
+begin Result := StableMagnitude([X, Y]); end;
 
 function TVector2D.Normalise: TVector2D;
-var M: Double;
+var M, Scale: Double;
 begin
-  M := Magnitude;
-  if M < GEO_EPS then raise EGeometryError.Create('Cannot normalise a zero vector');
-  Result.X := X / M; Result.Y := Y / M;
+  if IsNan(X) or IsNan(Y) or IsInfinite(X) or IsInfinite(Y) then
+    raise EGeometryError.Create('TVector2D.Normalise: vector must be finite');
+  Scale := Max(Abs(X), Abs(Y));
+  if Scale = 0.0 then
+    raise EGeometryError.Create('TVector2D.Normalise: zero vector has no direction');
+  M := StableMagnitude([X / Scale, Y / Scale]);
+  Result.X := (X / Scale) / M;
+  Result.Y := (Y / Scale) / M;
 end;
 
 function TVector2D.Dot(const V: TVector2D): Double;
@@ -506,14 +557,21 @@ class function TVector3D.FromPoints(const P, Q: TPoint3D): TVector3D;
 begin Result.X := Q.X-P.X; Result.Y := Q.Y-P.Y; Result.Z := Q.Z-P.Z; end;
 
 function TVector3D.Magnitude: Double;
-begin Result := Sqrt(X*X + Y*Y + Z*Z); end;
+begin Result := StableMagnitude([X, Y, Z]); end;
 
 function TVector3D.Normalise: TVector3D;
-var M: Double;
+var M, Scale: Double;
 begin
-  M := Magnitude;
-  if M < GEO_EPS then raise EGeometryError.Create('Cannot normalise a zero 3-D vector');
-  Result.X := X/M; Result.Y := Y/M; Result.Z := Z/M;
+  if IsNan(X) or IsNan(Y) or IsNan(Z) or
+     IsInfinite(X) or IsInfinite(Y) or IsInfinite(Z) then
+    raise EGeometryError.Create('TVector3D.Normalise: vector must be finite');
+  Scale := Max(Abs(X), Max(Abs(Y), Abs(Z)));
+  if Scale = 0.0 then
+    raise EGeometryError.Create('TVector3D.Normalise: zero vector has no direction');
+  M := StableMagnitude([X / Scale, Y / Scale, Z / Scale]);
+  Result.X := (X / Scale) / M;
+  Result.Y := (Y / Scale) / M;
+  Result.Z := (Z / Scale) / M;
 end;
 
 function TVector3D.Dot(const V: TVector3D): Double;
