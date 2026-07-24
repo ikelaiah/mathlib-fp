@@ -120,16 +120,66 @@ task. Work should proceed one release and one reviewable change at a time.
 - Keep each change small enough that its numerical assumptions, compatibility,
   and performance consequences can be reviewed independently.
 
-## Current release: 1.3.0
+## Current release: 1.4.0 — Geometry vector arithmetic
 
-Released on 2026-07-23, version 1.3.0 establishes the complex-number and vector
+Released on 2026-07-25, version 1.4.0 delivers a small but complete improvement
+to GeometryLib's fixed-size value types. It responds directly to the first
+external feature request received by the project: make ordinary vector
+arithmetic expressible without reconstructing a vector from its individual
+coordinates.
+
+### Completed 1.4.0 scope
+
+- `TVector2D` and `TVector3D` provide vector addition, subtraction, unary
+  negation, scalar multiplication in both operand orders, and vector/scalar
+  division.
+- Natural operators such as `V1 + V2` keep the 2-D and 3-D APIs symmetrical
+  while genuinely dimensional operations remain distinct.
+- Zero-scalar division, signed zero, NaN, Infinity, overflow, and alias/value
+  semantics have explicit documentation and tests.
+- The GeometryLib reference and runnable geometry example cover the complete
+  operator set, a compact Theodorus spiral, symmetric 3-D arithmetic, and
+  extreme-scale normalization.
+- Public-API smoke checks and focused properties cover identity, inverse,
+  distributivity, scaling, dot linearity, and agreement between 2-D and 3-D
+  forms.
+- The existing 2-D and 3-D magnitude and normalization methods are scale-safe
+  for finite tiny and large components, with explicit exact-zero and
+  non-finite normalization behavior.
+- Fixed-size vector arithmetic is documented as O(1), allocation-free,
+  reentrant, and thread-safe when callers do not concurrently mutate the same
+  record storage.
+
+Point/vector translation operators are not part of this release. They should
+be added only after the distinctions between points, displacement vectors, and
+coordinate transforms have a documented, consistent design.
+
+### 1.4.0 completion evidence
+
+- The complete operator set compiles on every supported Free Pascal target.
+- 2-D and 3-D behavior is consistent and has edge-case and property tests.
+- Magnitude and normalization avoid premature intermediate overflow and
+  underflow; normalization also works when a finite vector's magnitude exceeds
+  the representable `Double` range.
+- The motivating example uses `Radius := Radius + Step` without
+  coordinate-by-coordinate reconstruction.
+- Reference documentation, code comments, example output, changelog, package
+  metadata, and release notes describe the delivered API and behavior.
+- Existing GeometryLib callers remain source-compatible.
+
+See the [1.4.0 release notes](RELEASE_NOTES_1.4.0.md) for the delivered API and
+validation summary.
+
+## Previous release: 1.3.0
+
+Released on 2026-07-23, version 1.3.0 established the complex-number and vector
 foundation required by the next generation of algebra and signal-processing
 features. It preserves the existing matrix-as-vector API: an `IMatrix` with
 one row or one column remains an `IVector` and keeps its `DotProduct`,
 `CrossProduct`, and `Normalize` methods.
 
-The new foundation adds a complementary, allocation-light array API rather
-than replacing matrices:
+The foundation adds a complementary, allocation-light array API rather than
+replacing matrices:
 
 - `MathBase.Complex` supplies the scalar `TComplex` type, scale-safe division,
   signed-zero-aware principal functions (including inverse trigonometric and
@@ -138,7 +188,7 @@ than replacing matrices:
   (compensated reductions, elementwise operations, stable norms, scaling,
   AXPY-style combination, normalization, and reusable destination buffers);
 - `AlgebraLib.Vectors` remains the compatibility-oriented entry unit and
-  re-exports the new array-vector types and kernel facade;
+  re-exports the array-vector types and kernel facade;
 - signal processing uses `TComplexArray` as the FFT core while retaining its
   existing split real/imaginary procedures as source-compatible adapters.
 
@@ -160,7 +210,7 @@ runtime-checked, and heap-traced test runs, and the optimized Win32 suite. See
 the [1.3.0 release notes](RELEASE_NOTES_1.3.0.md) for the delivered API and
 validation summary.
 
-## Previous release: 1.2.3
+## Earlier release: 1.2.3
 
 Version 1.2.3 was a correctness and robustness release. It did not add a new
 domain. It concentrated on the operations already exposed:
@@ -172,54 +222,7 @@ domain. It concentrated on the operations already exposed:
   tests;
 - kept public signatures source-compatible wherever correctness permitted.
 
-## Next release: 1.4.0 — Geometry vector arithmetic
-
-The focus of 1.4.0 is a small but complete improvement to GeometryLib's
-fixed-size value types. It responds directly to the first external feature
-request received by the project: make ordinary vector arithmetic expressible
-without reconstructing a vector from its individual coordinates.
-
-### Planned scope
-
-- Add vector addition, subtraction, and unary negation for `TVector2D` and
-  `TVector3D`.
-- Add scalar multiplication in both operand orders and vector/scalar division.
-- Prefer natural operators such as `V1 + V2` while adding named methods only
-  when compiler compatibility or API clarity requires them.
-- Keep the 2-D and 3-D APIs symmetrical unless a genuinely dimensional
-  operation, such as the 2-D perpendicular, makes that impossible.
-- Define and test zero-scalar division, signed zero, NaN, Infinity, overflow,
-  and alias/value semantics rather than inheriting accidental target behavior.
-- Update the GeometryLib reference and runnable geometry example. With the
-  contributor's permission, include or link a compact Theodorus-spiral example
-  that demonstrates the motivating workflow.
-- Add public-API smoke checks and focused algebraic properties such as identity,
-  inverse, distributivity, scaling, and agreement between 2-D and 3-D forms.
-- Make the existing 2-D and 3-D magnitude and normalization methods scale-safe
-  for finite tiny and large components, with explicit exact-zero and non-finite
-  normalization behavior.
-- Document that fixed-size vector arithmetic is O(1), allocation-free,
-  reentrant, and thread-safe when callers do not concurrently mutate the same
-  record storage.
-
-Point/vector translation operators are not automatically part of this change.
-They should be added only after the distinctions between points, displacement
-vectors, and coordinate transforms have a documented, consistent design.
-
-### 1.4.0 completion gate
-
-- The complete operator set compiles on every supported Free Pascal target.
-- 2-D and 3-D behavior is consistent and has edge-case and property tests.
-- Magnitude and normalization avoid premature intermediate overflow and
-  underflow; normalization also works when a finite vector's magnitude exceeds
-  the representable `Double` range.
-- The motivating example can use `V1 := V1 + V2` without coordinate-by-
-  coordinate reconstruction.
-- Reference documentation, code comments, example output, changelog, package
-  metadata, and release notes describe the delivered API and behavior.
-- Existing GeometryLib callers remain source-compatible.
-
-## Planned 1.5.0 — Typed contiguous numerical foundation
+## Next release: 1.5.0 — Typed contiguous numerical foundation
 
 Version 1.5.0 establishes the scalar, storage, and kernel layers on which the
 later linear-algebra, fitting, signal, statistics, and machine-learning work

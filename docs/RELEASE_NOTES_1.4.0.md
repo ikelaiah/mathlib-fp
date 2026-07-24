@@ -1,7 +1,6 @@
 # mathlib-fp 1.4.0 release notes
 
-**Release status:** prepared for publication; the publication date will be set
-when the release is tagged.
+**Release date:** 2026-07-25
 
 ## Highlights
 

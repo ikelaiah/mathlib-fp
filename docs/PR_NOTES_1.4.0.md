@@ -74,7 +74,8 @@ configured FPU exception instead of a result for that operation.
 - Extended `examples/12_geometry.pas` with runnable arithmetic and
   Theodorus-spiral output, symmetric 3-D arithmetic, and extreme-scale
   normalization.
-- Added 1.4.0 prepared release notes and an index entry.
+- Finalized the 1.4.0 release notes for the 2026-07-25 publication date and
+  added an index entry.
 - Added an Unreleased changelog entry and advanced the Lazarus package metadata
   to 1.4.
 
@@ -124,6 +125,6 @@ this PR.
   work.
 - Point arithmetic, coordinate-transform APIs, or implicit point/vector
   conversion.
-- Post-merge release operations—finalizing publication metadata, creating
-  the v1.4.0 tag from the validated default-branch commit, and publishing
-  the GitHub release—are handled separately under RELEASING.md.
+- Merging into the default branch, verifying CI on the exact default-branch
+  commit, creating the v1.4.0 tag, and publishing the GitHub release are
+  handled separately under RELEASING.md.

@@ -8,8 +8,8 @@ native Free Pascal numerical package.
 
 ## Releases
 
-- [mathlib-fp 1.4.0 release notes](RELEASE_NOTES_1.4.0.md) — prepared release
-  notes for GeometryLib vector arithmetic.
+- [mathlib-fp 1.4.0 release notes](RELEASE_NOTES_1.4.0.md) — GeometryLib vector
+  arithmetic and scale-safe normalization.
 - [mathlib-fp 1.3.0 release notes](RELEASE_NOTES_1.3.0.md) — complex and
   vector foundation.
 - [mathlib-fp 1.2.3 release notes](RELEASE_NOTES_1.2.3.md) — numerical
