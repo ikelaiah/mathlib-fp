@@ -9,6 +9,7 @@ uses
   , TestMathBase
   , TestComplexLib
   , TestAlgebraLib
+  , TestDenseMatrices
   , TestFinanceLib
   , TestFinanceAliases
   , TestStatsLib

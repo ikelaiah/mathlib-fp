@@ -16,6 +16,9 @@ uses
   MathBase.Trigonometry,
   { AlgebraLib }
   AlgebraLib.Matrices,
+  AlgebraLib.DenseMatrices,
+  AlgebraLib.DenseKernels,
+  AlgebraLib.DenseSolvers,
   AlgebraLib.VectorKernels,
   AlgebraLib.Vectors,
   AlgebraLib.Determinants,

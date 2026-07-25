@@ -463,6 +463,31 @@ they must not constrain the new engine's type support, layout, or performance.
 - No compatibility API is removed, and every migration or copy cost is
   documented.
 
+### 1.5.0 qualification evidence
+
+- Real and complex arithmetic share the shape, retained-owner view, explicit
+  clone, finite-input, and `EDenseMatrixError` model documented in the
+  [typed dense design note](design/typed-dense-1.5.md).
+- Dense multiplication has reference, overlapping-alias, odd-shape,
+  empty-shape, mixed-extreme-scale, and deterministic odd-shape benchmark
+  coverage in `TestDenseMatrices` and `BenchmarkRunner`.
+- `Solve(A, B)` always uses reusable pivoted-LU factorisation and triangular
+  solves. Real and complex LU/Cholesky residual tests cover vectors and
+  multiple right-hand sides.
+- Allocating functions keep examples concise; every common kernel has an
+  exact-shape `Into` form and factor objects support repeated solves.
+- Single- and double-precision real/complex paths have the documented matching
+  operation set and precision-appropriate test budgets.
+- Shape, element-count, alignment-padding, and byte-count arithmetic is checked
+  before allocation with native-size types and has overflow tests. CI retains
+  both 32- and 64-bit qualification.
+- The [capability inventory](CAPABILITIES.md) publishes stable scalar/kernel
+  coverage and identifies Bessel, elliptic, exponential-integral, and typed
+  sparse families as unsupported rather than implying support.
+- No compatibility API was removed or deprecated. The
+  [migration guide](MIGRATING_TO_TYPED_DENSE.md) names every array, vector,
+  `IMatrix`, view, and clone copy/alias cost.
+
 ## Planned 1.6.0 — Complete dense and sparse linear algebra
 
 Version 1.6.0 turns the 1.5.0 engine into the dependable linear-algebra base

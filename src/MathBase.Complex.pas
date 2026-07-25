@@ -15,9 +15,32 @@ unit MathBase.Complex;
 interface
 
 uses
-  Math;
+  SysUtils, Math;
 
 type
+  { Single-precision complex scalar.  Operations stay in Single precision;
+    callers must opt in to an explicit conversion when crossing precisions. }
+  TSingleComplex = record
+    Re: Single;
+    Im: Single;
+    class function Create(const ARe, AIm: Single): TSingleComplex; static;
+    class function Zero: TSingleComplex; static;
+    class function One: TSingleComplex; static;
+    class operator +(const A, B: TSingleComplex): TSingleComplex;
+    class operator -(const A, B: TSingleComplex): TSingleComplex;
+    class operator -(const A: TSingleComplex): TSingleComplex;
+    class operator *(const A, B: TSingleComplex): TSingleComplex;
+    class operator /(const A, B: TSingleComplex): TSingleComplex;
+    class operator =(const A, B: TSingleComplex): Boolean;
+    class operator <>(const A, B: TSingleComplex): Boolean;
+    function Conjugate: TSingleComplex;
+    function SqrMagnitude: Single;
+    function Magnitude: Single;
+    function IsFinite: Boolean;
+  end;
+
+  TSingleComplexArray = array of TSingleComplex;
+
   TComplex = record
     Re: Double;
     Im: Double;
@@ -50,6 +73,9 @@ type
 
   TComplexArray = array of TComplex;
 
+function ToComplex(const Z: TSingleComplex): TComplex;
+function ToSingleComplex(const Z: TComplex): TSingleComplex;
+
 function CExp(const Z: TComplex): TComplex;
 function CLog(const Z: TComplex): TComplex;
 function CSqrt(const Z: TComplex): TComplex;
@@ -69,6 +95,130 @@ function CAcosh(const Z: TComplex): TComplex;
 function CAtanh(const Z: TComplex): TComplex;
 
 implementation
+
+class function TSingleComplex.Create(const ARe, AIm: Single): TSingleComplex;
+begin
+  Result.Re := ARe;
+  Result.Im := AIm;
+end;
+
+class function TSingleComplex.Zero: TSingleComplex;
+begin
+  Result := Create(0.0, 0.0);
+end;
+
+class function TSingleComplex.One: TSingleComplex;
+begin
+  Result := Create(1.0, 0.0);
+end;
+
+class operator TSingleComplex.+(const A, B: TSingleComplex): TSingleComplex;
+begin
+  Result := Create(A.Re + B.Re, A.Im + B.Im);
+end;
+
+class operator TSingleComplex.-(const A, B: TSingleComplex): TSingleComplex;
+begin
+  Result := Create(A.Re - B.Re, A.Im - B.Im);
+end;
+
+class operator TSingleComplex.-(const A: TSingleComplex): TSingleComplex;
+begin
+  Result := Create(-A.Re, -A.Im);
+end;
+
+class operator TSingleComplex.*(const A, B: TSingleComplex): TSingleComplex;
+begin
+  Result := Create(A.Re * B.Re - A.Im * B.Im,
+    A.Re * B.Im + A.Im * B.Re);
+end;
+
+class operator TSingleComplex./(const A, B: TSingleComplex): TSingleComplex;
+var
+  Scale, BR, BI, AR, AI, Denominator: Double;
+begin
+  if (B.Re = 0.0) and (B.Im = 0.0) then
+    Exit(Create(NaN, NaN));
+  if IsNan(A.Re) or IsNan(A.Im) or IsNan(B.Re) or IsNan(B.Im) then
+    Exit(Create(NaN, NaN));
+  if IsInfinite(B.Re) or IsInfinite(B.Im) then
+  begin
+    if A.IsFinite then
+      Exit(Zero)
+    else
+      Exit(Create(NaN, NaN));
+  end;
+  Scale := Max(Abs(B.Re), Abs(B.Im));
+  BR := B.Re / Scale;
+  BI := B.Im / Scale;
+  AR := A.Re / Scale;
+  AI := A.Im / Scale;
+  Denominator := BR * BR + BI * BI;
+  Result := Create((AR * BR + AI * BI) / Denominator,
+    (AI * BR - AR * BI) / Denominator);
+end;
+
+class operator TSingleComplex.=(const A, B: TSingleComplex): Boolean;
+begin
+  Result := (A.Re = B.Re) and (A.Im = B.Im);
+end;
+
+class operator TSingleComplex.<>(const A, B: TSingleComplex): Boolean;
+begin
+  Result := not (A = B);
+end;
+
+function TSingleComplex.Conjugate: TSingleComplex;
+begin
+  Result := Create(Re, -Im);
+end;
+
+function TSingleComplex.SqrMagnitude: Single;
+begin
+  Result := Re * Re + Im * Im;
+end;
+
+function TSingleComplex.Magnitude: Single;
+var
+  X, Y, Ratio: Single;
+begin
+  X := Abs(Re);
+  Y := Abs(Im);
+  if IsInfinite(X) or IsInfinite(Y) then
+    Exit(Infinity);
+  if IsNan(X) or IsNan(Y) then
+    Exit(NaN);
+  if X < Y then
+  begin
+    Ratio := X;
+    X := Y;
+    Y := Ratio;
+  end;
+  if X = 0.0 then
+    Exit(0.0);
+  Ratio := Y / X;
+  Result := X * Sqrt(1.0 + Ratio * Ratio);
+end;
+
+function TSingleComplex.IsFinite: Boolean;
+begin
+  Result := not IsNan(Re) and not IsInfinite(Re) and
+    not IsNan(Im) and not IsInfinite(Im);
+end;
+
+function ToComplex(const Z: TSingleComplex): TComplex;
+begin
+  Result := TComplex.Create(Z.Re, Z.Im);
+end;
+
+function ToSingleComplex(const Z: TComplex): TSingleComplex;
+begin
+  if Z.IsFinite and
+    ((Abs(Z.Re) > MaxSingle) or (Abs(Z.Im) > MaxSingle)) then
+    raise ERangeError.Create(
+      'ToSingleComplex: component is outside the finite Single range.');
+  Result := TSingleComplex.Create(Z.Re, Z.Im);
+end;
 
 function ComplexMagnitude(const ARe, AIm: Double): Double;
 var
