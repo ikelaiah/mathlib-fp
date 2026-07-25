@@ -1,72 +1,118 @@
 # Roadmap
 
-mathlib-fp aims to become the comprehensive, freely available numerical-
-computing library for Free Pascal: useful for a first numerical program,
-dependable in production, and capable enough for large, real-world scientific
-and engineering applications while remaining entirely native.
+> **North star:** mathlib-fp will earn its place as the default mathematics and
+> numerical-computing library for Free Pascal: the first library newcomers can
+> understand, the library experienced Pascal developers can trust, and the one
+> library both groups can keep using as their problems grow.
 
-The project is built on the following non-negotiable foundations:
+Being the default is not a slogan or a function-count contest. It means that a
+Free Pascal user can find mathlib-fp, download it directly, compile a useful
+example within minutes, choose the right algorithm from approachable
+documentation, and deploy the result without purchasing a licence, installing
+a binary dependency, or calling through a foreign-language wrapper.
 
-- MIT-licensed source code that compiles with Free Pascal;
-- native Object Pascal implementations rather than wrappers around
-  implementations written in another language;
-- no required DLLs, binary SDKs, or third-party runtime libraries;
-- correct, portable implementations before architecture-specific optimisation;
-- independently usable units rather than a mandatory monolithic import;
-- documentation and source comments treated as part of the public API;
-- compatibility and migration paths that respect existing users.
+The following user promises are permanent release constraints:
+
+1. **Free without qualification.** The complete library is MIT licensed for
+   personal, academic, open-source, and commercial use. There are no licence
+   keys, paid algorithm tiers, or field-of-use restrictions; modification and
+   redistribution are permitted under the MIT terms.
+2. **Free Pascal source, not a wrapper.** Every stable capability has a
+   readable implementation compiled from Object Pascal source in this
+   repository. Generated tables and optional adapters are permitted; a
+   precompiled C/C++ core or foreign numerical runtime is never the only
+   implementation.
+3. **No third-party runtime dependencies.** A normal build needs only a
+   supported Free Pascal installation and the standard units shipped with it.
+   No DLL, SDK, service, package download, registration step, or network
+   connection is required at build time or runtime.
+4. **Documentation people can actually use.** Reviewed documentation is
+   browsable on the web and usable offline as ordinary text/HTML. PDF may be an
+   additional format, but never the only practical route. Tutorials, task
+   guides, selection guides, API reference, runnable examples, and source
+   comments are part of the product.
+5. **Easy before clever.** Common tasks have short, idiomatic APIs, helpful
+   validation errors, sensible defaults, and examples that compile unchanged.
+   Advanced controls, workspaces, and allocation-free paths remain available
+   without burdening a first program.
+6. **Useful end to end.** Domains share compatible types, conventions, and
+   results so users can complete real scientific, statistical, financial, and
+   engineering workflows without writing glue code between mathlib-fp units.
+
+Correct, portable implementations come before architecture-specific
+optimisation. Units remain independently usable rather than requiring one
+monolithic import, but together they must feel like one coherent library.
+Compatibility and documented migration paths protect existing users.
 
 ## Product ambition
 
 mathlib-fp is intended to meet four related needs in the Pascal ecosystem.
 
-1. **A dependable standard numerical library for Free Pascal.** It should be
-   a well-maintained foundation with accurate algorithms, explicit contracts,
-   approachable documentation, and dependable releases.
+1. **The dependable standard numerical toolbox for Free Pascal.** It should
+   combine accurate algorithms, explicit contracts, predictable releases, easy
+   installation, and approachable learning material in one maintained project.
 2. **Comprehensive numerical breadth in native Pascal.** The long-term coverage
    target includes dense and sparse linear algebra, interpolation and fitting,
    optimisation, FFT/DSP, statistics, data analysis, integration, nonlinear
-   equations, and ODEs.
-3. **Productive, scalable numerical programming for Pascal developers.** The
-   direction includes expression-friendly real and complex vector/matrix
-   arithmetic, reusable memory, serious decompositions and solvers,
-   DSP/statistical workflows, and portable performance from implementations
-   maintained within this source tree.
+   equations, ODEs, finance, geometry, and common engineering calculations.
+3. **Productive, scalable numerical programming.** Expression-friendly real
+   and complex vector/matrix arithmetic, reusable memory, serious
+   decompositions and solvers, and portable performance should support both a
+   short teaching program and a large production workload.
 4. **Documentation and source that teach as well as serve.** A newcomer should
    be able to choose and use an algorithm safely, while an expert should be
-   able to audit its mathematics, numerical safeguards, complexity, ownership,
-   and platform behavior from the documentation and code.
+   able to audit its mathematics, safeguards, complexity, ownership, and
+   platform behavior from the documentation and code.
 
-Success means broad, reliable coverage and the ability to complete common
-scientific and engineering workflows. Each minor release should update the
-project's capability inventory and state important remaining gaps honestly.
+Success means completing common workflows, not merely accumulating entry
+points. A broad library whose domains do not interoperate, a fast library that
+needs an opaque binary, or a correct library that users cannot learn does not
+meet the goal. Each minor release must update the capability inventory and
+state important remaining gaps honestly.
 
-The distinguishing promise of mathlib-fp is that the portable implementation
-remains readable Free Pascal source. Optional acceleration may improve it, but
-must never become necessary to obtain correct and complete functionality.
+“One library” does not mean that mathlib-fp must become a symbolic algebra
+system, plotting framework, GUI toolkit, or clone of every specialist package.
+It means Free Pascal users should not need a second general-purpose numerical
+library to compensate for missing foundations, inaccessible documentation,
+licensing restrictions, or incompatible data types.
 
-## What “best” means for this project
+## What “preferred” means for this project
 
 The project should not call itself complete merely because it has many
-functions. Its standard is the combination of:
+functions. It must earn preference through the combination of:
 
+- **time to first correct result** — a clean source archive, a one-screen
+  program, and platform-specific instructions that work without guesswork;
 - **mathematical trust** — published accuracy expectations, independent
   references, visible convergence outcomes, and regression tests for every
   corrected defect;
 - **explainability** — clear selection guides, public contracts, algorithm
   references, and source comments that explain numerical decisions;
 - **end-to-end usefulness** — compatible containers and result types that let
-  callers complete realistic workflows without private conversions or solvers;
-- **scalability** — algorithms and storage appropriate to both small interactive
+  callers finish realistic workflows without private conversions or solvers;
+- **API coherence** — consistent naming, indexing, shape, ownership, error,
+  tolerance, and result conventions across domains;
+- **scalability** — algorithms and storage appropriate to small interactive
   problems and large dense, sparse, batched, streaming, or parallel workloads;
 - **stability** — deliberate versioning, migration paths, reproducible results,
   and a public maturity level for each capability;
 - **independence** — complete portable Pascal paths with no mandatory service,
-  binary component, proprietary tool, or network connection.
+  binary component, proprietary tool, package manager, or network connection.
 
-Claims about accuracy, performance, breadth, or readiness must be supported by
-published evidence. Missing and experimental capabilities should be easier to
-find than marketing language.
+Claims about accuracy, performance, breadth, ease of use, or readiness must be
+supported by published evidence. Missing and experimental capabilities should
+be easier to find than marketing language.
+
+When priorities compete, use this order:
+
+1. correct a silent wrong answer, unsafe contract, or portability defect;
+2. remove a blocker from a documented end-to-end user workflow;
+3. make an existing stable capability easier to find, learn, or use;
+4. complete shared scalar, container, solver, and result foundations;
+5. improve measured performance without weakening portability or clarity;
+6. add isolated specialist functions.
+
+This order keeps “more useful” tied to user outcomes rather than raw API size.
 
 ## How to read this roadmap
 
@@ -90,15 +136,15 @@ vector arithmetic is new public API and belongs to 1.4.0.
 
 ## Release sequence at a glance
 
-| Release | Primary outcome |
-|---------|-----------------|
-| 1.3.0 | Complex scalars and allocation-light real/complex vector kernels |
-| 1.4.0 | Ergonomic and consistent 2-D/3-D geometry vector arithmetic |
-| 1.5.0 | Typed contiguous scalar, vector, and dense matrix foundation |
-| 1.6.0 | Production-grade dense/sparse decompositions and linear solvers |
-| 1.7.0 | Interpolation, fitting, advanced numerics, and optimisation |
-| 1.8.0 | Applied numerics, interchange, tooling, and performance maturity |
-| 2.0.0 | Unified stable API, complete migration, and documented capability baseline |
+| Release | Numerical outcome | User-facing outcome |
+| --- | --- | --- |
+| 1.3.0 | Complex scalars and allocation-light real/complex vector kernels | Documented native complex/vector workflows with compatible FFT paths |
+| 1.4.0 | Ergonomic and consistent 2-D/3-D geometry vector arithmetic | Natural operators, runnable examples, and explicit edge-case behavior |
+| 1.5.0 | Typed contiguous scalar, vector, and dense matrix foundation | Five-minute install path, searchable documentation baseline, and concise solve examples |
+| 1.6.0 | Production-grade dense/sparse decompositions and linear solvers | “Choose a solver” guidance, inspectable outcomes, and migration recipes |
+| 1.7.0 | Interpolation, fitting, advanced numerics, and optimisation | End-to-end modelling recipes with convergence and diagnostic guidance |
+| 1.8.0 | Applied numerics, interchange, tooling, and performance maturity | Portable data workflows, reproducible benchmarks, and mature package/distribution paths |
+| 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
 
 ## Implementation discipline
 
@@ -119,6 +165,87 @@ task. Work should proceed one release and one reviewable change at a time.
   change.
 - Keep each change small enough that its numerical assumptions, compatibility,
   and performance consequences can be reviewed independently.
+
+## Continuous adoption track
+
+Installation, documentation, and usability are release work, not a 2.0 cleanup
+phase. The following track starts now and applies to every future stable
+release alongside its numerical scope.
+
+### Distribution and installation
+
+- Publish source archives and checksums on GitHub with direct links from the
+  README. Downloading a release must not require an account, custom downloader,
+  package manager, or JavaScript-only file browser.
+- Keep direct source use first-class: adding `src/` to the unit path is enough
+  to compile a basic program, with no configure step or generated source.
+- Keep the Lazarus package tested and versioned with the library. Direct source
+  use remains canonical. Package-manager metadata is out of scope unless a
+  future tool demonstrates active maintenance, meaningful adoption, and a
+  reproducible installation workflow.
+- Test release archives after clean extraction on supported Windows and Unix
+  targets, using only a supported FPC installation and with network access
+  unavailable.
+- Run a dependency audit before release. Stable numerical units must not load
+  third-party DLLs, invoke external programs, contact services, or require
+  optional packages transitively.
+- Document supported compiler, OS, CPU, and precision combinations in one
+  obvious support matrix rather than scattering qualifications across guides.
+
+### Documentation and discoverability
+
+- Establish searchable, versioned, static web documentation during the 1.5
+  cycle and preserve the same reviewed content in the repository for offline
+  use. HTML and PDF builds may be generated from it.
+- Give every domain a landing page with a 60-second example, common tasks,
+  “choose an algorithm” guidance, links to complete API contracts, and clearly
+  labelled maturity and limitations.
+- Maintain both a symbol index and a problem-oriented algorithm index. A user
+  who knows “least-squares fit” but not the Pascal identifier should still find
+  the right entry point.
+- Compile and run every published example in CI. Code copied from the current
+  documentation must work with the corresponding release archive.
+- Add realistic cookbook workflows that cross domain boundaries and interpret
+  their results. Examples should demonstrate safe choices and failure handling,
+  not only happy-path syntax.
+- Publish focused migration notes for widely used Pascal numerical APIs when
+  users request them and a responsible semantic mapping exists. State
+  differences instead of promising drop-in compatibility.
+
+### API and first-use experience
+
+- Common tasks should require only the relevant `uses` entry, data, and
+  operation. Stable numerical code must not require global registration,
+  framework startup, a GUI component, or hidden mutable singleton state.
+- Provide task-level entry points with consistent names and defaults while
+  preserving lower-level configuration and reusable-workspace APIs for expert
+  use.
+- Use shared scalar, vector, matrix, status, and option types across domains.
+  Public examples must not contain glue conversions that the library itself
+  should provide.
+- Make errors actionable: identify the operation, invalid parameter or shape,
+  expected condition, and terminology used by the relevant guide.
+- Document allocation and copying without forcing beginners to manage
+  workspaces. Show the simple API first and the repeated/high-performance form
+  beside it where the distinction matters.
+- Review naming and overloads through small runnable programs. If an ordinary
+  workflow reads awkwardly in Pascal, API design is not complete.
+
+### Adoption gate for every stable release
+
+- A new user can go from the release page to a correctly running documented
+  example in no more than five minutes on a primary supported platform.
+- The quick start is validated from the packaged release, not a maintainer's
+  configured checkout.
+- Every new stable public symbol has an API contract, and every new algorithm
+  family has selection guidance plus at least one runnable example.
+- Representative workflows build and run with no network, foreign binary,
+  licence key, or third-party runtime package.
+- Documentation search, links, code blocks, public-symbol coverage, and example
+  execution pass automated checks.
+- Release notes state user-visible additions, migration concerns, maturity
+  changes, known limitations, and the exact evidence behind accuracy or
+  performance claims.
 
 ## Current release: 1.4.0 — Geometry vector arithmetic
 
@@ -600,9 +727,8 @@ before the 2.0 API and compatibility boundary is finalised.
 - Serialise fitted models, decompositions where safe, spline/filter state, RNG
   state, and configuration with explicit format versions and compatibility
   tests.
-- Provide concise and full matrix/vector summaries, shape/type metadata, and
-  optional tabular inspection adapters without introducing a GUI dependency in
-  the numerical units.
+- Provide concise and full matrix/vector summaries plus shape/type metadata
+  without introducing a GUI dependency in the numerical units.
 - Provide an opt-in, non-Turing-complete mathematical expression evaluator for
   scalar, vector, and matrix formulas with explicit symbol binding, resource
   limits, typed errors, and no implicit file or network access.
@@ -710,6 +836,8 @@ the higher-level libraries and their migration path is proven.
 
 ### Documentation and release readiness
 
+- This section completes and verifies the continuous adoption track; it does
+  not defer documentation, packaging, or first-use work until 2.0.
 - Every public symbol is indexed and documented; every domain has a quick
   start, selection guide, API reference, error/convergence guide, and runnable
   examples.
@@ -719,10 +847,11 @@ the higher-level libraries and their migration path is proven.
   not just isolated one-function calls.
 - Documentation CI checks links, public-symbol coverage, code-block syntax, and
   compilation/execution of every runnable example.
-- Supported platforms have clean install/build instructions, package metadata,
-  CI, checksummed release archives, and a published support matrix. Where the
-  ecosystem tooling is reliable, provide Lazarus and `fppkg`-compatible package
-  metadata in addition to direct source use.
+- Supported platforms have clean install/build instructions, CI, checksummed
+  release archives, and a published support matrix. Provide a tested Lazarus
+  package in addition to direct source use. Package-manager integration is not
+  a release requirement and may be considered only for demonstrably maintained
+  tooling.
 - Assign compiler/OS/CPU combinations to support tiers: primary targets run the
   full suite on each change; secondary targets receive scheduled compile/test
   qualification with their limitations and last successful run published.
