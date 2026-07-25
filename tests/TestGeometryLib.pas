@@ -164,39 +164,65 @@ begin
 end;
 
 procedure ErrNormaliseZero;
-var V: TVector2D;
-begin V := TVector2D.Create(0, 0); V.Normalise; end;
+var
+  V: TVector2D;
+begin
+  V := TVector2D.Create(0, 0);
+  V.Normalise;
+end;
 
 procedure ErrNormalise3DZero;
-var V: TVector3D;
-begin V := TVector3D.Create(0, 0, 0); V.Normalise; end;
+var
+  V: TVector3D;
+begin
+  V := TVector3D.Create(0, 0, 0);
+  V.Normalise;
+end;
 
 procedure ErrNormalise2DInfinity;
-var V: TVector2D;
-begin V := TVector2D.Create(Infinity, 1); V.Normalise; end;
+var
+  V: TVector2D;
+begin
+  V := TVector2D.Create(Infinity, 1);
+  V.Normalise;
+end;
 
 procedure ErrNormalise3DNaN;
-var V: TVector3D;
-begin V := TVector3D.Create(1, NaN, 2); V.Normalise; end;
+var
+  V: TVector3D;
+begin
+  V := TVector3D.Create(1, NaN, 2);
+  V.Normalise;
+end;
 
 procedure ErrLineSamePoint;
-begin TLine2D.FromPoints(TPoint2D.Create(1,1), TPoint2D.Create(1,1)); end;
+begin
+  TLine2D.FromPoints(
+    TPoint2D.Create(1, 1),
+    TPoint2D.Create(1, 1));
+end;
 
 procedure ErrPolygonAreaTooFew;
-begin TGeometryKit.PolygonArea(GErrPts); end;
+begin
+  TGeometryKit.PolygonArea(GErrPts);
+end;
 
 procedure ErrConvexHullTooFew;
-begin TGeometryKit.ConvexHull(GErrPts); end;
+begin
+  TGeometryKit.ConvexHull(GErrPts);
+end;
 
 procedure ErrBoundingBoxEmpty;
-begin TGeometryKit.BoundingBox2D(GErrPts); end;
+begin
+  TGeometryKit.BoundingBox2D(GErrPts);
+end;
 
 procedure ErrPlaneCollinear;
 begin
   TPlane3D.FromThreePoints(
-    TPoint3D.Create(0,0,0),
-    TPoint3D.Create(1,0,0),
-    TPoint3D.Create(2,0,0));
+    TPoint3D.Create(0, 0, 0),
+    TPoint3D.Create(1, 0, 0),
+    TPoint3D.Create(2, 0, 0));
 end;
 
 { ---------------------------------------------------------------------------

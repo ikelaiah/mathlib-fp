@@ -103,9 +103,9 @@ type
     { Componentwise value arithmetic.  These O(1), reentrant operators do not
       mutate either operand or allocate storage; concurrent calls are safe
       unless another thread mutates the same record.  Normal IEEE-754 results,
-      including signed zero, NaN, and infinity, are retained.  Division by zero follows
-      IEEE-754: a non-zero finite component becomes signed infinity and zero
-      divided by zero becomes NaN. }
+      including signed zero, NaN, and infinity, are retained.  Division by zero
+      follows IEEE-754: a non-zero finite component becomes signed infinity
+      and zero divided by zero becomes NaN. }
     class operator +(const A, B: TVector2D): TVector2D;
     class operator -(const A, B: TVector2D): TVector2D;
     class operator -(const A: TVector2D): TVector2D;
@@ -406,16 +406,20 @@ class function TVector2D.FromPoints(const P, Q: TPoint2D): TVector2D;
 begin Result.X := Q.X - P.X; Result.Y := Q.Y - P.Y; end;
 
 function TVector2D.Magnitude: Double;
-begin Result := StableMagnitude([X, Y]); end;
+begin
+  Result := StableMagnitude([X, Y]);
+end;
 
 function TVector2D.Normalise: TVector2D;
-var M, Scale: Double;
+var
+  M, Scale: Double;
 begin
   if IsNan(X) or IsNan(Y) or IsInfinite(X) or IsInfinite(Y) then
     raise EGeometryError.Create('TVector2D.Normalise: vector must be finite');
   Scale := Max(Abs(X), Abs(Y));
   if Scale = 0.0 then
-    raise EGeometryError.Create('TVector2D.Normalise: zero vector has no direction');
+    raise EGeometryError.Create(
+      'TVector2D.Normalise: zero vector has no direction');
   M := StableMagnitude([X / Scale, Y / Scale]);
   Result.X := (X / Scale) / M;
   Result.Y := (Y / Scale) / M;
@@ -557,17 +561,21 @@ class function TVector3D.FromPoints(const P, Q: TPoint3D): TVector3D;
 begin Result.X := Q.X-P.X; Result.Y := Q.Y-P.Y; Result.Z := Q.Z-P.Z; end;
 
 function TVector3D.Magnitude: Double;
-begin Result := StableMagnitude([X, Y, Z]); end;
+begin
+  Result := StableMagnitude([X, Y, Z]);
+end;
 
 function TVector3D.Normalise: TVector3D;
-var M, Scale: Double;
+var
+  M, Scale: Double;
 begin
   if IsNan(X) or IsNan(Y) or IsNan(Z) or
      IsInfinite(X) or IsInfinite(Y) or IsInfinite(Z) then
     raise EGeometryError.Create('TVector3D.Normalise: vector must be finite');
   Scale := Max(Abs(X), Max(Abs(Y), Abs(Z)));
   if Scale = 0.0 then
-    raise EGeometryError.Create('TVector3D.Normalise: zero vector has no direction');
+    raise EGeometryError.Create(
+      'TVector3D.Normalise: zero vector has no direction');
   M := StableMagnitude([X / Scale, Y / Scale, Z / Scale]);
   Result.X := (X / Scale) / M;
   Result.Y := (Y / Scale) / M;
