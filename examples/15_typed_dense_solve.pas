@@ -3,33 +3,36 @@ program typed_dense_solve;
 {$mode objfpc}{$H+}{$J-}
 
 uses
-  SysUtils, Math,
   AlgebraLib.DenseMatrices,
   AlgebraLib.DenseKernels,
   AlgebraLib.DenseSolvers;
 
 var
-  A, B, X, Residual: IDenseDoubleMatrix;
-  Factors: IDenseDoubleLU;
+  ItemsPerReceipt, ReceiptTotals, UnitPrices: IDenseDoubleMatrix;
+  NewOrder, NewOrderTotal: IDenseDoubleMatrix;
 begin
-  A := TDenseDoubleMatrix.FromValues(3, 3,
-    [3.0, 2.0, -1.0,
-     2.0, -2.0, 4.0,
-     -1.0, 0.5, -1.0]);
-  B := TDenseDoubleMatrix.FromValues(3, 1, [1.0, -2.0, 0.0]);
+  { A cafe has three receipts but no itemised prices. Each row records the
+    quantities of coffee, sandwiches, and juice on one receipt. }
+  ItemsPerReceipt := TDenseDoubleMatrix.FromValues(3, 3,
+    [2.0, 1.0, 1.0,
+     1.0, 2.0, 3.0,
+     3.0, 2.0, 1.0]);
+  ReceiptTotals := TDenseDoubleMatrix.FromValues(3, 1,
+    [18.50, 28.00, 30.00]);
 
-  { Solve factors A once and uses triangular solves; it never forms A^-1. }
-  X := Solve(A, B);
-  Residual := Subtract(Multiply(A, X), B);
-  WriteLn('x = [', X[0, 0]:0:6, ', ', X[1, 0]:0:6, ', ',
-    X[2, 0]:0:6, ']');
-  WriteLn('maximum residual = ',
-    Max(Abs(Residual[0, 0]),
-      Max(Abs(Residual[1, 0]), Abs(Residual[2, 0]))):0:3);
+  { Solve ItemsPerReceipt * UnitPrices = ReceiptTotals. Solve uses an LU
+    factorisation and triangular solves; it does not form an inverse. }
+  UnitPrices := Solve(ItemsPerReceipt, ReceiptTotals);
 
-  { Keep a factor when solving the same A for more right-hand sides. }
-  Factors := FactorLU(A);
-  X := Factors.Solve(TDenseDoubleMatrix.FromValues(3, 2,
-    [1.0, 2.0, -2.0, -4.0, 0.0, 0.0]));
-  WriteLn('two-RHS first row = [', X[0, 0]:0:6, ', ', X[0, 1]:0:6, ']');
+  WriteLn('Prices inferred from the three receipts:');
+  WriteLn('  Coffee:  $', UnitPrices[0, 0]:0:2);
+  WriteLn('  Sandwich: $', UnitPrices[1, 0]:0:2);
+  WriteLn('  Juice:   $', UnitPrices[2, 0]:0:2);
+
+  { Use the solved prices to quote five coffees, four sandwiches, and
+    three juices. }
+  NewOrder := TDenseDoubleMatrix.FromValues(1, 3, [5.0, 4.0, 3.0]);
+  NewOrderTotal := Multiply(NewOrder, UnitPrices);
+  WriteLn;
+  WriteLn('Total for the new order: $', NewOrderTotal[0, 0]:0:2);
 end.
