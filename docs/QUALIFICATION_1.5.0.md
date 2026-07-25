@@ -13,7 +13,7 @@ expand the release into any 1.6.0 decomposition or sparse work.
 | Windows i386, FPC 3.2.2, `-O2` | 841/841 tests passed | Optimised full `TestRunner` |
 | Lazarus package 1.5 | Passed | Clean-config x86-64 and i386 builds |
 | Published examples | Passed | All 16 compiled and ran |
-| Searchable documentation | Passed | 30 pages, 16 indexed examples, 54 new-symbol checks |
+| Searchable documentation | Passed | 31 pages, 16 indexed examples, 54 new-symbol checks |
 | Clean extracted archive | Passed | Checksum generated; typed solve compiled and ran offline |
 
 The repository CI repeats normal Linux x86-64 and Windows x86-64 suites,
