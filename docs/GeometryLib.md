@@ -19,6 +19,9 @@ if TGeometryKit.SegmentsIntersect2D(A1, A2, B1, B2) then ...
 // Convex hull of a point cloud
 Hull := TGeometryKit.ConvexHull(Points);
 
+// Fixed-size vector arithmetic
+V := 2.0 * (V1 + V2) / 3.0;
+
 // Point-in-polygon test
 if TGeometryKit.PointInPolygon(Mouse, Boundary) then ...
 ```
@@ -48,6 +51,13 @@ TVector2D = record
   function Dot(const V: TVector2D): Double;
   function Cross(const V: TVector2D): Double;    { 2-D scalar (z-component) }
   function Perpendicular: TVector2D;             { rotate 90° CCW }
+  class operator +(const A, B: TVector2D): TVector2D;
+  class operator -(const A, B: TVector2D): TVector2D;
+  class operator -(const A: TVector2D): TVector2D;
+  class operator *(const A: TVector2D; const Scalar: Double): TVector2D;
+  class operator *(const Scalar: Double; const A: TVector2D): TVector2D;
+  class operator /(const A: TVector2D; const Scalar: Double): TVector2D;
+  function ToString: String;
 end;
 
 TSegment2D = record
@@ -105,6 +115,12 @@ TVector3D = record
   function Normalise: TVector3D;
   function Dot(const V: TVector3D): Double;
   function Cross(const V: TVector3D): TVector3D;
+  class operator +(const A, B: TVector3D): TVector3D;
+  class operator -(const A, B: TVector3D): TVector3D;
+  class operator -(const A: TVector3D): TVector3D;
+  class operator *(const A: TVector3D; const Scalar: Double): TVector3D;
+  class operator *(const Scalar: Double; const A: TVector3D): TVector3D;
+  class operator /(const A: TVector3D; const Scalar: Double): TVector3D;
   function ToString: String;
 end;
 
@@ -133,6 +149,71 @@ TSphere3D = record
   function ContainsPoint(const P: TPoint3D): Boolean;
 end;
 ```
+
+---
+
+## Vector arithmetic
+
+`TVector2D` and `TVector3D` are fixed-size value records. Addition,
+subtraction, negation, scalar multiplication, and vector/scalar division are
+componentwise and leave both operands unchanged. They allocate no storage, so
+assignments such as `V := V + Step` and `V := 2.0 * V` are value-safe.
+
+```pascal
+V2 := TVector2D.Create(3, -4) + TVector2D.Create(1, 2);  // (4, -2)
+V2 := -V2 / 2.0;                                         // (-2, 1)
+
+V3 := 0.5 * TVector3D.Create(2, 4, 6);                  // (1, 2, 3)
+```
+
+For a vector `V` and scalar `S`, `V * S`, `S * V`, and `V / S` apply the
+corresponding `Double` operation to every coordinate. The 2-D and 3-D forms
+have the same operator set; `Perpendicular` remains the intentionally 2-D
+operation.
+
+The arithmetic operators and numeric vector methods are O(1) for these fixed
+dimensions and perform no heap allocation on successful calls. They keep no
+hidden state and are reentrant. Concurrent calls are safe provided no thread
+modifies the same record storage while another thread is reading it.
+
+### Magnitude and normalization
+
+`Magnitude` uses scaled sum-of-squares accumulation. It therefore avoids
+premature overflow and underflow when a finite 2-D or 3-D magnitude is
+representable. An infinite component makes the magnitude infinite; otherwise a
+NaN component makes it NaN.
+
+`Normalise` uses that scale-safe magnitude and accepts every finite, non-zero
+vector, including vectors whose components are much smaller than `GEO_EPS` or
+whose full magnitude is larger than `Double` can represent. It returns a new
+unit vector without changing the source. Exact-zero and non-finite vectors have
+no supported direction and raise `EGeometryError`.
+
+The runnable [GeometryLib example](../examples/12_geometry.pas) normalizes both
+tiny and near-maximum finite vectors and prints the resulting unit lengths.
+
+### Floating-point behavior
+
+Arithmetic operators use ordinary IEEE-754 `Double` component operations and
+do not raise `EGeometryError` for non-finite values. NaN propagates through
+the affected coordinate, infinities follow the underlying operation rules, and
+finite overflow produces a signed infinity. Signed zero is retained where the
+underlying operation retains it. For division by `+0.0` or `-0.0`, a non-zero
+finite coordinate produces the corresponding signed infinity; zero divided by
+zero produces NaN. Callers who require finite vectors should validate their
+inputs and results before using them in a geometric construction. These results
+are returned when the corresponding IEEE status exceptions are masked. The
+operators do not change the caller's FPU exception mask, so a caller that has
+unmasked invalid-operation, zero-divide, or overflow exceptions receives its
+configured FPU exception instead.
+
+### Theodorus spiral
+
+The runnable [GeometryLib example](../examples/12_geometry.pas) includes a
+compact Theodorus-spiral construction. Each new unit-length perpendicular step
+is added with `Radius := Radius + Step`, so the successive radii have lengths
+`sqrt(1)`, `sqrt(2)`, and so on without rebuilding a vector coordinate by
+coordinate.
 
 ---
 
@@ -285,7 +366,7 @@ undefined.
 ## Error Handling
 
 `EGeometryError` is raised for:
-- Normalising a zero-length vector
+- Normalising a zero-length or non-finite vector
 - `TLine2D.FromPoints` with two identical points
 - `TPlane3D.FromThreePoints` with collinear points
 - `PolygonArea`, `PolygonCentroid`, `IsConvex` with fewer than 3 vertices

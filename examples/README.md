@@ -22,7 +22,7 @@ closest to your project.
 | `09_optimization.pas` | OptimizationLib | Scalar, multivariate, constrained, and linear optimisation |
 | `10_timeseries.pas` | TimeSeriesLib | Smoothing, decomposition, forecasting, and anomalies |
 | `11_machinelearning.pas` | MLLib | Preprocessing, models, clustering, PCA, and metrics |
-| `12_geometry.pas` | GeometryLib | 2-D/3-D geometry, intersections, hulls, and transforms |
+| `12_geometry.pas` | GeometryLib | Vector arithmetic and normalization, 2-D/3-D geometry, intersections, hulls, and transforms |
 | `13_numerical_methods.pas` | NumericsLib | Roots, integration, ODEs, interpolation, and errors |
 | `14_complex_vectors.pas` | MathBase / AlgebraLib / EngineeringLib | Complex inverse functions, elementwise and reusable-buffer vector kernels, Hermitian dot products, and complex FFT round trips |
 

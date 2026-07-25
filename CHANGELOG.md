@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-25
+
+### Added
+
+- Added componentwise `+`, binary and unary `-`, scalar `*` in both operand
+  orders, and vector/scalar `/` operators for `GeometryLib.Geometry`
+  `TVector2D` and `TVector3D`. The fixed-size value records retain IEEE-754
+  `Double` results for signed zero, NaN, infinity, overflow, and zero-scalar
+  division without mutating either operand.
+- Added focused GeometryLib operator, edge-case, algebraic-property, and
+  public-API smoke coverage, plus a runnable Theodorus-spiral demonstration in
+  the geometry example.
+
+### Fixed
+
+- Made `TVector2D` and `TVector3D` magnitude and normalization scale-safe for
+  finite tiny and large components. Normalization now accepts every finite
+  non-zero vector and rejects exact-zero or non-finite vectors explicitly.
+
 ## [1.3.0] - 2026-07-23
 
 ### Added
