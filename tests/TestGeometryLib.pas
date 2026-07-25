@@ -43,6 +43,8 @@ type
   private
     procedure AssertNear(const AMsg: string; Expected, Got: Double; Tol: Double = 1e-9);
     procedure AssertPoint2DNear(const AMsg: string; EX, EY: Double; const Got: TPoint2D; Tol: Double = 1e-9);
+    procedure AssertVector2DNear(const AMsg: string; EX, EY: Double; const Got: TVector2D; Tol: Double = 1e-9);
+    procedure AssertVector3DNear(const AMsg: string; EX, EY, EZ: Double; const Got: TVector3D; Tol: Double = 1e-9);
     procedure AssertGeoError(const AMsg: string; AProc: TProcedure);
     { Build a unit square CCW: (0,0),(1,0),(1,1),(0,1) }
     function UnitSquare: TPolygon2D;
@@ -53,9 +55,11 @@ type
     procedure TestPoint2D_DistanceTo;
     procedure TestVector2D_Magnitude;
     procedure TestVector2D_Normalise;
+    procedure TestVector2D_ExtremeMagnitudeAndNormalise;
     procedure TestVector2D_Dot;
     procedure TestVector2D_Cross;
     procedure TestVector2D_Perpendicular;
+    procedure TestVector2D_ArithmeticOperators;
     procedure TestSegment2D_Length;
     procedure TestSegment2D_Midpoint;
     procedure TestLine2D_Distance;
@@ -66,8 +70,14 @@ type
     procedure TestPoint3D_DistanceTo;
     procedure TestVector3D_Magnitude;
     procedure TestVector3D_Normalise;
+    procedure TestVector3D_ExtremeMagnitudeAndNormalise;
     procedure TestVector3D_Dot;
     procedure TestVector3D_Cross;
+    procedure TestVector3D_ArithmeticOperators;
+    procedure TestVectorArithmetic_PropertiesAndDimensionalAgreement;
+    procedure TestVectorArithmetic_ExistingOperationProperties;
+    procedure TestVectorArithmetic_NonFiniteAndOverflow;
+    procedure TestVectorArithmetic_ZeroDivisionAndSignedZero;
     procedure TestSegment3D_Length;
     procedure TestSegment3D_Midpoint;
     procedure TestPlane3D_Distance;
@@ -124,6 +134,8 @@ type
     procedure TestBoundingBox2D;
     { --- Error handling ---------------------------------------------------- }
     procedure TestVector2D_NormaliseZeroRaises;
+    procedure TestVector3D_NormaliseZeroRaises;
+    procedure TestVectorNormalise_NonFiniteRaises;
     procedure TestLine2D_SamePointRaises;
     procedure TestPolygonArea_TooFewRaises;
     procedure TestConvexHull_TooFewRaises;
@@ -143,28 +155,74 @@ implementation
 var
   GErrPts: TPolygon2D;
 
+function NegativeZero: Double;
+var
+  Bits: QWord;
+begin
+  Bits := QWord($8000000000000000);
+  Move(Bits, Result, SizeOf(Result));
+end;
+
 procedure ErrNormaliseZero;
-var V: TVector2D;
-begin V := TVector2D.Create(0, 0); V.Normalise; end;
+var
+  V: TVector2D;
+begin
+  V := TVector2D.Create(0, 0);
+  V.Normalise;
+end;
+
+procedure ErrNormalise3DZero;
+var
+  V: TVector3D;
+begin
+  V := TVector3D.Create(0, 0, 0);
+  V.Normalise;
+end;
+
+procedure ErrNormalise2DInfinity;
+var
+  V: TVector2D;
+begin
+  V := TVector2D.Create(Infinity, 1);
+  V.Normalise;
+end;
+
+procedure ErrNormalise3DNaN;
+var
+  V: TVector3D;
+begin
+  V := TVector3D.Create(1, NaN, 2);
+  V.Normalise;
+end;
 
 procedure ErrLineSamePoint;
-begin TLine2D.FromPoints(TPoint2D.Create(1,1), TPoint2D.Create(1,1)); end;
+begin
+  TLine2D.FromPoints(
+    TPoint2D.Create(1, 1),
+    TPoint2D.Create(1, 1));
+end;
 
 procedure ErrPolygonAreaTooFew;
-begin TGeometryKit.PolygonArea(GErrPts); end;
+begin
+  TGeometryKit.PolygonArea(GErrPts);
+end;
 
 procedure ErrConvexHullTooFew;
-begin TGeometryKit.ConvexHull(GErrPts); end;
+begin
+  TGeometryKit.ConvexHull(GErrPts);
+end;
 
 procedure ErrBoundingBoxEmpty;
-begin TGeometryKit.BoundingBox2D(GErrPts); end;
+begin
+  TGeometryKit.BoundingBox2D(GErrPts);
+end;
 
 procedure ErrPlaneCollinear;
 begin
   TPlane3D.FromThreePoints(
-    TPoint3D.Create(0,0,0),
-    TPoint3D.Create(1,0,0),
-    TPoint3D.Create(2,0,0));
+    TPoint3D.Create(0, 0, 0),
+    TPoint3D.Create(1, 0, 0),
+    TPoint3D.Create(2, 0, 0));
 end;
 
 { ---------------------------------------------------------------------------
@@ -181,6 +239,19 @@ procedure TTestGeometryLib.AssertPoint2DNear(const AMsg: string; EX, EY: Double;
 begin
   AssertNear(AMsg + ' X', EX, Got.X, Tol);
   AssertNear(AMsg + ' Y', EY, Got.Y, Tol);
+end;
+
+procedure TTestGeometryLib.AssertVector2DNear(const AMsg: string; EX, EY: Double; const Got: TVector2D; Tol: Double);
+begin
+  AssertNear(AMsg + ' X', EX, Got.X, Tol);
+  AssertNear(AMsg + ' Y', EY, Got.Y, Tol);
+end;
+
+procedure TTestGeometryLib.AssertVector3DNear(const AMsg: string; EX, EY, EZ: Double; const Got: TVector3D; Tol: Double);
+begin
+  AssertNear(AMsg + ' X', EX, Got.X, Tol);
+  AssertNear(AMsg + ' Y', EY, Got.Y, Tol);
+  AssertNear(AMsg + ' Z', EZ, Got.Z, Tol);
 end;
 
 procedure TTestGeometryLib.AssertGeoError(const AMsg: string; AProc: TProcedure);
@@ -241,6 +312,29 @@ begin
   AssertNear('Normalise Y', 0.8, N.Y);
 end;
 
+procedure TTestGeometryLib.TestVector2D_ExtremeMagnitudeAndNormalise;
+var
+  V, N: TVector2D;
+begin
+  V := TVector2D.Create(1E308, 1E308);
+  AssertNear('large 2-D magnitude remains representable', Sqrt(2.0),
+    V.Magnitude / 1E308, 1E-15);
+  N := V.Normalise;
+  AssertNear('large 2-D normal X', 1.0 / Sqrt(2.0), N.X, 1E-15);
+  AssertNear('large 2-D normal Y', 1.0 / Sqrt(2.0), N.Y, 1E-15);
+
+  V := TVector2D.Create(1.7E308, 1.7E308);
+  N := V.Normalise;
+  AssertVector2DNear('2-D normal survives unrepresentable magnitude',
+    1.0 / Sqrt(2.0), 1.0 / Sqrt(2.0), N, 1E-15);
+
+  V := TVector2D.Create(3E-300, 4E-300);
+  AssertNear('tiny 2-D magnitude does not underflow', 5.0,
+    V.Magnitude / 1E-300, 1E-14);
+  N := V.Normalise;
+  AssertVector2DNear('tiny 2-D vector normalises', 0.6, 0.8, N, 1E-15);
+end;
+
 procedure TTestGeometryLib.TestVector2D_Dot;
 var V1, V2: TVector2D;
 begin
@@ -272,6 +366,25 @@ begin
   AssertNear('Perp Y', 1.0, P.Y);
   { Dot with original = 0 }
   AssertNear('Perp dot = 0', 0.0, V.Dot(P));
+end;
+
+procedure TTestGeometryLib.TestVector2D_ArithmeticOperators;
+var
+  A, B, V: TVector2D;
+begin
+  A := TVector2D.Create(3, -4);
+  B := TVector2D.Create(-1, 2);
+  AssertVector2DNear('addition', 2, -2, A + B);
+  AssertVector2DNear('subtraction', 4, -6, A - B);
+  AssertVector2DNear('unary negation', -3, 4, -A);
+  AssertVector2DNear('vector times scalar', 6, -8, A * 2.0);
+  AssertVector2DNear('scalar times vector', 6, -8, 2.0 * A);
+  AssertVector2DNear('vector divided by scalar', 1.5, -2, A / 2.0);
+  V := A + B;
+  AssertVector2DNear('left operand remains a value', 3, -4, A);
+  AssertVector2DNear('right operand remains a value', -1, 2, B);
+  V := V + V;
+  AssertVector2DNear('self assignment is value-safe', 4, -4, V);
 end;
 
 procedure TTestGeometryLib.TestSegment2D_Length;
@@ -356,6 +469,30 @@ begin
   AssertNear('3D norm X', 1/3, N.X);
 end;
 
+procedure TTestGeometryLib.TestVector3D_ExtremeMagnitudeAndNormalise;
+var
+  V, N: TVector3D;
+begin
+  V := TVector3D.Create(1E308, 1E308, 1E308);
+  AssertNear('large 3-D magnitude remains representable', Sqrt(3.0),
+    V.Magnitude / 1E308, 1E-15);
+  N := V.Normalise;
+  AssertVector3DNear('large 3-D vector normalises', 1.0 / Sqrt(3.0),
+    1.0 / Sqrt(3.0), 1.0 / Sqrt(3.0), N, 1E-15);
+
+  V := TVector3D.Create(1.7E308, 1.7E308, 1.7E308);
+  N := V.Normalise;
+  AssertVector3DNear('3-D normal survives unrepresentable magnitude',
+    1.0 / Sqrt(3.0), 1.0 / Sqrt(3.0), 1.0 / Sqrt(3.0), N, 1E-15);
+
+  V := TVector3D.Create(1E-300, 2E-300, 2E-300);
+  AssertNear('tiny 3-D magnitude does not underflow', 3.0,
+    V.Magnitude / 1E-300, 1E-14);
+  N := V.Normalise;
+  AssertVector3DNear('tiny 3-D vector normalises', 1.0 / Sqrt(9.0),
+    2.0 / Sqrt(9.0), 2.0 / Sqrt(9.0), N, 1E-15);
+end;
+
 procedure TTestGeometryLib.TestVector3D_Dot;
 var V1, V2: TVector3D;
 begin
@@ -374,6 +511,144 @@ begin
   { Anti-commutative: V2 × V1 = -Z }
   C := V2.Cross(V1);
   AssertNear('Anti-comm Z=-1', -1.0, C.Z);
+end;
+
+procedure TTestGeometryLib.TestVector3D_ArithmeticOperators;
+var
+  A, B, V: TVector3D;
+begin
+  A := TVector3D.Create(3, -4, 5);
+  B := TVector3D.Create(-1, 2, 7);
+  AssertVector3DNear('addition', 2, -2, 12, A + B);
+  AssertVector3DNear('subtraction', 4, -6, -2, A - B);
+  AssertVector3DNear('unary negation', -3, 4, -5, -A);
+  AssertVector3DNear('vector times scalar', 6, -8, 10, A * 2.0);
+  AssertVector3DNear('scalar times vector', 6, -8, 10, 2.0 * A);
+  AssertVector3DNear('vector divided by scalar', 1.5, -2, 2.5, A / 2.0);
+  V := A + B;
+  AssertVector3DNear('left operand remains a value', 3, -4, 5, A);
+  AssertVector3DNear('right operand remains a value', -1, 2, 7, B);
+  V := V + V;
+  AssertVector3DNear('self assignment is value-safe', 4, -4, 24, V);
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_PropertiesAndDimensionalAgreement;
+var
+  A2, B2, Z2: TVector2D;
+  A3, B3, Z3: TVector3D;
+  Scale: Double;
+begin
+  A2 := TVector2D.Create(3.5, -4.25);
+  B2 := TVector2D.Create(-1.25, 2.5);
+  Z2 := TVector2D.Create(0, 0);
+  A3 := TVector3D.Create(A2.X, A2.Y, 0);
+  B3 := TVector3D.Create(B2.X, B2.Y, 0);
+  Z3 := TVector3D.Create(0, 0, 0);
+  Scale := -2.75;
+
+  AssertVector2DNear('2-D additive identity', A2.X, A2.Y, A2 + Z2);
+  AssertVector2DNear('2-D additive inverse', 0, 0, A2 + -A2);
+  AssertVector2DNear('2-D distributivity', (Scale * A2 + Scale * B2).X,
+    (Scale * A2 + Scale * B2).Y, Scale * (A2 + B2));
+  AssertVector2DNear('2-D scale inverse', A2.X, A2.Y, (A2 * Scale) / Scale);
+  AssertVector3DNear('3-D additive identity', A3.X, A3.Y, A3.Z, A3 + Z3);
+  AssertVector3DNear('3-D additive inverse', 0, 0, 0, A3 + -A3);
+  AssertVector3DNear('3-D distributivity', (Scale * A3 + Scale * B3).X,
+    (Scale * A3 + Scale * B3).Y, (Scale * A3 + Scale * B3).Z,
+    Scale * (A3 + B3));
+  AssertVector3DNear('3-D scale inverse', A3.X, A3.Y, A3.Z,
+    (A3 * Scale) / Scale);
+  AssertVector3DNear('2-D and 3-D addition agree', (A2 + B2).X,
+    (A2 + B2).Y, 0, A3 + B3);
+  AssertVector3DNear('2-D and 3-D subtraction agree', (A2 - B2).X,
+    (A2 - B2).Y, 0, A3 - B3);
+  AssertVector3DNear('2-D and 3-D scaling agree', (A2 * Scale).X,
+    (A2 * Scale).Y, 0, A3 * Scale);
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_ExistingOperationProperties;
+var
+  A2, B2, C2: TVector2D;
+  A3, B3, C3: TVector3D;
+  Scale: Double;
+begin
+  A2 := TVector2D.Create(1.25, -2.5);
+  B2 := TVector2D.Create(3.75, 0.5);
+  C2 := TVector2D.Create(-2.0, 4.0);
+  A3 := TVector3D.Create(1.25, -2.5, 0.75);
+  B3 := TVector3D.Create(3.75, 0.5, -1.25);
+  C3 := TVector3D.Create(-2.0, 4.0, 3.0);
+  Scale := -3.5;
+
+  AssertNear('2-D dot is linear over addition', A2.Dot(C2) + B2.Dot(C2),
+    (A2 + B2).Dot(C2), 1E-14);
+  AssertNear('3-D dot is linear over addition', A3.Dot(C3) + B3.Dot(C3),
+    (A3 + B3).Dot(C3), 1E-14);
+  AssertNear('2-D magnitude respects scaling', Abs(Scale) * A2.Magnitude,
+    (Scale * A2).Magnitude, 1E-14);
+  AssertNear('3-D magnitude respects scaling', Abs(Scale) * A3.Magnitude,
+    (Scale * A3).Magnitude, 1E-14);
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_NonFiniteAndOverflow;
+var
+  SavedMask: TFPUExceptionMask;
+  V2: TVector2D;
+  V3: TVector3D;
+begin
+  SavedMask := GetExceptionMask;
+  SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow,
+    exUnderflow, exPrecision]);
+  try
+    V2 := TVector2D.Create(Infinity, 1.0) + TVector2D.Create(-Infinity, NaN);
+    AssertTrue('2-D indeterminate infinity addition is NaN', IsNan(V2.X));
+    AssertTrue('2-D NaN propagates', IsNan(V2.Y));
+    V2 := TVector2D.Create(1E308, -1E308) * 2.0;
+    AssertTrue('2-D positive overflow is infinity', IsInfinite(V2.X) and (V2.X > 0));
+    AssertTrue('2-D negative overflow is infinity', IsInfinite(V2.Y) and (V2.Y < 0));
+
+    V3 := TVector3D.Create(Infinity, 0.0, 1.0) * 0.0;
+    AssertTrue('3-D infinity times zero is NaN', IsNan(V3.X));
+    AssertTrue('3-D zero times zero remains zero', V3.Y = 0.0);
+    AssertTrue('3-D finite times zero remains zero', V3.Z = 0.0);
+    V3 := TVector3D.Create(1E308, -1E308, 1E308) * 2.0;
+    AssertTrue('3-D positive overflow is infinity', IsInfinite(V3.X) and (V3.X > 0));
+    AssertTrue('3-D negative overflow is infinity', IsInfinite(V3.Y) and (V3.Y < 0));
+    AssertTrue('3-D positive overflow is infinity', IsInfinite(V3.Z) and (V3.Z > 0));
+  finally
+    SetExceptionMask(SavedMask);
+  end;
+end;
+
+procedure TTestGeometryLib.TestVectorArithmetic_ZeroDivisionAndSignedZero;
+var
+  SavedMask: TFPUExceptionMask;
+  Negative: Double;
+  V2: TVector2D;
+  V3: TVector3D;
+begin
+  SavedMask := GetExceptionMask;
+  SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow,
+    exUnderflow, exPrecision]);
+  try
+    Negative := NegativeZero;
+    V2 := TVector2D.Create(1.0, 0.0) / Negative;
+    AssertTrue('2-D division by negative zero has negative infinity',
+      IsInfinite(V2.X) and (V2.X < 0.0));
+    AssertTrue('2-D zero divided by zero is NaN', IsNan(V2.Y));
+    V2 := TVector2D.Create(Negative, 2.0) * 1.0;
+    AssertTrue('2-D multiplication retains negative zero', (V2.X = 0.0) and
+      ((1.0 / V2.X) < 0.0));
+
+    V3 := TVector3D.Create(1.0, -1.0, 0.0) / Negative;
+    AssertTrue('3-D positive division by negative zero is negative infinity',
+      IsInfinite(V3.X) and (V3.X < 0.0));
+    AssertTrue('3-D negative division by negative zero is positive infinity',
+      IsInfinite(V3.Y) and (V3.Y > 0.0));
+    AssertTrue('3-D zero divided by zero is NaN', IsNan(V3.Z));
+  finally
+    SetExceptionMask(SavedMask);
+  end;
 end;
 
 procedure TTestGeometryLib.TestSegment3D_Length;
@@ -871,6 +1146,17 @@ end;
 procedure TTestGeometryLib.TestVector2D_NormaliseZeroRaises;
 begin
   AssertGeoError('Normalise zero vector', @ErrNormaliseZero);
+end;
+
+procedure TTestGeometryLib.TestVector3D_NormaliseZeroRaises;
+begin
+  AssertGeoError('Normalise zero 3-D vector', @ErrNormalise3DZero);
+end;
+
+procedure TTestGeometryLib.TestVectorNormalise_NonFiniteRaises;
+begin
+  AssertGeoError('Normalise infinite 2-D vector', @ErrNormalise2DInfinity);
+  AssertGeoError('Normalise NaN 3-D vector', @ErrNormalise3DNaN);
 end;
 
 procedure TTestGeometryLib.TestLine2D_SamePointRaises;

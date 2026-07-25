@@ -55,6 +55,7 @@ type
   TTestPublicAPI = class(TTestCase)
   published
     procedure TestDocumentedKitClassesAreAccessible;
+    procedure TestGeometryVectorArithmeticOperatorsAreAccessible;
   end;
 
 implementation
@@ -126,6 +127,24 @@ begin
   AssertTrue('TTimeSeriesKit', TimeSeriesKit <> nil);
   AssertTrue('TMLKit', MLKit <> nil);
   AssertTrue('TGeometryKit', GeometryKit <> nil);
+end;
+
+procedure TTestPublicAPI.TestGeometryVectorArithmeticOperatorsAreAccessible;
+var
+  V2: TVector2D;
+  V3: TVector3D;
+begin
+  V2 := 2.0 * (TVector2D.Create(3.0, -4.0) + TVector2D.Create(1.0, 2.0));
+  V2 := -V2 / 2.0;
+  AssertEquals('TVector2D operator X', -4.0, V2.X, 0.0);
+  AssertEquals('TVector2D operator Y', 2.0, V2.Y, 0.0);
+
+  V3 := 2.0 * (TVector3D.Create(3.0, -4.0, 5.0) -
+    TVector3D.Create(1.0, 2.0, 3.0));
+  V3 := -V3 / 2.0;
+  AssertEquals('TVector3D operator X', -2.0, V3.X, 0.0);
+  AssertEquals('TVector3D operator Y', 6.0, V3.Y, 0.0);
+  AssertEquals('TVector3D operator Z', -2.0, V3.Z, 0.0);
 end;
 
 initialization
