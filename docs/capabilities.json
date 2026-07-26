@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "1.5.0",
+  "release": "1.6.0",
   "capabilities": [
     {
       "family": "scalar_special_functions",
@@ -60,28 +60,99 @@
     {
       "family": "typed_direct_solve",
       "unit": "AlgebraLib.DenseSolvers",
-      "entry_points": ["Solve", "FactorLU", "FactorCholesky"],
+      "entry_points": ["Solve", "SolveWithInfo", "SolvePositiveDefinite", "FactorLU", "FactorCholesky"],
       "maturity": "stable",
       "scalars": ["single", "double", "single_complex", "double_complex"],
       "shapes": ["square_coefficients", "one_or_many_rhs"],
       "complexity": "factor O(n^3), solve O(n^2*r)",
       "accuracy": "precision-relative pivot checks and residual tests",
-      "docs": "docs/TypedDenseMatrices.md",
+      "docs": "docs/DenseLinearAlgebra.md",
       "example": "examples/15_typed_dense_solve.pas",
-      "tests": "tests/TestDenseMatrices.pas",
-      "limitations": ["no least squares", "no sparse factors"]
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestDenseMatrices.pas; tests/TestDenseDecompositions.pas",
+      "limitations": ["square systems only", "no sparse factors"]
+    },
+    {
+      "family": "typed_triangular_solve",
+      "unit": "AlgebraLib.DenseDecompositions",
+      "entry_points": ["SolveTriangular"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["square_coefficients", "one_or_many_rhs"],
+      "complexity": "solve O(n^2*r)",
+      "accuracy": "precision- and scale-relative diagonal checks; residual fixtures",
+      "docs": "docs/DenseLinearAlgebra.md",
+      "tests": "tests/TestDenseDecompositions.pas",
+      "limitations": ["dense lower/upper factors only"]
+    },
+    {
+      "family": "typed_qr_least_squares",
+      "unit": "AlgebraLib.DenseDecompositions",
+      "entry_points": ["FactorQR", "FactorPivotedQR", "LeastSquares", "RankRevealingLeastSquares"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["tall", "square", "one_or_many_rhs"],
+      "complexity": "factor O(m*n^2), solve O(m*n*r+n^2*r)",
+      "accuracy": "normalized reconstruction, orthogonality, residual, pivot, and rank budgets by scalar precision",
+      "docs": "docs/DenseLinearAlgebra.md",
+      "example": "examples/16_dense_solver_selection.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestDenseDecompositions.pas",
+      "limitations": ["m >= n", "rank-deficient CPQR solve is basic, not minimum norm"]
+    },
+    {
+      "family": "typed_compact_svd_minimum_norm",
+      "unit": "AlgebraLib.DenseDecompositions",
+      "entry_points": ["FactorSVD", "MinimumNormSolve"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["tall", "square", "wide", "one_or_many_rhs"],
+      "complexity": "one-sided Jacobi O(sweeps*m*n^2)",
+      "accuracy": "descending singular values, reconstruction, unitarity, rank, and minimum-norm residual budgets",
+      "docs": "docs/DenseLinearAlgebra.md",
+      "example": "examples/16_dense_solver_selection.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestDenseDecompositions.pas",
+      "limitations": ["full compact SVD only", "no truncated or randomized SVD"]
+    },
+    {
+      "family": "typed_symmetric_hermitian_eigensystem",
+      "unit": "AlgebraLib.DenseDecompositions",
+      "entry_points": ["FactorSymmetricEigen", "FactorHermitianEigen"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["square_symmetric", "square_hermitian"],
+      "complexity": "cyclic Jacobi O(sweeps*n^3)",
+      "accuracy": "ascending eigenvalues, eigenpair residual, orthogonality/unitarity, repeated and clustered spectrum fixtures",
+      "docs": "docs/DenseLinearAlgebra.md",
+      "example": "examples/16_dense_solver_selection.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestDenseDecompositions.pas",
+      "limitations": ["full symmetric/Hermitian eigensystems only", "no nonsymmetric, generalized, or partial eigensystems"]
     },
     {
       "family": "bessel_elliptic_exponential_integral",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["no stable public implementation in 1.5.0"]
+      "limitations": ["no stable public implementation in 1.6.0"]
     },
     {
       "family": "typed_sparse_linear_algebra",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["outside the 1.5.0 milestone"]
+      "limitations": ["deferred beyond the 1.6.0 dense milestone"]
+    },
+    {
+      "family": "typed_iterative_matrix_free_linear_algebra",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["CG, MINRES, GMRES, BiCGSTAB, LSQR, preconditioners, and linear operators are deferred"]
+    },
+    {
+      "family": "typed_advanced_spectral_linear_algebra",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["nonsymmetric, generalized, polynomial, partial, and Schur eigensystems are deferred"]
     }
   ]
 }

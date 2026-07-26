@@ -349,7 +349,7 @@ domain. It concentrated on the operations already exposed:
   tests;
 - kept public signatures source-compatible wherever correctness permitted.
 
-## Current release: 1.5.0 — Typed contiguous numerical foundation
+## Previous release: 1.5.0 — Typed contiguous numerical foundation
 
 Released on 2026-07-26, version 1.5.0 establishes the scalar, storage, and kernel layers on which the
 later linear-algebra, fitting, signal, statistics, and machine-learning work
@@ -488,7 +488,7 @@ they must not constrain the new engine's type support, layout, or performance.
   [migration guide](MIGRATING_TO_TYPED_DENSE.md) names every array, vector,
   `IMatrix`, view, and clone copy/alias cost.
 
-## Next release: 1.6.0 — Dependable typed dense linear algebra
+## Current release: 1.6.0 — Dependable typed dense linear algebra
 
 Version 1.6.0 completes the first high-trust dense workflow on the 1.5.0
 storage and kernel foundation. A Free Pascal user should be able to solve
@@ -677,6 +677,35 @@ rather than inserted into an already full release.
 - No compatibility API is removed, no existing typed 1.5 contract changes
   silently, and the maintained public surface remains small enough that every
   stable algorithm has an owner-independent test and documentation path.
+
+### 1.6.0 qualification evidence
+
+- The [1.6 design record](design/typed-dense-1.6.md) fixes ownership, compact
+  shapes, scalar parity, permutation conventions, tolerance/rank/error
+  behavior, allocation, thread safety, compatibility, and algorithm
+  provenance.
+- `AlgebraLib.DenseDecompositions` supplies typed triangular, Householder QR,
+  CPQR, compact one-sided Jacobi SVD, and symmetric/Hermitian cyclic-Jacobi
+  factors across the mathematically applicable four scalar paths. Existing
+  LU/Cholesky factors retain their 1.5 behavior and add diagnostics.
+- Square, positive-definite, least-squares, rank-revealing, and minimum-norm
+  solves support multiple right-hand sides and reusable immutable factors.
+  `TDenseSolveDiagnostics` exposes rank, tolerance, condition indicator,
+  residual, and backward error without an inverse.
+- `TestDenseDecompositions`, the retained 1.5 dense tests, and public-API smoke
+  coverage check independent exact references, reconstruction,
+  orthogonality/unitarity, permutations, ordering, adversarial scale/rank,
+  empty/repeated cases, validation, input immutability, and scalar parity.
+- The [solver-selection guide](DenseLinearAlgebra.md), realistic
+  [selection example](../examples/16_dense_solver_selection.pas), capability
+  inventories, migration guide, package metadata,
+  [release notes](RELEASE_NOTES_1.6.0.md), and
+  [qualification report](QUALIFICATION_1.6.0.md) agree on the shipped and
+  explicitly deferred families.
+- CI retains Linux, Win64, and optimized Win32 public-API coverage. Local
+  release qualification includes normal, optimized, runtime-checked,
+  heap-traced, package, example, documentation, benchmark, and clean-archive
+  paths.
 
 ## Planned 1.7.0 — Numerical modelling and optimisation
 

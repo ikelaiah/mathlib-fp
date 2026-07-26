@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-07-26
+
+### Added
+
+- Added reusable single/double real/complex Householder QR and
+  column-pivoted QR factors, full-rank and rank-revealing least-squares solves,
+  copied compact factors/permutations, numerical-rank decisions, and
+  inspectable residual/backward-error diagnostics.
+- Added reusable compact one-sided Jacobi SVD factors for tall, square, and
+  wide matrices plus vector/multiple-RHS rank-deficient and underdetermined
+  minimum-norm solves.
+- Added full ascending symmetric real and Hermitian complex eigensystems with
+  normalized eigenvectors, deterministic cyclic-Jacobi convergence outcomes,
+  and single/double scalar parity.
+- Added lower/upper, unit/non-unit triangular solves for ordinary, transposed,
+  and conjugate-transposed systems.
+- Extended LU and Cholesky factors additively with `ConditionIndicator` and
+  `SolveWithInfo`, and added diagnostic square and positive-definite
+  convenience entry points without changing the 1.5 solve contract.
+- Added the 1.6 design record, solver-selection and migration guides, realistic
+  calibration/minimum-norm/eigen example, capability metadata, focused
+  public/numerical tests, deterministic factor-reuse benchmarks, release
+  notes, and qualification report.
+
+### Compatibility
+
+- Preserved every `IMatrix`, `TMatrixKit`, `IVector`, and typed 1.5 entry
+  point. No API was removed or deprecated, and compatibility decompositions
+  are not silently rerouted where their contracts differ.
+
 ## [1.5.0] - 2026-07-26
 
 ### Added

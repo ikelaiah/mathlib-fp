@@ -26,6 +26,7 @@ closest to your project.
 | `13_numerical_methods.pas` | NumericsLib | Roots, integration, ODEs, interpolation, and errors |
 | `14_complex_vectors.pas` | MathBase / AlgebraLib / EngineeringLib | Complex inverse functions, elementwise and reusable-buffer vector kernels, Hermitian dot products, and complex FFT round trips |
 | `15_typed_dense_solve.pas` | AlgebraLib | Infer item prices from receipt totals with a typed direct solve, then price a new order |
+| `16_dense_solver_selection.pas` | AlgebraLib | Choose QR, SVD minimum norm, and a symmetric eigensystem for realistic calibration tasks |
 
 ## Build and run
 

@@ -18,7 +18,7 @@ uses
   MathBase.Trigonometry,
   AlgebraLib.Matrices, AlgebraLib.VectorKernels,
   AlgebraLib.DenseMatrices, AlgebraLib.DenseKernels,
-  AlgebraLib.DenseSolvers,
+  AlgebraLib.DenseSolvers, AlgebraLib.DenseDecompositions,
   FinanceLib.Interest, FinanceLib.Bonds, FinanceLib.NPV,
   StatsLib.Stats,
   EngineeringLib.FluidDynamics, EngineeringLib.Thermodynamics,
@@ -59,6 +59,7 @@ type
     procedure TestDocumentedKitClassesAreAccessible;
     procedure TestGeometryVectorArithmeticOperatorsAreAccessible;
     procedure TestTypedDenseSolveIsAccessible;
+    procedure TestTypedDenseDecompositionsAreAccessible;
   end;
 
 implementation
@@ -162,6 +163,28 @@ begin
   Z := TDenseComplexMatrix.FromValues(1, 1, [TComplex.Create(1.0, 2.0)]);
   Z := ConjugateTranspose(Z);
   AssertEquals('typed complex kernel', -2.0, Z[0, 0].Im, 0.0);
+end;
+
+procedure TTestPublicAPI.TestTypedDenseDecompositionsAreAccessible;
+var
+  A, B, X: IDenseDoubleMatrix;
+  QR: IDenseDoubleQR;
+  SVD: IDenseDoubleSVD;
+  Eigen: IDenseDoubleSymmetricEigen;
+  Info: TDenseSolveDiagnostics;
+begin
+  A := TDenseDoubleMatrix.FromValues(3, 2,
+    [1.0, 0.0, 0.0, 1.0, 1.0, 1.0]);
+  B := TDenseDoubleMatrix.FromValues(3, 1, [1.0, 2.0, 3.0]);
+  QR := FactorPivotedQR(A);
+  X := QR.SolveLeastSquaresWithInfo(B, Info);
+  AssertEquals('typed QR rank', 2, Info.NumericalRank);
+  AssertEquals('typed QR result shape', 2, X.Rows);
+  SVD := FactorSVD(A);
+  AssertEquals('typed SVD compact size', 2, Length(SVD.SingularValues));
+  Eigen := FactorSymmetricEigen(
+    TDenseDoubleMatrix.FromValues(2, 2, [2.0, 1.0, 1.0, 2.0]));
+  AssertEquals('typed eigen size', 2, Length(Eigen.Eigenvalues));
 end;
 
 initialization

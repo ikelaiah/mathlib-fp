@@ -16,21 +16,25 @@ interface
 
 uses
   SysUtils, Math, MathBase.Complex,
-  AlgebraLib.DenseMatrices;
+  AlgebraLib.DenseMatrices, AlgebraLib.DenseDecompositions;
 
 type
   generic IDenseLUFactorization<T> = interface
     function GetSize: SizeInt;
     function GetPivotRatio: Double;
+    function GetConditionIndicator: Double;
     function GetIsIllConditioned: Boolean;
     function GetL: specialize IDenseMatrix<T>;
     function GetU: specialize IDenseMatrix<T>;
     function GetPermutation: TSizeIntArray;
     function Solve(const B: specialize IDenseMatrix<T>):
       specialize IDenseMatrix<T>;
+    function SolveWithInfo(const B: specialize IDenseMatrix<T>;
+      out Diagnostics: TDenseSolveDiagnostics): specialize IDenseMatrix<T>;
     property Size: SizeInt read GetSize;
     { Smallest accepted pivot divided by the largest input magnitude. }
     property PivotRatio: Double read GetPivotRatio;
+    property ConditionIndicator: Double read GetConditionIndicator;
     property IsIllConditioned: Boolean read GetIsIllConditioned;
     property L: specialize IDenseMatrix<T> read GetL;
     property U: specialize IDenseMatrix<T> read GetU;
@@ -39,10 +43,14 @@ type
 
   generic IDenseCholeskyFactorization<T> = interface
     function GetSize: SizeInt;
+    function GetConditionIndicator: Double;
     function GetL: specialize IDenseMatrix<T>;
     function Solve(const B: specialize IDenseMatrix<T>):
       specialize IDenseMatrix<T>;
+    function SolveWithInfo(const B: specialize IDenseMatrix<T>;
+      out Diagnostics: TDenseSolveDiagnostics): specialize IDenseMatrix<T>;
     property Size: SizeInt read GetSize;
+    property ConditionIndicator: Double read GetConditionIndicator;
     property L: specialize IDenseMatrix<T> read GetL;
   end;
 
@@ -79,6 +87,26 @@ function Solve(const A, B: IDenseDoubleMatrix): IDenseDoubleMatrix; overload;
 function Solve(const A, B: IDenseSingleComplexMatrix):
   IDenseSingleComplexMatrix; overload;
 function Solve(const A, B: IDenseComplexMatrix): IDenseComplexMatrix; overload;
+
+function SolveWithInfo(const A, B: IDenseSingleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseSingleMatrix; overload;
+function SolveWithInfo(const A, B: IDenseDoubleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseDoubleMatrix; overload;
+function SolveWithInfo(const A, B: IDenseSingleComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics):
+  IDenseSingleComplexMatrix; overload;
+function SolveWithInfo(const A, B: IDenseComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseComplexMatrix; overload;
+
+function SolvePositiveDefinite(const A, B: IDenseSingleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseSingleMatrix; overload;
+function SolvePositiveDefinite(const A, B: IDenseDoubleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseDoubleMatrix; overload;
+function SolvePositiveDefinite(const A, B: IDenseSingleComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics):
+  IDenseSingleComplexMatrix; overload;
+function SolvePositiveDefinite(const A, B: IDenseComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseComplexMatrix; overload;
 
 implementation
 
@@ -176,10 +204,10 @@ type
   private
     FPolicy: specialize IScalarPolicy<T>;
     FFactory: specialize IMatrixFactory<T>;
-    FCombined: specialize IDenseMatrix<T>;
+    FSource, FCombined: specialize IDenseMatrix<T>;
     FPivots, FPermutation: TSizeIntArray;
     FSize: SizeInt;
-    FPivotRatio: Double;
+    FPivotRatio, FPivotTolerance: Double;
     FIsIllConditioned: Boolean;
     procedure Factor(const A: specialize IDenseMatrix<T>);
   public
@@ -188,12 +216,15 @@ type
       const FactoryValue: specialize IMatrixFactory<T>);
     function GetSize: SizeInt;
     function GetPivotRatio: Double;
+    function GetConditionIndicator: Double;
     function GetIsIllConditioned: Boolean;
     function GetL: specialize IDenseMatrix<T>;
     function GetU: specialize IDenseMatrix<T>;
     function GetPermutation: TSizeIntArray;
     function Solve(const B: specialize IDenseMatrix<T>):
       specialize IDenseMatrix<T>;
+    function SolveWithInfo(const B: specialize IDenseMatrix<T>;
+      out Diagnostics: TDenseSolveDiagnostics): specialize IDenseMatrix<T>;
   end;
 
   generic TDenseCholeskyImpl<T> = class(TInterfacedObject,
@@ -201,17 +232,21 @@ type
   private
     FPolicy: specialize IScalarPolicy<T>;
     FFactory: specialize IMatrixFactory<T>;
-    FFactor: specialize IDenseMatrix<T>;
+    FSource, FFactor: specialize IDenseMatrix<T>;
     FSize: SizeInt;
+    FConditionIndicator, FDefinitenessTolerance: Double;
     procedure Factor(const A: specialize IDenseMatrix<T>);
   public
     constructor Create(const A: specialize IDenseMatrix<T>;
       const Policy: specialize IScalarPolicy<T>;
       const FactoryValue: specialize IMatrixFactory<T>);
     function GetSize: SizeInt;
+    function GetConditionIndicator: Double;
     function GetL: specialize IDenseMatrix<T>;
     function Solve(const B: specialize IDenseMatrix<T>):
       specialize IDenseMatrix<T>;
+    function SolveWithInfo(const B: specialize IDenseMatrix<T>;
+      out Diagnostics: TDenseSolveDiagnostics): specialize IDenseMatrix<T>;
   end;
 
 function TSinglePolicy.Zero: Single;
@@ -306,6 +341,121 @@ function TComplexMatrixFactory.Zeros(const Rows, Cols: SizeInt):
   IDenseComplexMatrix;
 begin Result := TDenseComplexMatrix.Zeros(Rows, Cols); end;
 
+procedure UpdateSolverNorm(const Value: Double;
+  var Scale, SumSquares: Double);
+var
+  Ratio: Double;
+begin
+  if Value = 0.0 then
+    Exit;
+  if Scale < Value then
+  begin
+    if Scale = 0.0 then
+      SumSquares := 1.0
+    else
+    begin
+      Ratio := Scale / Value;
+      SumSquares := 1.0 + SumSquares * Ratio * Ratio;
+    end;
+    Scale := Value;
+  end
+  else
+  begin
+    Ratio := Value / Scale;
+    SumSquares := SumSquares + Ratio * Ratio;
+  end;
+end;
+
+function FinishSolverNorm(const Scale, SumSquares: Double): Double;
+var
+  RootSum: Double;
+begin
+  if Scale = 0.0 then
+    Exit(0.0);
+  RootSum := Sqrt(SumSquares);
+  if Scale > MaxDouble / RootSum then
+    Result := Infinity
+  else
+    Result := Scale * RootSum;
+end;
+
+function SafeSolverNormProductSum(const A, B, C: Double): Double;
+var
+  ProductValue: Double;
+begin
+  if (A = 0.0) or (B = 0.0) then
+    ProductValue := 0.0
+  else if IsInfinite(A) or IsInfinite(B) then
+    ProductValue := Infinity
+  else if B >= 1.0 then
+  begin
+    if A > MaxDouble / B then ProductValue := Infinity
+    else ProductValue := A * B;
+  end
+  else
+    ProductValue := A * B;
+  if IsInfinite(ProductValue) or IsInfinite(C) or
+    (ProductValue > MaxDouble - C) then
+    Result := Infinity
+  else
+    Result := ProductValue + C;
+end;
+
+generic function SolverMatrixNorm<T>(const A: specialize IDenseMatrix<T>;
+  const Policy: specialize IScalarPolicy<T>): Double;
+var
+  I, J: SizeInt;
+  Scale, SumSquares: Double;
+begin
+  Scale := 0.0;
+  SumSquares := 1.0;
+  for I := 0 to A.Rows - 1 do
+    for J := 0 to A.Cols - 1 do
+      UpdateSolverNorm(Policy.Magnitude(A[I, J]), Scale, SumSquares);
+  Result := FinishSolverNorm(Scale, SumSquares);
+end;
+
+generic procedure FillSolverDiagnostics<T>(const MethodName: string;
+  const A, X, B: specialize IDenseMatrix<T>; const Rank: SizeInt;
+  const Tolerance, ConditionIndicator: Double;
+  const Policy: specialize IScalarPolicy<T>;
+  out Diagnostics: TDenseSolveDiagnostics);
+var
+  I, J, K: SizeInt;
+  Sum: T;
+  Scale, SumSquares, Denominator: Double;
+begin
+  Diagnostics.Method := MethodName;
+  Diagnostics.NumericalRank := Rank;
+  Diagnostics.IsRankDeficient := Rank < A.Cols;
+  Diagnostics.Tolerance := Tolerance;
+  Diagnostics.ConditionIndicator := ConditionIndicator;
+  Scale := 0.0;
+  SumSquares := 1.0;
+  for I := 0 to A.Rows - 1 do
+    for J := 0 to B.Cols - 1 do
+    begin
+      Sum := Policy.Zero;
+      for K := 0 to A.Cols - 1 do
+        Sum := Sum + A[I, K] * X[K, J];
+      UpdateSolverNorm(Policy.Magnitude(B[I, J] - Sum),
+        Scale, SumSquares);
+    end;
+  Diagnostics.ResidualNorm := FinishSolverNorm(Scale, SumSquares);
+  Denominator := SafeSolverNormProductSum(
+    specialize SolverMatrixNorm<T>(A, Policy),
+    specialize SolverMatrixNorm<T>(X, Policy),
+    specialize SolverMatrixNorm<T>(B, Policy));
+  if Diagnostics.ResidualNorm = 0.0 then
+    Diagnostics.BackwardError := 0.0
+  else if IsInfinite(Denominator) then
+    Diagnostics.BackwardError := 0.0
+  else if Denominator = 0.0 then
+    Diagnostics.BackwardError := Infinity
+  else
+    Diagnostics.BackwardError := Diagnostics.ResidualNorm / Denominator;
+end;
+
 constructor TDenseLUImpl.Create(const A: specialize IDenseMatrix<T>;
   const Policy: specialize IScalarPolicy<T>;
   const FactoryValue: specialize IMatrixFactory<T>);
@@ -329,6 +479,7 @@ begin
       'FactorLU: coefficient matrix must be square; got %d x %d.',
       [A.Rows, A.Cols]);
   FSize := A.Rows;
+  FSource := A.Clone;
   FCombined := A.Clone;
   SetLength(FPivots, FSize);
   SetLength(FPermutation, FSize);
@@ -347,6 +498,7 @@ begin
   if (FSize > 0) and (Scale = 0.0) then
     raise EDenseMatrixError.Create('FactorLU: coefficient matrix is singular (all zeros).');
   MinPivot := Scale;
+  FPivotTolerance := FPolicy.Epsilon * Max(1, FSize) * Scale;
   for K := 0 to FSize - 1 do
   begin
     PivotRow := K;
@@ -360,7 +512,7 @@ begin
         PivotRow := I;
       end;
     end;
-    if PivotMagnitude <= FPolicy.Epsilon * Max(1, FSize) * Scale then
+    if PivotMagnitude <= FPivotTolerance then
       raise EDenseMatrixError.CreateFmt(
         'FactorLU: singular or numerically singular pivot at column %d (|pivot|=%g, scale=%g).',
         [K, PivotMagnitude, Scale]);
@@ -398,6 +550,8 @@ end;
 function TDenseLUImpl.GetSize: SizeInt;
 begin Result := FSize; end;
 function TDenseLUImpl.GetPivotRatio: Double;
+begin Result := FPivotRatio; end;
+function TDenseLUImpl.GetConditionIndicator: Double;
 begin Result := FPivotRatio; end;
 function TDenseLUImpl.GetIsIllConditioned: Boolean;
 begin Result := FIsIllConditioned; end;
@@ -482,6 +636,15 @@ begin
     end;
 end;
 
+function TDenseLUImpl.SolveWithInfo(
+  const B: specialize IDenseMatrix<T>;
+  out Diagnostics: TDenseSolveDiagnostics): specialize IDenseMatrix<T>;
+begin
+  Result := Solve(B);
+  specialize FillSolverDiagnostics<T>('pivoted LU', FSource, Result, B,
+    FSize, FPivotTolerance, FPivotRatio, FPolicy, Diagnostics);
+end;
+
 constructor TDenseCholeskyImpl.Create(const A: specialize IDenseMatrix<T>;
   const Policy: specialize IScalarPolicy<T>;
   const FactoryValue: specialize IMatrixFactory<T>);
@@ -506,6 +669,7 @@ begin
       'FactorCholesky: coefficient matrix must be square; got %d x %d.',
       [A.Rows, A.Cols]);
   FSize := A.Rows;
+  FSource := A.Clone;
   Scale := 0.0;
   for I := 0 to FSize - 1 do
     for J := 0 to FSize - 1 do
@@ -519,6 +683,7 @@ begin
     raise EDenseMatrixError.Create(
       'FactorCholesky: coefficient matrix is not positive definite (all zeros).');
   Tolerance := FPolicy.Epsilon * Max(1, FSize) * Scale;
+  FDefinitenessTolerance := Tolerance;
   for I := 0 to FSize - 1 do
     for J := 0 to I - 1 do
     begin
@@ -548,10 +713,26 @@ begin
       else
         FFactor[I, J] := Sum / FFactor[J, J];
     end;
+  Scale := 0.0;
+  Diagonal := Infinity;
+  for I := 0 to FSize - 1 do
+  begin
+    Scale := Max(Scale, FPolicy.Magnitude(FFactor[I, I]));
+    Diagonal := Min(Diagonal, FPolicy.Magnitude(FFactor[I, I]));
+  end;
+  if FSize = 0 then
+    FConditionIndicator := 1.0
+  else if Scale = 0.0 then
+    FConditionIndicator := 0.0
+  else
+    FConditionIndicator := Diagonal / Scale;
 end;
 
 function TDenseCholeskyImpl.GetSize: SizeInt;
 begin Result := FSize; end;
+
+function TDenseCholeskyImpl.GetConditionIndicator: Double;
+begin Result := FConditionIndicator; end;
 
 function TDenseCholeskyImpl.GetL: specialize IDenseMatrix<T>;
 begin Result := FFactor.Clone; end;
@@ -592,6 +773,16 @@ begin
         Sum := Sum - FPolicy.Conjugate(FFactor[K, I]) * Result[K, J];
       Result[I, J] := Sum / FPolicy.Conjugate(FFactor[I, I]);
     end;
+end;
+
+function TDenseCholeskyImpl.SolveWithInfo(
+  const B: specialize IDenseMatrix<T>;
+  out Diagnostics: TDenseSolveDiagnostics): specialize IDenseMatrix<T>;
+begin
+  Result := Solve(B);
+  specialize FillSolverDiagnostics<T>('Cholesky', FSource, Result, B,
+    FSize, FDefinitenessTolerance, FConditionIndicator, FPolicy,
+    Diagnostics);
 end;
 
 function FactorLU(const A: IDenseSingleMatrix): IDenseSingleLU;
@@ -691,6 +882,54 @@ begin
       'Solve(complex): coefficient matrix is ill-conditioned (pivot ratio %g); use FactorLU to inspect and solve explicitly.',
       [Factor.PivotRatio]);
   Result := Factor.Solve(B);
+end;
+
+function SolveWithInfo(const A, B: IDenseSingleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseSingleMatrix;
+begin
+  Result := FactorLU(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolveWithInfo(const A, B: IDenseDoubleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseDoubleMatrix;
+begin
+  Result := FactorLU(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolveWithInfo(const A, B: IDenseSingleComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseSingleComplexMatrix;
+begin
+  Result := FactorLU(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolveWithInfo(const A, B: IDenseComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseComplexMatrix;
+begin
+  Result := FactorLU(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolvePositiveDefinite(const A, B: IDenseSingleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseSingleMatrix;
+begin
+  Result := FactorCholesky(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolvePositiveDefinite(const A, B: IDenseDoubleMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseDoubleMatrix;
+begin
+  Result := FactorCholesky(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolvePositiveDefinite(const A, B: IDenseSingleComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseSingleComplexMatrix;
+begin
+  Result := FactorCholesky(A).SolveWithInfo(B, Diagnostics);
+end;
+
+function SolvePositiveDefinite(const A, B: IDenseComplexMatrix;
+  out Diagnostics: TDenseSolveDiagnostics): IDenseComplexMatrix;
+begin
+  Result := FactorCholesky(A).SolveWithInfo(B, Diagnostics);
 end;
 
 end.

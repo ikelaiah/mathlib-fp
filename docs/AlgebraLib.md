@@ -15,6 +15,11 @@ Depends on: **MathBase**
 | `AlgebraLib.DenseMatrices` | [AlgebraLib.DenseMatrices.pas](../src/AlgebraLib.DenseMatrices.pas) | Typed aligned row-major storage, views, copies, and compatibility conversions |
 | `AlgebraLib.DenseKernels` | [AlgebraLib.DenseKernels.pas](../src/AlgebraLib.DenseKernels.pas) | Matching single/double real/complex allocating and `Into` kernels |
 | `AlgebraLib.DenseSolvers` | [AlgebraLib.DenseSolvers.pas](../src/AlgebraLib.DenseSolvers.pas) | Direct solve and reusable LU/Cholesky factors |
+| `AlgebraLib.DenseDecompositions` | [AlgebraLib.DenseDecompositions.pas](../src/AlgebraLib.DenseDecompositions.pas) | Typed triangular, QR/CPQR, SVD/minimum-norm, and symmetric/Hermitian eigen workflows |
+
+The typed dense solver-selection and complete factor contracts are in
+[Typed dense decompositions and solvers](DenseLinearAlgebra.md). The
+`IMatrix` records below remain the source-compatible legacy surface.
 
 ---
 
