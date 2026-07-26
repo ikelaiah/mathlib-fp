@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check local links, fences, inventory data, and the 1.5 public-symbol contract."""
+"""Check local links, fences, inventory data, and the 1.6 public-symbol contract."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def main() -> int:
     inventory_path = DOCS / "capabilities.json"
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-        assert inventory["release"] == "1.5.0"
+        assert inventory["release"] == "1.6.0"
         assert inventory["schema_version"] == 1
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -109,6 +109,33 @@ def main() -> int:
         "IDenseDoubleCholesky",
         "IDenseSingleComplexCholesky",
         "IDenseComplexCholesky",
+        "TDenseSolveDiagnostics",
+        "SolveWithInfo",
+        "SolvePositiveDefinite",
+        "SolveTriangular",
+        "TDenseTriangle",
+        "TDenseDiagonal",
+        "TDenseTranspose",
+        "FactorQR",
+        "FactorPivotedQR",
+        "LeastSquares",
+        "RankRevealingLeastSquares",
+        "IDenseSingleQR",
+        "IDenseDoubleQR",
+        "IDenseSingleComplexQR",
+        "IDenseComplexQR",
+        "FactorSVD",
+        "MinimumNormSolve",
+        "IDenseSingleSVD",
+        "IDenseDoubleSVD",
+        "IDenseSingleComplexSVD",
+        "IDenseComplexSVD",
+        "FactorSymmetricEigen",
+        "FactorHermitianEigen",
+        "IDenseSingleSymmetricEigen",
+        "IDenseDoubleSymmetricEigen",
+        "IDenseSingleComplexHermitianEigen",
+        "IDenseComplexHermitianEigen",
     ]
     for symbol in required_symbols:
         if symbol not in public_docs:
@@ -125,7 +152,7 @@ def main() -> int:
         return 1
     print(
         f"Documentation checks passed: {len(docs)} pages, "
-        f"{len(examples)} indexed examples, {len(required_symbols)} 1.5 symbols"
+        f"{len(examples)} indexed examples, {len(required_symbols)} 1.6 symbols"
     )
     return 0
 

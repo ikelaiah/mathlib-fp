@@ -12,6 +12,8 @@ uses
   AlgebraLib.Matrices,
   AlgebraLib.DenseMatrices,
   AlgebraLib.DenseKernels,
+  AlgebraLib.DenseSolvers,
+  AlgebraLib.DenseDecompositions,
   AlgebraLib.VectorKernels,
   EngineeringLib.Signal;
 
@@ -162,12 +164,88 @@ begin
     ' ms; checksum=', C[0, 0]:0:6);
 end;
 
+procedure BenchmarkTypedDenseDecompositions;
+const
+  Rows = 96;
+  Cols = 32;
+  RightHandSides = 4;
+  ReuseIterations = 20;
+  ConvenienceIterations = 5;
+var
+  A, B, X, Symmetric: IDenseDoubleMatrix;
+  QR: IDenseDoubleQR;
+  SVD: IDenseDoubleSVD;
+  Eigen: IDenseDoubleSymmetricEigen;
+  Info: TDenseSolveDiagnostics;
+  I, J, Iteration: SizeInt;
+  Started: QWord;
+  ReuseMilliseconds, ConvenienceMilliseconds: QWord;
+  Checksum: Double;
+begin
+  A := TDenseDoubleMatrix.Zeros(Rows, Cols);
+  B := TDenseDoubleMatrix.Zeros(Rows, RightHandSides);
+  for I := 0 to A.Rows - 1 do
+  begin
+    for J := 0 to A.Cols - 1 do
+      A[I, J] := Sin((I + 1) * (J + 1) * 0.013) +
+        (Ord(I = J) * 0.5);
+    for J := 0 to B.Cols - 1 do
+      B[I, J] := Cos((I + 1) * (J + 2) * 0.017);
+  end;
+  Started := GetTickCount64;
+  QR := FactorQR(A);
+  for Iteration := 1 to ReuseIterations do
+    X := QR.SolveLeastSquaresWithInfo(B, Info);
+  ReuseMilliseconds := GetTickCount64 - Started;
+  Checksum := X[0, 0] + Info.ResidualNorm + QR.ConditionIndicator;
+
+  Started := GetTickCount64;
+  for Iteration := 1 to ConvenienceIterations do
+    X := LeastSquares(A, B, Info);
+  ConvenienceMilliseconds := GetTickCount64 - Started;
+  Writeln('typed QR ', Rows, 'x', Cols, ', rhs=', RightHandSides,
+    ': reuse ', ReuseIterations, ' solves=', ReuseMilliseconds,
+    ' ms (factor_builds=1, result_allocations=', ReuseIterations,
+    '); convenience ', ConvenienceIterations, ' calls=',
+    ConvenienceMilliseconds, ' ms (factor_builds=', ConvenienceIterations,
+    ', result_allocations=', ConvenienceIterations,
+    '); factor_storage_elements~', Rows * Cols + Cols * Cols,
+    '; checksum=', Checksum:0:6);
+
+  Started := GetTickCount64;
+  SVD := FactorSVD(A.View(0, 0, 48, 16));
+  X := SVD.SolveMinimumNormWithInfo(B.View(0, 0, 48, 2), Info);
+  Writeln('typed compact SVD 48x16 + two-RHS minimum norm: ',
+    GetTickCount64 - Started, ' ms; sweeps=', SVD.Sweeps,
+    '; rank=', SVD.NumericalRank, '; working_elements~',
+    48 * 16 + 16 * 16, '; checksum=',
+    X[0, 0] + Info.ResidualNorm:0:6);
+
+  Symmetric := TDenseDoubleMatrix.Zeros(24, 24);
+  for I := 0 to Symmetric.Rows - 1 do
+  begin
+    Symmetric[I, I] := 2.0 + I * 0.01;
+    if I + 1 < Symmetric.Rows then
+    begin
+      Symmetric[I, I + 1] := -0.25;
+      Symmetric[I + 1, I] := -0.25;
+    end;
+  end;
+  Started := GetTickCount64;
+  Eigen := FactorSymmetricEigen(Symmetric);
+  Writeln('typed symmetric eigensystem 24x24: ',
+    GetTickCount64 - Started, ' ms; sweeps=', Eigen.Sweeps,
+    '; working_elements~', 2 * 24 * 24, '; checksum=',
+    Eigen.Eigenvalues[0] + Eigen.Eigenvalues[23]:0:6);
+end;
+
 begin
   Writeln('mathlib-fp representative microbenchmarks');
   BenchmarkSort;
   BenchmarkConvexHull;
   BenchmarkMatrixMultiply;
   BenchmarkTypedDenseMatrixMultiply;
+  BenchmarkTypedDenseDecompositions;
   BenchmarkComplexArithmetic;
   BenchmarkVectorKernels;
   BenchmarkComplexFFT;

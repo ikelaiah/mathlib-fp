@@ -8,6 +8,10 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.6.0 release notes](RELEASE_NOTES_1.6.0.md) — typed dense
+  QR/CPQR, SVD, eigensystems, and inspectable direct-solve diagnostics.
+- [1.6.0 qualification report](QUALIFICATION_1.6.0.md) — algorithm-specific
+  residual, reconstruction, target, example, and benchmark evidence.
 - [mathlib-fp 1.5.0 release notes](RELEASE_NOTES_1.5.0.md) — typed contiguous
   single/double real/complex matrices, kernels, and direct solve.
 - [1.5.0 qualification report](QUALIFICATION_1.5.0.md) — target
@@ -48,7 +52,7 @@ artificial Kit class.
 | Unit family | Domain | Depends on |
 |---------|-------------|------------|
 | [MathBase](MathBase.md) | Shared types, constants, precision functions, and trigonometry | RTL |
-| [AlgebraLib](AlgebraLib.md) | Compatibility matrices plus [typed dense matrices, kernels, and direct solves](TypedDenseMatrices.md) | MathBase |
+| [AlgebraLib](AlgebraLib.md) | Compatibility matrices plus [typed dense storage/kernels](TypedDenseMatrices.md) and [decompositions/direct solvers](DenseLinearAlgebra.md) | MathBase |
 | [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
 | [StatsLib](StatsLib.md) | Descriptive stats, hypothesis testing, correlation, bootstrap | MathBase |
 | [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing, unit conversion | MathBase |
@@ -65,7 +69,7 @@ artificial Kit class.
 | Domain | Primary units | Public Kit classes |
 |--------|---------------|--------------------|
 | Math foundation | `MathBase.SharedTypes`, `MathBase.Complex`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry` | `TTrigKit` |
-| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers` | `TMatrixKit`, `TVectorKit`, typed dense factories |
+| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers`, `AlgebraLib.DenseDecompositions` | `TMatrixKit`, `TVectorKit`, typed dense factories and factors |
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
 | Statistics | `StatsLib.Stats` | `TStatsKit` |
 | Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |

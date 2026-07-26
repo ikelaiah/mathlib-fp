@@ -19,6 +19,7 @@ uses
   AlgebraLib.DenseMatrices,
   AlgebraLib.DenseKernels,
   AlgebraLib.DenseSolvers,
+  AlgebraLib.DenseDecompositions,
   AlgebraLib.VectorKernels,
   AlgebraLib.Vectors,
   AlgebraLib.Determinants,

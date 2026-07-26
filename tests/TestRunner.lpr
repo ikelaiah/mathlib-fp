@@ -10,6 +10,7 @@ uses
   , TestComplexLib
   , TestAlgebraLib
   , TestDenseMatrices
+  , TestDenseDecompositions
   , TestFinanceLib
   , TestFinanceAliases
   , TestStatsLib

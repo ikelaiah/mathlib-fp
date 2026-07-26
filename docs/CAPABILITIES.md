@@ -12,9 +12,18 @@ The machine-readable source for this page is
 | Typed dense arithmetic | Stable | Single/double real/complex | Portable O(mkn) product; no SIMD/parallel dispatch |
 | Pivoted LU and direct solve | Stable | Single/double real/complex | Square systems only; no least squares |
 | Cholesky solve | Stable | Single/double real/complex | Positive-definite symmetric/Hermitian matrices only |
+| Triangular solve variants | Stable | Single/double real/complex | Dense lower/upper, unit/non-unit, ordinary/transposed/conjugate-transposed |
+| Householder QR least squares | Stable | Single/double real/complex | Tall/square, full-rank solve |
+| Column-pivoted QR and rank-revealing solve | Stable | Single/double real/complex | Basic rank-deficient solution is not minimum norm |
+| Compact SVD and minimum-norm solve | Stable | Single/double real/complex | Full compact deterministic Jacobi path; no truncated/randomized SVD |
+| Full symmetric/Hermitian eigensystem | Stable | Single/double real/complex as applicable | No nonsymmetric, generalized, or partial eigensystems |
 | Legacy `IMatrix` API | Stable compatibility | Double real | Nested storage and `Integer` dimensions |
 | Error/gamma/beta functions | Stable | Double real | Domains and budgets are documented in MathBase |
 | Bessel, elliptic, exponential-integral families | Unsupported | — | Visible roadmap gap; no stable public implementation |
-| Sparse typed storage and solvers | Unsupported | — | Planned after the 1.5 dense foundation |
+| Sparse typed storage and solvers | Unsupported | — | Deferred beyond the 1.6 dense milestone |
+| Iterative and matrix-free typed solvers | Unsupported | — | CG/MINRES/GMRES/BiCGSTAB/LSQR, preconditioners, and operators are deferred |
+| Advanced spectral families | Unsupported | — | Nonsymmetric/generalized/partial/Schur families are deferred |
 
-Unsupported entries are not counted in the 1.5.0 completeness claim.
+Unsupported entries are not counted in the 1.6.0 completeness claim. The
+[dense solver-selection guide](DenseLinearAlgebra.md#choose-a-dense-solver)
+names the stable boundary and the deferred families.

@@ -1,7 +1,11 @@
 # Typed dense matrices
 
-Status: **stable in 1.5.0**. The implementation is native Object Pascal and has
+Status: **stable since 1.5.0**. The implementation is native Object Pascal and has
 no third-party runtime dependency.
+
+Typed QR/CPQR, SVD, symmetric/Hermitian eigen, triangular, least-squares, and
+minimum-norm workflows added in 1.6 are documented in
+[Typed dense decompositions and solvers](DenseLinearAlgebra.md).
 
 ## 60-second solve
 
@@ -43,12 +47,14 @@ version is
 | Solve once | `Solve(A, B)` | LU factor plus result |
 | Solve repeatedly | `FactorLU(A).Solve(B)` | Factor once, result per solve |
 | Symmetric/Hermitian positive-definite solve | `FactorCholesky(A).Solve(B)` | Factor once, result per solve |
+| Least squares, minimum norm, or full symmetric/Hermitian eigen | See the [dense solver-selection guide](DenseLinearAlgebra.md#choose-a-dense-solver) | Reusable typed factors |
 | Use the old API | `FromIMatrix`, `ToIMatrix` | Explicit deep copy |
 
 Use LU for a general square system. Use Cholesky only when the matrix is real
 symmetric or complex Hermitian positive definite; it is cheaper and preserves
-that structure. The broader decomposition and sparse-solver catalogue belongs
-to a later release and is not part of this API.
+that structure. Use the [1.6 selection table](DenseLinearAlgebra.md#choose-a-dense-solver)
+for triangular, QR, CPQR, SVD, and symmetric/Hermitian eigen workflows.
+Sparse and iterative solvers remain outside the stable typed API.
 
 ## Types and matching operation sets
 
@@ -164,14 +170,15 @@ Sum / Dot / DotConjugate / Norm2     // conjugating dot is complex only
 `TSingleComplexUnaryKernel`, and `TComplexUnaryKernel`. They receive one value
 and return the same scalar type.
 
-`AlgebraLib.DenseSolvers` overloads `Solve`, `FactorLU`, and
-`FactorCholesky`. Reusable factor handles are `IDenseSingleLU`,
+`AlgebraLib.DenseSolvers` overloads `Solve`, `SolveWithInfo`,
+`SolvePositiveDefinite`, `FactorLU`, and `FactorCholesky`. Reusable factor handles are `IDenseSingleLU`,
 `IDenseDoubleLU`, `IDenseSingleComplexLU`, and `IDenseComplexLU`. Cholesky
 handles are `IDenseSingleCholesky`, `IDenseDoubleCholesky`,
 `IDenseSingleComplexCholesky`, and `IDenseComplexCholesky`. LU exposes
-`Size`, `PivotRatio`,
-`IsIllConditioned`, copied `L`/`U`/`Permutation`, and `Solve`; Cholesky exposes
-`Size`, copied `L`, and `Solve`.
+`Size`, `PivotRatio`, `ConditionIndicator`,
+`IsIllConditioned`, copied `L`/`U`/`Permutation`, `Solve`, and
+`SolveWithInfo`; Cholesky exposes `Size`, `ConditionIndicator`, copied `L`,
+`Solve`, and `SolveWithInfo`.
 
 All creation and conversion functions allocate a result unless their name is
 `View` or they return a fixed 2x2 value. Every `Into` procedure requires the
