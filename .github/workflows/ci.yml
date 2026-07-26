@@ -45,6 +45,12 @@ jobs:
             "./example-bin/$(basename "${file%.pas}")" > /dev/null
           done
 
+      - name: Check and build searchable documentation
+        run: |
+          python3 tools/check_docs.py
+          python3 tools/build_docs.py --output build-temp/docs-site/1.5.0
+          test -s build-temp/docs-site/1.5.0/search-index.json
+
       - name: Compile representative benchmarks
         run: |
           mkdir -p benchmarks/lib/ci
@@ -67,6 +73,20 @@ jobs:
           mkdir -p lib
           fpc -Fusrc -FUlib my_program.pas
           ./my_program
+
+      - name: Test typed solve from a checksummed source archive
+        run: |
+          archive_dir=$(mktemp -d)
+          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.5.0.tar.gz" HEAD
+          sha256sum "$archive_dir/mathlib-fp-1.5.0.tar.gz" > "$archive_dir/mathlib-fp-1.5.0.sha256"
+          sha256sum --check "$archive_dir/mathlib-fp-1.5.0.sha256"
+          mkdir "$archive_dir/source"
+          tar -xzf "$archive_dir/mathlib-fp-1.5.0.tar.gz" -C "$archive_dir/source"
+          cd "$archive_dir/source"
+          mkdir -p example-bin/units
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/15_typed_dense_solve.pas
+          ./example-bin/15_typed_dense_solve
 
   windows:
     runs-on: windows-latest
@@ -174,6 +194,17 @@ jobs:
             $executable = Join-Path example-bin ($_.BaseName + '.exe')
             & $executable | Out-Null
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Check and build searchable documentation
+        shell: pwsh
+        run: |
+          python tools/check_docs.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/build_docs.py --output build-temp/docs-site/1.5.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path build-temp/docs-site/1.5.0/search-index.json)) {
+            throw 'Documentation search index was not generated'
           }
 
       - name: Compile representative benchmarks

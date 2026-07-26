@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.4.0" src="https://img.shields.io/badge/version-1.4.0-orange.svg">
+  <img alt="Version 1.5.0" src="https://img.shields.io/badge/version-1.5.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -22,17 +22,19 @@
 - **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
-- **Ready to explore:** reference docs, runnable examples, and 830 passing tests.
+- **Ready to explore:** searchable reference docs, runnable examples, and 841 tests.
 
 > [!NOTE]
-> **1.4.0 is the current release; 1.2.0 was the first public release.** The
+> **1.5.0 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.4.0.md) and
+> [release notes](docs/RELEASE_NOTES_1.5.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-Download the source archive from the [latest GitHub release](https://github.com/ikelaiah/mathlib-fp/releases/latest), or clone the repository:
+Download the source archive from the
+[latest GitHub release](https://github.com/ikelaiah/mathlib-fp/releases/latest),
+or clone the repository:
 
 ```bash
 git clone https://github.com/ikelaiah/mathlib-fp.git
@@ -69,7 +71,7 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 | Domain (unit family) | Highlights |
 | --- | --- |
 | [MathBase](docs/MathBase.md) | Shared types, constants, precision, trigonometry |
-| [AlgebraLib](docs/AlgebraLib.md) | Matrices, decompositions, linear solvers |
+| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices plus [typed dense matrices, kernels, and direct solves](docs/TypedDenseMatrices.md) |
 | [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics |
 | [StatsLib](docs/StatsLib.md) | Descriptive statistics, tests, correlation, bootstrap |
 | [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, signals, unit conversion |
@@ -88,7 +90,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 15 commented walkthroughs with
+The [`examples/`](examples/) directory contains 16 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:

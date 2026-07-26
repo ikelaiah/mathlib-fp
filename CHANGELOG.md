@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-07-26
+
+### Added
+
+- Added 32-byte-aligned contiguous row-major single/double real/complex dense
+  matrices with checked native-size shapes, retained-owner mutable views,
+  explicit clones, and explicit compatibility conversions.
+- Added matching allocating and `Into` dense kernels for elementwise
+  arithmetic, AXPY, scalar-function application, reductions,
+  transpose/conjugation, compensated products, and dot products.
+- Added allocation-free operator-friendly 2x2 real/complex value matrices,
+  batch types, and explicit flat/nested, precision, real/complex, and
+  compatibility conversions.
+- Added pivoted-LU `Solve(A, B)`, reusable LU factors, and real/complex
+  Cholesky factors for vector and multiple right-hand sides.
+- Added `TSingleComplex`, the typed dense migration/design guides, capability
+  inventory, support matrix, solve example, benchmark, and completion-gate
+  tests.
+
+### Compatibility
+
+- Preserved `IMatrix`, `TMatrixKit`, `IVector`, and all existing unit entry
+  points. No API was removed or deprecated.
+
 ## [1.4.0] - 2026-07-25
 
 ### Added

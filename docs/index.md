@@ -8,6 +8,10 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.5.0 release notes](RELEASE_NOTES_1.5.0.md) — typed contiguous
+  single/double real/complex matrices, kernels, and direct solve.
+- [1.5.0 qualification report](QUALIFICATION_1.5.0.md) — target
+  configurations, numerical evidence, benchmarks, dependencies, and gaps.
 - [mathlib-fp 1.4.0 release notes](RELEASE_NOTES_1.4.0.md) — GeometryLib vector
   arithmetic and scale-safe normalization.
 - [mathlib-fp 1.3.0 release notes](RELEASE_NOTES_1.3.0.md) — complex and
@@ -44,7 +48,7 @@ artificial Kit class.
 | Unit family | Domain | Depends on |
 |---------|-------------|------------|
 | [MathBase](MathBase.md) | Shared types, constants, precision functions, and trigonometry | RTL |
-| [AlgebraLib](AlgebraLib.md) | Dense matrix ops, decompositions, iterative solvers, vectors | MathBase |
+| [AlgebraLib](AlgebraLib.md) | Compatibility matrices plus [typed dense matrices, kernels, and direct solves](TypedDenseMatrices.md) | MathBase |
 | [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
 | [StatsLib](StatsLib.md) | Descriptive stats, hypothesis testing, correlation, bootstrap | MathBase |
 | [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing, unit conversion | MathBase |
@@ -61,7 +65,7 @@ artificial Kit class.
 | Domain | Primary units | Public Kit classes |
 |--------|---------------|--------------------|
 | Math foundation | `MathBase.SharedTypes`, `MathBase.Complex`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry` | `TTrigKit` |
-| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants` | `TMatrixKit`, `TVectorKit` |
+| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers` | `TMatrixKit`, `TVectorKit`, typed dense factories |
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
 | Statistics | `StatsLib.Stats` | `TStatsKit` |
 | Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
@@ -101,6 +105,7 @@ TSingleArray   = array of Single;
 TExtendedArray = array of Extended;
 TDoublePair    = record Lower, Upper: Double; end;
 TComplexArray  = array of TComplex;  // MathBase.Complex
+TSingleComplexArray = array of TSingleComplex;
 ```
 
 ## Design Principles
@@ -108,7 +113,24 @@ TComplexArray  = array of TComplex;  // MathBase.Complex
 - Kit classes normally use static class methods for stateless calculations.
 - `TMatrixKit` also implements `IMatrix`; it is the established matrix factory
   and concrete implementation as well as the algebra Kit class.
+- The [typed dense API](TypedDenseMatrices.md) is the contiguous single/double
+  real/complex path. Its [migration guide](MIGRATING_TO_TYPED_DENSE.md) names
+  copy and allocation costs.
 - Collection APIs use `TDoubleArray`, `TIntegerArray`, or documented matrix aliases.
 - Optional `ADecimals` parameters round scalar results where documented.
 - Invalid inputs raise typed exceptions such as `EFinanceError`, `EStatsError`,
   `EMatrixError`, `EProbabilityError`, or the domain-specific equivalent.
+
+## Find an algorithm
+
+| Problem | Recommended starting point |
+| --- | --- |
+| Solve a square dense system | [`Solve(A, B)`](TypedDenseMatrices.md#60-second-solve) |
+| Repeated dense solves | [`FactorLU`](TypedDenseMatrices.md#factorisation-outcomes) |
+| Positive-definite dense solve | [`FactorCholesky`](TypedDenseMatrices.md#choose-an-entry-point) |
+| Typed matrix multiplication | [`Multiply` / `MultiplyInto`](TypedDenseMatrices.md#choose-an-entry-point) |
+| Compatibility `IMatrix` operations | [AlgebraLib compatibility reference](AlgebraLib.md) |
+| Supported and missing families | [Capability inventory](CAPABILITIES.md) |
+
+See the [supported platform matrix](SUPPORT.md) for compiler, target, and
+precision qualifications.

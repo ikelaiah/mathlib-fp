@@ -12,6 +12,9 @@ Depends on: **MathBase**
 | `AlgebraLib.Matrices` | [AlgebraLib.Matrices.pas](../src/AlgebraLib.Matrices.pas) | Core implementation — all logic lives here |
 | `AlgebraLib.Vectors` | [AlgebraLib.Vectors.pas](../src/AlgebraLib.Vectors.pas) | Re-exports vector-oriented type aliases |
 | `AlgebraLib.Determinants` | [AlgebraLib.Determinants.pas](../src/AlgebraLib.Determinants.pas) | Re-exports decomposition type aliases |
+| `AlgebraLib.DenseMatrices` | [AlgebraLib.DenseMatrices.pas](../src/AlgebraLib.DenseMatrices.pas) | Typed aligned row-major storage, views, copies, and compatibility conversions |
+| `AlgebraLib.DenseKernels` | [AlgebraLib.DenseKernels.pas](../src/AlgebraLib.DenseKernels.pas) | Matching single/double real/complex allocating and `Into` kernels |
+| `AlgebraLib.DenseSolvers` | [AlgebraLib.DenseSolvers.pas](../src/AlgebraLib.DenseSolvers.pas) | Direct solve and reusable LU/Cholesky factors |
 
 ---
 
@@ -190,8 +193,10 @@ function IsColumnVector: Boolean;
 | `SolveIterative` | `B: IMatrix; Method := imConjugateGradient; MaxIterations := 1000; Tolerance := 1e-10` | Iterative solve for a column-vector right-hand side; conjugate gradient assumes symmetric positive-definite A |
 | `PseudoInverse` | none | Moore-Penrose pseudoinverse; use `A.PseudoInverse.Multiply(B)` for least-squares solutions |
 
-There is no public direct `SolveLinear` method. For a direct solve, multiply the
-right-hand side by `A.Inverse`, or use `A.PseudoInverse` for least squares.
+The compatibility `IMatrix` interface has no direct `SolveLinear` method.
+New code can use the typed [`Solve(A, B)` path](TypedDenseMatrices.md), which
+factors the coefficient matrix instead of forming its inverse. Existing code
+can opt in through `TDenseDoubleMatrix.FromIMatrix`.
 `SolveIterative` raises `EMatrixError` if the selected method exhausts
 `MaxIterations`; it never silently returns an unconverged last iterate.
 
@@ -272,6 +277,10 @@ Sparse lookup and insertion are linear in the number of stored entries, and
 ---
 
 ## Quick Start
+
+For new dense code, start with the
+[typed dense five-minute guide](TypedDenseMatrices.md#60-second-solve). The
+following example documents the retained compatibility API.
 
 ```pascal
 uses AlgebraLib.Matrices;

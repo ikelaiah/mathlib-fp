@@ -16,8 +16,9 @@ Foundation domain for mathlib-fp. All other domains depend on its units.
 
 ## MathBase.Complex
 
-Portable double-precision complex arithmetic. `TComplex` is a value record
-with `Re` and `Im` fields; its operators never mutate either operand.
+Portable single- and double-precision complex arithmetic. `TSingleComplex` and
+`TComplex` are value records with `Re` and `Im` fields; their operators never
+mutate either operand.
 
 ```pascal
 uses MathBase.Complex;
@@ -35,6 +36,14 @@ end;
 
 ```pascal
 type
+  TSingleComplex = record
+    Re, Im: Single;
+    class function Create(ARe, AIm: Single): TSingleComplex; static;
+    function Conjugate: TSingleComplex;
+    function SqrMagnitude, Magnitude: Single;
+    function IsFinite: Boolean;
+  end;
+
   TComplex = record
     Re, Im: Double;
     class function Create(ARe, AIm: Double): TComplex; static;
@@ -44,11 +53,18 @@ type
     function IsFinite: Boolean;
   end;
 
+  TSingleComplexArray = array of TSingleComplex;
   TComplexArray = array of TComplex;
 ```
 
-`TComplex` supports addition, subtraction, multiplication, division, unary
-negation, and real-scalar variants. Division and magnitude use scaled forms to
+Both types support addition, subtraction, multiplication, division, unary
+negation, equality, conjugation, scale-safe magnitude, and finite checks.
+`ToComplex` widens explicitly. `ToSingleComplex` narrows explicitly and rejects
+a finite component outside the finite `Single` range; it never silently
+discards an imaginary component.
+
+`TComplex` additionally supports real-scalar variants and principal elementary
+functions. Division and magnitude use scaled forms to
 avoid avoidable intermediate overflow and underflow. `CLog`, `CSqrt`,
 `CPow`, `CAsin`, `CAcos`, `CAtan`, `CAsinh`, `CAcosh`, and `CAtanh` return
 principal values; `CExp`, `CSin`, `CCos`, `CTan`, `CSinh`, `CCosh`, and
@@ -147,6 +163,15 @@ finite positive A and B and clamps X outside [0,1] to the corresponding
 endpoint. Invalid shape arguments and failure to converge return NaN rather
 than an unchecked partial iterate. Representable `Beta` underflow and overflow
 return 0 and +Infinity respectively.
+
+The checked-in reference corpus applies these measured acceptance budgets:
+`GammaLn` 3e-15 relative (2e-13 absolute at the `x=100` fixture); `Beta`
+5e-15 relative for ordinary inputs and 2e-13 for the `Beta(100,100)` scale
+case; `BetaInc` 2e-14 relative/2e-15 absolute for ordinary fixtures. `Erf`,
+normal tails, and Student-t use absolute or tail-relative budgets in
+`TestMathBase.pas`, because one ULP budget is misleading near zero and in the
+tails. These are tested budgets over the published corpus, not universal
+worst-case proofs.
 
 `StudentT` intentionally covers only the non-negative half of the distribution
 and returns NaN for negative X. Use `TProbabilityKit.StudentTCDF` for a complete

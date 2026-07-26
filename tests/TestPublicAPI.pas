@@ -17,6 +17,8 @@ uses
   MathBase.Complex,
   MathBase.Trigonometry,
   AlgebraLib.Matrices, AlgebraLib.VectorKernels,
+  AlgebraLib.DenseMatrices, AlgebraLib.DenseKernels,
+  AlgebraLib.DenseSolvers,
   FinanceLib.Interest, FinanceLib.Bonds, FinanceLib.NPV,
   StatsLib.Stats,
   EngineeringLib.FluidDynamics, EngineeringLib.Thermodynamics,
@@ -56,6 +58,7 @@ type
   published
     procedure TestDocumentedKitClassesAreAccessible;
     procedure TestGeometryVectorArithmeticOperatorsAreAccessible;
+    procedure TestTypedDenseSolveIsAccessible;
   end;
 
 implementation
@@ -145,6 +148,20 @@ begin
   AssertEquals('TVector3D operator X', -2.0, V3.X, 0.0);
   AssertEquals('TVector3D operator Y', 6.0, V3.Y, 0.0);
   AssertEquals('TVector3D operator Z', -2.0, V3.Z, 0.0);
+end;
+
+procedure TTestPublicAPI.TestTypedDenseSolveIsAccessible;
+var
+  A, B, X: IDenseDoubleMatrix;
+  Z: IDenseComplexMatrix;
+begin
+  A := TDenseDoubleMatrix.FromValues(2, 2, [2.0, 0.0, 0.0, 4.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 1, [6.0, 8.0]);
+  X := Solve(A, B);
+  AssertEquals('typed Solve', 3.0, X[0, 0], 0.0);
+  Z := TDenseComplexMatrix.FromValues(1, 1, [TComplex.Create(1.0, 2.0)]);
+  Z := ConjugateTranspose(Z);
+  AssertEquals('typed complex kernel', -2.0, Z[0, 0].Im, 0.0);
 end;
 
 initialization

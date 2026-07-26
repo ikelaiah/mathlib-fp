@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "release": "1.5.0",
+  "capabilities": [
+    {
+      "family": "scalar_special_functions",
+      "unit": "MathBase.Precision",
+      "entry_points": ["GammaLn", "Beta", "BetaInc", "Erf", "NormalCDF", "StudentT"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar"],
+      "complexity": "function-dependent scalar iteration",
+      "accuracy": "GammaLn 3e-15 relative; Beta up to 2e-13 relative on the published scale fixture; BetaInc 2e-14 relative/2e-15 absolute on ordinary fixtures",
+      "docs": "docs/MathBase.md",
+      "tests": "tests/TestMathBase.pas",
+      "limitations": ["StudentT helper accepts x >= 0 only", "tested corpus budgets are not universal worst-case proofs"]
+    },
+    {
+      "family": "small_dense_value_arithmetic",
+      "unit": "AlgebraLib.DenseMatrices",
+      "entry_points": ["TSmallSingleMatrix2", "TSmallDoubleMatrix2", "TSmallSingleComplexMatrix2", "TSmallComplexMatrix2"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["2x2", "batch_of_2x2"],
+      "complexity": "O(1), allocation-free per value operation",
+      "accuracy": "declared scalar precision",
+      "docs": "docs/TypedDenseMatrices.md",
+      "tests": "tests/TestDenseMatrices.pas",
+      "limitations": ["2x2 only", "batch iteration is explicit"]
+    },
+    {
+      "family": "typed_dense_storage",
+      "unit": "AlgebraLib.DenseMatrices",
+      "entry_points": ["IDenseSingleMatrix", "IDenseDoubleMatrix", "IDenseSingleComplexMatrix", "IDenseComplexMatrix"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["dense_row_major", "strided_view"],
+      "complexity": "O(rows*cols) allocation and copy",
+      "accuracy": "exact storage; explicit scalar conversion",
+      "docs": "docs/TypedDenseMatrices.md",
+      "example": "examples/15_typed_dense_solve.pas",
+      "tests": "tests/TestDenseMatrices.pas",
+      "limitations": ["dense only", "no implicit broadcasting"]
+    },
+    {
+      "family": "typed_dense_kernels",
+      "unit": "AlgebraLib.DenseKernels",
+      "entry_points": ["CopyInto", "Add", "Subtract", "ElementWiseMultiply", "Scale", "Axpy", "Apply", "Transpose", "Conjugate", "ConjugateTranspose", "Multiply", "Sum", "Dot", "Norm2"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["dense", "strided_view"],
+      "complexity": "matrix multiplication O(m*k*n)",
+      "accuracy": "compensated sums; single paths accumulate in double",
+      "docs": "docs/TypedDenseMatrices.md",
+      "example": "examples/15_typed_dense_solve.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestDenseMatrices.pas",
+      "limitations": ["portable scalar kernel", "finite inputs required"]
+    },
+    {
+      "family": "typed_direct_solve",
+      "unit": "AlgebraLib.DenseSolvers",
+      "entry_points": ["Solve", "FactorLU", "FactorCholesky"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["square_coefficients", "one_or_many_rhs"],
+      "complexity": "factor O(n^3), solve O(n^2*r)",
+      "accuracy": "precision-relative pivot checks and residual tests",
+      "docs": "docs/TypedDenseMatrices.md",
+      "example": "examples/15_typed_dense_solve.pas",
+      "tests": "tests/TestDenseMatrices.pas",
+      "limitations": ["no least squares", "no sparse factors"]
+    },
+    {
+      "family": "bessel_elliptic_exponential_integral",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["no stable public implementation in 1.5.0"]
+    },
+    {
+      "family": "typed_sparse_linear_algebra",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["outside the 1.5.0 milestone"]
+    }
+  ]
+}

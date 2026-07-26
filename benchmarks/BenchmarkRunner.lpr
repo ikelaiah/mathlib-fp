@@ -10,6 +10,8 @@ uses
   StatsLib.Stats,
   GeometryLib.Geometry,
   AlgebraLib.Matrices,
+  AlgebraLib.DenseMatrices,
+  AlgebraLib.DenseKernels,
   AlgebraLib.VectorKernels,
   EngineeringLib.Signal;
 
@@ -133,11 +135,39 @@ begin
     ' ms; checksum=', Data[1].Magnitude:0:6);
 end;
 
+procedure BenchmarkTypedDenseMatrixMultiply;
+const
+  RowsA = 127;
+  Inner = 129;
+  ColsB = 65;
+var
+  A, B, C, Destination: IDenseDoubleMatrix;
+  I, J: SizeInt;
+  Started: QWord;
+begin
+  A := TDenseDoubleMatrix.Zeros(RowsA, Inner);
+  B := TDenseDoubleMatrix.Zeros(Inner, ColsB);
+  Destination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
+  for I := 0 to A.Rows - 1 do
+    for J := 0 to A.Cols - 1 do
+      A[I, J] := Sin(I * 0.01 + J * 0.03);
+  for I := 0 to B.Rows - 1 do
+    for J := 0 to B.Cols - 1 do
+      B[I, J] := Cos(I * 0.02 - J * 0.01);
+  Started := GetTickCount64;
+  MultiplyInto(A, B, Destination);
+  C := Destination;
+  Writeln('typed dense odd-shape multiply, ', RowsA, 'x', Inner, ' * ',
+    Inner, 'x', ColsB, ': ', GetTickCount64 - Started,
+    ' ms; checksum=', C[0, 0]:0:6);
+end;
+
 begin
   Writeln('mathlib-fp representative microbenchmarks');
   BenchmarkSort;
   BenchmarkConvexHull;
   BenchmarkMatrixMultiply;
+  BenchmarkTypedDenseMatrixMultiply;
   BenchmarkComplexArithmetic;
   BenchmarkVectorKernels;
   BenchmarkComplexFFT;
