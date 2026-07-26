@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.5.0 candidate" src="https://img.shields.io/badge/version-1.5.0--candidate-orange.svg">
+  <img alt="Version 1.5.0" src="https://img.shields.io/badge/version-1.5.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -25,16 +25,16 @@
 - **Ready to explore:** searchable reference docs, runnable examples, and 841 tests.
 
 > [!NOTE]
-> **1.5.0 is the next release candidate; 1.4.0 remains the latest published
-> release.** The project follows semantic versioning; read the candidate
+> **1.5.0 is the current release; 1.2.0 was the first public release.** The
+> project follows semantic versioning; read the
 > [release notes](docs/RELEASE_NOTES_1.5.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
 Download the source archive from the
-[latest published GitHub release](https://github.com/ikelaiah/mathlib-fp/releases/latest),
-or clone the repository to try the 1.5.0 candidate:
+[latest GitHub release](https://github.com/ikelaiah/mathlib-fp/releases/latest),
+or clone the repository:
 
 ```bash
 git clone https://github.com/ikelaiah/mathlib-fp.git

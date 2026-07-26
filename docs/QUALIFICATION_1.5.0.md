@@ -18,9 +18,11 @@ expand the release into any 1.6.0 decomposition or sparse work.
 
 The repository CI repeats normal Linux x86-64 and Windows x86-64 suites,
 examples, documentation checks, benchmark compilation, clean-archive quick
-starts, both Lazarus package builds, and the optimised i386 suite. A release
-operator must attach the successful workflow URL before publishing; a
-configured job is not represented here as an already successful remote run.
+starts, both Lazarus package builds, and the optimised i386 suite. The
+publication run completed successfully on
+[PR #9](https://github.com/ikelaiah/mathlib-fp/pull/9):
+[CI run #92](https://github.com/ikelaiah/mathlib-fp/actions/runs/30156655764)
+for commit `ddf7af23f15ef53940e9a0a0be3ae39fc861ae7e`.
 
 ## Numerical evidence
 
@@ -70,5 +72,4 @@ maturity and no API is deprecated.
 Known gaps are explicit: single-complex elementary functions beyond the kernel
 arithmetic subset; Bessel, elliptic, and exponential-integral scalar families;
 least squares and broader decompositions; typed sparse storage/solvers;
-parallel/SIMD typed kernels; and published Linux results for the candidate
-commit until CI completes. These do not become 1.5 features implicitly.
+parallel/SIMD typed kernels. These do not become 1.5 features implicitly.

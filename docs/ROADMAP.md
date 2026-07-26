@@ -247,7 +247,7 @@ release alongside its numerical scope.
   changes, known limitations, and the exact evidence behind accuracy or
   performance claims.
 
-## Current release: 1.4.0 — Geometry vector arithmetic
+## Previous release: 1.4.0 — Geometry vector arithmetic
 
 Released on 2026-07-25, version 1.4.0 delivers a small but complete improvement
 to GeometryLib's fixed-size value types. It responds directly to the first
@@ -349,9 +349,9 @@ domain. It concentrated on the operations already exposed:
   tests;
 - kept public signatures source-compatible wherever correctness permitted.
 
-## Next release: 1.5.0 — Typed contiguous numerical foundation
+## Current release: 1.5.0 — Typed contiguous numerical foundation
 
-Version 1.5.0 establishes the scalar, storage, and kernel layers on which the
+Released on 2026-07-26, version 1.5.0 establishes the scalar, storage, and kernel layers on which the
 later linear-algebra, fitting, signal, statistics, and machine-learning work
 can share one implementation. The current `IMatrix` API and nested
 `array of array of Double` storage remain available as compatibility paths;
@@ -488,7 +488,7 @@ they must not constrain the new engine's type support, layout, or performance.
   [migration guide](MIGRATING_TO_TYPED_DENSE.md) names every array, vector,
   `IMatrix`, view, and clone copy/alias cost.
 
-## Planned 1.6.0 — Complete dense and sparse linear algebra
+## Next release: 1.6.0 — Complete dense and sparse linear algebra
 
 Version 1.6.0 turns the 1.5.0 engine into the dependable linear-algebra base
 expected of a mature numerical-computing library. Existing algorithms are

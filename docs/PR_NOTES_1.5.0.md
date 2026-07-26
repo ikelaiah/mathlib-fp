@@ -2,7 +2,7 @@
 
 ## Summary
 
-This release-candidate PR implements the active mathlib-fp 1.5.0 milestone. It
+This PR implements the mathlib-fp 1.5.0 milestone. It
 adds typed, aligned contiguous dense matrices; matching real and complex
 kernels; direct square-system solves; reusable LU and Cholesky factors; and the
 documentation, examples, benchmarks, tests, and packaging needed to qualify
@@ -133,8 +133,10 @@ Local verification completed:
 - [x] The deterministic typed benchmark compiles and runs at `-O3`.
 - [x] `git diff --check` passes.
 
-Linux and Windows CI on the exact PR commit remain required publication checks;
-these notes do not represent a configured workflow as already successful.
+Linux and Windows CI completed successfully for
+[PR #9](https://github.com/ikelaiah/mathlib-fp/pull/9) in
+[CI run #92](https://github.com/ikelaiah/mathlib-fp/actions/runs/30156655764)
+on commit `ddf7af23f15ef53940e9a0a0be3ae39fc861ae7e`.
 
 ## Performance evidence
 
@@ -165,6 +167,3 @@ reproducibility evidence, not a cross-library speed claim.
 - Condition estimators beyond the documented LU pivot diagnostic.
 - SIMD, parallel dispatch, GPU support, or external BLAS/LAPACK bindings.
 - Bessel, elliptic, and exponential-integral scalar families.
-- Merging into `main`, tagging `v1.5.0`, publishing release assets, or changing
-  candidate documentation to “current release”; those steps follow
-  `RELEASING.md` after the exact release commit passes CI.

@@ -66,9 +66,9 @@ throughput improvement is claimed from this first portable kernel.
 
 The repository CI builds and runs the complete tests and examples on Linux
 x86-64 and Windows x86-64, builds the Lazarus package on Windows x86-64 and
-i386, and runs an optimised i386 suite. The release qualification must record
-the actual workflow run; this document does not claim a remote job passed
-before it did.
+i386, and runs an optimised i386 suite. The publication CI completed
+successfully for [PR #9](https://github.com/ikelaiah/mathlib-fp/pull/9) in
+[CI run #92](https://github.com/ikelaiah/mathlib-fp/actions/runs/30156655764).
 
 ## Installation
 
