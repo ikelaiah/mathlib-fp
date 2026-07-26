@@ -1,5 +1,7 @@
 # mathlib-fp 1.5.0
 
+**Release date:** 2026-07-26
+
 Version 1.5.0 adds the typed contiguous numerical foundation while preserving
 the complete 1.4 compatibility API.
 

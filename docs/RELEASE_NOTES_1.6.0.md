@@ -1,6 +1,6 @@
 # mathlib-fp 1.6.0
 
-Released: 2026-07-27
+**Release date:** 2026-07-27
 
 Version 1.6.0 completes the first typed dense decomposition workflow on the
 1.5 contiguous matrix foundation. It is a native Object Pascal release with
