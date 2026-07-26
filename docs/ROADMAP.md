@@ -488,92 +488,245 @@ they must not constrain the new engine's type support, layout, or performance.
   [migration guide](MIGRATING_TO_TYPED_DENSE.md) names every array, vector,
   `IMatrix`, view, and clone copy/alias cost.
 
-## Next release: 1.6.0 — Complete dense and sparse linear algebra
+## Next release: 1.6.0 — Production-grade dense and sparse linear algebra
 
-Version 1.6.0 turns the 1.5.0 engine into the dependable linear-algebra base
-expected of a mature numerical-computing library. Existing algorithms are
-audited and then retained, replaced, or narrowed according to numerical
-evidence; an algorithm is not considered complete merely because a method with
+Version 1.6.0 turns the 1.5.0 engine into a dependable linear-algebra base.
+It does not attempt to add every named method at once. The required release
+baseline is a coherent dense decomposition/solve path, typed sparse
+storage and kernels, and inspectable iterative solvers. Existing compatibility
+algorithms are audited and then retained, replaced, or narrowed according to
+numerical evidence; an algorithm is not complete merely because a method with
 its name already exists.
 
-### Dense decompositions and solvers
+### Release boundary and delivery sequence
 
-- Provide LU, Cholesky, LDLT, Householder QR/LQ, column-pivoted QR, SVD, and
-  reusable triangular solve APIs for real and complex matrices as applicable.
+- Publish a focused 1.6 design record before adding public types. It must fix
+  ownership, aliasing, mutation, indexing, scalar support, factor lifetime,
+  workspace, tolerance, outcome, and compatibility rules while preserving the
+  1.5 dense contracts unless an explicitly reviewed migration requires a
+  change.
+- Deliver reviewable vertical slices in this order: shared triangular and
+  reflector kernels; dense factorisations and least-squares solves;
+  eigensystems; sparse storage and kernels; iterative solvers and
+  preconditioners; compatibility migration and qualification.
+- Treat the dense and sparse baselines below as release requirements. Features
+  listed under **Conditional 1.6 extensions** are not completion blockers
+  unless a separate design change explicitly promotes them into the release.
+- Keep `Single`, `Double`, single-complex, and double-complex operation sets
+  symmetrical wherever the mathematics is the same. Every deliberate
+  real-only, complex-only, symmetric, or Hermitian restriction must be visible
+  in the capability inventory and selection guide.
+- Do not infer final public names, unit boundaries, result-record layouts, or
+  deprecations from this roadmap. Resolve them in the design record and land
+  tests and documentation with each implementation slice.
+
+### Public numerical and ownership contracts
+
+- Factorisations own an immutable snapshot or retained private storage; later
+  mutation of the source matrix cannot silently change an existing factor.
+  An explicit update/downdate operation, if provided, is the only operation
+  that may change factor state.
+- Caller matrices and right-hand sides are not overwritten by default.
+  Destructive expert paths must be named as such, reject unsafe aliases before
+  mutation, and document which input becomes workspace.
+- Every factor and solver documents accepted shapes, transpose/conjugate modes,
+  output shapes, pivot/permutation meaning, ordering, normalization, sign or
+  phase conventions, finite-input policy, thread safety, and additional
+  storage.
+- Economy/full QR and SVD shapes, thin/full vector choices, left/right
+  eigenvectors, eigenvalue ordering, and real-to-complex output rules are
+  explicit. Results must be reproducible up to documented sign, phase, and
+  ordering freedoms.
+- Tolerances are either caller supplied or derived from dimension, scale, and
+  scalar precision. Rank, singularity, definiteness, convergence, and
+  ill-conditioning must not share one unexplained global epsilon.
+- Ordinary mathematical failures such as rank deficiency, non-convergence, and
+  iterative breakdown return inspectable status and diagnostics where a useful
+  result exists. Invalid shapes, non-finite input, allocation overflow, and
+  violated destructive-operation preconditions fail before caller-owned output
+  is modified.
+- Repeated-work APIs expose reusable factors and, where measurement justifies
+  them, explicit workspaces or allocation-avoiding destinations. Convenience
+  functions may allocate but must not hide repeated factorisation.
+
+### Required dense decompositions and solvers
+
+- Requalify 1.5 LU and Cholesky against the new result and diagnostic model
+  without breaking their established solve behavior.
+- Provide reusable lower/upper, unit/non-unit triangular solves for ordinary,
+  transposed, and conjugate-transposed systems with one or many right-hand
+  sides.
+- Provide pivoted LDLT for real symmetric and complex Hermitian indefinite
+  systems, Householder QR/LQ, column-pivoted QR, and SVD for tall, square, and
+  wide matrices. Do not substitute classical Gram-Schmidt for the documented
+  Householder path.
+- Provide direct square solves, overdetermined least-squares solves,
+  underdetermined minimum-norm solves, multiple right-hand sides, and explicit
+  method selection when QR, pivoted QR, or SVD have materially different rank
+  or cost behavior.
+- Define numerical rank, reciprocal-condition estimates, forward/backward
+  error measures, and scale-aware residuals without forming an inverse merely
+  to estimate condition.
 - Provide symmetric/Hermitian eigensystems and general real/complex
-  eigensystems, including complex eigenvalues rather than silently excluding
-  common nonsymmetric problems.
-- Add generalised symmetric-definite and general real/complex eigenproblem
-  APIs only with explicit balancing, ordering, conditioning, and eigenvector
-  conventions.
-- Add direct square solves, under- and overdetermined least-squares solves,
-  minimum-norm solutions, multiple right-hand sides, and factor reuse.
-- Define numerical rank and condition estimates with caller-selectable or
-  scale-derived tolerances; avoid estimating condition by explicitly computing
-  a full inverse when a stable estimator is available.
-- Add Schur-based or otherwise stability-appropriate matrix functions where a
-  complete contract can be supported.
-- Expose convergence, rank, pivoting, residual, reciprocal-condition, and
-  iteration information in result records instead of reducing all outcomes to
-  a matrix or exception.
+  eigensystems. General real problems return complex eigenvalues and
+  eigenvectors when required; they never silently discard an imaginary part.
+- Build general eigensystems on a stability-appropriate reduction and Schur
+  path with documented balancing and convergence behavior. Whether Schur forms
+  themselves become public is a separate design decision.
 
-### Structured and large-scale problems
+### Required structured storage and paths
 
-- Represent diagonal, triangular, symmetric/Hermitian, banded, tridiagonal, and
-  packed matrices without silently expanding them to general dense storage.
-- Provide structure-aware multiplication, factorisation, determinant, solve,
-  and eigenvalue paths where they materially reduce work or memory.
-- Support low-rank updates/downdates and repeated-solve workflows when a stable
-  algorithm exists; invalidate factors explicitly when their source changes.
-- Add partial dense and sparse eigensolvers for callers that need a selected
-  part of the spectrum rather than every eigenpair.
-- Accept linear-operator callbacks in Krylov algorithms so callers can solve
-  matrix-free and out-of-core problems with documented workspace bounds.
-- Ensure structured inputs can opt into a general algorithm explicitly when no
-  specialised path exists; never make an expensive conversion invisible.
+- Add a structured type only together with an algorithm that benefits from its
+  storage or invariants; do not create a catalogue of labels that immediately
+  expands to dense storage.
+- Provide at least diagonal, triangular, symmetric/Hermitian, and
+  tridiagonal/banded paths where they materially reduce work or memory.
+  Construction validates the claimed structure or makes the caller's
+  unchecked assertion explicit.
+- Provide structure-aware multiplication, determinant, factorisation, solve,
+  and eigenvalue operations appropriate to each shipped structure.
+- General fallback is explicit and reports its allocation/copy cost.
+  No structured input silently becomes a full dense matrix.
 
-### Sparse matrices
+### Required sparse storage and kernels
 
-- Replace linear-search sparse storage with documented compressed sparse row
-  and/or column formats plus an efficient triplet/builder input path.
-- Preserve sparsity for operations whose mathematical result remains sparse;
-  conversion to dense must be explicit.
-- Supply sparse matrix-vector/matrix products, transposition, scaling,
-  triangular operations, and sparse norms.
-- Add CG, MINRES, GMRES, BiCGSTAB, and LSQR as their matrix assumptions justify,
-  with explicit convergence and breakdown results.
-- Provide at least diagonal/Jacobi and incomplete-factorisation
-  preconditioners, and accept operator callbacks for matrix-free problems.
-- Add sparse symmetric eigensolvers and shift/selection controls with residual
-  and convergence reporting.
-- Add pure-Pascal sparse direct Cholesky/LU capability once ordering, fill-in,
-  and singularity behavior meet the same correctness contract as dense solves.
+- Replace the compatibility sparse matrix's linear-search storage with typed,
+  native-size compressed storage and an efficient triplet/builder path.
+  Document row/column orientation, sorted-index invariants, duplicate-entry
+  reduction, explicit-zero handling, index validation, empty shapes, and
+  builder finalisation.
+- Provide at least one canonical compressed orientation and an explicit
+  lossless conversion or transpose path for algorithms needing the other
+  orientation. Published complexity must cover lookup, construction,
+  iteration, transpose, and matrix-vector multiplication.
+- Preserve sparsity for operations whose mathematical result remains sparse.
+  Dense conversion, structural fill, pruning, and tolerance-based zero removal
+  are explicit operations.
+- Supply sparse matrix-vector and matrix-matrix products, transpose/conjugate
+  transpose, scaling, triangular operations, diagonal extraction, and sparse
+  norms for the supported scalar paths.
+- Define a linear-operator and preconditioner contract with dimensions,
+  scalar kind, alias rules, callback failure behavior, and workspace bounds so
+  the same iterative algorithms work with sparse matrices, dense matrices, and
+  matrix-free callers.
+
+### Required iterative solvers and partial eigensolvers
+
+- Provide CG for positive-definite symmetric/Hermitian systems, MINRES for
+  symmetric/Hermitian indefinite systems, GMRES and BiCGSTAB for general square
+  systems, and LSQR for rectangular least-squares problems.
+- Provide diagonal/Jacobi preconditioning and at least one documented
+  incomplete-factorisation path appropriate to the supported matrix classes.
+  State whether preconditioning is left, right, or split and which residual is
+  used for termination.
+- Return termination reason, convergence flag, iteration count, initial/final
+  residual norms, tolerance achieved, and breakdown information. Iteration and
+  restart limits are validated, cancellation or callback failure is distinct
+  from numerical non-convergence, and an unconverged iterate is never labelled
+  success.
+- Provide partial symmetric/Hermitian and general eigensolvers only through
+  matrix/vector or linear-operator products. Selection rules, shift behavior,
+  requested/returned eigenpair counts, residuals, restart limits, and
+  convergence of each returned eigenpair are explicit; partial methods must
+  not compute an unnecessary full dense decomposition.
+
+### Compatibility, adoption, and documentation
+
+- Audit compatibility LU, QR, SVD, Cholesky, eigen, power-method, iterative,
+  and sparse paths against the typed implementations. Preserve documented
+  behavior through adapters only when numerical and error equivalence is
+  tested; otherwise document the narrower compatibility contract.
+- Do not remove or deprecate `IMatrix` entry points in 1.6. Migration remains
+  opt-in, and every compatibility conversion states whether it copies,
+  aliases, changes precision, changes ordering, or expands sparse/structured
+  storage.
+- Replace avoidable private Gaussian-elimination or normal-equation copies in
+  higher-level libraries only after behavioral equivalence tests cover their
+  singular, rank-deficient, and ill-conditioned cases.
+- Publish a “choose a solver” guide covering matrix shape and structure,
+  definiteness, rank, accuracy, memory, repeated solves, sparse density, and
+  expected diagnostics. Runnable examples must solve and interpret realistic
+  systems rather than merely print factors.
+- Update the human- and machine-readable capability inventories, Lazarus
+  package registration, migration guide, public API reference, release notes,
+  and qualification report with each stable slice.
 
 ### Validation and performance
 
-- Test reconstruction, orthogonality/unitarity, residual, backward error,
-  eigenpair residuals, rank-deficient cases, clustered spectra, and scaled
-  ill-conditioned systems.
-- Keep independent high-precision or trusted reference fixtures in the test
-  suite without adding a runtime dependency.
-- Benchmark dense and sparse operations by size, shape, density, real/complex
-  type, allocation mode, and thread count.
-- Document when a decomposition, direct solver, or iterative solver is the
-  appropriate choice and give examples that solve systems rather than merely
-  print factors.
+- Test reconstruction, orthogonality/unitarity, pivot/permutation identities,
+  residual and backward error, rank decisions, condition estimates, and
+  eigenpair residuals across square, tall, wide, empty, singleton, and
+  multiple-right-hand-side shapes.
+- Include rank-deficient, nearly rank-deficient, clustered-spectrum,
+  repeated-eigenvalue, defective, badly scaled, singular, indefinite, and
+  mixed-extreme-scale fixtures. Non-finite input, allocation overflow,
+  callback failure, aliasing, and destination immutability on validation
+  failure remain explicit tests.
+- Keep independent high-precision or trusted reference fixtures in the
+  repository without adding a runtime dependency. Randomized and metamorphic
+  tests use fixed seeds and preserve failing fixtures.
+- Define algorithm- and precision-specific acceptance budgets before claiming
+  support. Qualification reports normalized residuals or backward errors
+  alongside absolute/relative errors; it does not use one decimal tolerance
+  for every problem.
+- Test sparse builder invariants, duplicate handling, explicit zeros,
+  structural symmetry, 32-/64-bit index arithmetic, operator callbacks,
+  preconditioned and unpreconditioned convergence, restart, stagnation, and
+  every documented breakdown status.
+- Benchmark representative dense and sparse sizes, shapes, densities, scalar
+  paths, allocation modes, factor reuse, workspace reuse, and thread counts.
+  Record compiler, target, hardware, checksums, residuals, and peak working
+  storage so a faster but less accurate or unexpectedly dense path cannot pass.
+- Retain Linux, Win64, and Win32 CI coverage. Long reference, randomized, and
+  performance suites may be scheduled separately, but the pull-request suite
+  must exercise every stable public family on every supported scalar path.
+
+### Conditional 1.6 extensions
+
+The following work may ship in 1.6 only after the required baseline is
+qualified and a focused design promotes it. It is not part of the default
+completion gate:
+
+- generalised symmetric-definite eigensystems and general real/complex
+  generalized eigensystems, which require explicit QZ or equivalent behavior,
+  balancing, alpha/beta representation, infinite eigenvalues, ordering,
+  conditioning, and eigenvector conventions;
+- public Schur reordering and matrix functions such as logarithm and square
+  root, which require branch, existence, conditioning, and error contracts;
+- low-rank factor updates/downdates and mutable factor workflows;
+- packed specialist formats beyond the required structured baseline; and
+- pure-Pascal sparse direct Cholesky/LU, which requires documented ordering,
+  symbolic/numeric separation, fill-in, pivoting, memory growth, singularity,
+  and factor-reuse behavior.
 
 ### 1.6.0 completion gate
 
-- The documented dense decomposition set works for rectangular, rank-deficient,
-  real, and complex cases within its stated contracts.
-- Common structured systems use structure-aware storage and algorithms, and
-  partial eigensolvers do not compute an unnecessary full decomposition.
-- Sparse storage has complexity appropriate to large sparse problems and does
-  not densify silently.
-- Direct and iterative solvers expose verifiable outcome information and never
-  return an unconverged iterate as success.
-- All higher-level libraries use shared algebra solve/decomposition APIs instead
-  of maintaining avoidable private Gaussian-elimination copies.
+- The 1.6 design record fixes ownership, factors, workspaces, scalar parity,
+  tolerances, statuses, conventions, and compatibility before the associated
+  public APIs are declared stable.
+- LU, Cholesky, LDLT, Householder QR/LQ, column-pivoted QR, SVD, triangular
+  solves, square solves, least-squares/minimum-norm solves, and full
+  eigensystems pass their documented real/complex and single/double contracts
+  for square, rectangular, rank-deficient, and multiple-RHS cases as
+  applicable.
+- Required structured paths use structure-aware storage and algorithms, and
+  every dense fallback is explicit.
+- Typed sparse construction and compressed storage meet their published
+  complexity and invariant contracts; stable sparse operations do not densify
+  silently.
+- CG, MINRES, GMRES, BiCGSTAB, LSQR, the required preconditioners, and partial
+  eigensolvers expose verifiable outcomes and pass convergence, stagnation,
+  breakdown, callback, and matrix-free tests.
+- Algorithm-specific qualification includes independent references,
+  precision-appropriate error budgets, adversarial fixtures, deterministic
+  performance evidence, workspace bounds, and Linux/Win64/Win32 CI.
+- The solver-selection guide, realistic examples, capability inventories,
+  migration guidance, package metadata, and release/qualification notes match
+  the shipped API. No compatibility API is removed or silently changes storage
+  or numerical behavior.
+- Higher-level libraries use shared typed solve/decomposition paths wherever
+  equivalence is proven and no longer maintain avoidable private
+  Gaussian-elimination or normal-equation implementations.
 
 ## Planned 1.7.0 — Numerical modelling and optimisation
 
