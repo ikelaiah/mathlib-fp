@@ -490,12 +490,12 @@ they must not constrain the new engine's type support, layout, or performance.
 
 ## Current release: 1.6.0 — Dependable typed dense linear algebra
 
-Version 1.6.0 completes the first high-trust dense workflow on the 1.5.0
-storage and kernel foundation. A Free Pascal user should be able to solve
-ordinary square, least-squares, minimum-norm, and symmetric/Hermitian
-eigenproblems through one documented native API without forming an inverse,
-converting through the compatibility matrix type, or installing an external
-binary.
+Released on 2026-07-27, version 1.6.0 completes the first high-trust dense
+workflow on the 1.5.0 storage and kernel foundation. A Free Pascal user should
+be able to solve ordinary square, least-squares, minimum-norm, and
+symmetric/Hermitian eigenproblems through one documented native API without
+forming an inverse, converting through the compatibility matrix type, or
+installing an external binary.
 
 The release deliberately values a small maintainable surface over a catalogue
 of algorithm names. Every stable decomposition becomes a permanent
