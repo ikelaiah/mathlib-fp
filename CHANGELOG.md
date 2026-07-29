@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-07-30
+
+### Added
+
+- Explicit local xoshiro256** random state and constant-memory mergeable
+  online statistics, with replay, split-stream, and bounded-state tests.
+- Arbitrary-length/single/2-D FFTs, convolution and correlation, rational
+  resampling, spectra, analytic signals, and bounded FIR/biquad processing.
+- Typed-dense PCA, seeded k-means++, deterministic validation splits, binary
+  LDA, an exact low-dimensional KD tree, and scalar Kalman filtering.
+- Invariant text, delimited text, a dense Matrix Market subset, and
+  versioned checksummed little-endian numerical and random-state persistence.
+- Deterministic serial blocked and automatic typed dense multiplication using
+  the portable kernels as cross-path correctness oracles.
+- Cross-domain and interchange/replay examples, capability records, release
+  notes, benchmark comparison, and qualification evidence.
+
+### Compatibility
+
+- Existing 1.7 and earlier public signatures remain available. The 1.8 APIs
+  are additive; the legacy `EngineeringLib.Signal` FFT remains unchanged.
+- No parallel/SIMD ABI, advanced filter-design/wavelet surface, model
+  persistence, or broader statistical/ML API is claimed stable.
+
 ## [1.7.0] - 2026-07-30
 
 ### Added

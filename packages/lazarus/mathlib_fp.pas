@@ -15,6 +15,8 @@ uses
   MathBase.Precision,
   MathBase.Trigonometry,
   MathBase.Iteration,
+  MathBase.Random,
+  MathBase.Interchange,
   { AlgebraLib }
   AlgebraLib.Matrices,
   AlgebraLib.DenseMatrices,
@@ -33,11 +35,13 @@ uses
   EngineeringLib.FluidDynamics,
   EngineeringLib.Thermodynamics,
   EngineeringLib.Signal,
+  EngineeringLib.DSP,
   EngineeringLib.UnitConversion,
   EngineeringLib.Velocity,
   EngineeringLib.Pressure,
   { StatsLib }
   StatsLib.Stats,
+  StatsLib.Streaming,
   { ProbabilityLib }
   ProbabilityLib.Distributions,
   { CombinatoricsLib }
@@ -52,8 +56,10 @@ uses
   OptimizationLib.Convex,
   { TimeSeriesLib }
   TimeSeriesLib.TimeSeries,
+  TimeSeriesLib.StateSpace,
   { MLLib }
   MLLib.MachineLearning,
+  MLLib.Analysis,
   { GeometryLib }
   GeometryLib.Geometry;
 

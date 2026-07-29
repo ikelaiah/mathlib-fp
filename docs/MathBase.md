@@ -11,8 +11,19 @@ Foundation domain for mathlib-fp. All other domains depend on its units.
 | `MathBase.MathConstants` | [MathBase.MathConstants.pas](../src/MathBase.MathConstants.pas) |
 | `MathBase.Precision` | [MathBase.Precision.pas](../src/MathBase.Precision.pas) |
 | `MathBase.Trigonometry` | [MathBase.Trigonometry.pas](../src/MathBase.Trigonometry.pas) |
+| `MathBase.Iteration` | [MathBase.Iteration.pas](../src/MathBase.Iteration.pas) |
+| `MathBase.Random` | [MathBase.Random.pas](../src/MathBase.Random.pas) |
+| `MathBase.Interchange` | [MathBase.Interchange.pas](../src/MathBase.Interchange.pas) |
 
 ---
+
+## Reproducibility and interchange
+
+Version 1.8 adds `TLocalRandom`, an explicit-state generator that never touches
+the RTL global `RandSeed`, plus invariant text, delimited, Matrix Market, and
+checked binary interchange. See the [applied numerics guide](AppliedNumerics.md)
+for the random-state contract and the [interchange guide](Interchange.md) for
+format versions, ownership, limits, and failure behaviour.
 
 ## MathBase.Complex
 

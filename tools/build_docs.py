@@ -130,9 +130,9 @@ def main() -> int:
         page = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(title)} — mathlib-fp 1.7.0</title>
+<title>{html.escape(title)} — mathlib-fp 1.8.0</title>
 <link rel="stylesheet" href="{root_prefix}assets/site.css"></head>
-<body><header><a href="{root_prefix}index.html">mathlib-fp 1.7.0</a>
+<body><header><a href="{root_prefix}index.html">mathlib-fp 1.8.0</a>
 <label>Search <input id="search" type="search"></label></header>
 <div id="results"></div><main>{body}</main>
 <script src="{root_prefix}assets/search.js"></script></body></html>"""

@@ -47,7 +47,7 @@ def main() -> int:
     inventory_path = DOCS / "capabilities.json"
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-        assert inventory["release"] == "1.7.0"
+        assert inventory["release"] == "1.8.0"
         assert inventory["schema_version"] == 1
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -159,6 +159,28 @@ def main() -> int:
         "TSecondOrderCone",
         "TConvexOptions",
         "TConvexResult",
+        "TRandomState",
+        "TLocalRandom",
+        "TOnlineStatistics",
+        "TNonFinitePolicy",
+        "TDSPKit",
+        "TFFTNormalization",
+        "TStreamingFIR",
+        "TStreamingBiquad",
+        "TSpectralEstimate",
+        "TAnalysisKit",
+        "TPCAResult",
+        "TKMeansPlusPlusResult",
+        "TKDTree",
+        "TScalarKalmanConfiguration",
+        "TScalarKalmanFilter",
+        "SaveBinary",
+        "LoadDoubleMatrixBinary",
+        "WriteMatrixMarket",
+        "TDenseMultiplyPath",
+        "MultiplyBlockedInto",
+        "MultiplyAutoInto",
+        "SelectedMultiplyPath",
     ]
     for symbol in required_symbols:
         if symbol not in public_docs:

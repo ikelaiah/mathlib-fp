@@ -8,6 +8,13 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.8.0 release notes](RELEASE_NOTES_1.8.0.md) — applied DSP,
+  bounded streaming statistics, reproducible analysis, state-space filtering,
+  numerical interchange, and portable performance.
+- [1.8.0 PR notes](PR_NOTES_1.8.0.md) — review scope, compatibility, local
+  verification, risks, and explicitly open roadmap work.
+- [1.8.0 qualification report](QUALIFICATION_1.8.0.md) — numerical oracles,
+  memory bounds, persistence rejection, benchmark comparison, and targets.
 - [mathlib-fp 1.7.0 release notes](RELEASE_NOTES_1.7.0.md) — interpolation,
   fitting, adaptive integration/ODEs, differentiation, and convex optimisation.
 - [1.7.0 PR notes](PR_NOTES_1.7.0.md) — review scope, compatibility, local
@@ -57,34 +64,34 @@ artificial Kit class.
 
 | Unit family | Domain | Depends on |
 |---------|-------------|------------|
-| [MathBase](MathBase.md) | Shared types, constants, precision functions, and trigonometry | RTL |
-| [AlgebraLib](AlgebraLib.md) | Compatibility matrices plus [typed dense storage/kernels](TypedDenseMatrices.md) and [decompositions/direct solvers](DenseLinearAlgebra.md) | MathBase |
+| [MathBase](MathBase.md) | Shared types, constants, precision, trigonometry, [local random state and numerical interchange](Interchange.md) | RTL / FCL streams |
+| [AlgebraLib](AlgebraLib.md) | Compatibility matrices plus [typed dense storage/kernels](TypedDenseMatrices.md), deterministic blocked multiplication, and [decompositions/direct solvers](DenseLinearAlgebra.md) | MathBase |
 | [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
-| [StatsLib](StatsLib.md) | Descriptive stats, hypothesis testing, correlation, bootstrap | MathBase |
-| [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing, unit conversion | MathBase |
+| [StatsLib](StatsLib.md) | Descriptive stats, hypothesis testing, correlation, bootstrap, and [constant-memory online statistics](AppliedNumerics.md) | MathBase |
+| [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, [applied DSP](AppliedNumerics.md), signal processing, unit conversion | MathBase / AlgebraLib |
 | [NumericsLib](NumericsLib.md) | Root finding and introductory numerical methods; [advanced modelling](NumericalModelling.md) | MathBase / AlgebraLib |
 | [ProbabilityLib](ProbabilityLib.md) | Continuous and discrete probability distributions | MathBase |
 | [CombinatoricsLib](CombinatoricsLib.md) | Counting, sequences, number theory, permutations, combinations | MathBase |
 | [OptimizationLib](OptimizationLib.md) | Scalar/vector optimisation and LP; [dense convex QP/SOCP](ConvexOptimization.md) | MathBase / AlgebraLib |
-| [TimeSeriesLib](TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection | MathBase |
-| [MLLib](MLLib.md) | Preprocessing, regression, classifiers, clustering, PCA, metrics | MathBase |
+| [TimeSeriesLib](TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and [scalar state-space filtering](AppliedNumerics.md) | MathBase |
+| [MLLib](MLLib.md) | Preprocessing, regression, classifiers, clustering, metrics, and [typed reproducible analysis](AppliedNumerics.md) | MathBase / AlgebraLib |
 | [GeometryLib](GeometryLib.md) | 2-D and 3-D computational geometry | MathBase |
 
 ## Public API naming inventory
 
 | Domain | Primary units | Public Kit classes |
 |--------|---------------|--------------------|
-| Math foundation | `MathBase.SharedTypes`, `MathBase.Complex`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry` | `TTrigKit` |
+| Math foundation | `MathBase.SharedTypes`, `MathBase.Complex`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry`, `MathBase.Random`, `MathBase.Interchange` | `TTrigKit`, `TLocalRandom`, interchange procedures |
 | Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers`, `AlgebraLib.DenseDecompositions` | `TMatrixKit`, `TVectorKit`, typed dense factories and factors |
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
-| Statistics | `StatsLib.Stats` | `TStatsKit` |
-| Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
+| Statistics | `StatsLib.Stats`, `StatsLib.Streaming` | `TStatsKit`, `TOnlineStatistics` |
+| Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.DSP`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TDSPKit`, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
 | Numerics | `NumericsLib.Numerics`, `NumericsLib.Differentiation`, `NumericsLib.Interpolation`, `NumericsLib.Modelling` | `TNumericsKit`, `TDifferentiationKit`, `TInterpolationKit`, `TModellingKit` |
 | Probability | `ProbabilityLib.Distributions` | `TProbabilityKit` |
 | Combinatorics | `CombinatoricsLib.Combinatorics` | `TCombinatoricsKit` |
 | Optimization | `OptimizationLib.Optimization`, `OptimizationLib.Convex` | `TOptimizationKit`, `TConvexOptimizationKit` |
-| Time series | `TimeSeriesLib.TimeSeries` | `TTimeSeriesKit` |
-| Machine learning | `MLLib.MachineLearning` | `TMLKit` |
+| Time series | `TimeSeriesLib.TimeSeries`, `TimeSeriesLib.StateSpace` | `TTimeSeriesKit`, `TScalarKalmanFilter` |
+| Machine learning | `MLLib.MachineLearning`, `MLLib.Analysis` | `TMLKit`, `TAnalysisKit`, `TKDTree` |
 | Geometry | `GeometryLib.Geometry` | `TGeometryKit` |
 
 ## Dependency Graph
@@ -139,9 +146,12 @@ TSingleComplexArray = array of TSingleComplex;
 | Repeated dense solves | [`FactorLU`](TypedDenseMatrices.md#factorisation-outcomes) |
 | Positive-definite dense solve | [`FactorCholesky`](TypedDenseMatrices.md#choose-an-entry-point) |
 | Typed matrix multiplication | [`Multiply` / `MultiplyInto`](TypedDenseMatrices.md#choose-an-entry-point) |
+| Deterministic blocked matrix multiplication | [`MultiplyBlockedInto` / `MultiplyAutoInto`](PortablePerformance.md) |
 | Compatibility `IMatrix` operations | [AlgebraLib compatibility reference](AlgebraLib.md) |
 | Interpolation, fitting, adaptive integration, vector roots, or ODEs | [Numerical modelling selection guide](NumericalModelling.md#choose-an-algorithm) |
 | Dense convex QP or second-order cones | [Convex optimisation selection guide](ConvexOptimization.md#choose-a-solver) |
+| FFT, spectra, streaming statistics, PCA, clustering, or Kalman filtering | [Applied numerics guide](AppliedNumerics.md) |
+| Portable numerical text and binary persistence | [Interchange guide](Interchange.md) |
 | Supported and missing families | [Capability inventory](CAPABILITIES.md) |
 
 See the [supported platform matrix](SUPPORT.md) for compiler, target, and

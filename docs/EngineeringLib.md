@@ -13,11 +13,20 @@ Depends on: **MathBase**
 | `EngineeringLib.FluidDynamics` | [EngineeringLib.FluidDynamics.pas](../src/EngineeringLib.FluidDynamics.pas) | `TFluidDynamicsKit` — core implementation |
 | `EngineeringLib.Thermodynamics` | [EngineeringLib.Thermodynamics.pas](../src/EngineeringLib.Thermodynamics.pas) | `TThermodynamicsKit` |
 | `EngineeringLib.Signal` | [EngineeringLib.Signal.pas](../src/EngineeringLib.Signal.pas) | `TSignalKit` |
+| `EngineeringLib.DSP` | [EngineeringLib.DSP.pas](../src/EngineeringLib.DSP.pas) | `TDSPKit`, `TStreamingFIR`, `TStreamingBiquad` |
 | `EngineeringLib.UnitConversion` | [EngineeringLib.UnitConversion.pas](../src/EngineeringLib.UnitConversion.pas) | `TUnitConversionKit` |
 | `EngineeringLib.Velocity` | [EngineeringLib.Velocity.pas](../src/EngineeringLib.Velocity.pas) | Alias → `TVelocityKit = TFluidDynamicsKit` |
 | `EngineeringLib.Pressure` | [EngineeringLib.Pressure.pas](../src/EngineeringLib.Pressure.pas) | Alias → `TPressureKit = TFluidDynamicsKit` |
 
 ---
+
+## Applied DSP in 1.8
+
+`EngineeringLib.DSP` adds arbitrary-length and 2-D FFTs, explicit
+normalisation, convolution/correlation, rational resampling, spectral
+estimation, analytic/cross spectra, and bounded-state FIR/biquad processing.
+Selection, accuracy, ownership, and state-size contracts are in the
+[applied numerics guide](AppliedNumerics.md).
 
 ## Exception Hierarchy
 

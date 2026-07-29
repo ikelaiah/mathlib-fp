@@ -2,6 +2,11 @@
 
 `TimeSeriesLib.TimeSeries` — time series analysis for Free Pascal.
 
+`TimeSeriesLib.StateSpace` adds the stable 1.8 scalar linear-Gaussian Kalman
+baseline. Its configuration, bounded mutable state, failure-atomic block
+processing, and forecast ownership are documented in the
+[applied numerics guide](AppliedNumerics.md).
+
 ---
 
 ## Quick Start

@@ -11,8 +11,17 @@ Depends on: **MathBase**
 | Unit | File | Class |
 |------|------|-------|
 | `StatsLib.Stats` | [StatsLib.Stats.pas](../src/StatsLib.Stats.pas) | `TStatsKit` |
+| `StatsLib.Streaming` | [StatsLib.Streaming.pas](../src/StatsLib.Streaming.pas) | `TOnlineStatistics` |
 
 ---
+
+## Streaming statistics in 1.8
+
+`TOnlineStatistics` calculates count, weighted mean, extrema, and population or
+sample variance in constant retained memory. Independent records can be merged
+and choose explicit reject/ignore handling for non-finite observations. The
+[applied numerics guide](AppliedNumerics.md) documents its bounded state,
+ownership, and error contracts.
 
 ## Core Types
 

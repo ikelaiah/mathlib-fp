@@ -29,6 +29,8 @@ closest to your project.
 | `16_dense_solver_selection.pas` | AlgebraLib | Choose QR, SVD minimum norm, and a symmetric eigensystem for realistic calibration tasks |
 | `17_numerical_modelling.pas` | NumericsLib | Monotone interpolation, bounded nonlinear fitting, adaptive vector ODEs, and event diagnostics |
 | `18_convex_optimization.pas` | OptimizationLib | Dense convex QP and second-order-cone models with feasibility and termination diagnostics |
+| `19_applied_data_pipeline.pas` | DSP / StatsLib / NumericsLib / MLLib / TimeSeriesLib | Reuse shared containers across spectral analysis, streaming statistics, fitting, PCA, seeded clustering, and scalar Kalman filtering |
+| `20_interchange_replay.pas` | MathBase / AlgebraLib | Round-trip a typed dense matrix and replay an explicitly saved local random-generator state |
 
 ## Build and run
 

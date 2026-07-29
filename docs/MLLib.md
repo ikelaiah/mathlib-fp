@@ -2,6 +2,12 @@
 
 `MLLib.MachineLearning` — machine learning primitives for Free Pascal.
 
+`MLLib.Analysis` adds typed-dense PCA, seeded k-means++, deterministic
+validation splits, binary LDA, and an exact low-dimensional `TKDTree`. Rows are
+observations and columns are features. See the
+[applied numerics guide](AppliedNumerics.md) for stable 1.8 contracts and
+explicitly open data-science families.
+
 ---
 
 ## Quick Start

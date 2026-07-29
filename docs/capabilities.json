@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "1.7.0",
+  "release": "1.8.0",
   "capabilities": [
     {
       "family": "scalar_special_functions",
@@ -45,7 +45,7 @@
     {
       "family": "typed_dense_kernels",
       "unit": "AlgebraLib.DenseKernels",
-      "entry_points": ["CopyInto", "Add", "Subtract", "ElementWiseMultiply", "Scale", "Axpy", "Apply", "Transpose", "Conjugate", "ConjugateTranspose", "Multiply", "Sum", "Dot", "Norm2"],
+      "entry_points": ["CopyInto", "Add", "Subtract", "ElementWiseMultiply", "Scale", "Axpy", "Apply", "Transpose", "Conjugate", "ConjugateTranspose", "Multiply", "MultiplyBlockedInto", "MultiplyAutoInto", "SelectedMultiplyPath", "Sum", "Dot", "Norm2"],
       "maturity": "stable",
       "scalars": ["single", "double", "single_complex", "double_complex"],
       "shapes": ["dense", "strided_view"],
@@ -55,7 +55,7 @@
       "example": "examples/15_typed_dense_solve.pas",
       "benchmark": "benchmarks/BenchmarkRunner.lpr",
       "tests": "tests/TestDenseMatrices.pas",
-      "limitations": ["portable scalar kernel", "finite inputs required"]
+      "limitations": ["portable scalar oracle plus deterministic serial blocked traversal", "no parallel or SIMD dispatch", "finite inputs required"]
     },
     {
       "family": "typed_direct_solve",
@@ -199,10 +199,127 @@
       "limitations": ["algorithms report only statuses applicable to their mathematical model"]
     },
     {
+      "family": "explicit_local_random_state",
+      "unit": "MathBase.Random",
+      "entry_points": ["TLocalRandom", "TRandomState", "Seeded", "Split", "GetState", "SetState"],
+      "maturity": "stable",
+      "scalars": ["uint64", "double", "single"],
+      "shapes": ["scalar_stream", "four_word_state"],
+      "complexity": "O(1) per generated value and O(1) stored state",
+      "accuracy": "xoshiro256** transition and SplitMix64 seed fixtures; replay and split determinism tests",
+      "docs": "docs/AppliedNumerics.md",
+      "example": "examples/20_interchange_replay.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["not cryptographic", "sequence contract is algorithm- and version-specific", "one mutable generator must not be shared concurrently"]
+    },
+    {
+      "family": "streaming_descriptive_statistics",
+      "unit": "StatsLib.Streaming",
+      "entry_points": ["TOnlineStatistics", "Add", "AddWeighted", "Merge"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar_stream"],
+      "complexity": "O(1) per observation, O(1) retained state",
+      "accuracy": "weighted Welford/PeBay updates compared with batch references and merge-order fixtures",
+      "docs": "docs/AppliedNumerics.md",
+      "example": "examples/19_applied_data_pipeline.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["moments through variance only", "non-finite handling is explicitly reject or ignore", "caller synchronizes shared mutable records"]
+    },
+    {
+      "family": "applied_dsp",
+      "unit": "EngineeringLib.DSP",
+      "entry_points": ["TDSPKit", "Transform", "RealTransform", "Transform2D", "Convolve", "Correlate", "Welch", "ShortTimeFourierTransform", "AnalyticSignal", "CrossSpectrum", "TStreamingFIR", "TStreamingBiquad"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["one_dimensional_signal", "dense_complex_2d", "bounded_stream_block"],
+      "complexity": "radix-2/Bluestein transforms O(n log n); direct convolution O(n*m); streaming FIR O(block*m)",
+      "accuracy": "DFT-oracle, round-trip, direct/FFT convolution, spectral-bin, and block-equivalence fixtures with scalar-specific tolerances",
+      "docs": "docs/AppliedNumerics.md",
+      "example": "examples/19_applied_data_pipeline.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["finite inputs only", "FIR retains exactly taps-1 samples", "biquad retains two delay values", "advanced filter design and wavelets remain open"]
+    },
+    {
+      "family": "typed_data_analysis",
+      "unit": "MLLib.Analysis",
+      "entry_points": ["TAnalysisKit", "PCA", "KMeansPlusPlus", "CreateValidationSplit", "KFoldAssignments", "FitBinaryLDA", "TKDTree"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["rows_as_observations", "columns_as_features", "low_dimensional_neighbour_index"],
+      "complexity": "PCA uses dense SVD; k-means O(iterations*n*k*d); exact KD-tree query is data dependent with O(n) worst case",
+      "accuracy": "shared dense-factor oracle, deterministic seeded clustering/splits, classifier and brute-force-neighbour fixtures",
+      "docs": "docs/AppliedNumerics.md",
+      "example": "examples/19_applied_data_pipeline.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["dense in-memory double data", "KD tree is intended for exact low-dimensional queries", "no forests, GLM, survival, or factor-analysis API"]
+    },
+    {
+      "family": "scalar_linear_state_space",
+      "unit": "TimeSeriesLib.StateSpace",
+      "entry_points": ["TScalarKalmanConfiguration", "TScalarKalmanFilter", "Process", "Forecast"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar_measurement_stream"],
+      "complexity": "O(1) per measurement and O(steps) returned series storage",
+      "accuracy": "closed-form scalar update, covariance non-negativity, replay, and failure-atomicity fixtures",
+      "docs": "docs/AppliedNumerics.md",
+      "example": "examples/19_applied_data_pipeline.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["scalar linear-Gaussian model only", "no missing-value or multivariate model support", "caller synchronizes shared mutable records"]
+    },
+    {
+      "family": "numerical_interchange",
+      "unit": "MathBase.Interchange",
+      "entry_points": ["ComplexToInvariant", "DenseMatrixToInvariant", "WriteDelimitedMatrix", "WriteMatrixMarket", "SaveBinary", "LoadDoubleMatrixBinary", "SaveRandomStateBinary"],
+      "maturity": "stable",
+      "scalars": ["double", "double_complex", "uint64_state"],
+      "shapes": ["vector", "dense_matrix", "four_word_random_state"],
+      "complexity": "O(elements) encoding, validation, and copy",
+      "accuracy": "round-trip fixtures preserve binary double/complex/state bits; text is invariant and round-trip formatted",
+      "docs": "docs/Interchange.md",
+      "example": "examples/20_interchange_replay.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["binary format is little-endian version 1", "Matrix Market subset is dense array real/complex general", "no model or decomposition persistence"]
+    },
+    {
+      "family": "advanced_dsp_design_and_wavelets",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["equiripple and Chebyshev/elliptic/Bessel design, wavelets, and wavelet packets remain open 1.8 roadmap items"]
+    },
+    {
+      "family": "expanded_statistical_inference_and_modelling",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["GLM families, survival analysis, factor analysis, robust covariance, and expanded tests/distributions remain open"]
+    },
+    {
+      "family": "advanced_machine_learning_and_time_series",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["decision forests, hierarchical clustering, multivariate state-space, and broader forecasting workflows remain open"]
+    },
+    {
+      "family": "model_expression_and_decomposition_persistence",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["safe expression evaluation and versioned model/decomposition persistence are not in the stable 1.8 surface"]
+    },
+    {
+      "family": "parallel_and_simd_numerical_dispatch",
+      "maturity": "unsupported",
+      "scalars": [],
+      "limitations": ["1.8 provides a portable oracle and serial blocked matrix path only; optional thread-pool and SIMD dispatch remain open"]
+    },
+    {
       "family": "bessel_elliptic_exponential_integral",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["no stable public implementation in 1.7.0"]
+      "limitations": ["no stable public implementation in 1.8.0"]
     },
     {
       "family": "typed_sparse_linear_algebra",

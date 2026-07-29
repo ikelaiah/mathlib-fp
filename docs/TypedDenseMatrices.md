@@ -7,6 +7,11 @@ Typed QR/CPQR, SVD, symmetric/Hermitian eigen, triangular, least-squares, and
 minimum-norm workflows added in 1.6 are documented in
 [Typed dense decompositions and solvers](DenseLinearAlgebra.md).
 
+Version 1.8 adds `MultiplyBlockedInto` and `MultiplyAutoInto` for all four
+scalar families. The serial blocked traversal preserves the portable kernel's
+increasing-inner-index accumulation order; the portable path remains the
+correctness oracle. See [Portable performance](PortablePerformance.md).
+
 ## 60-second solve
 
 ```pascal
