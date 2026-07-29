@@ -488,7 +488,7 @@ they must not constrain the new engine's type support, layout, or performance.
   [migration guide](MIGRATING_TO_TYPED_DENSE.md) names every array, vector,
   `IMatrix`, view, and clone copy/alias cost.
 
-## Current release: 1.6.0 — Dependable typed dense linear algebra
+## Previous release: 1.6.0 — Dependable typed dense linear algebra
 
 Released on 2026-07-27, version 1.6.0 completes the first high-trust dense
 workflow on the 1.5.0 storage and kernel foundation. A Free Pascal user should
@@ -707,9 +707,9 @@ rather than inserted into an already full release.
   heap-traced, package, example, documentation, benchmark, and clean-archive
   paths.
 
-## Next release: 1.7.0 — Numerical modelling and optimisation
+## Current release: 1.7.0 — Numerical modelling and optimisation
 
-Targeted for 2026-07-30, version 1.7.0 builds higher-level numerical workflows
+Released on 2026-07-30, version 1.7.0 builds higher-level numerical workflows
 on the 1.5/1.6 engine.
 The aim is not a catalogue of disconnected routines, but end-to-end APIs that
 help callers select an algorithm, configure it, inspect its outcome, and

@@ -44,11 +44,13 @@ workflow.
 | Win64 release (`-O3`) | 864 tests, 0 errors, 0 failures |
 | Win64 debug (`-Ci -Cr -Co -Ct -gh`) | 864 tests, 0 errors, 0 failures, 0 unfreed blocks |
 | Win32 i386 optimised (`-O3`) | 864 tests, 0 errors, 0 failures |
+| PR CI | Linux and Windows jobs passed for PR #11 |
 | Examples | 19 compiled; examples 17 and 18 ran end to end |
 | Lazarus package, Win64 | all package units compiled |
 | Package umbrella, Win32 i386 | all package units compiled |
 | Documentation check | 42 pages, 19 indexed examples, 104 public symbols |
 | Documentation build | 42 HTML pages and a populated search index |
+| Representative benchmark | compiled and ran at `-O3`; QR/SVD/eigen checksums matched the recorded references |
 
 ## Numerical budgets
 

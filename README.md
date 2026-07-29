@@ -25,8 +25,8 @@
 - **Ready to explore:** searchable reference docs, runnable examples, and 864 tests.
 
 > [!NOTE]
-> **1.7.0 is the next release, targeted for 2026-07-30; 1.6.0 is the current
-> published release.** The project follows semantic versioning; read the
+> **1.7.0 is the current release; 1.2.0 was the first public release.** The
+> project follows semantic versioning; read the
 > [release notes](docs/RELEASE_NOTES_1.7.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 

@@ -15,7 +15,7 @@ including the scalar convenience wrappers and their documented exception
 behavior. The implementation is native Free Pascal and introduces no
 third-party runtime, foreign binary, service, or network dependency.
 
-The target release date is 2026-07-30. Merging, tagging, creating the GitHub
+The release date is 2026-07-30. Merging, tagging, creating the GitHub
 release, and publishing release artifacts remain separate release-management
 steps.
 
@@ -181,12 +181,35 @@ Local verification completed:
   and SOCP outcomes.
 - [x] Searchable documentation builds; checks cover 42 Markdown pages, 19
   indexed examples, and 104 public symbols.
+- [x] The representative benchmark compiles and runs at `-O3`.
 - [x] `git diff --check` passes.
 
-Linux is not locally executable from the Windows qualification host. The
-repository CI runs the registered public API and test suite on Linux x86-64,
-Win64, and Win32; the exact PR commit's Linux result remains a post-push merge
-check.
+Linux is not locally executable from the Windows qualification host. The exact
+PR commit passed the repository's Linux and Windows CI jobs, including tests,
+examples, documentation, benchmarks, source-archive checks, and the Lazarus
+package paths.
+
+## Performance evidence
+
+The local Windows x86-64 FPC 3.2.2 `-O3` release-day run recorded:
+
+- merge sort of 250,000 values: 63 ms;
+- convex hull of 150,000 points: 46 ms;
+- `192 x 192` dense matrix multiplication: 32 ms;
+- typed `127 x 129` by `129 x 65` multiplication: 31 ms;
+- one `96 x 32` QR factorization plus 20 reused four-RHS solves: 16 ms,
+  compared with 62 ms for five allocating convenience calls;
+- `48 x 16` compact SVD plus a two-RHS minimum-norm solve: below the 1 ms
+  timer resolution, with 8 sweeps;
+- `24 x 24` symmetric eigensystem: below the 1 ms timer resolution, with 7
+  sweeps;
+- two million complex arithmetic operations: 31 ms;
+- one million-element vector AXPY plus dot product: 32 ms; and
+- a 262,144-point complex FFT: 15 ms.
+
+The deterministic QR, SVD, and eigen checksums were `2.786934`, `2.917959`,
+and `4.230000`. These figures are reproducibility and regression evidence from
+one host, not cross-library or cross-platform performance claims.
 
 ## Risk and review notes
 
