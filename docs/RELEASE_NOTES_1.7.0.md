@@ -1,6 +1,6 @@
 # mathlib-fp 1.7.0
 
-Released 2026-07-29.
+Target release: 2026-07-30.
 
 Version 1.7.0 completes the numerical-modelling and optimisation milestone on
 the 1.5/1.6 typed dense engine. It provides end-to-end interpolation, fitting,
@@ -83,4 +83,3 @@ universal worst-case proofs.
 
 No persistence/interchange, expression-evaluation, parallel/SIMD, large-data,
 or other 1.8.0 feature was added.
-
