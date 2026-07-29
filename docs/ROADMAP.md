@@ -488,7 +488,7 @@ they must not constrain the new engine's type support, layout, or performance.
   [migration guide](MIGRATING_TO_TYPED_DENSE.md) names every array, vector,
   `IMatrix`, view, and clone copy/alias cost.
 
-## Current release: 1.6.0 — Dependable typed dense linear algebra
+## Previous release: 1.6.0 — Dependable typed dense linear algebra
 
 Released on 2026-07-27, version 1.6.0 completes the first high-trust dense
 workflow on the 1.5.0 storage and kernel foundation. A Free Pascal user should
@@ -707,9 +707,10 @@ rather than inserted into an already full release.
   heap-traced, package, example, documentation, benchmark, and clean-archive
   paths.
 
-## Planned 1.7.0 — Numerical modelling and optimisation
+## Current release: 1.7.0 — Numerical modelling and optimisation
 
-Version 1.7.0 builds higher-level numerical workflows on the 1.5/1.6 engine.
+Released on 2026-07-29, version 1.7.0 builds higher-level numerical workflows
+on the 1.5/1.6 engine.
 The aim is not a catalogue of disconnected routines, but end-to-end APIs that
 help callers select an algorithm, configure it, inspect its outcome, and
 understand its limitations.
@@ -814,6 +815,34 @@ understand its limitations.
   involved.
 - Selection guides explain which algorithms apply to smooth/nonsmooth,
   bounded/unbounded, small/large, stiff/non-stiff, and exact/noisy problems.
+
+### 1.7.0 qualification evidence
+
+- `NumericsLib.Interpolation` supplies barycentric/rational, PCHIP/Akima,
+  bilinear/bicubic, IDW, RBF, and thin-plate workflows with knot, monotonicity,
+  grid, and scattered-node tests.
+- `NumericsLib.Differentiation` supplies numerical gradients/Jacobians/Hessians,
+  forward dual-number AD, and derivative checks. Analytic, numerical, and AD
+  paths agree on smooth fixtures, and a deliberately bad derivative identifies
+  its worst variable.
+- `NumericsLib.Modelling` supplies adaptive finite/improper and deterministic
+  quasi-Monte-Carlo integration, QR-based linear/polynomial fits, bounded robust
+  nonlinear least squares, vector equations, and adaptive non-stiff vector ODE
+  integration with dense output and localised events.
+- Existing LP and nonlinear solvers plus `OptimizationLib.Convex` provide the
+  representative LP/QP, cone-constrained, gradient, and derivative-free
+  workflows. Results expose objective, residual/optimality, feasibility,
+  counts, best iterate, and a shared termination status as applicable.
+- Callback/model state is local to each call. The former unit-global penalty
+  and maximise callback bridges were removed; nested-callback and seeded
+  deterministic tests cover reentrancy and reproducibility.
+- The [modelling guide](NumericalModelling.md),
+  [convex selection guide](ConvexOptimization.md), runnable examples 17/18,
+  capability inventories,
+  [release notes](RELEASE_NOTES_1.7.0.md), and
+  [qualification report](QUALIFICATION_1.7.0.md) agree on the stable boundary
+  and explicitly list stiff, sparse, reverse-AD, large-scattered, integer, and
+  general cone limitations.
 
 ## Planned 1.8.0 — Applied numerics, tooling, and performance maturity
 

@@ -8,6 +8,10 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.7.0 release notes](RELEASE_NOTES_1.7.0.md) — interpolation,
+  fitting, adaptive integration/ODEs, differentiation, and convex optimisation.
+- [1.7.0 qualification report](QUALIFICATION_1.7.0.md) — modelling accuracy,
+  diagnostics, reentrancy, examples, and target checks.
 - [mathlib-fp 1.6.0 release notes](RELEASE_NOTES_1.6.0.md) — typed dense
   QR/CPQR, SVD, eigensystems, and inspectable direct-solve diagnostics.
 - [1.6.0 qualification report](QUALIFICATION_1.6.0.md) — algorithm-specific
@@ -56,10 +60,10 @@ artificial Kit class.
 | [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
 | [StatsLib](StatsLib.md) | Descriptive stats, hypothesis testing, correlation, bootstrap | MathBase |
 | [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, signal processing, unit conversion | MathBase |
-| [NumericsLib](NumericsLib.md) | Root finding, numerical integration, ODE solvers, interpolation | MathBase |
+| [NumericsLib](NumericsLib.md) | Root finding and introductory numerical methods; [advanced modelling](NumericalModelling.md) | MathBase / AlgebraLib |
 | [ProbabilityLib](ProbabilityLib.md) | Continuous and discrete probability distributions | MathBase |
 | [CombinatoricsLib](CombinatoricsLib.md) | Counting, sequences, number theory, permutations, combinations | MathBase |
-| [OptimizationLib](OptimizationLib.md) | Scalar, vector, constrained, and linear optimization | MathBase |
+| [OptimizationLib](OptimizationLib.md) | Scalar/vector optimisation and LP; [dense convex QP/SOCP](ConvexOptimization.md) | MathBase / AlgebraLib |
 | [TimeSeriesLib](TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection | MathBase |
 | [MLLib](MLLib.md) | Preprocessing, regression, classifiers, clustering, PCA, metrics | MathBase |
 | [GeometryLib](GeometryLib.md) | 2-D and 3-D computational geometry | MathBase |
@@ -73,10 +77,10 @@ artificial Kit class.
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
 | Statistics | `StatsLib.Stats` | `TStatsKit` |
 | Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
-| Numerics | `NumericsLib.Numerics` | `TNumericsKit` |
+| Numerics | `NumericsLib.Numerics`, `NumericsLib.Differentiation`, `NumericsLib.Interpolation`, `NumericsLib.Modelling` | `TNumericsKit`, `TDifferentiationKit`, `TInterpolationKit`, `TModellingKit` |
 | Probability | `ProbabilityLib.Distributions` | `TProbabilityKit` |
 | Combinatorics | `CombinatoricsLib.Combinatorics` | `TCombinatoricsKit` |
-| Optimization | `OptimizationLib.Optimization` | `TOptimizationKit` |
+| Optimization | `OptimizationLib.Optimization`, `OptimizationLib.Convex` | `TOptimizationKit`, `TConvexOptimizationKit` |
 | Time series | `TimeSeriesLib.TimeSeries` | `TTimeSeriesKit` |
 | Machine learning | `MLLib.MachineLearning` | `TMLKit` |
 | Geometry | `GeometryLib.Geometry` | `TGeometryKit` |
@@ -134,6 +138,8 @@ TSingleComplexArray = array of TSingleComplex;
 | Positive-definite dense solve | [`FactorCholesky`](TypedDenseMatrices.md#choose-an-entry-point) |
 | Typed matrix multiplication | [`Multiply` / `MultiplyInto`](TypedDenseMatrices.md#choose-an-entry-point) |
 | Compatibility `IMatrix` operations | [AlgebraLib compatibility reference](AlgebraLib.md) |
+| Interpolation, fitting, adaptive integration, vector roots, or ODEs | [Numerical modelling selection guide](NumericalModelling.md#choose-an-algorithm) |
+| Dense convex QP or second-order cones | [Convex optimisation selection guide](ConvexOptimization.md#choose-a-solver) |
 | Supported and missing families | [Capability inventory](CAPABILITIES.md) |
 
 See the [supported platform matrix](SUPPORT.md) for compiler, target, and

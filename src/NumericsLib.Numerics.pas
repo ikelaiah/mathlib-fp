@@ -37,7 +37,7 @@ interface
 
 uses
   Classes, SysUtils, Math,
-  MathBase.SharedTypes;
+  MathBase.SharedTypes, MathBase.Iteration;
 
 type
   ENumericsError = class(Exception);
@@ -60,6 +60,7 @@ type
     Residual: Double;
     Iterations: Integer;
     Converged: Boolean;
+    Status: TIterationStatus;
   end;
 
   { Result record for cubic spline (internal coefficients) }
@@ -265,11 +266,13 @@ begin
   if Abs(FA) <= Tol then
   begin
     Result.Root := A; Result.Residual := Abs(FA); Result.Converged := True;
+    Result.Status := isConverged;
     Exit;
   end;
   if Abs(FB) <= Tol then
   begin
     Result.Root := B; Result.Residual := Abs(FB); Result.Converged := True;
+    Result.Status := isConverged;
     Exit;
   end;
   if SameNonZeroSign(FA, FB) then
@@ -286,6 +289,7 @@ begin
     if (Result.Residual <= Tol) or (Abs(B - A) / 2 <= Tol) then
     begin
       Result.Converged := True;
+      Result.Status := isConverged;
       Exit;
     end;
     if not SameNonZeroSign(FA, FMid) then
@@ -301,6 +305,7 @@ begin
   end;
   Result.Root := A + (B - A) / 2;
   Result.Residual := Abs(EvaluateFinite('Bisection', F, Result.Root));
+  Result.Status := isIterationLimit;
 end;
 
 class function TNumericsKit.Bisection(F: TScalarFunc; A, B: Double;
@@ -338,17 +343,22 @@ begin
     if Result.Residual <= Tol then
     begin
       Result.Converged := True;
+      Result.Status := isConverged;
       Exit;
     end;
     DFX := EvaluateFinite('NewtonRaphson derivative', DF, X);
     if Abs(DFX) < 1E-300 then
-      raise EInvalidArgument.Create('NewtonRaphson: derivative too small (near-zero).');
+    begin
+      Result.Status := isNumericalBreakdown;
+      Exit;
+    end;
     X := X - FX / DFX;
     if IsNan(X) or IsInfinite(X) then
       raise ENumericsError.Create('NewtonRaphson: iteration became non-finite.');
   end;
   Result.Root := X;
   Result.Residual := Abs(EvaluateFinite('NewtonRaphson', F, X));
+  Result.Status := isIterationLimit;
 end;
 
 class function TNumericsKit.NewtonRaphson(F, DF: TScalarFunc; X0: Double;
@@ -357,6 +367,9 @@ var
   Outcome: TRootResult;
 begin
   Outcome := NewtonRaphsonResult(F, DF, X0, Tol, MaxIter);
+  if Outcome.Status = isNumericalBreakdown then
+    raise EInvalidArgument.Create(
+      'NewtonRaphson: derivative too small (near-zero).');
   if not Outcome.Converged then
     raise ENumericsConvergenceError.CreateFmt(
       'NewtonRaphson did not converge after %d iterations (residual %.6g).',
@@ -381,11 +394,13 @@ begin
   if Abs(FA) <= Tol then
   begin
     Result.Root := A; Result.Residual := Abs(FA); Result.Converged := True;
+    Result.Status := isConverged;
     Exit;
   end;
   if Abs(FB) <= Tol then
   begin
     Result.Root := B; Result.Residual := Abs(FB); Result.Converged := True;
+    Result.Status := isConverged;
     Exit;
   end;
   if SameNonZeroSign(FA, FB) then
@@ -411,6 +426,7 @@ begin
     if (Result.Residual <= Tol) or (Abs(B - A) <= Tol) then
     begin
       Result.Converged := True;
+      Result.Status := isConverged;
       Exit;
     end;
 
@@ -469,6 +485,7 @@ begin
   end;
   Result.Root := B;
   Result.Residual := Abs(FB);
+  Result.Status := isIterationLimit;
 end;
 
 class function TNumericsKit.Brent(F: TScalarFunc; A, B: Double;
@@ -504,10 +521,14 @@ begin
     if Result.Residual <= Tol then
     begin
       Result.Converged := True;
+      Result.Status := isConverged;
       Exit;
     end;
     if Abs(F1 - F0) < 1E-300 then
-      raise EInvalidArgument.Create('Secant: division by near-zero (f(x1) ≈ f(x0)).');
+    begin
+      Result.Status := isNumericalBreakdown;
+      Exit;
+    end;
     X2 := X1 - F1 * (X1 - X0) / (F1 - F0);
     if IsNan(X2) or IsInfinite(X2) then
       raise ENumericsError.Create('Secant: iteration became non-finite.');
@@ -516,6 +537,7 @@ begin
   end;
   Result.Root := X1;
   Result.Residual := Abs(F1);
+  Result.Status := isIterationLimit;
 end;
 
 class function TNumericsKit.Secant(F: TScalarFunc; X0, X1: Double;
@@ -524,6 +546,9 @@ var
   Outcome: TRootResult;
 begin
   Outcome := SecantResult(F, X0, X1, Tol, MaxIter);
+  if Outcome.Status = isNumericalBreakdown then
+    raise EInvalidArgument.Create(
+      'Secant: division by near-zero (f(x1) approximately f(x0)).');
   if not Outcome.Converged then
     raise ENumericsConvergenceError.CreateFmt(
       'Secant did not converge after %d iterations (residual %.6g).',

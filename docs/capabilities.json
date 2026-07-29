@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "1.6.0",
+  "release": "1.7.0",
   "capabilities": [
     {
       "family": "scalar_special_functions",
@@ -131,10 +131,78 @@
       "limitations": ["full symmetric/Hermitian eigensystems only", "no nonsymmetric, generalized, or partial eigensystems"]
     },
     {
+      "family": "interpolation_and_approximation",
+      "unit": "NumericsLib.Interpolation",
+      "entry_points": ["TBarycentricInterpolator", "Rational", "TCubicInterpolator", "TGridSurface", "InverseDistance", "TScatteredInterpolator"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["one_dimensional_knots", "rectangular_grid", "scattered_2d"],
+      "complexity": "local evaluation O(log n); barycentric O(n); dense RBF/thin-plate construction O(n^3)",
+      "accuracy": "knot reproduction, monotonicity, planar-grid, and exact-node reference tests",
+      "docs": "docs/NumericalModelling.md",
+      "example": "examples/17_numerical_modelling.pas",
+      "tests": "tests/TestNumericalModelling.pas",
+      "limitations": ["evaluation clamps outside knot ranges", "dense scattered methods target small data sets"]
+    },
+    {
+      "family": "differentiation_and_derivative_checking",
+      "unit": "NumericsLib.Differentiation",
+      "entry_points": ["Gradient", "Jacobian", "Hessian", "TDual", "AutoGradient", "CheckGradient"],
+      "maturity": "stable",
+      "scalars": ["double", "dual_double"],
+      "shapes": ["scalar", "vector", "dense_jacobian_hessian"],
+      "complexity": "forward/central finite differences O(n) callback evaluations; full gradient AD O(n) seeded evaluations",
+      "accuracy": "analytic, central numerical, and forward-AD smooth-reference agreement",
+      "docs": "docs/NumericalModelling.md",
+      "tests": "tests/TestNumericalModelling.pas",
+      "limitations": ["forward mode only", "dual elementary function catalogue is explicit"]
+    },
+    {
+      "family": "numerical_modelling",
+      "unit": "NumericsLib.Modelling",
+      "entry_points": ["IntegrateAdaptive", "IntegrateImproper", "IntegrateQuasiMonteCarlo", "FitLinearBasis", "FitPolynomial", "FitNonlinear", "SolveSystem", "SolveODE"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar_integral", "dense_fit", "vector_system", "vector_initial_value_ode"],
+      "complexity": "algorithm and tolerance dependent; dense fit/system steps up to O(n^3)",
+      "accuracy": "published quadrature, fit, root, ODE dense-output, and event budgets",
+      "docs": "docs/NumericalModelling.md",
+      "example": "examples/17_numerical_modelling.pas",
+      "tests": "tests/TestNumericalModelling.pas",
+      "limitations": ["non-stiff ODE only", "Halton integration error is a scale estimate, not a proof"]
+    },
+    {
+      "family": "dense_convex_optimization",
+      "unit": "OptimizationLib.Convex",
+      "entry_points": ["SolveQuadraticProgram", "SolveSecondOrderConeProgram"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["dense_convex_qp", "dense_affine_second_order_cones"],
+      "complexity": "convexity/equality checks O(n^3); iterative projection/barrier work model dependent",
+      "accuracy": "constrained QP and unit-cone objective/feasibility references",
+      "docs": "docs/ConvexOptimization.md",
+      "example": "examples/18_convex_optimization.pas",
+      "tests": "tests/TestNumericalModelling.pas",
+      "limitations": ["dense continuous models only", "SOCP requires a strictly feasible start", "no general cone infeasibility certificate"]
+    },
+    {
+      "family": "shared_iteration_diagnostics",
+      "unit": "MathBase.Iteration",
+      "entry_points": ["TIterationStatus", "IterationStatusName"],
+      "maturity": "stable",
+      "scalars": [],
+      "shapes": ["result_status"],
+      "complexity": "O(1)",
+      "accuracy": "not applicable",
+      "docs": "docs/NumericalModelling.md",
+      "tests": "tests/TestNumericalModelling.pas",
+      "limitations": ["algorithms report only statuses applicable to their mathematical model"]
+    },
+    {
       "family": "bessel_elliptic_exponential_integral",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["no stable public implementation in 1.6.0"]
+      "limitations": ["no stable public implementation in 1.7.0"]
     },
     {
       "family": "typed_sparse_linear_algebra",

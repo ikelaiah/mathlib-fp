@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-07-29
+
+### Added
+
+- Reusable barycentric, rational, PCHIP, Akima, bilinear/bicubic, IDW, RBF,
+  and thin-plate interpolation with explicit ownership and scale limitations.
+- Scale-aware finite gradients/Jacobians/Hessians, forward dual-number
+  automatic differentiation, and pre-solve derivative checking.
+- Adaptive Gauss-Kronrod finite/improper integration, deterministic
+  quasi-Monte-Carlo integration, typed-QR linear fitting, damped robust
+  nonlinear least squares, vector Newton equations, and adaptive
+  Dormand-Prince ODEs with dense output and event detection.
+- A shared `TIterationStatus` diagnostic vocabulary and dense convex QP/SOCP
+  workflows with objective, feasibility, optimality, iteration, and evaluation
+  results.
+- End-to-end modelling and convex-optimisation examples, selection guides,
+  tests, capability records, release notes, and qualification evidence.
+
+### Changed
+
+- `PenaltyMethod` and `Maximize` no longer serialize through unit-global
+  callback bridges; their callback paths are reentrant.
+- The Lazarus package and distribution metadata now identify version 1.7.0 and
+  include every new unit.
+
+### Compatibility
+
+- Existing 1.6 and earlier public signatures remain available. The 1.7 APIs
+  are additive.
+
 ## [1.6.0] - 2026-07-27
 
 ### Added

@@ -27,6 +27,8 @@ closest to your project.
 | `14_complex_vectors.pas` | MathBase / AlgebraLib / EngineeringLib | Complex inverse functions, elementwise and reusable-buffer vector kernels, Hermitian dot products, and complex FFT round trips |
 | `15_typed_dense_solve.pas` | AlgebraLib | Infer item prices from receipt totals with a typed direct solve, then price a new order |
 | `16_dense_solver_selection.pas` | AlgebraLib | Choose QR, SVD minimum norm, and a symmetric eigensystem for realistic calibration tasks |
+| `17_numerical_modelling.pas` | NumericsLib | Monotone interpolation, bounded nonlinear fitting, adaptive vector ODEs, and event diagnostics |
+| `18_convex_optimization.pas` | OptimizationLib | Dense convex QP and second-order-cone models with feasibility and termination diagnostics |
 
 ## Build and run
 

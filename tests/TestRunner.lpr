@@ -21,6 +21,7 @@ uses
   , TestEngineeringLib_UnitConversion
   , TestEngineeringLib_Aliases
   , TestNumericsLib
+  , TestNumericalModelling
   , TestProbabilityLib
   , TestCombinatoricsLib
   , TestOptimizationLib
