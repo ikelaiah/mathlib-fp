@@ -10,6 +10,8 @@ native Free Pascal numerical package.
 
 - [mathlib-fp 1.7.0 release notes](RELEASE_NOTES_1.7.0.md) — interpolation,
   fitting, adaptive integration/ODEs, differentiation, and convex optimisation.
+- [1.7.0 PR notes](PR_NOTES_1.7.0.md) — review scope, compatibility, local
+  verification, risks, and explicitly deferred work.
 - [1.7.0 qualification report](QUALIFICATION_1.7.0.md) — modelling accuracy,
   diagnostics, reentrancy, examples, and target checks.
 - [mathlib-fp 1.6.0 release notes](RELEASE_NOTES_1.6.0.md) — typed dense

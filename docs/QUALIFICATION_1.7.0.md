@@ -47,8 +47,8 @@ workflow.
 | Examples | 19 compiled; examples 17 and 18 ran end to end |
 | Lazarus package, Win64 | all package units compiled |
 | Package umbrella, Win32 i386 | all package units compiled |
-| Documentation check | 41 pages, 19 indexed examples, 104 public symbols |
-| Documentation build | 41 HTML pages and a populated search index |
+| Documentation check | 42 pages, 19 indexed examples, 104 public symbols |
+| Documentation build | 42 HTML pages and a populated search index |
 
 ## Numerical budgets
 
