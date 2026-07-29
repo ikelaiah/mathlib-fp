@@ -1,0 +1,407 @@
+unit NumericsLib.Differentiation;
+
+{ Scale-aware finite differences, forward automatic differentiation, and
+  derivative checking. Public arrays are borrowed and results own their data. }
+
+{$mode objfpc}{$H+}{$J-}
+{$modeswitch advancedrecords}
+
+interface
+
+uses
+  SysUtils, Math, MathBase.SharedTypes;
+
+type
+  EDifferentiationError = class(Exception);
+
+  TDifferenceMethod = (dmForward, dmCentral);
+  TVectorFunction = function(const X: TDoubleArray): TDoubleArray;
+  TScalarVectorFunction = function(const X: TDoubleArray): Double;
+  TGradientFunction = function(const X: TDoubleArray): TDoubleArray;
+  TDoubleMatrix = array of TDoubleArray;
+
+  TDual = record
+    Value: Double;
+    Derivative: Double;
+    class function Create(const AValue, ADerivative: Double): TDual; static;
+    class operator +(const A, B: TDual): TDual;
+    class operator -(const A, B: TDual): TDual;
+    class operator -(const A: TDual): TDual;
+    class operator *(const A, B: TDual): TDual;
+    class operator /(const A, B: TDual): TDual;
+    class operator +(const A: TDual; const B: Double): TDual;
+    class operator +(const A: Double; const B: TDual): TDual;
+    class operator -(const A: TDual; const B: Double): TDual;
+    class operator -(const A: Double; const B: TDual): TDual;
+    class operator *(const A: TDual; const B: Double): TDual;
+    class operator *(const A: Double; const B: TDual): TDual;
+    class operator /(const A: TDual; const B: Double): TDual;
+  end;
+
+  TDualArray = array of TDual;
+  TDualFunction = function(const X: TDualArray): TDual;
+
+  TDerivativeCheckResult = record
+    Passed: Boolean;
+    WorstIndex: Integer;
+    AnalyticValue: Double;
+    ReferenceValue: Double;
+    AbsoluteError: Double;
+    RelativeError: Double;
+  end;
+
+  TDifferentiationKit = class
+  public
+    class function Gradient(F: TScalarVectorFunction;
+      const X: TDoubleArray; Method: TDifferenceMethod = dmCentral;
+      RelativeStep: Double = 0.0): TDoubleArray; static;
+    class function Jacobian(F: TVectorFunction;
+      const X: TDoubleArray; Method: TDifferenceMethod = dmCentral;
+      RelativeStep: Double = 0.0): TDoubleMatrix; static;
+    class function Hessian(F: TScalarVectorFunction;
+      const X: TDoubleArray; RelativeStep: Double = 0.0): TDoubleMatrix; static;
+    class function AutoGradient(F: TDualFunction;
+      const X: TDoubleArray): TDoubleArray; static;
+    class function CheckGradient(F: TScalarVectorFunction;
+      Grad: TGradientFunction; const X: TDoubleArray;
+      RelativeTolerance: Double = 1E-5;
+      AbsoluteTolerance: Double = 1E-7): TDerivativeCheckResult; static;
+  end;
+
+function DualSin(const X: TDual): TDual;
+function DualCos(const X: TDual): TDual;
+function DualExp(const X: TDual): TDual;
+function DualLn(const X: TDual): TDual;
+function DualSqrt(const X: TDual): TDual;
+function DualPower(const X: TDual; const P: Double): TDual;
+
+implementation
+
+const
+  DoubleEpsilon = 2.2204460492503131E-16;
+
+function IsFiniteValue(const X: Double): Boolean; inline;
+begin
+  Result := not IsNan(X) and not IsInfinite(X);
+end;
+
+procedure ValidateVector(const X: TDoubleArray; const Name: String;
+  const AllowEmpty: Boolean = False);
+var
+  I: Integer;
+begin
+  if (not AllowEmpty) and (Length(X) = 0) then
+    raise EDifferentiationError.Create(Name + ': vector must not be empty.');
+  for I := 0 to High(X) do
+    if not IsFiniteValue(X[I]) then
+      raise EDifferentiationError.CreateFmt(
+        '%s: value at index %d must be finite.', [Name, I]);
+end;
+
+function DefaultStep(const Method: TDifferenceMethod): Double; inline;
+begin
+  if Method = dmForward then
+    Result := Sqrt(DoubleEpsilon)
+  else
+    Result := Power(DoubleEpsilon, 1.0 / 3.0);
+end;
+
+function CoordinateStep(const X, RelativeStep: Double;
+  const Method: TDifferenceMethod): Double; inline;
+begin
+  if RelativeStep > 0 then
+    Result := RelativeStep * Max(1.0, Abs(X))
+  else
+    Result := DefaultStep(Method) * Max(1.0, Abs(X));
+end;
+
+class function TDual.Create(const AValue, ADerivative: Double): TDual;
+begin
+  Result.Value := AValue;
+  Result.Derivative := ADerivative;
+end;
+
+class operator TDual.+(const A, B: TDual): TDual;
+begin Result := Create(A.Value + B.Value, A.Derivative + B.Derivative); end;
+class operator TDual.-(const A, B: TDual): TDual;
+begin Result := Create(A.Value - B.Value, A.Derivative - B.Derivative); end;
+class operator TDual.-(const A: TDual): TDual;
+begin Result := Create(-A.Value, -A.Derivative); end;
+class operator TDual.*(const A, B: TDual): TDual;
+begin Result := Create(A.Value * B.Value,
+  A.Derivative * B.Value + A.Value * B.Derivative); end;
+class operator TDual./(const A, B: TDual): TDual;
+begin
+  if B.Value = 0 then
+    raise EDifferentiationError.Create('TDual division: denominator is zero.');
+  Result := Create(A.Value / B.Value,
+    (A.Derivative * B.Value - A.Value * B.Derivative) /
+    (B.Value * B.Value));
+end;
+class operator TDual.+(const A: TDual; const B: Double): TDual;
+begin Result := Create(A.Value + B, A.Derivative); end;
+class operator TDual.+(const A: Double; const B: TDual): TDual;
+begin Result := B + A; end;
+class operator TDual.-(const A: TDual; const B: Double): TDual;
+begin Result := Create(A.Value - B, A.Derivative); end;
+class operator TDual.-(const A: Double; const B: TDual): TDual;
+begin Result := Create(A - B.Value, -B.Derivative); end;
+class operator TDual.*(const A: TDual; const B: Double): TDual;
+begin Result := Create(A.Value * B, A.Derivative * B); end;
+class operator TDual.*(const A: Double; const B: TDual): TDual;
+begin Result := B * A; end;
+class operator TDual./(const A: TDual; const B: Double): TDual;
+begin
+  if B = 0 then
+    raise EDifferentiationError.Create('TDual division: denominator is zero.');
+  Result := Create(A.Value / B, A.Derivative / B);
+end;
+
+function DualSin(const X: TDual): TDual;
+begin Result := TDual.Create(Sin(X.Value), Cos(X.Value) * X.Derivative); end;
+function DualCos(const X: TDual): TDual;
+begin Result := TDual.Create(Cos(X.Value), -Sin(X.Value) * X.Derivative); end;
+function DualExp(const X: TDual): TDual;
+begin
+  Result.Value := Exp(X.Value);
+  Result.Derivative := Result.Value * X.Derivative;
+end;
+function DualLn(const X: TDual): TDual;
+begin
+  if X.Value <= 0 then
+    raise EDifferentiationError.Create('DualLn: argument must be positive.');
+  Result := TDual.Create(Ln(X.Value), X.Derivative / X.Value);
+end;
+function DualSqrt(const X: TDual): TDual;
+begin
+  if X.Value < 0 then
+    raise EDifferentiationError.Create('DualSqrt: argument must be non-negative.');
+  Result.Value := Sqrt(X.Value);
+  if Result.Value = 0 then
+    if X.Derivative = 0 then Result.Derivative := 0
+    else raise EDifferentiationError.Create(
+      'DualSqrt: derivative is singular at zero.')
+  else
+    Result.Derivative := X.Derivative / (2 * Result.Value);
+end;
+function DualPower(const X: TDual; const P: Double): TDual;
+begin
+  if (X.Value < 0) and (Frac(P) <> 0) then
+    raise EDifferentiationError.Create(
+      'DualPower: negative base requires an integer exponent.');
+  Result.Value := Power(X.Value, P);
+  if P = 0 then Result.Derivative := 0
+  else Result.Derivative := P * Power(X.Value, P - 1) * X.Derivative;
+end;
+
+class function TDifferentiationKit.Gradient(F: TScalarVectorFunction;
+  const X: TDoubleArray; Method: TDifferenceMethod;
+  RelativeStep: Double): TDoubleArray;
+var
+  XP, XM: TDoubleArray;
+  I: Integer;
+  H, F0, FP, FM: Double;
+begin
+  Result := nil;
+  F0 := 0;
+  if not Assigned(F) then
+    raise EDifferentiationError.Create('Gradient: callback must be assigned.');
+  ValidateVector(X, 'Gradient');
+  if (RelativeStep < 0) or not IsFiniteValue(RelativeStep) then
+    raise EDifferentiationError.Create(
+      'Gradient: RelativeStep must be finite and non-negative.');
+  XP := Copy(X);
+  XM := Copy(X);
+  SetLength(Result, Length(X));
+  if Method = dmForward then
+  begin
+    F0 := F(X);
+    if not IsFiniteValue(F0) then
+      raise EDifferentiationError.Create(
+        'Gradient: callback returned a non-finite base value.');
+  end;
+  for I := 0 to High(X) do
+  begin
+    H := CoordinateStep(X[I], RelativeStep, Method);
+    XP[I] := X[I] + H;
+    FP := F(XP);
+    XP[I] := X[I];
+    if Method = dmCentral then
+    begin
+      XM[I] := X[I] - H;
+      FM := F(XM);
+      XM[I] := X[I];
+      Result[I] := (FP - FM) / (2 * H);
+      if not IsFiniteValue(FM) then
+        raise EDifferentiationError.CreateFmt(
+          'Gradient: callback returned non-finite value at variable %d.', [I]);
+    end
+    else
+      Result[I] := (FP - F0) / H;
+    if not IsFiniteValue(FP) or not IsFiniteValue(Result[I]) then
+      raise EDifferentiationError.CreateFmt(
+        'Gradient: non-finite result at variable %d.', [I]);
+  end;
+end;
+
+class function TDifferentiationKit.Jacobian(F: TVectorFunction;
+  const X: TDoubleArray; Method: TDifferenceMethod;
+  RelativeStep: Double): TDoubleMatrix;
+var
+  XP, XM, F0, FP, FM: TDoubleArray;
+  I, J, M: Integer;
+  H: Double;
+begin
+  Result := nil;
+  if not Assigned(F) then
+    raise EDifferentiationError.Create('Jacobian: callback must be assigned.');
+  ValidateVector(X, 'Jacobian');
+  if (RelativeStep < 0) or not IsFiniteValue(RelativeStep) then
+    raise EDifferentiationError.Create(
+      'Jacobian: RelativeStep must be finite and non-negative.');
+  F0 := F(X);
+  ValidateVector(F0, 'Jacobian callback', True);
+  M := Length(F0);
+  SetLength(Result, M);
+  for J := 0 to M - 1 do SetLength(Result[J], Length(X));
+  XP := Copy(X);
+  XM := Copy(X);
+  for I := 0 to High(X) do
+  begin
+    H := CoordinateStep(X[I], RelativeStep, Method);
+    XP[I] := X[I] + H;
+    FP := F(XP);
+    XP[I] := X[I];
+    if Length(FP) <> M then
+      raise EDifferentiationError.Create(
+        'Jacobian: callback result dimension changed.');
+    ValidateVector(FP, 'Jacobian callback', True);
+    if Method = dmCentral then
+    begin
+      XM[I] := X[I] - H;
+      FM := F(XM);
+      XM[I] := X[I];
+      if Length(FM) <> M then
+        raise EDifferentiationError.Create(
+          'Jacobian: callback result dimension changed.');
+      ValidateVector(FM, 'Jacobian callback', True);
+      for J := 0 to M - 1 do
+        Result[J][I] := (FP[J] - FM[J]) / (2 * H);
+    end
+    else
+      for J := 0 to M - 1 do
+        Result[J][I] := (FP[J] - F0[J]) / H;
+  end;
+end;
+
+class function TDifferentiationKit.Hessian(F: TScalarVectorFunction;
+  const X: TDoubleArray; RelativeStep: Double): TDoubleMatrix;
+var
+  XP, XM: TDoubleArray;
+  GP, GM: TDoubleArray;
+  I, J: Integer;
+  H: Double;
+begin
+  Result := nil;
+  if not Assigned(F) then
+    raise EDifferentiationError.Create('Hessian: callback must be assigned.');
+  ValidateVector(X, 'Hessian');
+  SetLength(Result, Length(X));
+  for I := 0 to High(Result) do SetLength(Result[I], Length(X));
+  XP := Copy(X);
+  XM := Copy(X);
+  for I := 0 to High(X) do
+  begin
+    H := CoordinateStep(X[I], RelativeStep, dmCentral);
+    XP[I] := X[I] + H;
+    XM[I] := X[I] - H;
+    GP := Gradient(F, XP, dmCentral, RelativeStep);
+    GM := Gradient(F, XM, dmCentral, RelativeStep);
+    XP[I] := X[I];
+    XM[I] := X[I];
+    for J := 0 to High(X) do
+      Result[J][I] := (GP[J] - GM[J]) / (2 * H);
+  end;
+  { Roundoff can make the two paths differ slightly; restore symmetry. }
+  for I := 0 to High(X) do
+    for J := I + 1 to High(X) do
+    begin
+      H := 0.5 * (Result[I][J] + Result[J][I]);
+      Result[I][J] := H;
+      Result[J][I] := H;
+    end;
+end;
+
+class function TDifferentiationKit.AutoGradient(F: TDualFunction;
+  const X: TDoubleArray): TDoubleArray;
+var
+  DX: TDualArray;
+  Y: TDual;
+  I, J: Integer;
+begin
+  Result := nil;
+  if not Assigned(F) then
+    raise EDifferentiationError.Create(
+      'AutoGradient: callback must be assigned.');
+  ValidateVector(X, 'AutoGradient');
+  SetLength(DX, Length(X));
+  SetLength(Result, Length(X));
+  for I := 0 to High(X) do
+  begin
+    for J := 0 to High(X) do
+      DX[J] := TDual.Create(X[J], Ord(I = J));
+    Y := F(DX);
+    if not IsFiniteValue(Y.Value) or not IsFiniteValue(Y.Derivative) then
+      raise EDifferentiationError.CreateFmt(
+        'AutoGradient: non-finite result for seed variable %d.', [I]);
+    Result[I] := Y.Derivative;
+  end;
+end;
+
+class function TDifferentiationKit.CheckGradient(F: TScalarVectorFunction;
+  Grad: TGradientFunction; const X: TDoubleArray;
+  RelativeTolerance, AbsoluteTolerance: Double): TDerivativeCheckResult;
+var
+  A, N: TDoubleArray;
+  I: Integer;
+  Scale, Limit, RelErr: Double;
+begin
+  Result := Default(TDerivativeCheckResult);
+  Result.WorstIndex := -1;
+  if not Assigned(Grad) then
+    raise EDifferentiationError.Create(
+      'CheckGradient: analytic gradient must be assigned.');
+  if (RelativeTolerance < 0) or (AbsoluteTolerance < 0) or
+     not IsFiniteValue(RelativeTolerance) or
+     not IsFiniteValue(AbsoluteTolerance) then
+    raise EDifferentiationError.Create(
+      'CheckGradient: tolerances must be finite and non-negative.');
+  ValidateVector(X, 'CheckGradient');
+  A := Grad(X);
+  if Length(A) <> Length(X) then
+    raise EDifferentiationError.CreateFmt(
+      'CheckGradient: analytic gradient length %d; expected %d.',
+      [Length(A), Length(X)]);
+  ValidateVector(A, 'CheckGradient analytic gradient');
+  N := Gradient(F, X, dmCentral);
+  Result.Passed := True;
+  for I := 0 to High(X) do
+  begin
+    Scale := Max(Abs(A[I]), Abs(N[I]));
+    Limit := AbsoluteTolerance + RelativeTolerance * Scale;
+    if Scale > 0 then RelErr := Abs(A[I] - N[I]) / Scale
+    else RelErr := 0;
+    if (Result.WorstIndex < 0) or
+       (Abs(A[I] - N[I]) > Result.AbsoluteError) then
+    begin
+      Result.WorstIndex := I;
+      Result.AnalyticValue := A[I];
+      Result.ReferenceValue := N[I];
+      Result.AbsoluteError := Abs(A[I] - N[I]);
+      Result.RelativeError := RelErr;
+    end;
+    if Abs(A[I] - N[I]) > Limit then Result.Passed := False;
+  end;
+end;
+
+end.

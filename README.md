@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.6.0" src="https://img.shields.io/badge/version-1.6.0-brightgreen.svg">
+  <img alt="Version 1.7.0" src="https://img.shields.io/badge/version-1.7.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -22,12 +22,12 @@
 - **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
-- **Ready to explore:** searchable reference docs, runnable examples, and 852 tests.
+- **Ready to explore:** searchable reference docs, runnable examples, and 864 tests.
 
 > [!NOTE]
-> **1.6.0 is the current release; 1.2.0 was the first public release.** The
+> **1.7.0 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.6.0.md) and
+> [release notes](docs/RELEASE_NOTES_1.7.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
@@ -75,10 +75,10 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 | [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics |
 | [StatsLib](docs/StatsLib.md) | Descriptive statistics, tests, correlation, bootstrap |
 | [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, signals, unit conversion |
-| [NumericsLib](docs/NumericsLib.md) | Root finding, integration, ODEs, interpolation |
+| [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs |
 | [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions |
 | [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations |
-| [OptimizationLib](docs/OptimizationLib.md) | Scalar, multivariate, constrained, linear optimization |
+| [OptimizationLib](docs/OptimizationLib.md) | Scalar/multivariate optimisation, LP, dense convex QP and SOCP |
 | [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection |
 | [MLLib](docs/MLLib.md) | Preprocessing, regression, classification, clustering, PCA |
 | [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms |
@@ -90,7 +90,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 17 commented walkthroughs with
+The [`examples/`](examples/) directory contains 19 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:

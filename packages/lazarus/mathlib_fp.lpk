@@ -30,7 +30,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
-    <Version Major="1" Minor="6"/>
+    <Version Major="1" Minor="7"/>
     <Files>
       <Item>
         <Filename Value="..\..\src\MathBase.MathConstants.pas"/>
@@ -51,6 +51,10 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
       <Item>
         <Filename Value="..\..\src\MathBase.Trigonometry.pas"/>
         <UnitName Value="MathBase.Trigonometry"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\MathBase.Iteration.pas"/>
+        <UnitName Value="MathBase.Iteration"/>
       </Item>
       <Item>
         <Filename Value="..\..\src\AlgebraLib.Matrices.pas"/>
@@ -141,8 +145,24 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
         <UnitName Value="NumericsLib.Numerics"/>
       </Item>
       <Item>
+        <Filename Value="..\..\src\NumericsLib.Differentiation.pas"/>
+        <UnitName Value="NumericsLib.Differentiation"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\NumericsLib.Interpolation.pas"/>
+        <UnitName Value="NumericsLib.Interpolation"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\NumericsLib.Modelling.pas"/>
+        <UnitName Value="NumericsLib.Modelling"/>
+      </Item>
+      <Item>
         <Filename Value="..\..\src\OptimizationLib.Optimization.pas"/>
         <UnitName Value="OptimizationLib.Optimization"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\OptimizationLib.Convex.pas"/>
+        <UnitName Value="OptimizationLib.Convex"/>
       </Item>
       <Item>
         <Filename Value="..\..\src\TimeSeriesLib.TimeSeries.pas"/>

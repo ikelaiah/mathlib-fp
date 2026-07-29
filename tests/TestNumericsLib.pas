@@ -91,6 +91,7 @@ type
     procedure Test40_BisectionEndpointRootRegression;
     procedure Test41_RootConvergenceIsReported;
     procedure Test42_InterpolationRejectsUnorderedKnots;
+    procedure Test43_LegacyRootBreakdownExceptions;
   end;
 
 implementation
@@ -591,6 +592,14 @@ begin
   except
     on E: EInvalidArgument do { expected };
   end;
+end;
+
+procedure TTestNumericsLib.Test43_LegacyRootBreakdownExceptions;
+begin
+  AssertException('Newton zero derivative remains EInvalidArgument',
+    EInvalidArgument, @DoNewtonZeroDeriv);
+  AssertException('Secant invalid guesses remain EInvalidArgument',
+    EInvalidArgument, @DoSecantStuck);
 end;
 
 initialization

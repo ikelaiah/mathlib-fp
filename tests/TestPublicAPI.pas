@@ -25,9 +25,12 @@ uses
   EngineeringLib.Signal, EngineeringLib.UnitConversion,
   EngineeringLib.Velocity, EngineeringLib.Pressure,
   NumericsLib.Numerics,
+  NumericsLib.Differentiation, NumericsLib.Interpolation,
+  NumericsLib.Modelling,
   ProbabilityLib.Distributions,
   CombinatoricsLib.Combinatorics,
   OptimizationLib.Optimization,
+  OptimizationLib.Convex,
   TimeSeriesLib.TimeSeries,
   MLLib.MachineLearning,
   GeometryLib.Geometry;
@@ -47,9 +50,13 @@ type
   TVelocityKitClass = class of TVelocityKit;
   TPressureKitClass = class of TPressureKit;
   TNumericsKitClass = class of TNumericsKit;
+  TDifferentiationKitClass = class of TDifferentiationKit;
+  TInterpolationKitClass = class of TInterpolationKit;
+  TModellingKitClass = class of TModellingKit;
   TProbabilityKitClass = class of TProbabilityKit;
   TCombinatoricsKitClass = class of TCombinatoricsKit;
   TOptimizationKitClass = class of TOptimizationKit;
+  TConvexOptimizationKitClass = class of TConvexOptimizationKit;
   TTimeSeriesKitClass = class of TTimeSeriesKit;
   TMLKitClass = class of TMLKit;
   TGeometryKitClass = class of TGeometryKit;
@@ -81,9 +88,13 @@ var
   VelocityKit: TVelocityKitClass;
   PressureKit: TPressureKitClass;
   NumericsKit: TNumericsKitClass;
+  DifferentiationKit: TDifferentiationKitClass;
+  InterpolationKit: TInterpolationKitClass;
+  ModellingKit: TModellingKitClass;
   ProbabilityKit: TProbabilityKitClass;
   CombinatoricsKit: TCombinatoricsKitClass;
   OptimizationKit: TOptimizationKitClass;
+  ConvexOptimizationKit: TConvexOptimizationKitClass;
   TimeSeriesKit: TTimeSeriesKitClass;
   MLKit: TMLKitClass;
   GeometryKit: TGeometryKitClass;
@@ -103,9 +114,13 @@ begin
   VelocityKit := TVelocityKit;
   PressureKit := TPressureKit;
   NumericsKit := TNumericsKit;
+  DifferentiationKit := TDifferentiationKit;
+  InterpolationKit := TInterpolationKit;
+  ModellingKit := TModellingKit;
   ProbabilityKit := TProbabilityKit;
   CombinatoricsKit := TCombinatoricsKit;
   OptimizationKit := TOptimizationKit;
+  ConvexOptimizationKit := TConvexOptimizationKit;
   TimeSeriesKit := TTimeSeriesKit;
   MLKit := TMLKit;
   GeometryKit := TGeometryKit;
@@ -125,9 +140,13 @@ begin
   AssertTrue('TVelocityKit', VelocityKit <> nil);
   AssertTrue('TPressureKit', PressureKit <> nil);
   AssertTrue('TNumericsKit', NumericsKit <> nil);
+  AssertTrue('TDifferentiationKit', DifferentiationKit <> nil);
+  AssertTrue('TInterpolationKit', InterpolationKit <> nil);
+  AssertTrue('TModellingKit', ModellingKit <> nil);
   AssertTrue('TProbabilityKit', ProbabilityKit <> nil);
   AssertTrue('TCombinatoricsKit', CombinatoricsKit <> nil);
   AssertTrue('TOptimizationKit', OptimizationKit <> nil);
+  AssertTrue('TConvexOptimizationKit', ConvexOptimizationKit <> nil);
   AssertTrue('TTimeSeriesKit', TimeSeriesKit <> nil);
   AssertTrue('TMLKit', MLKit <> nil);
   AssertTrue('TGeometryKit', GeometryKit <> nil);

@@ -2,6 +2,11 @@
 
 `OptimizationLib.Optimization` — mathematical optimization for Free Pascal.
 
+For dense convex quadratic and second-order-cone models with explicit
+feasibility and shared termination diagnostics, see the
+[convex optimisation guide](ConvexOptimization.md). The APIs on this page
+remain source compatible.
+
 ---
 
 ## Quick Start
@@ -43,6 +48,9 @@ TOptResult = record
   FVal:      Double;        { objective value at solution }
   Iters:     Integer;       { iterations used }
   Converged: Boolean;       { True if convergence criterion was met }
+  Status: TIterationStatus;
+  GradientNorm: Double;
+  ConstraintViolation: Double;
 end;
 
 TLPStatus = (lpsOptimal, lpsUnbounded, lpsIterationLimit,

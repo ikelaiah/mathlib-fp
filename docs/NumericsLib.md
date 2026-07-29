@@ -3,6 +3,10 @@
 Numerical methods domain for Free Pascal — root finding, quadrature, ODE
 solvers, and interpolation.
 
+For the 1.7 adaptive, vector, fitting, derivative, and reusable-interpolant
+APIs, see the [numerical modelling guide](NumericalModelling.md). The APIs on
+this page remain the concise compatibility and teaching path.
+
 Depends on: **MathBase**
 
 ## Units
@@ -53,12 +57,14 @@ TRootResult = record
   Residual: Double;
   Iterations: Integer;
   Converged: Boolean;
+  Status: TIterationStatus;
 end;
 ```
 
 Use the detailed result when iteration counts or explicit convergence reporting
 matter. Scalar methods raise `ENumericsConvergenceError` when their iteration
-limit is exhausted.
+limit is exhausted. `Status` distinguishes convergence, numerical breakdown,
+and iteration exhaustion; `Converged` remains for source compatibility.
 
 ### `Bisection`
 

@@ -14,6 +14,7 @@ uses
   MathBase.Complex,
   MathBase.Precision,
   MathBase.Trigonometry,
+  MathBase.Iteration,
   { AlgebraLib }
   AlgebraLib.Matrices,
   AlgebraLib.DenseMatrices,
@@ -43,8 +44,12 @@ uses
   CombinatoricsLib.Combinatorics,
   { NumericsLib }
   NumericsLib.Numerics,
+  NumericsLib.Differentiation,
+  NumericsLib.Interpolation,
+  NumericsLib.Modelling,
   { OptimizationLib }
   OptimizationLib.Optimization,
+  OptimizationLib.Convex,
   { TimeSeriesLib }
   TimeSeriesLib.TimeSeries,
   { MLLib }

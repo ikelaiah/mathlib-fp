@@ -49,7 +49,7 @@ interface
 
 uses
   Classes, SysUtils, Math,
-  MathBase.SharedTypes;
+  MathBase.SharedTypes, MathBase.Iteration;
 
 type
   { Raised for invalid optimizer inputs }
@@ -73,6 +73,9 @@ type
     FVal:      Double;        { objective value at solution }
     Iters:     Integer;       { iterations used }
     Converged: Boolean;       { True if convergence criterion was met }
+    Status: TIterationStatus; { detailed termination reason }
+    GradientNorm: Double;     { final gradient norm when applicable }
+    ConstraintViolation: Double; { maximum positive constraint violation }
   end;
 
   TLPStatus = (lpsOptimal, lpsUnbounded, lpsIterationLimit,
@@ -114,6 +117,14 @@ type
       const X, Dir: TDoubleArray;
       FX: Double;
       Alpha0: Double = 1.0): Double; static;
+    class function CoreObjective(F: TMultivarFunc;
+      const Constraints: array of TConstraintFunc;
+      const X: TDoubleArray; PenaltyWeight: Double;
+      Negate: Boolean): Double; static;
+    class function NelderMeadCore(F: TMultivarFunc;
+      const Constraints: array of TConstraintFunc;
+      const X0: TDoubleArray; Scale, Tol: Double; MaxIter: Integer;
+      PenaltyWeight: Double; Negate: Boolean): TOptResult; static;
 
   public
 
@@ -359,23 +370,6 @@ type
 
 implementation
 
-{ ---------------------------------------------------------------------------
-  Unit-level state for PenaltyMethod
-  (needed because FPC cannot pass a nested function as a procedure variable)
---------------------------------------------------------------------------- }
-type
-  TPenaltyState = record
-    F:        TMultivarFunc;
-    Constrs:  array of TConstraintFunc;
-    NC:       Integer;
-    Mu:       Double;
-  end;
-
-var
-  GPenalty:  TPenaltyState;
-  GMaximizeF: TMultivarFunc;
-  GPenaltyLock, GMaximizeLock: TRTLCriticalSection;
-
 procedure RequireFiniteVector(const X: TDoubleArray; const Operation: string);
 var
   I: Integer;
@@ -406,24 +400,6 @@ begin
   Result := F(X);
   if IsNan(Result) or IsInfinite(Result) then
     raise EOptimizationError.Create(Operation + ': objective returned a non-finite value');
-end;
-
-function PenaltyObjective(const X: TDoubleArray): Double;
-var J: Integer; Viol: Double;
-begin
-  Result := EvaluateMultivariate(GPenalty.F, X, 'PenaltyMethod');
-  for J := 0 to GPenalty.NC - 1 do
-  begin
-    Viol := GPenalty.Constrs[J](X);
-    if IsNan(Viol) or IsInfinite(Viol) then
-      raise EOptimizationError.Create('PenaltyMethod: constraint returned a non-finite value');
-    if Viol > 0 then Result := Result + GPenalty.Mu * Viol * Viol;
-  end;
-end;
-
-function NegObjective(const X: TDoubleArray): Double;
-begin
-  Result := -EvaluateMultivariate(GMaximizeF, X, 'Maximize');
 end;
 
 { ---------------------------------------------------------------------------
@@ -678,6 +654,8 @@ var
   FX, Alpha: Double;
   Iter: Integer;
 begin
+  G := nil;
+  Iter := 0;
   if not Assigned(F) then raise EOptimizationError.Create('GradientDescent: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('GradientDescent: X0 must not be empty');
@@ -713,6 +691,9 @@ begin
   Result.X     := X;
   Result.FVal  := FX;
   Result.Iters := Iter;
+  Result.GradientNorm := VecNorm(G);
+  if Result.Converged then Result.Status := isConverged
+  else Result.Status := isIterationLimit;
 end;
 
 { ---------------------------------------------------------------------------
@@ -730,6 +711,8 @@ var
   FX, MHat, VHat, B1t, B2t: Double;
   I, Iter, N: Integer;
 begin
+  G := nil;
+  Iter := 0;
   if not Assigned(F) then raise EOptimizationError.Create('Adam: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('Adam: X0 must not be empty');
@@ -782,6 +765,9 @@ begin
   Result.X     := X;
   Result.FVal  := FX;
   Result.Iters := Iter;
+  Result.GradientNorm := VecNorm(G);
+  if Result.Converged then Result.Status := isConverged
+  else Result.Status := isIterationLimit;
 end;
 
 { ---------------------------------------------------------------------------
@@ -804,6 +790,7 @@ var
   RhoBuf: TDoubleArray;
   FX, Alpha, Beta, GammaScale, Sy, Yy, SStep: Double;
 begin
+  Iter := 0;
   if not Assigned(F) then raise EOptimizationError.Create('LBFGS: objective is nil');
   if Length(X0) = 0 then
     raise EOptimizationError.Create('LBFGS: X0 must not be empty');
@@ -901,17 +888,44 @@ begin
   Result.X     := X;
   Result.FVal  := FX;
   Result.Iters := Iter;
+  Result.GradientNorm := VecNorm(G);
+  if Result.Converged then Result.Status := isConverged
+  else Result.Status := isIterationLimit;
 end;
 
 { ---------------------------------------------------------------------------
   NELDER-MEAD
 --------------------------------------------------------------------------- }
 
-class function TOptimizationKit.NelderMead(
+class function TOptimizationKit.CoreObjective(F: TMultivarFunc;
+  const Constraints: array of TConstraintFunc;
+  const X: TDoubleArray; PenaltyWeight: Double;
+  Negate: Boolean): Double;
+var
+  J: Integer;
+  Violation: Double;
+begin
+  Result := EvaluateMultivariate(F, X, 'NelderMead');
+  if Negate then Result := -Result;
+  for J := 0 to High(Constraints) do
+  begin
+    Violation := Constraints[J](X);
+    if IsNan(Violation) or IsInfinite(Violation) then
+      raise EOptimizationError.CreateFmt(
+        'NelderMead: constraint %d returned a non-finite value', [J]);
+    if Violation > 0 then
+      Result := Result + PenaltyWeight * Violation * Violation;
+  end;
+end;
+
+class function TOptimizationKit.NelderMeadCore(
   F: TMultivarFunc;
+  const Constraints: array of TConstraintFunc;
   const X0: TDoubleArray;
   Scale, Tol: Double;
-  MaxIter: Integer): TOptResult;
+  MaxIter: Integer;
+  PenaltyWeight: Double;
+  Negate: Boolean): TOptResult;
 { Standard Nelder-Mead with reflection α=1, expansion γ=2,
   contraction ρ=0.5, shrink σ=0.5 }
 const
@@ -926,6 +940,7 @@ var
   Centroid, XR, XE, XC, Tmp: TDoubleArray;
   FR, FE, FC, Diam, Diff: Double;
 begin
+  Iter := 0;
   N   := Length(X0);
   NP1 := N + 1;
   if not Assigned(F) then raise EOptimizationError.Create('NelderMead: objective is nil');
@@ -942,7 +957,8 @@ begin
   begin
     Simplex[I] := VecCopy(X0);
     if I > 0 then Simplex[I][I-1] := Simplex[I][I-1] + Scale;
-    FVals[I] := EvaluateMultivariate(F, Simplex[I], 'NelderMead');
+    FVals[I] := CoreObjective(F, Constraints, Simplex[I],
+      PenaltyWeight, Negate);
   end;
 
   Result.Converged := False;
@@ -986,13 +1002,13 @@ begin
 
     { Reflection }
     XR := VecAdd(Centroid, VecAdd(Centroid, Simplex[Worst], -1), Alpha);
-    FR := EvaluateMultivariate(F, XR, 'NelderMead');
+    FR := CoreObjective(F, Constraints, XR, PenaltyWeight, Negate);
 
     if (FR < FVals[Best]) then
     begin
       { Expansion }
       XE := VecAdd(Centroid, VecAdd(XR, Centroid, -1), Gamma);
-      FE := EvaluateMultivariate(F, XE, 'NelderMead');
+      FE := CoreObjective(F, Constraints, XE, PenaltyWeight, Negate);
       if FE < FR then begin Simplex[Worst] := XE; FVals[Worst] := FE; end
       else            begin Simplex[Worst] := XR; FVals[Worst] := FR; end;
     end
@@ -1008,7 +1024,7 @@ begin
         XC := VecAdd(Centroid, VecAdd(XR, Centroid, -1), Rho)
       else
         XC := VecAdd(Centroid, VecAdd(Simplex[Worst], Centroid, -1), Rho);
-      FC := EvaluateMultivariate(F, XC, 'NelderMead');
+      FC := CoreObjective(F, Constraints, XC, PenaltyWeight, Negate);
       if FC < Min(FR, FVals[Worst]) then
       begin
         Simplex[Worst] := XC;
@@ -1022,7 +1038,8 @@ begin
           begin
             Simplex[I] := VecAdd(Simplex[Best],
               VecAdd(Simplex[I], Simplex[Best], -1), Sigma);
-            FVals[I] := EvaluateMultivariate(F, Simplex[I], 'NelderMead');
+            FVals[I] := CoreObjective(F, Constraints, Simplex[I],
+              PenaltyWeight, Negate);
           end;
       end;
     end;
@@ -1036,6 +1053,17 @@ begin
   Result.X     := Simplex[Best];
   Result.FVal  := FVals[Best];
   Result.Iters := Iter;
+  if Result.Converged then Result.Status := isConverged
+  else Result.Status := isIterationLimit;
+end;
+
+class function TOptimizationKit.NelderMead(
+  F: TMultivarFunc;
+  const X0: TDoubleArray;
+  Scale, Tol: Double;
+  MaxIter: Integer): TOptResult;
+begin
+  Result := NelderMeadCore(F, [], X0, Scale, Tol, MaxIter, 0.0, False);
 end;
 
 { ---------------------------------------------------------------------------
@@ -1069,6 +1097,7 @@ var
   end;
 
 begin
+  Iter := 0;
   if not Assigned(F) then raise EOptimizationError.Create(
     'SimulatedAnnealing: objective is nil');
   if Length(X0) = 0 then
@@ -1125,6 +1154,8 @@ begin
   Result.X     := XBest;
   Result.FVal  := FBest;
   Result.Iters := Iter;
+  if Result.Converged then Result.Status := isConverged
+  else Result.Status := isIterationLimit;
 end;
 
 { ---------------------------------------------------------------------------
@@ -1156,44 +1187,34 @@ begin
     if not Assigned(Constraints[I]) then
       raise EOptimizationError.CreateFmt('PenaltyMethod: constraint %d is nil', [I]);
 
-  EnterCriticalSection(GPenaltyLock);
-  try
-    GPenalty.F  := F;
-    GPenalty.NC := Length(Constraints);
-    SetLength(GPenalty.Constrs, GPenalty.NC);
-    for I := 0 to GPenalty.NC - 1 do GPenalty.Constrs[I] := Constraints[I];
-
-    XCur := VecCopy(X0);
-    Mu_k := Mu;
-    AllInnerConverged := True;
-    TotalIterations := 0;
-    for Round := 1 to 10 do
-    begin
-      GPenalty.Mu := Mu_k;
-      Result := NelderMead(@PenaltyObjective, XCur, 1.0, Tol / Mu_k, MaxIter);
-      AllInnerConverged := AllInnerConverged and Result.Converged;
-      Inc(TotalIterations, Result.Iters);
-      XCur := Result.X;
-      Mu_k := Mu_k * 10;
-    end;
-    Result.FVal := EvaluateMultivariate(F, Result.X, 'PenaltyMethod');
-    MaxViolation := 0.0;
-    for I := 0 to GPenalty.NC - 1 do
-    begin
-      Violation := GPenalty.Constrs[I](Result.X);
-      if IsNan(Violation) or IsInfinite(Violation) then
-        raise EOptimizationError.Create(
-          'PenaltyMethod: constraint returned a non-finite value');
-      MaxViolation := Max(MaxViolation, Violation);
-    end;
-    Result.Converged := AllInnerConverged and (MaxViolation <= Tol);
-    Result.Iters := TotalIterations;
-  finally
-    GPenalty.F := nil;
-    SetLength(GPenalty.Constrs, 0);
-    GPenalty.NC := 0;
-    LeaveCriticalSection(GPenaltyLock);
+  XCur := VecCopy(X0);
+  Mu_k := Mu;
+  AllInnerConverged := True;
+  TotalIterations := 0;
+  for Round := 1 to 10 do
+  begin
+    Result := NelderMeadCore(F, Constraints, XCur, 1.0, Tol / Mu_k,
+      MaxIter, Mu_k, False);
+    AllInnerConverged := AllInnerConverged and Result.Converged;
+    Inc(TotalIterations, Result.Iters);
+    XCur := Result.X;
+    Mu_k := Mu_k * 10;
   end;
+  Result.FVal := EvaluateMultivariate(F, Result.X, 'PenaltyMethod');
+  MaxViolation := 0.0;
+  for I := 0 to High(Constraints) do
+  begin
+    Violation := Constraints[I](Result.X);
+    if IsNan(Violation) or IsInfinite(Violation) then
+      raise EOptimizationError.Create(
+        'PenaltyMethod: constraint returned a non-finite value');
+    MaxViolation := Max(MaxViolation, Violation);
+  end;
+  Result.Converged := AllInnerConverged and (MaxViolation <= Tol);
+  Result.Iters := TotalIterations;
+  Result.ConstraintViolation := Max(0.0, MaxViolation);
+  if Result.Converged then Result.Status := isConverged
+  else Result.Status := isIterationLimit;
 end;
 
 { ---------------------------------------------------------------------------
@@ -1338,26 +1359,10 @@ class function TOptimizationKit.Maximize(
   const X0: TDoubleArray;
   Scale, Tol: Double;
   MaxIter: Integer): TOptResult;
-{ Minimise -F via unit-level NegObjective to avoid nested-function pointer issue }
 begin
   if not Assigned(F) then raise EOptimizationError.Create('Maximize: objective is nil');
-  EnterCriticalSection(GMaximizeLock);
-  try
-    GMaximizeF  := F;
-    Result      := NelderMead(@NegObjective, X0, Scale, Tol, MaxIter);
-    Result.FVal := -Result.FVal;
-  finally
-    GMaximizeF := nil;
-    LeaveCriticalSection(GMaximizeLock);
-  end;
+  Result := NelderMeadCore(F, [], X0, Scale, Tol, MaxIter, 0.0, True);
+  Result.FVal := -Result.FVal;
 end;
-
-initialization
-  InitCriticalSection(GPenaltyLock);
-  InitCriticalSection(GMaximizeLock);
-
-finalization
-  DoneCriticalSection(GMaximizeLock);
-  DoneCriticalSection(GPenaltyLock);
 
 end.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check local links, fences, inventory data, and the 1.6 public-symbol contract."""
+"""Check local links, fences, inventory data, and the public-symbol contract."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def main() -> int:
     inventory_path = DOCS / "capabilities.json"
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-        assert inventory["release"] == "1.6.0"
+        assert inventory["release"] == "1.7.0"
         assert inventory["schema_version"] == 1
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -136,6 +136,29 @@ def main() -> int:
         "IDenseDoubleSymmetricEigen",
         "IDenseSingleComplexHermitianEigen",
         "IDenseComplexHermitianEigen",
+        "TIterationStatus",
+        "IterationStatusName",
+        "TDifferentiationKit",
+        "TDual",
+        "AutoGradient",
+        "CheckGradient",
+        "TBarycentricInterpolator",
+        "TCubicInterpolator",
+        "TGridSurface",
+        "TScatteredInterpolator",
+        "TInterpolationKit",
+        "TModellingKit",
+        "TIntegrationResult",
+        "TFitResult",
+        "TNonlinearFitOptions",
+        "TVectorRootResult",
+        "TAdaptiveODEOptions",
+        "TAdaptiveODESolution",
+        "TConvexOptimizationKit",
+        "TQuadraticProgram",
+        "TSecondOrderCone",
+        "TConvexOptions",
+        "TConvexResult",
     ]
     for symbol in required_symbols:
         if symbol not in public_docs:
@@ -152,7 +175,7 @@ def main() -> int:
         return 1
     print(
         f"Documentation checks passed: {len(docs)} pages, "
-        f"{len(examples)} indexed examples, {len(required_symbols)} 1.6 symbols"
+        f"{len(examples)} indexed examples, {len(required_symbols)} public symbols"
     )
     return 0
 
