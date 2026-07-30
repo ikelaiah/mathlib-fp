@@ -47,6 +47,26 @@ type
     function Integrate(const A, B: Double): Double;
   end;
 
+  TSplineBoundaryKind = (sbNatural, sbClamped, sbNotAKnot);
+
+  TCubicSplineInterpolator = record
+    X: TDoubleArray;
+    Y: TDoubleArray;
+    LinearCoefficients: TDoubleArray;
+    QuadraticCoefficients: TDoubleArray;
+    CubicCoefficients: TDoubleArray;
+    Boundary: TSplineBoundaryKind;
+    class function Build(const XKnots, YKnots: TDoubleArray;
+      BoundaryKind: TSplineBoundaryKind = sbNatural;
+      LeftDerivative: Double = 0.0;
+      RightDerivative: Double = 0.0): TCubicSplineInterpolator; static;
+    function Evaluate(const AtX: Double): Double;
+    function Derivative(const AtX: Double): Double;
+    function SecondDerivative(const AtX: Double): Double;
+    function Antiderivative(const AtX: Double): Double;
+    function Integrate(const A, B: Double): Double;
+  end;
+
   TGridSurface = record
     X: TDoubleArray;
     Y: TDoubleArray;
@@ -80,6 +100,9 @@ type
   end;
 
 implementation
+
+const
+  DoubleEpsilon = 2.2204460492503131E-16;
 
 function IsFiniteValue(const X: Double): Boolean; inline;
 begin Result := not IsNan(X) and not IsInfinite(X); end;
@@ -389,6 +412,239 @@ begin
 end;
 
 function TCubicInterpolator.Integrate(const A, B: Double): Double;
+begin
+  Result := Antiderivative(B) - Antiderivative(A);
+end;
+
+function SolveSplineSystem(const Matrix: TInterpolationMatrix;
+  const RightHandSide: TDoubleArray): TDoubleArray;
+var
+  A: TInterpolationMatrix;
+  B: TDoubleArray;
+  I, J, K, Pivot, N: Integer;
+  PivotMagnitude, CandidateMagnitude, Factor, Sum: Double;
+begin
+  Result := nil;
+  N := Length(RightHandSide);
+  if Length(Matrix) <> N then
+    raise EInterpolationError.Create(
+      'CubicSpline.Build: internal system row count mismatch.');
+  SetLength(A, N);
+  B := Copy(RightHandSide);
+  for I := 0 to N - 1 do
+  begin
+    if Length(Matrix[I]) <> N then
+      raise EInterpolationError.Create(
+        'CubicSpline.Build: internal system must be square.');
+    A[I] := Copy(Matrix[I]);
+  end;
+  for K := 0 to N - 1 do
+  begin
+    Pivot := K;
+    PivotMagnitude := Abs(A[K][K]);
+    for I := K + 1 to N - 1 do
+    begin
+      CandidateMagnitude := Abs(A[I][K]);
+      if CandidateMagnitude > PivotMagnitude then
+      begin
+        Pivot := I;
+        PivotMagnitude := CandidateMagnitude;
+      end;
+    end;
+    if PivotMagnitude <= 64 * DoubleEpsilon then
+      raise EInterpolationError.Create(
+        'CubicSpline.Build: boundary system is numerically singular.');
+    if Pivot <> K then
+    begin
+      for J := K to N - 1 do
+      begin
+        Sum := A[K][J];
+        A[K][J] := A[Pivot][J];
+        A[Pivot][J] := Sum;
+      end;
+      Sum := B[K];
+      B[K] := B[Pivot];
+      B[Pivot] := Sum;
+    end;
+    for I := K + 1 to N - 1 do
+    begin
+      Factor := A[I][K] / A[K][K];
+      A[I][K] := 0;
+      for J := K + 1 to N - 1 do
+        A[I][J] := A[I][J] - Factor * A[K][J];
+      B[I] := B[I] - Factor * B[K];
+    end;
+  end;
+  SetLength(Result, N);
+  for I := N - 1 downto 0 do
+  begin
+    Sum := B[I];
+    for J := I + 1 to N - 1 do
+      Sum := Sum - A[I][J] * Result[J];
+    Result[I] := Sum / A[I][I];
+    if not IsFiniteValue(Result[I]) then
+      raise EInterpolationError.Create(
+        'CubicSpline.Build: non-finite boundary-system solution.');
+  end;
+end;
+
+class function TCubicSplineInterpolator.Build(
+  const XKnots, YKnots: TDoubleArray;
+  BoundaryKind: TSplineBoundaryKind; LeftDerivative,
+  RightDerivative: Double): TCubicSplineInterpolator;
+var
+  Candidate: TCubicSplineInterpolator;
+  A: TInterpolationMatrix;
+  RHS, H, Delta, Second: TDoubleArray;
+  I, N: Integer;
+begin
+  Result := Default(TCubicSplineInterpolator);
+  if BoundaryKind = sbNotAKnot then
+    ValidateKnots(XKnots, YKnots, 'CubicSpline.Build', 4)
+  else
+    ValidateKnots(XKnots, YKnots, 'CubicSpline.Build', 2);
+  if (BoundaryKind = sbClamped) and
+     (not IsFiniteValue(LeftDerivative) or
+      not IsFiniteValue(RightDerivative)) then
+    raise EInterpolationError.Create(
+      'CubicSpline.Build: clamped endpoint derivatives must be finite.');
+  Candidate := Default(TCubicSplineInterpolator);
+  Candidate.X := Copy(XKnots);
+  Candidate.Y := Copy(YKnots);
+  Candidate.Boundary := BoundaryKind;
+  N := Length(XKnots);
+  SetLength(H, N - 1);
+  SetLength(Delta, N - 1);
+  for I := 0 to N - 2 do
+  begin
+    H[I] := XKnots[I + 1] - XKnots[I];
+    Delta[I] := (YKnots[I + 1] - YKnots[I]) / H[I];
+  end;
+  SetLength(A, N);
+  SetLength(RHS, N);
+  for I := 0 to N - 1 do
+    SetLength(A[I], N);
+  for I := 1 to N - 2 do
+  begin
+    A[I][I - 1] := H[I - 1];
+    A[I][I] := 2 * (H[I - 1] + H[I]);
+    A[I][I + 1] := H[I];
+    RHS[I] := 6 * (Delta[I] - Delta[I - 1]);
+  end;
+  case BoundaryKind of
+    sbNatural:
+      begin
+        A[0][0] := 1;
+        A[N - 1][N - 1] := 1;
+      end;
+    sbClamped:
+      begin
+        A[0][0] := 2 * H[0];
+        A[0][1] := H[0];
+        RHS[0] := 6 * (Delta[0] - LeftDerivative);
+        A[N - 1][N - 2] := H[N - 2];
+        A[N - 1][N - 1] := 2 * H[N - 2];
+        RHS[N - 1] := 6 * (RightDerivative - Delta[N - 2]);
+      end;
+    sbNotAKnot:
+      begin
+        A[0][0] := -H[1];
+        A[0][1] := H[0] + H[1];
+        A[0][2] := -H[0];
+        A[N - 1][N - 3] := -H[N - 2];
+        A[N - 1][N - 2] := H[N - 3] + H[N - 2];
+        A[N - 1][N - 1] := -H[N - 3];
+      end;
+  end;
+  Second := SolveSplineSystem(A, RHS);
+  SetLength(Candidate.LinearCoefficients, N - 1);
+  SetLength(Candidate.QuadraticCoefficients, N - 1);
+  SetLength(Candidate.CubicCoefficients, N - 1);
+  for I := 0 to N - 2 do
+  begin
+    Candidate.LinearCoefficients[I] := Delta[I] -
+      H[I] * (2 * Second[I] + Second[I + 1]) / 6;
+    Candidate.QuadraticCoefficients[I] := Second[I] / 2;
+    Candidate.CubicCoefficients[I] :=
+      (Second[I + 1] - Second[I]) / (6 * H[I]);
+  end;
+  Result := Candidate;
+end;
+
+function SplineCoordinate(const Interp: TCubicSplineInterpolator;
+  const AtX: Double; out Interval: Integer): Double;
+var
+  ClampedX: Double;
+begin
+  if Length(Interp.X) = 0 then
+    raise EInterpolationError.Create(
+      'CubicSpline: interpolator has no knots.');
+  if not IsFiniteValue(AtX) then
+    raise EInterpolationError.Create(
+      'CubicSpline: evaluation coordinate must be finite.');
+  ClampedX := Min(Max(AtX, Interp.X[0]), Interp.X[High(Interp.X)]);
+  Interval := LocateInterval(Interp.X, ClampedX);
+  Result := ClampedX - Interp.X[Interval];
+end;
+
+function TCubicSplineInterpolator.Evaluate(const AtX: Double): Double;
+var
+  I: Integer;
+  DX: Double;
+begin
+  DX := SplineCoordinate(Self, AtX, I);
+  Result := Y[I] + DX * (LinearCoefficients[I] +
+    DX * (QuadraticCoefficients[I] + DX * CubicCoefficients[I]));
+end;
+
+function TCubicSplineInterpolator.Derivative(const AtX: Double): Double;
+var
+  I: Integer;
+  DX: Double;
+begin
+  DX := SplineCoordinate(Self, AtX, I);
+  Result := LinearCoefficients[I] +
+    DX * (2 * QuadraticCoefficients[I] +
+    3 * CubicCoefficients[I] * DX);
+end;
+
+function TCubicSplineInterpolator.SecondDerivative(
+  const AtX: Double): Double;
+var
+  I: Integer;
+  DX: Double;
+begin
+  DX := SplineCoordinate(Self, AtX, I);
+  Result := 2 * QuadraticCoefficients[I] +
+    6 * CubicCoefficients[I] * DX;
+end;
+
+function SplineSegmentPrimitive(const Interp: TCubicSplineInterpolator;
+  const I: Integer; const DX: Double): Double;
+begin
+  Result := Interp.Y[I] * DX +
+    Interp.LinearCoefficients[I] * Sqr(DX) / 2 +
+    Interp.QuadraticCoefficients[I] * DX * Sqr(DX) / 3 +
+    Interp.CubicCoefficients[I] * Sqr(Sqr(DX)) / 4;
+end;
+
+function TCubicSplineInterpolator.Antiderivative(
+  const AtX: Double): Double;
+var
+  I, Last: Integer;
+  DX, H: Double;
+begin
+  DX := SplineCoordinate(Self, AtX, Last);
+  Result := 0;
+  for I := 0 to Last - 1 do
+  begin
+    H := X[I + 1] - X[I];
+    Result := Result + SplineSegmentPrimitive(Self, I, H);
+  end;
+  Result := Result + SplineSegmentPrimitive(Self, Last, DX);
+end;
+
+function TCubicSplineInterpolator.Integrate(const A, B: Double): Double;
 begin
   Result := Antiderivative(B) - Antiderivative(A);
 end;

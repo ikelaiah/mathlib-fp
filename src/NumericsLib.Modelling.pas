@@ -10,7 +10,8 @@ interface
 
 uses
   SysUtils, Math, MathBase.SharedTypes, MathBase.Iteration,
-  NumericsLib.Differentiation, AlgebraLib.DenseMatrices,
+  MathBase.Complex, MathBase.Random, NumericsLib.Differentiation,
+  AlgebraLib.DenseMatrices,
   AlgebraLib.DenseSolvers, AlgebraLib.DenseDecompositions;
 
 type
@@ -47,6 +48,12 @@ type
     Status: TIterationStatus;
   end;
 
+  TSplineFitResult = record
+    InteriorKnots: TDoubleArray;
+    Fit: TFitResult;
+    function Evaluate(const X: Double): Double;
+  end;
+
   TResidualFunction = function(const Parameters: TDoubleArray): TDoubleArray;
   TJacobianFunction = function(const Parameters: TDoubleArray): TModelMatrix;
   TRobustLoss = (rlSquared, rlHuber, rlSoftL1);
@@ -59,6 +66,7 @@ type
     MaxIterations: Integer;
     LowerBounds: TDoubleArray;
     UpperBounds: TDoubleArray;
+    ParameterScales: TDoubleArray;
     Loss: TRobustLoss;
     LossScale: Double;
     CheckDerivative: Boolean;
@@ -79,6 +87,14 @@ type
     Status: TIterationStatus;
   end;
 
+  TPolynomialRootResult = record
+    Roots: TComplexArray;
+    Residuals: TDoubleArray;
+    Iterations: Integer;
+    Evaluations: Integer;
+    Status: TIterationStatus;
+  end;
+
   TODEVectorFunction = function(T: Double;
     const Y: TDoubleArray): TDoubleArray;
   TODEEventFunction = function(T: Double;
@@ -86,6 +102,7 @@ type
 
   TAdaptiveODEOptions = record
     AbsoluteTolerance: Double;
+    AbsoluteTolerances: TDoubleArray;
     RelativeTolerance: Double;
     InitialStep: Double;
     MinimumStep: Double;
@@ -124,14 +141,25 @@ type
     class function IntegrateQuasiMonteCarlo(F: TMultidimensionalIntegrand;
       const LowerBounds, UpperBounds: TDoubleArray; Samples: Integer;
       Seed: Integer = 0): TIntegrationResult; static;
+    class function IntegrateCubature(F: TMultidimensionalIntegrand;
+      const LowerBounds, UpperBounds: TDoubleArray; Order: Integer = 5;
+      MaxEvaluations: Integer = 1000000): TIntegrationResult; static;
+    class function IntegrateMonteCarlo(F: TMultidimensionalIntegrand;
+      const LowerBounds, UpperBounds: TDoubleArray; Samples: Integer;
+      var Random: TLocalRandom): TIntegrationResult; static;
 
     class function FitLinearBasis(const X, Y: TDoubleArray;
       BasisCount: Integer; Basis: TLinearBasisFunction;
       const Weights: TDoubleArray): TFitResult; static;
     class function FitPolynomial(const X, Y: TDoubleArray; Degree: Integer;
       const Weights: TDoubleArray): TFitResult; static;
+    class function FitSplineBasis(const X, Y, InteriorKnots: TDoubleArray;
+      const Weights: TDoubleArray): TSplineFitResult; static;
     class function FitNonlinear(Residual: TResidualFunction;
       Jacobian: TJacobianFunction; const InitialParameters: TDoubleArray;
+      const Options: TNonlinearFitOptions): TFitResult; static;
+    class function FitNonlinearAuto(Residual: TDualVectorFunction;
+      const InitialParameters: TDoubleArray;
       const Options: TNonlinearFitOptions): TFitResult; static;
 
     class function SolveSystem(F: TVectorEquationFunction;
@@ -140,6 +168,17 @@ type
       RelativeTolerance: Double = 1E-8;
       MaxIterations: Integer = 100;
       Progress: TProgressFunction = nil): TVectorRootResult; static;
+    class function SolveSystemAuto(F: TDualVectorFunction;
+      const InitialX: TDoubleArray;
+      AbsoluteTolerance: Double = 1E-10;
+      RelativeTolerance: Double = 1E-8;
+      MaxIterations: Integer = 100;
+      Progress: TProgressFunction = nil): TVectorRootResult; static;
+
+    class function SolvePolynomial(const Coefficients: TDoubleArray;
+      AbsoluteTolerance: Double = 1E-12;
+      RelativeTolerance: Double = 1E-10;
+      MaxIterations: Integer = 2000): TPolynomialRootResult; static;
 
     class function SolveODE(F: TODEVectorFunction; T0: Double;
       const Y0: TDoubleArray; T1: Double;
@@ -503,41 +542,238 @@ begin
   Result.Intervals:=Samples; Result.Status:=isAcceptableLimit;
 end;
 
+class function TModellingKit.IntegrateCubature(
+  F: TMultidimensionalIntegrand; const LowerBounds,
+  UpperBounds: TDoubleArray; Order, MaxEvaluations: Integer):
+  TIntegrationResult;
+var
+  Point,Nodes3,Weights3,Nodes5,Weights5:TDoubleArray;
+  D,I,EvaluationCount:Integer;
+  Required,Count3,Count5:QWord;
+  Primary,Reference:Double;
+
+  function RuleValue(const Nodes,Weights:TDoubleArray):Double;
+  var
+    WeightedSum:Double;
+
+    procedure Visit(const Dimension:Integer; const Weight:Double);
+    var
+      NodeIndex:Integer;
+      Midpoint,HalfWidth,Value:Double;
+    begin
+      if Dimension=D then
+      begin
+        Value:=F(Point);
+        Inc(EvaluationCount);
+        if not IsFiniteValue(Value) then
+          raise EModellingError.CreateFmt(
+            'IntegrateCubature: non-finite callback result at evaluation %d.',
+            [EvaluationCount]);
+        WeightedSum:=WeightedSum+Weight*Value;
+        Exit;
+      end;
+      Midpoint:=0.5*(LowerBounds[Dimension]+UpperBounds[Dimension]);
+      HalfWidth:=0.5*(UpperBounds[Dimension]-LowerBounds[Dimension]);
+      for NodeIndex:=0 to High(Nodes) do
+      begin
+        Point[Dimension]:=Midpoint+HalfWidth*Nodes[NodeIndex];
+        Visit(Dimension+1,Weight*HalfWidth*Weights[NodeIndex]);
+      end;
+    end;
+
+  begin
+    WeightedSum:=0;
+    Visit(0,1);
+    Result:=WeightedSum;
+  end;
+
+begin
+  Result:=Default(TIntegrationResult);
+  if not Assigned(F) then
+    raise EModellingError.Create(
+      'IntegrateCubature: integrand must be assigned.');
+  D:=Length(LowerBounds);
+  if (D=0) or (D<>Length(UpperBounds)) or (D>16) then
+    raise EModellingError.Create(
+      'IntegrateCubature: dimensions must match and be between 1 and 16.');
+  if not (Order in [3,5]) then
+    raise EModellingError.Create(
+      'IntegrateCubature: Order must be 3 or 5.');
+  if MaxEvaluations<=0 then
+    raise EModellingError.Create(
+      'IntegrateCubature: MaxEvaluations must be positive.');
+  for I:=0 to D-1 do
+    if not IsFiniteValue(LowerBounds[I]) or
+       not IsFiniteValue(UpperBounds[I]) or
+       (LowerBounds[I]>=UpperBounds[I]) then
+      raise EModellingError.CreateFmt(
+        'IntegrateCubature: require finite lower < upper at dimension %d.',
+        [I]);
+  Count3:=1; Count5:=1;
+  for I:=1 to D do
+  begin
+    if Count3>QWord(MaxEvaluations) div 3 then
+      Count3:=QWord(MaxEvaluations)+1
+    else
+      Count3:=Count3*3;
+    if Count5>QWord(MaxEvaluations) div 5 then
+      Count5:=QWord(MaxEvaluations)+1
+    else
+      Count5:=Count5*5;
+  end;
+  if Order=5 then Required:=Count3+Count5
+  else Required:=Count3+1;
+  if (Required>QWord(MaxEvaluations)) or
+     (Required>QWord(High(Integer))) then
+    raise EModellingError.CreateFmt(
+      'IntegrateCubature: requested rules need %s evaluations; cap is %d.',
+      [UIntToStr(Required),MaxEvaluations]);
+  Nodes3:=TDoubleArray.Create(-Sqrt(3/5),0,Sqrt(3/5));
+  Weights3:=TDoubleArray.Create(5/9,8/9,5/9);
+  Nodes5:=TDoubleArray.Create(
+    -Sqrt(5+2*Sqrt(10/7))/3,
+    -Sqrt(5-2*Sqrt(10/7))/3,
+    0,
+    Sqrt(5-2*Sqrt(10/7))/3,
+    Sqrt(5+2*Sqrt(10/7))/3);
+  Weights5:=TDoubleArray.Create(
+    (322-13*Sqrt(70))/900,
+    (322+13*Sqrt(70))/900,
+    128/225,
+    (322+13*Sqrt(70))/900,
+    (322-13*Sqrt(70))/900);
+  SetLength(Point,D);
+  EvaluationCount:=0;
+  if Order=5 then
+  begin
+    Primary:=RuleValue(Nodes5,Weights5);
+    Reference:=RuleValue(Nodes3,Weights3);
+  end
+  else
+  begin
+    Primary:=RuleValue(Nodes3,Weights3);
+    SetLength(Nodes5,1); Nodes5[0]:=0;
+    SetLength(Weights5,1); Weights5[0]:=2;
+    Reference:=RuleValue(Nodes5,Weights5);
+  end;
+  Result.Value:=Primary;
+  Result.ErrorEstimate:=Abs(Primary-Reference);
+  Result.Evaluations:=EvaluationCount;
+  Result.Intervals:=EvaluationCount;
+  Result.Status:=isAcceptableLimit;
+end;
+
+class function TModellingKit.IntegrateMonteCarlo(
+  F: TMultidimensionalIntegrand; const LowerBounds,
+  UpperBounds: TDoubleArray; Samples: Integer;
+  var Random: TLocalRandom): TIntegrationResult;
+var
+  Working:TLocalRandom;
+  State:TRandomState;
+  Point:TDoubleArray;
+  I,J,D:Integer;
+  Value,Mean,M2,Delta,Volume:Double;
+begin
+  Result:=Default(TIntegrationResult);
+  if not Assigned(F) then
+    raise EModellingError.Create(
+      'IntegrateMonteCarlo: integrand must be assigned.');
+  D:=Length(LowerBounds);
+  if (D=0) or (D<>Length(UpperBounds)) or (D>64) then
+    raise EModellingError.Create(
+      'IntegrateMonteCarlo: dimensions must match and be between 1 and 64.');
+  if Samples<=1 then
+    raise EModellingError.Create(
+      'IntegrateMonteCarlo: Samples must exceed one.');
+  Working:=Random;
+  State:=Working.GetState;
+  if (State.Words[0]=0) and (State.Words[1]=0) and
+     (State.Words[2]=0) and (State.Words[3]=0) then
+    raise EModellingError.Create(
+      'IntegrateMonteCarlo: random state must not be all zero.');
+  SetLength(Point,D);
+  Volume:=1;
+  for J:=0 to D-1 do
+  begin
+    if not IsFiniteValue(LowerBounds[J]) or
+       not IsFiniteValue(UpperBounds[J]) or
+       (LowerBounds[J]>=UpperBounds[J]) then
+      raise EModellingError.CreateFmt(
+        'IntegrateMonteCarlo: require finite lower < upper at dimension %d.',
+        [J]);
+    Volume:=Volume*(UpperBounds[J]-LowerBounds[J]);
+    if not IsFiniteValue(Volume) then
+      raise EModellingError.Create(
+        'IntegrateMonteCarlo: integration volume overflowed.');
+  end;
+  Mean:=0; M2:=0;
+  for I:=1 to Samples do
+  begin
+    for J:=0 to D-1 do
+      Point[J]:=LowerBounds[J]+
+        (UpperBounds[J]-LowerBounds[J])*Working.NextDouble;
+    Value:=F(Point);
+    Inc(Result.Evaluations);
+    if not IsFiniteValue(Value) then
+      raise EModellingError.CreateFmt(
+        'IntegrateMonteCarlo: non-finite callback result at sample %d.',[I]);
+    Delta:=Value-Mean;
+    Mean:=Mean+Delta/I;
+    M2:=M2+Delta*(Value-Mean);
+  end;
+  Result.Value:=Volume*Mean;
+  Result.ErrorEstimate:=Volume*Sqrt(Max(0,M2)/(Samples-1)/Samples);
+  Result.Intervals:=Samples;
+  Result.Status:=isAcceptableLimit;
+  Random:=Working;
+end;
+
 function PolynomialBasis(X: Double; BasisIndex: Integer): Double;
 begin Result:=Power(X,BasisIndex); end;
 
-class function TModellingKit.FitLinearBasis(const X, Y: TDoubleArray;
-  BasisCount: Integer; Basis: TLinearBasisFunction;
-  const Weights: TDoubleArray): TFitResult;
+function FitPreparedDesign(const X, Y: TDoubleArray;
+  const RawDesign: TModelMatrix; const Weights: TDoubleArray;
+  const Operation: String): TFitResult;
 var
-  Design: TModelMatrix;
+  Design, Normal: TModelMatrix;
   RHSValues: TDoubleArray;
   A,B,Solution: IDenseDoubleMatrix;
   Diag: TDenseSolveDiagnostics;
-  I,J,N: Integer;
+  I,J,K,N,BasisCount: Integer;
   W,SqrtW,Pred,MeanY,SST: Double;
 begin
   Result:=Default(TFitResult);
-  if not Assigned(Basis) then raise EModellingError.Create(
-    'FitLinearBasis: basis callback must be assigned.');
-  if (Length(X)<>Length(Y)) or (Length(X)=0) then raise EModellingError.Create(
-    'FitLinearBasis: X and Y lengths must match and be non-empty.');
-  if (BasisCount<=0) or (BasisCount>Length(X)) then raise EModellingError.Create(
-    'FitLinearBasis: BasisCount must be between 1 and the observation count.');
+  if (Length(X)<>Length(Y)) or (Length(X)=0) then
+    raise EModellingError.Create(Operation+
+      ': X and Y lengths must match and be non-empty.');
+  if Length(RawDesign)<>Length(X) then
+    raise EModellingError.Create(Operation+
+      ': design row count must match observations.');
+  BasisCount:=Length(RawDesign[0]);
+  if (BasisCount<=0) or (BasisCount>Length(X)) then
+    raise EModellingError.Create(Operation+
+      ': basis count must be between 1 and the observation count.');
   if (Length(Weights)<>0) and (Length(Weights)<>Length(X)) then
-    raise EModellingError.Create(
-      'FitLinearBasis: Weights must be empty or match observations.');
-  ValidateVector(X,'FitLinearBasis X'); ValidateVector(Y,'FitLinearBasis Y');
+    raise EModellingError.Create(Operation+
+      ': Weights must be empty or match observations.');
+  ValidateVector(X,Operation+' X'); ValidateVector(Y,Operation+' Y');
   N:=Length(X); SetLength(Design,N); SetLength(RHSValues,N);
   for I:=0 to N-1 do begin
+    if Length(RawDesign[I])<>BasisCount then
+      raise EModellingError.CreateFmt(
+        '%s: design row %d has %d columns; expected %d.',
+        [Operation,I,Length(RawDesign[I]),BasisCount]);
     if Length(Weights)=0 then W:=1 else W:=Weights[I];
     if (W<=0) or not IsFiniteValue(W) then raise EModellingError.CreateFmt(
-      'FitLinearBasis: weight %d must be finite and positive.',[I]);
+      '%s: weight %d must be finite and positive.',[Operation,I]);
     SqrtW:=Sqrt(W); SetLength(Design[I],BasisCount);
     for J:=0 to BasisCount-1 do begin
-      Design[I][J]:=SqrtW*Basis(X[I],J);
+      if not IsFiniteValue(RawDesign[I][J]) then
+        raise EModellingError.CreateFmt(
+          '%s: basis value [%d,%d] is non-finite.',[Operation,I,J]);
+      Design[I][J]:=SqrtW*RawDesign[I][J];
       if not IsFiniteValue(Design[I][J]) then raise EModellingError.CreateFmt(
-        'FitLinearBasis: basis value [%d,%d] is non-finite.',[I,J]);
+        '%s: weighted basis value [%d,%d] overflowed.',[Operation,I,J]);
     end;
     RHSValues[I]:=SqrtW*Y[I];
   end;
@@ -549,7 +785,7 @@ begin
   Result.ResidualSumSquares:=0; SST:=0;
   for I:=0 to N-1 do begin
     Pred:=0; for J:=0 to BasisCount-1 do Pred:=Pred+
-      Result.Parameters[J]*Basis(X[I],J);
+      Result.Parameters[J]*RawDesign[I][J];
     Result.Residuals[I]:=Y[I]-Pred;
     Result.ResidualSumSquares:=Result.ResidualSumSquares+Sqr(Result.Residuals[I]);
     SST:=SST+Sqr(Y[I]-MeanY);
@@ -561,20 +797,14 @@ begin
   if (Result.Rank=BasisCount) and (Result.DegreesOfFreedom>0) then begin
     SetLength(Result.Covariance,BasisCount);
     for I:=0 to BasisCount-1 do SetLength(Result.Covariance[I],BasisCount);
-    { Use QR solves with unit right sides to avoid forming an inverse of A;
-      covariance columns are R^-1 R^-T through repeated least-squares solves. }
-    for J:=0 to BasisCount-1 do begin
-      SetLength(RHSValues,N); for I:=0 to N-1 do RHSValues[I]:=0;
-      { covariance computed from normal matrix below to preserve compact code }
-    end;
-    Design:=nil; SetLength(Design,BasisCount);
-    for I:=0 to BasisCount-1 do begin SetLength(Design[I],BasisCount);
+    SetLength(Normal,BasisCount);
+    for I:=0 to BasisCount-1 do begin SetLength(Normal[I],BasisCount);
       for J:=0 to BasisCount-1 do begin W:=0;
-        for N:=0 to Length(X)-1 do begin
-          if Length(Weights)=0 then SqrtW:=1 else SqrtW:=Weights[N];
-          W:=W+SqrtW*Basis(X[N],I)*Basis(X[N],J);
-        end; Design[I][J]:=W; end; end;
-    A:=DenseFromMatrix(Design);
+        for K:=0 to Length(X)-1 do begin
+          if Length(Weights)=0 then SqrtW:=1 else SqrtW:=Weights[K];
+          W:=W+SqrtW*RawDesign[K][I]*RawDesign[K][J];
+        end; Normal[I][J]:=W; end; end;
+    A:=DenseFromMatrix(Normal);
     B:=TDenseDoubleMatrix.Zeros(BasisCount,BasisCount);
     for I:=0 to BasisCount-1 do B[I,I]:=1;
     Solution:=Solve(A,B);
@@ -584,12 +814,111 @@ begin
   end;
 end;
 
+class function TModellingKit.FitLinearBasis(const X, Y: TDoubleArray;
+  BasisCount: Integer; Basis: TLinearBasisFunction;
+  const Weights: TDoubleArray): TFitResult;
+var
+  Design: TModelMatrix;
+  I,J: Integer;
+begin
+  Result:=Default(TFitResult);
+  if not Assigned(Basis) then raise EModellingError.Create(
+    'FitLinearBasis: basis callback must be assigned.');
+  if (Length(X)<>Length(Y)) or (Length(X)=0) then raise EModellingError.Create(
+    'FitLinearBasis: X and Y lengths must match and be non-empty.');
+  if (BasisCount<=0) or (BasisCount>Length(X)) then raise EModellingError.Create(
+    'FitLinearBasis: BasisCount must be between 1 and the observation count.');
+  SetLength(Design,Length(X));
+  for I:=0 to High(X) do
+  begin
+    SetLength(Design[I],BasisCount);
+    for J:=0 to BasisCount-1 do
+      Design[I][J]:=Basis(X[I],J);
+  end;
+  Result:=FitPreparedDesign(X,Y,Design,Weights,'FitLinearBasis');
+end;
+
 class function TModellingKit.FitPolynomial(const X, Y: TDoubleArray;
   Degree: Integer; const Weights: TDoubleArray): TFitResult;
 begin
   if Degree<0 then raise EModellingError.Create(
     'FitPolynomial: Degree must be non-negative.');
   Result:=FitLinearBasis(X,Y,Degree+1,@PolynomialBasis,Weights);
+end;
+
+function TSplineFitResult.Evaluate(const X: Double): Double;
+var
+  I, ParameterIndex: Integer;
+  DX: Double;
+begin
+  if not IsFiniteValue(X) then
+    raise EModellingError.Create(
+      'SplineFit.Evaluate: X must be finite.');
+  if Length(Fit.Parameters)<>4+Length(InteriorKnots) then
+    raise EModellingError.Create(
+      'SplineFit.Evaluate: model parameter shape is invalid.');
+  Result:=Fit.Parameters[0]+Fit.Parameters[1]*X+
+    Fit.Parameters[2]*Sqr(X)+Fit.Parameters[3]*X*Sqr(X);
+  ParameterIndex:=4;
+  for I:=0 to High(InteriorKnots) do
+  begin
+    DX:=X-InteriorKnots[I];
+    if DX>0 then
+      Result:=Result+Fit.Parameters[ParameterIndex]*DX*Sqr(DX);
+    Inc(ParameterIndex);
+  end;
+end;
+
+class function TModellingKit.FitSplineBasis(const X, Y,
+  InteriorKnots: TDoubleArray; const Weights: TDoubleArray):
+  TSplineFitResult;
+var
+  Design: TModelMatrix;
+  I,J,BasisCount: Integer;
+  DX,MinX,MaxX: Double;
+begin
+  Result:=Default(TSplineFitResult);
+  if (Length(X)<>Length(Y)) or (Length(X)=0) then
+    raise EModellingError.Create(
+      'FitSplineBasis: X and Y lengths must match and be non-empty.');
+  ValidateVector(X,'FitSplineBasis X');
+  ValidateVector(Y,'FitSplineBasis Y');
+  ValidateVector(InteriorKnots,'FitSplineBasis interior knots',True);
+  MinX:=X[0]; MaxX:=X[0];
+  for I:=1 to High(X) do
+  begin
+    MinX:=Min(MinX,X[I]);
+    MaxX:=Max(MaxX,X[I]);
+  end;
+  for I:=1 to High(InteriorKnots) do
+    if InteriorKnots[I]<=InteriorKnots[I-1] then
+      raise EModellingError.Create(
+        'FitSplineBasis: interior knots must be strictly increasing.');
+  for I:=0 to High(InteriorKnots) do
+    if (InteriorKnots[I]<=MinX) or
+       (InteriorKnots[I]>=MaxX) then
+      raise EModellingError.CreateFmt(
+        'FitSplineBasis: knot %d must lie strictly inside the X range.',[I]);
+  BasisCount:=4+Length(InteriorKnots);
+  if BasisCount>Length(X) then
+    raise EModellingError.Create(
+      'FitSplineBasis: observations must be at least the basis count.');
+  SetLength(Design,Length(X));
+  for I:=0 to High(X) do
+  begin
+    SetLength(Design[I],BasisCount);
+    Design[I][0]:=1;
+    Design[I][1]:=X[I];
+    Design[I][2]:=Sqr(X[I]);
+    Design[I][3]:=X[I]*Sqr(X[I]);
+    for J:=0 to High(InteriorKnots) do
+    begin
+      DX:=X[I]-InteriorKnots[J];
+      if DX>0 then Design[I][4+J]:=DX*Sqr(DX);
+    end;
+  end;
+  Result.InteriorKnots:=Copy(InteriorKnots);
+  Result.Fit:=FitPreparedDesign(X,Y,Design,Weights,'FitSplineBasis');
 end;
 
 class function TNonlinearFitOptions.Defaults: TNonlinearFitOptions;
@@ -610,7 +939,55 @@ begin
   else Result:=1; end;
 end;
 
-function NumericalResidualJacobian(F: TResidualFunction;
+type
+  TResidualSource = record
+    RealFunction:TResidualFunction;
+    AnalyticJacobian:TJacobianFunction;
+    DualFunction:TDualVectorFunction;
+  end;
+
+function EvaluateDualResidual(F:TDualVectorFunction;
+  const P:TDoubleArray):TDoubleArray;
+var
+  Input:TDualArray;
+  Output:TDualArray;
+  I:Integer;
+begin
+  Result:=nil;
+  SetLength(Input,Length(P));
+  for I:=0 to High(P) do
+    Input[I]:=TDual.Create(P[I],0);
+  Output:=F(Input);
+  SetLength(Result,Length(Output));
+  for I:=0 to High(Output) do
+  begin
+    if not IsFiniteValue(Output[I].Value) or
+       not IsFiniteValue(Output[I].Derivative) then
+      raise EModellingError.CreateFmt(
+        'automatic residual: non-finite value at row %d.',[I]);
+    Result[I]:=Output[I].Value;
+  end;
+end;
+
+function EvaluateResidualSource(const Source:TResidualSource;
+  const P:TDoubleArray; var Evaluations:Integer):TDoubleArray;
+begin
+  if Assigned(Source.DualFunction) then
+    Result:=EvaluateDualResidual(Source.DualFunction,P)
+  else
+    Result:=Source.RealFunction(P);
+  Inc(Evaluations);
+end;
+
+function AutomaticResidualJacobian(const Source:TResidualSource;
+  const P:TDoubleArray; var Evaluations:Integer):TModelMatrix;
+begin
+  Result:=TModelMatrix(TDifferentiationKit.AutoJacobian(
+    Source.DualFunction,P));
+  Inc(Evaluations,Length(P));
+end;
+
+function NumericalResidualJacobian(const Source:TResidualSource;
   const P, Base: TDoubleArray; var Evaluations: Integer): TModelMatrix;
 var PP,PM,RP,RM:TDoubleArray; I,J:Integer; H:Double;
 begin
@@ -620,7 +997,9 @@ begin
   PP:=Copy(P); PM:=Copy(P);
   for I:=0 to High(P) do begin
     H:=Power(DoubleEpsilon,1/3)*Max(1,Abs(P[I]));
-    PP[I]:=P[I]+H; PM[I]:=P[I]-H; RP:=F(PP); RM:=F(PM); Inc(Evaluations,2);
+    PP[I]:=P[I]+H; PM[I]:=P[I]-H;
+    RP:=EvaluateResidualSource(Source,PP,Evaluations);
+    RM:=EvaluateResidualSource(Source,PM,Evaluations);
     PP[I]:=P[I]; PM[I]:=P[I];
     if (Length(RP)<>Length(Base)) or (Length(RM)<>Length(Base)) then
       raise EModellingError.Create('FitNonlinear: residual dimension changed.');
@@ -637,18 +1016,23 @@ begin Result:=0; for I:=0 to High(R) do begin A:=Abs(R[I])/Scale;
     rlSoftL1:Result:=Result+Sqr(Scale)*(Sqrt(1+Sqr(A))-1);
   else Result:=Result+0.5*Sqr(R[I]); end; end; end;
 
-class function TModellingKit.FitNonlinear(Residual: TResidualFunction;
-  Jacobian: TJacobianFunction; const InitialParameters: TDoubleArray;
+function FitNonlinearCore(const Source:TResidualSource;
+  const InitialParameters: TDoubleArray;
   const Options: TNonlinearFitOptions): TFitResult;
 var
-  P,Trial,R,RTrial,Delta,G:TDoubleArray; J:TModelMatrix;
+  P,Trial,R,RTrial,Delta,G,ParameterScales,SingularValues:TDoubleArray;
+  J:TModelMatrix;
   JReference:TModelMatrix;
   H:TModelMatrix; A,B,S:IDenseDoubleMatrix;
+  FinalFactor:IDenseDoubleSVD;
+  V:IDenseDoubleMatrix;
   I,K,L,Q,N,M,Stale:Integer;
-  Lambda,Cost,TrialCost,W,Scale,StepNorm,PrevCost,Diff,Limit:Double;
+  Lambda,Cost,TrialCost,W,Scale,StepNorm,PrevCost,Diff,Limit,
+    PSI,PSL,VarianceEstimate:Double;
 begin
   Result:=Default(TFitResult);
-  if not Assigned(Residual) then raise EModellingError.Create(
+  if not Assigned(Source.RealFunction) and
+     not Assigned(Source.DualFunction) then raise EModellingError.Create(
     'FitNonlinear: residual callback must be assigned.');
   ValidateVector(InitialParameters,'FitNonlinear initial parameters');
   if (Options.AbsoluteTolerance<0) or (Options.RelativeTolerance<0) or
@@ -662,18 +1046,50 @@ begin
   if (Length(Options.UpperBounds)<>0) and
      (Length(Options.UpperBounds)<>N) then raise EModellingError.Create(
        'FitNonlinear: upper bounds length mismatch.');
+  if (Length(Options.ParameterScales)<>0) and
+     (Length(Options.ParameterScales)<>N) then raise EModellingError.Create(
+       'FitNonlinear: parameter scales length mismatch.');
+  SetLength(ParameterScales,N);
+  for I:=0 to N-1 do
+  begin
+    ParameterScales[I]:=1;
+    if Length(Options.ParameterScales)>0 then
+    begin
+      if not IsFiniteValue(Options.ParameterScales[I]) or
+         (Options.ParameterScales[I]<=0) then
+        raise EModellingError.CreateFmt(
+          'FitNonlinear: parameter scale %d must be finite and positive.',
+          [I]);
+      ParameterScales[I]:=Options.ParameterScales[I];
+    end;
+    if (Length(Options.LowerBounds)>0) and
+       (Length(Options.UpperBounds)>0) and
+       (Options.LowerBounds[I]>Options.UpperBounds[I]) then
+      raise EModellingError.CreateFmt(
+        'FitNonlinear: lower bound exceeds upper bound at parameter %d.',
+        [I]);
+  end;
   P:=Copy(InitialParameters);
   for I:=0 to N-1 do begin
     if Length(Options.LowerBounds)>0 then P[I]:=Max(P[I],Options.LowerBounds[I]);
     if Length(Options.UpperBounds)>0 then P[I]:=Min(P[I],Options.UpperBounds[I]);
   end;
-  R:=Residual(P); Inc(Result.Evaluations); ValidateVector(R,'FitNonlinear residual');
+  R:=EvaluateResidualSource(Source,P,Result.Evaluations);
+  ValidateVector(R,'FitNonlinear residual');
   M:=Length(R); Lambda:=Options.InitialDamping; Cost:=ResidualCost(R,Options.LossScale,Options.Loss);
-  if Options.CheckDerivative and Assigned(Jacobian) then
+  if Options.CheckDerivative and
+     (Assigned(Source.AnalyticJacobian) or
+      Assigned(Source.DualFunction)) then
   begin
-    J:=Jacobian(P); Inc(Result.Evaluations);
+    if Assigned(Source.DualFunction) then
+      J:=AutomaticResidualJacobian(Source,P,Result.Evaluations)
+    else
+    begin
+      J:=Source.AnalyticJacobian(P);
+      Inc(Result.Evaluations);
+    end;
     ValidateMatrix(J,M,N,'FitNonlinear Jacobian');
-    JReference:=NumericalResidualJacobian(Residual,P,R,Result.Evaluations);
+    JReference:=NumericalResidualJacobian(Source,P,R,Result.Evaluations);
     for I:=0 to M-1 do
       for L:=0 to N-1 do
       begin
@@ -687,16 +1103,29 @@ begin
   end;
   PrevCost:=Infinity; Stale:=0;
   for K:=1 to Options.MaxIterations do begin
-    if Assigned(Jacobian) then begin J:=Jacobian(P); Inc(Result.Evaluations); end
-    else J:=NumericalResidualJacobian(Residual,P,R,Result.Evaluations);
+    if Assigned(Source.DualFunction) then
+      J:=AutomaticResidualJacobian(Source,P,Result.Evaluations)
+    else if Assigned(Source.AnalyticJacobian) then
+    begin
+      J:=Source.AnalyticJacobian(P);
+      Inc(Result.Evaluations);
+    end
+    else
+      J:=NumericalResidualJacobian(Source,P,R,Result.Evaluations);
     ValidateMatrix(J,M,N,'FitNonlinear Jacobian');
     SetLength(H,N); SetLength(G,N);
-    for I:=0 to N-1 do begin SetLength(H[I],N); G[I]:=0;
+    for I:=0 to N-1 do begin
+      PSI:=ParameterScales[I];
+      SetLength(H[I],N); G[I]:=0;
       for L:=0 to M-1 do begin W:=RobustWeight(R[L],Options.LossScale,Options.Loss);
-        G[I]:=G[I]+Sqr(W)*J[L][I]*R[L]; end;
-      for L:=0 to N-1 do begin H[I][L]:=0;
+        G[I]:=G[I]+Sqr(W)*J[L][I]*PSI*R[L]; end;
+      for L:=0 to N-1 do begin
+        PSL:=ParameterScales[L];
+        H[I][L]:=0;
         for Q:=0 to M-1 do begin W:=RobustWeight(R[Q],Options.LossScale,Options.Loss);
-          H[I][L]:=H[I][L]+Sqr(W)*J[Q][I]*J[Q][L]; end; end;
+          H[I][L]:=H[I][L]+Sqr(W)*J[Q][I]*PSI*J[Q][L]*PSL;
+        end;
+      end;
       H[I][I]:=H[I][I]+Lambda*Max(1,H[I][I]); G[I]:=-G[I];
     end;
     Result.GradientNorm:=VectorNorm(G);
@@ -706,11 +1135,12 @@ begin
       Delta:=VectorFromDense(S);
     except on E:Exception do begin Result.Status:=isNumericalBreakdown;
       Result.Iterations:=K; Break; end; end;
+    for I:=0 to N-1 do Delta[I]:=Delta[I]*ParameterScales[I];
     StepNorm:=VectorNorm(Delta); Trial:=Copy(P);
     for I:=0 to N-1 do begin Trial[I]:=P[I]+Delta[I];
       if Length(Options.LowerBounds)>0 then Trial[I]:=Max(Trial[I],Options.LowerBounds[I]);
       if Length(Options.UpperBounds)>0 then Trial[I]:=Min(Trial[I],Options.UpperBounds[I]); end;
-    RTrial:=Residual(Trial); Inc(Result.Evaluations);
+    RTrial:=EvaluateResidualSource(Source,Trial,Result.Evaluations);
     if Length(RTrial)<>Length(R) then raise EModellingError.Create(
       'FitNonlinear: residual dimension changed.');
     ValidateVector(RTrial,'FitNonlinear residual'); TrialCost:=ResidualCost(RTrial,Options.LossScale,Options.Loss);
@@ -731,15 +1161,76 @@ begin
   Result.Parameters:=P; Result.Residuals:=R;
   Result.ResidualSumSquares:=0; for I:=0 to High(R) do
     Result.ResidualSumSquares:=Result.ResidualSumSquares+Sqr(R[I]);
-  Result.Rank:=N; Result.DegreesOfFreedom:=Length(R)-N;
+  if Assigned(Source.DualFunction) then
+    J:=AutomaticResidualJacobian(Source,P,Result.Evaluations)
+  else if Assigned(Source.AnalyticJacobian) then
+  begin
+    J:=Source.AnalyticJacobian(P);
+    Inc(Result.Evaluations);
+  end
+  else
+    J:=NumericalResidualJacobian(Source,P,R,Result.Evaluations);
+  ValidateMatrix(J,M,N,'FitNonlinear final Jacobian');
+  try
+    FinalFactor:=FactorSVD(DenseFromMatrix(J));
+    Result.Rank:=FinalFactor.NumericalRank;
+    SingularValues:=FinalFactor.SingularValues;
+    V:=FinalFactor.V;
+  except
+    on E:Exception do
+    begin
+      Result.Rank:=0;
+      SingularValues:=nil;
+      V:=nil;
+    end;
+  end;
+  Result.DegreesOfFreedom:=Length(R)-Result.Rank;
+  if (Options.Loss=rlSquared) and (Result.Rank=N) and
+     (Result.DegreesOfFreedom>0) then
+  begin
+    VarianceEstimate:=Result.ResidualSumSquares/Result.DegreesOfFreedom;
+    SetLength(Result.Covariance,N);
+    for I:=0 to N-1 do
+    begin
+      SetLength(Result.Covariance[I],N);
+      for L:=0 to N-1 do
+        for Q:=0 to N-1 do
+          if SingularValues[Q]>FinalFactor.Tolerance then
+            Result.Covariance[I][L]:=Result.Covariance[I][L]+
+              VarianceEstimate*V[I,Q]*V[L,Q]/Sqr(SingularValues[Q]);
+    end;
+  end;
+end;
+
+class function TModellingKit.FitNonlinear(Residual: TResidualFunction;
+  Jacobian: TJacobianFunction; const InitialParameters: TDoubleArray;
+  const Options: TNonlinearFitOptions): TFitResult;
+var
+  Source:TResidualSource;
+begin
+  Source:=Default(TResidualSource);
+  Source.RealFunction:=Residual;
+  Source.AnalyticJacobian:=Jacobian;
+  Result:=FitNonlinearCore(Source,InitialParameters,Options);
+end;
+
+class function TModellingKit.FitNonlinearAuto(
+  Residual: TDualVectorFunction; const InitialParameters: TDoubleArray;
+  const Options: TNonlinearFitOptions): TFitResult;
+var
+  Source:TResidualSource;
+begin
+  Source:=Default(TResidualSource);
+  Source.DualFunction:=Residual;
+  Result:=FitNonlinearCore(Source,InitialParameters,Options);
 end;
 
 function ConvertJacobian(const J:TModelMatrix):NumericsLib.Differentiation.TDoubleMatrix;
 var I:Integer; begin Result:=nil; SetLength(Result,Length(J));
   for I:=0 to High(J) do Result[I]:=Copy(J[I]); end;
 
-class function TModellingKit.SolveSystem(F: TVectorEquationFunction;
-  Jacobian: TVectorJacobianFunction; const InitialX: TDoubleArray;
+function SolveSystemCore(const Source:TResidualSource;
+  const InitialX: TDoubleArray;
   AbsoluteTolerance, RelativeTolerance: Double; MaxIterations: Integer;
   Progress: TProgressFunction): TVectorRootResult;
 var
@@ -748,25 +1239,30 @@ var
   NormR,NewNorm,Alpha,Scale,PrevNorm:Double;
 begin
   Result:=Default(TVectorRootResult);
-  if not Assigned(F) then raise EModellingError.Create(
+  if not Assigned(Source.RealFunction) and
+     not Assigned(Source.DualFunction) then raise EModellingError.Create(
     'SolveSystem: function callback must be assigned.');
   ValidateVector(InitialX,'SolveSystem initial X'); N:=Length(InitialX);
   if (AbsoluteTolerance<0) or (RelativeTolerance<0) or
      (AbsoluteTolerance+RelativeTolerance<=0) or (MaxIterations<=0) then
     raise EModellingError.Create('SolveSystem: invalid controls.');
-  X:=Copy(InitialX); R:=F(X); Inc(Result.Evaluations);
+  X:=Copy(InitialX);
+  R:=EvaluateResidualSource(Source,X,Result.Evaluations);
   if Length(R)<>N then raise EModellingError.Create(
     'SolveSystem: residual dimension must equal variable count.');
   ValidateVector(R,'SolveSystem residual'); NormR:=VectorNorm(R); Stale:=0;
   for K:=1 to MaxIterations do begin
     Scale:=AbsoluteTolerance+RelativeTolerance*Max(1,VectorNorm(X));
     if NormR<=Scale then begin Result.Status:=isConverged; Result.Iterations:=K-1; Break; end;
-    if Assigned(Jacobian) then begin J:=Jacobian(X); Inc(Result.Evaluations); end
-    else begin
-      J:=TModelMatrix(TDifferentiationKit.Jacobian(
-        NumericsLib.Differentiation.TVectorFunction(F),X));
-      Inc(Result.Evaluations,2*N+1);
-    end;
+    if Assigned(Source.DualFunction) then
+      J:=AutomaticResidualJacobian(Source,X,Result.Evaluations)
+    else if Assigned(Source.AnalyticJacobian) then
+    begin
+      J:=Source.AnalyticJacobian(X);
+      Inc(Result.Evaluations);
+    end
+    else
+      J:=NumericalResidualJacobian(Source,X,R,Result.Evaluations);
     ValidateMatrix(J,N,N,'SolveSystem Jacobian');
     for I:=0 to N-1 do R[I]:=-R[I];
     try A:=DenseFromMatrix(J); B:=DenseFromVector(R); S:=Solve(A,B);
@@ -777,7 +1273,7 @@ begin
     Result.StepNorm:=VectorNorm(Step); Alpha:=1; PrevNorm:=NormR;
     repeat
       Trial:=Copy(X); for I:=0 to N-1 do Trial[I]:=X[I]+Alpha*Step[I];
-      RNew:=F(Trial); Inc(Result.Evaluations);
+      RNew:=EvaluateResidualSource(Source,Trial,Result.Evaluations);
       if Length(RNew)<>N then raise EModellingError.Create(
         'SolveSystem: residual dimension changed.');
       ValidateVector(RNew,'SolveSystem residual'); NewNorm:=VectorNorm(RNew);
@@ -793,6 +1289,207 @@ begin
   end;
   if Result.Status=isUnknown then Result.Status:=isIterationLimit;
   Result.X:=X; Result.Residual:=R; Result.ResidualNorm:=NormR;
+end;
+
+class function TModellingKit.SolveSystem(F: TVectorEquationFunction;
+  Jacobian: TVectorJacobianFunction; const InitialX: TDoubleArray;
+  AbsoluteTolerance, RelativeTolerance: Double; MaxIterations: Integer;
+  Progress: TProgressFunction): TVectorRootResult;
+var
+  Source:TResidualSource;
+begin
+  Source:=Default(TResidualSource);
+  Source.RealFunction:=TResidualFunction(F);
+  Source.AnalyticJacobian:=TJacobianFunction(Jacobian);
+  Result:=SolveSystemCore(Source,InitialX,AbsoluteTolerance,
+    RelativeTolerance,MaxIterations,Progress);
+end;
+
+class function TModellingKit.SolveSystemAuto(F: TDualVectorFunction;
+  const InitialX: TDoubleArray; AbsoluteTolerance,
+  RelativeTolerance: Double; MaxIterations: Integer;
+  Progress: TProgressFunction): TVectorRootResult;
+var
+  Source:TResidualSource;
+begin
+  Source:=Default(TResidualSource);
+  Source.DualFunction:=F;
+  Result:=SolveSystemCore(Source,InitialX,AbsoluteTolerance,
+    RelativeTolerance,MaxIterations,Progress);
+end;
+
+function EvaluatePolynomialComplex(const Coefficients: TDoubleArray;
+  const X: TComplex): TComplex;
+var
+  I: Integer;
+begin
+  Result:=TComplex.Create(Coefficients[High(Coefficients)],0);
+  for I:=High(Coefficients)-1 downto 0 do
+    Result:=Result*X+Coefficients[I];
+end;
+
+procedure SortPolynomialRoots(var Roots:TComplexArray;
+  var Residuals:TDoubleArray);
+var
+  I,J:Integer;
+  Root:TComplex;
+  Residual:Double;
+begin
+  for I:=1 to High(Roots) do
+  begin
+    Root:=Roots[I]; Residual:=Residuals[I]; J:=I-1;
+    while (J>=0) and ((Roots[J].Re>Root.Re) or
+      ((Roots[J].Re=Root.Re) and (Roots[J].Im>Root.Im))) do
+    begin
+      Roots[J+1]:=Roots[J];
+      Residuals[J+1]:=Residuals[J];
+      Dec(J);
+    end;
+    Roots[J+1]:=Root;
+    Residuals[J+1]:=Residual;
+  end;
+end;
+
+class function TModellingKit.SolvePolynomial(
+  const Coefficients: TDoubleArray; AbsoluteTolerance,
+  RelativeTolerance: Double; MaxIterations: Integer):
+  TPolynomialRootResult;
+var
+  Current,Previous,Best:TComplexArray;
+  Value,Denominator,Update:TComplex;
+  I,J,K,Degree,Stale:Integer;
+  Leading,Radius,Angle,MaxUpdate,MaxResidual,BestMaximum,
+    Limit,CoefficientScale,DenominatorScale:Double;
+begin
+  Result:=Default(TPolynomialRootResult);
+  if Length(Coefficients)<2 then
+    raise EModellingError.Create(
+      'SolvePolynomial: at least two coefficients are required.');
+  ValidateVector(Coefficients,'SolvePolynomial coefficients');
+  if Coefficients[High(Coefficients)]=0 then
+    raise EModellingError.Create(
+      'SolvePolynomial: highest-order coefficient must be non-zero.');
+  if (AbsoluteTolerance<0) or (RelativeTolerance<0) or
+     (AbsoluteTolerance+RelativeTolerance<=0) or
+     not IsFiniteValue(AbsoluteTolerance) or
+     not IsFiniteValue(RelativeTolerance) or (MaxIterations<=0) then
+    raise EModellingError.Create('SolvePolynomial: invalid controls.');
+  Degree:=High(Coefficients);
+  Leading:=Coefficients[Degree];
+  CoefficientScale:=0;
+  Radius:=1;
+  for I:=0 to Degree-1 do
+  begin
+    CoefficientScale:=Max(CoefficientScale,Abs(Coefficients[I]));
+    Radius:=Max(Radius,1+Abs(Coefficients[I]/Leading));
+  end;
+  CoefficientScale:=Max(CoefficientScale,Abs(Leading));
+  if Degree=1 then
+  begin
+    SetLength(Result.Roots,1);
+    SetLength(Result.Residuals,1);
+    Result.Roots[0]:=TComplex.Create(-Coefficients[0]/Leading,0);
+    Value:=EvaluatePolynomialComplex(Coefficients,Result.Roots[0]);
+    Result.Residuals[0]:=Value.Magnitude;
+    Result.Evaluations:=1;
+    Result.Status:=isConverged;
+    Exit;
+  end;
+  SetLength(Current,Degree);
+  SetLength(Previous,Degree);
+  SetLength(Best,Degree);
+  for I:=0 to Degree-1 do
+  begin
+    Angle:=2*Pi*(I+0.5)/Degree;
+    { Unequal radii deliberately avoid an exactly conjugate-symmetric starting
+      set. Such a set cannot separate a conjugate pair onto two distinct real
+      roots in exact arithmetic, making convergence platform-rounding
+      dependent for real polynomials with several real roots. }
+    Current[I]:=TComplex.FromPolar(
+      Radius*(0.75+0.25*(I+1)/Degree),Angle);
+  end;
+  Best:=Copy(Current);
+  BestMaximum:=Infinity;
+  Stale:=0;
+  for K:=1 to MaxIterations do
+  begin
+    Previous:=Copy(Current);
+    MaxUpdate:=0;
+    for I:=0 to Degree-1 do
+    begin
+      Value:=EvaluatePolynomialComplex(Coefficients,Previous[I]);
+      Inc(Result.Evaluations);
+      Denominator:=TComplex.One;
+      for J:=0 to Degree-1 do
+        if J<>I then
+          Denominator:=Denominator*(Previous[I]-Previous[J]);
+      DenominatorScale:=Denominator.Magnitude;
+      if (DenominatorScale<=DoubleEpsilon) or
+         not IsFiniteValue(DenominatorScale) then
+      begin
+        Result.Status:=isNumericalBreakdown;
+        Break;
+      end;
+      Update:=Value/(Denominator*Leading);
+      Current[I]:=Previous[I]-Update;
+      if not Current[I].IsFinite then
+      begin
+        Result.Status:=isNumericalBreakdown;
+        Break;
+      end;
+      MaxUpdate:=Max(MaxUpdate,Update.Magnitude);
+    end;
+    Result.Iterations:=K;
+    if Result.Status=isNumericalBreakdown then Break;
+    MaxResidual:=0;
+    for I:=0 to Degree-1 do
+    begin
+      Value:=EvaluatePolynomialComplex(Coefficients,Current[I]);
+      Inc(Result.Evaluations);
+      if not Value.IsFinite then
+      begin
+        Result.Status:=isNumericalBreakdown;
+        Break;
+      end;
+      MaxResidual:=Max(MaxResidual,Value.Magnitude);
+    end;
+    if Result.Status=isNumericalBreakdown then Break;
+    if MaxResidual<BestMaximum then
+    begin
+      BestMaximum:=MaxResidual;
+      Best:=Copy(Current);
+      Stale:=0;
+    end
+    else
+      Inc(Stale);
+    Limit:=AbsoluteTolerance+RelativeTolerance*
+      Max(1.0,CoefficientScale);
+    if (MaxResidual<=Limit) and
+       (MaxUpdate<=AbsoluteTolerance+RelativeTolerance*Max(1.0,Radius)) then
+    begin
+      Result.Status:=isConverged;
+      Break;
+    end;
+    if Stale>=50 then
+    begin
+      Result.Status:=isStagnation;
+      Break;
+    end;
+  end;
+  if Result.Status=isUnknown then
+    Result.Status:=isIterationLimit;
+  Result.Roots:=Copy(Best);
+  SetLength(Result.Residuals,Degree);
+  for I:=0 to Degree-1 do
+  begin
+    Value:=EvaluatePolynomialComplex(Coefficients,Result.Roots[I]);
+    Inc(Result.Evaluations);
+    if Value.IsFinite then
+      Result.Residuals[I]:=Value.Magnitude
+    else
+      Result.Residuals[I]:=Infinity;
+  end;
+  SortPolynomialRoots(Result.Roots,Result.Residuals);
 end;
 
 class function TAdaptiveODEOptions.Defaults: TAdaptiveODEOptions;
@@ -839,10 +1536,21 @@ begin
   if not IsFiniteValue(T0) or not IsFiniteValue(T1) or (T0=T1) then
     raise EModellingError.Create('SolveODE: require finite T0 <> T1.');
   if (Options.AbsoluteTolerance<0) or (Options.RelativeTolerance<0) or
-     (Options.AbsoluteTolerance+Options.RelativeTolerance<=0) or
+     ((Length(Options.AbsoluteTolerances)=0) and
+      (Options.AbsoluteTolerance+Options.RelativeTolerance<=0)) or
      (Options.MinimumStep<=0) or (Options.MaximumStep<=0) or
      (Options.MaxSteps<=0) then raise EModellingError.Create(
        'SolveODE: invalid options.');
+  if (Length(Options.AbsoluteTolerances)<>0) and
+     (Length(Options.AbsoluteTolerances)<>N) then
+    raise EModellingError.Create(
+      'SolveODE: per-component absolute tolerance length mismatch.');
+  for I:=0 to High(Options.AbsoluteTolerances) do
+    if not IsFiniteValue(Options.AbsoluteTolerances[I]) or
+       (Options.AbsoluteTolerances[I]<0) or
+       (Options.AbsoluteTolerances[I]+Options.RelativeTolerance<=0) then
+      raise EModellingError.CreateFmt(
+        'SolveODE: absolute tolerance %d is invalid.',[I]);
   Direction:=1; if T1<T0 then Direction:=-1;
   H:=Options.InitialStep;
   if H=0 then H:=Direction*Min(Abs(T1-T0)/100,0.01)
@@ -872,7 +1580,12 @@ begin
     Y4:=Combine(Y,H,K,[5179/57600,0,7571/16695,393/640,-92097/339200,187/2100,1/40]);
     Err:=0;
     for I:=0 to N-1 do begin
-      Scale:=Options.AbsoluteTolerance+Options.RelativeTolerance*Max(Abs(Y[I]),Abs(YNew[I]));
+      if Length(Options.AbsoluteTolerances)>0 then
+        Scale:=Options.AbsoluteTolerances[I]
+      else
+        Scale:=Options.AbsoluteTolerance;
+      Scale:=Scale+Options.RelativeTolerance*
+        Max(Abs(Y[I]),Abs(YNew[I]));
       Ratio:=Abs(YNew[I]-Y4[I])/Scale; if Ratio>Err then Err:=Ratio; end;
     Accept:=Err<=1;
     if Accept then begin

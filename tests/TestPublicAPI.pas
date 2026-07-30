@@ -15,14 +15,15 @@ interface
 uses
   Classes, Math, fpcunit, testregistry,
   MathBase.Complex,
+  MathBase.Random, MathBase.Interchange, MathBase.Expressions,
   MathBase.Trigonometry,
   AlgebraLib.Matrices, AlgebraLib.VectorKernels,
   AlgebraLib.DenseMatrices, AlgebraLib.DenseKernels,
   AlgebraLib.DenseSolvers, AlgebraLib.DenseDecompositions,
   FinanceLib.Interest, FinanceLib.Bonds, FinanceLib.NPV,
-  StatsLib.Stats,
+  StatsLib.Stats, StatsLib.Streaming, StatsLib.Inference,
   EngineeringLib.FluidDynamics, EngineeringLib.Thermodynamics,
-  EngineeringLib.Signal, EngineeringLib.UnitConversion,
+  EngineeringLib.Signal, EngineeringLib.DSP, EngineeringLib.UnitConversion,
   EngineeringLib.Velocity, EngineeringLib.Pressure,
   NumericsLib.Numerics,
   NumericsLib.Differentiation, NumericsLib.Interpolation,
@@ -31,8 +32,8 @@ uses
   CombinatoricsLib.Combinatorics,
   OptimizationLib.Optimization,
   OptimizationLib.Convex,
-  TimeSeriesLib.TimeSeries,
-  MLLib.MachineLearning,
+  TimeSeriesLib.TimeSeries, TimeSeriesLib.StateSpace,
+  MLLib.MachineLearning, MLLib.Analysis, InterchangeLib.Models,
   GeometryLib.Geometry;
 
 type
@@ -43,9 +44,11 @@ type
   TBondKitClass = class of TBondKit;
   TNPVKitClass = class of TNPVKit;
   TStatsKitClass = class of TStatsKit;
+  TInferenceKitClass = class of TInferenceKit;
   TFluidDynamicsKitClass = class of TFluidDynamicsKit;
   TThermodynamicsKitClass = class of TThermodynamicsKit;
   TSignalKitClass = class of TSignalKit;
+  TDSPKitClass = class of TDSPKit;
   TUnitConversionKitClass = class of TUnitConversionKit;
   TVelocityKitClass = class of TVelocityKit;
   TPressureKitClass = class of TPressureKit;
@@ -59,7 +62,9 @@ type
   TConvexOptimizationKitClass = class of TConvexOptimizationKit;
   TTimeSeriesKitClass = class of TTimeSeriesKit;
   TMLKitClass = class of TMLKit;
+  TAnalysisKitClass = class of TAnalysisKit;
   TGeometryKitClass = class of TGeometryKit;
+  TExpressionEvaluatorClass = class of TExpressionEvaluator;
 
   TTestPublicAPI = class(TTestCase)
   published
@@ -67,6 +72,7 @@ type
     procedure TestGeometryVectorArithmeticOperatorsAreAccessible;
     procedure TestTypedDenseSolveIsAccessible;
     procedure TestTypedDenseDecompositionsAreAccessible;
+    procedure TestAppliedNumericsSurfaceIsAccessible;
   end;
 
 implementation
@@ -81,9 +87,11 @@ var
   BondKit: TBondKitClass;
   NPVKit: TNPVKitClass;
   StatsKit: TStatsKitClass;
+  InferenceKit:TInferenceKitClass;
   FluidDynamicsKit: TFluidDynamicsKitClass;
   ThermodynamicsKit: TThermodynamicsKitClass;
   SignalKit: TSignalKitClass;
+  DSPKit: TDSPKitClass;
   UnitConversionKit: TUnitConversionKitClass;
   VelocityKit: TVelocityKitClass;
   PressureKit: TPressureKitClass;
@@ -97,7 +105,9 @@ var
   ConvexOptimizationKit: TConvexOptimizationKitClass;
   TimeSeriesKit: TTimeSeriesKitClass;
   MLKit: TMLKitClass;
+  AnalysisKit: TAnalysisKitClass;
   GeometryKit: TGeometryKitClass;
+  ExpressionEvaluator:TExpressionEvaluatorClass;
 begin
   TrigKit := TTrigKit;
   MatrixKit := TMatrixKit;
@@ -107,9 +117,11 @@ begin
   BondKit := TBondKit;
   NPVKit := TNPVKit;
   StatsKit := TStatsKit;
+  InferenceKit:=TInferenceKit;
   FluidDynamicsKit := TFluidDynamicsKit;
   ThermodynamicsKit := TThermodynamicsKit;
   SignalKit := TSignalKit;
+  DSPKit := TDSPKit;
   UnitConversionKit := TUnitConversionKit;
   VelocityKit := TVelocityKit;
   PressureKit := TPressureKit;
@@ -123,7 +135,9 @@ begin
   ConvexOptimizationKit := TConvexOptimizationKit;
   TimeSeriesKit := TTimeSeriesKit;
   MLKit := TMLKit;
+  AnalysisKit := TAnalysisKit;
   GeometryKit := TGeometryKit;
+  ExpressionEvaluator:=TExpressionEvaluator;
 
   AssertTrue('TTrigKit', TrigKit <> nil);
   AssertTrue('TMatrixKit', MatrixKit <> nil);
@@ -133,9 +147,11 @@ begin
   AssertTrue('TBondKit', BondKit <> nil);
   AssertTrue('TNPVKit', NPVKit <> nil);
   AssertTrue('TStatsKit', StatsKit <> nil);
+  AssertTrue('TInferenceKit',InferenceKit<>nil);
   AssertTrue('TFluidDynamicsKit', FluidDynamicsKit <> nil);
   AssertTrue('TThermodynamicsKit', ThermodynamicsKit <> nil);
   AssertTrue('TSignalKit', SignalKit <> nil);
+  AssertTrue('TDSPKit', DSPKit <> nil);
   AssertTrue('TUnitConversionKit', UnitConversionKit <> nil);
   AssertTrue('TVelocityKit', VelocityKit <> nil);
   AssertTrue('TPressureKit', PressureKit <> nil);
@@ -149,7 +165,44 @@ begin
   AssertTrue('TConvexOptimizationKit', ConvexOptimizationKit <> nil);
   AssertTrue('TTimeSeriesKit', TimeSeriesKit <> nil);
   AssertTrue('TMLKit', MLKit <> nil);
+  AssertTrue('TAnalysisKit', AnalysisKit <> nil);
   AssertTrue('TGeometryKit', GeometryKit <> nil);
+  AssertTrue('TExpressionEvaluator',ExpressionEvaluator<>nil);
+end;
+
+procedure TTestPublicAPI.TestAppliedNumericsSurfaceIsAccessible;
+var
+  Generator: TLocalRandom;
+  State: TRandomState;
+  Statistics: TOnlineStatistics;
+  Configuration: TScalarKalmanConfiguration;
+  Filter: TScalarKalmanFilter;
+  A, B, Destination: IDenseDoubleMatrix;
+  Text: string;
+begin
+  Generator := TLocalRandom.Seeded(180);
+  State := Generator.GetState;
+  Generator.SetState(State);
+  AssertTrue('explicit local random state', Generator.NextDouble >= 0.0);
+
+  Statistics := TOnlineStatistics.Create(nfpReject);
+  Statistics.Add(4.0);
+  AssertEquals('streaming statistics', 4.0, Statistics.Mean, 0.0);
+
+  Configuration := TScalarKalmanConfiguration.Create(1.0, 1.0, 0.1, 0.2);
+  Filter := TScalarKalmanFilter.Create(Configuration, 0.0, 1.0);
+  Filter.Update(1.0);
+  AssertTrue('scalar state space', Filter.Variance >= 0.0);
+
+  A := TDenseDoubleMatrix.FromValues(1, 1, [2.0]);
+  B := TDenseDoubleMatrix.FromValues(1, 1, [3.0]);
+  Destination := TDenseDoubleMatrix.Zeros(1, 1);
+  MultiplyAutoInto(A, B, Destination);
+  AssertEquals('automatic portable/blocked multiply', 6.0,
+    Destination[0, 0], 0.0);
+
+  Text := DenseMatrixToInvariant(A);
+  AssertTrue('invariant interchange', Length(Text) > 0);
 end;
 
 procedure TTestPublicAPI.TestGeometryVectorArithmeticOperatorsAreAccessible;

@@ -8,6 +8,7 @@ uses
   MathBase.SharedTypes,
   MathBase.Complex,
   StatsLib.Stats,
+  StatsLib.Streaming,
   GeometryLib.Geometry,
   AlgebraLib.Matrices,
   AlgebraLib.DenseMatrices,
@@ -15,7 +16,9 @@ uses
   AlgebraLib.DenseSolvers,
   AlgebraLib.DenseDecompositions,
   AlgebraLib.VectorKernels,
-  EngineeringLib.Signal;
+  EngineeringLib.Signal,
+  EngineeringLib.DSP,
+  MLLib.Analysis;
 
 procedure BenchmarkSort;
 const
@@ -143,13 +146,17 @@ const
   Inner = 129;
   ColsB = 65;
 var
-  A, B, C, Destination: IDenseDoubleMatrix;
+  A, B, PortableDestination, BlockedDestination,
+    AutomaticDestination: IDenseDoubleMatrix;
   I, J: SizeInt;
   Started: QWord;
+  PortableMilliseconds, BlockedMilliseconds, AutomaticMilliseconds: QWord;
 begin
   A := TDenseDoubleMatrix.Zeros(RowsA, Inner);
   B := TDenseDoubleMatrix.Zeros(Inner, ColsB);
-  Destination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
+  PortableDestination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
+  BlockedDestination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
+  AutomaticDestination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
   for I := 0 to A.Rows - 1 do
     for J := 0 to A.Cols - 1 do
       A[I, J] := Sin(I * 0.01 + J * 0.03);
@@ -157,11 +164,173 @@ begin
     for J := 0 to B.Cols - 1 do
       B[I, J] := Cos(I * 0.02 - J * 0.01);
   Started := GetTickCount64;
-  MultiplyInto(A, B, Destination);
-  C := Destination;
+  MultiplyInto(A, B, PortableDestination);
+  PortableMilliseconds := GetTickCount64 - Started;
+  Started := GetTickCount64;
+  MultiplyBlockedInto(A, B, BlockedDestination);
+  BlockedMilliseconds := GetTickCount64 - Started;
+  Started := GetTickCount64;
+  MultiplyAutoInto(A, B, AutomaticDestination);
+  AutomaticMilliseconds := GetTickCount64 - Started;
+  if (PortableDestination[0, 0] <> BlockedDestination[0, 0]) or
+    (PortableDestination[RowsA - 1, ColsB - 1] <>
+      AutomaticDestination[RowsA - 1, ColsB - 1]) then
+    Halt(4);
   Writeln('typed dense odd-shape multiply, ', RowsA, 'x', Inner, ' * ',
-    Inner, 'x', ColsB, ': ', GetTickCount64 - Started,
-    ' ms; checksum=', C[0, 0]:0:6);
+    Inner, 'x', ColsB, ': portable=', PortableMilliseconds,
+    ' ms; blocked=', BlockedMilliseconds, ' ms; auto=',
+    AutomaticMilliseconds, ' ms; path=',
+    Ord(SelectedMultiplyPath(RowsA, Inner, ColsB)),
+    '; checksum=', PortableDestination[0, 0]:0:6);
+end;
+
+procedure BenchmarkAppliedDSP;
+const
+  PowerOfTwoLength = 262144;
+  ArbitraryLength = 100003;
+  SignalLength = 65536;
+  FilterLength = 129;
+var
+  ComplexSignal, Spectrum: TComplexArray;
+  Signal, Filter, Convolution: TDoubleArray;
+  I: SizeInt;
+  Started: QWord;
+begin
+  SetLength(ComplexSignal, PowerOfTwoLength);
+  for I := 0 to High(ComplexSignal) do
+    ComplexSignal[I] := TComplex.Create(Sin(I * 0.01), Cos(I * 0.03));
+  Started := GetTickCount64;
+  Spectrum := TDSPKit.Transform(ComplexSignal);
+  Writeln('applied DSP radix-2 FFT, n=', PowerOfTwoLength, ': ',
+    GetTickCount64 - Started, ' ms; checksum=', Spectrum[1].Magnitude:0:6);
+
+  SetLength(ComplexSignal, ArbitraryLength);
+  for I := 0 to High(ComplexSignal) do
+    ComplexSignal[I] := TComplex.Create(Sin(I * 0.007), 0.0);
+  Started := GetTickCount64;
+  Spectrum := TDSPKit.Transform(ComplexSignal);
+  Writeln('applied DSP Bluestein FFT, n=', ArbitraryLength, ': ',
+    GetTickCount64 - Started, ' ms; checksum=', Spectrum[7].Magnitude:0:6);
+
+  SetLength(Signal, SignalLength);
+  SetLength(Filter, FilterLength);
+  for I := 0 to High(Signal) do
+    Signal[I] := Sin(I * 0.011) + 0.2 * Cos(I * 0.071);
+  for I := 0 to High(Filter) do
+    Filter[I] := 1.0 / FilterLength;
+  Started := GetTickCount64;
+  Convolution := TDSPKit.Convolve(Signal, Filter, cmAutomatic);
+  Writeln('applied DSP convolution, ', SignalLength, 'x', FilterLength,
+    ': ', GetTickCount64 - Started, ' ms; method=',
+    Ord(TDSPKit.SelectedConvolutionMethod(SignalLength, FilterLength)),
+    '; checksum=', Convolution[FilterLength]:0:6);
+end;
+
+procedure BenchmarkRelease18DSPScales;
+const
+  SmallIterations = 5000;
+  BatchCount = 32;
+  BatchLength = 4096;
+  StreamBlocks = 128;
+  StreamBlockLength = 1024;
+  FilterLength = 129;
+var
+  SmallA,SmallB,SmallResult,Filter,Block,StreamResult:TDoubleArray;
+  Batch,Transformed:TComplexBatch;
+  Convolver:TOverlapSaveConvolver;
+  I,J:SizeInt;
+  Started:QWord;
+  Checksum:Double;
+begin
+  SmallA:=TDoubleArray.Create(1,2,3,4,5,6,7,8);
+  SmallB:=TDoubleArray.Create(0.25,0.5,0.25);
+  Started:=GetTickCount64;
+  Checksum:=0;
+  for I:=1 to SmallIterations do
+  begin
+    SmallResult:=TDSPKit.Convolve(SmallA,SmallB,cmDirect);
+    Checksum:=Checksum+SmallResult[4];
+  end;
+  Writeln('small direct convolution, 8x3, iterations=',SmallIterations,
+    ': ',GetTickCount64-Started,' ms; result_allocations=',SmallIterations,
+    '; result_elements=',SmallIterations*10,'; checksum=',Checksum:0:6);
+
+  SetLength(Batch,BatchCount);
+  for I:=0 to BatchCount-1 do
+  begin
+    SetLength(Batch[I],BatchLength);
+    for J:=0 to BatchLength-1 do
+      Batch[I][J]:=TComplex.Create(Sin((I+1)*(J+1)*0.0003),0);
+  end;
+  Started:=GetTickCount64;
+  Transformed:=TDSPKit.TransformBatch(Batch);
+  Writeln('batch FFT, batches=',BatchCount,', n=',BatchLength,': ',
+    GetTickCount64-Started,' ms; result_arrays=',BatchCount,
+    '; result_elements=',BatchCount*BatchLength,
+    '; checksum=',Transformed[BatchCount-1][7].Magnitude:0:6);
+
+  SetLength(Filter,FilterLength);
+  for I:=0 to High(Filter) do Filter[I]:=1/FilterLength;
+  SetLength(Block,StreamBlockLength);
+  for I:=0 to High(Block) do Block[I]:=Sin(I*0.011);
+  Convolver:=TOverlapSaveConvolver.Create(Filter,cmFFT);
+  Started:=GetTickCount64;
+  Checksum:=0;
+  for I:=1 to StreamBlocks do
+  begin
+    StreamResult:=Convolver.ProcessBlock(Block);
+    Checksum:=Checksum+StreamResult[High(StreamResult)];
+  end;
+  Writeln('stream overlap-save, blocks=',StreamBlocks,
+    ', block=',StreamBlockLength,', taps=',FilterLength,': ',
+    GetTickCount64-Started,' ms; output_allocations=',StreamBlocks,
+    '; retained_state_elements=',Convolver.StateSize,
+    '; checksum=',Checksum:0:6);
+end;
+
+procedure BenchmarkStreamingStatistics;
+const
+  N = 2000000;
+var
+  Statistics: TOnlineStatistics;
+  I: SizeInt;
+  Started: QWord;
+begin
+  Statistics := TOnlineStatistics.Create;
+  Started := GetTickCount64;
+  for I := 0 to N - 1 do
+    Statistics.Add(Sin(I * 0.001) + I * 1E-8);
+  Writeln('online statistics, n=', N, ': ',
+    GetTickCount64 - Started, ' ms; retained_scalars=6; checksum=',
+    Statistics.Mean + Statistics.PopulationVariance:0:6);
+end;
+
+procedure BenchmarkTypedAnalysis;
+const
+  Rows = 1024;
+  Cols = 8;
+var
+  Data: IDenseDoubleMatrix;
+  PCAResult: MLLib.Analysis.TPCAResult;
+  ClusterResult: TKMeansPlusPlusResult;
+  I, J: SizeInt;
+  Started: QWord;
+begin
+  Data := TDenseDoubleMatrix.Zeros(Rows, Cols);
+  for I := 0 to Rows - 1 do
+    for J := 0 to Cols - 1 do
+      Data[I, J] := Sin((I + 1) * (J + 2) * 0.003) +
+        0.05 * Cos((I + J + 1) * 0.017);
+  Started := GetTickCount64;
+  PCAResult := TAnalysisKit.PCA(Data, 4);
+  Writeln('typed PCA, ', Rows, 'x', Cols, ', components=4: ',
+    GetTickCount64 - Started, ' ms; checksum=',
+    PCAResult.ExplainedRatio[0]:0:6);
+  Started := GetTickCount64;
+  ClusterResult := TAnalysisKit.KMeansPlusPlus(Data, 6, 180, 40);
+  Writeln('seeded k-means++, ', Rows, 'x', Cols, ', k=6: ',
+    GetTickCount64 - Started, ' ms; iterations=',
+    ClusterResult.Iterations, '; checksum=', ClusterResult.Inertia:0:6);
 end;
 
 procedure BenchmarkTypedDenseDecompositions;
@@ -249,4 +418,8 @@ begin
   BenchmarkComplexArithmetic;
   BenchmarkVectorKernels;
   BenchmarkComplexFFT;
+  BenchmarkAppliedDSP;
+  BenchmarkRelease18DSPScales;
+  BenchmarkStreamingStatistics;
+  BenchmarkTypedAnalysis;
 end.

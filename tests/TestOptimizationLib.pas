@@ -28,7 +28,8 @@ interface
 uses
   Classes, SysUtils, Math,
   fpcunit, testutils, testregistry,
-  MathBase.SharedTypes,
+  MathBase.SharedTypes, MathBase.Iteration,
+  NumericsLib.Differentiation,
   OptimizationLib.Optimization;
 
 { ---------------------------------------------------------------------------
@@ -75,6 +76,10 @@ function ObjSimple(const X: TDoubleArray): Double;
 function ConstrX1(const X: TDoubleArray): Double;
 
 function WrongSizeGradient(const X: TDoubleArray): TDoubleArray;
+function QuadraticBowlDual(const X:TDualArray):TDual;
+function Constraint1Grad(const X:TDoubleArray):TDoubleArray;
+function ParetoLeft(const X:TDoubleArray):Double;
+function ParetoRight(const X:TDoubleArray):Double;
 
 type
   TTestOptimizationLib = class(TTestCase)
@@ -167,6 +172,14 @@ type
     procedure Test32_ScalarNonConvergenceRaises;
     procedure Test33_SimplexReportsUnboundedStatus;
     procedure Test34_GradientDimensionValidation;
+    procedure Test35_DetailedSmoothOptimizers;
+    procedure Test36_BoundedAndMultistart;
+    procedure Test37_ConstrainedFeasibility;
+    procedure Test38_AutomaticDerivativeOptimizer;
+    procedure Test39_MultiobjectiveOutcomes;
+    procedure Test40_SimplexPhaseOneFindsFeasibleBasis;
+    procedure Test41_SimplexPhaseOneReportsInfeasible;
+    procedure Test42_LegacyOptimizersPopulateDiagnostics;
 
   end;
 
@@ -228,6 +241,22 @@ function WrongSizeGradient(const X: TDoubleArray): TDoubleArray;
 begin
   Result := TDoubleArray.Create(1.0);
 end;
+
+function QuadraticBowlDual(const X:TDualArray):TDual;
+begin
+  Result:=(X[0]-2)*(X[0]-2)+(X[1]+1)*(X[1]+1);
+end;
+
+function Constraint1Grad(const X:TDoubleArray):TDoubleArray;
+begin
+  Result:=TDoubleArray.Create(1,1);
+end;
+
+function ParetoLeft(const X:TDoubleArray):Double;
+begin Result:=Sqr(X[0]); end;
+
+function ParetoRight(const X:TDoubleArray):Double;
+begin Result:=Sqr(X[0]-2); end;
 
 { ---------------------------------------------------------------------------
   Test class helpers
@@ -620,6 +649,192 @@ begin
   except
     on E: EOptimizationError do { expected };
   end;
+end;
+
+procedure TTestOptimizationLib.Test35_DetailedSmoothOptimizers;
+var
+  O:TOptimizationOptions;
+  R:TOptResult;
+begin
+  O:=TOptimizationOptions.Defaults;
+  O.MaxIterations:=500;
+  R:=TOptimizationKit.NonlinearConjugateGradient(@QuadraticBowl,
+    @QuadraticBowlGrad,TDoubleArray.Create(-4,5),O);
+  AssertEquals('nonlinear CG status',Ord(isConverged),Ord(R.Status));
+  AssertNear(2,R.X[0],1E-6,'nonlinear CG x');
+  AssertNear(-1,R.X[1],1E-6,'nonlinear CG y');
+  AssertTrue('nonlinear CG evaluations',R.Evaluations>0);
+  AssertTrue('nonlinear CG owns best point',Length(R.BestX)=2);
+  R:=TOptimizationKit.TrustRegion(@QuadraticBowl,@QuadraticBowlGrad,
+    TDoubleArray.Create(-4,5),O);
+  AssertEquals('trust-region status',Ord(isConverged),Ord(R.Status));
+  AssertNear(2,R.X[0],1E-5,'trust-region x');
+  AssertNear(-1,R.X[1],1E-5,'trust-region y');
+end;
+
+procedure TTestOptimizationLib.Test36_BoundedAndMultistart;
+var
+  O:TOptimizationOptions;
+  R:TOptResult;
+  Starts:TObjectiveMatrix;
+begin
+  O:=TOptimizationOptions.Defaults;
+  O.LowerBounds:=TDoubleArray.Create(0,-2);
+  O.UpperBounds:=TDoubleArray.Create(1,-0.5);
+  R:=TOptimizationKit.BoundedLBFGS(@QuadraticBowl,@QuadraticBowlGrad,
+    TDoubleArray.Create(-4,5),O);
+  AssertEquals('bounded L-BFGS status',Ord(isConverged),Ord(R.Status));
+  AssertNear(1,R.X[0],1E-7,'bounded L-BFGS active bound');
+  AssertNear(-1,R.X[1],1E-7,'bounded L-BFGS free variable');
+  O:=TOptimizationOptions.Defaults;
+  O.StartCount:=4;
+  SetLength(Starts,2);
+  Starts[0]:=TDoubleArray.Create(-2);
+  Starts[1]:=TDoubleArray.Create(2);
+  R:=TOptimizationKit.MultiStart(@DoubleWell,nil,Starts,O);
+  AssertTrue('multistart usable',
+    R.Status in [isConverged,isAcceptableLimit]);
+  AssertNear(0,R.FVal,1E-8,'multistart best objective');
+  AssertNear(1,Abs(R.X[0]),1E-5,'multistart well');
+end;
+
+procedure TTestOptimizationLib.Test37_ConstrainedFeasibility;
+var
+  O:TOptimizationOptions;
+  C:TSmoothConstraints;
+  R:TOptResult;
+begin
+  O:=TOptimizationOptions.Defaults;
+  O.MaxIterations:=1000;
+  O.GradientTolerance:=1E-6;
+  SetLength(C,1);
+  C[0].Value:=@Constraint1;
+  C[0].Gradient:=@Constraint1Grad;
+  C[0].Kind:=ckInequality;
+  C[0].Tolerance:=1E-7;
+  R:=TOptimizationKit.SolveConstrained(@ObjFn,nil,C,
+    TDoubleArray.Create(0,0),O);
+  AssertTrue(Format('constrained solver usable: status=%s x=(%.6g,%.6g) feasibility=%.6g',
+    [IterationStatusName(R.Status),R.X[0],R.X[1],R.ConstraintViolation]),
+    R.Status in [isConverged,isAcceptableLimit]);
+  AssertTrue('constrained feasibility',R.ConstraintViolation<=1E-5);
+  AssertNear(3,R.X[0],2E-3,'constrained x');
+  AssertNear(3,R.X[1],2E-3,'constrained y');
+end;
+
+procedure TTestOptimizationLib.Test38_AutomaticDerivativeOptimizer;
+var
+  O:TOptimizationOptions;
+  R:TOptResult;
+begin
+  O:=TOptimizationOptions.Defaults;
+  R:=TOptimizationKit.LBFGSAuto(@QuadraticBowlDual,
+    TDoubleArray.Create(-4,5),O);
+  AssertEquals('automatic L-BFGS status',Ord(isConverged),Ord(R.Status));
+  AssertNear(2,R.X[0],1E-7,'automatic L-BFGS x');
+  AssertNear(-1,R.X[1],1E-7,'automatic L-BFGS y');
+end;
+
+procedure TTestOptimizationLib.Test39_MultiobjectiveOutcomes;
+var
+  O:TOptimizationOptions;
+  Objectives:TMultivarFunctions;
+  Initial,Weights:TObjectiveMatrix;
+  R:TMultiObjectiveResult;
+  I:Integer;
+begin
+  O:=TOptimizationOptions.Defaults;
+  SetLength(Objectives,2);
+  Objectives[0]:=@ParetoLeft;
+  Objectives[1]:=@ParetoRight;
+  SetLength(Initial,1);
+  Initial[0]:=TDoubleArray.Create(1);
+  SetLength(Weights,3);
+  Weights[0]:=TDoubleArray.Create(1,0);
+  Weights[1]:=TDoubleArray.Create(0.5,0.5);
+  Weights[2]:=TDoubleArray.Create(0,1);
+  R:=TOptimizationKit.ExplorePareto(Objectives,Initial,Weights,O);
+  AssertTrue('Pareto status usable',
+    R.Status in [isConverged,isAcceptableLimit]);
+  AssertEquals('three nondominated weighted points',3,Length(R.Points));
+  for I:=0 to High(R.Points) do
+    AssertTrue('Pareto point lies between extremes',
+      (R.Points[I].X[0]>=-1E-5) and (R.Points[I].X[0]<=2+1E-5));
+end;
+
+procedure TTestOptimizationLib.Test40_SimplexPhaseOneFindsFeasibleBasis;
+{ min x subject to 1 <= x <= 2.  The negative right-hand side requires
+  phase I because the all-slack starting point is not feasible. }
+var
+  R:TLPResult;
+begin
+  R:=TOptimizationKit.SimplexLP(
+    TDoubleArray.Create(1),
+    [TDoubleArray.Create(-1),TDoubleArray.Create(1)],
+    TDoubleArray.Create(-1,2));
+  AssertEquals('phase-I feasible status',Ord(lpsOptimal),Ord(R.Status));
+  AssertTrue('phase-I result feasible',R.Feasible);
+  AssertNear(1,R.X[0],1E-9,'phase-I lower-bound solution');
+  AssertNear(1,R.ObjVal,1E-9,'phase-I objective');
+end;
+
+procedure TTestOptimizationLib.Test41_SimplexPhaseOneReportsInfeasible;
+{ x <= 0 and x >= 1 cannot both hold. }
+var
+  R:TLPResult;
+begin
+  R:=TOptimizationKit.SimplexLP(
+    TDoubleArray.Create(1),
+    [TDoubleArray.Create(1),TDoubleArray.Create(-1)],
+    TDoubleArray.Create(0,-1));
+  AssertEquals('phase-I infeasible status',Ord(lpsInfeasible),Ord(R.Status));
+  AssertFalse('infeasible result is not feasible',R.Feasible);
+end;
+
+procedure TTestOptimizationLib.Test42_LegacyOptimizersPopulateDiagnostics;
+var
+  R:TOptResult;
+  O:TOptimizationOptions;
+  Workspace:TOptimizationWorkspace;
+  FirstEvaluations:Integer;
+begin
+  R:=TOptimizationKit.GradientDescent(@QuadraticBowl,@QuadraticBowlGrad,
+    TDoubleArray.Create(-4,5),0.1,1E-6,500);
+  AssertTrue('gradient-descent evaluations',R.Evaluations>0);
+  AssertEquals('gradient-descent best point dimension',2,Length(R.BestX));
+  AssertTrue('gradient-descent best no worse than final',
+    R.BestFVal<=R.FVal+1E-12);
+
+  R:=TOptimizationKit.Adam(@QuadraticBowl,@QuadraticBowlGrad,
+    TDoubleArray.Create(-4,5),0.05,0.9,0.999,1E-8,1E-5,2000);
+  AssertTrue('Adam evaluations',R.Evaluations>0);
+  AssertEquals('Adam best point dimension',2,Length(R.BestX));
+
+  R:=TOptimizationKit.NelderMead(@QuadraticBowl,
+    TDoubleArray.Create(-4,5));
+  AssertTrue('Nelder-Mead evaluations',R.Evaluations>0);
+  AssertNear(R.FVal,R.BestFVal,0,'Nelder-Mead best objective');
+
+  R:=TOptimizationKit.SimulatedAnnealing(@DoubleWell,
+    TDoubleArray.Create(0),10,1E-3,0.99,0.1,2000,42);
+  AssertTrue('annealing evaluations',R.Evaluations>0);
+  AssertNear(R.FVal,R.BestFVal,0,'annealing best objective');
+
+  Workspace:=Default(TOptimizationWorkspace);
+  O:=TOptimizationOptions.Defaults;
+  R:=TOptimizationKit.BoundedLBFGSWithWorkspace(@QuadraticBowl,
+    @QuadraticBowlGrad,TDoubleArray.Create(-4,5),O,Workspace);
+  FirstEvaluations:=R.Evaluations;
+  R:=TOptimizationKit.BoundedLBFGSWithWorkspace(@QuadraticBowl,
+    @QuadraticBowlGrad,TDoubleArray.Create(100,100),O,Workspace);
+  AssertEquals('workspace run count',2,Workspace.Runs);
+  AssertEquals('workspace cumulative evaluations',
+    Int64(FirstEvaluations+R.Evaluations),Workspace.TotalEvaluations);
+  AssertNear(2,Workspace.WarmStartX[0],1E-7,'workspace warm-start x');
+  AssertNear(-1,Workspace.WarmStartX[1],1E-7,'workspace warm-start y');
+  Workspace.Clear;
+  AssertEquals('workspace clear point',0,Length(Workspace.WarmStartX));
+  AssertEquals('workspace clear runs',0,Workspace.Runs);
 end;
 
 initialization

@@ -28,6 +28,7 @@ uses
   , TestTimeSeriesLib
   , TestMLLib
   , TestGeometryLib
+  , TestAppliedNumerics
   , TestPublicAPI;
 
 type

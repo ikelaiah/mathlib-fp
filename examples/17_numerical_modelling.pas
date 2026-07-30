@@ -23,8 +23,21 @@ begin Result:=TDoubleArray.Create(Y[0]); end;
 function ReachTwo(T:Double;const Y:TDoubleArray):Double;
 begin Result:=Y[0]-2; end;
 
+function RankDeficientBasis(X:Double; BasisIndex:Integer):Double;
+begin
+  if BasisIndex in [0,1] then Result:=1
+  else Result:=X;
+end;
+
+function ScaledResidual(const P:TDoubleArray):TDoubleArray;
+begin
+  Result:=TDoubleArray.Create(
+    P[0]/1E6+P[1]*1E6-5,
+    P[0]/1E6-P[1]*1E6+1);
+end;
+
 var
-  Fit:TFitResult;
+  Fit,RankDeficientFit,ScaledFit:TFitResult;
   FitOptions:TNonlinearFitOptions;
   ODEOptions:TAdaptiveODEOptions;
   Solution:TAdaptiveODESolution;
@@ -45,6 +58,26 @@ begin
     ', amplitude=',Fit.Parameters[0]:0:5,
     ', rate=',Fit.Parameters[1]:0:5,
     ', RSS=',Fit.ResidualSumSquares:0:6);
+
+  RankDeficientFit:=TModellingKit.FitLinearBasis(
+    TDoubleArray.Create(0,1,2,3),
+    TDoubleArray.Create(1.02,2.96,5.05,6.98),
+    3,@RankDeficientBasis,
+    TDoubleArray.Create(1,2,2,1));
+  WriteLn('weighted rank-deficient fit: rank=',RankDeficientFit.Rank,
+    ', covariance entries=',Length(RankDeficientFit.Covariance),
+    ', status=',IterationStatusName(RankDeficientFit.Status));
+
+  FitOptions:=TNonlinearFitOptions.Defaults;
+  FitOptions.LowerBounds:=TDoubleArray.Create(0,0);
+  FitOptions.UpperBounds:=TDoubleArray.Create(4E6,10E-6);
+  FitOptions.ParameterScales:=TDoubleArray.Create(1E6,1E-6);
+  ScaledFit:=TModellingKit.FitNonlinear(@ScaledResidual,nil,
+    TDoubleArray.Create(1E5,0.1E-6),FitOptions);
+  WriteLn('badly-scaled bounded fit: ',
+    IterationStatusName(ScaledFit.Status),
+    ', p0=',ScaledFit.Parameters[0]:0:1,
+    ', p1=',ScaledFit.Parameters[1]:0:9);
 
   ODEOptions:=TAdaptiveODEOptions.Defaults;
   ODEOptions.Event:=@ReachTwo;

@@ -13,11 +13,35 @@ Depends on: **MathBase**
 | `EngineeringLib.FluidDynamics` | [EngineeringLib.FluidDynamics.pas](../src/EngineeringLib.FluidDynamics.pas) | `TFluidDynamicsKit` — core implementation |
 | `EngineeringLib.Thermodynamics` | [EngineeringLib.Thermodynamics.pas](../src/EngineeringLib.Thermodynamics.pas) | `TThermodynamicsKit` |
 | `EngineeringLib.Signal` | [EngineeringLib.Signal.pas](../src/EngineeringLib.Signal.pas) | `TSignalKit` |
+| `EngineeringLib.DSP` | [EngineeringLib.DSP.pas](../src/EngineeringLib.DSP.pas) | `TDSPKit`, `TOverlapAddConvolver`, `TOverlapSaveConvolver`, `TStreamingFIR`, `TStreamingBiquad` |
 | `EngineeringLib.UnitConversion` | [EngineeringLib.UnitConversion.pas](../src/EngineeringLib.UnitConversion.pas) | `TUnitConversionKit` |
 | `EngineeringLib.Velocity` | [EngineeringLib.Velocity.pas](../src/EngineeringLib.Velocity.pas) | Alias → `TVelocityKit = TFluidDynamicsKit` |
 | `EngineeringLib.Pressure` | [EngineeringLib.Pressure.pas](../src/EngineeringLib.Pressure.pas) | Alias → `TPressureKit = TFluidDynamicsKit` |
 
 ---
+
+## Applied DSP in 1.8
+
+`EngineeringLib.DSP` adds arbitrary-length, batched, and 2-D FFTs, explicit
+normalisation, direct/FFT and overlap-add/save convolution, rational
+resampling, spectral estimation, analytic/cross spectra, an orthonormal Haar
+transform, and bounded-state FIR/biquad processing.
+Selection, accuracy, ownership, and state-size contracts are in the
+[applied numerics guide](AppliedNumerics.md).
+
+| Workflow | Stable entry point | State/output convention |
+| --- | --- | --- |
+| Independent same-or-mixed length FFT jobs | `TDSPKit.TransformBatch` | One owned spectrum per input; no shared transform state |
+| Finite block convolution | `TOverlapAddConvolver.ProcessBlock` then `Flush` | Block outputs followed by exactly the pending tail |
+| Continuous block convolution | `TOverlapSaveConvolver.ProcessBlock` | Output length equals input block length; history is taps minus one |
+| Dyadic Haar analysis/synthesis | `TDSPKit.HaarTransform(Input, Inverse)` | Orthonormal scaling; power-of-two length |
+| Ordinary causal FIR | `TStreamingFIR.ProcessBlock` | Coefficient snapshot plus taps-minus-one history |
+
+All stateful processors validate an entire block before committing state.
+Independent record instances are reentrant; concurrent mutation of one record
+requires caller synchronization. The portable serial direct and FFT paths are
+the stable oracle. Equiripple and Chebyshev/elliptic/Bessel design, wavelet
+packets, and parallel/SIMD dispatch remain outside 1.8.
 
 ## Exception Hierarchy
 

@@ -29,7 +29,7 @@ QP and cone-constrained workflows.
 | Model | Entry point | Assumptions and scale |
 | --- | --- | --- |
 | Scalar/unconstrained/non-smooth local objective | `TOptimizationKit` | Existing compatibility API |
-| Small standard-form LP with non-negative right sides | `SimplexLP` | Tableau simplex; inspect `TLPResult.Status` |
+| Small `Ax <= b`, `x >= 0` LP | `SimplexLP` | Two-phase tableau; inspect infeasible/unbounded/limit status |
 | Dense convex quadratic with box/linear constraints | `SolveQuadraticProgram` | Symmetric positive-semidefinite `Q`; small/medium dense models |
 | Dense affine second-order cones | `SolveSecondOrderConeProgram` | Strictly feasible initial point; small/medium dense models |
 
@@ -65,9 +65,19 @@ tolerances plus an iteration limit. `TConvexProgress` can cancel a solve.
 
 `TConvexResult` owns `X` and reports `Objective`, projected/barrier
 `GradientNorm`, maximum `Feasibility` violation, `Iterations`, `Evaluations`,
-and `TIterationStatus`. `isAcceptableLimit` means a feasible barrier point met
-the documented duality-gap scale even if the inner line search could not make
-another representable step.
+and `TIterationStatus`. `BestX`/`BestObjective` preserve the best finite
+feasible iterate seen. `Certificate` contains a checked recession direction
+when an unconstrained convex QP is classified `isUnbounded`; it is otherwise
+empty. `isAcceptableLimit` means a feasible barrier point met the documented
+duality-gap scale even if the inner line search could not make another
+representable step.
+
+The QP feasibility phase reports `isInfeasible` with a positive feasibility
+residual when the supplied dense box/linear constraints cannot be reconciled
+within the configured budget. That status is diagnostic evidence, not a
+general Farkas certificate. The recession certificate is deliberately limited
+to the unconstrained convex quadratic case, where the returned direction is
+checked against `Q` and `C`.
 
 ## Errors, ownership, and limitations
 
@@ -80,8 +90,11 @@ Calls are thread-safe unless the caller concurrently mutates the same input
 arrays or callback state.
 
 Complexity is O(n³) for convexity/equality checks and O(iterations × constraints
-× n) or more for projections/barrier evaluations. The 1.7 stable boundary is
+× n) or more for projections/barrier evaluations. The 1.8 stable boundary is
 dense continuous convex QP and affine SOCP. Sparse constraints, semidefinite
-programming, general non-convex QP, integer/mixed-integer optimisation, and
-infeasibility certificates for arbitrary cones are not claimed.
+programming, quadratic constraints outside the documented affine cones,
+general non-convex QP, integer/mixed-integer optimisation, and infeasibility
+certificates for arbitrary cones are not claimed. The roadmap's interior-point
+LP/scaling family remains conditional because no separately qualified
+interior-point implementation is shipped.
 

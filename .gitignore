@@ -47,6 +47,10 @@
 lib/
 backup/
 example-bin/
+build-temp/
+
+# Lazarus package metadata generated during local package builds
+/packagefiles.xml
 
 # -----------------------------------------------------------------------------
 # Test runner artefacts

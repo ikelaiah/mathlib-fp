@@ -20,6 +20,13 @@ uses
   SysUtils, Math, MathBase.Complex, AlgebraLib.DenseMatrices;
 
 type
+  TDenseMultiplyPath = (dmpPortable, dmpBlocked);
+
+const
+  DENSE_MULTIPLY_BLOCK_SIZE = 32;
+  DENSE_MULTIPLY_AUTO_THRESHOLD = 131072;
+
+type
   TSingleUnaryKernel = function(const Value: Single): Single;
   TDoubleUnaryKernel = function(const Value: Double): Double;
   TSingleComplexUnaryKernel = function(
@@ -161,6 +168,28 @@ procedure MultiplyInto(const A, B, Destination: IDenseDoubleMatrix); overload;
 procedure MultiplyInto(const A, B, Destination:
   IDenseSingleComplexMatrix); overload;
 procedure MultiplyInto(const A, B, Destination: IDenseComplexMatrix); overload;
+procedure MultiplyBlockedInto(const A, B, Destination:
+  IDenseSingleMatrix; const BlockSize: SizeInt =
+  DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyBlockedInto(const A, B, Destination:
+  IDenseDoubleMatrix; const BlockSize: SizeInt =
+  DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyBlockedInto(const A, B, Destination:
+  IDenseSingleComplexMatrix; const BlockSize: SizeInt =
+  DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyBlockedInto(const A, B, Destination:
+  IDenseComplexMatrix; const BlockSize: SizeInt =
+  DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyAutoInto(const A, B, Destination:
+  IDenseSingleMatrix); overload;
+procedure MultiplyAutoInto(const A, B, Destination:
+  IDenseDoubleMatrix); overload;
+procedure MultiplyAutoInto(const A, B, Destination:
+  IDenseSingleComplexMatrix); overload;
+procedure MultiplyAutoInto(const A, B, Destination:
+  IDenseComplexMatrix); overload;
+function SelectedMultiplyPath(const Rows, InnerDimension,
+  Columns: SizeInt): TDenseMultiplyPath;
 
 function Dot(const A, B: IDenseSingleMatrix): Single; overload;
 function Dot(const A, B: IDenseDoubleMatrix): Double; overload;
@@ -1139,6 +1168,312 @@ begin
     Result := A[0, Index]
   else
     Result := A[Index, 0];
+end;
+
+function SelectedMultiplyPath(const Rows, InnerDimension,
+  Columns: SizeInt): TDenseMultiplyPath;
+var
+  Operations: QWord;
+begin
+  if (Rows < 0) or (InnerDimension < 0) or (Columns < 0) then
+    raise EDenseMatrixError.Create(
+      'SelectedMultiplyPath: dimensions must be non-negative.');
+  if (Rows = 0) or (InnerDimension = 0) or (Columns = 0) then
+    Exit(dmpPortable);
+  if QWord(Rows) > High(QWord) div QWord(InnerDimension) then
+    Exit(dmpBlocked);
+  Operations := QWord(Rows) * QWord(InnerDimension);
+  if Operations > High(QWord) div QWord(Columns) then
+    Exit(dmpBlocked);
+  Operations := Operations * QWord(Columns);
+  if Operations >= DENSE_MULTIPLY_AUTO_THRESHOLD then
+    Result := dmpBlocked
+  else
+    Result := dmpPortable;
+end;
+
+procedure RequirePositiveBlockSize(const BlockSize: SizeInt;
+  const Operation: string);
+begin
+  if BlockSize <= 0 then
+    raise EDenseMatrixError.Create(Operation +
+      ': BlockSize must be positive.');
+end;
+
+procedure MultiplyBlockedInto(const A, B, Destination: IDenseDoubleMatrix;
+  const BlockSize: SizeInt);
+var
+  Work: IDenseDoubleMatrix;
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Sum, Correction: Double;
+begin
+  RequirePositiveBlockSize(BlockSize, 'MultiplyBlockedInto(double)');
+  RequireFinite(A, 'MultiplyBlockedInto(double)');
+  RequireFinite(B, 'MultiplyBlockedInto(double)');
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      'MultiplyBlockedInto(double): inner dimensions must match; got %d x %d and %d x %d.',
+      [A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<Double>(Destination, A.Rows, B.Cols,
+    'MultiplyBlockedInto(double)');
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Work := TDenseDoubleMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Work := Destination;
+
+  IBlock := 0;
+  while IBlock < A.Rows do
+  begin
+    IEnd := IBlock + BlockSize;
+    if IEnd > A.Rows then IEnd := A.Rows;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      JEnd := JBlock + BlockSize;
+      if JEnd > B.Cols then JEnd := B.Cols;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          Sum := 0.0;
+          Correction := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            KEnd := KBlock + BlockSize;
+            if KEnd > A.Cols then KEnd := A.Cols;
+            for K := KBlock to KEnd - 1 do
+              AddCompensated(A[I, K] * B[K, J], Sum, Correction);
+            KBlock := KEnd;
+          end;
+          Work[I, J] := Sum + Correction;
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+  if Work <> Destination then
+    specialize CopyMatrix<Double>(Work, Destination);
+end;
+
+procedure MultiplyBlockedInto(const A, B, Destination: IDenseSingleMatrix;
+  const BlockSize: SizeInt);
+var
+  Work: IDenseSingleMatrix;
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Sum, Correction: Double;
+begin
+  RequirePositiveBlockSize(BlockSize, 'MultiplyBlockedInto(single)');
+  RequireFinite(A, 'MultiplyBlockedInto(single)');
+  RequireFinite(B, 'MultiplyBlockedInto(single)');
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      'MultiplyBlockedInto(single): inner dimensions must match; got %d x %d and %d x %d.',
+      [A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<Single>(Destination, A.Rows, B.Cols,
+    'MultiplyBlockedInto(single)');
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Work := TDenseSingleMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Work := Destination;
+
+  IBlock := 0;
+  while IBlock < A.Rows do
+  begin
+    IEnd := IBlock + BlockSize;
+    if IEnd > A.Rows then IEnd := A.Rows;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      JEnd := JBlock + BlockSize;
+      if JEnd > B.Cols then JEnd := B.Cols;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          Sum := 0.0;
+          Correction := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            KEnd := KBlock + BlockSize;
+            if KEnd > A.Cols then KEnd := A.Cols;
+            for K := KBlock to KEnd - 1 do
+              AddCompensated(Double(A[I, K]) * Double(B[K, J]),
+                Sum, Correction);
+            KBlock := KEnd;
+          end;
+          Work[I, J] := Single(Sum + Correction);
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+  if Work <> Destination then
+    specialize CopyMatrix<Single>(Work, Destination);
+end;
+
+procedure MultiplyBlockedInto(const A, B, Destination:
+  IDenseSingleComplexMatrix; const BlockSize: SizeInt);
+var
+  Work: IDenseSingleComplexMatrix;
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Product: TSingleComplex;
+  SumRe, SumIm, CorrectionRe, CorrectionIm: Double;
+begin
+  RequirePositiveBlockSize(BlockSize,
+    'MultiplyBlockedInto(single complex)');
+  RequireFinite(A, 'MultiplyBlockedInto(single complex)');
+  RequireFinite(B, 'MultiplyBlockedInto(single complex)');
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      'MultiplyBlockedInto(single complex): inner dimensions must match; got %d x %d and %d x %d.',
+      [A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<TSingleComplex>(Destination,
+    A.Rows, B.Cols, 'MultiplyBlockedInto(single complex)');
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Work := TDenseSingleComplexMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Work := Destination;
+
+  IBlock := 0;
+  while IBlock < A.Rows do
+  begin
+    IEnd := IBlock + BlockSize;
+    if IEnd > A.Rows then IEnd := A.Rows;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      JEnd := JBlock + BlockSize;
+      if JEnd > B.Cols then JEnd := B.Cols;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          SumRe := 0.0; SumIm := 0.0;
+          CorrectionRe := 0.0; CorrectionIm := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            KEnd := KBlock + BlockSize;
+            if KEnd > A.Cols then KEnd := A.Cols;
+            for K := KBlock to KEnd - 1 do
+            begin
+              Product := A[I, K] * B[K, J];
+              AddCompensated(Product.Re, SumRe, CorrectionRe);
+              AddCompensated(Product.Im, SumIm, CorrectionIm);
+            end;
+            KBlock := KEnd;
+          end;
+          Work[I, J] := TSingleComplex.Create(
+            SumRe + CorrectionRe, SumIm + CorrectionIm);
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+  if Work <> Destination then
+    specialize CopyMatrix<TSingleComplex>(Work, Destination);
+end;
+
+procedure MultiplyBlockedInto(const A, B, Destination:
+  IDenseComplexMatrix; const BlockSize: SizeInt);
+var
+  Work: IDenseComplexMatrix;
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Product: TComplex;
+  SumRe, SumIm, CorrectionRe, CorrectionIm: Double;
+begin
+  RequirePositiveBlockSize(BlockSize, 'MultiplyBlockedInto(complex)');
+  RequireFinite(A, 'MultiplyBlockedInto(complex)');
+  RequireFinite(B, 'MultiplyBlockedInto(complex)');
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      'MultiplyBlockedInto(complex): inner dimensions must match; got %d x %d and %d x %d.',
+      [A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<TComplex>(Destination, A.Rows, B.Cols,
+    'MultiplyBlockedInto(complex)');
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Work := TDenseComplexMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Work := Destination;
+
+  IBlock := 0;
+  while IBlock < A.Rows do
+  begin
+    IEnd := IBlock + BlockSize;
+    if IEnd > A.Rows then IEnd := A.Rows;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      JEnd := JBlock + BlockSize;
+      if JEnd > B.Cols then JEnd := B.Cols;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          SumRe := 0.0; SumIm := 0.0;
+          CorrectionRe := 0.0; CorrectionIm := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            KEnd := KBlock + BlockSize;
+            if KEnd > A.Cols then KEnd := A.Cols;
+            for K := KBlock to KEnd - 1 do
+            begin
+              Product := A[I, K] * B[K, J];
+              AddCompensated(Product.Re, SumRe, CorrectionRe);
+              AddCompensated(Product.Im, SumIm, CorrectionIm);
+            end;
+            KBlock := KEnd;
+          end;
+          Work[I, J] := TComplex.Create(
+            SumRe + CorrectionRe, SumIm + CorrectionIm);
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+  if Work <> Destination then
+    specialize CopyMatrix<TComplex>(Work, Destination);
+end;
+
+procedure MultiplyAutoInto(const A, B, Destination: IDenseDoubleMatrix);
+begin
+  RequireAssigned((A <> nil) and (B <> nil), 'MultiplyAutoInto(double)');
+  if SelectedMultiplyPath(A.Rows, A.Cols, B.Cols) = dmpBlocked then
+    MultiplyBlockedInto(A, B, Destination)
+  else
+    MultiplyInto(A, B, Destination);
+end;
+
+procedure MultiplyAutoInto(const A, B, Destination: IDenseSingleMatrix);
+begin
+  RequireAssigned((A <> nil) and (B <> nil), 'MultiplyAutoInto(single)');
+  if SelectedMultiplyPath(A.Rows, A.Cols, B.Cols) = dmpBlocked then
+    MultiplyBlockedInto(A, B, Destination)
+  else
+    MultiplyInto(A, B, Destination);
+end;
+
+procedure MultiplyAutoInto(const A, B, Destination:
+  IDenseSingleComplexMatrix);
+begin
+  RequireAssigned((A <> nil) and (B <> nil),
+    'MultiplyAutoInto(single complex)');
+  if SelectedMultiplyPath(A.Rows, A.Cols, B.Cols) = dmpBlocked then
+    MultiplyBlockedInto(A, B, Destination)
+  else
+    MultiplyInto(A, B, Destination);
+end;
+
+procedure MultiplyAutoInto(const A, B, Destination: IDenseComplexMatrix);
+begin
+  RequireAssigned((A <> nil) and (B <> nil), 'MultiplyAutoInto(complex)');
+  if SelectedMultiplyPath(A.Rows, A.Cols, B.Cols) = dmpBlocked then
+    MultiplyBlockedInto(A, B, Destination)
+  else
+    MultiplyInto(A, B, Destination);
 end;
 
 procedure MultiplyInto(const A, B, Destination: IDenseDoubleMatrix);

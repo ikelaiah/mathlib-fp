@@ -2,6 +2,52 @@
 
 `MLLib.MachineLearning` — machine learning primitives for Free Pascal.
 
+`MLLib.Analysis` adds typed-dense PCA, seeded k-means++, deterministic
+validation splits, fitted standardization, binary LDA, hierarchical
+clustering, reproducible decision forests, and an exact low-dimensional
+`TKDTree`. Rows are observations and columns are features. See the
+[applied numerics guide](AppliedNumerics.md) for stable 1.8 contracts and
+explicitly open data-science families.
+
+## Typed analysis additions in 1.8
+
+Use `TAnalysisKit.FitStandardization` only on training rows, then apply the
+returned `TStandardizationModel` to training, validation, and test matrices
+with `TransformStandardized`. Constant columns receive a safe unit scale.
+The model owns its means and scales; transforms return new dense matrices.
+This explicit fit/transform split prevents validation leakage.
+
+`HierarchicalCluster(Data, Linkage)` supports `hlSingle`, `hlComplete`, and
+`hlAverage`. It returns the two merged cluster IDs, merge distances, and
+cluster sizes for each of `N-1` deterministic merges. `CutHierarchy` converts
+that tree to exactly the requested number of flat clusters. The portable
+baseline stores pairwise distances and is intended for in-memory data; its
+worst-case merge search is cubic in the row count.
+
+Choose a forest entry point by target:
+
+| Target | Train | Predict | OOB metric |
+| --- | --- | --- | --- |
+| Non-negative integer class | `FitClassificationForest` | `PredictForestClasses` | accuracy |
+| Finite real value | `FitRegressionForest` | `PredictForestValues` | R-squared |
+
+Forests use a caller-selected seed, bootstrap rows, and a deterministic
+feature-subset/split rule. `TDecisionForest.FeatureImportances` contains
+normalized total impurity reduction and `OOBScore` uses only rows that received
+at least one out-of-bag prediction. For a small tree count, not every row is
+guaranteed an OOB prediction. Impurity importance can favour continuous or
+high-cardinality inputs and is not a causal measure. Models own all tree
+nodes and do not retain the training matrix.
+
+The inspectable tree layout uses `TForestTask`, `TDecisionTreeNode`,
+`TDecisionTreeNodes`, `TDecisionTreeModel`, and `TDecisionTrees`; nodes record
+their split feature/threshold, child indexes, leaf flag, and prediction.
+
+All typed-analysis additions reject nil/empty, non-finite, or shape-inconsistent
+input with `EAnalysisError`. They are dense, serial, in-memory baselines.
+Multiclass LDA, gradient boosting, survival forests, factor analysis, and
+distributed training are not part of 1.8.
+
 ---
 
 ## Quick Start

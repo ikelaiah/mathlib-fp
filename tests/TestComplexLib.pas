@@ -125,7 +125,7 @@ end;
 
 procedure TTestComplexFoundation.Test04_ComplexTrigonometry;
 var
-  IUnit: TComplex;
+  IUnit, Z: TComplex;
 begin
   IUnit := TComplex.ImaginaryUnit;
   AssertComplexNear(TComplex.Create(0.0, Sinh(1.0)), CSin(IUnit), 1E-15,
@@ -134,6 +134,9 @@ begin
     'cos(i)');
   AssertComplexNear(TComplex.Create(0.0, Tanh(1.0)), CTan(IUnit), 1E-15,
     'tan(i)');
+  Z := CSin(TComplex.Create(0.4, 1E-20));
+  AssertEquals('small imaginary perturbation',
+    Cos(0.4) * 1E-20, Z.Im, 1E-34);
 end;
 
 procedure TTestComplexFoundation.Test05_ComplexDivisionExtremeScales;

@@ -574,16 +574,33 @@ begin
   Result := CPow(Base, TComplex.Create(Exponent, 0.0));
 end;
 
+function StableSinh(const X: Double): Double; inline;
+var
+  X2: Double;
+begin
+  { Some RTL targets evaluate sinh as a subtraction of exponentials.  The
+    short odd series preserves the imaginary perturbations used by explicit
+    complex-step differentiation. }
+  if Abs(X) < 1E-4 then
+  begin
+    X2 := X * X;
+    Result := X * (1.0 + X2 * (1.0 / 6.0 +
+      X2 * (1.0 / 120.0 + X2 / 5040.0)));
+  end
+  else
+    Result := Sinh(X);
+end;
+
 function CSin(const Z: TComplex): TComplex;
 begin
   Result := TComplex.Create(Sin(Z.Re) * Cosh(Z.Im),
-    Cos(Z.Re) * Sinh(Z.Im));
+    Cos(Z.Re) * StableSinh(Z.Im));
 end;
 
 function CCos(const Z: TComplex): TComplex;
 begin
   Result := TComplex.Create(Cos(Z.Re) * Cosh(Z.Im),
-    -Sin(Z.Re) * Sinh(Z.Im));
+    -Sin(Z.Re) * StableSinh(Z.Im));
 end;
 
 function CTan(const Z: TComplex): TComplex;
@@ -593,14 +610,14 @@ end;
 
 function CSinh(const Z: TComplex): TComplex;
 begin
-  Result := TComplex.Create(Sinh(Z.Re) * Cos(Z.Im),
+  Result := TComplex.Create(StableSinh(Z.Re) * Cos(Z.Im),
     Cosh(Z.Re) * Sin(Z.Im));
 end;
 
 function CCosh(const Z: TComplex): TComplex;
 begin
   Result := TComplex.Create(Cosh(Z.Re) * Cos(Z.Im),
-    Sinh(Z.Re) * Sin(Z.Im));
+    StableSinh(Z.Re) * Sin(Z.Im));
 end;
 
 function CTanh(const Z: TComplex): TComplex;

@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-07-30
+
+### Added
+
+- Explicit local xoshiro256** random state and constant-memory mergeable
+  online statistics, with replay, split-stream, and bounded-state tests.
+- Arbitrary-length/single/batched/2-D FFTs, direct/FFT/overlap convolution,
+  correlation, rational resampling, spectra, analytic signals, Haar transform,
+  and bounded block/FIR/biquad processing.
+- Paired distribution APIs, parameter estimates, common inference/effect/
+  correction results, SVD OLS diagnostics, and separation-aware binary
+  logistic regression.
+- Typed-dense PCA, seeded k-means++, hierarchy, fitted standardization,
+  deterministic splits, binary LDA, seeded classification/regression forests,
+  an exact low-dimensional KD tree, and scalar/multivariate Kalman filtering.
+- Invariant text, delimited text, a dense Matrix Market subset, and
+  versioned checksummed little-endian numerical and random-state persistence.
+- Versioned selected-model adapters, typed metadata/complex summaries, and a
+  resource-bounded scalar/vector/matrix expression evaluator.
+- Audited 1.7 gap closure: classical spline boundaries, explicit complex-step
+  and vector AD, cubature/local-RNG Monte Carlo, scaled/covariance-aware
+  fitting, complex polynomial roots, component ODE tolerances, detailed
+  optimization/workspaces, two-phase simplex, and QP outcome certificates.
+- Deterministic serial blocked and automatic typed dense multiplication using
+  the portable kernels as cross-path correctness oracles.
+- Cross-domain and interchange/replay examples, capability records, release
+  notes, benchmark comparison, and qualification evidence.
+
+### Fixed
+
+- Made simultaneous complex polynomial-root initialization
+  non-conjugate-symmetric, removing a platform-rounding-dependent Win32
+  convergence failure.
+
+### Validation
+
+- Release-qualified on 2026-07-30 with 899 passing tests under Win64 normal,
+  `-O3`, and checked-heap builds, plus 899 passing tests under Win32 `-O2`.
+- Built and ran all 22 examples, built both Lazarus packages for Win64 and
+  Win32, and passed documentation checks covering 50 pages, 22 examples, and
+  248 public symbols.
+- Rebuilt and verified the checksummed clean source archive, then reran its
+  899-test suite, all 22 examples, and documentation checks.
+- Passed the required Linux and Windows GitHub Actions pull-request and push
+  workflows on the qualified release branch.
+
+### Compatibility
+
+- Existing 1.7 and earlier public signatures remain available. The 1.8 APIs
+  are additive; the legacy `EngineeringLib.Signal` FFT remains unchanged.
+- No parallel/SIMD ABI, advanced filter-design/broader-wavelet surface,
+  survival/factor/robust-covariance family, implicit stiff ODE, or general
+  model/decomposition persistence is claimed stable.
+
 ## [1.7.0] - 2026-07-30
 
 ### Added

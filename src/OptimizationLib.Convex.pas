@@ -27,6 +27,9 @@ type
     Iterations: Integer;
     Evaluations: Integer;
     Status: TIterationStatus;
+    BestX: TDoubleArray;
+    BestObjective: Double;
+    Certificate: TDoubleArray;
   end;
 
   TQuadraticProgram = record
@@ -158,6 +161,43 @@ var I,J:Integer; begin Result:=nil; SetLength(Result,Length(X));
   for I:=0 to High(X) do begin Result[I]:=Model.C[I];
     for J:=0 to High(X) do Result[I]:=Result[I]+Model.Q[I][J]*X[J]; end; end;
 
+function UnconstrainedQPRecessionCertificate(const Model:TQuadraticProgram;
+  out Direction:TDoubleArray):Boolean;
+var
+  Eig:IDenseDoubleSymmetricEigen;
+  Vectors:IDenseDoubleMatrix;
+  Values:TDoubleArray;
+  I,J,N:Integer;
+  Curvature,LinearPart,Scale,Tol:Double;
+begin
+  Result:=False;
+  Direction:=nil;
+  if (Length(Model.InequalityA)>0) or (Length(Model.EqualityA)>0) or
+     (Length(Model.LowerBounds)>0) or (Length(Model.UpperBounds)>0) then
+    Exit;
+  N:=Length(Model.C);
+  Eig:=FactorSymmetricEigen(DenseFromMatrix(Model.Q));
+  Values:=Eig.Eigenvalues;
+  Vectors:=Eig.Eigenvectors;
+  Scale:=1;
+  if Length(Values)>0 then Scale:=Max(Scale,Abs(Values[High(Values)]));
+  Tol:=1E-10*Scale;
+  for J:=0 to N-1 do
+  begin
+    Curvature:=Values[J];
+    if Abs(Curvature)>Tol then Continue;
+    LinearPart:=0;
+    for I:=0 to N-1 do LinearPart:=LinearPart+Model.C[I]*Vectors[I,J];
+    if Abs(LinearPart)<=1E-12*Max(1,Norm(Model.C)) then Continue;
+    SetLength(Direction,N);
+    if LinearPart>0 then
+      for I:=0 to N-1 do Direction[I]:=-Vectors[I,J]
+    else
+      for I:=0 to N-1 do Direction[I]:=Vectors[I,J];
+    Exit(True);
+  end;
+end;
+
 function ProjectEqualities(const A:TConvexMatrix;const B:TDoubleArray;
   const X:TDoubleArray):TDoubleArray;
 var
@@ -234,10 +274,17 @@ end;
 class function TConvexOptimizationKit.SolveQuadraticProgram(
   const Model:TQuadraticProgram;const Options:TConvexOptions):TConvexResult;
 var
-  X,Trial,G,PG:TDoubleArray; I,K,N,Stale:Integer;
+  X,Trial,G,PG,Direction:TDoubleArray; I,K,N,Stale:Integer;
   L,Step,Obj,NewObj,PrevObj,Tol:Double;
 begin
   Result:=Default(TConvexResult); ValidateOptions(Options); ValidateQP(Model);
+  if UnconstrainedQPRecessionCertificate(Model,Direction) then
+  begin
+    Result.Status:=isUnbounded;
+    Result.Certificate:=Copy(Direction);
+    Result.Objective:=-Infinity;
+    Exit;
+  end;
   N:=Length(Model.C); if Length(Options.InitialX)=0 then begin SetLength(X,N);
     for I:=0 to N-1 do begin
       if Length(Model.LowerBounds)>0 then X[I]:=Max(X[I],Model.LowerBounds[I]);
@@ -246,10 +293,14 @@ begin
   ProjectFeasible(Model,X,100);
   Result.Feasibility:=QPFeasibility(Model,X);
   if Result.Feasibility>Max(1E-4,100*Options.FeasibilityTolerance) then begin
-    Result.X:=X; Result.Status:=isInfeasible; Exit; end;
+    Result.X:=Copy(X); Result.BestX:=Copy(X);
+    Result.Objective:=QPObjective(Model,X);
+    Result.BestObjective:=Result.Objective;
+    Result.Status:=isInfeasible; Exit; end;
   L:=0; for I:=0 to N-1 do begin Step:=0;
     for K:=0 to N-1 do Step:=Step+Abs(Model.Q[I][K]); L:=Max(L,Step); end;
   if L=0 then L:=1; Step:=1/L; Obj:=QPObjective(Model,X); Inc(Result.Evaluations);
+  Result.BestX:=Copy(X); Result.BestObjective:=Obj;
   Stale:=0;
   for K:=1 to Options.MaxIterations do begin
     G:=QPGradient(Model,X); Inc(Result.Evaluations); Trial:=Copy(X);
@@ -265,6 +316,8 @@ begin
     if NewObj>Obj+1E-12*Max(1,Abs(Obj)) then begin Step:=Step/2;
       if Step<1E-16 then begin Result.Status:=isStagnation; Break; end; Continue; end;
     PrevObj:=Obj; Obj:=NewObj; X:=Trial;
+    if Obj<Result.BestObjective then
+    begin Result.BestObjective:=Obj; Result.BestX:=Copy(X); end;
     if Abs(PrevObj-Obj)<=DoubleEpsilon*Max(1,Abs(Obj)) then Inc(Stale) else Stale:=0;
     if Stale>=20 then begin Result.Status:=isStagnation; Break; end;
     Result.Iterations:=K;
@@ -273,7 +326,8 @@ begin
       Result.Status:=isCancelled; Break; end;
   end;
   if Result.Status=isUnknown then Result.Status:=isIterationLimit;
-  Result.X:=X; Result.Objective:=QPObjective(Model,X); Inc(Result.Evaluations);
+  Result.X:=Copy(X); Result.Objective:=QPObjective(Model,X);
+  Inc(Result.Evaluations);
 end;
 
 function ConeSlack(const Cone:TSecondOrderCone;const X:TDoubleArray;

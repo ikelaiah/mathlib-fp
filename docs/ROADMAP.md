@@ -707,7 +707,7 @@ rather than inserted into an already full release.
   heap-traced, package, example, documentation, benchmark, and clean-archive
   paths.
 
-## Current release: 1.7.0 — Numerical modelling and optimisation
+## Previous release: 1.7.0 — Numerical modelling and optimisation
 
 Released on 2026-07-30, version 1.7.0 builds higher-level numerical workflows
 on the 1.5/1.6 engine.
@@ -844,7 +844,7 @@ understand its limitations.
   and explicitly list stiff, sparse, reverse-AD, large-scattered, integer, and
   general cone limitations.
 
-## Planned 1.8.0 — Applied numerics, tooling, and performance maturity
+## Current release: 1.8.0 — Applied numerics, tooling, and performance maturity
 
 Version 1.8.0 broadens the workflows most visible to scientists and engineers
 and hardens the existing stack for larger data. A focused sparse/iterative
@@ -963,6 +963,56 @@ already broad applied-numerics release.
 - A published capability inventory identifies which common scientific and
   engineering workflows mathlib-fp can complete, their important scale or
   performance limits, and which roadmap items remain open.
+
+### 1.8.0 qualification evidence
+
+- `EngineeringLib.DSP`, `StatsLib.Streaming`, `NumericsLib.Modelling`, and
+  `MLLib.Analysis` use the existing shared real/complex arrays and typed dense
+  matrices. The [applied-data example](../examples/19_applied_data_pipeline.pas)
+  passes those containers through DSP, statistics, fitting, PCA, clustering,
+  and scalar Kalman filtering without format adapters. The
+  [gap-closure example](../examples/21_release_1_8_workflows.pas) covers
+  block DSP, inference, fitted preprocessing, forests, multivariate Kalman,
+  selected-model persistence, and bounded expressions.
+- Online statistics, overlap-add/save, streaming FIR/biquad filters, and
+  scalar/multivariate Kalman filtering publish bounded retained state and have
+  restoration, long-block, and failure-atomic tests. Small, batch, streaming,
+  and large benchmark classes record result allocation or retained-state
+  counts as well as elapsed time.
+- `MathBase.Interchange` provides invariant text, delimited text, Matrix Market,
+  and a versioned little-endian binary format. Win64 and Win32 round-trip tests
+  cover real/complex vectors and matrices plus RNG state; malformed CRC,
+  version, reserved-byte, truncation, non-finite, and oversized inputs are
+  rejected before a result or caller state is changed. `InterchangeLib.Models`
+  applies the same version/kind/CRC/resource discipline to cubic splines,
+  streaming FIR, fitted standardization, and scalar Kalman state.
+- The 1.7 audit adds configurable classical splines, explicit complex-step and
+  vector AD paths, cubature/local-RNG Monte Carlo, scaled/rank-aware fitting,
+  complex polynomial roots, component ODE tolerances, detailed optimizers and
+  workspace reuse, two-phase simplex, and QP failure/certificate diagnostics.
+- `StatsLib.Inference`, deterministic hierarchy/forests, leakage-safe fitted
+  preprocessing, multivariate Kalman filtering, typed metadata, model
+  summaries, and bounded expression evaluation have direct reference,
+  malformed-input, resource, and identifiability tests.
+- The direct DFT and portable dense multiply remain correctness oracles.
+  Bluestein, blocked, and automatic paths have cross-path tolerance,
+  deterministic-dispatch, aliasing, and failure-atomic tests. No parallel or
+  SIMD path is shipped in 1.8.0, so those remain visibly open rather than
+  bypassing the portable contract.
+- The [1.8 qualification report](QUALIFICATION_1.8.0.md) publishes numerical
+  budgets, two representative benchmark runs, comparison with 1.7.0, and
+  explanations for slower observations. Release/debug/heap-traced Win64,
+  optimized Win32, package, example, documentation, dependency, and clean
+  archive checks are recorded there. The required Linux and Windows GitHub
+  Actions pull-request and push workflows passed on the qualified release
+  branch.
+- The machine-readable [capability inventory](capabilities.json) and generated
+  [status page](CAPABILITIES.md) identify stable entry points, scalar and shape
+  limits, complexity and workspace behavior, evidence locations, and the
+  conditional advanced DSP design, survival/factor/robust-covariance,
+  controlled/smoothed state space, general persistence, implicit ODE,
+  interior-point/general-cone, and parallel/SIMD families that remain
+  unsupported.
 
 ## Planned 2.0.0 — Stable native numerical platform
 
