@@ -144,6 +144,7 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 1.6.0 | Dependable typed dense decompositions and direct solvers | “Choose a dense solver” guidance, reusable factors, and inspectable diagnostics |
 | 1.7.0 | Interpolation, fitting, advanced numerics, and optimisation | End-to-end modelling recipes with convergence and diagnostic guidance |
 | 1.8.0 | Applied numerics, interchange, tooling, and performance maturity | Portable data workflows, reproducible benchmarks, and mature package/distribution paths |
+| 1.9.0 | Typed structured/sparse linear algebra and matrix-free iterative solvers | Large-problem workflows with bounded storage, verified contracts, and a 2.0 migration preview |
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
 
 ## Implementation discipline
@@ -844,7 +845,7 @@ understand its limitations.
   and explicitly list stiff, sparse, reverse-AD, large-scattered, integer, and
   general cone limitations.
 
-## Current release: 1.8.0 — Applied numerics, tooling, and performance maturity
+## Previous release: 1.8.0 — Applied numerics, tooling, and performance maturity
 
 Version 1.8.0 broadens the workflows most visible to scientists and engineers
 and hardens the existing stack for larger data. A focused sparse/iterative
@@ -1014,6 +1015,179 @@ already broad applied-numerics release.
   interior-point/general-cone, and parallel/SIMD families that remain
   unsupported.
 
+## Next release: 1.9.0 — Scalable linear algebra and API convergence
+
+Version 1.9.0 closes the largest foundation gap before 2.0: problems whose
+matrices are structured, sparse, or available only as an operation. It also
+publishes the candidate 2.0 conventions early enough for users to test
+migrations during a stable 1.x release. This is a focused scalability and
+compatibility milestone, not a second applied-numerics grab-bag.
+
+Dense typed matrices remain the preferred representation for genuinely dense
+problems. Sparse support must preserve work and storage proportional to the
+documented nonzero structure; no API may claim sparse scalability while
+silently materialising a dense matrix or factor.
+
+### Typed structured and sparse storage
+
+- Add validated compressed sparse row and compressed sparse column matrices for
+  single/double real and complex values, with zero-based indices, checked
+  native-size shapes, sorted-index invariants, and explicit ownership and
+  mutation rules.
+- Provide a triplet builder that accepts unordered contributions, combines
+  duplicate coordinates deterministically, applies an explicit stored-zero
+  policy, and produces canonical compressed storage without quadratic
+  insertion behavior.
+- Add typed diagonal, tridiagonal, and general band storage where structure
+  gives a materially simpler or faster algorithm than general sparse storage.
+- Cover sparse vector products, sparse/dense matrix products, addition,
+  scaling, transpose/conjugate transpose, norms, row/column extraction, and
+  conversions without accidental densification. Aliasing and destination
+  buffer behavior must match the typed dense conventions.
+- Extend Matrix Market support to the documented coordinate real/complex
+  subset and add versioned binary sparse interchange with shape, index,
+  nonzero-count, ordering, checksum, and resource-limit validation.
+- Preserve the existing `TMatrixKitSparse` surface as a compatibility path.
+  Document its complexity and storage limitations and provide explicit
+  conversion examples rather than silently changing its representation or
+  numerical behavior.
+
+### Operators, iterative solvers, and preconditioning
+
+- Introduce a typed linear-operator contract for stored and matrix-free
+  problems, including dimensions, scalar kind, ordinary and adjoint products,
+  ownership, reentrancy, and failure behavior.
+- Provide conjugate gradient for symmetric/Hermitian positive-definite systems,
+  MINRES for symmetric/Hermitian indefinite systems, restarted GMRES and
+  BiCGSTAB for general square systems, and LSQR for rectangular least-squares
+  problems.
+- Use shared iteration options and results that report termination reason,
+  iteration and product counts, initial/final residuals, requested and achieved
+  tolerances, detected breakdown, and whether convergence was confirmed using
+  an explicitly recomputed residual.
+- Provide reusable workspaces and allocation-measured repeated-solve paths.
+  The simple overload remains one-call friendly, while expert overloads expose
+  restart size, residual refresh, cancellation, and progress reporting.
+- Provide at least identity and diagonal preconditioners across the stable
+  scalar set, plus incomplete Cholesky for eligible positive-definite sparse
+  systems and ILU(0) for eligible general sparse systems. Construction and
+  application must report zero pivots, breakdown, and unsupported structure
+  rather than returning a misleading convergence result.
+- Test stored sparse, structured, dense-adapter, and user-supplied matrix-free
+  operators through the same solver contracts. Solver selection guidance must
+  state symmetry, definiteness, conditioning, memory, and transpose/adjoint
+  requirements.
+
+### Structured solves and partial spectral methods
+
+- Add direct tridiagonal and band solves with reusable factors, pivot and
+  singularity diagnostics, multiple right-hand sides, and real/complex
+  single/double coverage.
+- Add a documented sparse direct baseline for common square systems. Symbolic
+  analysis, ordering, fill, numerical factor ownership, pivot behavior, and
+  supported matrix classes must be visible; unsupported cases must fall back
+  only through an explicit caller choice.
+- Add restarted Lanczos for selected symmetric/Hermitian eigenpairs and
+  restarted Arnoldi for selected general eigenpairs, including residuals,
+  convergence status, deterministic starting-state control, and shift/target
+  limitations.
+- Compare every structured or sparse result with the corresponding typed-dense
+  oracle on small problems and with independently checkable residuals on
+  problems too large to densify.
+
+### 2.0 API candidate and migration runway
+
+- Publish the proposed primary 2.0 entry units, naming, indexing, ownership,
+  shape, tolerance, status, exception, RNG, cancellation, progress, and
+  thread-safety conventions as one reviewable contract.
+- Inventory every maintained 1.x public entry point as primary, compatibility,
+  deprecated, experimental, or internal. Each deprecated entry point must name
+  its replacement and remain source-compatible throughout 1.9.x unless a
+  correctness defect makes that impossible.
+- Add compile-checked migration examples for dense construction and solves,
+  interpolation/fitting, optimisation, DSP, statistics, and the new sparse
+  workflows. The examples must expose semantic differences rather than imply
+  drop-in equivalence.
+- Freeze the candidate 2.0 public surface before the 1.9 release candidate and
+  enforce it with machine-readable API snapshots. Changes after that point
+  require a documented compatibility or correctness reason.
+- Update the capability inventory so every 2.0 baseline family is either
+  supported with evidence or names the exact remaining algorithm, scale,
+  platform, or performance gap.
+
+### Documentation accuracy and traceability
+
+- Audit every new structured, sparse, operator, solver, preconditioner, and
+  spectral API against its shipped declaration and implementation. Signatures,
+  overloads, defaults, scalar support, shapes, indexing, ownership, mutation,
+  aliasing, exceptions, statuses, and thread-safety statements must agree.
+- State the exact residual and stopping formulas used by each iterative method,
+  including norm choice, absolute/relative scaling, preconditioned versus true
+  residuals, refresh behavior, and the meaning of every termination status.
+  Selection guidance must not describe a mathematical guarantee that the
+  implementation does not check or preserve.
+- Document storage invariants and actual complexity for construction,
+  conversion, products, factors, and workspaces. Any operation that may create
+  fill, copy inputs, retain caller storage, or densify by explicit request must
+  say so at the point of use.
+- Link each accuracy, convergence, allocation, and performance statement to a
+  reproducible test, fixture, benchmark, or qualification result with the
+  relevant precision, tolerance, compiler, and platform context.
+- Compile and run every guide fragment, migration example, and command against
+  a clean packaged 1.9 release. Documentation checks must compare referenced
+  symbols and defaults with the public-API snapshot rather than checking only
+  that a symbol name exists.
+- Reconcile API references, selection guides, the capability inventory,
+  examples, release notes, and qualification report before release. A conflict
+  between those sources is a release-blocking documentation defect.
+
+### Explicit 1.9.0 non-goals
+
+- Distributed, out-of-core, GPU, and mandatory vendor-library execution are
+  outside this milestone. All stable work must retain a complete portable
+  Pascal path.
+- Parallel and SIMD sparse kernels may be added only with portable cross-path
+  tests and reproducible evidence; they are not substitutes for correct serial
+  storage, operator, and solver contracts.
+- 1.9.0 does not remove maintained 1.x APIs. Breaking removals or default
+  changes belong to 2.0 after the documented deprecation and migration period.
+- Deferred advanced DSP, survival analysis, state-space, implicit ODE, and
+  mixed-integer/global optimisation families do not enter 1.9 merely to expand
+  the feature count. They require their own evidence and maturity gates.
+
+### 1.9.0 completion gate
+
+- A documented end-to-end example assembles a sparse problem, round-trips it
+  through an open format, selects and applies a preconditioner, solves it
+  without densification, and interprets convergence and residual diagnostics.
+- Real/complex single/double storage and operator products agree with typed
+  dense references on small fixtures. Solvers cover successful, nonconverged,
+  cancelled, invalid-structure, singular, and numerical-breakdown outcomes.
+- Large sparse and matrix-free qualification cases publish nonzero counts,
+  allocations, peak retained storage, operator products, iterations, residuals,
+  compiler flags, and timing. Tests fail if a stable sparse path allocates
+  storage proportional to the full dense shape.
+- Structured factors, sparse factors, preconditioners, and iterative workspaces
+  have explicit reuse, aliasing, mutation, thread-safety, and failure-atomicity
+  tests.
+- Matrix Market and binary sparse inputs round-trip across supported targets
+  and reject malformed indices, duplicate-policy violations, truncation,
+  incompatible versions, corrupt checksums, and unreasonable sizes before
+  exposing a partial result.
+- The 2.0 migration preview builds in CI, every proposed deprecation has a
+  tested replacement, and the public-API snapshot detects unintended changes.
+- The documentation audit records every stable 1.9 public symbol and contract
+  field as verified, corrected, or explicitly unsupported. There are no open
+  mismatches between public declarations, guides, examples, capability data,
+  release notes, and observed test behavior.
+- Every published code fragment and documented build or migration command
+  passes from the checksummed release archive on its stated platform. Numerical
+  and performance claims resolve to the evidence and conditions that support
+  them.
+- Release notes and qualification evidence state which structured, sparse,
+  iterative, preconditioner, and partial-eigensystem paths are stable, their
+  important limits, and every 2.0 baseline gap that remains.
+
 ## Planned 2.0.0 — Stable native numerical platform
 
 Version 2.0.0 is a quality and API graduation, not an excuse for an arbitrary
@@ -1074,19 +1248,42 @@ the higher-level libraries and their migration path is proven.
 - A solver family that has not met its correctness, diagnostics, scalability,
   and termination gates remains experimental even if code for it exists.
 
-### Documentation and release readiness
+### Documentation accuracy and release readiness
 
 - This section completes and verifies the continuous adoption track; it does
   not defer documentation, packaging, or first-use work until 2.0.
+- Documentation completeness is not sufficient. An incorrect signature,
+  default, formula, unit, shape, ownership rule, convergence claim, complexity,
+  limitation, or migration instruction is a release-blocking product defect.
 - Every public symbol is indexed and documented; every domain has a quick
   start, selection guide, API reference, error/convergence guide, and runnable
   examples.
+- Audit every stable API contract against the compiled public declaration,
+  implementation, and tests. Mechanically compare symbols, overloads, defaults,
+  types, deprecations, and supported scalar/shape combinations wherever
+  practical, and record the remaining human-reviewed semantic fields.
+- Verify that algorithm descriptions and selection guides state the
+  implementation actually shipped: assumptions, formulas, units, indexing,
+  ownership, mutation, aliasing, tolerances, stopping tests, error/status
+  behavior, workspace and complexity bounds, thread safety, and unsupported
+  cases.
+- Require every numerical-accuracy, convergence, determinism, memory, and
+  performance claim to identify reproducible evidence and its precision,
+  dataset, tolerance, compiler, platform, and comparison conditions. Remove or
+  qualify claims that the release evidence does not support.
+- Check consistency among API references, task and selection guides,
+  source comments, examples, migration material, capability data, support
+  matrices, release notes, and qualification reports. The least mature or most
+  restrictive truthful statement governs until the discrepancy is resolved.
 - Publish searchable, versioned documentation as a static website and an
-  offline archive generated from the same reviewed sources.
+  offline archive generated from the same reviewed sources and tagged release
+  tree. A versioned documentation site must not silently describe another
+  release's API.
 - Representative multi-domain applications demonstrate realistic data flow,
   not just isolated one-function calls.
 - Documentation CI checks links, public-symbol coverage, code-block syntax, and
-  compilation/execution of every runnable example.
+  compilation/execution of every runnable example and command from a clean
+  release archive.
 - Supported platforms have clean install/build instructions, CI, checksummed
   release archives, and a published support matrix. Provide a tested Lazarus
   package in addition to direct source use. Package-manager integration is not
@@ -1118,9 +1315,16 @@ the higher-level libraries and their migration path is proven.
 - Accuracy budgets, performance-regression limits, public-symbol documentation,
   and capability maturity are evaluated mechanically where practical and
   published in the release qualification report.
+- The final documentation audit has no unresolved mismatch that could cause an
+  incorrect result, unsafe ownership or concurrency use, an invalid algorithm
+  choice, or a failed 1.x migration. Lesser known documentation defects are
+  listed with scope and workarounds rather than hidden.
+- API references, guides, examples, source comments, capability data, release
+  notes, and qualification evidence agree on the stable surface, maturity,
+  supported platforms, limitations, and measured claims.
 - At least one release-candidate cycle validates clean installation, the
-  migration guide, and representative workflows from release archives rather
-  than a developer checkout.
+  complete documentation set, migration guide, and representative workflows
+  from release archives rather than a developer checkout.
 - Compatibility removals have migration coverage, and no known correctness
   defect is being hidden to meet a version target.
 - The capability inventory demonstrates that mathlib-fp is a credible native,
