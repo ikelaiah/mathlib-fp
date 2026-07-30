@@ -109,7 +109,7 @@ Observed local results after all rows passed:
 | Documentation check/build | 50 searchable pages, 22 indexed examples, 248 covered public symbols |
 | Representative benchmark | compiled and ran twice at `-O3`; results above |
 | Working source archive | SHA-256 generated and verified; clean extraction builds/runs all 22 examples and passes all 899 tests |
-| Linux CI | retained in the workflow; remote CI is not claimed by this local change |
+| GitHub Actions CI | required Linux and Windows pull-request and push workflows passed on the qualified release branch |
 
 ## Dependency and scope audit
 

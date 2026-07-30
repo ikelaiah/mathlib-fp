@@ -83,6 +83,11 @@ gate, bounded-state and corrupt-input evidence, and performance changes from
 1.7.0. Timing statements are workload- and machine-specific, not universal
 speed claims.
 
+Release qualification completed on 2026-07-30 with 899 passing tests across
+the documented Win64 and Win32 configurations, all 22 examples, both Lazarus
+package targets, documentation and clean-archive checks, and the required
+Linux and Windows GitHub Actions pull-request and push workflows.
+
 ## Known limitations and open roadmap work
 
 - FIR/overlap state is bounded by tap count; biquad state has two delay values.

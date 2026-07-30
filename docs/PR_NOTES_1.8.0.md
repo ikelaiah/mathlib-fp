@@ -13,8 +13,9 @@ random state, parallel runtime, or SIMD ABI.
 
 ## Release readiness — 2026-07-30
 
-The release candidate is locally qualified for release on 2026-07-30. Full
-command transcripts and benchmark results are recorded in
+Version 1.8.0 completed local qualification and the required Linux and Windows
+GitHub Actions checks for release on 2026-07-30. Full command transcripts and
+benchmark results are recorded in
 [QUALIFICATION_1.8.0.md](QUALIFICATION_1.8.0.md).
 
 | Check | Result |
@@ -27,10 +28,10 @@ command transcripts and benchmark results are recorded in
 | Documentation | 50 pages, 22 examples, and 248 public symbols checked |
 | Clean source archive | SHA-256 verified; 899 tests, 22 examples, and documentation checks passed after extraction |
 | Benchmarks | Two Win64 `-O3` runs recorded against the 1.7 comparison |
+| Remote CI | Linux and Windows pull-request and push workflows passed |
 
-The repository's Linux CI workflow remains the remote merge gate. After that
-check passes, the remaining operations are merge, tag, GitHub release, and
-archive publication.
+All required remote CI checks have passed and the PR is ready to merge. The
+remaining operations are merge, tag, GitHub release, and archive publication.
 
 ## Design discipline
 

@@ -1003,7 +1003,9 @@ already broad applied-numerics release.
   budgets, two representative benchmark runs, comparison with 1.7.0, and
   explanations for slower observations. Release/debug/heap-traced Win64,
   optimized Win32, package, example, documentation, dependency, and clean
-  archive checks are recorded there.
+  archive checks are recorded there. The required Linux and Windows GitHub
+  Actions pull-request and push workflows passed on the qualified release
+  branch.
 - The machine-readable [capability inventory](capabilities.json) and generated
   [status page](CAPABILITIES.md) identify stable entry points, scalar and shape
   limits, complexity and workspace behavior, evidence locations, and the

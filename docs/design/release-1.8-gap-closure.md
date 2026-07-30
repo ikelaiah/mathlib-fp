@@ -1,7 +1,8 @@
 # 1.7/1.8 gap-closure design and traceability record
 
-Status: implementation and local release qualification complete on the
-`release/v1.8.0` branch; publication remains intentionally paused.
+Status: complete and release-qualified for 1.8.0. Implementation, local
+qualification, and the required Linux and Windows GitHub Actions checks passed
+on the `release/v1.8.0` branch.
 
 ## Purpose
 

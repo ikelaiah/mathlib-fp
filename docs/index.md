@@ -11,8 +11,8 @@ native Free Pascal numerical package.
 - [mathlib-fp 1.8.0 release notes](RELEASE_NOTES_1.8.0.md) — applied DSP,
   bounded streaming statistics, reproducible analysis, state-space filtering,
   numerical interchange, and portable performance.
-- [1.8.0 PR notes](PR_NOTES_1.8.0.md) — review scope, compatibility, local
-  verification, risks, and explicitly open roadmap work.
+- [1.8.0 PR notes](PR_NOTES_1.8.0.md) — review scope, compatibility, release
+  qualification, risks, and explicitly open roadmap work.
 - [1.8.0 qualification report](QUALIFICATION_1.8.0.md) — numerical oracles,
   memory bounds, persistence rejection, benchmark comparison, and targets.
 - [mathlib-fp 1.7.0 release notes](RELEASE_NOTES_1.7.0.md) — interpolation,

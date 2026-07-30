@@ -50,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   248 public symbols.
 - Rebuilt and verified the checksummed clean source archive, then reran its
   899-test suite, all 22 examples, and documentation checks.
+- Passed the required Linux and Windows GitHub Actions pull-request and push
+  workflows on the qualified release branch.
 
 ### Compatibility
 
