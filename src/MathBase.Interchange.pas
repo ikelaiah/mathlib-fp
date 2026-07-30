@@ -22,6 +22,15 @@ const
 
 type
   EInterchangeError = class(Exception);
+  TInterchangeScalarType = (istFloat64, istComplex128);
+  TInterchangeValueKind = (ivkVector, ivkMatrix);
+  TValueMetadata = record
+    Kind:TInterchangeValueKind;
+    ScalarType:TInterchangeScalarType;
+    Rows:SizeInt;
+    Columns:SizeInt;
+    Elements:QWord;
+  end;
 
 function ComplexToInvariant(const Value: TComplex): string;
 function ParseComplexInvariant(const Text: string): TComplex;
@@ -77,9 +86,15 @@ function LoadRandomStateBinary(const Stream: TStream): TRandomState;
 
 function Summarize(const Values: TDoubleArray;
   const MaximumValues: SizeInt = 8): string; overload;
+function Summarize(const Values:TComplexArray;
+  const MaximumValues:SizeInt=8):string; overload;
 function Summarize(const Matrix: IDenseDoubleMatrix;
   const MaximumRows: SizeInt = 4;
   const MaximumColumns: SizeInt = 6): string; overload;
+function Describe(const Values:TDoubleArray):TValueMetadata; overload;
+function Describe(const Values:TComplexArray):TValueMetadata; overload;
+function Describe(const Matrix:IDenseDoubleMatrix):TValueMetadata; overload;
+function Describe(const Matrix:IDenseComplexMatrix):TValueMetadata; overload;
 
 implementation
 
@@ -105,6 +120,33 @@ begin
   Result := DefaultFormatSettings;
   Result.DecimalSeparator := '.';
   Result.ThousandSeparator := #0;
+end;
+
+function Summarize(const Values:TComplexArray;
+  const MaximumValues:SizeInt):string;
+var
+  Builder:TStringBuilder;
+  I,DisplayCount:SizeInt;
+begin
+  if MaximumValues<0 then
+    raise EInterchangeError.Create(
+      'Summarize(complex vector): MaximumValues must be non-negative.');
+  Builder:=TStringBuilder.Create;
+  try
+    Builder.Append('Complex vector length=').Append(IntToStr(Length(Values))).
+      Append(' [');
+    DisplayCount:=Min(Length(Values),MaximumValues);
+    for I:=0 to DisplayCount-1 do
+    begin
+      if I>0 then Builder.Append(', ');
+      Builder.Append(ComplexToInvariant(Values[I]));
+    end;
+    if DisplayCount<Length(Values) then Builder.Append(', ...');
+    Builder.Append(']');
+    Result:=Builder.ToString;
+  finally
+    Builder.Free;
+  end;
 end;
 
 procedure RequireFinite(const Value: Double; const Operation: string);
@@ -1187,6 +1229,40 @@ begin
   finally
     Builder.Free;
   end;
+end;
+
+function Describe(const Values:TDoubleArray):TValueMetadata;
+begin
+  Result:=Default(TValueMetadata);
+  Result.Kind:=ivkVector; Result.ScalarType:=istFloat64;
+  Result.Rows:=Length(Values); Result.Columns:=1;
+  Result.Elements:=Length(Values);
+end;
+
+function Describe(const Values:TComplexArray):TValueMetadata;
+begin
+  Result:=Default(TValueMetadata);
+  Result.Kind:=ivkVector; Result.ScalarType:=istComplex128;
+  Result.Rows:=Length(Values); Result.Columns:=1;
+  Result.Elements:=Length(Values);
+end;
+
+function Describe(const Matrix:IDenseDoubleMatrix):TValueMetadata;
+begin
+  RequireMatrix(Matrix,'Describe(double matrix)');
+  Result:=Default(TValueMetadata);
+  Result.Kind:=ivkMatrix; Result.ScalarType:=istFloat64;
+  Result.Rows:=Matrix.Rows; Result.Columns:=Matrix.Cols;
+  Result.Elements:=QWord(Matrix.Rows)*QWord(Matrix.Cols);
+end;
+
+function Describe(const Matrix:IDenseComplexMatrix):TValueMetadata;
+begin
+  RequireMatrix(Matrix,'Describe(complex matrix)');
+  Result:=Default(TValueMetadata);
+  Result.Kind:=ivkMatrix; Result.ScalarType:=istComplex128;
+  Result.Rows:=Matrix.Rows; Result.Columns:=Matrix.Cols;
+  Result.Elements:=QWord(Matrix.Rows)*QWord(Matrix.Cols);
 end;
 
 end.

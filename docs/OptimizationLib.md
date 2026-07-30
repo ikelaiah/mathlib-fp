@@ -51,10 +51,13 @@ TOptResult = record
   Status: TIterationStatus;
   GradientNorm: Double;
   ConstraintViolation: Double;
+  Evaluations: Integer;
+  BestX: TDoubleArray;
+  BestFVal: Double;
 end;
 
 TLPStatus = (lpsOptimal, lpsUnbounded, lpsIterationLimit,
-  lpsUnsupportedStart);
+  lpsUnsupportedStart, lpsInfeasible);
 
 TLPResult = record
   X:        TDoubleArray;
@@ -74,11 +77,51 @@ end;
 | 1-D, unimodal | `BrentMinimize` | Fastest, superlinear convergence |
 | 1-D, guaranteed bracket | `GoldenSection` | Simplest, no function smoothness needed |
 | Smooth multi-var, gradient available | `LBFGS` | Fast quasi-Newton, low memory |
+| Smooth bounded objective | `BoundedLBFGS` | Projected gradient plus L-BFGS history and detailed stopping status |
+| Repeated related bounded solves | `BoundedLBFGSWithWorkspace` | Explicit warm start and cumulative evaluation counters |
+| Smooth objective, little useful curvature | `NonlinearConjugateGradient` | O(N) vector storage |
+| Smooth objective needing conservative steps | `TrustRegion` | Explicit trust radius and accept/reject diagnostics |
+| Dual-number objective | `LBFGSAuto` | Exact forward-AD gradients within the supported dual catalogue |
+| Several supplied starting points | `MultiStart` | Reproducible best finite result and aggregate evaluation count |
+| Smooth equality/inequality constraints | `SolveConstrained` | Augmented-Lagrangian baseline with explicit feasibility |
+| Several objectives/weights | `ExplorePareto` | Deterministic weighted-sum points; inspect every point status |
 | Smooth multi-var, no gradient | `NelderMead` | Reliable, no derivatives |
 | ML / deep learning style | `Adam` | Adaptive rates, handles noise |
 | Non-convex, many local minima | `SimulatedAnnealing` | Global search |
 | Constrained problems | `PenaltyMethod` + `NelderMead` | Easy to set up |
 | Small standard-form linear programs | `SimplexLP` | Tableau simplex with an immediately feasible slack basis |
+
+---
+
+## Detailed solver contract
+
+The newer solvers take `TOptimizationOptions.Defaults`, with separate
+absolute, relative, and gradient tolerances; iteration and evaluation limits;
+line-search/trust controls; history size; optional lower/upper bounds; seed;
+start count; and a cancellation callback. Empty bound arrays mean unbounded
+coordinates.
+
+Every returned `TOptResult` keeps the final `X`/`FVal`, detailed `Status`,
+gradient norm, maximum constraint violation, evaluations, and the best finite
+`BestX`/`BestFVal` observed. Inspect `Status`; `Converged` is only the legacy
+compatibility view. Cancellation and limits preserve the best finite iterate.
+
+`TOptimizationWorkspace` is caller-owned and contains a copied `WarmStartX`,
+`Runs`, and `TotalEvaluations`. `BoundedLBFGSWithWorkspace` uses the warm start
+only when its dimension and bounds are valid, then updates the workspace after
+the run. `Clear` releases it. Separate workspaces are independent and
+reentrant; sharing a mutable workspace requires synchronization.
+
+`SolveConstrained` accepts `TSmoothConstraint` records. Inequalities use
+`Value(X) <= 0`; equalities use `Value(X) = 0` within their tolerance. This is
+a local dense smooth solver, not a proof of global optimality or
+infeasibility. `ExplorePareto` is a supplied-weight scalarization baseline and
+can miss non-convex parts of a Pareto front.
+
+The public collection aliases are `TSmoothConstraints`,
+`TMultivarFunctions`, `TOptResults`, and `TObjectiveMatrix`;
+`TConstraintKind` selects equality or inequality.
+`TOptimizationProgress` is the detailed cancellation callback.
 
 ---
 
@@ -225,16 +268,16 @@ if lp.Feasible then
 ```
 
 `Feasible` is retained as a compatibility flag and is `True` only when
-`Status = lpsOptimal`. Inspect `Status` to distinguish an unbounded model, an
-iteration limit, and an unsupported negative-right-hand-side starting basis.
+`Status = lpsOptimal`. Inspect `Status` to distinguish an unbounded model,
+infeasibility, and an iteration limit.
 
 **Standard form requirements:**
 
-- All right-hand sides `b[i] >= 0`, so the added slack variables form the
-  initial feasible basis
 - Variables implicitly >= 0
-- Only `<=` constraints are supported; there is no Phase I procedure for
-  `>=`, equality, or a non-obvious initial feasible basis
+- Only `<=` constraints are supported
+- A two-phase tableau constructs a feasible basis when a right-hand side is
+  negative and returns `lpsInfeasible` when Phase I cannot remove artificial
+  feasibility
 
 **Example — capacity-constrained production:**
 
@@ -250,8 +293,8 @@ lp := TOptimizationKit.SimplexLP(
   TDoubleArray.Create(4, 3, 3));
 ```
 
-`Feasible = False` is also used for an unbounded tableau, so the result does
-not distinguish infeasibility from unboundedness.
+`Feasible` remains `False` for every non-optimal status; `Status` distinguishes
+infeasibility, unboundedness, and a limit.
 
 ---
 

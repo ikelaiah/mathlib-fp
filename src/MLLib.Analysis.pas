@@ -54,6 +54,47 @@ type
     SquaredDistances: TDoubleArray;
   end;
 
+  THierarchicalLinkage = (hlSingle, hlComplete, hlAverage);
+
+  THierarchicalClustering = record
+    SampleCount:Integer;
+    MergeLeft:TIntegerArray;
+    MergeRight:TIntegerArray;
+    Distances:TDoubleArray;
+    ClusterSizes:TIntegerArray;
+  end;
+
+  TStandardizationModel = record
+    Means:TDoubleArray;
+    Scales:TDoubleArray;
+  end;
+
+  TForestTask = (ftClassification, ftRegression);
+
+  TDecisionTreeNode = record
+    Feature:Integer;
+    Threshold:Double;
+    LeftNode:Integer;
+    RightNode:Integer;
+    Prediction:Double;
+    IsLeaf:Boolean;
+  end;
+  TDecisionTreeNodes = array of TDecisionTreeNode;
+
+  TDecisionTreeModel = record
+    Nodes:TDecisionTreeNodes;
+  end;
+  TDecisionTrees = array of TDecisionTreeModel;
+
+  TDecisionForest = record
+    Trees:TDecisionTrees;
+    Task:TForestTask;
+    ClassCount:Integer;
+    FeatureImportances:TDoubleArray;
+    OOBScore:Double;
+    Seed:QWord;
+  end;
+
   TAnalysisKit = class
   public
     class function PCA(const Data: IDenseDoubleMatrix;
@@ -72,6 +113,27 @@ type
       const Ridge: Double = 1E-9): TBinaryLDAResult; static;
     class function PredictBinaryLDA(const Model: TBinaryLDAResult;
       const Data: IDenseDoubleMatrix): TIntegerArray; static;
+    class function HierarchicalCluster(const Data:IDenseDoubleMatrix;
+      const Linkage:THierarchicalLinkage=hlAverage):
+      THierarchicalClustering; static;
+    class function CutHierarchy(const Model:THierarchicalClustering;
+      const ClusterCount:Integer):TIntegerArray; static;
+    class function FitStandardization(const TrainingData:IDenseDoubleMatrix):
+      TStandardizationModel; static;
+    class function TransformStandardized(const Model:TStandardizationModel;
+      const Data:IDenseDoubleMatrix):IDenseDoubleMatrix; static;
+    class function FitClassificationForest(const Data:IDenseDoubleMatrix;
+      const Labels:TIntegerArray; const TreeCount:Integer=32;
+      const MaximumDepth:Integer=8; const MinimumLeafSize:Integer=2;
+      const Seed:QWord=42):TDecisionForest; static;
+    class function FitRegressionForest(const Data:IDenseDoubleMatrix;
+      const Targets:TDoubleArray; const TreeCount:Integer=32;
+      const MaximumDepth:Integer=8; const MinimumLeafSize:Integer=2;
+      const Seed:QWord=42):TDecisionForest; static;
+    class function PredictForestClasses(const Model:TDecisionForest;
+      const Data:IDenseDoubleMatrix):TIntegerArray; static;
+    class function PredictForestValues(const Model:TDecisionForest;
+      const Data:IDenseDoubleMatrix):TDoubleArray; static;
   end;
 
   TKDTree = class
@@ -620,6 +682,525 @@ begin
       Result[RowIndex] := Model.PositiveClass
     else
       Result[RowIndex] := Model.NegativeClass;
+  end;
+end;
+
+type
+  TClusterMembers = array of TIntegerArray;
+
+function ClusterDistance(const Data:IDenseDoubleMatrix;
+  const LeftMembers,RightMembers:TIntegerArray;
+  const Linkage:THierarchicalLinkage):Double;
+var
+  I,J,K:Integer;
+  DistanceSquared,DistanceValue,Total:Double;
+begin
+  if Linkage=hlSingle then Result:=Infinity else Result:=0;
+  Total:=0;
+  for I:=0 to High(LeftMembers) do
+    for J:=0 to High(RightMembers) do
+    begin
+      DistanceSquared:=0;
+      for K:=0 to Data.Cols-1 do
+        AddSquaredDifference(DistanceSquared,
+          Data[LeftMembers[I],K],Data[RightMembers[J],K],
+          'HierarchicalCluster');
+      DistanceValue:=Sqrt(DistanceSquared);
+      case Linkage of
+        hlSingle: Result:=Min(Result,DistanceValue);
+        hlComplete: Result:=Max(Result,DistanceValue);
+        hlAverage: Total:=Total+DistanceValue;
+      end;
+    end;
+  if Linkage=hlAverage then
+    Result:=Total/(Length(LeftMembers)*Length(RightMembers));
+end;
+
+class function TAnalysisKit.HierarchicalCluster(
+  const Data:IDenseDoubleMatrix;
+  const Linkage:THierarchicalLinkage):THierarchicalClustering;
+var
+  Members:TClusterMembers;
+  Active:array of Boolean;
+  I,J,K,Step,N,LeftID,RightID,NewID,Offset:Integer;
+  DistanceValue,BestDistance:Double;
+begin
+  Result:=Default(THierarchicalClustering);
+  ValidateData(Data,'HierarchicalCluster',True);
+  N:=Data.Rows;
+  Result.SampleCount:=N;
+  SetLength(Result.MergeLeft,N-1);
+  SetLength(Result.MergeRight,N-1);
+  SetLength(Result.Distances,N-1);
+  SetLength(Result.ClusterSizes,N-1);
+  SetLength(Members,2*N-1);
+  SetLength(Active,2*N-1);
+  for I:=0 to N-1 do
+  begin
+    Members[I]:=TIntegerArray.Create(I);
+    Active[I]:=True;
+  end;
+  for Step:=0 to N-2 do
+  begin
+    LeftID:=-1; RightID:=-1; BestDistance:=Infinity;
+    for I:=0 to N+Step-1 do
+      if Active[I] then
+        for J:=I+1 to N+Step-1 do
+          if Active[J] then
+          begin
+            DistanceValue:=ClusterDistance(Data,Members[I],Members[J],Linkage);
+            if (DistanceValue<BestDistance) or
+               ((DistanceValue=BestDistance) and
+                ((LeftID<0) or (I<LeftID) or
+                 ((I=LeftID) and (J<RightID)))) then
+            begin
+              BestDistance:=DistanceValue;
+              LeftID:=I; RightID:=J;
+            end;
+          end;
+    Result.MergeLeft[Step]:=LeftID;
+    Result.MergeRight[Step]:=RightID;
+    Result.Distances[Step]:=BestDistance;
+    Result.ClusterSizes[Step]:=Length(Members[LeftID])+Length(Members[RightID]);
+    NewID:=N+Step;
+    SetLength(Members[NewID],Result.ClusterSizes[Step]);
+    Offset:=0;
+    for K:=0 to High(Members[LeftID]) do
+    begin Members[NewID][Offset]:=Members[LeftID][K]; Inc(Offset); end;
+    for K:=0 to High(Members[RightID]) do
+    begin Members[NewID][Offset]:=Members[RightID][K]; Inc(Offset); end;
+    Active[LeftID]:=False; Active[RightID]:=False; Active[NewID]:=True;
+  end;
+end;
+
+class function TAnalysisKit.CutHierarchy(
+  const Model:THierarchicalClustering;
+  const ClusterCount:Integer):TIntegerArray;
+var
+  Members:TClusterMembers;
+  OriginalLabels:TIntegerArray;
+  I,J,Step,N,NewID,Offset,NextLabel,OldLabel:Integer;
+begin
+  Result:=nil; N:=Model.SampleCount;
+  if (N<2) or (Length(Model.MergeLeft)<>N-1) or
+     (Length(Model.MergeRight)<>N-1) or
+     (Length(Model.Distances)<>N-1) or
+     (Length(Model.ClusterSizes)<>N-1) then
+    raise EAnalysisError.Create('CutHierarchy: invalid hierarchy model.');
+  if (ClusterCount<1) or (ClusterCount>N) then
+    raise EAnalysisError.CreateFmt(
+      'CutHierarchy: ClusterCount must be in [1,%d].',[N]);
+  SetLength(Members,2*N-1);
+  SetLength(Result,N);
+  for I:=0 to N-1 do
+  begin Members[I]:=TIntegerArray.Create(I); Result[I]:=I; end;
+  for Step:=0 to N-2 do
+  begin
+    if (Model.MergeLeft[Step]<0) or (Model.MergeLeft[Step]>=N+Step) or
+       (Model.MergeRight[Step]<0) or (Model.MergeRight[Step]>=N+Step) then
+      raise EAnalysisError.Create('CutHierarchy: merge index is invalid.');
+    NewID:=N+Step;
+    SetLength(Members[NewID],Length(Members[Model.MergeLeft[Step]])+
+      Length(Members[Model.MergeRight[Step]]));
+    Offset:=0;
+    for J:=0 to High(Members[Model.MergeLeft[Step]]) do
+    begin
+      Members[NewID][Offset]:=Members[Model.MergeLeft[Step]][J]; Inc(Offset);
+    end;
+    for J:=0 to High(Members[Model.MergeRight[Step]]) do
+    begin
+      Members[NewID][Offset]:=Members[Model.MergeRight[Step]][J]; Inc(Offset);
+    end;
+    if Step<N-ClusterCount then
+    begin
+      OldLabel:=Result[Members[NewID][0]];
+      for J:=0 to High(Members[NewID]) do
+        Result[Members[NewID][J]]:=OldLabel;
+    end;
+  end;
+  OriginalLabels:=Copy(Result);
+  NextLabel:=0;
+  for I:=0 to N-1 do
+  begin
+    OldLabel:=OriginalLabels[I];
+    for J:=0 to I-1 do
+      if OriginalLabels[J]=OldLabel then
+      begin Result[I]:=Result[J]; OldLabel:=-1; Break; end;
+    if OldLabel>=0 then
+    begin Result[I]:=NextLabel; Inc(NextLabel); end;
+  end;
+end;
+
+class function TAnalysisKit.FitStandardization(
+  const TrainingData:IDenseDoubleMatrix):TStandardizationModel;
+var
+  I,J:Integer;
+  Delta,M2:Double;
+begin
+  Result:=Default(TStandardizationModel);
+  ValidateData(TrainingData,'FitStandardization');
+  SetLength(Result.Means,TrainingData.Cols);
+  SetLength(Result.Scales,TrainingData.Cols);
+  for J:=0 to TrainingData.Cols-1 do
+  begin
+    M2:=0;
+    for I:=0 to TrainingData.Rows-1 do
+    begin
+      Delta:=TrainingData[I,J]-Result.Means[J];
+      Result.Means[J]:=Result.Means[J]+Delta/(I+1);
+      M2:=M2+Delta*(TrainingData[I,J]-Result.Means[J]);
+    end;
+    if TrainingData.Rows>1 then
+      Result.Scales[J]:=Sqrt(M2/(TrainingData.Rows-1));
+    if Result.Scales[J]=0 then Result.Scales[J]:=1;
+  end;
+end;
+
+class function TAnalysisKit.TransformStandardized(
+  const Model:TStandardizationModel;
+  const Data:IDenseDoubleMatrix):IDenseDoubleMatrix;
+var I,J:Integer;
+begin
+  ValidateData(Data,'TransformStandardized');
+  if (Length(Model.Means)<>Data.Cols) or
+     (Length(Model.Scales)<>Data.Cols) then
+    raise EAnalysisError.Create(
+      'TransformStandardized: model feature count does not match Data.');
+  Result:=TDenseDoubleMatrix.Zeros(Data.Rows,Data.Cols);
+  for J:=0 to Data.Cols-1 do
+  begin
+    if IsNan(Model.Means[J]) or IsInfinite(Model.Means[J]) or
+       IsNan(Model.Scales[J]) or IsInfinite(Model.Scales[J]) or
+       (Model.Scales[J]<=0) then
+      raise EAnalysisError.CreateFmt(
+        'TransformStandardized: invalid model scale at feature %d.',[J]);
+    for I:=0 to Data.Rows-1 do
+      Result[I,J]:=(Data[I,J]-Model.Means[J])/Model.Scales[J];
+  end;
+end;
+
+function TreePrediction(const Tree:TDecisionTreeModel;
+  const Data:IDenseDoubleMatrix; Row:Integer):Double;
+var NodeIndex:Integer;
+begin
+  if Length(Tree.Nodes)=0 then
+    raise EAnalysisError.Create('Decision forest: tree is empty.');
+  NodeIndex:=0;
+  while not Tree.Nodes[NodeIndex].IsLeaf do
+    if Data[Row,Tree.Nodes[NodeIndex].Feature]<=
+       Tree.Nodes[NodeIndex].Threshold then
+      NodeIndex:=Tree.Nodes[NodeIndex].LeftNode
+    else
+      NodeIndex:=Tree.Nodes[NodeIndex].RightNode;
+  Result:=Tree.Nodes[NodeIndex].Prediction;
+end;
+
+function BuildForest(const Data:IDenseDoubleMatrix;
+  const Labels:TIntegerArray; const Targets:TDoubleArray;
+  Task:TForestTask; TreeCount,MaximumDepth,MinimumLeafSize:Integer;
+  Seed:QWord):TDecisionForest;
+var
+  Random:TLocalRandom;
+  OOBCounts:TIntegerArray;
+  OOBSums:TDoubleArray;
+  OOBVotes:array of TIntegerArray;
+  TreeIndex,I,J,N,ClassCount,ClassIndex,OOBTotal,Correct:Integer;
+  InBag:array of Boolean;
+  Bootstrap:TIntegerArray;
+  Importance:TDoubleArray;
+  Prediction,MeanTarget,SSE,SST,ImportanceTotal:Double;
+
+  function NodePrediction(const Rows:TIntegerArray):Double;
+  var
+    Counts:TIntegerArray;
+    RowIndex,ClassIndex,Best:Integer;
+    Sum:Double;
+  begin
+    if Task=ftRegression then
+    begin
+      Sum:=0;
+      for RowIndex:=0 to High(Rows) do Sum:=Sum+Targets[Rows[RowIndex]];
+      Exit(Sum/Length(Rows));
+    end;
+    SetLength(Counts,ClassCount);
+    for RowIndex:=0 to High(Rows) do Inc(Counts[Labels[Rows[RowIndex]]]);
+    Best:=0;
+    for ClassIndex:=1 to ClassCount-1 do
+      if Counts[ClassIndex]>Counts[Best] then Best:=ClassIndex;
+    Result:=Best;
+  end;
+
+  function Impurity(const Rows:TIntegerArray):Double;
+  var
+    Counts:TIntegerArray;
+    RowIndex,ClassIndex:Integer;
+    Sum,MeanValue:Double;
+  begin
+    if Task=ftRegression then
+    begin
+      MeanValue:=NodePrediction(Rows); Result:=0;
+      for RowIndex:=0 to High(Rows) do
+        Result:=Result+Sqr(Targets[Rows[RowIndex]]-MeanValue);
+      Exit;
+    end;
+    SetLength(Counts,ClassCount);
+    for RowIndex:=0 to High(Rows) do Inc(Counts[Labels[Rows[RowIndex]]]);
+    Sum:=0;
+    for ClassIndex:=0 to High(Counts) do
+      Sum:=Sum+Sqr(Counts[ClassIndex]/Length(Rows));
+    Result:=Length(Rows)*(1-Sum);
+  end;
+
+  function BuildNode(const Rows:TIntegerArray; Depth:Integer;
+    var Tree:TDecisionTreeModel):Integer;
+  var
+    Selected:array of Boolean;
+    LeftRows,RightRows:TIntegerArray;
+    FeatureTrial,Feature,FeatureTrials,Candidate,RowIndex,
+      LeftCount,RightCount,NodeIndex:Integer;
+    Threshold,BestThreshold,ParentImpurity,SplitImpurity,
+      BestImprovement,Improvement:Double;
+    BestFeature:Integer;
+    Node:TDecisionTreeNode;
+  begin
+    NodeIndex:=Length(Tree.Nodes);
+    SetLength(Tree.Nodes,NodeIndex+1);
+    Node:=Default(TDecisionTreeNode);
+    Node.Prediction:=NodePrediction(Rows);
+    Node.IsLeaf:=True;
+    Tree.Nodes[NodeIndex]:=Node;
+    if (Depth>=MaximumDepth) or
+       (Length(Rows)<2*MinimumLeafSize) then Exit(NodeIndex);
+    ParentImpurity:=Impurity(Rows);
+    if ParentImpurity<=0 then Exit(NodeIndex);
+    FeatureTrials:=Max(1,Round(Sqrt(Data.Cols)));
+    SetLength(Selected,Data.Cols);
+    BestFeature:=-1; BestThreshold:=0; BestImprovement:=0;
+    for FeatureTrial:=1 to FeatureTrials do
+    begin
+      repeat Feature:=Random.NextInteger(Data.Cols) until not Selected[Feature];
+      Selected[Feature]:=True;
+      for Candidate:=0 to High(Rows) do
+      begin
+        Threshold:=Data[Rows[Candidate],Feature];
+        LeftCount:=0; RightCount:=0;
+        for RowIndex:=0 to High(Rows) do
+          if Data[Rows[RowIndex],Feature]<=Threshold then Inc(LeftCount)
+          else Inc(RightCount);
+        if (LeftCount<MinimumLeafSize) or
+           (RightCount<MinimumLeafSize) then Continue;
+        SetLength(LeftRows,LeftCount); SetLength(RightRows,RightCount);
+        LeftCount:=0; RightCount:=0;
+        for RowIndex:=0 to High(Rows) do
+          if Data[Rows[RowIndex],Feature]<=Threshold then
+          begin LeftRows[LeftCount]:=Rows[RowIndex]; Inc(LeftCount); end
+          else
+          begin RightRows[RightCount]:=Rows[RowIndex]; Inc(RightCount); end;
+        SplitImpurity:=Impurity(LeftRows)+Impurity(RightRows);
+        Improvement:=ParentImpurity-SplitImpurity;
+        if (Improvement>BestImprovement+1E-15) or
+           ((Abs(Improvement-BestImprovement)<=1E-15) and
+            (Improvement>0) and
+            ((BestFeature<0) or (Feature<BestFeature) or
+             ((Feature=BestFeature) and (Threshold<BestThreshold)))) then
+        begin
+          BestImprovement:=Improvement;
+          BestFeature:=Feature;
+          BestThreshold:=Threshold;
+        end;
+      end;
+    end;
+    if BestFeature<0 then Exit(NodeIndex);
+    LeftCount:=0; RightCount:=0;
+    for RowIndex:=0 to High(Rows) do
+      if Data[Rows[RowIndex],BestFeature]<=BestThreshold then Inc(LeftCount)
+      else Inc(RightCount);
+    SetLength(LeftRows,LeftCount); SetLength(RightRows,RightCount);
+    LeftCount:=0; RightCount:=0;
+    for RowIndex:=0 to High(Rows) do
+      if Data[Rows[RowIndex],BestFeature]<=BestThreshold then
+      begin LeftRows[LeftCount]:=Rows[RowIndex]; Inc(LeftCount); end
+      else
+      begin RightRows[RightCount]:=Rows[RowIndex]; Inc(RightCount); end;
+    Node.IsLeaf:=False;
+    Node.Feature:=BestFeature;
+    Node.Threshold:=BestThreshold;
+    Importance[BestFeature]:=Importance[BestFeature]+BestImprovement;
+    Node.LeftNode:=BuildNode(LeftRows,Depth+1,Tree);
+    Node.RightNode:=BuildNode(RightRows,Depth+1,Tree);
+    Tree.Nodes[NodeIndex]:=Node;
+    Result:=NodeIndex;
+  end;
+
+begin
+  Result:=Default(TDecisionForest);
+  ClassCount:=0;
+  OOBVotes:=nil;
+  ValidateData(Data,'Decision forest',True);
+  if (TreeCount<1) or (MaximumDepth<1) or (MinimumLeafSize<1) then
+    raise EAnalysisError.Create('Decision forest: invalid training options.');
+  N:=Data.Rows;
+  if Task=ftClassification then
+  begin
+    if Length(Labels)<>N then
+      raise EAnalysisError.Create(
+        'FitClassificationForest: labels length mismatch.');
+    for I:=0 to N-1 do
+    begin
+      if Labels[I]<0 then
+        raise EAnalysisError.Create(
+          'FitClassificationForest: labels must be non-negative.');
+      ClassCount:=Max(ClassCount,Labels[I]+1);
+    end;
+    if ClassCount<2 then
+      raise EAnalysisError.Create(
+        'FitClassificationForest: at least two classes are required.');
+    SetLength(OOBVotes,N);
+    for I:=0 to N-1 do SetLength(OOBVotes[I],ClassCount);
+  end
+  else
+  begin
+    if Length(Targets)<>N then
+      raise EAnalysisError.Create(
+        'FitRegressionForest: targets length mismatch.');
+    for I:=0 to N-1 do
+      if IsNan(Targets[I]) or IsInfinite(Targets[I]) then
+        raise EAnalysisError.CreateFmt(
+          'FitRegressionForest: target %d must be finite.',[I]);
+  end;
+  Result.Task:=Task; Result.ClassCount:=ClassCount;
+  Result.Seed:=Seed;
+  SetLength(Result.Trees,TreeCount);
+  SetLength(Importance,Data.Cols);
+  SetLength(OOBCounts,N); SetLength(OOBSums,N);
+  Random:=TLocalRandom.Seeded(Seed);
+  SetLength(Bootstrap,N); SetLength(InBag,N);
+  for TreeIndex:=0 to TreeCount-1 do
+  begin
+    FillChar(InBag[0],N*SizeOf(Boolean),0);
+    for I:=0 to N-1 do
+    begin
+      Bootstrap[I]:=Random.NextInteger(N);
+      InBag[Bootstrap[I]]:=True;
+    end;
+    BuildNode(Bootstrap,0,Result.Trees[TreeIndex]);
+    for I:=0 to N-1 do
+      if not InBag[I] then
+      begin
+        Prediction:=TreePrediction(Result.Trees[TreeIndex],Data,I);
+        Inc(OOBCounts[I]);
+        if Task=ftClassification then
+          Inc(OOBVotes[I][Round(Prediction)])
+        else
+          OOBSums[I]:=OOBSums[I]+Prediction;
+      end;
+  end;
+  Result.FeatureImportances:=Copy(Importance);
+  ImportanceTotal:=0;
+  for J:=0 to High(Result.FeatureImportances) do
+    ImportanceTotal:=ImportanceTotal+Result.FeatureImportances[J];
+  if ImportanceTotal>0 then
+    for J:=0 to High(Result.FeatureImportances) do
+      Result.FeatureImportances[J]:=
+        Result.FeatureImportances[J]/ImportanceTotal;
+  OOBTotal:=0;
+  if Task=ftClassification then
+  begin
+    Correct:=0;
+    for I:=0 to N-1 do if OOBCounts[I]>0 then
+    begin
+      Inc(OOBTotal); J:=0;
+      for ClassIndex:=1 to High(OOBVotes[I]) do
+        if OOBVotes[I][ClassIndex]>OOBVotes[I][J] then J:=ClassIndex;
+      if J=Labels[I] then Inc(Correct);
+    end;
+    if OOBTotal>0 then Result.OOBScore:=Correct/OOBTotal;
+  end
+  else
+  begin
+    MeanTarget:=0; OOBTotal:=0;
+    for I:=0 to N-1 do if OOBCounts[I]>0 then
+    begin MeanTarget:=MeanTarget+Targets[I]; Inc(OOBTotal); end;
+    if OOBTotal>0 then MeanTarget:=MeanTarget/OOBTotal;
+    SSE:=0; SST:=0;
+    for I:=0 to N-1 do if OOBCounts[I]>0 then
+    begin
+      Prediction:=OOBSums[I]/OOBCounts[I];
+      SSE:=SSE+Sqr(Targets[I]-Prediction);
+      SST:=SST+Sqr(Targets[I]-MeanTarget);
+    end;
+    if SST>0 then Result.OOBScore:=1-SSE/SST;
+  end;
+end;
+
+class function TAnalysisKit.FitClassificationForest(
+  const Data:IDenseDoubleMatrix; const Labels:TIntegerArray;
+  const TreeCount,MaximumDepth,MinimumLeafSize:Integer;
+  const Seed:QWord):TDecisionForest;
+begin
+  Result:=BuildForest(Data,Labels,nil,ftClassification,TreeCount,
+    MaximumDepth,MinimumLeafSize,Seed);
+end;
+
+class function TAnalysisKit.FitRegressionForest(
+  const Data:IDenseDoubleMatrix; const Targets:TDoubleArray;
+  const TreeCount,MaximumDepth,MinimumLeafSize:Integer;
+  const Seed:QWord):TDecisionForest;
+begin
+  Result:=BuildForest(Data,nil,Targets,ftRegression,TreeCount,
+    MaximumDepth,MinimumLeafSize,Seed);
+end;
+
+procedure ValidateForestPrediction(const Model:TDecisionForest;
+  const Data:IDenseDoubleMatrix; Task:TForestTask);
+begin
+  ValidateData(Data,'Decision forest prediction');
+  if Model.Task<>Task then
+    raise EAnalysisError.Create('Decision forest prediction: task mismatch.');
+  if Length(Model.Trees)=0 then
+    raise EAnalysisError.Create('Decision forest prediction: model has no trees.');
+  if Length(Model.FeatureImportances)<>Data.Cols then
+    raise EAnalysisError.Create(
+      'Decision forest prediction: feature count mismatch.');
+end;
+
+class function TAnalysisKit.PredictForestClasses(
+  const Model:TDecisionForest;
+  const Data:IDenseDoubleMatrix):TIntegerArray;
+var
+  Votes:TIntegerArray;
+  I,J,Best:Integer;
+begin
+  Result:=nil;
+  ValidateForestPrediction(Model,Data,ftClassification);
+  if Model.ClassCount<2 then
+    raise EAnalysisError.Create(
+      'PredictForestClasses: invalid class metadata.');
+  SetLength(Result,Data.Rows); SetLength(Votes,Model.ClassCount);
+  for I:=0 to Data.Rows-1 do
+  begin
+    FillChar(Votes[0],Length(Votes)*SizeOf(Integer),0);
+    for J:=0 to High(Model.Trees) do
+      Inc(Votes[Round(TreePrediction(Model.Trees[J],Data,I))]);
+    Best:=0;
+    for J:=1 to High(Votes) do if Votes[J]>Votes[Best] then Best:=J;
+    Result[I]:=Best;
+  end;
+end;
+
+class function TAnalysisKit.PredictForestValues(
+  const Model:TDecisionForest;
+  const Data:IDenseDoubleMatrix):TDoubleArray;
+var I,J:Integer;
+begin
+  Result:=nil;
+  ValidateForestPrediction(Model,Data,ftRegression);
+  SetLength(Result,Data.Rows);
+  for I:=0 to Data.Rows-1 do
+  begin
+    for J:=0 to High(Model.Trees) do
+      Result[I]:=Result[I]+TreePrediction(Model.Trees[J],Data,I);
+    Result[I]:=Result[I]/Length(Model.Trees);
   end;
 end;
 

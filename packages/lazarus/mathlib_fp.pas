@@ -17,6 +17,7 @@ uses
   MathBase.Iteration,
   MathBase.Random,
   MathBase.Interchange,
+  MathBase.Expressions,
   { AlgebraLib }
   AlgebraLib.Matrices,
   AlgebraLib.DenseMatrices,
@@ -42,6 +43,7 @@ uses
   { StatsLib }
   StatsLib.Stats,
   StatsLib.Streaming,
+  StatsLib.Inference,
   { ProbabilityLib }
   ProbabilityLib.Distributions,
   { CombinatoricsLib }
@@ -60,6 +62,8 @@ uses
   { MLLib }
   MLLib.MachineLearning,
   MLLib.Analysis,
+  { Optional cross-domain adapters }
+  InterchangeLib.Models,
   { GeometryLib }
   GeometryLib.Geometry;
 

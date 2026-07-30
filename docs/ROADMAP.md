@@ -970,15 +970,30 @@ already broad applied-numerics release.
   `MLLib.Analysis` use the existing shared real/complex arrays and typed dense
   matrices. The [applied-data example](../examples/19_applied_data_pipeline.pas)
   passes those containers through DSP, statistics, fitting, PCA, clustering,
-  and scalar Kalman filtering without format adapters.
-- Online statistics, streaming FIR/biquad filters, and scalar Kalman filtering
-  publish their retained state and have bounded-state tests. The large-data
-  benchmark records retained accumulators as well as elapsed time.
+  and scalar Kalman filtering without format adapters. The
+  [gap-closure example](../examples/21_release_1_8_workflows.pas) covers
+  block DSP, inference, fitted preprocessing, forests, multivariate Kalman,
+  selected-model persistence, and bounded expressions.
+- Online statistics, overlap-add/save, streaming FIR/biquad filters, and
+  scalar/multivariate Kalman filtering publish bounded retained state and have
+  restoration, long-block, and failure-atomic tests. Small, batch, streaming,
+  and large benchmark classes record result allocation or retained-state
+  counts as well as elapsed time.
 - `MathBase.Interchange` provides invariant text, delimited text, Matrix Market,
   and a versioned little-endian binary format. Win64 and Win32 round-trip tests
   cover real/complex vectors and matrices plus RNG state; malformed CRC,
   version, reserved-byte, truncation, non-finite, and oversized inputs are
-  rejected before a result or caller state is changed.
+  rejected before a result or caller state is changed. `InterchangeLib.Models`
+  applies the same version/kind/CRC/resource discipline to cubic splines,
+  streaming FIR, fitted standardization, and scalar Kalman state.
+- The 1.7 audit adds configurable classical splines, explicit complex-step and
+  vector AD paths, cubature/local-RNG Monte Carlo, scaled/rank-aware fitting,
+  complex polynomial roots, component ODE tolerances, detailed optimizers and
+  workspace reuse, two-phase simplex, and QP failure/certificate diagnostics.
+- `StatsLib.Inference`, deterministic hierarchy/forests, leakage-safe fitted
+  preprocessing, multivariate Kalman filtering, typed metadata, model
+  summaries, and bounded expression evaluation have direct reference,
+  malformed-input, resource, and identifiability tests.
 - The direct DFT and portable dense multiply remain correctness oracles.
   Bluestein, blocked, and automatic paths have cross-path tolerance,
   deterministic-dispatch, aliasing, and failure-atomic tests. No parallel or
@@ -992,8 +1007,10 @@ already broad applied-numerics release.
 - The machine-readable [capability inventory](capabilities.json) and generated
   [status page](CAPABILITIES.md) identify stable entry points, scalar and shape
   limits, complexity and workspace behavior, evidence locations, and the
-  advanced DSP, inference, model-persistence, multivariate state-space, and
-  parallel/SIMD families that remain unsupported.
+  conditional advanced DSP design, survival/factor/robust-covariance,
+  controlled/smoothed state space, general persistence, implicit ODE,
+  interior-point/general-cone, and parallel/SIMD families that remain
+  unsupported.
 
 ## Planned 2.0.0 — Stable native numerical platform
 

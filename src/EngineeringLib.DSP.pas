@@ -24,6 +24,41 @@ type
 
   TFFTNormalization = (fnBackward, fnForward, fnUnitary, fnNone);
   TConvolutionMethod = (cmAutomatic, cmDirect, cmFFT);
+  TComplexBatch = array of TComplexArray;
+  TSingleComplexBatch = array of TSingleComplexArray;
+
+  TOverlapAddConvolver = record
+  private
+    FImpulse: TDoubleArray;
+    FTail: TDoubleArray;
+    FMethod: TConvolutionMethod;
+  public
+    class function Create(const Impulse:TDoubleArray;
+      const Method:TConvolutionMethod=cmFFT):TOverlapAddConvolver; static;
+    function ProcessBlock(const Input:TDoubleArray):TDoubleArray;
+    function Flush:TDoubleArray;
+    procedure Reset;
+    function Impulse:TDoubleArray;
+    function Tail:TDoubleArray;
+    procedure RestoreTail(const Values:TDoubleArray);
+    function StateSize:SizeInt;
+  end;
+
+  TOverlapSaveConvolver = record
+  private
+    FImpulse: TDoubleArray;
+    FHistory: TDoubleArray;
+    FMethod: TConvolutionMethod;
+  public
+    class function Create(const Impulse:TDoubleArray;
+      const Method:TConvolutionMethod=cmFFT):TOverlapSaveConvolver; static;
+    function ProcessBlock(const Input:TDoubleArray):TDoubleArray;
+    procedure Reset;
+    function Impulse:TDoubleArray;
+    function History:TDoubleArray;
+    procedure RestoreHistory(const Values:TDoubleArray);
+    function StateSize:SizeInt;
+  end;
 
   TWindowMetrics = record
     CoherentGain: Double;
@@ -107,6 +142,14 @@ type
       const Inverse: Boolean = False;
       const Normalization: TFFTNormalization = fnBackward):
       IDenseComplexMatrix; static;
+    class function TransformBatch(const Input:TComplexBatch;
+      const Inverse:Boolean=False;
+      const Normalization:TFFTNormalization=fnBackward):TComplexBatch;
+      overload; static;
+    class function TransformBatch(const Input:TSingleComplexBatch;
+      const Inverse:Boolean=False;
+      const Normalization:TFFTNormalization=fnBackward):TSingleComplexBatch;
+      overload; static;
 
     class function Convolve(const A, B: TDoubleArray;
       const Method: TConvolutionMethod = cmAutomatic): TDoubleArray; static;
@@ -137,6 +180,8 @@ type
       const SegmentLength, Overlap: SizeInt;
       const SampleRate: Double = 1.0;
       const WindowType: TWindowType = wtHann): TCrossSpectralEstimate; static;
+    class function HaarTransform(const Input:TDoubleArray;
+      const Inverse:Boolean=False):TDoubleArray; static;
 
     class function DesignButterworthLowPass(const NormalizedCutoff: Double):
       TBiquadCoefficients; static;
@@ -534,6 +579,29 @@ begin
   end;
 end;
 
+class function TDSPKit.TransformBatch(const Input:TComplexBatch;
+  const Inverse:Boolean; const Normalization:TFFTNormalization):TComplexBatch;
+var
+  I:SizeInt;
+begin
+  Result:=nil;
+  SetLength(Result,Length(Input));
+  for I:=0 to High(Input) do
+    Result[I]:=Transform(Input[I],Inverse,Normalization);
+end;
+
+class function TDSPKit.TransformBatch(const Input:TSingleComplexBatch;
+  const Inverse:Boolean;
+  const Normalization:TFFTNormalization):TSingleComplexBatch;
+var
+  I:SizeInt;
+begin
+  Result:=nil;
+  SetLength(Result,Length(Input));
+  for I:=0 to High(Input) do
+    Result[I]:=Transform(Input[I],Inverse,Normalization);
+end;
+
 class function TDSPKit.SelectedConvolutionMethod(const LengthA,
   LengthB: SizeInt): TConvolutionMethod;
 begin
@@ -614,6 +682,149 @@ begin
     Reversed[I] := B[High(B) - I];
   Result := Convolve(A, Reversed, Method);
 end;
+
+class function TOverlapAddConvolver.Create(const Impulse:TDoubleArray;
+  const Method:TConvolutionMethod):TOverlapAddConvolver;
+begin
+  Result:=Default(TOverlapAddConvolver);
+  RequireFinite(Impulse,'TOverlapAddConvolver.Create');
+  if Length(Impulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapAddConvolver.Create: impulse must not be empty.');
+  Result.FImpulse:=Copy(Impulse);
+  SetLength(Result.FTail,Length(Impulse)-1);
+  Result.FMethod:=Method;
+end;
+
+function TOverlapAddConvolver.ProcessBlock(
+  const Input:TDoubleArray):TDoubleArray;
+var
+  Work,NewTail:TDoubleArray;
+  I,SourceIndex:SizeInt;
+begin
+  if Length(FImpulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapAddConvolver.ProcessBlock: convolver is not initialized.');
+  RequireFinite(Input,'TOverlapAddConvolver.ProcessBlock');
+  if Length(Input)=0 then Exit(nil);
+  Work:=TDSPKit.Convolve(Input,FImpulse,FMethod);
+  SetLength(Result,Length(Input));
+  for I:=0 to High(Result) do
+  begin
+    Result[I]:=Work[I];
+    if I<Length(FTail) then
+      Result[I]:=SafeSum(Result[I],FTail[I],
+        'TOverlapAddConvolver.ProcessBlock');
+  end;
+  SetLength(NewTail,Length(FImpulse)-1);
+  for I:=0 to High(NewTail) do
+  begin
+    SourceIndex:=Length(Input)+I;
+    if SourceIndex<Length(Work) then NewTail[I]:=Work[SourceIndex];
+    if SourceIndex<Length(FTail) then
+      NewTail[I]:=SafeSum(NewTail[I],FTail[SourceIndex],
+        'TOverlapAddConvolver.ProcessBlock');
+  end;
+  FTail:=NewTail;
+end;
+
+function TOverlapAddConvolver.Flush:TDoubleArray;
+begin
+  if Length(FImpulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapAddConvolver.Flush: convolver is not initialized.');
+  Result:=Copy(FTail);
+  Reset;
+end;
+
+procedure TOverlapAddConvolver.Reset;
+begin
+  SetLength(FTail,Length(FImpulse)-1);
+end;
+
+function TOverlapAddConvolver.Impulse:TDoubleArray;
+begin Result:=Copy(FImpulse); end;
+
+function TOverlapAddConvolver.Tail:TDoubleArray;
+begin Result:=Copy(FTail); end;
+
+procedure TOverlapAddConvolver.RestoreTail(const Values:TDoubleArray);
+begin
+  if Length(FImpulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapAddConvolver.RestoreTail: convolver is not initialized.');
+  RequireFinite(Values,'TOverlapAddConvolver.RestoreTail');
+  if Length(Values)<>Length(FTail) then
+    raise EDSPError.CreateFmt(
+      'TOverlapAddConvolver.RestoreTail: expected %d samples; got %d.',
+      [Length(FTail),Length(Values)]);
+  FTail:=Copy(Values);
+end;
+
+function TOverlapAddConvolver.StateSize:SizeInt;
+begin Result:=Length(FTail); end;
+
+class function TOverlapSaveConvolver.Create(const Impulse:TDoubleArray;
+  const Method:TConvolutionMethod):TOverlapSaveConvolver;
+begin
+  Result:=Default(TOverlapSaveConvolver);
+  RequireFinite(Impulse,'TOverlapSaveConvolver.Create');
+  if Length(Impulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapSaveConvolver.Create: impulse must not be empty.');
+  Result.FImpulse:=Copy(Impulse);
+  SetLength(Result.FHistory,Length(Impulse)-1);
+  Result.FMethod:=Method;
+end;
+
+function TOverlapSaveConvolver.ProcessBlock(
+  const Input:TDoubleArray):TDoubleArray;
+var
+  Combined,Work,NewHistory:TDoubleArray;
+  I,Offset:SizeInt;
+begin
+  if Length(FImpulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapSaveConvolver.ProcessBlock: convolver is not initialized.');
+  RequireFinite(Input,'TOverlapSaveConvolver.ProcessBlock');
+  if Length(Input)=0 then Exit(nil);
+  Offset:=Length(FHistory);
+  SetLength(Combined,Offset+Length(Input));
+  for I:=0 to High(FHistory) do Combined[I]:=FHistory[I];
+  for I:=0 to High(Input) do Combined[Offset+I]:=Input[I];
+  Work:=TDSPKit.Convolve(Combined,FImpulse,FMethod);
+  SetLength(Result,Length(Input));
+  for I:=0 to High(Result) do Result[I]:=Work[Offset+I];
+  SetLength(NewHistory,Offset);
+  for I:=0 to High(NewHistory) do
+    NewHistory[I]:=Combined[Length(Combined)-Offset+I];
+  FHistory:=NewHistory;
+end;
+
+procedure TOverlapSaveConvolver.Reset;
+begin SetLength(FHistory,Length(FImpulse)-1); end;
+
+function TOverlapSaveConvolver.Impulse:TDoubleArray;
+begin Result:=Copy(FImpulse); end;
+
+function TOverlapSaveConvolver.History:TDoubleArray;
+begin Result:=Copy(FHistory); end;
+
+procedure TOverlapSaveConvolver.RestoreHistory(const Values:TDoubleArray);
+begin
+  if Length(FImpulse)=0 then
+    raise EDSPError.Create(
+      'TOverlapSaveConvolver.RestoreHistory: convolver is not initialized.');
+  RequireFinite(Values,'TOverlapSaveConvolver.RestoreHistory');
+  if Length(Values)<>Length(FHistory) then
+    raise EDSPError.CreateFmt(
+      'TOverlapSaveConvolver.RestoreHistory: expected %d samples; got %d.',
+      [Length(FHistory),Length(Values)]);
+  FHistory:=Copy(Values);
+end;
+
+function TOverlapSaveConvolver.StateSize:SizeInt;
+begin Result:=Length(FHistory); end;
 
 class function TDSPKit.ResampleLinear(const Input: TDoubleArray;
   const OutputLength: SizeInt): TDoubleArray;
@@ -930,6 +1141,52 @@ begin
         ComplexMagnitudeSquared(Result.CrossPower[I]) / Denominator)
     else
       Result.Coherence[I] := 0.0;
+  end;
+end;
+
+class function TDSPKit.HaarTransform(const Input:TDoubleArray;
+  const Inverse:Boolean):TDoubleArray;
+var
+  Work:TDoubleArray;
+  Active,Half,I:SizeInt;
+  InvSqrt2:Double;
+begin
+  RequireFinite(Input,'HaarTransform');
+  if Length(Input)=0 then Exit(nil);
+  if (Length(Input) and (Length(Input)-1))<>0 then
+    raise EDSPError.Create(
+      'HaarTransform: input length must be a power of two.');
+  Result:=Copy(Input);
+  SetLength(Work,Length(Input));
+  InvSqrt2:=1/Sqrt(2);
+  if not Inverse then
+  begin
+    Active:=Length(Result);
+    while Active>1 do
+    begin
+      Half:=Active div 2;
+      for I:=0 to Half-1 do
+      begin
+        Work[I]:=(Result[2*I]+Result[2*I+1])*InvSqrt2;
+        Work[Half+I]:=(Result[2*I]-Result[2*I+1])*InvSqrt2;
+      end;
+      for I:=0 to Active-1 do Result[I]:=Work[I];
+      Active:=Half;
+    end;
+  end
+  else
+  begin
+    Active:=1;
+    while Active<Length(Result) do
+    begin
+      for I:=0 to Active-1 do
+      begin
+        Work[2*I]:=(Result[I]+Result[Active+I])*InvSqrt2;
+        Work[2*I+1]:=(Result[I]-Result[Active+I])*InvSqrt2;
+      end;
+      for I:=0 to 2*Active-1 do Result[I]:=Work[I];
+      Active:=2*Active;
+    end;
   end;
 end;
 

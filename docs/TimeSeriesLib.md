@@ -2,10 +2,44 @@
 
 `TimeSeriesLib.TimeSeries` — time series analysis for Free Pascal.
 
-`TimeSeriesLib.StateSpace` adds the stable 1.8 scalar linear-Gaussian Kalman
-baseline. Its configuration, bounded mutable state, failure-atomic block
-processing, and forecast ownership are documented in the
+`TimeSeriesLib.StateSpace` adds stable 1.8 scalar and multivariate
+linear-Gaussian Kalman baselines. Their configuration, bounded mutable state,
+failure-atomic block processing, and forecast ownership are documented in the
 [applied numerics guide](AppliedNumerics.md).
+
+---
+
+## State-space selection in 1.8
+
+Use `TScalarKalmanFilter` when state and observation are both scalar. Its
+configuration holds four finite coefficients; each update and forecast step
+uses constant retained state.
+
+Use `TMultivariateKalmanFilter` when either state or observation has multiple
+components. `TMultivariateKalmanConfiguration.Create` snapshots:
+
+- square state transition and process covariance matrices;
+- an observation-by-state observation matrix; and
+- a square observation measurement covariance.
+
+`Update` returns the posterior state, state covariance, innovation, innovation
+covariance, and log likelihood contribution. `Process` accepts observations
+as matrix rows and returns every state/covariance and innovation diagnostic.
+`Forecast` returns observation means and covariances without mutating the
+filter. `StateMean` and `StateCovariance` return independent copies.
+`TDenseDoubleMatrixArray` is the owned covariance-series container used by
+the multivariate result records.
+
+Both filters validate a complete block before committing the working state.
+Invalid shapes, non-finite values, asymmetric covariance input, failed
+positive-definite innovation solves, and overflow raise `EStateSpaceError`
+without a partial state advance. Covariance updates use symmetry restoration
+and checked dense factors. A filter record is mutable and must not be updated
+concurrently.
+
+These are time-invariant, linear-Gaussian filtering and forecasting
+baselines. Missing observations, controls, smoothing, nonlinear filters, and
+parameter estimation are deliberately outside 1.8.
 
 ---
 

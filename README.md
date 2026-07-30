@@ -71,17 +71,17 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 
 | Domain (unit family) | Highlights |
 | --- | --- |
-| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, and numerical interchange |
+| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange |
 | [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed storage/kernels](docs/TypedDenseMatrices.md), and [dense decompositions/solvers](docs/DenseLinearAlgebra.md) |
 | [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics |
-| [StatsLib](docs/StatsLib.md) | Descriptive, weighted/streaming statistics, tests, correlation, and bootstrap |
-| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, signals/DSP, and unit conversion |
+| [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap |
+| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion |
 | [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs |
 | [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions |
 | [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations |
-| [OptimizationLib](docs/OptimizationLib.md) | Scalar/multivariate optimisation, LP, dense convex QP and SOCP |
-| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar Kalman filtering |
-| [MLLib](docs/MLLib.md) | Preprocessing, regression, classification, typed PCA/clustering/LDA, and exact neighbours |
+| [OptimizationLib](docs/OptimizationLib.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP |
+| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering |
+| [MLLib](docs/MLLib.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours |
 | [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms |
 
 All public units live in `src/`; the domains can be used independently unless
@@ -91,7 +91,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 21 commented walkthroughs with
+The [`examples/`](examples/) directory contains 22 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:

@@ -1,9 +1,11 @@
 # Applied numerics and data workflows
 
-Version 1.8 adds applied DSP, streaming statistics, typed data analysis, local
-random state, and a scalar state-space baseline without introducing new vector
-or matrix containers. The reviewed ownership and numerical decisions are in
-the [1.8 design record](design/applied-numerics-1.8.md).
+Version 1.8 adds applied DSP, statistical inference, typed data analysis,
+local random state, scalar and multivariate state-space models, bounded
+expressions, and versioned model persistence without introducing new vector or
+matrix containers. The original design decisions and the audited 1.7/1.8 gap
+closure are in the [applied-numerics design record](design/applied-numerics-1.8.md)
+and [release gap-closure record](design/release-1.8-gap-closure.md).
 
 Maturity: **stable for the APIs documented on this page**. The capability
 inventory lists the broader roadmap families that remain unsupported.
@@ -44,6 +46,10 @@ Kalman filtering without private array conversions.
 | Larger convolution | `TDSPKit.Convolve(..., cmFFT)` | Lower asymptotic cost; small rounding differences are expected |
 | Default convolution | `cmAutomatic` | Fixed `Length(A)*Length(B)` threshold, independent of timing and CPU |
 | Repeated causal FIR blocks | `TStreamingFIR` | State is exactly `tap count - 1` prior samples |
+| Independent FFT batches | `TransformBatch` | One result per input; single- and double-complex overloads |
+| Finite block convolution | `TOverlapAddConvolver` | Returns each block plus a final `Flush` tail |
+| Continuous same-size blocks | `TOverlapSaveConvolver` | Returns one output per input sample and retains `tap count - 1` history |
+| Dyadic wavelet analysis | `HaarTransform` | Portable orthonormal Haar transform; length must be a power of two |
 
 Forward transforms use `exp(-2*pi*i*k*n/N)`. `fnBackward`, the default, leaves
 the forward transform unscaled and divides the inverse by `N`. `fnForward`
@@ -54,6 +60,13 @@ correctness oracle, not the throughput path.
 `Convolve` returns `Length(A)+Length(B)-1` samples. `Correlate` reports lags
 from `-(Length(B)-1)` to `Length(A)-1`. Empty convolution input produces an
 empty result. Inputs must be finite.
+
+Overlap-add and overlap-save snapshot their impulse response, validate a whole
+block before advancing state, and expose state only through copied
+`Tail`/`History` values. `Reset` restores zero state. Use overlap-add plus
+`Flush` for a finite sequence; use overlap-save where every block must have
+the same length as its input. Both accept the deterministic direct/FFT
+selection enum and are compared with direct convolution in the test oracle.
 
 ## Spectral analysis and filters
 
@@ -113,6 +126,26 @@ the current stream as a child and jumps the parent by `2^128` states.
 This generator is suitable for simulation and deterministic sampling, not
 cryptography. Give each thread its own state.
 
+## Statistical inference and regression
+
+`StatsLib.Inference` adds paired distribution operations and diagnostics:
+
+- normal, exponential, and binomial `PDF`/`PMF`, `LogPDF`/`LogPMF`, `CDF`,
+  `Survival`, `Quantile`, and caller-owned local-RNG `Sample`;
+- normal, exponential, gamma, and binomial parameter estimates with
+  likelihood, standard errors where identifiable, iteration status, and an
+  explicit `Identifiable` flag;
+- one-sample, paired, and Welch t tests, one-way ANOVA, contingency chi-square,
+  Mann-Whitney U, and Bonferroni or Benjamini-Hochberg corrections; and
+- SVD-based OLS diagnostics and logistic regression that reports separation
+  or singular information through status and `Identifiable`.
+
+Distribution endpoints follow their mathematical limits. Invalid parameters,
+non-finite samples, degenerate designs, and inconsistent shapes raise
+`EInferenceError`. Approximate p-values and standard errors are documented
+diagnostics, not substitutes for a certified regulatory statistics package.
+See the [statistics guide](StatsLib.md) for selection details.
+
 ## Typed data analysis
 
 `MLLib.Analysis` uses `IDenseDoubleMatrix` directly, with observations in rows
@@ -126,17 +159,27 @@ and features in columns:
   result.
 - `CreateValidationSplit` and `KFoldAssignments` return reproducible row-index
   partitions. Preprocessing must be fitted on training rows only.
+- `FitStandardization` learns finite column means and population scales from
+  training data only; `TransformStandardized` applies that immutable snapshot.
 - `FitBinaryLDA` uses the shared dense solve for the within-class scatter
   system. The optional non-negative ridge handles singular or nearly singular
   scatter.
+- `HierarchicalCluster` supports single, complete, and average linkage with
+  deterministic tie-breaking. `CutHierarchy` returns a requested flat cut.
+- `FitClassificationForest` and `FitRegressionForest` build reproducible
+  seeded bootstrap forests. Results include normalized impurity importance
+  and OOB accuracy or OOB R-squared over rows receiving an OOB prediction.
 - `TKDTree` owns an immutable typed-matrix snapshot. `Query` returns exact
   neighbours ordered by squared distance and then original row index.
 
 All feature values must be finite. PCA needs at least two rows and non-zero
-centered variance. K-means++ targets in-memory dense data. The k-d tree is most
-useful for exact low-dimensional queries; high dimensions weaken pruning.
+centered variance. K-means++, hierarchical clustering, and forests target
+in-memory dense data. Forest feature importance is impurity-based and can
+favour continuous or high-cardinality variables; OOB score can be based on
+fewer than all training rows for small forests. The k-d tree is most useful
+for exact low-dimensional queries; high dimensions weaken pruning.
 
-## Scalar state-space baseline
+## Scalar and multivariate state space
 
 `TScalarKalmanConfiguration` defines transition, observation, process
 variance, and measurement variance for a scalar linear-Gaussian system.
@@ -148,8 +191,17 @@ updates a private working copy, so validation or numerical failure does not
 partially advance the caller state. `Forecast` does not mutate the filter.
 Covariance uses the Joseph update.
 
-The stable baseline is scalar and time-invariant. Multivariate, controlled,
-missing-observation, smoothing, and parameter-estimation models remain open.
+`TMultivariateKalmanConfiguration` snapshots dense transition, observation,
+process-covariance, and measurement-covariance matrices.
+`TMultivariateKalmanFilter` returns state means/covariances, innovations,
+innovation covariances, per-block log likelihood, and observation forecasts.
+Construction and updates validate dimensions, symmetry, and positive
+definiteness where required. A complete measurement matrix is processed on a
+working copy, so invalid input or a numerical failure leaves the filter
+unchanged.
+
+Both stable models are time-invariant and linear-Gaussian. Controlled systems,
+missing observations, smoothing, and parameter estimation remain open.
 
 ## Complexity, ownership, and errors
 
@@ -161,23 +213,28 @@ Arrays are zero-indexed.
 | --- | --- | --- |
 | FFT | O(N log N) | O(N), or next power of two above `2N-1` for Bluestein |
 | Direct / FFT convolution | O(NM) / O(L log L) | output / padded spectra |
+| FFT batch | Sum of member FFT costs | independent output arrays |
+| Overlap-add/save block | direct O(block*taps), FFT O(L log L) | output plus O(taps) retained state |
 | Streaming FIR | O(block*taps) | O(taps) state plus output |
 | Online statistics update/merge | O(1) | O(1) |
 | PCA | typed compact SVD cost | centered matrix, factors, scores |
 | k-means++ | O(iterations*rows*features*clusters) | labels, centroids, distances |
+| Hierarchical clustering | O(rows^3) portable baseline | O(rows^2) distances/state |
+| Decision forest | data/tree/depth dependent | owned trees plus O(rows) bootstrap/OOB state |
 | k-d query | average sublinear; O(rows) worst case | O(k + tree depth) |
 | Scalar Kalman sample | O(1) | O(1) state |
+| Multivariate Kalman sample | dense factor/solve cost | state and observation covariance workspaces |
 
-`EDSPError`, `EStreamingStatsError`, `ERandomStateError`, `EAnalysisError`, and
-`EStateSpaceError` identify invalid parameters or numerical failures. No API
-on this page uses a service, foreign binary, network, GUI, or hidden global
-state.
+`EDSPError`, `EStreamingStatsError`, `EInferenceError`,
+`ERandomStateError`, `EAnalysisError`, and `EStateSpaceError` identify invalid
+parameters or numerical failures. No API on this page uses a service, foreign
+binary, network, GUI, or hidden global state.
 
 ## Important open items
 
-The 1.8 stable boundary does not claim overlap-add/save convolution,
-equiripple filters, Chebyshev/elliptic/Bessel IIR design, wavelets, decision
-forests, generalized linear models, survival/factor analysis, multivariate
-state-space models, or parallel/SIMD execution. See the
-[capability inventory](CAPABILITIES.md) rather than inferring support from the
-roadmap.
+The 1.8 stable boundary does not claim equiripple filters,
+Chebyshev/elliptic/Bessel IIR design, wavelet packets, survival/factor
+analysis, robust covariance families, controlled or smoothed state-space
+models, or parallel/SIMD execution. Logistic regression is the only new
+generalized-linear-model family. See the [capability inventory](CAPABILITIES.md)
+rather than inferring support from the roadmap.

@@ -14,6 +14,7 @@ Foundation domain for mathlib-fp. All other domains depend on its units.
 | `MathBase.Iteration` | [MathBase.Iteration.pas](../src/MathBase.Iteration.pas) |
 | `MathBase.Random` | [MathBase.Random.pas](../src/MathBase.Random.pas) |
 | `MathBase.Interchange` | [MathBase.Interchange.pas](../src/MathBase.Interchange.pas) |
+| `MathBase.Expressions` | [MathBase.Expressions.pas](../src/MathBase.Expressions.pas) |
 
 ---
 
@@ -24,6 +25,14 @@ the RTL global `RandSeed`, plus invariant text, delimited, Matrix Market, and
 checked binary interchange. See the [applied numerics guide](AppliedNumerics.md)
 for the random-state contract and the [interchange guide](Interchange.md) for
 format versions, ownership, limits, and failure behaviour.
+
+`MathBase.Expressions` is an opt-in, bounded mathematical evaluator for finite
+scalar, vector, and dense-matrix symbol bindings. It supports arithmetic,
+elementwise elementary functions, `dot`, `matmul`, and `transpose`, subject to
+caller-selected text, depth, operation, and element limits. It deliberately
+has no assignment, loops, recursion, I/O, process, environment, network, or
+callback primitives. See the [interchange guide](Interchange.md) for the
+language and safety boundary.
 
 ## MathBase.Complex
 

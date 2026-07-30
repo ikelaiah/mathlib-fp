@@ -133,12 +133,12 @@
     {
       "family": "interpolation_and_approximation",
       "unit": "NumericsLib.Interpolation",
-      "entry_points": ["TBarycentricInterpolator", "Rational", "TCubicInterpolator", "TGridSurface", "InverseDistance", "TScatteredInterpolator"],
+      "entry_points": ["TBarycentricInterpolator", "Rational", "TCubicInterpolator", "TCubicSplineInterpolator", "TGridSurface", "InverseDistance", "TScatteredInterpolator"],
       "maturity": "stable",
       "scalars": ["double"],
       "shapes": ["one_dimensional_knots", "rectangular_grid", "scattered_2d"],
       "complexity": "local evaluation O(log n); barycentric O(n); dense RBF/thin-plate construction O(n^3)",
-      "accuracy": "knot reproduction, monotonicity, planar-grid, and exact-node reference tests",
+      "accuracy": "knot reproduction, spline derivative/integral, monotonicity, planar-grid, and exact-node reference tests",
       "docs": "docs/NumericalModelling.md",
       "example": "examples/17_numerical_modelling.pas",
       "tests": "tests/TestNumericalModelling.pas",
@@ -147,7 +147,7 @@
     {
       "family": "differentiation_and_derivative_checking",
       "unit": "NumericsLib.Differentiation",
-      "entry_points": ["Gradient", "Jacobian", "Hessian", "TDual", "AutoGradient", "CheckGradient"],
+      "entry_points": ["Gradient", "Jacobian", "Hessian", "ComplexStepGradient", "TDual", "AutoGradient", "AutoJacobian", "CheckGradient", "CheckJacobian"],
       "maturity": "stable",
       "scalars": ["double", "dual_double"],
       "shapes": ["scalar", "vector", "dense_jacobian_hessian"],
@@ -155,12 +155,12 @@
       "accuracy": "analytic, central numerical, and forward-AD smooth-reference agreement",
       "docs": "docs/NumericalModelling.md",
       "tests": "tests/TestNumericalModelling.pas",
-      "limitations": ["forward mode only", "dual elementary function catalogue is explicit"]
+      "limitations": ["forward mode only", "complex-step callbacks must be analytic and preserve the imaginary perturbation", "dual elementary function catalogue is explicit"]
     },
     {
       "family": "numerical_modelling",
       "unit": "NumericsLib.Modelling",
-      "entry_points": ["IntegrateAdaptive", "IntegrateImproper", "IntegrateQuasiMonteCarlo", "FitLinearBasis", "FitPolynomial", "FitNonlinear", "SolveSystem", "SolveODE"],
+      "entry_points": ["IntegrateAdaptive", "IntegrateImproper", "IntegrateCubature", "IntegrateQuasiMonteCarlo", "IntegrateMonteCarlo", "FitLinearBasis", "FitPolynomial", "FitNonlinear", "FitNonlinearAuto", "SolveSystem", "SolveSystemAuto", "SolvePolynomial", "SolveODE"],
       "maturity": "stable",
       "scalars": ["double"],
       "shapes": ["scalar_integral", "dense_fit", "vector_system", "vector_initial_value_ode"],
@@ -169,7 +169,21 @@
       "docs": "docs/NumericalModelling.md",
       "example": "examples/17_numerical_modelling.pas",
       "tests": "tests/TestNumericalModelling.pas",
-      "limitations": ["non-stiff ODE only", "Halton integration error is a scale estimate, not a proof"]
+      "limitations": ["non-stiff explicit ODE only; no mass matrices", "tensor cubature is capped and intended for low dimensions", "Monte Carlo and Halton error values are estimates, not proofs"]
+    },
+    {
+      "family": "diagnostic_nonlinear_and_linear_optimization",
+      "unit": "OptimizationLib.Optimization",
+      "entry_points": ["TOptimizationOptions", "TOptimizationWorkspace", "NonlinearConjugateGradient", "BoundedLBFGS", "BoundedLBFGSWithWorkspace", "TrustRegion", "LBFGSAuto", "MultiStart", "SolveConstrained", "ExplorePareto", "SimplexLP"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["objective_vector", "smooth_constraints", "multiple_starts", "multiple_objectives", "dense_linear_program"],
+      "complexity": "iteration, callback, history, constraint, and tableau-size dependent",
+      "accuracy": "scaled/bounded/ill-conditioned objectives, cancellation/limits, warm start, feasibility, Pareto, and infeasible/unbounded LP fixtures",
+      "docs": "docs/OptimizationLib.md",
+      "example": "examples/17_numerical_modelling.pas",
+      "tests": "tests/TestOptimizationLib.pas",
+      "limitations": ["local smooth solvers do not prove global optimality", "weighted-sum Pareto exploration can miss non-convex fronts", "LP variables are non-negative and constraints use Ax <= b"]
     },
     {
       "family": "dense_convex_optimization",
@@ -183,7 +197,7 @@
       "docs": "docs/ConvexOptimization.md",
       "example": "examples/18_convex_optimization.pas",
       "tests": "tests/TestNumericalModelling.pas",
-      "limitations": ["dense continuous models only", "SOCP requires a strictly feasible start", "no general cone infeasibility certificate"]
+      "limitations": ["dense continuous models only", "SOCP requires a strictly feasible start", "unbounded certificate is limited to unconstrained QP recession directions", "no general cone infeasibility certificate"]
     },
     {
       "family": "shared_iteration_diagnostics",
@@ -230,51 +244,51 @@
     {
       "family": "applied_dsp",
       "unit": "EngineeringLib.DSP",
-      "entry_points": ["TDSPKit", "Transform", "RealTransform", "Transform2D", "Convolve", "Correlate", "Welch", "ShortTimeFourierTransform", "AnalyticSignal", "CrossSpectrum", "TStreamingFIR", "TStreamingBiquad"],
+      "entry_points": ["TDSPKit", "Transform", "TransformBatch", "RealTransform", "Transform2D", "Convolve", "Correlate", "TOverlapAddConvolver", "TOverlapSaveConvolver", "Welch", "ShortTimeFourierTransform", "AnalyticSignal", "CrossSpectrum", "HaarTransform", "TStreamingFIR", "TStreamingBiquad"],
       "maturity": "stable",
       "scalars": ["single", "double", "single_complex", "double_complex"],
       "shapes": ["one_dimensional_signal", "dense_complex_2d", "bounded_stream_block"],
-      "complexity": "radix-2/Bluestein transforms O(n log n); direct convolution O(n*m); streaming FIR O(block*m)",
-      "accuracy": "DFT-oracle, round-trip, direct/FFT convolution, spectral-bin, and block-equivalence fixtures with scalar-specific tolerances",
+      "complexity": "radix-2/Bluestein transforms O(n log n); direct convolution O(n*m); FFT/block convolution O(L log L); streaming FIR O(block*m)",
+      "accuracy": "DFT-oracle, batch/round-trip, direct/FFT/overlap convolution, spectral-bin, Haar, and block-equivalence fixtures with scalar-specific tolerances",
       "docs": "docs/AppliedNumerics.md",
       "example": "examples/19_applied_data_pipeline.pas",
       "benchmark": "benchmarks/BenchmarkRunner.lpr",
       "tests": "tests/TestAppliedNumerics.pas",
-      "limitations": ["finite inputs only", "FIR retains exactly taps-1 samples", "biquad retains two delay values", "advanced filter design and wavelets remain open"]
+      "limitations": ["finite inputs only", "overlap/FIR state is bounded by taps", "biquad retains two delay values", "equiripple and advanced IIR design plus wavelet packets remain open"]
     },
     {
       "family": "typed_data_analysis",
       "unit": "MLLib.Analysis",
-      "entry_points": ["TAnalysisKit", "PCA", "KMeansPlusPlus", "CreateValidationSplit", "KFoldAssignments", "FitBinaryLDA", "TKDTree"],
+      "entry_points": ["TAnalysisKit", "PCA", "KMeansPlusPlus", "CreateValidationSplit", "KFoldAssignments", "FitStandardization", "FitBinaryLDA", "HierarchicalCluster", "CutHierarchy", "FitClassificationForest", "FitRegressionForest", "PredictForestClasses", "PredictForestValues", "TKDTree"],
       "maturity": "stable",
       "scalars": ["double"],
       "shapes": ["rows_as_observations", "columns_as_features", "low_dimensional_neighbour_index"],
-      "complexity": "PCA uses dense SVD; k-means O(iterations*n*k*d); exact KD-tree query is data dependent with O(n) worst case",
-      "accuracy": "shared dense-factor oracle, deterministic seeded clustering/splits, classifier and brute-force-neighbour fixtures",
+      "complexity": "PCA uses dense SVD; k-means O(iterations*n*k*d); hierarchy baseline O(n^3); forest cost is tree/data/depth dependent; exact KD-tree query has O(n) worst case",
+      "accuracy": "shared dense-factor oracle, leakage-safe fitted transforms, deterministic clustering/splits/forests, OOB/importance, classifier and brute-force-neighbour fixtures",
       "docs": "docs/AppliedNumerics.md",
       "example": "examples/19_applied_data_pipeline.pas",
       "benchmark": "benchmarks/BenchmarkRunner.lpr",
       "tests": "tests/TestAppliedNumerics.pas",
-      "limitations": ["dense in-memory double data", "KD tree is intended for exact low-dimensional queries", "no forests, GLM, survival, or factor-analysis API"]
+      "limitations": ["dense in-memory double data", "impurity importance is biased toward continuous/high-cardinality features", "KD tree is intended for exact low-dimensional queries", "no survival or factor-analysis API"]
     },
     {
-      "family": "scalar_linear_state_space",
+      "family": "linear_gaussian_state_space",
       "unit": "TimeSeriesLib.StateSpace",
-      "entry_points": ["TScalarKalmanConfiguration", "TScalarKalmanFilter", "Process", "Forecast"],
+      "entry_points": ["TScalarKalmanConfiguration", "TScalarKalmanFilter", "TMultivariateKalmanConfiguration", "TMultivariateKalmanFilter", "Process", "Forecast"],
       "maturity": "stable",
       "scalars": ["double"],
-      "shapes": ["scalar_measurement_stream"],
-      "complexity": "O(1) per measurement and O(steps) returned series storage",
-      "accuracy": "closed-form scalar update, covariance non-negativity, replay, and failure-atomicity fixtures",
+      "shapes": ["scalar_measurement_stream", "dense_multivariate_measurement_stream"],
+      "complexity": "scalar O(1) per measurement; multivariate uses dense factor/solve work per measurement; O(steps) returned series storage",
+      "accuracy": "closed-form scalar and dense multivariate innovation/covariance references, likelihood, replay, forecast, and failure-atomicity fixtures",
       "docs": "docs/AppliedNumerics.md",
       "example": "examples/19_applied_data_pipeline.pas",
       "tests": "tests/TestAppliedNumerics.pas",
-      "limitations": ["scalar linear-Gaussian model only", "no missing-value or multivariate model support", "caller synchronizes shared mutable records"]
+      "limitations": ["time-invariant linear-Gaussian models only", "no missing-value, control, smoothing, or parameter-estimation support", "caller synchronizes shared mutable records"]
     },
     {
       "family": "numerical_interchange",
       "unit": "MathBase.Interchange",
-      "entry_points": ["ComplexToInvariant", "DenseMatrixToInvariant", "WriteDelimitedMatrix", "WriteMatrixMarket", "SaveBinary", "LoadDoubleMatrixBinary", "SaveRandomStateBinary"],
+      "entry_points": ["ComplexToInvariant", "DenseMatrixToInvariant", "WriteDelimitedMatrix", "WriteMatrixMarket", "SaveBinary", "LoadDoubleMatrixBinary", "SaveRandomStateBinary", "Summarize", "Describe", "TValueMetadata"],
       "maturity": "stable",
       "scalars": ["double", "double_complex", "uint64_state"],
       "shapes": ["vector", "dense_matrix", "four_word_random_state"],
@@ -283,31 +297,61 @@
       "docs": "docs/Interchange.md",
       "example": "examples/20_interchange_replay.pas",
       "tests": "tests/TestAppliedNumerics.pas",
-      "limitations": ["binary format is little-endian version 1", "Matrix Market subset is dense array real/complex general", "no model or decomposition persistence"]
+      "limitations": ["binary format is little-endian version 1", "Matrix Market subset is dense array real/complex general", "decomposition persistence is not shipped"]
     },
     {
       "family": "advanced_dsp_design_and_wavelets",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["equiripple and Chebyshev/elliptic/Bessel design, wavelets, and wavelet packets remain open 1.8 roadmap items"]
+      "limitations": ["Haar analysis/synthesis is stable; equiripple and Chebyshev/elliptic/Bessel design plus broader wavelets/wavelet packets remain conditional and unqualified"]
     },
     {
-      "family": "expanded_statistical_inference_and_modelling",
-      "maturity": "unsupported",
-      "scalars": [],
-      "limitations": ["GLM families, survival analysis, factor analysis, robust covariance, and expanded tests/distributions remain open"]
+      "family": "statistical_inference_and_regression",
+      "unit": "StatsLib.Inference",
+      "entry_points": ["TNormalDistribution", "TExponentialDistribution", "TBinomialDistribution", "EstimateNormal", "EstimateExponential", "EstimateGamma", "EstimateBinomial", "OneSampleT", "PairedT", "WelchT", "OneWayANOVA", "ChiSquareContingency", "MannWhitneyU", "AdjustBonferroni", "AdjustBenjaminiHochberg", "FitOLS", "FitLogistic"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar_distribution", "sample_vector", "dense_design_matrix", "contingency_table"],
+      "complexity": "distribution operations scalar/iterative; tests linear or sort-based; OLS/logistic use dense factor/solve work",
+      "accuracy": "distribution identities/round trips, seeded sampling, analytic fixtures, SVD rank diagnostics, and separated-logistic status tests",
+      "docs": "docs/StatsLib.md",
+      "example": "examples/21_release_1_8_workflows.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["portable approximate p-values and confidence intervals", "binary logistic only", "survival/factor analysis and robust covariance families remain conditional"]
     },
     {
-      "family": "advanced_machine_learning_and_time_series",
+      "family": "conditional_data_science_extensions",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["decision forests, hierarchical clustering, multivariate state-space, and broader forecasting workflows remain open"]
+      "limitations": ["survival analysis, factor analysis, robust covariance, gradient boosting, and broader forecasting workflows were not activated because prerequisite numerical validation was not available"]
     },
     {
-      "family": "model_expression_and_decomposition_persistence",
-      "maturity": "unsupported",
-      "scalars": [],
-      "limitations": ["safe expression evaluation and versioned model/decomposition persistence are not in the stable 1.8 surface"]
+      "family": "selected_model_persistence",
+      "unit": "InterchangeLib.Models",
+      "entry_points": ["SaveCubicSpline", "LoadCubicSpline", "SaveStreamingFIR", "LoadStreamingFIR", "SaveStandardization", "LoadStandardization", "SaveScalarKalman", "LoadScalarKalman"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["cubic_spline", "streaming_fir", "standardization_model", "scalar_kalman_state"],
+      "complexity": "O(serialized elements) encoding, validation, and copy",
+      "accuracy": "version/kind/CRC/resource-cap/corruption and behavioral round-trip fixtures",
+      "docs": "docs/Interchange.md",
+      "example": "examples/21_release_1_8_workflows.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["little-endian adapter format version 1", "no decomposition, forest, arbitrary graph, or multivariate Kalman persistence"]
+    },
+    {
+      "family": "bounded_mathematical_expressions",
+      "unit": "MathBase.Expressions",
+      "entry_points": ["TExpressionValue", "TExpressionSymbol", "TExpressionLimits", "TExpressionEvaluator.Evaluate"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar", "vector", "dense_matrix"],
+      "complexity": "bounded by explicit text, depth, operation, and element limits",
+      "accuracy": "scalar/vector/matrix oracle, immutable binding, resource-limit, malformed-input, and non-finite tests",
+      "docs": "docs/Interchange.md",
+      "example": "examples/21_release_1_8_workflows.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": ["no vector/matrix literals; bind them as symbols", "no assignment, loops, recursion, I/O, process, environment, network, or callbacks"]
     },
     {
       "family": "parallel_and_simd_numerical_dispatch",

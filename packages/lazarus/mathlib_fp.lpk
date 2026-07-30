@@ -65,6 +65,10 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
         <UnitName Value="MathBase.Interchange"/>
       </Item>
       <Item>
+        <Filename Value="..\..\src\MathBase.Expressions.pas"/>
+        <UnitName Value="MathBase.Expressions"/>
+      </Item>
+      <Item>
         <Filename Value="..\..\src\AlgebraLib.Matrices.pas"/>
         <UnitName Value="AlgebraLib.Matrices"/>
       </Item>
@@ -149,6 +153,10 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
         <UnitName Value="StatsLib.Streaming"/>
       </Item>
       <Item>
+        <Filename Value="..\..\src\StatsLib.Inference.pas"/>
+        <UnitName Value="StatsLib.Inference"/>
+      </Item>
+      <Item>
         <Filename Value="..\..\src\ProbabilityLib.Distributions.pas"/>
         <UnitName Value="ProbabilityLib.Distributions"/>
       </Item>
@@ -195,6 +203,10 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
       <Item>
         <Filename Value="..\..\src\MLLib.Analysis.pas"/>
         <UnitName Value="MLLib.Analysis"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\InterchangeLib.Models.pas"/>
+        <UnitName Value="InterchangeLib.Models"/>
       </Item>
       <Item>
         <Filename Value="..\..\src\GeometryLib.Geometry.pas"/>

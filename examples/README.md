@@ -27,10 +27,11 @@ closest to your project.
 | `14_complex_vectors.pas` | MathBase / AlgebraLib / EngineeringLib | Complex inverse functions, elementwise and reusable-buffer vector kernels, Hermitian dot products, and complex FFT round trips |
 | `15_typed_dense_solve.pas` | AlgebraLib | Infer item prices from receipt totals with a typed direct solve, then price a new order |
 | `16_dense_solver_selection.pas` | AlgebraLib | Choose QR, SVD minimum norm, and a symmetric eigensystem for realistic calibration tasks |
-| `17_numerical_modelling.pas` | NumericsLib | Monotone interpolation, bounded nonlinear fitting, adaptive vector ODEs, and event diagnostics |
+| `17_numerical_modelling.pas` | NumericsLib | Monotone interpolation, noisy/weighted/rank-deficient and badly-scaled bounded fitting, adaptive vector ODEs, and event diagnostics |
 | `18_convex_optimization.pas` | OptimizationLib | Dense convex QP and second-order-cone models with feasibility and termination diagnostics |
 | `19_applied_data_pipeline.pas` | DSP / StatsLib / NumericsLib / MLLib / TimeSeriesLib | Reuse shared containers across spectral analysis, streaming statistics, fitting, PCA, seeded clustering, and scalar Kalman filtering |
 | `20_interchange_replay.pas` | MathBase / AlgebraLib | Round-trip a typed dense matrix and replay an explicitly saved local random-generator state |
+| `21_release_1_8_workflows.pas` | DSP / StatsLib / MLLib / TimeSeriesLib / InterchangeLib | Block convolution, paired distribution APIs, leakage-safe preprocessing, seeded forests, multivariate Kalman filtering, model persistence, and bounded expressions |
 
 ## Build and run
 

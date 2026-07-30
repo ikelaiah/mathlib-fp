@@ -15,13 +15,13 @@ interface
 uses
   Classes, Math, fpcunit, testregistry,
   MathBase.Complex,
-  MathBase.Random, MathBase.Interchange,
+  MathBase.Random, MathBase.Interchange, MathBase.Expressions,
   MathBase.Trigonometry,
   AlgebraLib.Matrices, AlgebraLib.VectorKernels,
   AlgebraLib.DenseMatrices, AlgebraLib.DenseKernels,
   AlgebraLib.DenseSolvers, AlgebraLib.DenseDecompositions,
   FinanceLib.Interest, FinanceLib.Bonds, FinanceLib.NPV,
-  StatsLib.Stats, StatsLib.Streaming,
+  StatsLib.Stats, StatsLib.Streaming, StatsLib.Inference,
   EngineeringLib.FluidDynamics, EngineeringLib.Thermodynamics,
   EngineeringLib.Signal, EngineeringLib.DSP, EngineeringLib.UnitConversion,
   EngineeringLib.Velocity, EngineeringLib.Pressure,
@@ -33,7 +33,7 @@ uses
   OptimizationLib.Optimization,
   OptimizationLib.Convex,
   TimeSeriesLib.TimeSeries, TimeSeriesLib.StateSpace,
-  MLLib.MachineLearning, MLLib.Analysis,
+  MLLib.MachineLearning, MLLib.Analysis, InterchangeLib.Models,
   GeometryLib.Geometry;
 
 type
@@ -44,6 +44,7 @@ type
   TBondKitClass = class of TBondKit;
   TNPVKitClass = class of TNPVKit;
   TStatsKitClass = class of TStatsKit;
+  TInferenceKitClass = class of TInferenceKit;
   TFluidDynamicsKitClass = class of TFluidDynamicsKit;
   TThermodynamicsKitClass = class of TThermodynamicsKit;
   TSignalKitClass = class of TSignalKit;
@@ -63,6 +64,7 @@ type
   TMLKitClass = class of TMLKit;
   TAnalysisKitClass = class of TAnalysisKit;
   TGeometryKitClass = class of TGeometryKit;
+  TExpressionEvaluatorClass = class of TExpressionEvaluator;
 
   TTestPublicAPI = class(TTestCase)
   published
@@ -85,6 +87,7 @@ var
   BondKit: TBondKitClass;
   NPVKit: TNPVKitClass;
   StatsKit: TStatsKitClass;
+  InferenceKit:TInferenceKitClass;
   FluidDynamicsKit: TFluidDynamicsKitClass;
   ThermodynamicsKit: TThermodynamicsKitClass;
   SignalKit: TSignalKitClass;
@@ -104,6 +107,7 @@ var
   MLKit: TMLKitClass;
   AnalysisKit: TAnalysisKitClass;
   GeometryKit: TGeometryKitClass;
+  ExpressionEvaluator:TExpressionEvaluatorClass;
 begin
   TrigKit := TTrigKit;
   MatrixKit := TMatrixKit;
@@ -113,6 +117,7 @@ begin
   BondKit := TBondKit;
   NPVKit := TNPVKit;
   StatsKit := TStatsKit;
+  InferenceKit:=TInferenceKit;
   FluidDynamicsKit := TFluidDynamicsKit;
   ThermodynamicsKit := TThermodynamicsKit;
   SignalKit := TSignalKit;
@@ -132,6 +137,7 @@ begin
   MLKit := TMLKit;
   AnalysisKit := TAnalysisKit;
   GeometryKit := TGeometryKit;
+  ExpressionEvaluator:=TExpressionEvaluator;
 
   AssertTrue('TTrigKit', TrigKit <> nil);
   AssertTrue('TMatrixKit', MatrixKit <> nil);
@@ -141,6 +147,7 @@ begin
   AssertTrue('TBondKit', BondKit <> nil);
   AssertTrue('TNPVKit', NPVKit <> nil);
   AssertTrue('TStatsKit', StatsKit <> nil);
+  AssertTrue('TInferenceKit',InferenceKit<>nil);
   AssertTrue('TFluidDynamicsKit', FluidDynamicsKit <> nil);
   AssertTrue('TThermodynamicsKit', ThermodynamicsKit <> nil);
   AssertTrue('TSignalKit', SignalKit <> nil);
@@ -160,6 +167,7 @@ begin
   AssertTrue('TMLKit', MLKit <> nil);
   AssertTrue('TAnalysisKit', AnalysisKit <> nil);
   AssertTrue('TGeometryKit', GeometryKit <> nil);
+  AssertTrue('TExpressionEvaluator',ExpressionEvaluator<>nil);
 end;
 
 procedure TTestPublicAPI.TestAppliedNumericsSurfaceIsAccessible;

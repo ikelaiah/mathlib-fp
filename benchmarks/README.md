@@ -7,6 +7,9 @@ SVD/minimum norm, a full symmetric eigensystem, portable/blocked/automatic
 typed multiplication, radix-2 and arbitrary-length DSP transforms,
 FFT-selected convolution, online statistics, typed PCA, and seeded k-means++
 on deterministic inputs.
+The 1.8 runner separately measures small repeated direct convolution,
+independent FFT batches, bounded streaming overlap-save, and larger whole-array
+DSP workloads.
 The vector benchmark uses a reusable destination array through `AxpyInto`, so
 it measures the kernel rather than repeated dynamic-array allocation.
 
@@ -16,6 +19,10 @@ storage. The reuse and allocating forms use the same coefficient/RHS data.
 The 1.8 output also reports selected execution paths and deterministic
 checksums. Streaming statistics retain six numeric accumulators regardless of
 the two-million-value benchmark length.
+Representative allocating paths report a deterministic result/output
+allocation count or retained-state element count. These counters describe
+public result and state allocations for the workload; they are not a
+profiler-derived count of every internal RTL heap operation.
 
 Compile and run from the repository root:
 

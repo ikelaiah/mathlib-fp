@@ -226,6 +226,68 @@ begin
     '; checksum=', Convolution[FilterLength]:0:6);
 end;
 
+procedure BenchmarkRelease18DSPScales;
+const
+  SmallIterations = 5000;
+  BatchCount = 32;
+  BatchLength = 4096;
+  StreamBlocks = 128;
+  StreamBlockLength = 1024;
+  FilterLength = 129;
+var
+  SmallA,SmallB,SmallResult,Filter,Block,StreamResult:TDoubleArray;
+  Batch,Transformed:TComplexBatch;
+  Convolver:TOverlapSaveConvolver;
+  I,J:SizeInt;
+  Started:QWord;
+  Checksum:Double;
+begin
+  SmallA:=TDoubleArray.Create(1,2,3,4,5,6,7,8);
+  SmallB:=TDoubleArray.Create(0.25,0.5,0.25);
+  Started:=GetTickCount64;
+  Checksum:=0;
+  for I:=1 to SmallIterations do
+  begin
+    SmallResult:=TDSPKit.Convolve(SmallA,SmallB,cmDirect);
+    Checksum:=Checksum+SmallResult[4];
+  end;
+  Writeln('small direct convolution, 8x3, iterations=',SmallIterations,
+    ': ',GetTickCount64-Started,' ms; result_allocations=',SmallIterations,
+    '; result_elements=',SmallIterations*10,'; checksum=',Checksum:0:6);
+
+  SetLength(Batch,BatchCount);
+  for I:=0 to BatchCount-1 do
+  begin
+    SetLength(Batch[I],BatchLength);
+    for J:=0 to BatchLength-1 do
+      Batch[I][J]:=TComplex.Create(Sin((I+1)*(J+1)*0.0003),0);
+  end;
+  Started:=GetTickCount64;
+  Transformed:=TDSPKit.TransformBatch(Batch);
+  Writeln('batch FFT, batches=',BatchCount,', n=',BatchLength,': ',
+    GetTickCount64-Started,' ms; result_arrays=',BatchCount,
+    '; result_elements=',BatchCount*BatchLength,
+    '; checksum=',Transformed[BatchCount-1][7].Magnitude:0:6);
+
+  SetLength(Filter,FilterLength);
+  for I:=0 to High(Filter) do Filter[I]:=1/FilterLength;
+  SetLength(Block,StreamBlockLength);
+  for I:=0 to High(Block) do Block[I]:=Sin(I*0.011);
+  Convolver:=TOverlapSaveConvolver.Create(Filter,cmFFT);
+  Started:=GetTickCount64;
+  Checksum:=0;
+  for I:=1 to StreamBlocks do
+  begin
+    StreamResult:=Convolver.ProcessBlock(Block);
+    Checksum:=Checksum+StreamResult[High(StreamResult)];
+  end;
+  Writeln('stream overlap-save, blocks=',StreamBlocks,
+    ', block=',StreamBlockLength,', taps=',FilterLength,': ',
+    GetTickCount64-Started,' ms; output_allocations=',StreamBlocks,
+    '; retained_state_elements=',Convolver.StateSize,
+    '; checksum=',Checksum:0:6);
+end;
+
 procedure BenchmarkStreamingStatistics;
 const
   N = 2000000;
@@ -357,6 +419,7 @@ begin
   BenchmarkVectorKernels;
   BenchmarkComplexFFT;
   BenchmarkAppliedDSP;
+  BenchmarkRelease18DSPScales;
   BenchmarkStreamingStatistics;
   BenchmarkTypedAnalysis;
 end.

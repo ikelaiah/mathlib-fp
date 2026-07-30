@@ -1,11 +1,13 @@
 # Numerical interchange and inspection
 
 `MathBase.Interchange` is an optional unit for invariant text, delimited text,
-Matrix Market, versioned binary persistence, and concise summaries. Numerical
-core units do not depend on it.
+Matrix Market, versioned binary persistence, typed metadata, and concise
+summaries. `InterchangeLib.Models` adds separate versioned adapters for a small
+set of fitted/stateful models. Numerical core units do not depend on either
+interchange unit.
 
-Maturity: **stable for the dense real/complex and RNG-state formats documented
-here**.
+Maturity: **stable for the dense real/complex, RNG-state, and selected model
+formats documented here**.
 
 ## 60-second round trip
 
@@ -42,10 +44,14 @@ state replay.
 | Large exact round trip | `SaveBinary`, typed `Load...Binary` | Versioned, little-endian scalar payload and CRC-32 |
 | Reproducible simulation | `SaveRandomStateBinary`, `LoadRandomStateBinary` | Exact four-word `TLocalRandom` state |
 | Logging/debugging | `Summarize` | Shape/type metadata plus bounded values |
+| Programmatic inspection | `Describe` | `TValueMetadata` kind, scalar type, shape, and element count |
+| Selected fitted/stateful models | `InterchangeLib.Models` | Separate model magic/version/kind, resource cap, and CRC-32 |
 
 Delimited input is the numeric rectangular subset: it does not interpret
 headers, dates, categories, missing fields, or quoted embedded delimiters.
 Matrix Market coordinate/sparse and structured symmetry variants are rejected.
+Metadata uses the public `TInterchangeValueKind` and
+`TInterchangeScalarType` enums.
 
 ## Binary format version 1
 
@@ -99,9 +105,56 @@ the same stream.
 `EInterchangeError` names the failing operation and violated format or limit.
 I/O errors from an underlying stream may also propagate.
 
+## Selected model persistence
+
+`InterchangeLib.Models` provides these explicit adapters:
+
+| Model | Save/load | Persisted state |
+| --- | --- | --- |
+| `TCubicSplineInterpolator` | `SaveCubicSpline` / `LoadCubicSpline` | boundary kind, knots, values, and polynomial coefficients |
+| `TStreamingFIR` | `SaveStreamingFIR` / `LoadStreamingFIR` | coefficient snapshot and current history |
+| `TStandardizationModel` | `SaveStandardization` / `LoadStandardization` | fitted means and positive scales |
+| `TScalarKalmanFilter` | `SaveScalarKalman` / `LoadScalarKalman` | configuration, current estimate, and covariance |
+
+The model envelope is version 1, little endian, kind tagged, and CRC-32
+protected. Loaders enforce payload/element caps, validate the complete object,
+and construct a new model only after validation succeeds. They work with
+streams that return partial reads. `SummarizeCubicSpline`,
+`SummarizeStreamingFIR`, `SummarizeStandardization`, and
+`SummarizeScalarKalman` report bounded structural state without dumping an
+unbounded payload.
+
+`DEFAULT_MAX_MODEL_ELEMENTS` is the default adapter cap;
+`EModelInterchangeError` identifies model-envelope/schema failures.
+
+These adapters are deliberately separate from the numerical units, so using a
+spline, filter, standardizer, or Kalman filter never pulls persistence into
+the numerical dependency graph. The schema does not dump Pascal record memory
+and therefore does not depend on record padding.
+
+## Bounded expression evaluation
+
+`MathBase.Expressions` evaluates opt-in arithmetic over caller-supplied finite
+scalar, vector, and dense-matrix symbols. `TExpressionValue` snapshots vector
+and matrix bindings; `TExpressionLimits` caps text length, parser depth,
+operation count, and produced elements.
+
+`TExpressionValueKind` distinguishes `evScalar`, `evVector`, and `evMatrix`;
+`TExpressionSymbols` is the owned symbol-array alias. `EExpressionError`
+identifies parse, type, shape, arithmetic, and resource failures.
+
+The supported language contains scalar arithmetic, elementwise compatible
+arithmetic, unary elementary functions, `dot`, `matmul`, and `transpose`.
+Vectors and matrices enter through bindings rather than text literals. There
+is no assignment, loop, recursion, file, environment, process, network, or
+user callback primitive. Unknown names, shape errors, division by zero,
+non-finite results, and exhausted limits raise `EExpressionError` before a
+result is returned. This is a bounded mathematical evaluator, not a general
+Pascal or scripting runtime.
+
 ## Open persistence families
 
-Version 1.8 does not promise sparse matrices, fitted models, decomposition
-factors, splines, general filter objects, or configuration graphs as stable
-formats. Adding one requires a separate versioned schema and compatibility
-tests; raw Pascal record dumps are not accepted as persistence.
+Version 1.8 does not promise sparse matrices, decomposition factors, arbitrary
+model graphs, decision forests, multivariate Kalman filters, or general filter
+objects as stable formats. Adding one requires a separate versioned schema and
+compatibility tests; raw Pascal record dumps are not accepted as persistence.

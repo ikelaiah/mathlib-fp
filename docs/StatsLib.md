@@ -12,6 +12,7 @@ Depends on: **MathBase**
 |------|------|-------|
 | `StatsLib.Stats` | [StatsLib.Stats.pas](../src/StatsLib.Stats.pas) | `TStatsKit` |
 | `StatsLib.Streaming` | [StatsLib.Streaming.pas](../src/StatsLib.Streaming.pas) | `TOnlineStatistics` |
+| `StatsLib.Inference` | [StatsLib.Inference.pas](../src/StatsLib.Inference.pas) | `TInferenceKit` |
 
 ---
 
@@ -22,6 +23,68 @@ sample variance in constant retained memory. Independent records can be merged
 and choose explicit reject/ignore handling for non-finite observations. The
 [applied numerics guide](AppliedNumerics.md) documents its bounded state,
 ownership, and error contracts.
+
+## Inference, distributions, and regression in 1.8
+
+`StatsLib.Inference` is the stable typed inference surface. It is separate
+from the older `TStatsKit` compatibility methods so every new result can carry
+its assumptions and diagnostics.
+
+### Distribution selection
+
+| Model | Construct | Operations |
+| --- | --- | --- |
+| Normal | `TNormalDistribution.Create(Mean, StandardDeviation)` | `PDF`, `LogPDF`, `CDF`, `Survival`, `Quantile`, `Sample` |
+| Exponential | `TExponentialDistribution.Create(Rate)` | `PDF`, `LogPDF`, `CDF`, `Survival`, `Quantile`, `Sample` |
+| Binomial | `TBinomialDistribution.Create(Trials, Probability)` | `PMF`, `LogPMF`, `CDF`, `Survival`, `Quantile`, `Sample` |
+
+Sampling takes `var TLocalRandom`; it is reproducible and never uses global
+`RandSeed`. `CDF` and `Survival` are paired to avoid cancellation in ordinary
+tails. Quantiles are monotone and accept the documented probability
+endpoints, returning mathematical infinities where appropriate.
+
+`EstimateNormal`, `EstimateExponential`, `EstimateGamma`, and
+`EstimateBinomial` return `TDistributionEstimate`. Inspect `Status` and
+`Identifiable` before using `StandardErrors`; a returned parameter value does
+not imply that uncertainty was identifiable.
+
+### Test selection
+
+| Question | API | Effect/interval |
+| --- | --- | --- |
+| One mean versus a constant | `OneSampleT` | standardized mean and confidence interval |
+| Matched observations | `PairedT` | paired standardized difference and interval |
+| Two independent means, unequal variance | `WelchT` | standardized difference and Welch degrees of freedom |
+| Three or more independent means | `OneWayANOVA` | eta-squared |
+| Categorical association | `ChiSquareContingency` | Cramer's V |
+| Two independent ordinal/continuous samples | `MannWhitneyU` | rank-biserial effect |
+| Family-wise p-value control | `AdjustBonferroni` | adjusted p-values in input order |
+| False-discovery-rate control | `AdjustBenjaminiHochberg` | monotone BH adjusted p-values in input order |
+
+All test records include the statistic, p-value, degrees of freedom where
+applicable, and an effect size. T-test records also include a confidence
+interval. These are two-sided tests. The Mann-Whitney p-value uses the
+tie-corrected normal approximation in this unit.
+
+### Regression selection and failure contracts
+
+`FitOLS(Design, Response)` uses the shared compact SVD. It returns coefficients,
+standard errors, fitted values, residuals, R-squared, adjusted R-squared,
+numerical rank, degrees of freedom, and `Status`. A rank-deficient design is
+reported rather than hidden; covariance-style standard errors require full
+rank and positive residual degrees of freedom.
+
+`FitLogistic(Design, Labels)` fits binary labels using Newton/IRLS steps.
+`Status`, `Iterations`, and `Identifiable` distinguish convergence from
+complete/quasi separation or singular information. Probabilities and the best
+finite coefficient estimate remain inspectable on a non-identifiable result.
+
+Every new inference API rejects non-finite data, inconsistent shapes, invalid
+probabilities, and insufficient sample sizes with `EInferenceError`. The
+`TCountMatrix` alias represents contingency rows. The
+implementation is a portable double-precision baseline; survival analysis,
+factor analysis, robust covariance families, multinomial/count GLMs, and
+certified exact small-sample tables remain outside 1.8.
 
 ## Core Types
 

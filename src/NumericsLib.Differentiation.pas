@@ -9,16 +9,20 @@ unit NumericsLib.Differentiation;
 interface
 
 uses
-  SysUtils, Math, MathBase.SharedTypes;
+  SysUtils, Math, MathBase.SharedTypes, MathBase.Complex;
 
 type
   EDifferentiationError = class(Exception);
 
-  TDifferenceMethod = (dmForward, dmCentral);
+  TDifferenceMethod = (dmForward, dmCentral, dmComplexStep);
   TVectorFunction = function(const X: TDoubleArray): TDoubleArray;
   TScalarVectorFunction = function(const X: TDoubleArray): Double;
+  TComplexScalarVectorFunction = function(
+    const X: TComplexArray): TComplex;
   TGradientFunction = function(const X: TDoubleArray): TDoubleArray;
   TDoubleMatrix = array of TDoubleArray;
+  TJacobianMatrixFunction = function(
+    const X: TDoubleArray): TDoubleMatrix;
 
   TDual = record
     Value: Double;
@@ -40,10 +44,21 @@ type
 
   TDualArray = array of TDual;
   TDualFunction = function(const X: TDualArray): TDual;
+  TDualVectorFunction = function(const X: TDualArray): TDualArray;
 
   TDerivativeCheckResult = record
     Passed: Boolean;
     WorstIndex: Integer;
+    AnalyticValue: Double;
+    ReferenceValue: Double;
+    AbsoluteError: Double;
+    RelativeError: Double;
+  end;
+
+  TJacobianCheckResult = record
+    Passed: Boolean;
+    WorstRow: Integer;
+    WorstColumn: Integer;
     AnalyticValue: Double;
     ReferenceValue: Double;
     AbsoluteError: Double;
@@ -60,12 +75,20 @@ type
       RelativeStep: Double = 0.0): TDoubleMatrix; static;
     class function Hessian(F: TScalarVectorFunction;
       const X: TDoubleArray; RelativeStep: Double = 0.0): TDoubleMatrix; static;
+    class function ComplexStepGradient(F: TComplexScalarVectorFunction;
+      const X: TDoubleArray; Step: Double = 1E-20): TDoubleArray; static;
     class function AutoGradient(F: TDualFunction;
       const X: TDoubleArray): TDoubleArray; static;
+    class function AutoJacobian(F: TDualVectorFunction;
+      const X: TDoubleArray): TDoubleMatrix; static;
     class function CheckGradient(F: TScalarVectorFunction;
       Grad: TGradientFunction; const X: TDoubleArray;
       RelativeTolerance: Double = 1E-5;
       AbsoluteTolerance: Double = 1E-7): TDerivativeCheckResult; static;
+    class function CheckJacobian(F: TVectorFunction;
+      AnalyticJacobian: TJacobianMatrixFunction; const X: TDoubleArray;
+      RelativeTolerance: Double = 1E-5;
+      AbsoluteTolerance: Double = 1E-7): TJacobianCheckResult; static;
   end;
 
 function DualSin(const X: TDual): TDual;
@@ -74,6 +97,10 @@ function DualExp(const X: TDual): TDual;
 function DualLn(const X: TDual): TDual;
 function DualSqrt(const X: TDual): TDual;
 function DualPower(const X: TDual; const P: Double): TDual;
+function DualTan(const X: TDual): TDual;
+function DualSinh(const X: TDual): TDual;
+function DualCosh(const X: TDual): TDual;
+function DualTanh(const X: TDual): TDual;
 
 implementation
 
@@ -100,10 +127,11 @@ end;
 
 function DefaultStep(const Method: TDifferenceMethod): Double; inline;
 begin
-  if Method = dmForward then
-    Result := Sqrt(DoubleEpsilon)
-  else
-    Result := Power(DoubleEpsilon, 1.0 / 3.0);
+  case Method of
+    dmForward: Result := Sqrt(DoubleEpsilon);
+    dmCentral: Result := Power(DoubleEpsilon, 1.0 / 3.0);
+    dmComplexStep: Result := 1E-20;
+  end;
 end;
 
 function CoordinateStep(const X, RelativeStep: Double;
@@ -193,6 +221,31 @@ begin
   if P = 0 then Result.Derivative := 0
   else Result.Derivative := P * Power(X.Value, P - 1) * X.Derivative;
 end;
+function DualTan(const X: TDual): TDual;
+var
+  C: Double;
+begin
+  C := Cos(X.Value);
+  if C = 0 then
+    raise EDifferentiationError.Create(
+      'DualTan: derivative is singular where cosine is zero.');
+  Result := TDual.Create(Tan(X.Value), X.Derivative / Sqr(C));
+end;
+function DualSinh(const X: TDual): TDual;
+begin
+  Result := TDual.Create(Sinh(X.Value), Cosh(X.Value) * X.Derivative);
+end;
+function DualCosh(const X: TDual): TDual;
+begin
+  Result := TDual.Create(Cosh(X.Value), Sinh(X.Value) * X.Derivative);
+end;
+function DualTanh(const X: TDual): TDual;
+var
+  C: Double;
+begin
+  C := Cosh(X.Value);
+  Result := TDual.Create(Tanh(X.Value), X.Derivative / Sqr(C));
+end;
 
 class function TDifferentiationKit.Gradient(F: TScalarVectorFunction;
   const X: TDoubleArray; Method: TDifferenceMethod;
@@ -207,6 +260,9 @@ begin
   if not Assigned(F) then
     raise EDifferentiationError.Create('Gradient: callback must be assigned.');
   ValidateVector(X, 'Gradient');
+  if Method = dmComplexStep then
+    raise EDifferentiationError.Create(
+      'Gradient: dmComplexStep requires ComplexStepGradient and an explicit complex callback.');
   if (RelativeStep < 0) or not IsFiniteValue(RelativeStep) then
     raise EDifferentiationError.Create(
       'Gradient: RelativeStep must be finite and non-negative.');
@@ -256,6 +312,9 @@ begin
   if not Assigned(F) then
     raise EDifferentiationError.Create('Jacobian: callback must be assigned.');
   ValidateVector(X, 'Jacobian');
+  if Method = dmComplexStep then
+    raise EDifferentiationError.Create(
+      'Jacobian: dmComplexStep requires an explicit complex vector callback.');
   if (RelativeStep < 0) or not IsFiniteValue(RelativeStep) then
     raise EDifferentiationError.Create(
       'Jacobian: RelativeStep must be finite and non-negative.');
@@ -332,6 +391,51 @@ begin
     end;
 end;
 
+class function TDifferentiationKit.ComplexStepGradient(
+  F: TComplexScalarVectorFunction; const X: TDoubleArray;
+  Step: Double): TDoubleArray;
+var
+  CX: TComplexArray;
+  BaseValue, Value: TComplex;
+  I, J: Integer;
+begin
+  Result := nil;
+  if not Assigned(F) then
+    raise EDifferentiationError.Create(
+      'ComplexStepGradient: callback must be assigned.');
+  ValidateVector(X, 'ComplexStepGradient');
+  if (Step <= 0) or not IsFiniteValue(Step) then
+    raise EDifferentiationError.Create(
+      'ComplexStepGradient: Step must be finite and positive.');
+  SetLength(CX, Length(X));
+  for I := 0 to High(X) do
+    CX[I] := TComplex.Create(X[I], 0);
+  BaseValue := F(CX);
+  if not BaseValue.IsFinite then
+    raise EDifferentiationError.Create(
+      'ComplexStepGradient: callback returned a non-finite base value.');
+  if Abs(BaseValue.Im) > 64 * DoubleEpsilon *
+      Max(1.0, Abs(BaseValue.Re)) then
+    raise EDifferentiationError.Create(
+      'ComplexStepGradient: callback must be real-valued on real inputs.');
+  SetLength(Result, Length(X));
+  for I := 0 to High(X) do
+  begin
+    for J := 0 to High(X) do
+      CX[J] := TComplex.Create(X[J], 0);
+    CX[I].Im := Step;
+    Value := F(CX);
+    if not Value.IsFinite then
+      raise EDifferentiationError.CreateFmt(
+        'ComplexStepGradient: callback returned a non-finite value at variable %d.',
+        [I]);
+    Result[I] := (Value.Im - BaseValue.Im) / Step;
+    if not IsFiniteValue(Result[I]) then
+      raise EDifferentiationError.CreateFmt(
+        'ComplexStepGradient: non-finite derivative at variable %d.', [I]);
+  end;
+end;
+
 class function TDifferentiationKit.AutoGradient(F: TDualFunction;
   const X: TDoubleArray): TDoubleArray;
 var
@@ -355,6 +459,47 @@ begin
       raise EDifferentiationError.CreateFmt(
         'AutoGradient: non-finite result for seed variable %d.', [I]);
     Result[I] := Y.Derivative;
+  end;
+end;
+
+class function TDifferentiationKit.AutoJacobian(F: TDualVectorFunction;
+  const X: TDoubleArray): TDoubleMatrix;
+var
+  DX: TDualArray;
+  Y: TDualArray;
+  I, J, M: Integer;
+begin
+  Result := nil;
+  if not Assigned(F) then
+    raise EDifferentiationError.Create(
+      'AutoJacobian: callback must be assigned.');
+  ValidateVector(X, 'AutoJacobian');
+  SetLength(DX, Length(X));
+  M := -1;
+  for I := 0 to High(X) do
+  begin
+    for J := 0 to High(X) do
+      DX[J] := TDual.Create(X[J], Ord(I = J));
+    Y := F(DX);
+    if M < 0 then
+    begin
+      M := Length(Y);
+      SetLength(Result, M);
+      for J := 0 to M - 1 do
+        SetLength(Result[J], Length(X));
+    end
+    else if Length(Y) <> M then
+      raise EDifferentiationError.Create(
+        'AutoJacobian: callback result dimension changed.');
+    for J := 0 to M - 1 do
+    begin
+      if not IsFiniteValue(Y[J].Value) or
+         not IsFiniteValue(Y[J].Derivative) then
+        raise EDifferentiationError.CreateFmt(
+          'AutoJacobian: non-finite result at row %d, seed variable %d.',
+          [J, I]);
+      Result[J][I] := Y[J].Derivative;
+    end;
   end;
 end;
 
@@ -401,6 +546,66 @@ begin
       Result.RelativeError := RelErr;
     end;
     if Abs(A[I] - N[I]) > Limit then Result.Passed := False;
+  end;
+end;
+
+class function TDifferentiationKit.CheckJacobian(F: TVectorFunction;
+  AnalyticJacobian: TJacobianMatrixFunction; const X: TDoubleArray;
+  RelativeTolerance, AbsoluteTolerance: Double): TJacobianCheckResult;
+var
+  A, N: TDoubleMatrix;
+  I, J, ColumnCount: Integer;
+  Scale, Limit, Difference, RelErr: Double;
+begin
+  Result := Default(TJacobianCheckResult);
+  Result.WorstRow := -1;
+  Result.WorstColumn := -1;
+  if not Assigned(F) or not Assigned(AnalyticJacobian) then
+    raise EDifferentiationError.Create(
+      'CheckJacobian: function and analytic Jacobian must be assigned.');
+  if (RelativeTolerance < 0) or (AbsoluteTolerance < 0) or
+     not IsFiniteValue(RelativeTolerance) or
+     not IsFiniteValue(AbsoluteTolerance) then
+    raise EDifferentiationError.Create(
+      'CheckJacobian: tolerances must be finite and non-negative.');
+  ValidateVector(X, 'CheckJacobian');
+  A := AnalyticJacobian(X);
+  N := TDifferentiationKit.Jacobian(F, X, dmCentral);
+  if Length(A) <> Length(N) then
+    raise EDifferentiationError.CreateFmt(
+      'CheckJacobian: analytic row count %d; expected %d.',
+      [Length(A), Length(N)]);
+  ColumnCount := Length(X);
+  Result.Passed := True;
+  for I := 0 to High(A) do
+  begin
+    if Length(A[I]) <> ColumnCount then
+      raise EDifferentiationError.CreateFmt(
+        'CheckJacobian: analytic row %d has %d columns; expected %d.',
+        [I, Length(A[I]), ColumnCount]);
+    ValidateVector(A[I], 'CheckJacobian analytic row', True);
+    for J := 0 to ColumnCount - 1 do
+    begin
+      Difference := Abs(A[I][J] - N[I][J]);
+      Scale := Max(Abs(A[I][J]), Abs(N[I][J]));
+      Limit := AbsoluteTolerance + RelativeTolerance * Scale;
+      if Scale > 0 then
+        RelErr := Difference / Scale
+      else
+        RelErr := 0;
+      if (Result.WorstRow < 0) or
+         (Difference > Result.AbsoluteError) then
+      begin
+        Result.WorstRow := I;
+        Result.WorstColumn := J;
+        Result.AnalyticValue := A[I][J];
+        Result.ReferenceValue := N[I][J];
+        Result.AbsoluteError := Difference;
+        Result.RelativeError := RelErr;
+      end;
+      if Difference > Limit then
+        Result.Passed := False;
+    end;
   end;
 end;
 
