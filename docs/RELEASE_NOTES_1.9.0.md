@@ -1,5 +1,7 @@
 # mathlib-fp 1.9.0
 
+Released 2026-08-01.
+
 Version 1.9.0 adds a complete portable typed path for matrices that are sparse,
 compactly structured, or available only through a product. It is an additive
 release: maintained 1.x APIs and defaults remain available.

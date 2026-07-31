@@ -93,16 +93,17 @@ The final observed matrix is recorded after the commands complete:
 | Win64 normal | 930 tests, 0 errors, 0 failures |
 | Win64 `-O3` | 930 tests, 0 errors, 0 failures |
 | Win64 checked/heap-traced | 930 tests, 0 errors, 0 failures; 295,567 blocks allocated/freed and 0 unfreed |
-| Win32 `-O2` | Native i386 FPC 3.2.2 correction run: 930 tests, 0 errors, 0 failures; final GitHub Actions rerun required |
-| Linux x86-64 | Initial PR and push jobs passed; the final portability-correction commit must rerun before merge |
+| Win32 `-O2` | Native i386 FPC 3.2.2: 930 tests, 0 errors, 0 failures; final GitHub Actions pull-request and push jobs passed |
+| Linux x86-64 | Final GitHub Actions pull-request and push jobs passed |
 | Examples | 24 compiled and ran successfully on Win64 |
-| Lazarus package | Win64 package 1.9 built successfully; Win32 package remains in the configured CI gate |
+| Lazarus package | Package 1.9 built successfully for Win64 and Win32 |
 | Documentation/API snapshot | Static checks pass for 59 pages, 24 indexed examples, 281 required entry names, and 2,880 exact owner/signature-aware declaration rows; 15 self-contained Pascal fragments compile and run |
 | Representative benchmark | Compiled and ran at `-O3`; large results above |
 | Clean checksummed archive | 197 source files checksummed and extracted into an isolated directory; normal, `-O3`, checked/heap-traced, documentation, all examples, Win64 package, and benchmark gates repeated successfully |
 
-The two cross-target rows remain mandatory remote release checks; they are
-explicitly not represented as local successes.
+The required Linux and Windows GitHub Actions pull-request and push workflows
+passed on the final portability-correction commit. The Win32 and Linux results
+are remote CI evidence and are not represented as local runs.
 
 ## Dependency and remaining-gap audit
 

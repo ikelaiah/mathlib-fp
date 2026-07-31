@@ -12,6 +12,29 @@ The implementation is native Free Pascal and adds no third-party runtime,
 foreign binary, service, network dependency, global registry, GPU/vendor
 requirement, or parallel/SIMD ABI.
 
+## Release readiness — 2026-08-01
+
+Version 1.9.0 completed local qualification and the required Linux and Windows
+GitHub Actions checks for release on 2026-08-01. Full commands and benchmark
+results are recorded in
+[QUALIFICATION_1.9.0.md](QUALIFICATION_1.9.0.md).
+
+| Check | Result |
+| --- | --- |
+| Win64 normal and `-O3` suites | 930 passed, 0 failed, 0 errors |
+| Win64 checked/heap-traced suite | 930 passed; 0 unfreed memory blocks |
+| Win32 `-O2` suite | 930 passed, 0 failed, 0 errors |
+| Examples | All 24 compiled and ran |
+| Lazarus packages | Built for Win64 and Win32 |
+| Documentation | 59 pages, 24 examples, 281 required entry names, and 2,880 exact declarations checked |
+| Clean source archive | 197 files checksummed; all local release gates passed after extraction |
+| Benchmarks | Win64 `-O3` sparse and matrix-free qualification cases passed their allocation limits |
+| Remote CI | Linux and Windows pull-request and push workflows passed |
+
+All required local and remote checks have passed. The PR is ready to merge;
+the remaining release operations are merge, tag, GitHub release, and archive
+publication.
+
 ## Design discipline
 
 The [1.9 design record](design/sparse-iterative-1.9.md) was written before the
