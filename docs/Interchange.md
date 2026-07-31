@@ -6,8 +6,8 @@ summaries. `InterchangeLib.Models` adds separate versioned adapters for a small
 set of fitted/stateful models. Numerical core units do not depend on either
 interchange unit.
 
-Maturity: **stable for the dense real/complex, RNG-state, and selected model
-formats documented here**.
+Maturity: **stable for the dense and sparse real/complex, RNG-state, and
+selected model formats documented here**.
 
 ## 60-second round trip
 
@@ -32,7 +32,8 @@ end.
 ```
 
 See [example 20](../examples/20_interchange_replay.pas) for matrix and random
-state replay.
+state replay. [Example 22](../examples/22_sparse_end_to_end.pas) performs a
+sparse Matrix Market round trip before an iterative solve.
 
 ## Choose a format
 
@@ -41,7 +42,9 @@ state replay.
 | Pasteable configuration | `DoubleVectorToInvariant`, `ComplexVectorToInvariant`, `DenseMatrixToInvariant` | Locale independent; finite values only |
 | Simple table interchange | `WriteDelimitedMatrix`, `ReadDelimitedMatrix` | Dense rectangular numeric rows; caller-selected delimiter |
 | Other numerical tools | `WriteMatrixMarket`, `ReadMatrixMarketDouble`, `ReadMatrixMarketComplex` | Matrix Market dense `array`, `real`/`complex`, `general` subset |
+| Sparse exchange with other tools | `WriteSparseMatrixMarket`, `ReadSparseMatrixMarketDouble`, `ReadSparseMatrixMarketComplex` | Matrix Market coordinate double-real/double-complex `general`; canonical entries only |
 | Large exact round trip | `SaveBinary`, typed `Load...Binary` | Versioned, little-endian scalar payload and CRC-32 |
+| Exact typed sparse round trip | `SaveSparseBinary`, `LoadSparseSingleBinary`, `LoadSparseDoubleBinary`, `LoadSparseSingleComplexBinary`, `LoadSparseComplexBinary` | Versioned CSR/CSC metadata, all four scalar paths, CRC-32 |
 | Reproducible simulation | `SaveRandomStateBinary`, `LoadRandomStateBinary` | Exact four-word `TLocalRandom` state |
 | Logging/debugging | `Summarize` | Shape/type metadata plus bounded values |
 | Programmatic inspection | `Describe` | `TValueMetadata` kind, scalar type, shape, and element count |
@@ -49,9 +52,11 @@ state replay.
 
 Delimited input is the numeric rectangular subset: it does not interpret
 headers, dates, categories, missing fields, or quoted embedded delimiters.
-Matrix Market coordinate/sparse and structured symmetry variants are rejected.
-Metadata uses the public `TInterchangeValueKind` and
-`TInterchangeScalarType` enums.
+Dense Matrix Market uses array real/complex general. Sparse Matrix Market uses
+coordinate real/complex general, one-based file coordinates, and rejects
+duplicates and explicit stored zeros. Pattern, integer, symmetric, Hermitian,
+and skew-symmetric variants are rejected. Metadata uses the public
+`TInterchangeValueKind` and `TInterchangeScalarType` enums.
 
 ## Binary format version 1
 
@@ -63,17 +68,30 @@ Every object starts with:
 - little-endian unsigned 64-bit rows, columns, and payload byte count;
 - little-endian CRC-32 of the payload; and
 - row-major IEEE binary64 real values, interleaved real/imaginary binary64
-  values, or four unsigned 64-bit RNG state words.
+  values, four unsigned 64-bit RNG state words, or a sparse payload.
+
+A sparse payload contains format and stored-zero-policy tags, checked
+`SizeInt` shape/nonzero metadata encoded as little-endian 64-bit integers,
+the complete outer-pointer and inner-index arrays, then IEEE binary32/binary64
+real or interleaved complex values matching the kind tag. Readers validate the
+CSR/CSC canonical invariants after checksum validation and before returning an
+interface.
 
 The format is endian-defined and does not write Pascal record memory layouts.
 It therefore avoids ABI padding and host-endian ambiguity.
 
 Loaders validate magic, version, kind, dimension products, platform address
-limits, caller element limits, payload byte count, truncation, checksum, and
-finite scalar values. Only after those checks does a loader return a new
-array/matrix/state. There is no destination to partially mutate.
+limits, caller element/nonzero and sparse dimension limits, payload byte count,
+truncation, checksum, and finite scalar values. Sparse loaders additionally validate
+format, zero policy, outer terminal/counts, sorted in-range indices, duplicate
+absence, and policy-compatible zeros. Only after those checks does a loader
+return a new array/matrix/state. There is no destination to partially mutate.
 
-`DEFAULT_MAX_INTERCHANGE_ELEMENTS` is 16,000,000. Pass a smaller limit when
+`DEFAULT_MAX_INTERCHANGE_ELEMENTS` and `DEFAULT_MAX_SPARSE_DIMENSION` are both
+16,000,000. Dense loaders apply the element limit to the total scalar count.
+Sparse loaders apply the nonzero limit to the stored nonzero count and apply the
+dimension limit independently to each axis before allocating outer-pointer
+arrays, reading payloads, or constructing builders. Pass a smaller limit when
 processing untrusted input with a known expected shape. A larger caller limit
 does not bypass `SizeInt`, byte-count, or address-space checks.
 
@@ -97,10 +115,12 @@ close or reposition a stream after their payload. Read functions start at the
 current position and stop after one binary object or at end-of-stream for text
 formats.
 
-Results own independent arrays or typed dense storage. Binary validation uses
-a payload buffer before construction, so peak memory is approximately payload
-plus result. Functions are reentrant when callers do not concurrently mutate
-the same stream.
+Results own independent arrays or typed dense/sparse storage. Binary validation
+uses a payload buffer before construction, so peak memory is approximately
+payload plus result. Text writers build and validate the complete representation
+before writing it; an unsupported explicit sparse zero therefore does not
+partially modify the stream. Functions are reentrant when callers do not
+concurrently mutate the same stream.
 
 `EInterchangeError` names the failing operation and violated format or limit.
 I/O errors from an underlying stream may also propagate.
@@ -154,7 +174,7 @@ Pascal or scripting runtime.
 
 ## Open persistence families
 
-Version 1.8 does not promise sparse matrices, decomposition factors, arbitrary
+Version 1.9 does not promise decomposition or preconditioner factors, arbitrary
 model graphs, decision forests, multivariate Kalman filters, or general filter
 objects as stable formats. Adding one requires a separate versioned schema and
 compatibility tests; raw Pascal record dumps are not accepted as persistence.

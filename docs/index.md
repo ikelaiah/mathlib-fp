@@ -8,6 +8,17 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.9.0 release notes](RELEASE_NOTES_1.9.0.md) — typed
+  structured/sparse storage, matrix-free Krylov solvers, reusable factors,
+  partial eigensystems, and the candidate-2.0 runway.
+- [1.9.0 PR notes](PR_NOTES_1.9.0.md) — review scope, compatibility,
+  completion-gate mapping, risks, and explicit exclusions.
+- [1.9.0 qualification report](QUALIFICATION_1.9.0.md) — dense oracles,
+  termination outcomes, bounded-storage measurements, and target gates.
+- [1.9 API audit](API_AUDIT_1.9.md),
+  [generated declaration reference](API_REFERENCE_1.9.md),
+  [candidate 2.0 contract](API_CANDIDATE_2.0.md), and
+  [migration preview](MIGRATING_TO_2.0_PREVIEW.md).
 - [mathlib-fp 1.8.0 release notes](RELEASE_NOTES_1.8.0.md) — applied DSP,
   bounded streaming statistics, reproducible analysis, state-space filtering,
   numerical interchange, and portable performance.
@@ -65,7 +76,7 @@ artificial Kit class.
 | Unit family | Domain | Depends on |
 |---------|-------------|------------|
 | [MathBase](MathBase.md) | Shared types, constants, precision, trigonometry, local random state, bounded expressions, and [numerical interchange](Interchange.md) | RTL / FCL streams |
-| [AlgebraLib](AlgebraLib.md) | Compatibility matrices plus [typed dense storage/kernels](TypedDenseMatrices.md), deterministic blocked multiplication, and [decompositions/direct solvers](DenseLinearAlgebra.md) | MathBase |
+| [AlgebraLib](AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](DenseLinearAlgebra.md), and [structured/sparse/matrix-free linear algebra](SparseLinearAlgebra.md) | MathBase |
 | [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
 | [StatsLib](StatsLib.md) | Descriptive/online statistics, paired distributions, inference, regression diagnostics, and bootstrap | MathBase / AlgebraLib |
 | [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, [applied DSP](AppliedNumerics.md), signal processing, unit conversion | MathBase / AlgebraLib |
@@ -83,7 +94,7 @@ artificial Kit class.
 | Domain | Primary units | Public Kit classes |
 |--------|---------------|--------------------|
 | Math foundation | `MathBase.SharedTypes`, `MathBase.Complex`, `MathBase.MathConstants`, `MathBase.Precision`, `MathBase.Trigonometry`, `MathBase.Random`, `MathBase.Interchange`, `MathBase.Expressions` | `TTrigKit`, `TLocalRandom`, interchange procedures, `TExpressionEvaluator` |
-| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers`, `AlgebraLib.DenseDecompositions` | `TMatrixKit`, `TVectorKit`, typed dense factories and factors |
+| Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers`, `AlgebraLib.DenseDecompositions`, `AlgebraLib.SparseMatrices`, `AlgebraLib.LinearOperators`, `AlgebraLib.IterativeSolvers`, `AlgebraLib.StructuredSolvers`, `AlgebraLib.PartialEigensystems` | `TMatrixKit`, `TVectorKit`, typed dense/sparse/operator/solver facades |
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
 | Statistics | `StatsLib.Stats`, `StatsLib.Streaming`, `StatsLib.Inference` | `TStatsKit`, `TOnlineStatistics`, `TInferenceKit` |
 | Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.DSP`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TDSPKit`, block/streaming DSP records, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
@@ -150,6 +161,11 @@ TSingleComplexArray = array of TSingleComplex;
 | Positive-definite dense solve | [`FactorCholesky`](TypedDenseMatrices.md#choose-an-entry-point) |
 | Typed matrix multiplication | [`Multiply` / `MultiplyInto`](TypedDenseMatrices.md#choose-an-entry-point) |
 | Deterministic blocked matrix multiplication | [`MultiplyBlockedInto` / `MultiplyAutoInto`](PortablePerformance.md) |
+| Assemble or multiply a sparse matrix | [Sparse storage and operation contracts](SparseLinearAlgebra.md#compressed-storage-contract) |
+| Solve a large positive-definite system | [`ConjugateGradient` selection guide](SparseLinearAlgebra.md#choose-an-iterative-solver) |
+| Solve a general square or rectangular operator problem | [GMRES, BiCGSTAB, and LSQR selection](SparseLinearAlgebra.md#choose-an-iterative-solver) |
+| Repeated tridiagonal, band, or explicit sparse direct solve | [Reusable direct factors](SparseLinearAlgebra.md#reusable-direct-factors) |
+| Selected largest-magnitude eigenpairs | [Restarted Lanczos/Arnoldi](SparseLinearAlgebra.md#partial-eigensystems) |
 | Compatibility `IMatrix` operations | [AlgebraLib compatibility reference](AlgebraLib.md) |
 | Interpolation, fitting, adaptive integration, vector roots, or ODEs | [Numerical modelling selection guide](NumericalModelling.md#choose-an-algorithm) |
 | Dense convex QP or second-order cones | [Convex optimisation selection guide](ConvexOptimization.md#choose-a-solver) |

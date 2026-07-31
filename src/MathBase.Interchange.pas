@@ -15,10 +15,11 @@ interface
 uses
   Classes, SysUtils, Math,
   MathBase.SharedTypes, MathBase.Complex, MathBase.Random,
-  AlgebraLib.DenseMatrices;
+  AlgebraLib.DenseMatrices, AlgebraLib.SparseMatrices;
 
 const
   DEFAULT_MAX_INTERCHANGE_ELEMENTS = 16000000;
+  DEFAULT_MAX_SPARSE_DIMENSION = 16000000;
 
 type
   EInterchangeError = class(Exception);
@@ -61,6 +62,20 @@ function ReadMatrixMarketDouble(const Stream: TStream;
 function ReadMatrixMarketComplex(const Stream: TStream;
   const MaxElements: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS):
   IDenseComplexMatrix;
+procedure WriteSparseMatrixMarket(const Stream: TStream;
+  const Matrix: ISparseDoubleMatrix); overload;
+procedure WriteSparseMatrixMarket(const Stream: TStream;
+  const Matrix: ISparseComplexMatrix); overload;
+function ReadSparseMatrixMarketDouble(const Stream: TStream;
+  const Format: TSparseFormat = sfCSR;
+  const MaxNonZeros: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS;
+  const MaxDimension: QWord = DEFAULT_MAX_SPARSE_DIMENSION):
+  ISparseDoubleMatrix;
+function ReadSparseMatrixMarketComplex(const Stream: TStream;
+  const Format: TSparseFormat = sfCSR;
+  const MaxNonZeros: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS;
+  const MaxDimension: QWord = DEFAULT_MAX_SPARSE_DIMENSION):
+  ISparseComplexMatrix;
 
 procedure SaveBinary(const Stream: TStream;
   const Values: TDoubleArray); overload;
@@ -80,6 +95,30 @@ function LoadDoubleMatrixBinary(const Stream: TStream;
 function LoadComplexMatrixBinary(const Stream: TStream;
   const MaxElements: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS):
   IDenseComplexMatrix;
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseSingleMatrix); overload;
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseDoubleMatrix); overload;
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseSingleComplexMatrix); overload;
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseComplexMatrix); overload;
+function LoadSparseSingleBinary(const Stream: TStream;
+  const MaxNonZeros: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS;
+  const MaxDimension: QWord = DEFAULT_MAX_SPARSE_DIMENSION):
+  ISparseSingleMatrix;
+function LoadSparseDoubleBinary(const Stream: TStream;
+  const MaxNonZeros: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS;
+  const MaxDimension: QWord = DEFAULT_MAX_SPARSE_DIMENSION):
+  ISparseDoubleMatrix;
+function LoadSparseSingleComplexBinary(const Stream: TStream;
+  const MaxNonZeros: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS;
+  const MaxDimension: QWord = DEFAULT_MAX_SPARSE_DIMENSION):
+  ISparseSingleComplexMatrix;
+function LoadSparseComplexBinary(const Stream: TStream;
+  const MaxNonZeros: QWord = DEFAULT_MAX_INTERCHANGE_ELEMENTS;
+  const MaxDimension: QWord = DEFAULT_MAX_SPARSE_DIMENSION):
+  ISparseComplexMatrix;
 procedure SaveRandomStateBinary(const Stream: TStream;
   const State: TRandomState);
 function LoadRandomStateBinary(const Stream: TStream): TRandomState;
@@ -100,7 +139,9 @@ implementation
 
 type
   TBinaryKind = (bkDoubleVector = 1, bkComplexVector = 2,
-    bkDoubleMatrix = 3, bkComplexMatrix = 4, bkRandomState = 5);
+    bkDoubleMatrix = 3, bkComplexMatrix = 4, bkRandomState = 5,
+    bkSparseSingle = 6, bkSparseDouble = 7,
+    bkSparseSingleComplex = 8, bkSparseComplex = 9);
 
   TBinaryHeader = record
     Kind: TBinaryKind;
@@ -717,6 +758,258 @@ begin
   end;
 end;
 
+procedure WriteSparseMatrixMarket(const Stream: TStream;
+  const Matrix: ISparseDoubleMatrix);
+var
+  Builder: TStringBuilder;
+  OuterIndex, K, RowIndex, ColumnIndex: SizeInt;
+begin
+  if Matrix = nil then
+    raise EInterchangeError.Create(
+      'WriteSparseMatrixMarket(double): matrix must not be nil.');
+  for K := 0 to Matrix.NonZeroCount - 1 do
+    if Matrix.GetStoredValue(K) = 0.0 then
+      raise EInterchangeError.Create(
+        'WriteSparseMatrixMarket(double): explicit stored zeros are outside the canonical coordinate subset.');
+  Builder := TStringBuilder.Create;
+  try
+    Builder.Append('%%MatrixMarket matrix coordinate real general').
+      Append(LineEnding);
+    Builder.Append(IntToStr(Matrix.Rows)).Append(' ').
+      Append(IntToStr(Matrix.Cols)).Append(' ').
+      Append(IntToStr(Matrix.NonZeroCount)).Append(LineEnding);
+    if Matrix.Format = sfCSR then
+      for OuterIndex := 0 to Matrix.Rows - 1 do
+        for K := Matrix.GetOuterPointer(OuterIndex) to
+          Matrix.GetOuterPointer(OuterIndex + 1) - 1 do
+          Builder.Append(IntToStr(OuterIndex + 1)).Append(' ').
+            Append(IntToStr(Matrix.GetInnerIndex(K) + 1)).Append(' ').
+            Append(FloatInvariant(Matrix.GetStoredValue(K))).Append(LineEnding)
+    else
+      for OuterIndex := 0 to Matrix.Cols - 1 do
+        for K := Matrix.GetOuterPointer(OuterIndex) to
+          Matrix.GetOuterPointer(OuterIndex + 1) - 1 do
+        begin
+          RowIndex := Matrix.GetInnerIndex(K);
+          ColumnIndex := OuterIndex;
+          Builder.Append(IntToStr(RowIndex + 1)).Append(' ').
+            Append(IntToStr(ColumnIndex + 1)).Append(' ').
+            Append(FloatInvariant(Matrix.GetStoredValue(K))).Append(LineEnding);
+        end;
+    WriteString(Stream, Builder.ToString);
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure WriteSparseMatrixMarket(const Stream: TStream;
+  const Matrix: ISparseComplexMatrix);
+var
+  Builder: TStringBuilder;
+  OuterIndex, K, RowIndex, ColumnIndex: SizeInt;
+  Value: TComplex;
+begin
+  if Matrix = nil then
+    raise EInterchangeError.Create(
+      'WriteSparseMatrixMarket(complex): matrix must not be nil.');
+  for K := 0 to Matrix.NonZeroCount - 1 do
+  begin
+    Value := Matrix.GetStoredValue(K);
+    if (Value.Re = 0.0) and (Value.Im = 0.0) then
+      raise EInterchangeError.Create(
+        'WriteSparseMatrixMarket(complex): explicit stored zeros are outside the canonical coordinate subset.');
+  end;
+  Builder := TStringBuilder.Create;
+  try
+    Builder.Append('%%MatrixMarket matrix coordinate complex general').
+      Append(LineEnding);
+    Builder.Append(IntToStr(Matrix.Rows)).Append(' ').
+      Append(IntToStr(Matrix.Cols)).Append(' ').
+      Append(IntToStr(Matrix.NonZeroCount)).Append(LineEnding);
+    if Matrix.Format = sfCSR then
+      for OuterIndex := 0 to Matrix.Rows - 1 do
+        for K := Matrix.GetOuterPointer(OuterIndex) to
+          Matrix.GetOuterPointer(OuterIndex + 1) - 1 do
+        begin
+          Value := Matrix.GetStoredValue(K);
+          Builder.Append(IntToStr(OuterIndex + 1)).Append(' ').
+            Append(IntToStr(Matrix.GetInnerIndex(K) + 1)).Append(' ').
+            Append(FloatInvariant(Value.Re)).Append(' ').
+            Append(FloatInvariant(Value.Im)).Append(LineEnding);
+        end
+    else
+      for OuterIndex := 0 to Matrix.Cols - 1 do
+        for K := Matrix.GetOuterPointer(OuterIndex) to
+          Matrix.GetOuterPointer(OuterIndex + 1) - 1 do
+        begin
+          RowIndex := Matrix.GetInnerIndex(K);
+          ColumnIndex := OuterIndex;
+          Value := Matrix.GetStoredValue(K);
+          Builder.Append(IntToStr(RowIndex + 1)).Append(' ').
+            Append(IntToStr(ColumnIndex + 1)).Append(' ').
+            Append(FloatInvariant(Value.Re)).Append(' ').
+            Append(FloatInvariant(Value.Im)).Append(LineEnding);
+        end;
+    WriteString(Stream, Builder.ToString);
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure ParseSparseMatrixMarketShape(const Line, Operation: string;
+  const MaxNonZeros, MaxDimension: QWord;
+  out Rows, Columns, NonZeros: SizeInt);
+var
+  Fields: TStringList;
+  Rows64, Columns64, NonZeros64: QWord;
+begin
+  Fields := SplitStrict(Trim(Line), ' ');
+  try
+    while Fields.IndexOf('') >= 0 do Fields.Delete(Fields.IndexOf(''));
+    if (Fields.Count <> 3) or
+       not TryStrToQWord(Fields[0], Rows64) or
+       not TryStrToQWord(Fields[1], Columns64) or
+       not TryStrToQWord(Fields[2], NonZeros64) then
+      raise EInterchangeError.Create(
+        Operation + ': invalid coordinate shape line.');
+    if (Rows64 > QWord(High(SizeInt))) or
+       (Columns64 > QWord(High(SizeInt))) or
+       (NonZeros64 > QWord(High(SizeInt))) then
+      raise EInterchangeError.Create(
+        Operation + ': shape or nonzero count exceeds platform limits.');
+    if NonZeros64 > MaxNonZeros then
+      raise EInterchangeError.CreateFmt(
+        '%s: declared %d nonzeros exceed limit %d.',
+        [Operation, NonZeros64, MaxNonZeros]);
+    if (Rows64 > MaxDimension) or (Columns64 > MaxDimension) then
+      raise EInterchangeError.CreateFmt(
+        '%s: declared shape %d x %d exceeds dimension limit %d.',
+        [Operation, Rows64, Columns64, MaxDimension]);
+    Rows := SizeInt(Rows64);
+    Columns := SizeInt(Columns64);
+    NonZeros := SizeInt(NonZeros64);
+  finally
+    Fields.Free;
+  end;
+end;
+
+function ReadSparseMatrixMarketDouble(const Stream: TStream;
+  const Format: TSparseFormat; const MaxNonZeros, MaxDimension: QWord):
+  ISparseDoubleMatrix;
+var
+  Lines, Fields: TStringList;
+  Builder: TSparseDoubleTripletBuilder;
+  Rows, Columns, NonZeros, I: SizeInt;
+  Row64, Column64: QWord;
+begin
+  Lines := MatrixMarketLines(Stream, MaxNonZeros,
+    'ReadSparseMatrixMarketDouble');
+  try
+    if (Lines.Count < 2) or
+       (LowerCase(Trim(Lines[0])) <>
+        '%%matrixmarket matrix coordinate real general') then
+      raise EInterchangeError.Create(
+        'ReadSparseMatrixMarketDouble: expected coordinate real general.');
+    ParseSparseMatrixMarketShape(Lines[1],
+      'ReadSparseMatrixMarketDouble', MaxNonZeros, MaxDimension,
+      Rows, Columns, NonZeros);
+    if Lines.Count - 2 <> NonZeros then
+      raise EInterchangeError.Create(
+        'ReadSparseMatrixMarketDouble: payload count does not match declaration.');
+    Builder := TSparseDoubleTripletBuilder.Create(Rows, Columns);
+    try
+      for I := 0 to NonZeros - 1 do
+      begin
+        Fields := SplitStrict(Trim(Lines[I + 2]), ' ');
+        try
+          while Fields.IndexOf('') >= 0 do Fields.Delete(Fields.IndexOf(''));
+          if (Fields.Count <> 3) or
+             not TryStrToQWord(Fields[0], Row64) or
+             not TryStrToQWord(Fields[1], Column64) or
+             (Row64 = 0) or (Column64 = 0) or
+             (Row64 > QWord(Rows)) or (Column64 > QWord(Columns)) then
+            raise EInterchangeError.Create(
+              'ReadSparseMatrixMarketDouble: invalid one-based coordinate.');
+          Builder.Add(SizeInt(Row64 - 1), SizeInt(Column64 - 1),
+            ParseInvariantFloat(Fields[2],
+              'ReadSparseMatrixMarketDouble'));
+        finally
+          Fields.Free;
+        end;
+      end;
+      if Format = sfCSR then Result := Builder.ToCSR(szDrop)
+      else Result := Builder.ToCSC(szDrop);
+      if Result.NonZeroCount <> NonZeros then
+        raise EInterchangeError.Create(
+          'ReadSparseMatrixMarketDouble: duplicates or explicit zeros are outside the canonical subset.');
+    finally
+      Builder.Free;
+    end;
+  finally
+    Lines.Free;
+  end;
+end;
+
+function ReadSparseMatrixMarketComplex(const Stream: TStream;
+  const Format: TSparseFormat; const MaxNonZeros, MaxDimension: QWord):
+  ISparseComplexMatrix;
+var
+  Lines, Fields: TStringList;
+  Builder: TSparseComplexTripletBuilder;
+  Rows, Columns, NonZeros, I: SizeInt;
+  Row64, Column64: QWord;
+begin
+  Lines := MatrixMarketLines(Stream, MaxNonZeros,
+    'ReadSparseMatrixMarketComplex');
+  try
+    if (Lines.Count < 2) or
+       (LowerCase(Trim(Lines[0])) <>
+        '%%matrixmarket matrix coordinate complex general') then
+      raise EInterchangeError.Create(
+        'ReadSparseMatrixMarketComplex: expected coordinate complex general.');
+    ParseSparseMatrixMarketShape(Lines[1],
+      'ReadSparseMatrixMarketComplex', MaxNonZeros, MaxDimension,
+      Rows, Columns, NonZeros);
+    if Lines.Count - 2 <> NonZeros then
+      raise EInterchangeError.Create(
+        'ReadSparseMatrixMarketComplex: payload count does not match declaration.');
+    Builder := TSparseComplexTripletBuilder.Create(Rows, Columns);
+    try
+      for I := 0 to NonZeros - 1 do
+      begin
+        Fields := SplitStrict(Trim(Lines[I + 2]), ' ');
+        try
+          while Fields.IndexOf('') >= 0 do Fields.Delete(Fields.IndexOf(''));
+          if (Fields.Count <> 4) or
+             not TryStrToQWord(Fields[0], Row64) or
+             not TryStrToQWord(Fields[1], Column64) or
+             (Row64 = 0) or (Column64 = 0) or
+             (Row64 > QWord(Rows)) or (Column64 > QWord(Columns)) then
+            raise EInterchangeError.Create(
+              'ReadSparseMatrixMarketComplex: invalid one-based coordinate.');
+          Builder.Add(SizeInt(Row64 - 1), SizeInt(Column64 - 1),
+            TComplex.Create(
+              ParseInvariantFloat(Fields[2],
+                'ReadSparseMatrixMarketComplex'),
+              ParseInvariantFloat(Fields[3],
+                'ReadSparseMatrixMarketComplex')));
+        finally
+          Fields.Free;
+        end;
+      end;
+      if Format = sfCSR then Result := Builder.ToCSR(szDrop)
+      else Result := Builder.ToCSC(szDrop);
+      if Result.NonZeroCount <> NonZeros then
+        raise EInterchangeError.Create(
+          'ReadSparseMatrixMarketComplex: duplicates or explicit zeros are outside the canonical subset.');
+    finally
+      Builder.Free;
+    end;
+  finally
+    Lines.Free;
+  end;
+end;
+
 procedure WriteBytes(const Stream: TStream; const Bytes; const Count: SizeInt);
 begin
   if Stream = nil then
@@ -777,6 +1070,14 @@ begin
   for I := 0 to 7 do Bytes[Offset + I] := (Value shr (8 * I)) and $FF;
 end;
 
+procedure PutUInt32LE(var Bytes: TBytes; const Offset: SizeInt;
+  const Value: LongWord); overload;
+var
+  I: Integer;
+begin
+  for I := 0 to 3 do Bytes[Offset + I] := (Value shr (8 * I)) and $FF;
+end;
+
 function GetUInt64LE(const Bytes: TBytes; const Offset: SizeInt): QWord;
 var
   I: Integer;
@@ -784,6 +1085,16 @@ begin
   Result := 0;
   for I := 0 to 7 do
     Result := Result or (QWord(Bytes[Offset + I]) shl (8 * I));
+end;
+
+function GetUInt32LE(const Bytes: TBytes;
+  const Offset: SizeInt): LongWord; overload;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 0 to 3 do
+    Result := Result or (LongWord(Bytes[Offset + I]) shl (8 * I));
 end;
 
 procedure PutDoubleLE(var Bytes: TBytes; const Offset: SizeInt;
@@ -800,6 +1111,23 @@ var
   Bits: QWord;
 begin
   Bits := GetUInt64LE(Bytes, Offset);
+  Move(Bits, Result, SizeOf(Result));
+end;
+
+procedure PutSingleLE(var Bytes: TBytes; const Offset: SizeInt;
+  const Value: Single);
+var
+  Bits: LongWord;
+begin
+  Move(Value, Bits, SizeOf(Bits));
+  PutUInt32LE(Bytes, Offset, Bits);
+end;
+
+function GetSingleLE(const Bytes: TBytes; const Offset: SizeInt): Single;
+var
+  Bits: LongWord;
+begin
+  Bits := GetUInt32LE(Bytes, Offset);
   Move(Bits, Result, SizeOf(Result));
 end;
 
@@ -1138,7 +1466,413 @@ begin
       Result[RowIndex, ColumnIndex] := TComplex.Create(
         GetDoubleLE(Payload, Offset), GetDoubleLE(Payload, Offset + 8));
       Inc(Offset, 16);
-    end;
+  end;
+end;
+
+function NewSparsePayload(const Format: TSparseFormat;
+  const ZeroPolicy: TSparseStoredZeroPolicy;
+  const OuterLength, NonZeros, ValueBytes: SizeInt;
+  out OuterOffset, InnerOffset, ValueOffset: SizeInt): TBytes;
+var
+  PayloadBytes: QWord;
+begin
+  Result := nil;
+  PayloadBytes := 24;
+  if QWord(OuterLength) > (High(QWord) - PayloadBytes) div 8 then
+    raise EInterchangeError.Create('SaveSparseBinary: outer byte count overflows.');
+  Inc(PayloadBytes, QWord(OuterLength) * 8);
+  if QWord(NonZeros) >
+     (High(QWord) - PayloadBytes) div QWord(8 + ValueBytes) then
+    raise EInterchangeError.Create('SaveSparseBinary: payload byte count overflows.');
+  Inc(PayloadBytes, QWord(NonZeros) * QWord(8 + ValueBytes));
+  if PayloadBytes > QWord(High(SizeInt)) then
+    raise EInterchangeError.Create(
+      'SaveSparseBinary: payload exceeds platform address-space limit.');
+  SetLength(Result, SizeInt(PayloadBytes));
+  Result[0] := Ord(Format);
+  Result[1] := Ord(ZeroPolicy);
+  PutUInt64LE(Result, 8, NonZeros);
+  PutUInt64LE(Result, 16, OuterLength);
+  OuterOffset := 24;
+  InnerOffset := OuterOffset + OuterLength * 8;
+  ValueOffset := InnerOffset + NonZeros * 8;
+end;
+
+function ReadSparseBinaryEnvelope(const Stream: TStream;
+  const ExpectedKind: TBinaryKind;
+  const MaxNonZeros, MaxDimension, ValueBytes: QWord;
+  const Operation: string; out Header: TBinaryHeader): TBytes;
+var
+  Magic: array[0..7] of Byte;
+  KindByte, Reserved: Byte;
+  Version: Word;
+  I: Integer;
+  MaximumOuter, MaximumPayload, PerNonZero: QWord;
+begin
+  Result := nil;
+  if Stream = nil then
+    raise EInterchangeError.Create(Operation + ': Stream must not be nil.');
+  if not ReadExact(Stream, Magic, SizeOf(Magic)) then
+    raise EInterchangeError.Create(Operation + ': truncated binary magic.');
+  for I := 0 to High(Magic) do
+    if Magic[I] <> BINARY_MAGIC[I] then
+      raise EInterchangeError.Create(Operation + ': incompatible binary magic.');
+  Version := ReadUInt16LE(Stream, Operation);
+  if Version <> BINARY_VERSION then
+    raise EInterchangeError.CreateFmt(
+      '%s: unsupported format version %d.', [Operation, Version]);
+  if not ReadExact(Stream, KindByte, 1) or
+     not ReadExact(Stream, Reserved, 1) then
+    raise EInterchangeError.Create(Operation + ': truncated binary kind.');
+  if Reserved <> 0 then
+    raise EInterchangeError.Create(
+      Operation + ': reserved binary header byte must be zero.');
+  if KindByte <> Ord(ExpectedKind) then
+    raise EInterchangeError.CreateFmt(
+      '%s: scalar/storage kind %d is incompatible with expected kind %d.',
+      [Operation, KindByte, Ord(ExpectedKind)]);
+  Header.Kind := ExpectedKind;
+  Header.Rows := ReadUInt64LE(Stream, Operation);
+  Header.Columns := ReadUInt64LE(Stream, Operation);
+  Header.PayloadBytes := ReadUInt64LE(Stream, Operation);
+  Header.Checksum := ReadUInt32LE(Stream, Operation);
+  if (Header.Rows > QWord(High(SizeInt))) or
+     (Header.Columns > QWord(High(SizeInt))) then
+    raise EInterchangeError.Create(
+      Operation + ': shape exceeds platform limits.');
+  if (Header.Rows > MaxDimension) or
+     (Header.Columns > MaxDimension) then
+    raise EInterchangeError.CreateFmt(
+      '%s: declared shape %d x %d exceeds dimension limit %d.',
+      [Operation, Header.Rows, Header.Columns, MaxDimension]);
+  MaximumOuter := Max(Header.Rows, Header.Columns);
+  if MaximumOuter = High(QWord) then
+    raise EInterchangeError.Create(Operation + ': pointer length overflows.');
+  Inc(MaximumOuter);
+  if MaximumOuter > (High(QWord) - 24) div 8 then
+    MaximumPayload := High(QWord)
+  else
+    MaximumPayload := 24 + MaximumOuter * 8;
+  PerNonZero := 8 + ValueBytes;
+  if (MaximumPayload <> High(QWord)) and
+     (MaxNonZeros <= (High(QWord) - MaximumPayload) div PerNonZero) then
+    Inc(MaximumPayload, MaxNonZeros * PerNonZero)
+  else
+    MaximumPayload := High(QWord);
+  if Header.PayloadBytes > MaximumPayload then
+    raise EInterchangeError.CreateFmt(
+      '%s: payload length exceeds the configured sparse resource limit.',
+      [Operation]);
+  if Header.PayloadBytes > QWord(High(SizeInt)) then
+    raise EInterchangeError.Create(
+      Operation + ': payload exceeds platform address-space limit.');
+  SetLength(Result, SizeInt(Header.PayloadBytes));
+  if (Length(Result) > 0) and
+     not ReadExact(Stream, Result[0], Length(Result)) then
+    raise EInterchangeError.Create(Operation + ': truncated binary payload.');
+  if CRC32(Result) <> Header.Checksum then
+    raise EInterchangeError.Create(Operation + ': payload checksum mismatch.');
+end;
+
+procedure ParseSparsePayload(const Payload: TBytes;
+  const Header: TBinaryHeader; const MaxNonZeros: QWord;
+  const ValueBytes: SizeInt; const Operation: string;
+  out Format: TSparseFormat; out ZeroPolicy: TSparseStoredZeroPolicy;
+  out Outer, Inner: TSparseSizeIntArray; out ValueOffset: SizeInt);
+var
+  NonZeros64, OuterLength64, ExpectedOuter, ExpectedBytes: QWord;
+  I, OuterOffset, InnerOffset: SizeInt;
+  Index64: QWord;
+begin
+  if Length(Payload) < 24 then
+    raise EInterchangeError.Create(Operation + ': sparse payload is too short.');
+  if (Payload[0] > Ord(High(TSparseFormat))) or
+     (Payload[1] > Ord(High(TSparseStoredZeroPolicy))) then
+    raise EInterchangeError.Create(
+      Operation + ': invalid sparse format or zero policy.');
+  for I := 2 to 7 do
+    if Payload[I] <> 0 then
+      raise EInterchangeError.Create(
+        Operation + ': reserved sparse payload bytes must be zero.');
+  Format := TSparseFormat(Payload[0]);
+  ZeroPolicy := TSparseStoredZeroPolicy(Payload[1]);
+  NonZeros64 := GetUInt64LE(Payload, 8);
+  OuterLength64 := GetUInt64LE(Payload, 16);
+  if NonZeros64 > MaxNonZeros then
+    raise EInterchangeError.CreateFmt(
+      '%s: declared %d nonzeros exceed limit %d.',
+      [Operation, NonZeros64, MaxNonZeros]);
+  if (NonZeros64 > QWord(High(SizeInt))) or
+     (OuterLength64 > QWord(High(SizeInt))) then
+    raise EInterchangeError.Create(
+      Operation + ': sparse array length exceeds platform limits.');
+  if Format = sfCSR then ExpectedOuter := Header.Rows + 1
+  else ExpectedOuter := Header.Columns + 1;
+  if OuterLength64 <> ExpectedOuter then
+    raise EInterchangeError.Create(
+      Operation + ': compressed pointer length does not match format and shape.');
+  if OuterLength64 > (High(QWord) - 24) div 8 then
+    raise EInterchangeError.Create(Operation + ': pointer bytes overflow.');
+  ExpectedBytes := 24 + OuterLength64 * 8;
+  if NonZeros64 >
+     (High(QWord) - ExpectedBytes) div QWord(8 + ValueBytes) then
+    raise EInterchangeError.Create(Operation + ': sparse payload bytes overflow.');
+  Inc(ExpectedBytes, NonZeros64 * QWord(8 + ValueBytes));
+  if ExpectedBytes <> QWord(Length(Payload)) then
+    raise EInterchangeError.Create(
+      Operation + ': payload length does not match sparse metadata.');
+  SetLength(Outer, SizeInt(OuterLength64));
+  SetLength(Inner, SizeInt(NonZeros64));
+  OuterOffset := 24;
+  InnerOffset := OuterOffset + Length(Outer) * 8;
+  ValueOffset := InnerOffset + Length(Inner) * 8;
+  for I := 0 to High(Outer) do
+  begin
+    Index64 := GetUInt64LE(Payload, OuterOffset + I * 8);
+    if Index64 > QWord(High(SizeInt)) then
+      raise EInterchangeError.Create(
+        Operation + ': outer pointer exceeds platform limits.');
+    Outer[I] := SizeInt(Index64);
+  end;
+  for I := 0 to High(Inner) do
+  begin
+    Index64 := GetUInt64LE(Payload, InnerOffset + I * 8);
+    if Index64 > QWord(High(SizeInt)) then
+      raise EInterchangeError.Create(
+        Operation + ': inner index exceeds platform limits.');
+    Inner[I] := SizeInt(Index64);
+  end;
+end;
+
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseSingleMatrix);
+var
+  Payload: TBytes;
+  OuterOffset, InnerOffset, ValueOffset, I, OuterLength: SizeInt;
+begin
+  if Matrix = nil then
+    raise EInterchangeError.Create('SaveSparseBinary(single): matrix is nil.');
+  if Matrix.Format = sfCSR then OuterLength := Matrix.Rows + 1
+  else OuterLength := Matrix.Cols + 1;
+  Payload := NewSparsePayload(Matrix.Format, Matrix.StoredZeroPolicy,
+    OuterLength, Matrix.NonZeroCount, 4,
+    OuterOffset, InnerOffset, ValueOffset);
+  for I := 0 to OuterLength - 1 do
+    PutUInt64LE(Payload, OuterOffset + I * 8, Matrix.GetOuterPointer(I));
+  for I := 0 to Matrix.NonZeroCount - 1 do
+  begin
+    PutUInt64LE(Payload, InnerOffset + I * 8, Matrix.GetInnerIndex(I));
+    PutSingleLE(Payload, ValueOffset + I * 4, Matrix.GetStoredValue(I));
+  end;
+  WriteBinaryObject(Stream, bkSparseSingle,
+    Matrix.Rows, Matrix.Cols, Payload);
+end;
+
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseDoubleMatrix);
+var
+  Payload: TBytes;
+  OuterOffset, InnerOffset, ValueOffset, I, OuterLength: SizeInt;
+begin
+  if Matrix = nil then
+    raise EInterchangeError.Create('SaveSparseBinary(double): matrix is nil.');
+  if Matrix.Format = sfCSR then OuterLength := Matrix.Rows + 1
+  else OuterLength := Matrix.Cols + 1;
+  Payload := NewSparsePayload(Matrix.Format, Matrix.StoredZeroPolicy,
+    OuterLength, Matrix.NonZeroCount, 8,
+    OuterOffset, InnerOffset, ValueOffset);
+  for I := 0 to OuterLength - 1 do
+    PutUInt64LE(Payload, OuterOffset + I * 8, Matrix.GetOuterPointer(I));
+  for I := 0 to Matrix.NonZeroCount - 1 do
+  begin
+    PutUInt64LE(Payload, InnerOffset + I * 8, Matrix.GetInnerIndex(I));
+    PutDoubleLE(Payload, ValueOffset + I * 8, Matrix.GetStoredValue(I));
+  end;
+  WriteBinaryObject(Stream, bkSparseDouble,
+    Matrix.Rows, Matrix.Cols, Payload);
+end;
+
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseSingleComplexMatrix);
+var
+  Payload: TBytes;
+  OuterOffset, InnerOffset, ValueOffset, I, OuterLength: SizeInt;
+  Value: TSingleComplex;
+begin
+  if Matrix = nil then
+    raise EInterchangeError.Create(
+      'SaveSparseBinary(single complex): matrix is nil.');
+  if Matrix.Format = sfCSR then OuterLength := Matrix.Rows + 1
+  else OuterLength := Matrix.Cols + 1;
+  Payload := NewSparsePayload(Matrix.Format, Matrix.StoredZeroPolicy,
+    OuterLength, Matrix.NonZeroCount, 8,
+    OuterOffset, InnerOffset, ValueOffset);
+  for I := 0 to OuterLength - 1 do
+    PutUInt64LE(Payload, OuterOffset + I * 8, Matrix.GetOuterPointer(I));
+  for I := 0 to Matrix.NonZeroCount - 1 do
+  begin
+    PutUInt64LE(Payload, InnerOffset + I * 8, Matrix.GetInnerIndex(I));
+    Value := Matrix.GetStoredValue(I);
+    PutSingleLE(Payload, ValueOffset + I * 8, Value.Re);
+    PutSingleLE(Payload, ValueOffset + I * 8 + 4, Value.Im);
+  end;
+  WriteBinaryObject(Stream, bkSparseSingleComplex,
+    Matrix.Rows, Matrix.Cols, Payload);
+end;
+
+procedure SaveSparseBinary(const Stream: TStream;
+  const Matrix: ISparseComplexMatrix);
+var
+  Payload: TBytes;
+  OuterOffset, InnerOffset, ValueOffset, I, OuterLength: SizeInt;
+  Value: TComplex;
+begin
+  if Matrix = nil then
+    raise EInterchangeError.Create('SaveSparseBinary(complex): matrix is nil.');
+  if Matrix.Format = sfCSR then OuterLength := Matrix.Rows + 1
+  else OuterLength := Matrix.Cols + 1;
+  Payload := NewSparsePayload(Matrix.Format, Matrix.StoredZeroPolicy,
+    OuterLength, Matrix.NonZeroCount, 16,
+    OuterOffset, InnerOffset, ValueOffset);
+  for I := 0 to OuterLength - 1 do
+    PutUInt64LE(Payload, OuterOffset + I * 8, Matrix.GetOuterPointer(I));
+  for I := 0 to Matrix.NonZeroCount - 1 do
+  begin
+    PutUInt64LE(Payload, InnerOffset + I * 8, Matrix.GetInnerIndex(I));
+    Value := Matrix.GetStoredValue(I);
+    PutDoubleLE(Payload, ValueOffset + I * 16, Value.Re);
+    PutDoubleLE(Payload, ValueOffset + I * 16 + 8, Value.Im);
+  end;
+  WriteBinaryObject(Stream, bkSparseComplex,
+    Matrix.Rows, Matrix.Cols, Payload);
+end;
+
+function LoadSparseSingleBinary(const Stream: TStream;
+  const MaxNonZeros, MaxDimension: QWord): ISparseSingleMatrix;
+var
+  Header: TBinaryHeader;
+  Payload: TBytes;
+  Format: TSparseFormat;
+  ZeroPolicy: TSparseStoredZeroPolicy;
+  Outer, Inner: TSparseSizeIntArray;
+  Values: array of Single;
+  ValueOffset, I: SizeInt;
+begin
+  Payload := ReadSparseBinaryEnvelope(Stream, bkSparseSingle,
+    MaxNonZeros, MaxDimension, 4, 'LoadSparseSingleBinary', Header);
+  ParseSparsePayload(Payload, Header, MaxNonZeros, 4,
+    'LoadSparseSingleBinary', Format, ZeroPolicy,
+    Outer, Inner, ValueOffset);
+  SetLength(Values, Length(Inner));
+  for I := 0 to High(Values) do
+  begin
+    Values[I] := GetSingleLE(Payload, ValueOffset + I * 4);
+    RequireFinite(Values[I], 'LoadSparseSingleBinary');
+  end;
+  if Format = sfCSR then
+    Result := TSparseSingleMatrix.FromCSR(Header.Rows, Header.Columns,
+      Outer, Inner, Values, ZeroPolicy)
+  else
+    Result := TSparseSingleMatrix.FromCSC(Header.Rows, Header.Columns,
+      Outer, Inner, Values, ZeroPolicy);
+end;
+
+function LoadSparseDoubleBinary(const Stream: TStream;
+  const MaxNonZeros, MaxDimension: QWord): ISparseDoubleMatrix;
+var
+  Header: TBinaryHeader;
+  Payload: TBytes;
+  Format: TSparseFormat;
+  ZeroPolicy: TSparseStoredZeroPolicy;
+  Outer, Inner: TSparseSizeIntArray;
+  Values: array of Double;
+  ValueOffset, I: SizeInt;
+begin
+  Payload := ReadSparseBinaryEnvelope(Stream, bkSparseDouble,
+    MaxNonZeros, MaxDimension, 8, 'LoadSparseDoubleBinary', Header);
+  ParseSparsePayload(Payload, Header, MaxNonZeros, 8,
+    'LoadSparseDoubleBinary', Format, ZeroPolicy,
+    Outer, Inner, ValueOffset);
+  SetLength(Values, Length(Inner));
+  for I := 0 to High(Values) do
+  begin
+    Values[I] := GetDoubleLE(Payload, ValueOffset + I * 8);
+    RequireFinite(Values[I], 'LoadSparseDoubleBinary');
+  end;
+  if Format = sfCSR then
+    Result := TSparseDoubleMatrix.FromCSR(Header.Rows, Header.Columns,
+      Outer, Inner, Values, ZeroPolicy)
+  else
+    Result := TSparseDoubleMatrix.FromCSC(Header.Rows, Header.Columns,
+      Outer, Inner, Values, ZeroPolicy);
+end;
+
+function LoadSparseSingleComplexBinary(const Stream: TStream;
+  const MaxNonZeros, MaxDimension: QWord): ISparseSingleComplexMatrix;
+var
+  Header: TBinaryHeader;
+  Payload: TBytes;
+  Format: TSparseFormat;
+  ZeroPolicy: TSparseStoredZeroPolicy;
+  Outer, Inner: TSparseSizeIntArray;
+  Values: array of TSingleComplex;
+  ValueOffset, I: SizeInt;
+begin
+  Payload := ReadSparseBinaryEnvelope(Stream, bkSparseSingleComplex,
+    MaxNonZeros, MaxDimension, 8, 'LoadSparseSingleComplexBinary', Header);
+  ParseSparsePayload(Payload, Header, MaxNonZeros, 8,
+    'LoadSparseSingleComplexBinary', Format, ZeroPolicy,
+    Outer, Inner, ValueOffset);
+  SetLength(Values, Length(Inner));
+  for I := 0 to High(Values) do
+  begin
+    Values[I] := TSingleComplex.Create(
+      GetSingleLE(Payload, ValueOffset + I * 8),
+      GetSingleLE(Payload, ValueOffset + I * 8 + 4));
+    if not Values[I].IsFinite then
+      raise EInterchangeError.Create(
+        'LoadSparseSingleComplexBinary: values must be finite.');
+  end;
+  if Format = sfCSR then
+    Result := TSparseSingleComplexMatrix.FromCSR(
+      Header.Rows, Header.Columns, Outer, Inner, Values, ZeroPolicy)
+  else
+    Result := TSparseSingleComplexMatrix.FromCSC(
+      Header.Rows, Header.Columns, Outer, Inner, Values, ZeroPolicy);
+end;
+
+function LoadSparseComplexBinary(const Stream: TStream;
+  const MaxNonZeros, MaxDimension: QWord): ISparseComplexMatrix;
+var
+  Header: TBinaryHeader;
+  Payload: TBytes;
+  Format: TSparseFormat;
+  ZeroPolicy: TSparseStoredZeroPolicy;
+  Outer, Inner: TSparseSizeIntArray;
+  Values: array of TComplex;
+  ValueOffset, I: SizeInt;
+begin
+  Payload := ReadSparseBinaryEnvelope(Stream, bkSparseComplex,
+    MaxNonZeros, MaxDimension, 16, 'LoadSparseComplexBinary', Header);
+  ParseSparsePayload(Payload, Header, MaxNonZeros, 16,
+    'LoadSparseComplexBinary', Format, ZeroPolicy,
+    Outer, Inner, ValueOffset);
+  SetLength(Values, Length(Inner));
+  for I := 0 to High(Values) do
+  begin
+    Values[I] := TComplex.Create(
+      GetDoubleLE(Payload, ValueOffset + I * 16),
+      GetDoubleLE(Payload, ValueOffset + I * 16 + 8));
+    if not Values[I].IsFinite then
+      raise EInterchangeError.Create(
+        'LoadSparseComplexBinary: values must be finite.');
+  end;
+  if Format = sfCSR then
+    Result := TSparseComplexMatrix.FromCSR(
+      Header.Rows, Header.Columns, Outer, Inner, Values, ZeroPolicy)
+  else
+    Result := TSparseComplexMatrix.FromCSC(
+      Header.Rows, Header.Columns, Outer, Inner, Values, ZeroPolicy);
 end;
 
 procedure SaveRandomStateBinary(const Stream: TStream;

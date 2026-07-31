@@ -32,6 +32,8 @@ closest to your project.
 | `19_applied_data_pipeline.pas` | DSP / StatsLib / NumericsLib / MLLib / TimeSeriesLib | Reuse shared containers across spectral analysis, streaming statistics, fitting, PCA, seeded clustering, and scalar Kalman filtering |
 | `20_interchange_replay.pas` | MathBase / AlgebraLib | Round-trip a typed dense matrix and replay an explicitly saved local random-generator state |
 | `21_release_1_8_workflows.pas` | DSP / StatsLib / MLLib / TimeSeriesLib / InterchangeLib | Block convolution, paired distribution APIs, leakage-safe preprocessing, seeded forests, multivariate Kalman filtering, model persistence, and bounded expressions |
+| `22_sparse_end_to_end.pas` | AlgebraLib / MathBase | Assemble canonical sparse storage, round-trip Matrix Market, build IC(0), solve without densification, and interpret residual diagnostics |
+| `23_api_migration_preview.pas` | Cross-domain migration | Run and verify typed dense and sparse solves, fitting, interpolation, optimisation, DSP, and statistics while preserving explicit compatibility paths |
 
 ## Build and run
 

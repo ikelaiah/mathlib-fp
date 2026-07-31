@@ -69,6 +69,20 @@ fpc -B -FcUTF8 -Fu../src -FUlib TestRunner.lpr
 - Include examples for new features
 - Update changelog
 
+Run the static contract check and compiler-backed documentation examples:
+
+```bash
+python tools/test_api_snapshot.py
+python tools/test_doc_examples.py
+python tools/check_docs.py
+python tools/check_doc_examples.py
+python tools/build_docs.py --output build-temp/docs-site/dev
+```
+
+Release-facing Pascal fences must be self-contained: the documentation gate
+wraps fragments that begin with `uses`, compiles them against `src/`, and runs
+the resulting program. This catches stale signatures as well as syntax errors.
+
 Use the project terminology defined in the
 [documentation index](docs/index.md#terminology):
 

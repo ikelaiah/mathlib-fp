@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-07-31
+
+### Added
+
+- Immutable validated CSR/CSC and diagonal/tridiagonal/band storage for
+  single/double real and complex values, deterministic triplet construction,
+  sparse arithmetic/products, and explicit dense conversions.
+- Typed retained/delegated linear operators and identity, diagonal, IC(0), and
+  ILU(0) preconditioners with documented ownership and reentrancy.
+- CG, MINRES, restarted GMRES, BiCGSTAB, and LSQR with shared options,
+  true-residual diagnostics, cancellation/progress, breakdown reasons, and
+  reusable scalar-specific workspaces.
+- Reusable pivoted tridiagonal/no-pivot band factors and an explicit
+  natural-order sparse LU baseline with multiple RHS and fill diagnostics.
+- Deterministic restarted largest-magnitude Lanczos and Arnoldi with
+  independently checked residuals.
+- Matrix Market coordinate double-real/double-complex sparse exchange and
+  versioned checksummed four-scalar sparse binary interchange.
+- End-to-end sparse and candidate-2.0 migration examples, a classified
+  machine-readable public-API snapshot, declaration/default documentation
+  checks, capability records, and large no-densification benchmarks.
+
+### Validation
+
+- Added dense-oracle, canonical/malformed interchange, status/breakdown,
+  factor/preconditioner/workspace reuse, in-place alias, concurrent immutable
+  reuse, and 20,000-dimensional no-densification fixtures.
+- Recorded 100,000-nonzero sparse and 200,000-dimensional matrix-free `-O3`
+  qualification cases with nonzero/allocation/storage/product/iteration/
+  residual/timing evidence.
+- The complete platform, package, example, documentation, and archive matrix is
+  recorded in `docs/QUALIFICATION_1.9.0.md`.
+
+### Compatibility
+
+- Existing public signatures, defaults, and `TMatrixKitSparse` behavior remain
+  available. Legacy-to-typed sparse conversion is explicit.
+- The 2.0 contract and migration example are preview evidence only. No 2.0
+  removal, default change, or later-roadmap implementation is included.
+
 ## [1.8.0] - 2026-07-30
 
 ### Added
