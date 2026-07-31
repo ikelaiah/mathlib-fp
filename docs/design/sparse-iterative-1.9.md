@@ -91,6 +91,11 @@ product. Stored sparse, structured, and dense adapters retain their immutable
 matrix handle. Matrix-free adapters retain procedural callbacks plus an opaque
 caller context; the caller owns that context and must keep it alive.
 
+Matrix-free row and column capacities are validated independently because the
+adapter never allocates the full `rows * columns` shape. Applying a dense-shape
+address-space limit would reject valid linear-memory workloads on Win32. Each
+axis must remain representable as one typed dense vector.
+
 Operator methods accept dense column blocks with exact input/output shapes.
 They do not retain those blocks. Implementations and callbacks must be
 reentrant for concurrent calls with distinct destination storage. A nil

@@ -7,7 +7,7 @@
 | End-to-end workflow | Example 22: 5x5 Poisson triplets → CSR → Matrix Market → CSR → IC(0) → CG; 13 stored entries, one iteration, three products, confirmed true residual, endpoint solution 1 |
 | Four-scalar storage/operators | `TestSparseMatrices`, `TestIterativeSolvers`, `TestStructuredSolvers`, and `TestPartialEigensystems`; all five iterative methods, operator adjoints, preconditioner families, and direct-factor families execute through named scalar facades |
 | Complete outcomes | Iterative success/limit/cancel/breakdown; invalid preconditioner structure; band/sparse singularity; spectral validation |
-| No dense-scale allocation | 20,000-dimensional matrix-free test; 100,000-entry sparse and 200,000-dimensional matrix-free benchmark rows below |
+| No dense-scale allocation | portable constructor regression whose hypothetical dense product exceeds `High(SizeInt)`, 20,000-dimensional matrix-free solve, and 100,000-entry sparse/200,000-dimensional matrix-free benchmark rows below |
 | Reuse/aliasing/mutation/failure atomicity | sequential/concurrent factor and preconditioner reuse, exact in-place operation, partial-view rejection, source snapshots, atomic validation/construction failures, and atomic workspace ownership/recovery |
 | Interchange | text real/complex and four-scalar binary round trips; malformed index, duplicate, explicit zero, version, kind, checksum, truncation, nonzero-limit, and per-axis dimension-limit rejection |
 | Migration/API freeze | example 23 runs dense/sparse solves, fitting, interpolation, optimization, DSP, and statistics; schema-2 snapshot distinguishes owners/overloads and the generated reference contains every exact declaration |
@@ -46,7 +46,10 @@ Both report `dense_shape_elements_allocated=0`. Their storage is linear in
 vector length/nonzeros; a full dense binary64 allocation would require 80 GB
 and 320 GB respectively. The stable regression suite separately uses
 dimension 20,000, where a dense matrix alone would require 3.2 GB, and passes
-within linear workspace storage.
+within linear workspace storage. Constructor coverage also uses a portable
+shape whose hypothetical dense byte count exceeds `High(SizeInt)` while each
+axis remains a representable vector; this prevents a dense-product
+address-space check from reappearing on matrix-free paths.
 
 The warmed measurements use `GetHeapStatus.TotalAllocated`, sampled by the
 iteration monitor and after every solve from a post-warm-up baseline. The
@@ -90,8 +93,8 @@ The final observed matrix is recorded after the commands complete:
 | Win64 normal | 930 tests, 0 errors, 0 failures |
 | Win64 `-O3` | 930 tests, 0 errors, 0 failures |
 | Win64 checked/heap-traced | 930 tests, 0 errors, 0 failures; 295,567 blocks allocated/freed and 0 unfreed |
-| Win32 `-O2` | GitHub Actions gate configured; no Win32 compiler is installed in the local qualification environment |
-| Linux x86-64 | GitHub Actions gate configured; no Linux FPC target is installed in the local qualification environment |
+| Win32 `-O2` | Native i386 FPC 3.2.2 correction run: 930 tests, 0 errors, 0 failures; final GitHub Actions rerun required |
+| Linux x86-64 | Initial PR and push jobs passed; the final portability-correction commit must rerun before merge |
 | Examples | 24 compiled and ran successfully on Win64 |
 | Lazarus package | Win64 package 1.9 built successfully; Win32 package remains in the configured CI gate |
 | Documentation/API snapshot | Static checks pass for 59 pages, 24 indexed examples, 281 required entry names, and 2,880 exact owner/signature-aware declaration rows; 15 self-contained Pascal fragments compile and run |

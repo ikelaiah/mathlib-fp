@@ -134,6 +134,13 @@ for both ordinary and adjoint products and must leave its destination valid or
 raise an exception. Shape, nil, and scalar failures raise
 `ELinearOperatorError` before an adapter writes a result.
 
+Matrix-free construction validates the row and column vector capacities
+independently. It does not multiply the dimensions or impose a hypothetical
+dense-matrix allocation limit: the adapter stores only two dimensions and the
+delegated action. Each axis must still be non-negative and small enough for one
+typed dense vector on the target, which keeps invalid shapes deterministic on
+Win32 without rejecting legitimate linear-storage problems.
+
 `IPreconditioner<T>` exposes size, scalar kind, `TPreconditionerKind`,
 reentrancy, and `Apply`. The named factories are `TSinglePreconditioner`,
 `TDoublePreconditioner`, `TSingleComplexPreconditioner`, and

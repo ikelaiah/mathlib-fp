@@ -65,7 +65,10 @@ checksum corruption, truncation, nonzero limits, and dimension limits.
 
 A 20,000-dimensional matrix-free test is a regression tripwire against an
 accidental full dense allocation (which would require 3.2 GB of binary64
-values). The Win64 FPC 3.2.2 `-O3` qualification benchmark additionally ran:
+values). Matrix-free construction validates each vector axis independently,
+so this linear-storage path is not rejected on Win32 because the hypothetical
+dense product exceeds its address space. The Win64 FPC 3.2.2 `-O3`
+qualification benchmark additionally ran:
 
 - a 100,000-by-100,000 CSR system with 100,000 nonzeros in 125 ms initially,
   then 20 warmed solves in 2,109 ms, one CG iteration/three products per solve,

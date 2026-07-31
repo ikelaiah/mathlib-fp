@@ -34,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added dense-oracle, canonical/malformed interchange, status/breakdown,
   factor/preconditioner/workspace reuse, in-place alias, concurrent immutable
   reuse, and 20,000-dimensional no-densification fixtures.
+- Corrected matrix-free shape validation to bound vector axes independently,
+  preserving large linear-storage workloads on Win32 without weakening
+  invalid-dimension or address-space checks.
 - Recorded 100,000-nonzero sparse and 200,000-dimensional matrix-free `-O3`
   qualification cases with nonzero/allocation/storage/product/iteration/
   residual/timing evidence.

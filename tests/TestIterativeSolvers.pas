@@ -567,14 +567,47 @@ procedure TIterativeSolverTest.TestLargeMatrixFreePathDoesNotDensify;
 const
   N = 20000;
 var
-  Action: IMatrixFreeDoubleAction;
-  OperatorValue: ILinearDoubleOperator;
+  Action, ShapeOnlyAction: IMatrixFreeDoubleAction;
+  OperatorValue, ShapeOnlyOperator: ILinearDoubleOperator;
   B, X: IDenseDoubleMatrix;
   Workspace: TDoubleIterativeWorkspace;
   Options: TLinearSolveOptions;
   Diagnostics: TLinearSolveDiagnostics;
-  I: SizeInt;
+  I, DenseProductLimitDimension, TooLargeDimension: SizeInt;
+  Failed: Boolean;
 begin
+  { This shape's hypothetical dense byte count exceeds High(SizeInt) on every
+    target, while either vector dimension remains independently representable.
+    Constructing the delegated operator must not apply a dense-product limit. }
+  DenseProductLimitDimension :=
+    Trunc(Sqrt(High(SizeInt) div SizeOf(Double))) + 1;
+  ShapeOnlyAction := TLargeDiagonalAction.Create(DenseProductLimitDimension);
+  ShapeOnlyOperator := TDoubleLinearOperator.MatrixFree(
+    DenseProductLimitDimension, DenseProductLimitDimension, ShapeOnlyAction);
+  AssertEquals('matrix-free rows ignore hypothetical dense product',
+    DenseProductLimitDimension, ShapeOnlyOperator.Rows);
+  AssertEquals('matrix-free columns ignore hypothetical dense product',
+    DenseProductLimitDimension, ShapeOnlyOperator.Cols);
+
+  Failed := False;
+  try
+    ShapeOnlyOperator := TDoubleLinearOperator.MatrixFree(
+      -1, DenseProductLimitDimension, ShapeOnlyAction);
+  except
+    on ELinearOperatorError do Failed := True;
+  end;
+  AssertTrue('negative matrix-free dimension rejected', Failed);
+
+  TooLargeDimension := High(SizeInt) div SizeOf(Double) + 1;
+  Failed := False;
+  try
+    ShapeOnlyOperator := TDoubleLinearOperator.MatrixFree(
+      TooLargeDimension, 1, ShapeOnlyAction);
+  except
+    on ELinearOperatorError do Failed := True;
+  end;
+  AssertTrue('unrepresentable matrix-free vector rejected', Failed);
+
   { A dense N x N allocation would require 3.2 GB. This fixture runs within
     linear operator/vector storage and is the regression tripwire against
     accidental densification. }

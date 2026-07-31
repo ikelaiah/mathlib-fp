@@ -651,8 +651,19 @@ constructor TMatrixFreeLinearOperator.Create(const Rows, Cols: SizeInt;
   const Action: specialize IMatrixFreeAction<T>);
 begin
   inherited Create;
-  specialize TSparseMatrixStorage<T>.CheckedCount(
-    Rows, Cols, SizeOf(T), 'Matrix-free operator shape');
+  { A matrix-free operator never allocates Rows * Cols values. Validate the
+    two vector domains independently so a linear-storage problem is not
+    rejected merely because its hypothetical dense matrix would exceed the
+    platform address space. }
+  try
+    specialize TSparseMatrixStorage<T>.CheckedCount(
+      Rows, 1, SizeOf(T), 'Matrix-free operator row dimension');
+    specialize TSparseMatrixStorage<T>.CheckedCount(
+      Cols, 1, SizeOf(T), 'Matrix-free operator column dimension');
+  except
+    on E: ESparseMatrixError do
+      raise ELinearOperatorError.Create(E.Message);
+  end;
   if Action = nil then
     raise ELinearOperatorError.Create(
       'Matrix-free operator: action must not be nil.');

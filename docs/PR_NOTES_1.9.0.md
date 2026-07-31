@@ -46,6 +46,12 @@ additive and any conversion is explicit.
 10. Local normal/optimized/checked, docs, examples, package, benchmark, and
     clean-archive gates are recorded separately from remote Win32/Linux jobs.
 
+The first native Win32 CI run exposed a portability defect in matrix-free
+shape validation: construction checked the byte size of a hypothetical dense
+matrix. The correction validates row and column vector capacities
+independently, retains invalid-axis rejection, and adds a target-independent
+regression whose dense product exceeds `High(SizeInt)`.
+
 ## Completion-gate mapping
 
 | Gate | Evidence |
