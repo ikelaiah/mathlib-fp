@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/mathlib-fp-logo.svg" alt="mathlib-fp — mathematics and engineering for Free Pascal" width="760">
+  <img src="docs/assets/mathlib-fp-banner-v2.svg" alt="mathlib-fp — numerical computing for Free Pascal" width="760">
 </p>
 
 # mathlib-fp
