@@ -67,7 +67,7 @@ mathlib-fp is intended to meet four related needs in the Pascal ecosystem.
 Success means completing common workflows, not merely accumulating entry
 points. A broad library whose domains do not interoperate, a fast library that
 needs an opaque binary, or a correct library that users cannot learn does not
-meet the goal. Each minor release must update the capability inventory and
+meet the goal. Each stable release must update the capability inventory and
 state important remaining gaps honestly.
 
 “One library” does not mean that mathlib-fp must become a symbolic algebra
@@ -128,8 +128,10 @@ The project follows Semantic Versioning:
 - minor releases add backward-compatible capabilities;
 - 1.x keeps established APIs working wherever correctness permits and provides
   adapters or deprecation notices for APIs that will change;
-- 2.0.0 is the point at which the coherent replacement API becomes the default
-  and previously announced breaking changes may be completed.
+- 2.0.0 is the point at which the coherent replacement API becomes the default.
+  A previously announced breaking change may be completed only after its
+  documented minor-release runway; a breaking change is not required merely to
+  justify the major version.
 
 A 1.3.x maintenance release may therefore occur before 1.4.0, but GeometryLib
 vector arithmetic is new public API and belongs to 1.4.0.
@@ -145,6 +147,15 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 1.7.0 | Interpolation, fitting, advanced numerics, and optimisation | End-to-end modelling recipes with convergence and diagnostic guidance |
 | 1.8.0 | Applied numerics, interchange, tooling, and performance maturity | Portable data workflows, reproducible benchmarks, and mature package/distribution paths |
 | 1.9.0 | Typed structured/sparse linear algebra and matrix-free iterative solvers | Large-problem workflows with bounded storage, verified contracts, and a 2.0 migration preview |
+| 1.9.1 | Stabilisation and documentation delivery | A dependable 1.9 release, versioned web/offline documentation, and verified first-use paths |
+| 1.9.2 | Beginner learning path | Short task-oriented recipes and a clear double-real path before advanced controls |
+| 1.9.3 | Complete 2.0 API decision | A curated all-domain primary surface with every compatibility decision resolved |
+| 1.9.4 | Numerical trust closure | Independent references, adversarial cases, and published accuracy/failure budgets |
+| 1.9.5 | Predictable performance | Reproducible time/allocation baselines and evidence-led internal optimisation |
+| 1.9.6 | Portability and distribution | Clean archives, offline use, and a current evidence-backed support matrix |
+| 1.9.7 | Migration and compatibility rehearsal | Complete 1.x mappings and a tested compatibility-package plan |
+| 1.9.8 | Representative workflows and external beta | Multi-domain applications and recorded use by people outside their implementation |
+| 1.9.9 | Final 2.0 freeze | Frozen API/docs/artifacts followed by release-candidate qualification and soak |
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
 
 ## Implementation discipline
@@ -152,7 +163,7 @@ vector arithmetic is new public API and belongs to 1.4.0.
 This roadmap describes a sequence of release outcomes, not one implementation
 task. Work should proceed one release and one reviewable change at a time.
 
-- Only the release marked **Next release** is the active feature target.
+- Only the release marked **Next release** is the active release target.
   Later planned releases provide architectural direction and should not be
   implemented opportunistically.
 - Before adding a public type or changing storage, document ownership, aliasing,
@@ -1189,18 +1200,374 @@ silently materialising a dense matrix or factor.
   iterative, preconditioner, and partial-eigensystem paths are stable, their
   important limits, and every 2.0 baseline gap that remains.
 
+## 1.9.x convergence contract
+
+The 1.9.x line is the adoption, compatibility, and trust runway between the
+large additive 1.9.0 milestone and the 2.0 stability commitment. Its purpose is
+to prove and curate the capabilities already shipped, not to consume patch
+numbers with unrelated algorithm families.
+
+- A 1.9.x release may correct defects, strengthen validation and numerical
+  safeguards, improve a non-public implementation, add tests/fixtures,
+  publish documentation and examples, improve tooling, or qualify an existing
+  path on another target without changing its public contract.
+- A new public algorithm family, type, or convenience surface that applications
+  are expected to depend on is a minor-version capability and belongs in
+  1.10.0 rather than being hidden inside a 1.9.x patch.
+- The 1.9 API snapshot remains the compatibility baseline. Any interface change
+  requires a documented correctness or compatibility reason, an exact snapshot
+  diff, migration impact, and the same declaration/documentation checks as a
+  minor release.
+- Later entries below are planning gates. Only 1.9.1 is active; work is not
+  pulled forward merely because it is convenient to bundle with another fix.
+- Passing a gate requires evidence from a clean release archive. A count of
+  functions, tests, pages, or examples does not substitute for the stated user
+  and numerical outcome.
+
+## Next release: 1.9.1 — Stabilisation and documentation delivery
+
+Version 1.9.1 makes the new 1.9 surface dependable and easy to reach before any
+broader migration decision is made. It is deliberately feature-frozen.
+
+### 1.9.1 scope
+
+- Triage reports from the 1.9.0 archive and correct confirmed numerical,
+  portability, ownership, allocation, packaging, and documentation defects.
+  Every numerical correction receives a permanent regression case.
+- Publish the generated searchable documentation as a release-versioned static
+  website and as an offline archive built from the same tagged sources. The
+  default site must identify the release it describes and link older versions
+  without silently replacing their content.
+- Verify the README quick start, direct `src/` use, Lazarus package, examples,
+  and documented commands from clean source archives on the primary targets.
+- Strengthen documentation execution checks so that claimed output, statuses,
+  and final success markers are checked where a guide relies on them; a program
+  returning exit code zero is not sufficient evidence that prose and observed
+  behaviour agree.
+- Add a focused feedback route for installation time, confusing type choices,
+  boilerplate conversions, unexpected errors, missing selection guidance, and
+  1.9 migration problems.
+
+### 1.9.1 completion gate
+
+- No confirmed critical or high-impact 1.9 correctness, unsafe-contract,
+  portability, packaging, or materially misleading documentation defect is
+  unresolved.
+- A new user can reach the current release page, obtain a source archive, and
+  run the documented one-screen program in no more than five minutes on a
+  primary platform.
+- Versioned web documentation, the offline documentation archive, and repository
+  Markdown agree on public signatures, release identity, examples, and known
+  limitations.
+- Normal, optimised, checked/heap-traced, examples, documentation, package, and
+  clean-archive qualification results are published for the release.
+
+## Planned 1.9.2 — Beginner learning path
+
+Version 1.9.2 turns the existing breadth into an intentional learning journey.
+The primary teaching path uses double-real data and simple allocating calls;
+single precision, complex values, views, destinations, and reusable workspaces
+remain one clearly labelled step deeper.
+
+### 1.9.2 scope
+
+- Give every domain a minimal copy/run example, a short list of common tasks,
+  a “choose an algorithm” path, expected output, and links to the exact contract
+  and failure guidance.
+- Add a newcomer guide for Free Pascal dynamic arrays, zero-based indexing,
+  managed interface lifetimes, callbacks, options records, result statuses,
+  and the difference between an expected non-convergence result and an invalid-
+  contract exception.
+- Present common entry points before generic implementation types and before
+  allocation-free expert overloads. Documentation must never require a reader
+  to understand specialization scaffolding to solve an ordinary double-real
+  problem.
+- Add task recipes covering at least dense and sparse solves, descriptive and
+  streaming statistics, probability, interpolation/fitting, optimisation,
+  FFT/filtering, time series, finance, geometry, and unit conversion.
+- Record copy/allocation and precision implications without forcing beginners
+  to manage destinations or workspaces prematurely.
+
+### 1.9.2 completion gate
+
+- At least three clean-room walkthroughs by people who did not implement the
+  exercised feature reach correct results without reading implementation units.
+- Every stable domain has a tested beginner route and an advanced route, and
+  the transition between them does not require undocumented conversions.
+- Documentation search finds common problems such as “least squares”, “normal
+  probability”, or “FFT convolution” even when the reader does not know the
+  Pascal identifier.
+- All recipe code and claimed output pass from the packaged release.
+
+## Planned 1.9.3 — Complete 2.0 API decision
+
+Version 1.9.3 converts the 1.9 API inventory into a complete all-domain 2.0
+decision. The exact declaration reference remains exhaustive; a smaller curated
+map tells ordinary users what to choose.
+
+### 1.9.3 scope
+
+- Classify every snapshot declaration as the recommended common path, an
+  advanced stable path, compatibility surface, experimental surface, or generic
+  implementation support. Visibility required for FPC specialization does not
+  make a declaration a recommended application API.
+- Extend the candidate conventions across every domain, not only typed linear
+  algebra. Resolve naming, indexing, shape, units, ownership, mutation,
+  aliasing, exceptions, tolerances, outcomes, RNG state, cancellation,
+  progress, and thread-safety language.
+- Give every compatibility entry a named replacement and semantic-difference
+  note, or record an explicit decision to retain it. Age, naming taste, or the
+  availability of a major version is not by itself a reason to deprecate an API.
+- Review the candidate through short complete programs for the most common
+  workflows. If an ordinary task remains awkward, document the problem rather
+  than inventing an unreviewed public wrapper inside this patch release.
+- Produce an exact proposed 1.9-to-2.0 API diff and separate changes that are
+  documentary defaults from changes that would affect source or behaviour.
+
+### 1.9.3 completion gate
+
+- There is no undecided stable 2.0 declaration, default, ownership rule,
+  compatibility classification, or replacement mapping.
+- Every recommended common path has a concise compile-checked example, and no
+  common example depends on a declaration classified as internal.
+- The proposed API diff names every source, behaviour, warning, and packaging
+  consequence; an empty diff is acceptable if the existing API proves sound.
+- Any newly required public capability is routed to a separately planned
+  1.10.0 minor release and is not added opportunistically to 1.9.x.
+
+## Planned 1.9.4 — Numerical trust closure
+
+Version 1.9.4 closes validation gaps across the existing stable capability
+inventory and makes the evidence understandable outside the test source.
+
+### 1.9.4 scope
+
+- Audit each stable family for independent reference fixtures, structural or
+  metamorphic properties, adversarial scales, deterministic randomized cases,
+  and explicit invalid/non-finite/degenerate behaviour.
+- Publish precision- and algorithm-specific accuracy, residual, reconstruction,
+  feasibility, or backward-error budgets. A passing ordinary example is not a
+  universal accuracy claim.
+- Record provenance for algorithms and generated fixtures, including the source
+  or method, precision, parameters, licence compatibility, and regeneration
+  procedure.
+- Add expected-output checks for examples whose teaching claim depends on a
+  status, diagnostic, numerical range, or final interpretation.
+- Use sampled mutation testing or deliberate fault injection on high-risk
+  kernels to confirm that the relevant validation groups detect plausible
+  implementation errors.
+
+### 1.9.4 completion gate
+
+- Every stable capability resolves to independent numerical evidence, a stated
+  budget, edge/failure cases, and reproducible provenance, or is downgraded with
+  the exact missing evidence identified.
+- No known silent-wrong-answer defect or unsupported case presented as stable
+  remains open.
+- Qualification summaries distinguish exact mathematical checks, reference
+  comparisons, estimates, and machine-specific observations.
+- The release suite remains independent of proprietary software, external
+  numerical DLLs, and network access.
+
+## Planned 1.9.5 — Predictable performance
+
+Version 1.9.5 makes performance and allocation behaviour inspectable without
+turning portable Pascal into a secondary implementation.
+
+### 1.9.5 scope
+
+- Publish cold and warmed timings, allocations, retained memory, dimensions,
+  scalar kinds, compiler flags, hardware, tolerances, and setup rules for
+  representative dense, sparse, iterative, DSP, modelling, statistics, and
+  data-analysis workflows.
+- Add same-run baseline comparisons and exact allocation/complexity tripwires.
+  Wall-clock thresholds remain advisory on variable hosted runners unless a
+  stable dedicated environment justifies a hard gate.
+- Profile before changing implementation. Optimise internal traversal,
+  allocation, workspace reuse, and algorithm selection only when a reproducible
+  workload shows material benefit and portable cross-path tests remain green.
+- Include small inputs, where abstraction or setup overhead dominates, as well
+  as large workloads. First-use simplicity must not be sacrificed for a
+  benchmark that represents only warmed repeated calls.
+- Keep external-library comparisons optional, reproducible, licence-compliant,
+  and matched for algorithm, precision, tolerance, setup, and output checking;
+  marketing-only timing claims are not release evidence.
+
+### 1.9.5 completion gate
+
+- Every published performance or memory claim names reproducible conditions and
+  resolves to a checked benchmark row.
+- No stable path has an unexplained material regression from the prior baseline
+  or hidden allocation proportional to an inappropriate dense shape.
+- Exact allocation ceilings fail mechanically where practical; noisy timing
+  movements trigger review rather than false precision.
+- The portable implementation remains complete, readable, and tested even when
+  an optional faster path is later introduced.
+
+## Planned 1.9.6 — Portability and distribution
+
+Version 1.9.6 proves that installation and support claims survive outside a
+maintainer checkout and remain honest about targets without continuous
+qualification.
+
+### 1.9.6 scope
+
+- Run primary targets on each change and schedule complete normal, optimised,
+  runtime-checked, heap-traced, examples, documentation, benchmark, and package
+  qualification often enough to detect drift before release.
+- Test checksummed source and offline-documentation archives after clean
+  extraction with networking unavailable. Direct `src/` use and the Lazarus
+  package remain first-class and must not require generated source.
+- Publish compiler, OS, CPU, pointer width, and scalar ABI support tiers with
+  the last successful evidence date and the exact checks run on each target.
+- Qualify an additional platform such as macOS/ARM64 only when a maintainable
+  runner and repeatable numerical evidence exist. Otherwise document it as
+  unqualified rather than extrapolating from another Unix or 64-bit target.
+- Audit units for filesystem, locale, endianness, floating-point, calling-
+  convention, and address-space assumptions exposed by the target matrix.
+
+### 1.9.6 completion gate
+
+- Every supported target has current evidence appropriate to its tier; no table
+  cell implies a test configuration that did not run.
+- Clean archives pass the documented quick start, representative workflows,
+  documentation checks, and applicable package build without repository-local
+  state or network access.
+- Binary formats and numerical results pass their documented cross-target
+  invariants, with ABI-dependent precision differences stated explicitly.
+- Unqualified targets and platform-specific limitations are easy to find from
+  the installation instructions and capability inventory.
+
+## Planned 1.9.7 — Migration and compatibility rehearsal
+
+Version 1.9.7 proves migration before any 2.0 documentation default changes.
+It does not remove maintained 1.x declarations or silently reinterpret their
+storage, defaults, or numerical behaviour.
+
+### 1.9.7 scope
+
+- Complete side-by-side 1.x and candidate-2.0 examples for every domain,
+  including construction, ordinary success, diagnostic failure, ownership,
+  copying, indexing, precision, defaults, and result interpretation.
+- Publish responsible conceptual mappings for commonly used Free Pascal
+  numerical APIs such as NumLib and LMath/DMath where the mathematical and
+  ownership semantics are verified. State differences and unsupported mappings
+  instead of promising drop-in compatibility.
+- Define and compile-test the packaging boundary for compatibility APIs. Keeping
+  an entry in its existing unit may be safer than moving it; the choice must be
+  based on migration evidence rather than a desire for visual tidiness.
+- Add representative consumer projects that compile against 1.9 and the
+  proposed 2.0 layout, with expected warnings and source edits recorded.
+- Publish the deprecation decision list. A source removal still requires the
+  minor-release runway promised by this roadmap; 1.9.7 alone does not create a
+  removal entitlement.
+
+### 1.9.7 completion gate
+
+- Every proposed deprecated entry has a tested replacement, semantic-difference
+  note, migration example, compatibility period, and owner; entries without
+  that evidence remain supported.
+- All domain migration examples compile and run from a clean archive, and
+  expected behaviour changes are asserted rather than described only in prose.
+- The compatibility-package or in-place-retention choice is tested on every
+  supported package/compiler path and does not introduce hidden dependencies.
+- If migration requires a new public replacement, it has shipped and soaked in
+  a 1.x minor release before any corresponding removal is considered.
+
+## Planned 1.9.8 — Representative workflows and external beta
+
+Version 1.9.8 validates that separately mature domains feel like one library in
+applications not written to mirror the internal architecture.
+
+### 1.9.8 scope
+
+- Ship at least three maintained multi-domain applications: for example a
+  sensor/DSP/statistics/time-series pipeline, a numerical modelling and
+  optimisation workflow, and a probability/finance or reproducible data-
+  analysis workflow.
+- Exercise loading, validation, transformations, fitting or solving,
+  diagnostics, cancellation where relevant, persistence/export, and result
+  interpretation rather than chaining only happy-path scalar calls.
+- Recruit users who did not implement the exercised features, including at
+  least one person relatively new to Free Pascal, and record installation,
+  comprehension, API-friction, migration, and error-recovery observations.
+- Resolve defects and documentation gaps found by the beta. Keep desirable new
+  algorithm families in the post-2.0 backlog unless they block a documented
+  core workflow and receive their own minor-release plan.
+- Publish known limitations and workarounds found during the beta rather than
+  delaying disclosure until the final release notes.
+
+### 1.9.8 completion gate
+
+- At least three representative applications build and run from the release
+  archive on primary targets and have bounded, reproducible expected results.
+- At least three people outside the implementation of those workflows complete
+  recorded clean-room use; unresolved confusion is either corrected or named
+  with a tested workaround.
+- No reference application requires private conversions, undocumented symbols,
+  a foreign runtime, a licence key, or network access for its numerical path.
+- Beta findings are triaged by correctness risk and user-workflow impact, not
+  by the ease of adding another isolated function.
+
+## Planned 1.9.9 — Final 2.0 freeze
+
+Version 1.9.9 is the final 1.x convergence release. It introduces no planned
+public capability and freezes the code, API decision, documentation sources,
+support claims, migration material, qualification procedure, and distribution
+artifacts that will be promoted to 2.0.
+
+### 1.9.9 scope
+
+- Publish the final candidate public-API snapshot and an exact diff from 1.9.0,
+  separating compatibility-preserving corrections from 2.0 documentation or
+  packaging changes.
+- Complete the algorithm/fixture provenance and licence audit, 2.x maintenance
+  policy, support policy, deprecation policy, contribution gate for new domains,
+  and security support window.
+- Build release-candidate source and offline-documentation archives from tags,
+  then run the complete target, numerical, memory, performance, examples,
+  migration, package, and documentation qualification against those archives.
+- Run at least two 2.0 release-candidate cycles. After the freeze, accept only
+  release-blocking correctness, safety, portability, packaging, documentation,
+  or migration fixes, each with regression evidence and a reviewed API diff.
+- Allow a 30–60 day external soak after the first complete candidate; elapsed
+  time without use is not evidence, so the representative workflows and beta
+  users must exercise the actual candidate artifacts.
+
+### 1.9.9 completion gate
+
+- The final snapshot, guides, examples, source comments, capability inventory,
+  support matrix, release notes, and qualification report contain no unresolved
+  contract mismatch.
+- Two release candidates pass full archive-based qualification and the later
+  candidate includes every accepted freeze fix.
+- No unresolved critical/high-impact correctness, unsafe ownership/concurrency,
+  portability, packaging, or migration defect is hidden to meet the version
+  target.
+- Representative 1.x applications complete the documented migration or remain
+  operational through the tested compatibility surface.
+- The only remaining work for 2.0.0 is version/release metadata and promotion
+  of the qualified candidate, not a new algorithm or public API design.
+
 ## Planned 2.0.0 — Stable native numerical platform
 
 Version 2.0.0 is a quality and API graduation, not an excuse for an arbitrary
 rewrite. It ships only when the additive 1.x foundations have been used by
-the higher-level libraries and their migration path is proven.
+the higher-level libraries, their migration path is proven, and the 1.9.x
+convergence gates are complete. Version 2.0.0 does not need a breaking change
+to justify its number: the major-version promise is that the curated native API
+is coherent, documented, qualified, and stable enough for long-term use.
 
 ### Public API and compatibility boundary
 
 - Make the contiguous real/complex value types and shared result/configuration
   conventions the primary documented API.
-- Remove or isolate 1.x APIs only after at least one minor-release deprecation
-  period, a documented replacement, and migration examples.
+- Do not remove a maintained 1.x API merely because the major version permits
+  it. In the absence of a prior 1.x minor-release deprecation period, retain it
+  in place or through the tested compatibility surface for the 2.x line.
+- Remove or isolate a 1.x API only after a documented replacement, complete
+  migration examples, representative consumer testing, and at least one prior
+  minor-release deprecation period. Formal removals are not a 2.0 requirement.
 - Keep a clearly named compatibility package when doing so is practical and
   does not compromise the new API's ownership or numerical semantics.
 - Standardise naming, indexing, shape rules, exceptions, result statuses,
@@ -1323,11 +1690,13 @@ the higher-level libraries and their migration path is proven.
 - API references, guides, examples, source comments, capability data, release
   notes, and qualification evidence agree on the stable surface, maturity,
   supported platforms, limitations, and measured claims.
-- At least one release-candidate cycle validates clean installation, the
-  complete documentation set, migration guide, and representative workflows
-  from release archives rather than a developer checkout.
-- Compatibility removals have migration coverage, and no known correctness
-  defect is being hidden to meet a version target.
+- At least two release-candidate cycles and a 30–60 day exercised soak validate
+  clean installation, the complete documentation set, migration guide, and
+  representative workflows from release archives rather than a developer
+  checkout.
+- Any compatibility removal has the required prior minor-release runway and
+  complete migration coverage; no removal is required for 2.0, and no known
+  correctness defect is being hidden to meet a version target.
 - The capability inventory demonstrates that mathlib-fp is a credible native,
   free default for core numerical and scientific Free Pascal workflows.
 
