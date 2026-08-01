@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.9.0" src="https://img.shields.io/badge/version-1.9.0-brightgreen.svg">
+  <img alt="Version 1.9.1" src="https://img.shields.io/badge/version-1.9.1-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,16 +26,18 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **1.9.0 is the current release; 1.2.0 was the first public release.** The
+> **1.9.1 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.9.0.md) and
+> [release notes](docs/RELEASE_NOTES_1.9.1.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-Download the source archive from the
-[latest GitHub release](https://github.com/ikelaiah/mathlib-fp/releases/latest),
-or clone the repository:
+Open the [1.9.1 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.1)
+or download the source directly as
+[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.1.tar.gz)
+or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.1.zip).
+You can also clone the repository:
 
 ```bash
 git clone https://github.com/ikelaiah/mathlib-fp.git
@@ -55,6 +57,12 @@ uses
 begin
   Writeln('P(Z <= 1.96) = ', TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
 end.
+```
+
+Expected output:
+
+```text
+P(Z <= 1.96) = 0.975002
 ```
 
 Compile it with `src/` on the unit search path:
@@ -103,7 +111,10 @@ fpc -Fu../src -FUlib 00_getting_started.pas
 ./00_getting_started
 ```
 
-On Windows, run the generated `.exe` instead. Start with the [documentation index](docs/index.md) for the full API tour.
+On Windows, run the generated `.exe` instead. Start with the
+[versioned web documentation](https://ikelaiah.github.io/mathlib-fp/) or the
+[repository documentation index](docs/index.md) for offline use. The release
+page also provides the generated offline HTML archive and its SHA-256 checksum.
 
 To compile all examples into `example-bin/` from the repository root, run
 `sh ./build-examples.sh` or `.\build-examples.ps1`. See the
@@ -112,7 +123,9 @@ options.
 
 ## 🤝 Contributing
 
-Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) to get started, or run the full test suite locally:
+Bug reports and pull requests are welcome. For first-use friction, use the
+[focused 1.9 feedback route](docs/FEEDBACK.md). See
+[CONTRIBUTING.md](CONTRIBUTING.md) to get started, or run the full test suite locally:
 
 ```bash
 cd tests

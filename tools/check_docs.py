@@ -12,6 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
+CURRENT_RELEASE = "1.9.1"
+API_BASELINE_RELEASE = "1.9.0"
 
 
 def normalized_interface(source: str) -> str:
@@ -26,7 +28,7 @@ def heading_slugs(text: str) -> set[str]:
     result = set()
     for heading in re.findall(r"^#{1,6}\s+(.+)$", text, re.M):
         value = re.sub(r"[^\w\s-]", "", heading.lower(), flags=re.UNICODE)
-        result.add(re.sub(r"\s", "-", value).strip("-"))
+        result.add(re.sub(r"\s+", "-", value).strip("-"))
     return result
 
 
@@ -56,7 +58,7 @@ def main() -> int:
     inventory_path = DOCS / "capabilities.json"
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-        assert inventory["release"] == "1.9.0"
+        assert inventory["release"] == CURRENT_RELEASE
         assert inventory["schema_version"] == 1
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -67,7 +69,7 @@ def main() -> int:
     snapshot_declarations: list[tuple[str, dict[str, object]]] = []
     try:
         snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-        assert snapshot["release"] == "1.9.0"
+        assert snapshot["release"] == API_BASELINE_RELEASE
         assert snapshot["schema_version"] == 2
         assert snapshot["identity"] == [
             "unit",
@@ -555,6 +557,81 @@ def main() -> int:
     for example in examples:
         if example.name not in index:
             errors.append(f"example missing from examples/README.md: {example.name}")
+
+    try:
+        versions = json.loads((DOCS / "versions.json").read_text(encoding="utf-8"))
+        assert versions["schema_version"] == 1
+        assert versions["current"] == CURRENT_RELEASE
+        listed_releases = [item["release"] for item in versions["versions"]]
+        assert listed_releases == [CURRENT_RELEASE, API_BASELINE_RELEASE]
+        assert versions["site_url"].startswith("https://")
+        assert versions["repository_url"].startswith("https://")
+    except (ValueError, KeyError, AssertionError) as exc:
+        errors.append(f"docs/versions.json: invalid version manifest: {exc}")
+
+    release_files = [
+        DOCS / f"RELEASE_NOTES_{CURRENT_RELEASE}.md",
+        DOCS / f"PR_NOTES_{CURRENT_RELEASE}.md",
+        DOCS / f"QUALIFICATION_{CURRENT_RELEASE}.md",
+        DOCS / "FEEDBACK.md",
+    ]
+    for release_file in release_files:
+        if not release_file.is_file():
+            errors.append(f"missing release document: {release_file.relative_to(ROOT)}")
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    support = (DOCS / "SUPPORT.md").read_text(encoding="utf-8")
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    package = (ROOT / "packages" / "lazarus" / "mathlib_fp.lpk").read_text(
+        encoding="utf-8"
+    )
+    identity_checks = {
+        "README badge": f"version-{CURRENT_RELEASE}-brightgreen" in readme,
+        "README release notes": f"RELEASE_NOTES_{CURRENT_RELEASE}.md" in readme,
+        "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
+        "support matrix": f"Version {CURRENT_RELEASE}" in support,
+        "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="1"/>' in package,
+    }
+    for description, valid in identity_checks.items():
+        if not valid:
+            errors.append(f"release identity mismatch: {description}")
+
+    contracts_path = ROOT / "examples" / "output-contracts.json"
+    try:
+        contract_data = json.loads(contracts_path.read_text(encoding="utf-8"))
+        assert contract_data["schema_version"] == 1
+        contracts = contract_data["examples"]
+        assert len(contracts) == 4
+        for contract in contracts:
+            source = ROOT / contract["path"]
+            assert source.is_file()
+            assert contract["contains"]
+            final_line = contract["final_line"]
+            assert final_line in source.read_text(encoding="utf-8")
+    except (ValueError, KeyError, AssertionError) as exc:
+        errors.append(f"examples/output-contracts.json: invalid contracts: {exc}")
+
+    feedback_form = (
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "release_feedback.yml"
+    ).read_text(encoding="utf-8")
+    feedback_terms = [
+        "Installation time", "Confusing type choice", "Boilerplate conversion",
+        "Unexpected error or status", "Missing algorithm-selection guidance",
+        "Migration from an earlier API",
+    ]
+    for term in feedback_terms:
+        if term not in feedback_form:
+            errors.append(f"release feedback form is missing category: {term}")
+
+    for workflow in ("documentation.yml", "release-qualification.yml"):
+        if not (ROOT / ".github" / "workflows" / workflow).is_file():
+            errors.append(f"missing release workflow: .github/workflows/{workflow}")
+    documentation_workflow = (
+        ROOT / ".github" / "workflows" / "documentation.yml"
+    ).read_text(encoding="utf-8")
+    if "check_built_docs.py --site site" not in documentation_workflow:
+        errors.append("documentation workflow does not check built-site links")
 
     if errors:
         print("\n".join(errors), file=sys.stderr)

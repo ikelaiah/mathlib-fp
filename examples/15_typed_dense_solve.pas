@@ -35,4 +35,5 @@ begin
   NewOrderTotal := Multiply(NewOrder, UnitPrices);
   WriteLn;
   WriteLn('Total for the new order: $', NewOrderTotal[0, 0]:0:2);
+  WriteLn('typed dense solve: success');
 end.

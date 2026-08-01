@@ -22,6 +22,7 @@ type
   TTestStatsLib = class(TTestCase)
   published
     procedure TestSeededBootstrapIsDeterministic;
+    procedure TestSeededBootstrapPowerOfTwoSampleVaries;
     procedure TestSeededBootstrapDoesNotChangeGlobalRandomState;
     procedure TestBootstrapRejectsInvalidInputs;
     procedure TestMannWhitneyExactSeparatedSamples;
@@ -50,6 +51,35 @@ begin
   CIB := TStatsKit.BootstrapConfidenceInterval(Data, 0.05, 100, 98765);
   AssertEquals('seeded CI lower', CIA.Lower, CIB.Lower, 0.0);
   AssertEquals('seeded CI upper', CIA.Upper, CIB.Upper, 0.0);
+end;
+
+procedure TTestStatsLib.TestSeededBootstrapPowerOfTwoSampleVaries;
+var
+  Data, Means: TDoubleArray;
+  CI: TDoublePair;
+  I: Integer;
+  MinimumMean, MaximumMean, DataMean: Double;
+begin
+  { Regression: the former low-LCG-bit modulo path sampled each element once
+    when Length(Data)=8, collapsing all means and both CI endpoints. }
+  Data := TDoubleArray.Create(2.1, 3.5, 2.8, 4.2, 3.0, 3.7, 2.5, 4.1);
+  Means := TStatsKit.BootstrapMean(Data, 64, 2026);
+  MinimumMean := Means[0];
+  MaximumMean := Means[0];
+  for I := 1 to High(Means) do
+  begin
+    if Means[I] < MinimumMean then MinimumMean := Means[I];
+    if Means[I] > MaximumMean then MaximumMean := Means[I];
+  end;
+  AssertTrue('power-of-two bootstrap samples must vary',
+    MaximumMean > MinimumMean);
+
+  CI := TStatsKit.BootstrapConfidenceInterval(Data, 0.05, 2000, 2026);
+  DataMean := TStatsKit.Mean(Data);
+  AssertTrue('bootstrap lower endpoint is below the sample mean',
+    CI.Lower < DataMean);
+  AssertTrue('bootstrap upper endpoint is above the sample mean',
+    CI.Upper > DataMean);
 end;
 
 procedure TTestStatsLib.TestMannWhitneyExactSeparatedSamples;

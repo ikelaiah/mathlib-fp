@@ -69,6 +69,9 @@ sh ./build-examples.sh
 
 Set the `FPC` environment variable for the shell script, or pass
 `-Compiler <path>` to the PowerShell script, when `fpc` is not on `PATH`.
+The release-facing dense, sparse, and migration examples also have checked
+output/status contracts in `output-contracts.json`; from the repository root,
+run `python tools/check_example_output.py` after compiling the examples.
 
 ## Suggested learning path
 

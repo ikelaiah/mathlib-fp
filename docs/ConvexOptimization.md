@@ -21,6 +21,12 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+converged x=2.00000
+```
+
 See [`18_convex_optimization.pas`](../examples/18_convex_optimization.pas) for
 QP and cone-constrained workflows.
 

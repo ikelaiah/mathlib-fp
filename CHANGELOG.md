@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2026-08-02
+
+### Fixed
+
+- Replaced seeded bootstrap's private low-bit LCG/modulo sampling with the
+  shared explicit-state generator's unbiased bounded-index path. Eight-element
+  samples no longer collapse every resample to the same mean; a permanent
+  regression covers varying resamples, non-degenerate confidence bounds,
+  deterministic replay, and unchanged global random state.
+
+### Documentation
+
+- Added release-identified versioned static documentation, preservation of the
+  tagged 1.9.0 site, and a deterministic offline HTML ZIP plus SHA-256 file.
+- Made every output-producing runnable documentation program verify its
+  claimed output, and added checked statuses/final markers for the release-
+  facing dense, sparse, and migration examples.
+- Added a focused feedback route for installation time, type choice,
+  conversions, unexpected errors/statuses, selection guidance, and migration.
+
+### Validation
+
+- Added clean-archive qualification automation for normal, optimised,
+  checked/heap-traced, examples, documentation, Lazarus package, quick-start,
+  and benchmark gates, while preserving the exact 1.9 public API snapshot.
+- Recorded the release evidence and unchanged limitations in
+  `docs/QUALIFICATION_1.9.1.md`.
+
 ## [1.9.0] - 2026-08-01
 
 ### Added

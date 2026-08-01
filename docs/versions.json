@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "current": "1.9.1",
+  "site_url": "https://ikelaiah.github.io/mathlib-fp",
+  "repository_url": "https://github.com/ikelaiah/mathlib-fp",
+  "versions": [
+    {
+      "release": "1.9.1",
+      "source_ref": "v1.9.1"
+    },
+    {
+      "release": "1.9.0",
+      "source_ref": "v1.9.0"
+    }
+  ]
+}

@@ -595,6 +595,14 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+Re = 99700
+Carnot η = 0.4000
+1 m = 3.2808 ft
+```
+
 ## Unit Aliases
 
 ```pascal

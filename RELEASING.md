@@ -23,6 +23,14 @@ Use this checklist for every mathlib-fp release.
   compile a small consumer project.
 - [ ] Check all Markdown links and compare documented public names with the
   declarations in each unit's `interface` section.
+- [ ] Build the current release under its versioned static-site path, rebuild
+  each listed older version from its tag, and verify the root page identifies
+  the current release without replacing an older directory.
+- [ ] Verify every output-producing runnable documentation fence and every
+  release-facing example output contract, including final success markers.
+- [ ] Build the deterministic offline documentation ZIP, verify its SHA-256,
+  extract it without network access, and compare its `release.json`, examples,
+  signatures, and limitations with repository Markdown.
 - [ ] Review the MIT license, security contact route, repository URL, and
   supported-version policy.
 - [ ] Confirm the exact commit to tag has green `linux` and `windows` CI jobs;
@@ -65,6 +73,13 @@ sh ./build-examples.sh
 for file in examples/*.pas; do
   "./example-bin/$(basename "${file%.pas}")" > /dev/null
 done
+python tools/check_example_output.py
+
+python tools/build_docs.py --release X.Y.Z \
+  --output build-temp/docs-site/X.Y.Z \
+  --offline-archive build-temp/mathlib-fp-docs-X.Y.Z.zip
+python tools/check_built_docs.py \
+  --site build-temp/docs-site/X.Y.Z --release X.Y.Z
 
 mkdir -p benchmarks/lib/release
 fpc -B -O3 -FcUTF8 -Fusrc -FUbenchmarks/lib/release \
@@ -90,7 +105,9 @@ lazbuild --build-all packages/lazarus/mathlib_fp.lpk
    changelog entries into the release notes.
 6. Mark it as the latest release, leave **pre-release** unchecked, and publish.
    GitHub automatically provides source `.zip` and `.tar.gz` downloads for the
-   tag; no separately generated source archive is needed.
+   tag; no separately generated source archive is needed. The documentation
+   workflow deploys the versioned site and attaches the offline HTML ZIP and
+   checksum to the published release.
 
 ## Verify the published release
 
@@ -100,4 +117,6 @@ lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 - [ ] Confirm the archive includes `src/`, `docs/`, `examples/`, package
   metadata, tests, and the license, but no compiler output.
 - [ ] Install `packages/lazarus/mathlib_fp.lpk` from a clean environment.
+- [ ] Download the offline documentation ZIP, verify its adjacent SHA-256, and
+  confirm its landing page identifies the release and links older versions.
 - [ ] Mark only the maintained release lines as supported in `SECURITY.md`.

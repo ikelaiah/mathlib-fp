@@ -289,6 +289,16 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+sqrt(2) = 1.4142135624
+sqrt(2) = 1.4142135624
+Integral = 0.333333
+y(1) = e = 2.71828183
+Spline(1.5) = 2.2321
+```
+
 ---
 
 ## Error Handling

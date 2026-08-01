@@ -6,7 +6,14 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from check_doc_examples import Fragment, is_runnable, program_source
+from check_doc_examples import (
+    Fragment,
+    OutputExpectation,
+    expectation_error,
+    is_runnable,
+    output_expectation,
+    program_source,
+)
 
 
 class DocumentationFragmentTests(unittest.TestCase):
@@ -22,6 +29,28 @@ class DocumentationFragmentTests(unittest.TestCase):
         wrapped = program_source(runnable, 7)
         self.assertIn("program doc_fragment_007;", wrapped)
         self.assertIn("uses SysUtils;", wrapped)
+
+    def test_discovers_and_checks_exact_and_ordered_output(self) -> None:
+        document = (
+            "```pascal\nuses SysUtils;\nbegin\n  WriteLn('ok');\nend.\n```\n\n"
+            "Expected output contains:\n\n```text\nstatus: converged\nsuccess\n```\n"
+        )
+        offset = document.index("```\n\n") + len("```")
+        expectation = output_expectation(document, offset, Path("docs/Guide.md"))
+        self.assertIsNotNone(expectation)
+        assert expectation is not None
+        self.assertEqual("contains", expectation.mode)
+        self.assertIsNone(
+            expectation_error(
+                expectation, "heading\nstatus: converged\nvalue=2\nsuccess\n"
+            )
+        )
+        self.assertIn(
+            "not found",
+            expectation_error(expectation, "status: converged\nfailed\n") or "",
+        )
+        exact = OutputExpectation("exact", 1, "answer=2\n")
+        self.assertIsNone(expectation_error(exact, "answer=2\r\n"))
 
 
 if __name__ == "__main__":

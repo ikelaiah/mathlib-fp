@@ -219,6 +219,13 @@ begin
 end.
 ```
 
+Expected output contains:
+
+```text
+1	263.37	750.00	199736.63
+360	1009.58	3.79	0.02
+```
+
 ## Design Notes
 
 - All rates are decimals (e.g. `0.05` for 5 %).

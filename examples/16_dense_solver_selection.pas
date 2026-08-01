@@ -92,4 +92,5 @@ begin
     Spectrum.Eigenvalues[1]:0:4);
   WriteLn('  leading direction = [', Spectrum.Eigenvectors[0, 1]:0:4,
     ', ', Spectrum.Eigenvectors[1, 1]:0:4, ']');
+  WriteLn('dense solver selection: success');
 end.

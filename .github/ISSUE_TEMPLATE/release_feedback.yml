@@ -1,0 +1,79 @@
+name: 1.9 experience feedback
+description: Report friction installing, choosing, using, or migrating mathlib-fp 1.9
+title: "[1.9 feedback]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping us improve the 1.9 first-use path. For a private security issue, follow SECURITY.md instead of using this public form.
+  - type: dropdown
+    id: category
+    attributes:
+      label: What made the workflow difficult?
+      options:
+        - Installation time or command failure
+        - Confusing type choice
+        - Boilerplate conversion
+        - Unexpected error or status
+        - Missing algorithm-selection guidance
+        - Migration from an earlier API
+        - Other 1.9 usability problem
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: mathlib-fp version or commit
+      placeholder: v1.9.1 or a commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, CPU, FPC version, and Lazarus version if used.
+      placeholder: Windows 11 x86-64, FPC 3.2.2, Lazarus 4.8
+    validations:
+      required: true
+  - type: input
+    id: elapsed_time
+    attributes:
+      label: Time to first useful result
+      description: Estimate the elapsed time, especially for installation or quick-start feedback.
+      placeholder: About 8 minutes
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to do?
+      description: Describe the task and the documentation page or example you followed.
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: What was confusing or unexpected?
+      description: Include type choices, conversions, messages, statuses, or missing guidance.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Commands or small reproducer
+      description: Paste the exact command or the smallest useful Pascal program when applicable.
+      render: Pascal
+  - type: textarea
+    id: output
+    attributes:
+      label: Observed and expected result
+      description: Include exact compiler/runtime output and what you expected to happen.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: This report contains no private vulnerability details.
+          required: true

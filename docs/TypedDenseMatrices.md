@@ -29,6 +29,12 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+1.900000 1.400000
+```
+
 The result is approximately `[1.9, 1.4]`. `Solve` supports a vector or several
 right-hand-side columns and does not compute an inverse. The complete runnable
 version is

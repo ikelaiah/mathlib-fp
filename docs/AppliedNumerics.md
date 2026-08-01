@@ -31,6 +31,12 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+mean spectral power = 0.083333
+```
+
 The complete [applied pipeline example](../examples/19_applied_data_pipeline.pas)
 joins DSP, streaming statistics, polynomial fitting, typed PCA/k-means++, and
 Kalman filtering without private array conversions.

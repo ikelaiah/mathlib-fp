@@ -24,6 +24,13 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+intercept=3.500 slope=1.400
+residual=2.049390
+```
+
 This fits a line without forming normal equations or an inverse. The complete
 [solver-selection example](../examples/16_dense_solver_selection.pas) also
 handles a rank-deficient calibration with SVD and interprets a covariance

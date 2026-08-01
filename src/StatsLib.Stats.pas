@@ -1433,6 +1433,9 @@ type
 
 implementation
 
+uses
+  MathBase.Random;
+
 type
   TIndexedValue = record
     Value: Double;
@@ -2257,7 +2260,7 @@ class function TStatsKit.BootstrapMean(const Data: TDoubleArray;
   const Iterations: Integer; const Seed: LongWord): TDoubleArray;
 var
   I, J, Index: Integer;
-  State: LongWord;
+  LocalRandom: TLocalRandom;
   Sample: TDoubleArray;
 begin
   Result := nil;
@@ -2265,15 +2268,17 @@ begin
     raise EStatsError.Create('BootstrapMean requires non-empty data');
   if Iterations <= 0 then
     raise EStatsError.Create('BootstrapMean requires Iterations > 0');
-  State := Seed;
+  { Use the shared explicit-state generator and its rejection-sampled bounded
+    integer path. Taking the low LCG bits modulo a power-of-two data length
+    makes each resample a permutation and collapses the bootstrap interval. }
+  LocalRandom := TLocalRandom.Seeded(Seed);
   SetLength(Result, Iterations);
   SetLength(Sample, Length(Data));
   for I := 0 to Iterations - 1 do
   begin
     for J := 0 to High(Sample) do
     begin
-      State := LongWord((QWord(State) * 1664525 + 1013904223) and $FFFFFFFF);
-      Index := State mod LongWord(Length(Data));
+      Index := Integer(LocalRandom.NextInteger(SizeUInt(Length(Data))));
       Sample[J] := Data[Index];
     end;
     Result[I] := Mean(Sample);

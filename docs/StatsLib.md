@@ -283,8 +283,9 @@ class function RandomSample(const Data: TDoubleArray): TDoubleArray;
 `MathBase.SharedTypes`) holds the lower and upper confidence bounds.
 
 The compatibility overloads use caller-managed global random state and never
-call `Randomize`. The seeded overloads use local state, are reproducible, and
-do not change the process-wide `RandSeed`.
+call `Randomize`. The seeded overloads use the shared explicit-state generator
+and unbiased bounded-index sampling; they are reproducible and do not change
+the process-wide `RandSeed`.
 
 ---
 
@@ -311,6 +312,13 @@ begin
   CI := TStatsKit.BootstrapConfidenceInterval(Data1, 0.05, 2000, 2026);
   Writeln('95% CI: [', CI.Lower:0:4, ', ', CI.Upper:0:4, ']');
 end.
+```
+
+Expected output contains:
+
+```text
+r = 0.9880
+95% CI: [2.7747, 3.7375]
 ```
 
 ---
