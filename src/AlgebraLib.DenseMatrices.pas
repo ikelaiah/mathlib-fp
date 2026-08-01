@@ -149,6 +149,11 @@ type
       const AsColumn: Boolean = True): IDenseComplexMatrix; static;
   end;
 
+{ Cross-unit generic implementation support. The caller must ensure that S
+  and T are the same scalar type; applications should use named factories. }
+generic function DenseInterfaceCast<S, T>(
+  const Matrix: specialize IDenseMatrix<S>): specialize IDenseMatrix<T>;
+
 function ToArray(const Matrix: IDenseSingleMatrix): TSingleMatrixArray; overload;
 function ToArray(const Matrix: IDenseDoubleMatrix): TMatrixArray; overload;
 function ToArray(const Matrix: IDenseSingleComplexMatrix):
@@ -400,6 +405,18 @@ begin
   FOffset := 0;
   FRowStride := SizeUInt(Cols);
   FColStride := 1;
+end;
+
+generic function DenseInterfaceCast<S, T>(
+  const Matrix: specialize IDenseMatrix<S>): specialize IDenseMatrix<T>;
+begin
+  { A generic interface function's hidden result may be reused by FPC 3.2.2
+    between calls. Finalize that managed result before the representation-safe
+    scalar-preserving bridge assignment, otherwise the previous interface
+    remains over-retained. }
+  Result := nil;
+  Pointer(Result) := Pointer(Matrix);
+  Result._AddRef;
 end;
 
 constructor TDenseMatrixImpl.CreateView(

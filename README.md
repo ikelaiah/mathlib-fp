@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.8.0" src="https://img.shields.io/badge/version-1.8.0-brightgreen.svg">
+  <img alt="Version 1.9.0" src="https://img.shields.io/badge/version-1.9.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,9 +26,9 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **1.8.0 is the current release; 1.2.0 was the first public release.** The
+> **1.9.0 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.8.0.md) and
+> [release notes](docs/RELEASE_NOTES_1.9.0.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
@@ -72,7 +72,7 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 | Domain (unit family) | Highlights |
 | --- | --- |
 | [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange |
-| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed storage/kernels](docs/TypedDenseMatrices.md), and [dense decompositions/solvers](docs/DenseLinearAlgebra.md) |
+| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](docs/DenseLinearAlgebra.md), and [structured/sparse/matrix-free solvers](docs/SparseLinearAlgebra.md) |
 | [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics |
 | [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap |
 | [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion |
@@ -91,7 +91,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 22 commented walkthroughs with
+The [`examples/`](examples/) directory contains 24 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:

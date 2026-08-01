@@ -1015,9 +1015,10 @@ already broad applied-numerics release.
   interior-point/general-cone, and parallel/SIMD families that remain
   unsupported.
 
-## Next release: 1.9.0 — Scalable linear algebra and API convergence
+## Current release: 1.9.0 — Scalable linear algebra and API convergence
 
-Version 1.9.0 closes the largest foundation gap before 2.0: problems whose
+Released on 2026-08-01, version 1.9.0 closes the largest foundation gap before
+2.0: problems whose
 matrices are structured, sparse, or available only as an operation. It also
 publishes the candidate 2.0 conventions early enough for users to test
 migrations during a stable 1.x release. This is a focused scalability and

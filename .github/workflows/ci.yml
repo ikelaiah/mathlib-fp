@@ -47,9 +47,12 @@ jobs:
 
       - name: Check and build searchable documentation
         run: |
+          python3 tools/test_api_snapshot.py
+          python3 tools/test_doc_examples.py
           python3 tools/check_docs.py
-          python3 tools/build_docs.py --output build-temp/docs-site/1.8.0
-          test -s build-temp/docs-site/1.8.0/search-index.json
+          python3 tools/check_doc_examples.py --compiler fpc
+          python3 tools/build_docs.py --output build-temp/docs-site/1.9.0
+          test -s build-temp/docs-site/1.9.0/search-index.json
 
       - name: Compile representative benchmarks
         run: |
@@ -77,12 +80,14 @@ jobs:
       - name: Test typed solve from a checksummed source archive
         run: |
           archive_dir=$(mktemp -d)
-          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.8.0.tar.gz" HEAD
-          sha256sum "$archive_dir/mathlib-fp-1.8.0.tar.gz" > "$archive_dir/mathlib-fp-1.8.0.sha256"
-          sha256sum --check "$archive_dir/mathlib-fp-1.8.0.sha256"
+          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.9.0.tar.gz" HEAD
+          sha256sum "$archive_dir/mathlib-fp-1.9.0.tar.gz" > "$archive_dir/mathlib-fp-1.9.0.sha256"
+          sha256sum --check "$archive_dir/mathlib-fp-1.9.0.sha256"
           mkdir "$archive_dir/source"
-          tar -xzf "$archive_dir/mathlib-fp-1.8.0.tar.gz" -C "$archive_dir/source"
+          tar -xzf "$archive_dir/mathlib-fp-1.9.0.tar.gz" -C "$archive_dir/source"
           cd "$archive_dir/source"
+          python3 tools/check_docs.py
+          python3 tools/check_doc_examples.py --compiler fpc
           mkdir -p example-bin/units
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
             examples/15_typed_dense_solve.pas
@@ -90,6 +95,12 @@ jobs:
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
             examples/16_dense_solver_selection.pas
           ./example-bin/16_dense_solver_selection
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/22_sparse_end_to_end.pas
+          ./example-bin/22_sparse_end_to_end
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/23_api_migration_preview.pas
+          ./example-bin/23_api_migration_preview
 
   windows:
     runs-on: windows-latest
@@ -202,11 +213,17 @@ jobs:
       - name: Check and build searchable documentation
         shell: pwsh
         run: |
+          python tools/test_api_snapshot.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_doc_examples.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_docs.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/build_docs.py --output build-temp/docs-site/1.8.0
+          python tools/check_doc_examples.py --compiler $env:FPC_WIN64
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if (-not (Test-Path build-temp/docs-site/1.8.0/search-index.json)) {
+          python tools/build_docs.py --output build-temp/docs-site/1.9.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path build-temp/docs-site/1.9.0/search-index.json)) {
             throw 'Documentation search index was not generated'
           }
 

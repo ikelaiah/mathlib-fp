@@ -1,7 +1,8 @@
 # AlgebraLib
 
-Linear algebra domain providing dense matrix operations, decompositions,
-iterative solvers, and vector operations for Free Pascal.
+Linear algebra domain providing typed dense, structured, sparse, and
+matrix-free operations, direct/iterative solvers, partial eigensystems, and
+vector operations for Free Pascal.
 
 Depends on: **MathBase**
 
@@ -16,9 +17,17 @@ Depends on: **MathBase**
 | `AlgebraLib.DenseKernels` | [AlgebraLib.DenseKernels.pas](../src/AlgebraLib.DenseKernels.pas) | Matching single/double real/complex allocating and `Into` kernels |
 | `AlgebraLib.DenseSolvers` | [AlgebraLib.DenseSolvers.pas](../src/AlgebraLib.DenseSolvers.pas) | Direct solve and reusable LU/Cholesky factors |
 | `AlgebraLib.DenseDecompositions` | [AlgebraLib.DenseDecompositions.pas](../src/AlgebraLib.DenseDecompositions.pas) | Typed triangular, QR/CPQR, SVD/minimum-norm, and symmetric/Hermitian eigen workflows |
+| `AlgebraLib.SparseMatrices` | [AlgebraLib.SparseMatrices.pas](../src/AlgebraLib.SparseMatrices.pas) | Typed immutable CSR/CSC plus diagonal, tridiagonal, and band storage |
+| `AlgebraLib.LinearOperators` | [AlgebraLib.LinearOperators.pas](../src/AlgebraLib.LinearOperators.pas) | Stored/matrix-free operators and identity, diagonal, IC(0), and ILU(0) preconditioners |
+| `AlgebraLib.IterativeSolvers` | [AlgebraLib.IterativeSolvers.pas](../src/AlgebraLib.IterativeSolvers.pas) | Diagnostic CG, MINRES, restarted GMRES, BiCGSTAB, and LSQR |
+| `AlgebraLib.StructuredSolvers` | [AlgebraLib.StructuredSolvers.pas](../src/AlgebraLib.StructuredSolvers.pas) | Reusable tridiagonal/band factors and explicit natural-order sparse LU baseline |
+| `AlgebraLib.PartialEigensystems` | [AlgebraLib.PartialEigensystems.pas](../src/AlgebraLib.PartialEigensystems.pas) | Restarted largest-magnitude Lanczos and Arnoldi |
 
 The typed dense solver-selection and complete factor contracts are in
 [Typed dense decompositions and solvers](DenseLinearAlgebra.md). The
+large-problem selection, storage, residual, and reuse contracts are in
+[Sparse, structured, and matrix-free linear algebra](SparseLinearAlgebra.md).
+The
 `IMatrix` records below remain the source-compatible legacy surface.
 
 ---

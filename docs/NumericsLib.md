@@ -249,7 +249,7 @@ and its finite query value.
 ## Quick Start
 
 ```pascal
-uses NumericsLib.Numerics;
+uses MathBase.SharedTypes, NumericsLib.Numerics;
 
 { --- functions for root finding and integration --- }
 function F(X: Double): Double; begin Result := X*X - 2; end;

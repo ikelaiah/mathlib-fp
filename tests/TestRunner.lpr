@@ -11,6 +11,11 @@ uses
   , TestAlgebraLib
   , TestDenseMatrices
   , TestDenseDecompositions
+  , TestSparseMatrices
+  , TestIterativeSolvers
+  , TestStructuredSolvers
+  , TestSparseInterchange
+  , TestPartialEigensystems
   , TestFinanceLib
   , TestFinanceAliases
   , TestStatsLib

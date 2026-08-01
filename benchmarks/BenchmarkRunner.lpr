@@ -7,6 +7,7 @@ uses
   SysUtils, Math,
   MathBase.SharedTypes,
   MathBase.Complex,
+  MathBase.Iteration,
   StatsLib.Stats,
   StatsLib.Streaming,
   GeometryLib.Geometry,
@@ -15,10 +16,103 @@ uses
   AlgebraLib.DenseKernels,
   AlgebraLib.DenseSolvers,
   AlgebraLib.DenseDecompositions,
+  AlgebraLib.SparseMatrices,
+  AlgebraLib.LinearOperators,
+  AlgebraLib.IterativeSolvers,
   AlgebraLib.VectorKernels,
   EngineeringLib.Signal,
   EngineeringLib.DSP,
   MLLib.Analysis;
+
+type
+  THeapMonitor = class(TInterfacedObject, IIterationMonitor)
+  private
+    FBaseline, FPeakIncrease: QWord;
+    procedure Sample;
+  public
+    constructor Create(const Baseline: QWord);
+    procedure ResetBaseline;
+    function ShouldCancel: Boolean;
+    procedure ReportProgress(const Method: TIterativeMethod;
+      const Iteration, ProductCount: SizeInt;
+      const ResidualNorm, StoppingThreshold: Double);
+    property PeakIncrease: QWord read FPeakIncrease;
+  end;
+
+  TScaledIdentityAction = class(TInterfacedObject,
+    IMatrixFreeDoubleAction)
+  private
+    FSize, FProducts: SizeInt;
+  public
+    constructor Create(const ASize: SizeInt);
+    procedure Apply(const Input, Destination: IDenseDoubleMatrix);
+    procedure ApplyAdjoint(const Input, Destination: IDenseDoubleMatrix);
+    function GetIsReentrant: Boolean;
+    property Products: SizeInt read FProducts;
+  end;
+
+procedure THeapMonitor.Sample;
+var
+  Current, Increase: QWord;
+begin
+  Current := GetHeapStatus.TotalAllocated;
+  if Current >= FBaseline then Increase := Current - FBaseline
+  else Increase := 0;
+  if Increase > FPeakIncrease then FPeakIncrease := Increase;
+end;
+
+constructor THeapMonitor.Create(const Baseline: QWord);
+begin
+  inherited Create;
+  FBaseline := Baseline;
+  FPeakIncrease := 0;
+end;
+
+procedure THeapMonitor.ResetBaseline;
+begin
+  FBaseline := GetHeapStatus.TotalAllocated;
+  FPeakIncrease := 0;
+end;
+
+function THeapMonitor.ShouldCancel: Boolean;
+begin
+  Sample;
+  Result := False;
+end;
+
+procedure THeapMonitor.ReportProgress(const Method: TIterativeMethod;
+  const Iteration, ProductCount: SizeInt;
+  const ResidualNorm, StoppingThreshold: Double);
+begin
+  Sample;
+end;
+
+constructor TScaledIdentityAction.Create(const ASize: SizeInt);
+begin
+  inherited Create;
+  FSize := ASize;
+  FProducts := 0;
+end;
+
+procedure TScaledIdentityAction.Apply(const Input,
+  Destination: IDenseDoubleMatrix);
+var
+  I: SizeInt;
+begin
+  Inc(FProducts);
+  for I := 0 to FSize - 1 do Destination[I, 0] := 2.0 * Input[I, 0];
+end;
+
+procedure TScaledIdentityAction.ApplyAdjoint(const Input,
+  Destination: IDenseDoubleMatrix);
+begin
+  Apply(Input, Destination);
+end;
+
+function TScaledIdentityAction.GetIsReentrant: Boolean;
+begin
+  Result := True;
+end;
 
 procedure BenchmarkSort;
 const
@@ -408,6 +502,196 @@ begin
     Eigen.Eigenvalues[0] + Eigen.Eigenvalues[23]:0:6);
 end;
 
+procedure BenchmarkLargeSparseSolve;
+const
+  N = 100000;
+  Restart = 4;
+  RepeatedSolves = 20;
+  MaximumRepeatedHeapIncrease = 65536;
+var
+  Builder: TSparseDoubleTripletBuilder;
+  MatrixValue: ISparseDoubleMatrix;
+  OperatorValue: ILinearDoubleOperator;
+  Preconditioner: IDoublePreconditioner;
+  B, X: IDenseDoubleMatrix;
+  Workspace: TDoubleIterativeWorkspace;
+  Options: TLinearSolveOptions;
+  Diagnostics: TLinearSolveDiagnostics;
+  MonitorObject: THeapMonitor;
+  Monitor: IIterationMonitor;
+  I, SolveIndex: SizeInt;
+  Started, BaselineHeap, InitialSolveMilliseconds,
+    RepeatedSolveMilliseconds, InitialPeakHeap,
+    RepeatedPeakHeap, RepeatedRetainedHeap: QWord;
+  RetainedSlots, CurrentHeap: QWord;
+begin
+  BaselineHeap := GetHeapStatus.TotalAllocated;
+  Builder := TSparseDoubleTripletBuilder.Create(N, N);
+  try
+    for I := 0 to N - 1 do
+      Builder.Add(I, I, 2.0 + (I mod 7) * 0.125);
+    MatrixValue := Builder.ToCSR;
+  finally
+    Builder.Free;
+  end;
+  OperatorValue := TDoubleLinearOperator.FromSparse(MatrixValue);
+  Preconditioner := TDoublePreconditioner.SparseDiagonal(MatrixValue);
+  B := TDenseDoubleMatrix.Zeros(N, 1);
+  X := TDenseDoubleMatrix.Zeros(N, 1);
+  for I := 0 to N - 1 do B[I, 0] := 1.0;
+  Workspace := TDoubleIterativeWorkspace.Create;
+  try
+    Workspace.Prepare(N, N, Restart);
+    Options := TLinearSolveOptions.Default;
+    Options.MaxIterations := 8;
+    Options.RestartSize := Restart;
+    Options.RelativeTolerance := 1.0e-12;
+    MonitorObject := THeapMonitor.Create(BaselineHeap);
+    Monitor := MonitorObject;
+    Options.Monitor := Monitor;
+    Started := GetTickCount64;
+    Diagnostics := TDoubleIterativeSolver.ConjugateGradientInto(
+      OperatorValue, B, X, Workspace, Options, Preconditioner);
+    InitialSolveMilliseconds := GetTickCount64 - Started;
+    InitialPeakHeap := MonitorObject.PeakIncrease;
+
+    MonitorObject.ResetBaseline;
+    BaselineHeap := GetHeapStatus.TotalAllocated;
+    Started := GetTickCount64;
+    for SolveIndex := 1 to RepeatedSolves do
+    begin
+      for I := 0 to N - 1 do X[I, 0] := 0.0;
+      Diagnostics := TDoubleIterativeSolver.ConjugateGradientInto(
+        OperatorValue, B, X, Workspace, Options, Preconditioner);
+      if Diagnostics.Status <> isConverged then Halt(5);
+    end;
+    RepeatedSolveMilliseconds := GetTickCount64 - Started;
+    RepeatedPeakHeap := MonitorObject.PeakIncrease;
+    CurrentHeap := GetHeapStatus.TotalAllocated;
+    if CurrentHeap >= BaselineHeap then
+      RepeatedRetainedHeap := CurrentHeap - BaselineHeap
+    else
+      RepeatedRetainedHeap := 0;
+    { Matrix: outer/inner/value; preconditioner: inverse diagonal; B/X;
+      workspace: 18 work vectors, restart+1 basis, four bridge vectors,
+      and the small restarted storage. }
+    RetainedSlots := QWord(3) * N + N + QWord(2) * N +
+      QWord(18 + Restart + 1 + 4) * N +
+      QWord(Restart + 1) * Restart + QWord(5) * Restart + 1;
+    Writeln('large sparse diagonal CG, n=', N, ', nnz=',
+      MatrixValue.NonZeroCount, ': initial=', InitialSolveMilliseconds,
+      ' ms; repeated=', RepeatedSolves, ' solves/',
+      RepeatedSolveMilliseconds,
+      ' ms; iterations=', Diagnostics.Iterations,
+      '; operator_products=', Diagnostics.ProductCount,
+      '; final_true_residual=', Diagnostics.FinalResidualNorm:0:12,
+      '; residual_confirmed=', Ord(Diagnostics.ResidualConfirmed),
+      '; retained_scalar_or_index_slots~', RetainedSlots,
+      '; initial_measured_peak_heap_increase_bytes=', InitialPeakHeap,
+      '; repeated_measured_peak_heap_increase_bytes=', RepeatedPeakHeap,
+      '; repeated_measured_retained_heap_delta_bytes=',
+      RepeatedRetainedHeap, '; repeated_heap_limit_bytes=',
+      MaximumRepeatedHeapIncrease,
+      '; dense_shape_elements_allocated=0');
+    if (Diagnostics.Status <> isConverged) or
+       (Diagnostics.FinalResidualNorm > 1.0e-10) or
+       (RepeatedPeakHeap > MaximumRepeatedHeapIncrease) or
+       (RepeatedRetainedHeap > MaximumRepeatedHeapIncrease) then Halt(5);
+  finally
+    Workspace.Free;
+  end;
+end;
+
+procedure BenchmarkLargeMatrixFreeSolve;
+const
+  N = 200000;
+  Restart = 4;
+  RepeatedSolves = 20;
+  MaximumRepeatedHeapIncrease = 65536;
+var
+  ActionObject: TScaledIdentityAction;
+  Action: IMatrixFreeDoubleAction;
+  OperatorValue: ILinearDoubleOperator;
+  B, X: IDenseDoubleMatrix;
+  Workspace: TDoubleIterativeWorkspace;
+  Options: TLinearSolveOptions;
+  Diagnostics: TLinearSolveDiagnostics;
+  MonitorObject: THeapMonitor;
+  Monitor: IIterationMonitor;
+  I, SolveIndex: SizeInt;
+  Started, BaselineHeap, InitialSolveMilliseconds,
+    RepeatedSolveMilliseconds, InitialPeakHeap,
+    RepeatedPeakHeap, RepeatedRetainedHeap: QWord;
+  RetainedSlots, CurrentHeap: QWord;
+begin
+  BaselineHeap := GetHeapStatus.TotalAllocated;
+  ActionObject := TScaledIdentityAction.Create(N);
+  Action := ActionObject;
+  OperatorValue := TDoubleLinearOperator.MatrixFree(N, N, Action);
+  B := TDenseDoubleMatrix.Zeros(N, 1);
+  X := TDenseDoubleMatrix.Zeros(N, 1);
+  for I := 0 to N - 1 do B[I, 0] := 1.0;
+  Workspace := TDoubleIterativeWorkspace.Create;
+  try
+    Workspace.Prepare(N, N, Restart);
+    Options := TLinearSolveOptions.Default;
+    Options.MaxIterations := 4;
+    Options.RestartSize := Restart;
+    Options.RelativeTolerance := 1.0e-12;
+    MonitorObject := THeapMonitor.Create(BaselineHeap);
+    Monitor := MonitorObject;
+    Options.Monitor := Monitor;
+    Started := GetTickCount64;
+    Diagnostics := TDoubleIterativeSolver.ConjugateGradientInto(
+      OperatorValue, B, X, Workspace, Options);
+    InitialSolveMilliseconds := GetTickCount64 - Started;
+    InitialPeakHeap := MonitorObject.PeakIncrease;
+
+    MonitorObject.ResetBaseline;
+    BaselineHeap := GetHeapStatus.TotalAllocated;
+    Started := GetTickCount64;
+    for SolveIndex := 1 to RepeatedSolves do
+    begin
+      for I := 0 to N - 1 do X[I, 0] := 0.0;
+      Diagnostics := TDoubleIterativeSolver.ConjugateGradientInto(
+        OperatorValue, B, X, Workspace, Options);
+      if Diagnostics.Status <> isConverged then Halt(6);
+    end;
+    RepeatedSolveMilliseconds := GetTickCount64 - Started;
+    RepeatedPeakHeap := MonitorObject.PeakIncrease;
+    CurrentHeap := GetHeapStatus.TotalAllocated;
+    if CurrentHeap >= BaselineHeap then
+      RepeatedRetainedHeap := CurrentHeap - BaselineHeap
+    else
+      RepeatedRetainedHeap := 0;
+    RetainedSlots := QWord(2) * N +
+      QWord(18 + Restart + 1 + 4) * N +
+      QWord(Restart + 1) * Restart + QWord(5) * Restart + 1;
+    Writeln('large matrix-free scaled-identity CG, n=', N,
+      ', retained_operator_values=0: initial=', InitialSolveMilliseconds,
+      ' ms; repeated=', RepeatedSolves, ' solves/',
+      RepeatedSolveMilliseconds,
+      ' ms; iterations=', Diagnostics.Iterations,
+      '; operator_products=', Diagnostics.ProductCount,
+      '; action_products=', ActionObject.Products,
+      '; final_true_residual=', Diagnostics.FinalResidualNorm:0:12,
+      '; residual_confirmed=', Ord(Diagnostics.ResidualConfirmed),
+      '; retained_scalar_slots~', RetainedSlots,
+      '; initial_measured_peak_heap_increase_bytes=', InitialPeakHeap,
+      '; repeated_measured_peak_heap_increase_bytes=', RepeatedPeakHeap,
+      '; repeated_measured_retained_heap_delta_bytes=',
+      RepeatedRetainedHeap, '; repeated_heap_limit_bytes=',
+      MaximumRepeatedHeapIncrease,
+      '; dense_shape_elements_allocated=0');
+    if (Diagnostics.Status <> isConverged) or
+       (Diagnostics.FinalResidualNorm > 1.0e-10) or
+       (RepeatedPeakHeap > MaximumRepeatedHeapIncrease) or
+       (RepeatedRetainedHeap > MaximumRepeatedHeapIncrease) then Halt(6);
+  finally
+    Workspace.Free;
+  end;
+end;
+
 begin
   Writeln('mathlib-fp representative microbenchmarks');
   BenchmarkSort;
@@ -422,4 +706,6 @@ begin
   BenchmarkRelease18DSPScales;
   BenchmarkStreamingStatistics;
   BenchmarkTypedAnalysis;
+  BenchmarkLargeSparseSolve;
+  BenchmarkLargeMatrixFreeSolve;
 end.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "1.8.0",
+  "release": "1.9.0",
   "capabilities": [
     {
       "family": "scalar_special_functions",
@@ -288,16 +288,16 @@
     {
       "family": "numerical_interchange",
       "unit": "MathBase.Interchange",
-      "entry_points": ["ComplexToInvariant", "DenseMatrixToInvariant", "WriteDelimitedMatrix", "WriteMatrixMarket", "SaveBinary", "LoadDoubleMatrixBinary", "SaveRandomStateBinary", "Summarize", "Describe", "TValueMetadata"],
+      "entry_points": ["ComplexToInvariant", "DenseMatrixToInvariant", "WriteDelimitedMatrix", "WriteMatrixMarket", "WriteSparseMatrixMarket", "ReadSparseMatrixMarketDouble", "ReadSparseMatrixMarketComplex", "SaveBinary", "SaveSparseBinary", "LoadDoubleMatrixBinary", "LoadSparseSingleBinary", "LoadSparseDoubleBinary", "LoadSparseSingleComplexBinary", "LoadSparseComplexBinary", "DEFAULT_MAX_INTERCHANGE_ELEMENTS", "DEFAULT_MAX_SPARSE_DIMENSION", "SaveRandomStateBinary", "Summarize", "Describe", "TValueMetadata"],
       "maturity": "stable",
-      "scalars": ["double", "double_complex", "uint64_state"],
-      "shapes": ["vector", "dense_matrix", "four_word_random_state"],
+      "scalars": ["single", "double", "single_complex", "double_complex", "uint64_state"],
+      "shapes": ["vector", "dense_matrix", "compressed_sparse_matrix", "four_word_random_state"],
       "complexity": "O(elements) encoding, validation, and copy",
-      "accuracy": "round-trip fixtures preserve binary double/complex/state bits; text is invariant and round-trip formatted",
+      "accuracy": "round-trip fixtures preserve binary scalar/storage metadata and double/complex/state values; text is invariant and round-trip formatted",
       "docs": "docs/Interchange.md",
-      "example": "examples/20_interchange_replay.pas",
-      "tests": "tests/TestAppliedNumerics.pas",
-      "limitations": ["binary format is little-endian version 1", "Matrix Market subset is dense array real/complex general", "decomposition persistence is not shipped"]
+      "example": "examples/20_interchange_replay.pas; examples/22_sparse_end_to_end.pas",
+      "tests": "tests/TestAppliedNumerics.pas; tests/TestSparseInterchange.pas",
+      "limitations": ["binary format is little-endian version 1", "Matrix Market sparse subset is coordinate double-real/double-complex general with no duplicate or explicit-zero entries", "sparse loads independently cap stored nonzeros and each shape axis before shape-sized allocation; both defaults are 16,000,000", "factor/decomposition persistence is not shipped"]
     },
     {
       "family": "advanced_dsp_design_and_wavelets",
@@ -357,31 +357,75 @@
       "family": "parallel_and_simd_numerical_dispatch",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["1.8 provides a portable oracle and serial blocked matrix path only; optional thread-pool and SIMD dispatch remain open"]
+      "limitations": ["1.9 provides portable dense and sparse serial oracles; stable thread-pool and SIMD sparse dispatch remain open"]
     },
     {
       "family": "bessel_elliptic_exponential_integral",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["no stable public implementation in 1.8.0"]
+      "limitations": ["no stable public implementation in 1.9.0"]
     },
     {
       "family": "typed_sparse_linear_algebra",
-      "maturity": "unsupported",
-      "scalars": [],
-      "limitations": ["deferred beyond the 1.6.0 dense milestone"]
+      "unit": "AlgebraLib.SparseMatrices",
+      "entry_points": ["ISparseSingleMatrix", "ISparseDoubleMatrix", "ISparseSingleComplexMatrix", "ISparseComplexMatrix", "TSparseSingleMatrix", "TSparseDoubleMatrix", "TSparseSingleComplexMatrix", "TSparseComplexMatrix", "TSparseSingleTripletBuilder", "TSparseDoubleTripletBuilder", "TSparseSingleComplexTripletBuilder", "TSparseComplexTripletBuilder", "TStructuredSingleMatrix", "TStructuredDoubleMatrix", "TStructuredSingleComplexMatrix", "TStructuredComplexMatrix"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["csr", "csc", "diagonal", "tridiagonal", "general_band"],
+      "complexity": "O(k log k) triplet construction; O(nonzeros*rhs) sparse/dense product; no implicit dense shape allocation",
+      "accuracy": "four-scalar dense-oracle products, arithmetic, transpose, duplicate, zero-policy, and canonical-validation fixtures",
+      "docs": "docs/SparseLinearAlgebra.md",
+      "example": "examples/22_sparse_end_to_end.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestSparseMatrices.pas",
+      "limitations": ["immutable compressed storage", "sparse products may create mathematical fill", "sparse interchange uses independent caller nonzero and per-axis dimension caps", "parallel, SIMD, GPU, distributed, and out-of-core paths are not shipped"]
     },
     {
       "family": "typed_iterative_matrix_free_linear_algebra",
-      "maturity": "unsupported",
-      "scalars": [],
-      "limitations": ["CG, MINRES, GMRES, BiCGSTAB, LSQR, preconditioners, and linear operators are deferred"]
+      "unit": "AlgebraLib.LinearOperators; AlgebraLib.IterativeSolvers",
+      "entry_points": ["ILinearSingleOperator", "ILinearDoubleOperator", "ILinearSingleComplexOperator", "ILinearComplexOperator", "IMatrixFreeSingleAction", "IMatrixFreeDoubleAction", "IMatrixFreeSingleComplexAction", "IMatrixFreeComplexAction", "TLinearSolveOptions", "TLinearSolveDiagnostics", "TSingleIterativeSolver", "TDoubleIterativeSolver", "TSingleComplexIterativeSolver", "TComplexIterativeSolver", "TSinglePreconditioner", "TDoublePreconditioner", "TSingleComplexPreconditioner", "TComplexPreconditioner"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["square_system", "rectangular_least_squares", "stored_operator", "matrix_free_operator"],
+      "complexity": "operator-product and iteration dependent; GMRES O(n*restart+restart^2), other solver workspaces O(rows+cols)",
+      "accuracy": "all five methods execute for all four scalars; ordinary/adjoint typed-dense oracles, inconsistent least-squares normal-residual convergence, refresh/progress, success/limit/cancel/breakdown, all preconditioner families, and workspace lifecycle fixtures",
+      "docs": "docs/SparseLinearAlgebra.md",
+      "example": "examples/22_sparse_end_to_end.pas",
+      "benchmark": "benchmarks/BenchmarkRunner.lpr",
+      "tests": "tests/TestIterativeSolvers.pas",
+      "limitations": ["caller supplies symmetry/definiteness model", "LSQR has no preconditioner in 1.9", "no block or flexible Krylov variants"]
     },
     {
-      "family": "typed_advanced_spectral_linear_algebra",
+      "family": "typed_structured_and_sparse_direct_solve",
+      "unit": "AlgebraLib.StructuredSolvers",
+      "entry_points": ["TSingleStructuredSolver", "TDoubleStructuredSolver", "TSingleComplexStructuredSolver", "TComplexStructuredSolver", "IStructuredSingleDirectFactor", "IStructuredDoubleDirectFactor", "IStructuredSingleComplexDirectFactor", "IStructuredComplexDirectFactor", "ISparseSingleLUFactor", "ISparseDoubleLUFactor", "ISparseSingleComplexLUFactor", "ISparseComplexLUFactor"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["square_tridiagonal", "square_band", "square_csr", "one_or_many_rhs"],
+      "complexity": "tridiagonal O(n); band factor O(n*bandwidth^2); sparse natural-order work and storage depend on actual fill",
+      "accuracy": "all tridiagonal/band/sparse-LU families execute for all four scalars with typed-dense residual, pivot/singularity, multiple-RHS, snapshot/reuse/alias/concurrency/failure, and fill-diagnostic fixtures",
+      "docs": "docs/SparseLinearAlgebra.md",
+      "tests": "tests/TestStructuredSolvers.pas",
+      "limitations": ["general band factor uses no pivoting", "sparse LU uses natural ordering with row pivoting and no fill-reducing symbolic analysis"]
+    },
+    {
+      "family": "typed_partial_spectral_linear_algebra",
+      "unit": "AlgebraLib.PartialEigensystems",
+      "entry_points": ["TSpectralOptions", "TSpectralResult", "TSinglePartialEigenSolver", "TDoublePartialEigenSolver", "TSingleComplexPartialEigenSolver", "TComplexPartialEigenSolver"],
+      "maturity": "stable",
+      "scalars": ["single", "double", "single_complex", "double_complex"],
+      "shapes": ["square_operator", "selected_eigenpairs"],
+      "complexity": "operator-product dependent with O(n*krylov+krylov^2) retained storage",
+      "accuracy": "deterministic largest-magnitude eigenvalue/eigenvector residual fixtures across real/complex and single/double paths, including single-complex execution",
+      "docs": "docs/SparseLinearAlgebra.md",
+      "tests": "tests/TestPartialEigensystems.pas",
+      "limitations": ["largest magnitude only", "no shift-invert, interior, generalized, Schur, or polynomial eigensystems", "real Arnoldi restart projects complex Ritz vectors to their real part"]
+    },
+    {
+      "family": "remaining_advanced_spectral_linear_algebra",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["nonsymmetric, generalized, polynomial, partial, and Schur eigensystems are deferred"]
+      "limitations": ["full nonsymmetric, generalized, polynomial, Schur, interior-target, and shift-invert eigensystems remain deferred"]
     }
   ]
 }
