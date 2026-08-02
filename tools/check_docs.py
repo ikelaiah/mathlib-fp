@@ -12,8 +12,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.1"
+CURRENT_RELEASE = "1.9.2"
 API_BASELINE_RELEASE = "1.9.0"
+HISTORICAL_RELEASES = ["1.9.1", API_BASELINE_RELEASE]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -660,7 +661,7 @@ def main() -> int:
         assert versions["schema_version"] == 1
         assert versions["current"] == CURRENT_RELEASE
         listed_releases = [item["release"] for item in versions["versions"]]
-        assert listed_releases == [CURRENT_RELEASE, API_BASELINE_RELEASE]
+        assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
         assert versions["site_url"].startswith("https://")
         assert versions["repository_url"].startswith("https://")
     except (ValueError, KeyError, AssertionError) as exc:
@@ -688,7 +689,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="1"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="2"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:

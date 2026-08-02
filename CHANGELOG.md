@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.2] - 2026-08-02
+
 ### Documentation
 
 - Added a double-real beginner guide, task-oriented recipe index, and explicit

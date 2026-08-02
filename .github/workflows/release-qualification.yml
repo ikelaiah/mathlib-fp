@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   linux-clean-archive:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.1'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.2'
     runs-on: ubuntu-latest
 
     steps:
@@ -29,31 +29,31 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/qualification/source"
           git archive --format=tar.gz \
-            --output="$RUNNER_TEMP/qualification/mathlib-fp-1.9.1.tar.gz" HEAD
-          sha256sum "$RUNNER_TEMP/qualification/mathlib-fp-1.9.1.tar.gz" \
-            > "$RUNNER_TEMP/qualification/mathlib-fp-1.9.1.tar.gz.sha256"
+            --output="$RUNNER_TEMP/qualification/mathlib-fp-1.9.2.tar.gz" HEAD
+          sha256sum "$RUNNER_TEMP/qualification/mathlib-fp-1.9.2.tar.gz" \
+            > "$RUNNER_TEMP/qualification/mathlib-fp-1.9.2.tar.gz.sha256"
           sha256sum --check \
-            "$RUNNER_TEMP/qualification/mathlib-fp-1.9.1.tar.gz.sha256"
-          tar -xzf "$RUNNER_TEMP/qualification/mathlib-fp-1.9.1.tar.gz" \
+            "$RUNNER_TEMP/qualification/mathlib-fp-1.9.2.tar.gz.sha256"
+          tar -xzf "$RUNNER_TEMP/qualification/mathlib-fp-1.9.2.tar.gz" \
             -C "$RUNNER_TEMP/qualification/source"
 
       - name: Run Linux qualification from extracted archive
         working-directory: ${{ runner.temp }}/qualification/source
         run: |
-          python3 tools/qualify_release.py --release 1.9.1 \
+          python3 tools/qualify_release.py --release 1.9.2 \
             --compiler fpc --skip-package
 
       - name: Publish Linux qualification evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: qualification-1.9.1-linux-x86-64
+          name: qualification-1.9.2-linux-x86-64
           if-no-files-found: error
           path: |
-            ${{ runner.temp }}/qualification/mathlib-fp-1.9.1.tar.gz.sha256
+            ${{ runner.temp }}/qualification/mathlib-fp-1.9.2.tar.gz.sha256
             ${{ runner.temp }}/qualification/source/build-temp/release-qualification
 
   windows-clean-archive:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.1'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.2'
     runs-on: windows-latest
 
     steps:
@@ -101,11 +101,11 @@ jobs:
           $qualification = Join-Path $env:RUNNER_TEMP 'qualification'
           $source = Join-Path $qualification 'source'
           New-Item -ItemType Directory -Force -Path $source | Out-Null
-          $archive = Join-Path $qualification 'mathlib-fp-1.9.1.zip'
+          $archive = Join-Path $qualification 'mathlib-fp-1.9.2.zip'
           git archive --format=zip --output=$archive HEAD
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
-          "$hash  mathlib-fp-1.9.1.zip" | Set-Content `
+          "$hash  mathlib-fp-1.9.2.zip" | Set-Content `
             -Encoding ascii "$archive.sha256"
           Expand-Archive -LiteralPath $archive -DestinationPath $source
 
@@ -113,15 +113,15 @@ jobs:
         shell: pwsh
         working-directory: ${{ runner.temp }}/qualification/source
         run: |
-          python tools/qualify_release.py --release 1.9.1 `
+          python tools/qualify_release.py --release 1.9.2 `
             --compiler $env:FPC_WIN64 --lazbuild $env:LAZBUILD_WIN64
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Publish Windows qualification evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: qualification-1.9.1-windows-x86-64
+          name: qualification-1.9.2-windows-x86-64
           if-no-files-found: error
           path: |
-            ${{ runner.temp }}/qualification/mathlib-fp-1.9.1.zip.sha256
+            ${{ runner.temp }}/qualification/mathlib-fp-1.9.2.zip.sha256
             ${{ runner.temp }}/qualification/source/build-temp/release-qualification
