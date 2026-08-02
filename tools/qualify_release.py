@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import platform
+import re
 import subprocess
 import sys
 import time
@@ -48,12 +49,16 @@ class Qualification:
 
     def run(
         self, name: str, command: list[str], timeout: int = 600,
-        cwd: Path = ROOT,
+        cwd: Path = ROOT, env: dict[str, str] | None = None,
     ) -> str:
         started = time.monotonic()
+        environment = os.environ.copy()
+        if env:
+            environment.update(env)
         completed = subprocess.run(
             command,
             cwd=cwd,
+            env=environment,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -90,6 +95,35 @@ def verify_test_output(name: str, output: str) -> None:
         raise RuntimeError(f"{name}: test summary is missing {missing}")
 
 
+def output_tail(output: str, limit: int = 12000) -> str:
+    if len(output) <= limit:
+        return output
+    return "[... earlier output omitted ...]\n" + output[-limit:]
+
+
+def verify_heaptrc_output(output: str) -> None:
+    summaries = re.findall(
+        r"(?im)^\s*(\d+)\s+unfreed\s+memory\s+blocks\s*:\s*(\d+)\s*$",
+        output,
+    )
+    if not summaries:
+        raise RuntimeError(
+            "checked-heap: heaptrc produced no unfreed-block summary\n"
+            f"Captured heaptrc output:\n{output_tail(output)}"
+        )
+    nonzero = [
+        (int(blocks), int(size))
+        for blocks, size in summaries
+        if int(blocks) != 0 or int(size) != 0
+    ]
+    if nonzero:
+        blocks, size = nonzero[-1]
+        raise RuntimeError(
+            f"checked-heap: heaptrc reported {blocks} unfreed blocks "
+            f"({size} bytes)\nCaptured heaptrc output:\n{output_tail(output)}"
+        )
+
+
 def compile_and_run_tests(
     qualification: Qualification, compiler: str, label: str, flags: list[str],
 ) -> None:
@@ -105,16 +139,30 @@ def compile_and_run_tests(
             f"-FU{units}", f"-FE{binaries}", str(ROOT / "tests" / "TestRunner.lpr"),
         ],
     )
+    run_name = f"tests-{label}-run"
+    heap_log = directory / "heaptrc.log"
+    run_env = None
+    if label == "checked-heap":
+        heap_log.unlink(missing_ok=True)
+        run_env = {"HEAPTRC": f"log={heap_log}"}
     output = qualification.run(
-        f"tests-{label}-run",
+        run_name,
         [str(executable_path(binaries, "TestRunner")), "-a", "--format=plain"],
+        env=run_env,
     )
     try:
         verify_test_output(label, output)
-        if label == "checked-heap" and "0 unfreed memory blocks" not in output:
-            raise RuntimeError(
-                "checked-heap: heaptrc did not report zero unfreed memory blocks"
-            )
+        if label == "checked-heap":
+            try:
+                heap_output = heap_log.read_text(
+                    encoding="utf-8", errors="replace"
+                )
+            except OSError as exc:
+                raise RuntimeError(
+                    f"checked-heap: cannot read heaptrc log {heap_log}: {exc}\n"
+                    f"Captured test output:\n{output_tail(output)}"
+                ) from exc
+            verify_heaptrc_output(heap_output)
     except RuntimeError:
         qualification.results[-1]["status"] = "failed"
         raise
@@ -271,6 +319,10 @@ def main() -> int:
             raise RuntimeError(
                 f"release qualification requires FPC 3.2.2, found {compiler_version}"
             )
+        qualification.run(
+            "test-qualify-release",
+            [sys.executable, str(ROOT / "tools" / "test_qualify_release.py")],
+        )
         compile_and_run_tests(qualification, args.compiler, "normal", [])
         compile_and_run_tests(
             qualification, args.compiler, "optimized", ["-O3"]
