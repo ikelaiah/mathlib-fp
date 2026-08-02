@@ -314,6 +314,13 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+Det = -2.0000
+Rank = 2
+```
+
 ## Design Notes
 
 - **Mostly value-oriented** — calculations return new `IMatrix` instances;

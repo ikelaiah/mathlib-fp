@@ -70,4 +70,5 @@ begin
     SolveResult.Solution[4, 0]:0:6);
 
   if SolveResult.Diagnostics.Status <> isConverged then Halt(1);
+  Writeln('sparse workflow: success');
 end.

@@ -29,6 +29,30 @@ class Fragment:
     path: Path
     line: int
     source: str
+    expectation: "OutputExpectation | None" = None
+
+
+@dataclass(frozen=True)
+class OutputExpectation:
+    mode: str
+    line: int
+    text: str
+
+
+def output_expectation(text: str, offset: int, path: Path) -> OutputExpectation | None:
+    tail = text[offset:]
+    match = re.match(
+        r"(?ms)\A\s*Expected output(?P<contains> contains)?:\s*\n"
+        r"```(?:text|console)[ \t]*\n(?P<output>.*?)^```[ \t]*$",
+        tail,
+    )
+    if match is None:
+        return None
+    return OutputExpectation(
+        mode="contains" if match.group("contains") else "exact",
+        line=text.count("\n", 0, offset + match.start()) + 1,
+        text=match.group("output").rstrip() + "\n",
+    )
 
 
 def pascal_fragments(root: Path) -> list[Fragment]:
@@ -47,6 +71,9 @@ def pascal_fragments(root: Path) -> list[Fragment]:
                     path=path.relative_to(root),
                     line=text.count("\n", 0, match.start()) + 1,
                     source=match.group("source").rstrip() + "\n",
+                    expectation=output_expectation(
+                        text, match.end(), path.relative_to(root)
+                    ),
                 )
             )
     return result
@@ -74,7 +101,7 @@ def program_source(fragment: Fragment, number: int) -> str:
     )
 
 
-def run_checked(command: list[str], description: str, timeout: int) -> None:
+def run_checked(command: list[str], description: str, timeout: int) -> str:
     completed = subprocess.run(
         command,
         cwd=ROOT,
@@ -92,6 +119,32 @@ def run_checked(command: list[str], description: str, timeout: int) -> None:
             f"{description} failed with exit code {completed.returncode}\n"
             f"{completed.stdout}"
         )
+    return completed.stdout
+
+
+def normalized_output(value: str) -> str:
+    return "\n".join(line.rstrip() for line in value.splitlines()).strip()
+
+
+def expectation_error(expectation: OutputExpectation, observed: str) -> str | None:
+    expected = normalized_output(expectation.text)
+    actual = normalized_output(observed)
+    if expectation.mode == "exact":
+        if actual != expected:
+            return f"expected exact output:\n{expected}\nobserved:\n{actual}"
+        return None
+    if expectation.mode != "contains":
+        return f"unknown output expectation mode {expectation.mode!r}"
+    cursor = 0
+    for required in expected.splitlines():
+        position = actual.find(required, cursor)
+        if position < 0:
+            return (
+                f"expected output fragment not found in order: {required!r}\n"
+                f"observed:\n{actual}"
+            )
+        cursor = position + len(required)
+    return None
 
 
 def main() -> int:
@@ -124,6 +177,21 @@ def main() -> int:
             )
         return 1
 
+    missing_output_contracts = [
+        fragment for fragment in runnable
+        if re.search(r"(?i)\bWrite(?:Ln)?\s*\(", fragment.source)
+        and fragment.expectation is None
+    ]
+    if missing_output_contracts:
+        for fragment in missing_output_contracts:
+            print(
+                f"{fragment.path}:{fragment.line}: runnable output-producing "
+                "Pascal fence needs an adjacent 'Expected output:' or "
+                "'Expected output contains:' text fence",
+                file=sys.stderr,
+            )
+        return 1
+
     work = (ROOT / args.work_dir).resolve()
     sources = work / "sources"
     units = work / "units"
@@ -149,15 +217,27 @@ def main() -> int:
             f"{fragment.path}:{fragment.line} compile",
             args.compile_timeout,
         )
-        run_checked(
+        observed = run_checked(
             [str(executable)],
             f"{fragment.path}:{fragment.line} run",
             args.run_timeout,
         )
+        if fragment.expectation is not None:
+            mismatch = expectation_error(fragment.expectation, observed)
+            if mismatch is not None:
+                print(
+                    f"{fragment.path}:{fragment.expectation.line}: {mismatch}",
+                    file=sys.stderr,
+                )
+                return 1
 
+    expectation_count = sum(
+        fragment.expectation is not None for fragment in runnable
+    )
     print(
         f"Documentation example checks passed: {len(runnable)} compiled and "
-        f"executed Pascal fragments ({len(fragments)} Pascal fences inventoried)"
+        f"executed Pascal fragments, {expectation_count} output contracts "
+        f"verified ({len(fragments)} Pascal fences inventoried)"
     )
     return 0
 

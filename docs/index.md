@@ -8,6 +8,15 @@ native Free Pascal numerical package.
 
 ## Releases
 
+- [mathlib-fp 1.9.1 release notes](RELEASE_NOTES_1.9.1.md) — feature-frozen
+  correctness stabilisation, versioned web/offline documentation, output-aware
+  execution checks, and first-use feedback.
+- [1.9.1 PR notes](PR_NOTES_1.9.1.md) — review boundary, compatibility
+  evidence, and completion-gate mapping.
+- [1.9.1 qualification report](QUALIFICATION_1.9.1.md) — normal, optimised,
+  checked/heap, examples, documentation, package, and clean-archive evidence.
+- [Versioned web documentation](https://ikelaiah.github.io/mathlib-fp/) and
+  [focused 1.9 feedback](FEEDBACK.md).
 - [mathlib-fp 1.9.0 release notes](RELEASE_NOTES_1.9.0.md) — typed
   structured/sparse storage, matrix-free Krylov solvers, reusable factors,
   partial eigensystems, and the candidate-2.0 runway.

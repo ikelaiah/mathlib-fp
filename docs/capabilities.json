@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "1.9.0",
+  "release": "1.9.1",
   "capabilities": [
     {
       "family": "scalar_special_functions",
@@ -363,7 +363,7 @@
       "family": "bessel_elliptic_exponential_integral",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["no stable public implementation in 1.9.0"]
+      "limitations": ["no stable public implementation in the 1.9 line"]
     },
     {
       "family": "typed_sparse_linear_algebra",

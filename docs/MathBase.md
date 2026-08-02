@@ -317,6 +317,12 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+5.0000  0.9750
+```
+
 ## Dependencies
 
 None. `MathBase` has no dependencies on other domains in mathlib-fp.

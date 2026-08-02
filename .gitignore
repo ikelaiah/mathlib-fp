@@ -49,6 +49,10 @@ backup/
 example-bin/
 build-temp/
 
+# Python documentation/release tooling caches
+__pycache__/
+*.py[cod]
+
 # Lazarus package metadata generated during local package builds
 /packagefiles.xml
 

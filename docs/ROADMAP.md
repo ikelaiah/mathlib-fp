@@ -1026,7 +1026,7 @@ already broad applied-numerics release.
   interior-point/general-cone, and parallel/SIMD families that remain
   unsupported.
 
-## Current release: 1.9.0 — Scalable linear algebra and API convergence
+## Previous release: 1.9.0 — Scalable linear algebra and API convergence
 
 Released on 2026-08-01, version 1.9.0 closes the largest foundation gap before
 2.0: problems whose
@@ -1218,16 +1218,18 @@ numbers with unrelated algorithm families.
   requires a documented correctness or compatibility reason, an exact snapshot
   diff, migration impact, and the same declaration/documentation checks as a
   minor release.
-- Later entries below are planning gates. Only 1.9.1 is active; work is not
-  pulled forward merely because it is convenient to bundle with another fix.
+- Later entries below are planning gates. Only 1.9.1 was active for this
+  release; work is not pulled forward merely because it is convenient to
+  bundle with another fix.
 - Passing a gate requires evidence from a clean release archive. A count of
   functions, tests, pages, or examples does not substitute for the stated user
   and numerical outcome.
 
-## Next release: 1.9.1 — Stabilisation and documentation delivery
+## Current release: 1.9.1 — Stabilisation and documentation delivery
 
-Version 1.9.1 makes the new 1.9 surface dependable and easy to reach before any
-broader migration decision is made. It is deliberately feature-frozen.
+Released on 2026-08-02, version 1.9.1 makes the new 1.9 surface dependable and
+easy to reach before any broader migration decision is made. It is
+deliberately feature-frozen.
 
 ### 1.9.1 scope
 

@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "examples": [
+    {
+      "path": "examples/15_typed_dense_solve.pas",
+      "contains": [
+        "Coffee:  $4.00",
+        "Sandwich: $7.50",
+        "Juice:   $3.00",
+        "Total for the new order: $59.00"
+      ],
+      "final_line": "typed dense solve: success"
+    },
+    {
+      "path": "examples/16_dense_solver_selection.pas",
+      "contains": [
+        "Sensor calibration (Householder QR)",
+        "residual norm = 0.286356",
+        "command = [0.6667, 0.6667, 1.3333]",
+        "numerical rank = 2",
+        "eigenvalues = 1.1972, 4.8028"
+      ],
+      "final_line": "dense solver selection: success"
+    },
+    {
+      "path": "examples/22_sparse_end_to_end.pas",
+      "contains": [
+        "stored nonzeros: 13",
+        "termination: converged",
+        "true residual confirmed: TRUE",
+        "solution endpoints: 1.000000, 1.000000"
+      ],
+      "final_line": "sparse workflow: success"
+    },
+    {
+      "path": "examples/23_api_migration_preview.pas",
+      "contains": [
+        "dense solve: 2.0, 3.0; residual=0.000000000000",
+        "sparse solve: converged; residual=0.000000000000",
+        "linear fit: intercept=1.000000, slope=2.000000, status=converged",
+        "optimization: x=2.000000, -1.000000; status=converged"
+      ],
+      "final_line": "migration preview: success"
+    }
+  ]
+}

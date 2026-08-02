@@ -26,6 +26,12 @@ begin
 end.
 ```
 
+Expected output:
+
+```text
+converged 1.0000 2.0000
+```
+
 The complete runnable workflow is
 [`17_numerical_modelling.pas`](../examples/17_numerical_modelling.pas).
 

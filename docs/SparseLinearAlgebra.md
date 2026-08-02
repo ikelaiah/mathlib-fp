@@ -41,8 +41,23 @@ begin
   Options := TLinearSolveOptions.Default;
   Solved := TDoubleIterativeSolver.ConjugateGradient(Op, B, Options);
   if Solved.Diagnostics.Status <> isConverged then
+  begin
     Writeln('solve stopped: ', IterationStatusName(Solved.Diagnostics.Status));
+    Halt(1);
+  end;
+  Writeln('status: ', IterationStatusName(Solved.Diagnostics.Status));
+  Writeln('solution: ', Solved.Solution[0, 0]:0:6, ' ',
+    Solved.Solution[1, 0]:0:6, ' ', Solved.Solution[2, 0]:0:6);
+  Writeln('sparse solve: success');
 end.
+```
+
+Expected output:
+
+```text
+status: converged
+solution: 1.000000 1.000000 1.000000
+sparse solve: success
 ```
 
 The simple overload creates a zero initial guess, solution, and workspace.

@@ -143,4 +143,5 @@ begin
     IterationStatusName(OptimizationResult.Status));
   Writeln('DSP DC bin: ', Spectrum[0].Re:0:1);
   Writeln('streaming mean: ', Summary.Mean:0:1);
+  Writeln('migration preview: success');
 end.
