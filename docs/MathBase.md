@@ -2,6 +2,33 @@
 
 Foundation domain for mathlib-fp. All other domains depend on its units.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [double-real quick start](#quick-start). It prints
+`5.0000  0.9750` using a shared array-free scalar path. The calls return
+`Double` values and allocate no caller-visible workspace. Read the
+[newcomer guide](BEGINNER_GUIDE.md) before selecting another precision.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Shared real samples | `TDoubleArray` | [Shared types](#mathbasesharedtypes) |
+| Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
+| Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
+| Reproducible simulation | `TLocalRandom` | [Random-state contract](AppliedNumerics.md#reproducible-local-random-state) |
+| Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](Interchange.md#choose-a-format) |
+
+### Advanced route
+
+Run [example 14](../examples/14_complex_vectors.pas) for complex scalars and
+destination-reusing vector kernels, or [example 20](../examples/20_interchange_replay.pas)
+for explicit random-state replay. `TDoubleArray` remains the shared real
+container; moving to `TComplexArray` or a destination buffer is an explicit
+choice documented by those guides. The examples are compiled and run in CI.
+
 ## Units
 
 | Unit | File |
@@ -326,3 +353,9 @@ Expected output:
 ## Dependencies
 
 None. `MathBase` has no dependencies on other domains in mathlib-fp.
+
+Invalid domains and non-finite inputs follow the exception or IEEE behavior
+documented beside each operation. In particular, precision predicates return
+a Boolean, while parsers, bounded expressions, invalid RNG state, and
+operations with an explicit finite-domain contract raise their named
+MathBase exception before returning a result.

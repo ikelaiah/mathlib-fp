@@ -22,7 +22,7 @@ of those exact declaration identities for human review.
 | `TMatrixKitSparse` | compatibility status, unchanged behavior, explicit conversion | migration example; `SparseLinearAlgebra.md` | Verified compatibility |
 | Migration workflows | run-checked dense and sparse solves, fitting, interpolation, optimisation, DSP, and streaming statistics with explicit semantic differences | `23_api_migration_preview.pas`; `MIGRATING_TO_2.0_PREVIEW.md` | Verified preview only |
 | 2.0 candidate | classification, candidate conventions, owner/kind/signature-aware freeze, overload preservation, exact generated reference, no 1.9 removals/default changes | `API_CANDIDATE_2.0.md`; API snapshot/reference; extractor regressions | Verified preview only |
-| Documentation execution | all Pascal fences inventoried; all self-contained programs compiled and run; every output-producing runnable fence has checked exact/ordered output; release-facing examples check statuses and final markers | `test_doc_examples.py`; `check_doc_examples.py`; `check_example_output.py`; `QUALIFICATION_1.9.1.md` | Verified |
+| Documentation execution | all Pascal fences inventoried; all self-contained programs compiled and run; every output-producing runnable fence has checked exact/ordered output; release-facing examples check statuses and final markers | `test_doc_examples.py`; `check_doc_examples.py`; `check_example_output.py`; `QUALIFICATION_1.9.2.md` | Verified |
 | Repeated-solve allocation | warm-up plus 20 `Into` solves, sampled peak and retained heap deltas, fixed 65,536-byte failure ceiling | `BenchmarkRunner.lpr`; `QUALIFICATION_1.9.0.md` | Verified on qualified Win64 host |
 
 The audit found no stable 1.9 documentation/declaration mismatch. Operations

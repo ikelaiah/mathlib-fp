@@ -2,6 +2,31 @@
 
 `ProbabilityLib.Distributions` — probability distributions for Free Pascal.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [normal-probability quick start](#quick-start). It prints
+`P(Z <= 1.96) = 0.975002`. Distribution methods are static double-real scalar
+calls and allocate no caller-visible numerical storage.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Probability below a value | matching `CDF` | [Five-function convention](#five-functions-per-distribution) |
+| Upper-tail probability | matching `Survival` | [Design conventions](#design-conventions) |
+| Density or exact discrete mass | matching `PDF` or `PMF` | [Distribution list](#continuous-distributions) |
+| Common continuous model | Normal, exponential, gamma, beta, t, or F section | [Continuous distributions](#continuous-distributions) |
+| Counts/trials model | Binomial, Poisson, geometric, or hypergeometric section | [Discrete distributions](#discrete-distributions) |
+
+### Advanced route
+
+Run [example 07](../examples/07_probability.pas) for continuous/discrete
+selection, tails, moments, and invalid-parameter handling. It uses the same
+`Double` inputs; advanced inference distribution records are documented in
+[Applied numerics](AppliedNumerics.md#statistical-inference-and-regression).
+
 ---
 
 ## Quick Start
@@ -9,14 +34,16 @@
 ```pascal
 uses ProbabilityLib.Distributions;
 
-// What is P(X <= 1.96) for a standard Normal?
-p := TProbabilityKit.NormalCDF(1.96, 0, 1);       // 0.975002
+begin
+  WriteLn('P(Z <= 1.96) = ',
+    TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
+end.
+```
 
-// P(exactly 3 heads in 10 fair coin flips)?
-p := TProbabilityKit.BinomialPMF(3, 10, 0.5);     // 0.117188
+Expected output:
 
-// P(waiting time > 2 hours when average rate is 1/hr)?
-p := TProbabilityKit.ExponentialSurvival(2, 1);    // 0.135335
+```text
+P(Z <= 1.96) = 0.975002
 ```
 
 No object creation needed — all methods are **class static**.

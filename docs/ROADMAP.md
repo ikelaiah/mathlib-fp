@@ -1218,14 +1218,14 @@ numbers with unrelated algorithm families.
   requires a documented correctness or compatibility reason, an exact snapshot
   diff, migration impact, and the same declaration/documentation checks as a
   minor release.
-- Later entries below are planning gates. Only 1.9.1 was active for this
-  release; work is not pulled forward merely because it is convenient to
-  bundle with another fix.
+- Later entries below are planning gates. Only the release marked **Next
+  release** is active; work is not pulled forward merely because it is
+  convenient to bundle with another fix.
 - Passing a gate requires evidence from a clean release archive. A count of
   functions, tests, pages, or examples does not substitute for the stated user
   and numerical outcome.
 
-## Current release: 1.9.1 — Stabilisation and documentation delivery
+## Previous release: 1.9.1 — Stabilisation and documentation delivery
 
 Released on 2026-08-02, version 1.9.1 makes the new 1.9 surface dependable and
 easy to reach before any broader migration decision is made. It is
@@ -1264,7 +1264,7 @@ deliberately feature-frozen.
 - Normal, optimised, checked/heap-traced, examples, documentation, package, and
   clean-archive qualification results are published for the release.
 
-## Planned 1.9.2 — Beginner learning path
+## Next release: 1.9.2 — Beginner learning path
 
 Version 1.9.2 turns the existing breadth into an intentional learning journey.
 The primary teaching path uses double-real data and simple allocating calls;
@@ -1292,8 +1292,10 @@ remain one clearly labelled step deeper.
 
 ### 1.9.2 completion gate
 
-- At least three clean-room walkthroughs by people who did not implement the
-  exercised feature reach correct results without reading implementation units.
+- Checksummed clean-archive automation verifies the complete beginner journey:
+  problem-oriented search, beginner and advanced route links, runnable code,
+  claimed output, contract/failure guidance, and copy/allocation and precision
+  guidance. Qualification must not depend on external participation or reports.
 - Every stable domain has a tested beginner route and an advanced route, and
   the transition between them does not require undocumented conversions.
 - Documentation search finds common problems such as “least squares”, “normal

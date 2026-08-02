@@ -12,8 +12,31 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.1"
+CURRENT_RELEASE = "1.9.2"
 API_BASELINE_RELEASE = "1.9.0"
+HISTORICAL_RELEASES = ["1.9.1", API_BASELINE_RELEASE]
+
+LEARNING_ROUTE_DOCUMENTS = {
+    "MathBase.md": "#quick-start",
+    "AlgebraLib.md": "TypedDenseMatrices.md#60-second-solve",
+    "FinanceLib.md": "#quick-start",
+    "StatsLib.md": "#quick-start",
+    "EngineeringLib.md": "#quick-start",
+    "NumericsLib.md": "#quick-start",
+    "ProbabilityLib.md": "#quick-start",
+    "CombinatoricsLib.md": "#quick-start",
+    "OptimizationLib.md": "#quick-start",
+    "TimeSeriesLib.md": "#quick-start",
+    "MLLib.md": "#quick-start",
+    "Interchange.md": "#60-second-round-trip",
+    "GeometryLib.md": "#quick-start",
+}
+
+REQUIRED_PROBLEM_QUERIES = (
+    "least squares",
+    "normal probability",
+    "FFT convolution",
+)
 
 
 def normalized_interface(source: str) -> str:
@@ -54,6 +77,66 @@ def main() -> int:
                     errors.append(
                         f"{path.relative_to(ROOT)}: missing anchor {target}"
                     )
+
+    for name, beginner_target in LEARNING_ROUTE_DOCUMENTS.items():
+        path = DOCS / name
+        text = path.read_text(encoding="utf-8")
+        headings = (
+            "## Learning routes",
+            "### Beginner route",
+            "### Common tasks and algorithm choice",
+            "### Advanced route",
+        )
+        positions = [text.find(heading) for heading in headings]
+        if any(position < 0 for position in positions) or positions != sorted(positions):
+            errors.append(
+                f"docs/{name}: learning-route headings are missing or out of order"
+            )
+        if beginner_target not in text:
+            errors.append(
+                f"docs/{name}: beginner route does not link {beginner_target}"
+            )
+        advanced_start = text.find("### Advanced route")
+        advanced_end = text.find("\n## ", advanced_start + 1)
+        advanced = text[
+            advanced_start : advanced_end if advanced_end >= 0 else len(text)
+        ]
+        if "../examples/" not in advanced or ".pas" not in advanced:
+            errors.append(
+                f"docs/{name}: advanced route has no runnable example link"
+            )
+
+    required_learning_pages = (
+        "BEGINNER_GUIDE.md",
+        "RECIPES.md",
+        "AUTOMATED_JOURNEYS_1.9.2.md",
+        "PR_NOTES_1.9.2.md",
+    )
+    for name in required_learning_pages:
+        if not (DOCS / name).is_file():
+            errors.append(f"missing 1.9.2 learning document: docs/{name}")
+
+    recipes = (DOCS / "RECIPES.md").read_text(encoding="utf-8")
+    for query in REQUIRED_PROBLEM_QUERIES:
+        if query.casefold() not in recipes.casefold():
+            errors.append(f"docs/RECIPES.md: missing problem query {query!r}")
+    recipe_sections = (
+        "Dense square solve",
+        "Dense least squares",
+        "Sparse solve",
+        "Descriptive and streaming statistics",
+        "Normal probability",
+        "Interpolation and fitting",
+        "Optimisation",
+        "FFT convolution and filtering",
+        "Time series",
+        "Finance",
+        "Geometry",
+        "Unit conversion",
+    )
+    for heading in recipe_sections:
+        if f"## {heading}" not in recipes:
+            errors.append(f"docs/RECIPES.md: missing recipe section {heading!r}")
 
     inventory_path = DOCS / "capabilities.json"
     try:
@@ -563,7 +646,7 @@ def main() -> int:
         assert versions["schema_version"] == 1
         assert versions["current"] == CURRENT_RELEASE
         listed_releases = [item["release"] for item in versions["versions"]]
-        assert listed_releases == [CURRENT_RELEASE, API_BASELINE_RELEASE]
+        assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
         assert versions["site_url"].startswith("https://")
         assert versions["repository_url"].startswith("https://")
     except (ValueError, KeyError, AssertionError) as exc:
@@ -591,7 +674,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="1"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="2"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:
@@ -638,6 +721,7 @@ def main() -> int:
         return 1
     print(
         f"Documentation checks passed: {len(docs)} pages, "
+        f"{len(LEARNING_ROUTE_DOCUMENTS)} learning routes, "
         f"{len(examples)} indexed examples, {len(required_symbols)} public symbols, "
         f"{len(snapshot_declarations)} owner/signature-aware declarations"
     )

@@ -7,6 +7,31 @@ linear-Gaussian Kalman baselines. Their configuration, bounded mutable state,
 failure-atomic block processing, and forecast ownership are documented in the
 [applied numerics guide](AppliedNumerics.md).
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [moving-average quick start](#quick-start). It uses one
+`TDoubleArray`, allocates the smoothed result, and prints
+`last moving average = 4.50`.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Smooth a series | `SimpleMovingAverage` or `ExponentialSmoothing` | [Smoothing](#smoothing-filtering) |
+| Separate trend/seasonality | `Decompose` | [Decomposition](#decomposition) |
+| Diagnose ARIMA order | differencing, ACF/PACF, then fit | [ARIMA models](#arima-models) |
+| Detect isolated anomalies | `ZScoreAnomalies` / `RollingZScore` | [Detection](#change-point-anomaly-detection) |
+| Model evolving uncertainty | scalar/multivariate Kalman filter | [State-space selection](#state-space-selection-in-18) |
+
+### Advanced route
+
+Run [example 10](../examples/10_timeseries.pas) for smoothing through ARIMA and
+[example 19](../examples/19_applied_data_pipeline.pas) for Kalman state-space
+filtering. Both keep double-real arrays/matrices; stateful filters explicitly
+retain state rather than requiring a private conversion.
+
 ---
 
 ## State-space selection in 1.8
@@ -46,20 +71,21 @@ parameter estimation are deliberately outside 1.8.
 ## Quick Start
 
 ```pascal
-uses TimeSeriesLib.TimeSeries;
+uses MathBase.SharedTypes, TimeSeriesLib.TimeSeries;
 
-// Smooth a noisy series with a 5-point moving average
-smooth := TTimeSeriesKit.SimpleMovingAverage(prices, 5);
+var
+  Values, Smoothed: TDoubleArray;
+begin
+  Values := TDoubleArray.Create(1, 2, 3, 4, 5);
+  Smoothed := TTimeSeriesKit.SimpleMovingAverage(Values, 3);
+  WriteLn('last moving average = ', Smoothed[High(Smoothed)]:0:2);
+end.
+```
 
-// Fit and forecast an ARIMA(1,1,0) model
-model  := TTimeSeriesKit.ARIMAFit(sales, 1, 1, 0);
-fcast  := TTimeSeriesKit.ARIMAForecast(model, sales, 12);  // 12 steps ahead
+Expected output:
 
-// Detect anomalies more than 3 standard deviations from the mean
-idx := TTimeSeriesKit.ZScoreAnomalies(readings, 3.0);
-
-// Find the dominant seasonal period
-period := TTimeSeriesKit.PeriodogramPeak(Y);
+```text
+last moving average = 4.50
 ```
 
 All methods are **class static** — no `Create`/`Free` needed.

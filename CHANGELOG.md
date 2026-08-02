@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.2] - 2026-08-02
+
+### Documentation
+
+- Added a double-real beginner guide, task-oriented recipe index, and explicit
+  beginner-to-advanced routes for every stable domain without changing the
+  frozen 1.9 public API.
+- Added searchable routes for dense and sparse solves, descriptive and
+  streaming statistics, probability, interpolation and fitting,
+  optimisation, FFT and filtering, time series, finance, geometry, and unit
+  conversion.
+
+### Validation
+
+- Made each beginner recipe's code and claimed output part of the clean-
+  archive documentation checks, including all 13 domain routes, generated
+  problem-oriented search results, local links, release identity, and exact
+  public declarations.
+
 ## [1.9.1] - 2026-08-02
 
 ### Fixed

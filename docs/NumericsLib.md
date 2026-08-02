@@ -9,6 +9,31 @@ this page remain the concise compatibility and teaching path.
 
 Depends on: **MathBase**
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [double-real numerical quick start](#quick-start). It prints
+checked root, integral, ODE, and spline values using plain callbacks and
+allocating result records. Start with `Brent` for a bracketed scalar root.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Bracketed scalar root | `Brent` | [Root finding](#root-finding) |
+| Smooth finite integral | `SimpsonRule` for teaching, `IntegrateAdaptive` for diagnostics | [Modelling selection](NumericalModelling.md#choose-an-algorithm) |
+| Introductory scalar ODE | `RK4Solve` | [ODE solvers](#ode-solvers) |
+| Interpolation between knots | `CubicSplineBuild` | [Interpolation](#interpolation) |
+| Fitting/vector equations/adaptive ODE | `TModellingKit` | [Numerical modelling](NumericalModelling.md#choose-an-algorithm) |
+
+### Advanced route
+
+Run [example 17](../examples/17_numerical_modelling.pas) for reusable
+interpolants, fitting, bounded options, event-aware adaptive ODEs, and explicit
+statuses. It retains the double-real array path; coefficient/result arrays are
+allocated explicitly and no private dense conversion is needed.
+
 ## Units
 
 | Unit | File | Class |

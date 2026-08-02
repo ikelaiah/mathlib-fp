@@ -5,6 +5,31 @@ depreciation, option pricing, ratio analysis, and risk metrics.
 
 Depends on: **MathBase**
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [double-real loan-schedule quick start](#quick-start). Its
+checked output includes the first and final payments. The schedule is a newly
+allocated managed array; scalar financial calls return `Double` values.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Present/future value and payments | `PresentValue`, `FutureValue`, `Payment` | [Time value of money](#time-value-of-money) |
+| Cash-flow value or return | `NetPresentValue`, `InternalRateOfReturn` | [NPV and IRR](#net-present-value-irr) |
+| Bond price/yield/schedule | `TBondKit` | [Bond calculations](#bond-calculations) |
+| Option value | `BlackScholes` | [Option pricing](#option-pricing-black-scholes) |
+| Ratios and risk metrics | named `TFinanceKit` method | [Design and failure notes](#design-notes) |
+
+### Advanced route
+
+Run [example 04](../examples/04_finance_npv_irr.pas) for a complete cash-flow,
+IRR, bond, option, ratio, and amortisation walkthrough. It uses the same
+double-real rates and cash-flow arrays as the beginner call; no destination or
+workspace conversion is required.
+
 ## Units
 
 | Unit | File | Purpose |

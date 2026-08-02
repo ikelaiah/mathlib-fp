@@ -9,6 +9,32 @@ clustering, reproducible decision forests, and an exact low-dimensional
 [applied numerics guide](AppliedNumerics.md) for stable 1.8 contracts and
 explicitly open data-science families.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [double-real regression quick start](#quick-start). It creates
+a small row-major `TDoubleMatrix`, allocates a fitted model, and prints
+`y = 1.0 + 2.0*x`.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Scale features | fitted standardisation for train/test work | [Preprocessing](#preprocessing) |
+| Continuous prediction | `LinearRegression` / typed `FitOLS` | [Regression](#regression) |
+| Classification | logistic, KNN, or forest by data/diagnostics | [Classification](#classification) |
+| Unlabelled grouping | seeded k-means++ or hierarchical clustering | [Clustering](#clustering) |
+| Lower-dimensional representation | typed PCA | [Dimensionality reduction](#dimensionality-reduction) |
+
+### Advanced route
+
+Run [example 19](../examples/19_applied_data_pipeline.pas) for typed PCA and
+seeded clustering or [example 21](../examples/21_release_1_8_workflows.pas) for
+fitted standardisation and forests. Nested beginner matrices convert through
+the explicit typed factories described by the advanced guide; fitted
+train/test paths themselves need no undocumented glue.
+
 ## Typed analysis additions in 1.8
 
 Use `TAnalysisKit.FitStandardization` only on training rows, then apply the
@@ -53,28 +79,28 @@ distributed training are not part of 1.8.
 ## Quick Start
 
 ```pascal
-uses MLLib.MachineLearning;
+uses MathBase.SharedTypes, MLLib.MachineLearning;
 
-// Preprocess: scale features to [0,1]
-Xscaled := TMLKit.Normalise(X);
+var
+  X: TDoubleMatrix;
+  Y: TDoubleArray;
+  Model: TLinearModel;
+begin
+  X := TDoubleMatrix.Create(
+    TDoubleArray.Create(0),
+    TDoubleArray.Create(1),
+    TDoubleArray.Create(2));
+  Y := TDoubleArray.Create(1, 3, 5);
+  Model := TMLKit.LinearRegression(X, Y);
+  WriteLn('y = ', Model.Intercept:0:1, ' + ',
+    Model.Coefficients[0]:0:1, '*x');
+end.
+```
 
-// Train a linear regression model
-model := TMLKit.LinearRegression(X, Y);
-pred  := TMLKit.LinearPredict(model, Xtest);
+Expected output:
 
-// Classify with K-Nearest Neighbours
-labels := TMLKit.KNearestNeighbours(TrainX, TrainY, TestX, 5);
-
-// Cluster with K-Means
-clusters := TMLKit.KMeans(X, 3);
-
-// Reduce dimensions with PCA
-pca       := TMLKit.PCA(X, 2);
-Xreduced  := TMLKit.PCATransform(pca, X);
-
-// Evaluate
-WriteLn(TMLKit.Accuracy(YTrue, YPred));
-WriteLn(TMLKit.RMSE(YTrue, YPred));
+```text
+y = 1.0 + 2.0*x
 ```
 
 All methods are **class static** — no `Create`/`Free` needed.
