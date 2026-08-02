@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   archive documentation checks, including all 13 domain routes, generated
   problem-oriented search results, local links, release identity, and exact
   public declarations.
+- Made checked-heap qualification capture heaptrc in an explicit cross-platform
+  log, reject missing or nonzero summaries numerically, and preserve evidence
+  artifacts even when a qualification job fails.
 
 ## [1.9.1] - 2026-08-02
 

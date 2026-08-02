@@ -1,6 +1,6 @@
 # mathlib-fp 1.9.2 qualification
 
-Status on 2026-08-02: **all 68 local release-qualification gates passed;
+Status on 2026-08-02: **all 69 local release-qualification gates passed;
 final Linux and Windows clean-archive CI is pending**.
 
 ## Completion-gate evidence
@@ -15,12 +15,16 @@ final Linux and Windows clean-archive CI is pending**.
 
 ## Automated preflight
 
-The 1.9.2 candidate passed all 68 local gates in `qualify_release.py`: normal,
+The 1.9.2 candidate passed all 69 local gates in `qualify_release.py`: normal,
 optimised, checked/heap-traced tests, all examples and output contracts,
 documentation structure/API/execution/search checks, generated/offline
 documentation, Lazarus package, and representative benchmark. The run used
 FPC 3.2.2 and Lazarus 4.8 on Windows 11 x86-64 and reported no test, example,
 documentation, package, or benchmark failure.
+
+The checked-heap gate directs heaptrc to an explicit evidence log and parses
+its unfreed-block and byte counts. A missing summary or any nonzero count is a
+failure; qualification artifacts are retained even when a later gate fails.
 
 The authoritative Linux and Windows results must come from checksummed clean
 source archives of the exact commit selected for the tag. They are not

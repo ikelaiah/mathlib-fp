@@ -44,10 +44,11 @@ jobs:
             --compiler fpc --skip-package
 
       - name: Publish Linux qualification evidence
+        if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: qualification-1.9.2-linux-x86-64
-          if-no-files-found: error
+          if-no-files-found: warn
           path: |
             ${{ runner.temp }}/qualification/mathlib-fp-1.9.2.tar.gz.sha256
             ${{ runner.temp }}/qualification/source/build-temp/release-qualification
@@ -118,10 +119,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Publish Windows qualification evidence
+        if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: qualification-1.9.2-windows-x86-64
-          if-no-files-found: error
+          if-no-files-found: warn
           path: |
             ${{ runner.temp }}/qualification/mathlib-fp-1.9.2.zip.sha256
             ${{ runner.temp }}/qualification/source/build-temp/release-qualification
