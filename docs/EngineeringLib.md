@@ -5,6 +5,33 @@ signal processing, and comprehensive unit conversion for Free Pascal.
 
 Depends on: **MathBase**
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [double-real engineering quick start](#quick-start). It checks
+a Reynolds number, Carnot efficiency, and typed length conversion, including
+the output `1 m = 3.2808 ft`. These scalar calls allocate no numerical
+workspace.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Fluid/pipe calculation | `TFluidDynamicsKit` | [Fluid methods](#engineeringlibfluiddynamics-tfluiddynamicskit) |
+| Heat/thermodynamic calculation | `TThermodynamicsKit` | [Thermodynamic methods](#engineeringlibthermodynamics-tthermodynamicskit) |
+| FFT convolution or filtering | `TDSPKit` | [DSP selection](AppliedNumerics.md#choose-a-transform-or-convolution) |
+| Legacy power-of-two spectrum | `TSignalKit` | [Signal methods](#engineeringlibsignal-tsignalkit) |
+| Physical unit conversion | `TUnitConversionKit` | [Conversion contract](#engineeringlibunitconversion-tunitconversionkit) |
+
+### Advanced route
+
+Run [example 19](../examples/19_applied_data_pipeline.pas) for spectral and
+streaming DSP or [example 21](../examples/21_release_1_8_workflows.pas) for
+block convolution and filters. Array results allocate by default; stateful
+filters retain bounded state. Complex spectra and reusable state are explicit
+steps beyond the same double-real signal arrays.
+
 ## Units
 
 | Unit | File | Class |

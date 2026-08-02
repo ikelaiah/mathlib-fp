@@ -2,6 +2,31 @@
 
 `CombinatoricsLib.Combinatorics` — discrete mathematics and combinatorics for Free Pascal.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [counting quick start](#quick-start). It prints `C(10,3) = 120`
+using an integer-returning static call. Small scalar counting operations do not
+allocate; generated permutations/combinations return managed arrays.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Ordered/unordered selections | `Permutation` / `Combination` | [Counting](#counting-combinations) |
+| Large count magnitude | `LogFactorial` / `LogCombination` | [Overflow reference](#overflow-reference) |
+| GCD, modular arithmetic, primes | matching number-theory method | [Number theory](#number-theory) |
+| Enumerate arrangements | `Permutations` / `Combinations` | [Generation](#permutation-combination-generation) |
+| Enumerate every subset | `PowerSet` | [Power set](#power-set) |
+
+### Advanced route
+
+Run [example 08](../examples/08_combinatorics.pas) for overflow-aware counts,
+prime factorisation, modular arithmetic, iterator-style permutations, and
+managed result arrays. It uses the same zero-based integer arrays introduced
+by the beginner route.
+
 ---
 
 ## Quick Start
@@ -9,14 +34,15 @@
 ```pascal
 uses CombinatoricsLib.Combinatorics;
 
-// How many ways to choose 3 items from 10?
-n := TCombinatoricsKit.Combination(10, 3);    // 120
+begin
+  WriteLn('C(10,3) = ', TCombinatoricsKit.Combination(10, 3));
+end.
+```
 
-// Is 999999937 prime?
-b := TCombinatoricsKit.IsPrime(999999937);    // True
+Expected output:
 
-// All permutations of [1,2,3]
-perms := TCombinatoricsKit.Permutations(TIntegerArray.Create(1,2,3));  // 6 permutations
+```text
+C(10,3) = 120
 ```
 
 All methods are **class static** — no `Create`/`Free` needed.

@@ -101,6 +101,8 @@ difference between domains, units, and Kit classes.
 
 The [`examples/`](examples/) directory contains 24 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
+[beginner guide](docs/BEGINNER_GUIDE.md), choose a short task from the
+[beginner recipes](docs/RECIPES.md), or follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:
 

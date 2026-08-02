@@ -23,6 +23,25 @@ REQUIRED_RUNNABLE_DOCUMENTS = {
     Path("docs/SparseLinearAlgebra.md"),
 }
 
+# One output-checked program is the mechanical beginner route for each stable
+# domain. Algebra deliberately points to the primary typed-double guide rather
+# than the compatibility landing-page example.
+BEGINNER_ROUTE_DOCUMENTS = {
+    "MathBase": Path("docs/MathBase.md"),
+    "AlgebraLib": Path("docs/TypedDenseMatrices.md"),
+    "FinanceLib": Path("docs/FinanceLib.md"),
+    "StatsLib": Path("docs/StatsLib.md"),
+    "EngineeringLib": Path("docs/EngineeringLib.md"),
+    "NumericsLib": Path("docs/NumericsLib.md"),
+    "ProbabilityLib": Path("docs/ProbabilityLib.md"),
+    "CombinatoricsLib": Path("docs/CombinatoricsLib.md"),
+    "OptimizationLib": Path("docs/OptimizationLib.md"),
+    "TimeSeriesLib": Path("docs/TimeSeriesLib.md"),
+    "MLLib": Path("docs/MLLib.md"),
+    "InterchangeLib": Path("docs/Interchange.md"),
+    "GeometryLib": Path("docs/GeometryLib.md"),
+}
+
 
 @dataclass(frozen=True)
 class Fragment:
@@ -89,6 +108,19 @@ def is_runnable(fragment: Fragment) -> bool:
             and re.search(r"(?is)\bend\s*\.\s*$", source)
         )
     )
+
+
+def missing_beginner_routes(fragments: list[Fragment]) -> list[str]:
+    runnable_with_output = {
+        fragment.path
+        for fragment in fragments
+        if is_runnable(fragment) and fragment.expectation is not None
+    }
+    return [
+        f"{domain}: {path} has no output-checked runnable program"
+        for domain, path in BEGINNER_ROUTE_DOCUMENTS.items()
+        if path not in runnable_with_output
+    ]
 
 
 def program_source(fragment: Fragment, number: int) -> str:
@@ -159,6 +191,10 @@ def main() -> int:
 
     fragments = pascal_fragments(ROOT)
     runnable = [fragment for fragment in fragments if is_runnable(fragment)]
+    missing_routes = missing_beginner_routes(fragments)
+    if missing_routes:
+        print("\n".join(missing_routes), file=sys.stderr)
+        return 1
     opaque_required = sorted(
         (
             fragment
@@ -237,7 +273,8 @@ def main() -> int:
     print(
         f"Documentation example checks passed: {len(runnable)} compiled and "
         f"executed Pascal fragments, {expectation_count} output contracts "
-        f"verified ({len(fragments)} Pascal fences inventoried)"
+        f"verified, {len(BEGINNER_ROUTE_DOCUMENTS)} beginner routes covered "
+        f"({len(fragments)} Pascal fences inventoried)"
     )
     return 0
 

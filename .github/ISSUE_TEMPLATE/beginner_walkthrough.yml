@@ -1,0 +1,83 @@
+name: 1.9.2 beginner walkthrough
+description: Record an independent clean-room use of a tested beginner recipe
+title: "[1.9.2 walkthrough]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing the beginner route. Start from a clean source archive, use documentation search rather than a known Pascal identifier, and do not read files under src/ during the session.
+  - type: dropdown
+    id: route
+    attributes:
+      label: Recipe followed
+      options:
+        - Dense square solve
+        - Dense least squares
+        - Sparse solve
+        - Descriptive statistics
+        - Streaming statistics
+        - Normal probability
+        - Interpolation or fitting
+        - Optimisation
+        - FFT convolution or filtering
+        - Time series
+        - Finance
+        - Geometry
+        - Unit conversion
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include archive/commit, OS, CPU, and FPC version.
+      placeholder: Candidate archive SHA-256; Windows 11 x86-64; FPC 3.2.2
+    validations:
+      required: true
+  - type: input
+    id: search_query
+    attributes:
+      label: Documentation search words
+      description: Enter the problem words used before you knew the Pascal identifier.
+    validations:
+      required: true
+  - type: input
+    id: elapsed
+    attributes:
+      label: Elapsed minutes
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Result and correctness check
+      description: Include observed output, the changed input, and how you checked the result.
+    validations:
+      required: true
+  - type: textarea
+    id: transition
+    attributes:
+      label: Failure guidance and advanced transition
+      description: State where failure/status guidance was found and when the advanced route would replace the simple call.
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: Confusion, failure, or missing step
+      description: Write "none" only if the whole route was clear.
+    validations:
+      required: true
+  - type: checkboxes
+    id: independence
+    attributes:
+      label: Clean-room declarations
+      options:
+        - label: I am a person who did not implement the exercised feature.
+          required: true
+        - label: I did not read implementation units under src/ during this walkthrough.
+          required: true
+        - label: I started from a clean source archive and obtained a correct result.
+          required: true
+        - label: This report contains no private vulnerability details.
+          required: true

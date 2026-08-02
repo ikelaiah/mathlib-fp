@@ -6,6 +6,31 @@ and non-parametric tests.
 
 Depends on: **MathBase**
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [descriptive-statistics quick start](#quick-start). It uses a
+`TDoubleArray`, prints a checked correlation and seeded bootstrap interval,
+and returns newly allocated result arrays where the operation requires them.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| One in-memory sample | `TStatsKit.Describe` | [Descriptive methods](#descriptive-statistics) |
+| Incremental or mergeable sample | `TOnlineStatistics` | [Streaming contract](AppliedNumerics.md#online-and-mergeable-statistics) |
+| Mean/group comparison | `TInferenceKit` test selected by design | [Test selection](#test-selection) |
+| Distribution fit | `EstimateNormal`/matching estimate | [Distribution selection](#distribution-selection) |
+| Regression with diagnostics | `FitOLS` or `FitLogistic` | [Regression selection](#regression-selection-and-failure-contracts) |
+
+### Advanced route
+
+Run [example 19](../examples/19_applied_data_pipeline.pas) for streaming
+statistics in a typed data pipeline and [example 21](../examples/21_release_1_8_workflows.pas)
+for inference. Both consume the shared double-real containers directly; the
+transition from `TStatsKit` to fitted/streaming records needs no glue copy.
+
 ## Units
 
 | Unit | File | Class |

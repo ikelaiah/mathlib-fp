@@ -28,6 +28,10 @@ Use this checklist for every mathlib-fp release.
   the current release without replacing an older directory.
 - [ ] Verify every output-producing runnable documentation fence and every
   release-facing example output contract, including final success markers.
+- [ ] Run any milestone-specific evidence checker. For 1.9.2,
+  `python tools/check_walkthroughs.py` must validate three genuine independent
+  clean-room walkthrough records; automated agents or fabricated records do
+  not satisfy this gate.
 - [ ] Build the deterministic offline documentation ZIP, verify its SHA-256,
   extract it without network access, and compare its `release.json`, examples,
   signatures, and limitations with repository Markdown.

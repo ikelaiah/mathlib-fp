@@ -6,7 +6,17 @@ source tree and distribution.
 See the [roadmap](ROADMAP.md) for the quality-first path toward a comprehensive
 native Free Pascal numerical package.
 
+New to Free Pascal numerical code? Read the
+[beginner guide](BEGINNER_GUIDE.md), then choose a tested task from the
+[beginner recipes](RECIPES.md). The recipes lead with the double-real,
+allocating path and link the advanced controls separately.
+
 ## Releases
+
+- [1.9.2 PR notes](PR_NOTES_1.9.2.md) — active beginner-learning-path review
+  boundary and honest independent-walkthrough gate status.
+- [1.9.2 clean-room protocol](WALKTHROUGHS_1.9.2.md) — evidence required before
+  the next release may pass its completion gate.
 
 - [mathlib-fp 1.9.1 release notes](RELEASE_NOTES_1.9.1.md) — feature-frozen
   correctness stabilisation, versioned web/offline documentation, output-aware
@@ -84,19 +94,19 @@ artificial Kit class.
 
 | Unit family | Domain | Depends on |
 |---------|-------------|------------|
-| [MathBase](MathBase.md) | Shared types, constants, precision, trigonometry, local random state, bounded expressions, and [numerical interchange](Interchange.md) | RTL / FCL streams |
-| [AlgebraLib](AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](DenseLinearAlgebra.md), and [structured/sparse/matrix-free linear algebra](SparseLinearAlgebra.md) | MathBase |
-| [FinanceLib](FinanceLib.md) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
-| [StatsLib](StatsLib.md) | Descriptive/online statistics, paired distributions, inference, regression diagnostics, and bootstrap | MathBase / AlgebraLib |
-| [EngineeringLib](EngineeringLib.md) | Fluid dynamics, thermodynamics, [applied DSP](AppliedNumerics.md), signal processing, unit conversion | MathBase / AlgebraLib |
-| [NumericsLib](NumericsLib.md) | Root finding and introductory numerical methods; [advanced modelling](NumericalModelling.md) | MathBase / AlgebraLib |
-| [ProbabilityLib](ProbabilityLib.md) | Continuous and discrete probability distributions | MathBase |
-| [CombinatoricsLib](CombinatoricsLib.md) | Counting, sequences, number theory, permutations, combinations | MathBase |
-| [OptimizationLib](OptimizationLib.md) | Diagnostic scalar/vector/constrained optimisation and two-phase LP; [dense convex QP/SOCP](ConvexOptimization.md) | MathBase / AlgebraLib / NumericsLib AD |
-| [TimeSeriesLib](TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and [scalar/multivariate state-space filtering](AppliedNumerics.md) | MathBase / AlgebraLib |
-| [MLLib](MLLib.md) | Preprocessing, regression, classifiers, clustering, forests, metrics, and [typed reproducible analysis](AppliedNumerics.md) | MathBase / AlgebraLib |
-| [InterchangeLib](Interchange.md) | Versioned selected-model persistence adapters | MathBase / selected model domains |
-| [GeometryLib](GeometryLib.md) | 2-D and 3-D computational geometry | MathBase |
+| [MathBase](MathBase.md#learning-routes) | Shared types, constants, precision, trigonometry, local random state, bounded expressions, and [numerical interchange](Interchange.md) | RTL / FCL streams |
+| [AlgebraLib](AlgebraLib.md#learning-routes) | Compatibility matrices, [typed dense storage/solvers](DenseLinearAlgebra.md), and [structured/sparse/matrix-free linear algebra](SparseLinearAlgebra.md) | MathBase |
+| [FinanceLib](FinanceLib.md#learning-routes) | Time value of money, bonds, NPV/IRR, options, ratios, risk metrics | MathBase |
+| [StatsLib](StatsLib.md#learning-routes) | Descriptive/online statistics, paired distributions, inference, regression diagnostics, and bootstrap | MathBase / AlgebraLib |
+| [EngineeringLib](EngineeringLib.md#learning-routes) | Fluid dynamics, thermodynamics, [applied DSP](AppliedNumerics.md), signal processing, unit conversion | MathBase / AlgebraLib |
+| [NumericsLib](NumericsLib.md#learning-routes) | Root finding and introductory numerical methods; [advanced modelling](NumericalModelling.md) | MathBase / AlgebraLib |
+| [ProbabilityLib](ProbabilityLib.md#learning-routes) | Continuous and discrete probability distributions | MathBase |
+| [CombinatoricsLib](CombinatoricsLib.md#learning-routes) | Counting, sequences, number theory, permutations, combinations | MathBase |
+| [OptimizationLib](OptimizationLib.md#learning-routes) | Diagnostic scalar/vector/constrained optimisation and two-phase LP; [dense convex QP/SOCP](ConvexOptimization.md) | MathBase / AlgebraLib / NumericsLib AD |
+| [TimeSeriesLib](TimeSeriesLib.md#learning-routes) | Smoothing, decomposition, ARIMA, anomaly detection, and [scalar/multivariate state-space filtering](AppliedNumerics.md) | MathBase / AlgebraLib |
+| [MLLib](MLLib.md#learning-routes) | Preprocessing, regression, classifiers, clustering, forests, metrics, and [typed reproducible analysis](AppliedNumerics.md) | MathBase / AlgebraLib |
+| [InterchangeLib](Interchange.md#learning-routes) | Versioned selected-model persistence adapters | MathBase / selected model domains |
+| [GeometryLib](GeometryLib.md#learning-routes) | 2-D and 3-D computational geometry | MathBase |
 
 ## Public API naming inventory
 
@@ -162,6 +172,9 @@ TSingleComplexArray = array of TSingleComplex;
   `EMatrixError`, `EProbabilityError`, or the domain-specific equivalent.
 
 ## Find an algorithm
+
+The [problem-oriented beginner recipes](RECIPES.md#choose-a-recipe) are the
+shortest route when you know the task but not its Pascal identifier.
 
 | Problem | Recommended starting point |
 | --- | --- |

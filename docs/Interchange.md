@@ -9,6 +9,31 @@ interchange unit.
 Maturity: **stable for the dense and sparse real/complex, RNG-state, and
 selected model formats documented here**.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [in-memory double-matrix round trip](#60-second-round-trip).
+It prints `round trip value = 4.0`. Saving allocates stream payload bytes;
+loading validates the complete payload before returning a new typed matrix.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Human-readable vector/matrix text | invariant or delimited helpers | [Choose a format](#choose-a-format) |
+| Exchange with numerical tools | Matrix Market | [Text forms](#text-forms) |
+| Exact typed numerical round trip | binary save/load pair | [Binary format](#binary-format-version-1) |
+| Reproducible RNG replay | random-state binary pair | [Binary format](#binary-format-version-1) |
+| Selected fitted model | `InterchangeLib.Models` pair | [Model persistence](#selected-model-persistence) |
+
+### Advanced route
+
+Run [example 20](../examples/20_interchange_replay.pas) for matrix/RNG replay
+and [example 22](../examples/22_sparse_end_to_end.pas) for Matrix Market sparse
+exchange. All conversions are named, allocate independent results, and retain
+the source scalar precision unless an explicitly named conversion is chosen.
+
 ## 60-second round trip
 
 ```pascal
@@ -25,10 +50,17 @@ begin
     SaveBinary(Stream, A);
     Stream.Position := 0;
     B := LoadDoubleMatrixBinary(Stream);
+    WriteLn('round trip value = ', B[1, 1]:0:1);
   finally
     Stream.Free;
   end;
 end.
+```
+
+Expected output:
+
+```text
+round trip value = 4.0
 ```
 
 See [example 20](../examples/20_interchange_replay.pas) for matrix and random
@@ -124,6 +156,13 @@ concurrently mutate the same stream.
 
 `EInterchangeError` names the failing operation and violated format or limit.
 I/O errors from an underlying stream may also propagate.
+
+Malformed magic/version/kind metadata, truncated payloads, CRC mismatches,
+non-canonical sparse entries, non-finite text values, and configured resource
+limit violations raise before a matrix, state, or model is returned. A stream
+may already contain bytes if the stream itself raises during a write; callers
+needing transactional file replacement should write a temporary file and
+rename it after success.
 
 ## Selected model persistence
 

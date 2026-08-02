@@ -2,6 +2,31 @@
 
 `GeometryLib.Geometry` — 2-D and 3-D computational geometry for Free Pascal.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [fixed-size vector quick start](#quick-start). It prints
+`length = 5.0000`. `TVector2D` is a double-real value record, so this arithmetic
+is allocation-free and needs no object lifetime management.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Point displacement/direction | `TPoint2D` / `TVector2D` | [Types](#types) |
+| Distance to segment/line | named distance method | [Distance functions](#distance-functions) |
+| Segment/line/circle crossing | matching intersection method | [Intersection tests](#intersection-tests) |
+| Polygon containment/area/hull | matching polygon method | [Polygon operations](#polygon-operations) |
+| Translate/scale/rotate a polygon | named transformation | [Transformations](#transformations-2-d) |
+
+### Advanced route
+
+Run [example 12](../examples/12_geometry.pas) for scale-safe vector
+normalisation, intersections, hulls, transformations, and 3-D calculations.
+Fixed-size values remain allocation-free; polygon/hull results use documented
+managed arrays and require no private conversion.
+
 ---
 
 ## Quick Start
@@ -9,21 +34,18 @@
 ```pascal
 uses GeometryLib.Geometry;
 
-// Distance from a point to a line segment
-T := 0;
-D := TGeometryKit.PointToSegment2D(P, A, B, T);
+var
+  V: TVector2D;
+begin
+  V := TVector2D.Create(3, 4);
+  WriteLn('length = ', V.Magnitude:0:4);
+end.
+```
 
-// Do two segments cross?
-if TGeometryKit.SegmentsIntersect2D(A1, A2, B1, B2) then ...
+Expected output:
 
-// Convex hull of a point cloud
-Hull := TGeometryKit.ConvexHull(Points);
-
-// Fixed-size vector arithmetic
-V := 2.0 * (V1 + V2) / 3.0;
-
-// Point-in-polygon test
-if TGeometryKit.PointInPolygon(Mouse, Boundary) then ...
+```text
+length = 5.0000
 ```
 
 All methods are **class static** — no `Create`/`Free` needed.

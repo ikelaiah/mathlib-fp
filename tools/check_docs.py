@@ -15,6 +15,28 @@ DOCS = ROOT / "docs"
 CURRENT_RELEASE = "1.9.1"
 API_BASELINE_RELEASE = "1.9.0"
 
+LEARNING_ROUTE_DOCUMENTS = {
+    "MathBase.md": "#quick-start",
+    "AlgebraLib.md": "TypedDenseMatrices.md#60-second-solve",
+    "FinanceLib.md": "#quick-start",
+    "StatsLib.md": "#quick-start",
+    "EngineeringLib.md": "#quick-start",
+    "NumericsLib.md": "#quick-start",
+    "ProbabilityLib.md": "#quick-start",
+    "CombinatoricsLib.md": "#quick-start",
+    "OptimizationLib.md": "#quick-start",
+    "TimeSeriesLib.md": "#quick-start",
+    "MLLib.md": "#quick-start",
+    "Interchange.md": "#60-second-round-trip",
+    "GeometryLib.md": "#quick-start",
+}
+
+REQUIRED_PROBLEM_QUERIES = (
+    "least squares",
+    "normal probability",
+    "FFT convolution",
+)
+
 
 def normalized_interface(source: str) -> str:
     match = re.search(r"(?mi)^implementation\s*$", source)
@@ -54,6 +76,81 @@ def main() -> int:
                     errors.append(
                         f"{path.relative_to(ROOT)}: missing anchor {target}"
                     )
+
+    for name, beginner_target in LEARNING_ROUTE_DOCUMENTS.items():
+        path = DOCS / name
+        text = path.read_text(encoding="utf-8")
+        headings = (
+            "## Learning routes",
+            "### Beginner route",
+            "### Common tasks and algorithm choice",
+            "### Advanced route",
+        )
+        positions = [text.find(heading) for heading in headings]
+        if any(position < 0 for position in positions) or positions != sorted(positions):
+            errors.append(
+                f"docs/{name}: learning-route headings are missing or out of order"
+            )
+        if beginner_target not in text:
+            errors.append(
+                f"docs/{name}: beginner route does not link {beginner_target}"
+            )
+        advanced_start = text.find("### Advanced route")
+        advanced_end = text.find("\n## ", advanced_start + 1)
+        advanced = text[
+            advanced_start : advanced_end if advanced_end >= 0 else len(text)
+        ]
+        if "../examples/" not in advanced or ".pas" not in advanced:
+            errors.append(
+                f"docs/{name}: advanced route has no runnable example link"
+            )
+
+    required_learning_pages = (
+        "BEGINNER_GUIDE.md",
+        "RECIPES.md",
+        "WALKTHROUGHS_1.9.2.md",
+        "PR_NOTES_1.9.2.md",
+    )
+    for name in required_learning_pages:
+        if not (DOCS / name).is_file():
+            errors.append(f"missing 1.9.2 learning document: docs/{name}")
+
+    recipes = (DOCS / "RECIPES.md").read_text(encoding="utf-8")
+    for query in REQUIRED_PROBLEM_QUERIES:
+        if query.casefold() not in recipes.casefold():
+            errors.append(f"docs/RECIPES.md: missing problem query {query!r}")
+    recipe_sections = (
+        "Dense square solve",
+        "Dense least squares",
+        "Sparse solve",
+        "Descriptive and streaming statistics",
+        "Normal probability",
+        "Interpolation and fitting",
+        "Optimisation",
+        "FFT convolution and filtering",
+        "Time series",
+        "Finance",
+        "Geometry",
+        "Unit conversion",
+    )
+    for heading in recipe_sections:
+        if f"## {heading}" not in recipes:
+            errors.append(f"docs/RECIPES.md: missing recipe section {heading!r}")
+
+    walkthrough_path = DOCS / "walkthroughs-1.9.2.json"
+    try:
+        walkthroughs = json.loads(walkthrough_path.read_text(encoding="utf-8"))
+        assert walkthroughs["schema_version"] == 1
+        assert walkthroughs["release"] == "1.9.2"
+        assert isinstance(walkthroughs["walkthroughs"], list)
+    except (OSError, ValueError, KeyError, AssertionError) as exc:
+        errors.append(f"docs/walkthroughs-1.9.2.json: invalid manifest: {exc}")
+
+    walkthrough_form = (
+        ROOT / ".github" / "ISSUE_TEMPLATE" / "beginner_walkthrough.yml"
+    )
+    if not walkthrough_form.is_file():
+        errors.append("missing 1.9.2 beginner walkthrough issue form")
 
     inventory_path = DOCS / "capabilities.json"
     try:
@@ -638,6 +735,7 @@ def main() -> int:
         return 1
     print(
         f"Documentation checks passed: {len(docs)} pages, "
+        f"{len(LEARNING_ROUTE_DOCUMENTS)} learning routes, "
         f"{len(examples)} indexed examples, {len(required_symbols)} public symbols, "
         f"{len(snapshot_declarations)} owner/signature-aware declarations"
     )

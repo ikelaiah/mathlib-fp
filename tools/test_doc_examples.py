@@ -11,6 +11,7 @@ from check_doc_examples import (
     OutputExpectation,
     expectation_error,
     is_runnable,
+    missing_beginner_routes,
     output_expectation,
     program_source,
 )
@@ -51,6 +52,10 @@ class DocumentationFragmentTests(unittest.TestCase):
         )
         exact = OutputExpectation("exact", 1, "answer=2\n")
         self.assertIsNone(expectation_error(exact, "answer=2\r\n"))
+
+    def test_beginner_routes_require_runnable_checked_output(self) -> None:
+        missing = missing_beginner_routes([])
+        self.assertTrue(any(item.startswith("MathBase:") for item in missing))
 
 
 if __name__ == "__main__":

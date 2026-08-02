@@ -12,6 +12,13 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 
+REQUIRED_PROBLEM_QUERIES = (
+    "least squares",
+    "normal probability",
+    "FFT convolution",
+)
+
+
 class PageParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -76,7 +83,9 @@ def validate_page(page: Path, root: Path, expected_release: str) -> list[str]:
     return errors
 
 
-def check_search_index(directory: Path) -> list[str]:
+def check_search_index(
+    directory: Path, required_queries: tuple[str, ...] = (),
+) -> list[str]:
     errors: list[str] = []
     path = directory / "search-index.json"
     if not path.is_file():
@@ -89,6 +98,14 @@ def check_search_index(directory: Path) -> list[str]:
             target = directory / entry["url"]
             if not target.is_file():
                 errors.append(f"{path}: missing indexed page {entry['url']}")
+        corpus = [
+            f"{entry.get('title', '')} {entry.get('text', '')}".casefold()
+            for entry in entries
+            if isinstance(entry, dict)
+        ]
+        for query in required_queries:
+            if not any(query.casefold() in item for item in corpus):
+                errors.append(f"{path}: search cannot find problem {query!r}")
     except (ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
         errors.append(f"{path}: invalid search index: {exc}")
     return errors
@@ -132,7 +149,12 @@ def main() -> int:
                     raise ValueError("release/source_ref identity mismatch")
             except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
                 errors.append(f"{release_path}: invalid release identity: {exc}")
-            errors.extend(check_search_index(directory))
+            required_queries = (
+                REQUIRED_PROBLEM_QUERIES
+                if args.release or release == current
+                else ()
+            )
+            errors.extend(check_search_index(directory, required_queries))
         pages = [directory / "index.html"] if directory == site and not args.release else sorted(directory.rglob("*.html"))
         for page in pages:
             if not page.is_file():

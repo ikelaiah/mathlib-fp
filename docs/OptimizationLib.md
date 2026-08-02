@@ -7,6 +7,31 @@ feasibility and shared termination diagnostics, see the
 [convex optimisation guide](ConvexOptimization.md). The APIs on this page
 remain source compatible.
 
+## Learning routes
+
+### Beginner route
+
+Copy and run the [bounded scalar quick start](#quick-start). It prints
+`x = 3.000000` from a plain double-real callback. The scalar convenience call
+does not expose a destination or workspace.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Bounded scalar minimum | `GoldenSection` or `BrentMinimize` | [Single-variable methods](#single-variable-minimization) |
+| Smooth multivariate minimum | `L-BFGS` | [Solver selection](#solver-selection-guide) |
+| Derivative-free multivariate minimum | `NelderMead` | [Solver selection](#solver-selection-guide) |
+| Linear constraints/model | `SimplexLP` | [Linear programming](#linear-programming) |
+| Dense convex QP/SOCP | `TConvexOptimizationKit` | [Convex solver choice](ConvexOptimization.md#choose-a-solver) |
+
+### Advanced route
+
+Run [example 18](../examples/18_convex_optimization.pas) for explicit model,
+feasibility, and termination diagnostics, or [example 09](../examples/09_optimization.pas)
+for the compatibility facade. Both use `TDoubleArray`; options/workspaces and
+result arrays deepen that same path without undocumented conversions.
+
 ---
 
 ## Quick Start
@@ -14,15 +39,20 @@ remain source compatible.
 ```pascal
 uses OptimizationLib.Optimization;
 
-// Single-variable: find x that minimises (x-3)^2 on [0,10]
-xMin := TOptimizationKit.GoldenSection(@MyFunc, 0, 10);  // ≈ 3.0
+function Objective(X: Double): Double;
+begin
+  Result := Sqr(X - 3.0);
+end;
 
-// Multi-variable: minimise f(x,y) = (x-2)^2 + (y+1)^2
-result := TOptimizationKit.NelderMead(@MyFunc, TDoubleArray.Create(0, 0));
-// result.X[0] ≈ 2.0,  result.X[1] ≈ -1.0
+begin
+  WriteLn('x = ', TOptimizationKit.GoldenSection(@Objective, 0, 10):0:6);
+end.
+```
 
-// Linear programming: minimise -x1-x2 subject to x1+x2 ≤ 4
-lp := TOptimizationKit.SimplexLP([-1,-1], [[1,1],[1,0],[0,1]], [4,3,3]);
+Expected output:
+
+```text
+x = 3.000000
 ```
 
 All methods are **class static** — no `Create`/`Free` needed.

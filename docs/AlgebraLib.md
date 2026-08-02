@@ -6,6 +6,33 @@ vector operations for Free Pascal.
 
 Depends on: **MathBase**
 
+## Learning routes
+
+### Beginner route
+
+New code should copy and run the [typed double-real solve](TypedDenseMatrices.md#60-second-solve),
+which prints `solution = 2.0000, 3.0000`. `Solve` allocates a result and private
+factor storage without mutating its inputs. The lower [quick start](#quick-start)
+documents the retained compatibility API, not the primary beginner path.
+
+### Common tasks and algorithm choice
+
+| Task | Start with | Contract or failure guidance |
+| --- | --- | --- |
+| Square dense solve | `Solve` / `SolveWithInfo` | [Dense solver choice](DenseLinearAlgebra.md#choose-a-dense-solver) |
+| Tall least squares | `LeastSquares` | [Least-squares recipe](RECIPES.md#dense-least-squares) |
+| Sparse positive-definite solve | `ConjugateGradient` | [Sparse solver choice](SparseLinearAlgebra.md#choose-an-iterative-solver) |
+| Matrix multiplication | `Multiply` | [Typed entry-point choice](TypedDenseMatrices.md#choose-an-entry-point) |
+| Compatibility `IMatrix` code | `TMatrixKit` | [Compatibility design notes](#design-notes) |
+
+### Advanced route
+
+Run [example 16](../examples/16_dense_solver_selection.pas) for QR/SVD/eigen
+selection and [example 22](../examples/22_sparse_end_to_end.pas) for sparse
+storage, preconditioning, and diagnostic statuses. Both keep double-real typed
+containers; reusable factors, views, destinations, and workspaces are deeper
+forms of the same documented APIs and require no private conversion.
+
 ## Units
 
 | Unit | File | Purpose |

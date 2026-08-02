@@ -159,11 +159,17 @@ def documentation_gates(
         "test_example_output.py",
         "test_build_docs.py",
         "test_built_docs.py",
+        "test_walkthroughs.py",
         "check_docs.py",
     ):
         qualification.run(
             script.removesuffix(".py"),
             [sys.executable, str(ROOT / "tools" / script)],
+        )
+    if release == "1.9.2":
+        qualification.run(
+            "clean-room-walkthroughs",
+            [sys.executable, str(ROOT / "tools" / "check_walkthroughs.py")],
         )
     qualification.run(
         "documentation-execution",
