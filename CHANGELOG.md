@@ -22,9 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Validation
 
 - Made each beginner recipe's code and claimed output part of the clean-
-  archive documentation checks, and added release-only validation for the
-  three independent clean-room walkthrough records required by the 1.9.2
-  completion gate.
+  archive documentation checks, including all 13 domain routes, generated
+  problem-oriented search results, local links, release identity, and exact
+  public declarations.
 
 ## [1.9.1] - 2026-08-02
 

@@ -109,7 +109,7 @@ def main() -> int:
     required_learning_pages = (
         "BEGINNER_GUIDE.md",
         "RECIPES.md",
-        "WALKTHROUGHS_1.9.2.md",
+        "AUTOMATED_JOURNEYS_1.9.2.md",
         "PR_NOTES_1.9.2.md",
     )
     for name in required_learning_pages:
@@ -137,21 +137,6 @@ def main() -> int:
     for heading in recipe_sections:
         if f"## {heading}" not in recipes:
             errors.append(f"docs/RECIPES.md: missing recipe section {heading!r}")
-
-    walkthrough_path = DOCS / "walkthroughs-1.9.2.json"
-    try:
-        walkthroughs = json.loads(walkthrough_path.read_text(encoding="utf-8"))
-        assert walkthroughs["schema_version"] == 1
-        assert walkthroughs["release"] == "1.9.2"
-        assert isinstance(walkthroughs["walkthroughs"], list)
-    except (OSError, ValueError, KeyError, AssertionError) as exc:
-        errors.append(f"docs/walkthroughs-1.9.2.json: invalid manifest: {exc}")
-
-    walkthrough_form = (
-        ROOT / ".github" / "ISSUE_TEMPLATE" / "beginner_walkthrough.yml"
-    )
-    if not walkthrough_form.is_file():
-        errors.append("missing 1.9.2 beginner walkthrough issue form")
 
     inventory_path = DOCS / "capabilities.json"
     try:

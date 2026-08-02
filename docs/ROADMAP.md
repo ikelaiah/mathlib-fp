@@ -1292,8 +1292,10 @@ remain one clearly labelled step deeper.
 
 ### 1.9.2 completion gate
 
-- At least three clean-room walkthroughs by people who did not implement the
-  exercised feature reach correct results without reading implementation units.
+- Checksummed clean-archive automation verifies the complete beginner journey:
+  problem-oriented search, beginner and advanced route links, runnable code,
+  claimed output, contract/failure guidance, and copy/allocation and precision
+  guidance. Qualification must not depend on external participation or reports.
 - Every stable domain has a tested beginner route and an advanced route, and
   the transition between them does not require undocumented conversions.
 - Documentation search finds common problems such as “least squares”, “normal

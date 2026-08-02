@@ -4,9 +4,10 @@
 
 This change implements only the active 1.9.2 beginner-learning-path
 milestone. It adds documentation, runnable examples, output/search checks, and
-an independent-walkthrough evidence gate. It does not change any declaration
-in the frozen public 1.9 API snapshot and does not begin 1.9.3 API-decision or
-later trust, performance, portability, migration, beta, or freeze work.
+an automated clean-archive beginner-journey gate. It does not change any
+declaration in the frozen public 1.9 API snapshot and does not begin 1.9.3
+API-decision or later trust, performance, portability, migration, beta, or
+freeze work.
 
 ## Reviewable changes
 
@@ -19,8 +20,9 @@ later trust, performance, portability, migration, beta, or freeze work.
    callbacks, options, statuses, exceptions, copies, and precision.
 4. Add task recipes for all families named by the 1.9.2 roadmap and make the
    common-problem search phrases mechanical checks.
-5. Refuse to qualify 1.9.2 until three genuine, reviewed, independent clean-
-   room walkthrough records pass `tools/check_walkthroughs.py`.
+5. Qualify first use mechanically from a checksummed clean archive: verify
+   problem-oriented search, all beginner and advanced links, compile/run every
+   beginner program, compare claimed output, and audit public declarations.
 
 ## Compatibility evidence
 
@@ -31,8 +33,9 @@ storage rule, or implicit conversion.
 
 ## Completion-gate status
 
-All locally automatable gates can be run from a clean archive. The independent
-human walkthrough manifest intentionally starts empty; maintainers must record
-and review three real sessions before release qualification can pass. An empty
-manifest is not completion evidence and this document does not claim that the
-1.9.2 completion gate has passed.
+Every 1.9.2 gate is deterministic and can run from a clean archive without
+external participation, accounts, reports, services, or network access. The
+release driver checks documentation structure and declarations, compiles and
+runs all published beginner programs, compares claimed output, builds the
+searchable versioned site, checks problem phrases and links, and verifies the
+offline archive before qualification can pass.

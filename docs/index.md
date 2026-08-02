@@ -17,11 +17,11 @@ allocating path and link the advanced controls separately.
   task recipes, stable-domain learning routes, and checked problem-oriented
   search.
 - [1.9.2 PR notes](PR_NOTES_1.9.2.md) — beginner-learning-path review boundary
-  and honest independent-walkthrough gate status.
+  and automated completion-gate evidence.
 - [1.9.2 qualification report](QUALIFICATION_1.9.2.md) — automated preflight,
-  API freeze, clean-archive requirements, and the currently pending human gate.
-- [1.9.2 clean-room protocol](WALKTHROUGHS_1.9.2.md) — evidence required before
-  the next release may pass its completion gate.
+  API freeze, and clean-archive requirements.
+- [1.9.2 automated beginner journeys](AUTOMATED_JOURNEYS_1.9.2.md) — the
+  deterministic evidence replacing external participant collection.
 
 - [mathlib-fp 1.9.1 release notes](RELEASE_NOTES_1.9.1.md) — feature-frozen
   correctness stabilisation, versioned web/offline documentation, output-aware

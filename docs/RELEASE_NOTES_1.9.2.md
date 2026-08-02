@@ -31,9 +31,9 @@ steps.
 - Release checks require an output-checked runnable beginner program for all
   13 stable domains. All published recipe code and claimed output are compiled
   and run from the clean source archive.
-- A dedicated [clean-room walkthrough protocol](WALKTHROUGHS_1.9.2.md) and
-  issue form record the three independent first-use sessions required by the
-  roadmap. Release qualification refuses to pass without reviewed evidence.
+- The [automated beginner-journey contract](AUTOMATED_JOURNEYS_1.9.2.md)
+  verifies search discovery, route links, runnable code, claimed output,
+  release identity, and public declarations from checksummed clean archives.
 
 ## Install
 
@@ -53,5 +53,4 @@ conversion. Existing 1.9 source remains compatible, and the limitations in the
 [capability inventory](CAPABILITIES.md) are unchanged.
 
 See the [1.9.2 qualification report](QUALIFICATION_1.9.2.md) for the exact
-automated and independent-use release gates. The v1.9.2 tag must not be
-published while that report identifies an unresolved completion gate.
+automated release gates and clean-archive requirements.

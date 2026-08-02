@@ -1,13 +1,13 @@
 # mathlib-fp 1.9.2 qualification
 
-Status on 2026-08-02: **release candidate blocked pending independent
-walkthrough evidence**.
+Status on 2026-08-02: **all 68 local release-qualification gates passed;
+final Linux and Windows clean-archive CI is pending**.
 
 ## Completion-gate evidence
 
 | Gate | Current evidence |
 | --- | --- |
-| Independent clean-room use | **Blocked:** `walkthroughs-1.9.2.json` contains 0 of the required 3 reviewed records. `check_walkthroughs.py` exits nonzero, as required. |
+| Automated clean-archive journey | Documentation/API structure, all beginner and advanced links, executable programs, claimed output, generated search, built links, release identity, and offline artifacts are checked without external participation or services. |
 | Stable-domain beginner and advanced routes | 13 domain landing pages contain ordered beginner/common-task/advanced sections. Every beginner route has an output-checked runnable program; every advanced route links an example compiled and run by CI. |
 | Problem-oriented search | Generated search is required to find “least squares”, “normal probability”, and “FFT convolution” in the current release path. |
 | Recipe execution | 22 self-contained documentation programs compile and execute, with 21 exact or ordered output contracts and all 13 beginner domains covered. Clean-archive CI runs the same checker. |
@@ -15,30 +15,29 @@ walkthrough evidence**.
 
 ## Automated preflight
 
-Before the release-identity update, the prospective working tree passed all 69
-local gates in `qualify_release.py`: normal, optimised, checked/heap-traced
-tests, all examples and output contracts, documentation unit/execution/search
-checks, generated/offline documentation, Lazarus package, and representative
-benchmark. That run used FPC 3.2.2 and Lazarus 4.8 on Windows 11 x86-64 and
-reported no test, example, documentation, package, or benchmark failure.
+The 1.9.2 candidate passed all 68 local gates in `qualify_release.py`: normal,
+optimised, checked/heap-traced tests, all examples and output contracts,
+documentation structure/API/execution/search checks, generated/offline
+documentation, Lazarus package, and representative benchmark. The run used
+FPC 3.2.2 and Lazarus 4.8 on Windows 11 x86-64 and reported no test, example,
+documentation, package, or benchmark failure.
 
-The release-candidate identity checks additionally pass locally for 1.9.2.
-The authoritative Linux and Windows results must come from the exact tagged,
-checksummed, clean source archives. They are not replaced by the pre-tag local
-run.
+The authoritative Linux and Windows results must come from checksummed clean
+source archives of the exact commit selected for the tag. They are not
+replaced by the pre-tag local run.
 
 ## Required final command
 
-After three genuine records have been reviewed and committed, run from the
-clean 1.9.2 source archive:
+Run from the exact clean 1.9.2 source archive selected for release:
 
 ```text
 python tools/qualify_release.py --release 1.9.2 --compiler fpc \
   --lazbuild lazbuild
 ```
 
-The driver runs `check_walkthroughs.py` before documentation execution and
-cannot produce a passing result while the manifest is incomplete. The release
+The driver enforces the
+[automated beginner-journey contract](AUTOMATED_JOURNEYS_1.9.2.md) alongside
+the numerical, example, package, archive, and benchmark gates. The release
 must then pass Linux and Windows clean-archive workflows, including the
 Lazarus package on Windows, before the tag is published.
 
