@@ -155,7 +155,8 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 1.9.6 | Portability and distribution | Clean archives, offline use, and a current evidence-backed support matrix |
 | 1.9.7 | Migration and compatibility rehearsal | Complete 1.x mappings and a tested compatibility-package plan |
 | 1.9.8 | Representative workflows and external beta | Multi-domain applications and recorded use by people outside their implementation |
-| 1.9.9 | Final 2.0 freeze | Frozen API/docs/artifacts followed by release-candidate qualification and soak |
+| 1.9.9 | Final 1.9.x convergence handoff | Closed 1.10.0 capability manifest, complete evidence, and no unresolved API decisions |
+| 1.10.0 | Additive API completion and final 2.0 freeze | Approved missing conveniences, including 2-D vector rotation, followed by release-candidate qualification and soak |
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
 
 ## Implementation discipline
@@ -1513,12 +1514,12 @@ applications not written to mirror the internal architecture.
 - Beta findings are triaged by correctness risk and user-workflow impact, not
   by the ease of adding another isolated function.
 
-## Planned 1.9.9 — Final 2.0 freeze
+## Planned 1.9.9 — Final 1.9.x convergence handoff
 
-Version 1.9.9 is the final 1.x convergence release. It introduces no planned
-public capability and freezes the code, API decision, documentation sources,
-support claims, migration material, qualification procedure, and distribution
-artifacts that will be promoted to 2.0.
+Version 1.9.9 is the final 1.9.x convergence release. It introduces no planned
+public capability and closes the evidence, compatibility decisions, and exact
+manifest of additive public work assigned to 1.10.0. It is the handoff to the
+minor release that completes the approved API before the final 2.0 freeze.
 
 ### 1.9.9 scope
 
@@ -1528,21 +1529,63 @@ artifacts that will be promoted to 2.0.
 - Complete the algorithm/fixture provenance and licence audit, 2.x maintenance
   policy, support policy, deprecation policy, contribution gate for new domains,
   and security support window.
-- Build release-candidate source and offline-documentation archives from tags,
-  then run the complete target, numerical, memory, performance, examples,
-  migration, package, and documentation qualification against those archives.
-- Run at least two 2.0 release-candidate cycles. After the freeze, accept only
-  release-blocking correctness, safety, portability, packaging, documentation,
-  or migration fixes, each with regression evidence and a reviewed API diff.
-- Allow a 30–60 day external soak after the first complete candidate; elapsed
-  time without use is not evidence, so the representative workflows and beta
-  users must exercise the actual candidate artifacts.
+- Convert every accepted public capability gap into a closed 1.10.0 declaration,
+  behavior contract, test plan, documentation plan, and compatibility impact;
+  defer all other proposals explicitly beyond 2.0.
+- Build source and offline-documentation archives from the release tag, then run
+  the complete target, numerical, memory, performance, examples, migration,
+  package, and documentation qualification against those archives.
 
 ### 1.9.9 completion gate
 
 - The final snapshot, guides, examples, source comments, capability inventory,
   support matrix, release notes, and qualification report contain no unresolved
   contract mismatch.
+- The tagged release passes full archive-based qualification and includes every
+  accepted 1.9.x correction.
+- No unresolved critical/high-impact correctness, unsafe ownership/concurrency,
+  portability, packaging, or migration defect is hidden to meet the version
+  target.
+- Representative 1.x applications complete the documented migration or remain
+  operational through the tested compatibility surface.
+- Every public addition required before 2.0 is either present in the closed
+  1.10.0 manifest or explicitly deferred; no API design question remains open.
+
+## Planned 1.10.0 — Additive API completion and final 2.0 freeze
+
+Version 1.10.0 is the backward-compatible minor release for public capabilities
+approved during 1.9.x convergence. It implements only the closed 1.9.9 manifest,
+then freezes the code, API, documentation sources, support claims, migration
+material, qualification procedure, and distribution artifacts promoted to 2.0.
+
+### 1.10.0 scope
+
+- Add `TVector2D.Rotate(const Angle: Double): TVector2D` as an allocation-free
+  value operation. `Angle` is in radians; positive values rotate
+  counter-clockwise about the origin; the source vector is not modified.
+- Document and test rotation orientation, zero and negative angles, agreement
+  with `Perpendicular` at π/2, magnitude preservation within a stated
+  tolerance, assignment back to the source variable, zero-vector behavior, and
+  the finite/non-finite input contract.
+- Implement the other public declarations in the closed 1.9.9 capability
+  manifest without pulling in unrelated algorithm families or speculative
+  convenience APIs.
+- Publish an exact API snapshot diff, migration impact, release notes, concise
+  compile-checked examples, and generated reference documentation for every
+  addition.
+- Run at least two 2.0 release-candidate cycles from tagged source and offline-
+  documentation archives. After the freeze, accept only release-blocking
+  correctness, safety, portability, packaging, documentation, or migration
+  fixes, each with regression evidence and a reviewed API diff.
+- Allow a 30–60 day external soak after the first complete candidate; elapsed
+  time without use is not evidence, so representative workflows and beta users
+  must exercise the actual candidate artifacts.
+
+### 1.10.0 completion gate
+
+- The shipped public API exactly matches the closed capability manifest and
+  every addition has a documented contract, focused regression coverage, and a
+  complete runnable example where it is part of a common workflow.
 - Two release candidates pass full archive-based qualification and the later
   candidate includes every accepted freeze fix.
 - No unresolved critical/high-impact correctness, unsafe ownership/concurrency,
@@ -1557,10 +1600,11 @@ artifacts that will be promoted to 2.0.
 
 Version 2.0.0 is a quality and API graduation, not an excuse for an arbitrary
 rewrite. It ships only when the additive 1.x foundations have been used by
-the higher-level libraries, their migration path is proven, and the 1.9.x
-convergence gates are complete. Version 2.0.0 does not need a breaking change
-to justify its number: the major-version promise is that the curated native API
-is coherent, documented, qualified, and stable enough for long-term use.
+the higher-level libraries, their migration path is proven, and the 1.x
+convergence gates through 1.10.0 are complete. Version 2.0.0 does not need a
+breaking change to justify its number: the major-version promise is that the
+curated native API is coherent, documented, qualified, and stable enough for
+long-term use.
 
 ### Public API and compatibility boundary
 
