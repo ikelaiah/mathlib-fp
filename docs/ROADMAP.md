@@ -1316,6 +1316,11 @@ map tells ordinary users what to choose.
   advanced stable path, compatibility surface, experimental surface, or generic
   implementation support. Visibility required for FPC specialization does not
   make a declaration a recommended application API.
+- Review aliases that may duplicate the same type, facade, error, result, or
+  container. Record whether behavior, defaults, ownership, exception identity,
+  and numerical results are genuinely identical, and name the prospective
+  canonical path or retain decision. This milestone is review-only: it does not
+  deprecate, remove, or move an alias.
 - Extend the candidate conventions across every domain, not only typed linear
   algebra. Resolve naming, indexing, shape, units, ownership, mutation,
   aliasing, exceptions, tolerances, outcomes, RNG state, cancellation,
@@ -1458,14 +1463,17 @@ storage, defaults, or numerical behaviour.
   numerical APIs such as NumLib and LMath/DMath where the mathematical and
   ownership semantics are verified. State differences and unsupported mappings
   instead of promising drop-in compatibility.
-- Define and compile-test the packaging boundary for compatibility APIs. Keeping
-  an entry in its existing unit may be safer than moving it; the choice must be
+- Define and compile-test the packaging boundary for compatibility APIs,
+  including every duplicate-alias candidate identified in 1.9.3. Keeping an
+  entry in its existing unit may be safer than moving it; the choice must be
   based on migration evidence rather than a desire for visual tidiness.
 - Add representative consumer projects that compile against 1.9 and the
   proposed 2.0 layout, with expected warnings and source edits recorded.
-- Publish the deprecation decision list. A source removal still requires the
-  minor-release runway promised by this roadmap; 1.9.7 alone does not create a
-  removal entitlement.
+- Confirm or reject deprecation for every duplicate-alias candidate reviewed in
+  1.9.3, then publish the deprecation decision list with tested migration and
+  package-boundary evidence. A source removal still requires the minor-release
+  runway promised by this roadmap; 1.9.7 alone does not create a removal
+  entitlement.
 
 ### 1.9.7 completion gate
 
@@ -1563,6 +1571,9 @@ material, qualification procedure, and distribution artifacts promoted to 2.0.
 - Add `TVector2D.Rotate(const Angle: Double): TVector2D` as an allocation-free
   value operation. `Angle` is in radians; positive values rotate
   counter-clockwise about the origin; the source vector is not modified.
+- Mark aliases whose deprecation was confirmed by the 1.9.7 migration rehearsal
+  as deprecated, with their canonical replacements named, while retaining full
+  source compatibility throughout 1.10.0.
 - Document and test rotation orientation, zero and negative angles, agreement
   with `Perpendicular` at π/2, magnitude preservation within a stated
   tolerance, assignment back to the source variable, zero-vector behavior, and
@@ -1616,6 +1627,9 @@ long-term use.
 - Remove or isolate a 1.x API only after a documented replacement, complete
   migration examples, representative consumer testing, and at least one prior
   minor-release deprecation period. Formal removals are not a 2.0 requirement.
+- For duplicate aliases that completed that deprecation runway, either remove
+  them from the primary 2.0 API or move them into the tested compatibility
+  package; retain them when the migration or packaging evidence is incomplete.
 - Keep a clearly named compatibility package when doing so is practical and
   does not compromise the new API's ownership or numerical semantics.
 - Standardise naming, indexing, shape rules, exceptions, result statuses,
