@@ -1265,7 +1265,7 @@ deliberately feature-frozen.
 - Normal, optimised, checked/heap-traced, examples, documentation, package, and
   clean-archive qualification results are published for the release.
 
-## Next release: 1.9.2 — Beginner learning path
+## Previous release: 1.9.2 — Beginner learning path
 
 Version 1.9.2 turns the existing breadth into an intentional learning journey.
 The primary teaching path uses double-real data and simple allocating calls;
@@ -1304,7 +1304,7 @@ remain one clearly labelled step deeper.
   Pascal identifier.
 - All recipe code and claimed output pass from the packaged release.
 
-## Planned 1.9.3 — Complete 2.0 API decision
+## Next release: 1.9.3 — Complete 2.0 API decision
 
 Version 1.9.3 converts the 1.9 API inventory into a complete all-domain 2.0
 decision. The exact declaration reference remains exhaustive; a smaller curated
