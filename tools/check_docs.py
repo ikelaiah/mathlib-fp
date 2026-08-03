@@ -259,18 +259,19 @@ def main() -> int:
     reference_path = DOCS / "API_REFERENCE_1.9.md"
     reference_text = reference_path.read_text(encoding="utf-8")
     reference_rows = set(reference_text.splitlines())
+
+    def code(value: object) -> str:
+        return (
+            "`"
+            + str(value).replace("|", r"\|").replace("`", r"\`")
+            + "`"
+        )
+
     for unit_name, declaration in snapshot_declarations:
         owner = declaration["owner"] or "(unit)"
         replacement = declaration.get("preferred_replacement", "—")
         compatibility_decision = declaration.get("compatibility_decision", "—")
         compatibility_note = declaration.get("compatibility_note", "—")
-
-        def code(value: object) -> str:
-            return (
-                "`"
-                + str(value).replace("|", r"\|").replace("`", r"\`")
-                + "`"
-            )
 
         expected_row = (
             "| "
@@ -293,6 +294,40 @@ def main() -> int:
                 "docs/API_REFERENCE_1.9.md: missing exact declaration row for "
                 f"{unit_name}.{owner}.{declaration['name']}"
             )
+
+    try:
+        decision = json.loads(
+            (DOCS / "api-decision-2.0.json").read_text(encoding="utf-8")
+        )
+        assert decision["schema_version"] == 2
+        assert len(decision["alias_reviews"]) == 21
+        for review in decision["alias_reviews"]:
+            selector = review["selector"]
+            alias_name = f"{selector['unit']}.{selector['name']}"
+            status = review["status"]
+            if review.get("follow_up_release"):
+                status += f"; revisit {review['follow_up_release']}"
+            expected_row = (
+                "| "
+                + " | ".join(
+                    [
+                        code(alias_name),
+                        code(review["target"]),
+                        code(review["decision"]),
+                        code(review.get("canonical", "—")),
+                        code(status),
+                        str(review["reason"]).replace("|", r"\|"),
+                    ]
+                )
+                + " |"
+            )
+            if expected_row not in reference_rows:
+                errors.append(
+                    "docs/API_REFERENCE_1.9.md: missing exact alias-review row "
+                    f"for {alias_name}"
+                )
+    except (ValueError, KeyError, AssertionError) as exc:
+        errors.append(f"docs/api-decision-2.0.json: invalid alias review: {exc}")
 
     public_docs = "\n".join(path.read_text(encoding="utf-8") for path in docs)
     required_symbols = [

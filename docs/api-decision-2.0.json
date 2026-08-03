@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "decision_release": "1.9.3",
   "api_baseline_release": "1.9.0",
   "required_concerns": [
@@ -243,7 +243,7 @@
       "common_path_ids": ["engineering-typed-calculations"],
       "inherits_global": true,
       "specific_decisions": {
-        "naming": "Use the domain kit named for the calculation; TDSPKit and explicit streaming/filter types are the advanced signal path.",
+        "naming": "Use TFluidDynamicsKit for pressure, velocity, and flow calculations; TPressureKit and TVelocityKit are exact aliases reviewed for possible future canonicalization. TDSPKit and explicit streaming/filter types are the advanced signal path.",
         "units": "Each engineering routine documents its physical units; TUnitConversionKit uses typed unit enums and canonical case-sensitive symbols.",
         "ownership": "Stateless kit results are values; streaming FIR, biquad, and overlap processors are mutable caller-owned instances.",
         "mutation": "Batch calculations leave inputs unchanged; streaming processors mutate only their named retained state.",
@@ -353,11 +353,224 @@
       }
     }
   ],
+  "alias_equivalence_profiles": {
+    "compiler-type-identity": {
+      "behavior": "identical",
+      "defaults": "identical",
+      "ownership": "identical",
+      "exception_identity": "identical",
+      "numerical_results": "identical",
+      "basis": "A Free Pascal plain-equals type alias denotes the same compiler type and introduces no implementation, wrapper, storage, default, exception translation, or numerical path."
+    }
+  },
+  "alias_reviews": [
+    {
+      "id": "retain-iter-solver-method-alias",
+      "selector": {"unit": "AlgebraLib.Determinants", "name": "TIterSolverMethod", "owner": null, "kind": "type"},
+      "target": "TIterativeMethod",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the focused determinant/decomposition entry name; it adds no implementation and existing source uses it directly."
+    },
+    {
+      "id": "retain-vector-kernels-complex-vector-alias",
+      "selector": {"unit": "AlgebraLib.VectorKernels", "name": "TComplexVector", "owner": null, "kind": "type"},
+      "target": "TComplexArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the vector-domain vocabulary used consistently by TVectorKit signatures."
+    },
+    {
+      "id": "retain-vector-kernels-real-vector-alias",
+      "selector": {"unit": "AlgebraLib.VectorKernels", "name": "TRealVector", "owner": null, "kind": "type"},
+      "target": "TDoubleArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the vector-domain vocabulary used consistently by TVectorKit signatures."
+    },
+    {
+      "id": "retain-vectors-error-alias",
+      "selector": {"unit": "AlgebraLib.Vectors", "name": "EVectorError", "owner": null, "kind": "type"},
+      "target": "AlgebraLib.VectorKernels.EVectorError",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the documented one-unit vector entry point without introducing a second exception type."
+    },
+    {
+      "id": "retain-ivector-alias",
+      "selector": {"unit": "AlgebraLib.Vectors", "name": "IVector", "owner": null, "kind": "type"},
+      "target": "IMatrix",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the established matrix-as-vector compatibility spelling documented by AlgebraLib.Vectors."
+    },
+    {
+      "id": "retain-vectors-complex-vector-alias",
+      "selector": {"unit": "AlgebraLib.Vectors", "name": "TComplexVector", "owner": null, "kind": "type"},
+      "target": "TComplexArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the documented one-unit vector entry point and its contiguous complex-vector vocabulary."
+    },
+    {
+      "id": "retain-vectors-real-vector-alias",
+      "selector": {"unit": "AlgebraLib.Vectors", "name": "TRealVector", "owner": null, "kind": "type"},
+      "target": "TDoubleArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the documented one-unit vector entry point and its contiguous real-vector vocabulary."
+    },
+    {
+      "id": "retain-tvector-alias",
+      "selector": {"unit": "AlgebraLib.Vectors", "name": "TVector", "owner": null, "kind": "type"},
+      "target": "TMatrixKit",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the established matrix-as-vector construction spelling documented by AlgebraLib.Vectors."
+    },
+    {
+      "id": "retain-vectors-kit-alias",
+      "selector": {"unit": "AlgebraLib.Vectors", "name": "TVectorKit", "owner": null, "kind": "type"},
+      "target": "AlgebraLib.VectorKernels.TVectorKit",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the documented one-unit vector entry point; all implementation remains owned by AlgebraLib.VectorKernels."
+    },
+    {
+      "id": "canonicalize-pressure-error-alias",
+      "selector": {"unit": "EngineeringLib.Pressure", "name": "EPressureError", "owner": null, "kind": "type"},
+      "target": "EngineeringLib.Common.EFluidDynamicsError",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "canonicalize",
+      "canonical": "EngineeringLib.Common.EFluidDynamicsError",
+      "status": "review-only",
+      "follow_up_release": "1.9.7",
+      "reason": "Review migration with the pressure facade alias so one fluid-dynamics exception path can be preferred."
+    },
+    {
+      "id": "canonicalize-pressure-kit-alias",
+      "selector": {"unit": "EngineeringLib.Pressure", "name": "TPressureKit", "owner": null, "kind": "type"},
+      "target": "TFluidDynamicsKit",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "canonicalize",
+      "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+      "status": "review-only",
+      "follow_up_release": "1.9.7",
+      "reason": "The alias exposes the complete fluid-dynamics facade rather than a narrower pressure surface; test migration to the owning facade in 1.9.7."
+    },
+    {
+      "id": "retain-signal-double-array-alias",
+      "selector": {"unit": "EngineeringLib.Signal", "name": "TDoubleArray", "owner": null, "kind": "type"},
+      "target": "MathBase.SharedTypes.TDoubleArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the familiar signal entry spelling used throughout TSignalKit signatures while sharing the project-wide container type."
+    },
+    {
+      "id": "canonicalize-velocity-error-alias",
+      "selector": {"unit": "EngineeringLib.Velocity", "name": "EVelocityError", "owner": null, "kind": "type"},
+      "target": "EngineeringLib.Common.EFluidDynamicsError",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "canonicalize",
+      "canonical": "EngineeringLib.Common.EFluidDynamicsError",
+      "status": "review-only",
+      "follow_up_release": "1.9.7",
+      "reason": "Review migration with the velocity facade alias so one fluid-dynamics exception path can be preferred."
+    },
+    {
+      "id": "canonicalize-velocity-kit-alias",
+      "selector": {"unit": "EngineeringLib.Velocity", "name": "TVelocityKit", "owner": null, "kind": "type"},
+      "target": "TFluidDynamicsKit",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "canonicalize",
+      "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+      "status": "review-only",
+      "follow_up_release": "1.9.7",
+      "reason": "The alias exposes the complete fluid-dynamics facade rather than a narrower velocity surface; test migration to the owning facade in 1.9.7."
+    },
+    {
+      "id": "retain-bond-error-alias",
+      "selector": {"unit": "FinanceLib.Bonds", "name": "EBondError", "owner": null, "kind": "type"},
+      "target": "EFinanceError",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the focused bond entry unit and its finance-owned exception identity."
+    },
+    {
+      "id": "retain-bond-kit-alias",
+      "selector": {"unit": "FinanceLib.Bonds", "name": "TBondKit", "owner": null, "kind": "type"},
+      "target": "TFinanceKit",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the useful focused bond import without copying financial formulas."
+    },
+    {
+      "id": "retain-bond-payment-alias",
+      "selector": {"unit": "FinanceLib.Bonds", "name": "TBondPayment", "owner": null, "kind": "type"},
+      "target": "TFinanceKit.TAmortizationPayment",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the directly nameable focused result type with identical managed-value semantics."
+    },
+    {
+      "id": "retain-bond-schedule-alias",
+      "selector": {"unit": "FinanceLib.Bonds", "name": "TBondSchedule", "owner": null, "kind": "type"},
+      "target": "TFinanceKit.TAmortizationArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the directly nameable focused schedule type with identical ownership and values."
+    },
+    {
+      "id": "retain-npv-error-alias",
+      "selector": {"unit": "FinanceLib.NPV", "name": "ENPVError", "owner": null, "kind": "type"},
+      "target": "EFinanceError",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the focused NPV entry unit and its finance-owned exception identity."
+    },
+    {
+      "id": "retain-npv-cash-flows-alias",
+      "selector": {"unit": "FinanceLib.NPV", "name": "TNPVCashFlows", "owner": null, "kind": "type"},
+      "target": "TDoubleArray",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the directly nameable focused cash-flow container with identical managed-array semantics."
+    },
+    {
+      "id": "retain-npv-kit-alias",
+      "selector": {"unit": "FinanceLib.NPV", "name": "TNPVKit", "owner": null, "kind": "type"},
+      "target": "TFinanceKit",
+      "equivalence_profile": "compiler-type-identity",
+      "decision": "retain",
+      "status": "review-only",
+      "reason": "Retain the useful focused NPV import without copying financial formulas."
+    }
+  ],
   "compatibility_notes": {
     "legacy-dense-matrix": "The typed replacement is not a cast: convert with TDenseDoubleMatrix.FromIMatrix or ToIMatrix, which deep-copies. Typed storage uses SizeInt shapes, explicit kernels/factors/results, and documented views instead of the combined mutable IMatrix method surface.",
     "legacy-sparse-matrix": "TSparseDoubleMatrix constructs canonical CSR/CSC values returned as ISparseDoubleMatrix. TMatrixKitSparse remains an IMatrix-compatible mutable representation; conversion must enumerate/copy and must not be treated as a zero-copy CSR cast.",
     "focused-bond-alias-unit": "Retain FinanceLib.Bonds as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TFinanceKit amortization types, so retaining it has no numerical or ownership difference.",
-    "focused-npv-alias-unit": "Retain FinanceLib.NPV as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TDoubleArray, so retaining it has no numerical or ownership difference."
+    "focused-npv-alias-unit": "Retain FinanceLib.NPV as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TDoubleArray, so retaining it has no numerical or ownership difference.",
+    "pressure-facade-alias": "Prefer EngineeringLib.FluidDynamics.TFluidDynamicsKit for new pressure code. TPressureKit is the identical class type and changes no behavior, defaults, ownership, exceptions, or numerical results; 1.9.7 must confirm migration and packaging before any deprecation decision.",
+    "pressure-error-alias": "Prefer EngineeringLib.Common.EFluidDynamicsError with TFluidDynamicsKit. EPressureError is the identical exception class; 1.9.7 must confirm migration and packaging before any deprecation decision.",
+    "velocity-facade-alias": "Prefer EngineeringLib.FluidDynamics.TFluidDynamicsKit for new velocity code. TVelocityKit is the identical class type and changes no behavior, defaults, ownership, exceptions, or numerical results; 1.9.7 must confirm migration and packaging before any deprecation decision.",
+    "velocity-error-alias": "Prefer EngineeringLib.Common.EFluidDynamicsError with TFluidDynamicsKit. EVelocityError is the identical exception class; 1.9.7 must confirm migration and packaging before any deprecation decision."
   },
   "compatibility_decisions": [
     {
@@ -392,6 +605,34 @@
       "selector": {"unit": "FinanceLib.NPV"},
       "decision": "retain",
       "note": "focused-npv-alias-unit"
+    },
+    {
+      "id": "replace-pressure-error-alias",
+      "selector": {"unit": "EngineeringLib.Pressure", "name": "EPressureError", "owner": null},
+      "decision": "replace",
+      "replacement": "EFluidDynamicsError",
+      "note": "pressure-error-alias"
+    },
+    {
+      "id": "replace-pressure-kit-alias",
+      "selector": {"unit": "EngineeringLib.Pressure", "name": "TPressureKit", "owner": null},
+      "decision": "replace",
+      "replacement": "TFluidDynamicsKit",
+      "note": "pressure-facade-alias"
+    },
+    {
+      "id": "replace-velocity-error-alias",
+      "selector": {"unit": "EngineeringLib.Velocity", "name": "EVelocityError", "owner": null},
+      "decision": "replace",
+      "replacement": "EFluidDynamicsError",
+      "note": "velocity-error-alias"
+    },
+    {
+      "id": "replace-velocity-kit-alias",
+      "selector": {"unit": "EngineeringLib.Velocity", "name": "TVelocityKit", "owner": null},
+      "decision": "replace",
+      "replacement": "TFluidDynamicsKit",
+      "note": "velocity-facade-alias"
     }
   ],
   "experimental_selectors": [],

@@ -132,7 +132,7 @@ artificial Kit class.
 | Algebra | `AlgebraLib.Matrices`, `AlgebraLib.VectorKernels`, `AlgebraLib.Vectors`, `AlgebraLib.Determinants`, `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels`, `AlgebraLib.DenseSolvers`, `AlgebraLib.DenseDecompositions`, `AlgebraLib.SparseMatrices`, `AlgebraLib.LinearOperators`, `AlgebraLib.IterativeSolvers`, `AlgebraLib.StructuredSolvers`, `AlgebraLib.PartialEigensystems` | `TMatrixKit`, `TVectorKit`, typed dense/sparse/operator/solver facades |
 | Finance | `FinanceLib.Interest`, `FinanceLib.Bonds`, `FinanceLib.NPV` | `TFinanceKit`; aliases `TBondKit`, `TNPVKit` |
 | Statistics | `StatsLib.Stats`, `StatsLib.Streaming`, `StatsLib.Inference` | `TStatsKit`, `TOnlineStatistics`, `TInferenceKit` |
-| Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.DSP`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TDSPKit`, block/streaming DSP records, `TUnitConversionKit`; aliases `TVelocityKit`, `TPressureKit` |
+| Engineering | `EngineeringLib.FluidDynamics`, `EngineeringLib.Thermodynamics`, `EngineeringLib.Signal`, `EngineeringLib.DSP`, `EngineeringLib.UnitConversion` | `TFluidDynamicsKit`, `TThermodynamicsKit`, `TSignalKit`, `TDSPKit`, block/streaming DSP records, `TUnitConversionKit`; supported compatibility aliases `TVelocityKit`, `TPressureKit` |
 | Numerics | `NumericsLib.Numerics`, `NumericsLib.Differentiation`, `NumericsLib.Interpolation`, `NumericsLib.Modelling` | `TNumericsKit`, `TDifferentiationKit`, `TInterpolationKit`, `TModellingKit` |
 | Probability | `ProbabilityLib.Distributions` | `TProbabilityKit` |
 | Combinatorics | `CombinatoricsLib.Combinatorics` | `TCombinatoricsKit` |

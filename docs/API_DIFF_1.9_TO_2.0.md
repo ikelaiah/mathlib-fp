@@ -17,8 +17,8 @@ the exact owner/kind/name/signature baseline in
 | Source | None. No declaration is added, removed, renamed, hidden, or given a different signature/default. |
 | Behaviour | None. No numerical rule, ownership/mutation/aliasing contract, exception, status, tolerance, RNG, callback, or thread-safety behavior changes. |
 | Warnings | None. No deprecation or compiler warning is added or removed. |
-| Packaging | None. All current source units, focused finance alias units, direct-source use, and the Lazarus package remain present. |
-| Documentary defaults | The 13 common paths appear first; advanced stable declarations remain documented; compatibility rows receive exact replacement/retain guidance; generic scaffolding is labelled implementation support. |
+| Packaging | None. All current source units—including pressure, velocity, and focused finance alias units—direct-source use, and the Lazarus package remain present. |
+| Documentary defaults | The 13 common paths appear first; advanced stable declarations remain documented; all 21 exact aliases and compatibility rows receive explicit guidance; generic scaffolding is labelled implementation support. |
 
 ## Why compatibility entries remain
 
@@ -27,6 +27,12 @@ deprecation warning. New double-real code is directed to the named typed
 facades through explicit copying conversions. `FinanceLib.Bonds` and
 `FinanceLib.NPV` are retained because their focused aliases are semantically
 exact and useful; age or naming taste is not a removal reason.
+
+The exact-alias review identifies `TPressureKit`/`EPressureError` and
+`TVelocityKit`/`EVelocityError` as prospective canonicalization candidates.
+That changes documentation priority only: 1.9.3 retains every alias and adds no
+deprecation warning. Migration and the package boundary are deferred to the
+planned 1.9.7 confirmation gate.
 
 ## Separately routed capability
 
@@ -39,7 +45,8 @@ This document does not propose a declaration, and 1.9.x does not implement it.
 ## Mechanical closure
 
 `tools/check_api_decision.py` fails if any declaration lacks one of the five
-classifications, any compatibility row lacks exactly one decision/note, any
+classifications, any plain compiler alias lacks exactly one five-part review,
+any compatibility row lacks exactly one decision/note, any
 recommended selector lacks an output-checked common example, any common
 example names generic implementation support, any domain/unit or convention is
 unresolved, or any source/behaviour/warning/packaging consequence differs from

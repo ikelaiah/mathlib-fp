@@ -39,7 +39,7 @@ row.
 | AlgebraLib | Double-real named dense facade first; scalar variants, sparse/structured storage, operators, factors, diagnostics, and workspaces remain advanced stable paths. Matrices are rows × columns; operator vectors are explicit n × 1 matrices. | Typed handles retain reference-counted storage, factories copy arrays, and views are mutable aliases. Direct contract failures raise; iterative outcomes carry status/residual diagnostics. |
 | FinanceLib | `TFinanceKit` is primary; focused bond/NPV alias units are retained compatibility entries. | Rates are decimal and time is periods/years. Results own schedules; undefined ratios and unresolved roots raise `EFinanceError`. |
 | StatsLib | `TStatsKit` + `TDoubleArray` first; inference and streaming types are advanced. Model matrices are observations × variables. | Batch results own arrays, online statistics is explicit mutable state, and randomized methods use local seeds/state. |
-| EngineeringLib | Choose the kit named for the calculation; DSP streaming/filter types are advanced. | Each routine states physical units. Static calculations are reentrant; mutable processors require separate instances. |
+| EngineeringLib | Use `TFluidDynamicsKit` for pressure, velocity, and flow calculations; DSP streaming/filter types are advanced. | Each routine states physical units. Static calculations are reentrant; mutable processors require separate instances. |
 | NumericsLib | `TNumericsKit` first; interpolation, differentiation, fitting, integration, roots, and ODE controls stay in focused units. | Constructed interpolators/fits own coefficients, callbacks are caller-owned, and adaptive algorithms use algorithm-specific statuses and tolerances. |
 | ProbabilityLib | `TProbabilityKit` is the double-real stateless facade. | Probabilities are dimensionless; inputs share the variate's unit. Invalid parameters raise `EProbabilityError`. |
 | CombinatoricsLib | `TCombinatoricsKit` first; result arrays retain descriptive mathematical names. | Arrays are zero-based while n/k keep their mathematical meaning. Invalid domains and overflow raise rather than wrap. |
@@ -58,10 +58,16 @@ Compatibility is not deprecation. No warning or removal is proposed.
 | `IMatrix` | Replace in new code | Use `IDenseDoubleMatrix`; conversion is an explicit deep copy and typed algorithms use separate kernels, factors, results, and `SizeInt` shapes. |
 | `TMatrixKit` | Replace in new code | Use `TDenseDoubleMatrix`; it is a named factory, not a cast or subclass replacement. |
 | `TMatrixKitSparse` | Replace in new code | Use `TSparseDoubleMatrix`, which creates canonical CSR/CSC `ISparseDoubleMatrix` values. Conversion enumerates/copies; it is never a zero-copy reinterpretation. |
+| `EPressureError` | Prospective canonical path | Use `EFluidDynamicsError` with `TFluidDynamicsKit`. It is the identical exception class; 1.9.7 must confirm migration and packaging before deprecation is considered. |
+| `TPressureKit` | Prospective canonical path | Use `TFluidDynamicsKit`. It is the identical complete facade, not a narrower pressure implementation; 1.9.7 must confirm migration and packaging before deprecation is considered. |
+| `EVelocityError` | Prospective canonical path | Use `EFluidDynamicsError` with `TFluidDynamicsKit`. It is the identical exception class; 1.9.7 must confirm migration and packaging before deprecation is considered. |
+| `TVelocityKit` | Prospective canonical path | Use `TFluidDynamicsKit`. It is the identical complete facade, not a narrower velocity implementation; 1.9.7 must confirm migration and packaging before deprecation is considered. |
 | `FinanceLib.Bonds` | Retain | Its four public names are exact focused aliases of `TFinanceKit`, `EFinanceError`, and amortization types. |
 | `FinanceLib.NPV` | Retain | Its three public names are exact focused aliases of `TFinanceKit`, `EFinanceError`, and `TDoubleArray`. |
 
-The generated declaration reference repeats the decision, replacement, and
-semantic-note identifier on every exact compatibility row. There are no formal
-deprecations and no undecided stable declarations, compiled defaults, ownership
+The generated declaration reference records all 21 exact compiler aliases and
+their five-part equivalence profile, retain/canonical decision, reason, status,
+and follow-up. It also repeats the decision, replacement, and semantic-note
+identifier on every exact compatibility row. There are no formal deprecations
+and no undecided stable declarations, aliases, compiled defaults, ownership
 rules, classifications, or replacement mappings.

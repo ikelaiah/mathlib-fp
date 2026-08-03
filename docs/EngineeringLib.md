@@ -81,8 +81,10 @@ EEngineeringError
 ```
 
 The focused alias units also export `EVelocityError = EFluidDynamicsError` and
-`EPressureError = EFluidDynamicsError`, so an application importing only one
-focused unit can catch its domain error without importing `EngineeringLib.Common`.
+`EPressureError = EFluidDynamicsError`, so existing applications importing only
+one focused unit keep the identical exception type. New code should use
+`EFluidDynamicsError` with the common `TFluidDynamicsKit` path. The focused
+aliases remain supported and receive no 1.9.3 deprecation warning.
 
 Catch a specific subtype when recovering from one engineering domain, or
 `EEngineeringError` when a caller handles all EngineeringLib validation
@@ -642,8 +644,10 @@ EPressureError = EFluidDynamicsError;
 TPressureKit = TFluidDynamicsKit;
 ```
 
-Add these focused units to your `uses` clause when your code is specifically
-about velocity or pressure calculations. They intentionally contain aliases,
-not duplicate implementations. `TVelocityKit` and `TPressureKit` expose the
-relevant `TFluidDynamicsKit` calculations; physical unit conversions remain in
-`TUnitConversionKit.ConvertVelocity` and `ConvertPressure`.
+These focused units intentionally contain aliases, not duplicate
+implementations. The one obvious path for new pressure, velocity, and flow code
+is `EngineeringLib.FluidDynamics.TFluidDynamicsKit`; `TVelocityKit` and
+`TPressureKit` remain exact supported aliases. Their migration and package
+boundary are reviewed in 1.9.7 before any deprecation decision. Physical unit
+conversions remain in `TUnitConversionKit.ConvertVelocity` and
+`ConvertPressure`.

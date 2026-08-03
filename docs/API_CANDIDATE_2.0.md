@@ -16,7 +16,7 @@ advanced control, compatibility entry, or specialization detail matters.
 | --- | --- |
 | [`public-api-1.9.json`](public-api-1.9.json) | Exact 2,880-row unit/owner/kind/name/signature baseline plus the classification and compatibility decision for every row |
 | [`API_REFERENCE_1.9.md`](API_REFERENCE_1.9.md) | Generated human-readable rendering of every exact row |
-| [`api-decision-2.0.json`](api-decision-2.0.json) | Normative common selectors, all-domain conventions, compatibility decisions, and separately routed capability |
+| [`api-decision-2.0.json`](api-decision-2.0.json) | Normative common selectors, all-domain conventions, exact alias reviews, compatibility decisions, and separately routed capability |
 | [`API_CONVENTIONS_2.0.md`](API_CONVENTIONS_2.0.md) | Reviewed explanation of shared and domain-specific decisions |
 | [`api-diff-1.9-to-2.0.json`](api-diff-1.9-to-2.0.json) | Machine-readable source/behaviour/warning/packaging/documentary consequences |
 | [`API_DIFF_1.9_TO_2.0.md`](API_DIFF_1.9_TO_2.0.md) | Human-readable exact proposed diff |
@@ -24,7 +24,8 @@ advanced control, compatibility entry, or specialization detail matters.
 `tools/update_api_snapshot.py` regenerates the snapshot and reference from
 every `src/*.pas` interface plus the reviewed decision selectors.
 `tools/check_api_decision.py` independently verifies exact coverage, convention
-closure, compatibility mappings, common examples, and diff categories.
+closure, exact alias coverage, compatibility mappings, common examples, and
+diff categories.
 
 ## Five complete classifications
 
@@ -70,7 +71,17 @@ differences. This guidance is not a deprecation or removal schedule.
 types are exact aliases into `FinanceLib.Interest`/shared arrays, so the focused
 entry units add no conflicting numerical, ownership, or default behavior.
 
-Every one of the 127 exact compatibility declaration rows carries its decision
+The snapshot contains 21 plain `=` compiler aliases. Every alias has one exact
+review in the generated declaration reference. The shared compiler-identity
+profile records identical behavior, defaults, ownership, exception identity,
+and numerical results. Seventeen aliases are explicitly retained.
+`TPressureKit`, `EPressureError`, `TVelocityKit`, and `EVelocityError` are
+review-only canonicalization candidates: new code prefers
+`TFluidDynamicsKit`/`EFluidDynamicsError`, while 1.9.7 must confirm migration
+and packaging before any deprecation decision. Version 1.9.3 adds no warning,
+removal, or package move.
+
+Every one of the 131 exact compatibility declaration rows carries its decision
 and semantic-note identifier in the generated reference.
 
 ## Exact proposed diff
@@ -108,6 +119,6 @@ this decision does not authorize breaking changes. A maintained 1.x API is not
 removed merely because a major version is available, and compatibility is not
 deprecation.
 
-There are no unresolved stable declarations, compiled defaults, ownership
-rules, classifications, compatibility decisions, or replacement mappings in
-this candidate.
+There are no unresolved stable declarations, aliases, compiled defaults,
+ownership rules, classifications, compatibility decisions, or replacement
+mappings in this candidate.

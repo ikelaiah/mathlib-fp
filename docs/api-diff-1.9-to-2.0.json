@@ -38,6 +38,10 @@
         {
           "id": "all-domain-conventions",
           "consequence": "All domains inherit one resolved convention set and publish domain-specific decisions without changing compiled defaults."
+        },
+        {
+          "id": "exact-alias-review",
+          "consequence": "All 21 plain compiler aliases record five-part equivalence plus an explicit retain or prospective canonical decision; 1.9.3 adds no deprecation, removal, or package move."
         }
       ]
     }

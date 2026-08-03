@@ -7,11 +7,12 @@ final Linux and Windows checksummed clean-archive CI is pending**.
 
 | Gate | Current evidence |
 | --- | --- |
-| Complete exact classification | The schema-3 snapshot contains all 2,880 owner/signature-aware declarations: 536 recommended, 1,786 advanced, 127 compatibility, zero experimental, and 431 generic implementation-support rows. The decision checker independently reconstructs each result. |
+| Complete exact classification | The schema-3 snapshot contains all 2,880 owner/signature-aware declarations: 536 recommended, 1,782 advanced, 131 compatibility, zero experimental, and 431 generic implementation-support rows. The decision checker independently reconstructs each result. |
 | Complete conventions and ownership/default decisions | All 50 snapshot units belong to one of 13 domains. Every domain inherits the 15 resolved shared concerns and records specific decisions; unresolved lists are empty. |
-| Compatibility closure | All 127 compatibility declarations resolve through five non-overlapping decisions: three named typed replacements with semantic differences and two explicitly retained finance units. |
+| Exact alias closure | All 21 plain compiler aliases have exactly one review recording identical behavior, defaults, ownership, exception identity, and numerical results. Seventeen are retained; four pressure/velocity aliases have prospective canonical paths routed to 1.9.7 without deprecation. |
+| Compatibility closure | All 131 compatibility declarations resolve through nine non-overlapping decisions: seven named replacements with semantic notes and two explicitly retained finance units. |
 | Common-path programs | Thirteen domain paths point to concise output-checked programs. Documentation execution compiles/runs them; decision checks reject generic implementation surfaces in the selected source. |
-| Exact proposed diff | Source, behavior, warning, and packaging consequences are explicit empty lists; four documentary-priority changes are named separately. |
+| Exact proposed diff | Source, behavior, warning, and packaging consequences are explicit empty lists; five documentary-priority changes are named separately. |
 | Future capability routing | Ergonomic 2-D/3-D vector rotation is routed to a separate 1.10.0 design with no 1.9.x declaration. |
 | API compatibility | All source-unit interface SHA-256 values still match the frozen 1.9.0 baseline. No `src/` interface is changed. |
 

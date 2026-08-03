@@ -434,7 +434,9 @@ def markdown_code(value: object) -> str:
     return "`" + str(value).replace("|", r"\|").replace("`", r"\`") + "`"
 
 
-def write_reference(snapshot: dict[str, object]) -> None:
+def write_reference(
+    snapshot: dict[str, object], decision: dict[str, object]
+) -> None:
     units = snapshot["units"]
     assert isinstance(units, list)
     counts = {classification: 0 for classification in CLASSIFICATIONS}
@@ -462,6 +464,48 @@ def write_reference(snapshot: dict[str, object]) -> None:
     ]
     for classification in sorted(CLASSIFICATIONS):
         lines.append(f"| `{classification}` | {counts[classification]} |")
+
+    profile = decision["alias_equivalence_profiles"]["compiler-type-identity"]
+    lines.extend(
+        [
+            "",
+            "## Exact compiler-alias review",
+            "",
+            "Every plain `=` type alias in the snapshot has exactly one 1.9.3",
+            "review. The compiler-identity profile records identical behavior,",
+            "defaults, ownership, exception identity, and numerical results; an",
+            "alias adds only another public spelling/import path. `Canonicalize`",
+            "is a prospective common path for 1.9.7 migration/package testing,",
+            "not a 1.9.3 deprecation, removal, warning, or package move.",
+            "",
+            f"Equivalence basis: {profile['basis']}",
+            "",
+            "| Alias | Exact target | 1.9.3 decision | Prospective canonical path | Status / follow-up | Reason |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+    )
+    for review in decision["alias_reviews"]:
+        selector = review["selector"]
+        alias_name = f"{selector['unit']}.{selector['name']}"
+        canonical = review.get("canonical", "—")
+        follow_up = review.get("follow_up_release")
+        status = review["status"]
+        if follow_up:
+            status += f"; revisit {follow_up}"
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    markdown_code(alias_name),
+                    markdown_code(review["target"]),
+                    markdown_code(review["decision"]),
+                    markdown_code(canonical),
+                    markdown_code(status),
+                    str(review["reason"]).replace("|", r"\|"),
+                ]
+            )
+            + " |"
+        )
 
     for unit in units:
         unit_name = unit["unit"]
@@ -556,7 +600,7 @@ def main() -> int:
         json.dumps(snapshot, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    write_reference(snapshot)
+    write_reference(snapshot, decision)
     print(
         f"Wrote {OUTPUT.relative_to(ROOT)} and "
         f"{REFERENCE_OUTPUT.relative_to(ROOT)} with {len(units)} units and "

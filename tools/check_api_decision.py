@@ -14,7 +14,9 @@ from api_decision import (
     classify_declaration,
     common_path_selectors,
     generic_surfaces,
+    matching_alias_reviews,
     matching_compatibility_decisions,
+    plain_alias_target,
     selector_matches,
 )
 from check_doc_examples import is_runnable, pascal_fragments
@@ -31,6 +33,13 @@ REQUIRED_DIFF_CATEGORIES = {
     "packaging",
     "documentary_defaults",
 }
+ALIAS_EQUIVALENCE_FIELDS = {
+    "behavior",
+    "defaults",
+    "ownership",
+    "exception_identity",
+    "numerical_results",
+}
 
 
 def load_json(path: Path, errors: list[str]) -> dict[str, object]:
@@ -44,13 +53,127 @@ def load_json(path: Path, errors: list[str]) -> dict[str, object]:
         return {}
 
 
+def check_alias_reviews(
+    decision: dict[str, object],
+    declarations: list[tuple[str, dict[str, object]]],
+    symbols: set[str],
+    errors: list[str],
+) -> None:
+    """Require one review-only decision for every exact compiler type alias."""
+    profiles = decision.get("alias_equivalence_profiles", {})
+    if not isinstance(profiles, dict) or not profiles:
+        errors.append("alias equivalence profiles are missing")
+        profiles = {}
+    for profile_id, profile in profiles.items():
+        if not isinstance(profile, dict):
+            errors.append(f"alias profile {profile_id}: expected an object")
+            continue
+        fields = set(profile) - {"basis"}
+        if fields != ALIAS_EQUIVALENCE_FIELDS:
+            errors.append(
+                f"alias profile {profile_id}: equivalence fields are "
+                f"{sorted(fields)}, expected {sorted(ALIAS_EQUIVALENCE_FIELDS)}"
+            )
+        for field in ALIAS_EQUIVALENCE_FIELDS:
+            if profile.get(field) != "identical":
+                errors.append(
+                    f"alias profile {profile_id}.{field}: exact aliases must be "
+                    "recorded as identical"
+                )
+        if not isinstance(profile.get("basis"), str) or not profile["basis"].strip():
+            errors.append(f"alias profile {profile_id}: equivalence basis is missing")
+
+    reviews = decision.get("alias_reviews", [])
+    if not isinstance(reviews, list):
+        errors.append("alias_reviews must be a list")
+        return
+    review_ids = [item.get("id") for item in reviews if isinstance(item, dict)]
+    if len(review_ids) != len(reviews) or len(review_ids) != len(set(review_ids)):
+        errors.append("alias review ids are missing or duplicated")
+
+    alias_rows = [
+        (unit_name, declaration, plain_alias_target(declaration))
+        for unit_name, declaration in declarations
+        if plain_alias_target(declaration) is not None
+    ]
+    for unit_name, declaration, target in alias_rows:
+        matches = matching_alias_reviews(unit_name, declaration, decision)
+        identity = f"{unit_name}.{declaration['name']}"
+        if len(matches) != 1:
+            errors.append(f"{identity}: alias review count is {len(matches)}")
+            continue
+        review = matches[0]
+        if review.get("target") != target:
+            errors.append(
+                f"{review['id']}: target {review.get('target')!r} does not match "
+                f"the exact alias target {target!r}"
+            )
+        profile_id = review.get("equivalence_profile")
+        if profile_id not in profiles:
+            errors.append(f"{review['id']}: unknown equivalence profile {profile_id!r}")
+        if review.get("status") != "review-only":
+            errors.append(f"{review['id']}: 1.9.3 alias status must be review-only")
+        if any(key in review for key in ("deprecated", "remove", "package_move")):
+            errors.append(f"{review['id']}: 1.9.3 must not deprecate/remove/move aliases")
+        if not isinstance(review.get("reason"), str) or not review["reason"].strip():
+            errors.append(f"{review['id']}: review reason is missing")
+
+        review_decision = review.get("decision")
+        compatibility = matching_compatibility_decisions(
+            unit_name, declaration, decision
+        )
+        if review_decision == "canonicalize":
+            canonical = review.get("canonical")
+            canonical_name = None
+            if not isinstance(canonical, str) or not canonical.strip():
+                errors.append(f"{review['id']}: prospective canonical path is missing")
+            else:
+                canonical_name = canonical.rsplit(".", 1)[-1]
+                if canonical_name not in symbols:
+                    errors.append(f"{review['id']}: canonical symbol {canonical} is absent")
+            if review.get("follow_up_release") != "1.9.7":
+                errors.append(f"{review['id']}: canonicalization must route to 1.9.7")
+            if len(compatibility) != 1 or compatibility[0].get("decision") != "replace":
+                errors.append(
+                    f"{review['id']}: canonicalization needs one matching "
+                    "compatibility replacement"
+                )
+            elif canonical_name and compatibility[0].get("replacement") != canonical_name:
+                errors.append(
+                    f"{review['id']}: compatibility replacement disagrees with "
+                    "the prospective canonical path"
+                )
+        elif review_decision == "retain":
+            if review.get("canonical") or review.get("follow_up_release"):
+                errors.append(f"{review['id']}: retained alias has future-removal metadata")
+            if compatibility and any(
+                item.get("decision") != "retain" for item in compatibility
+            ):
+                errors.append(f"{review['id']}: retain review conflicts with compatibility")
+        else:
+            errors.append(f"{review['id']}: invalid alias decision {review_decision!r}")
+
+    for review in reviews:
+        if not isinstance(review, dict) or "selector" not in review:
+            continue
+        matches = [
+            (unit_name, declaration)
+            for unit_name, declaration in declarations
+            if selector_matches(unit_name, declaration, review["selector"])
+        ]
+        if len(matches) != 1:
+            errors.append(f"{review.get('id')}: selector match count is {len(matches)}")
+        elif plain_alias_target(matches[0][1]) is None:
+            errors.append(f"{review.get('id')}: selector does not identify a plain alias")
+
+
 def check_decision(
     decision: dict[str, object],
     snapshot: dict[str, object],
     errors: list[str],
 ) -> None:
     try:
-        assert decision["schema_version"] == 1
+        assert decision["schema_version"] == 2
         assert decision["decision_release"] == DECISION_RELEASE
         assert decision["api_baseline_release"] == API_BASELINE_RELEASE
         assert decision["unresolved_decisions"] == []
@@ -212,6 +335,8 @@ def check_decision(
         if replacement and replacement not in symbols:
             errors.append(f"{item['id']}: replacement {replacement} is absent")
 
+    check_alias_reviews(decision, all_declarations, symbols, errors)
+
     fragments = pascal_fragments(ROOT)
     implementation_names = {
         declaration["name"]
@@ -298,6 +423,7 @@ def main() -> int:
         f"{len(decision['domains'])} domains, "
         f"{len(decision['common_paths'])} checked common paths, "
         f"{len(decision['compatibility_decisions'])} compatibility decisions, "
+        f"{len(decision['alias_reviews'])} exact alias reviews, "
         "0 unresolved decisions"
     )
     return 0
@@ -305,4 +431,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

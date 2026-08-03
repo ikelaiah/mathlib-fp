@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Iterable
 
@@ -15,6 +16,10 @@ CLASSIFICATIONS = {
     "experimental",
     "implementation",
 }
+
+PLAIN_ALIAS_RE = re.compile(
+    r"^[A-Za-z_]\w*=((?:[A-Za-z_]\w*\.)*[A-Za-z_]\w*)$"
+)
 
 
 def load_decision(path: Path) -> dict[str, object]:
@@ -74,6 +79,34 @@ def matching_compatibility_decisions(
     ]
 
 
+def plain_alias_target(declaration: dict[str, object]) -> str | None:
+    """Return the exact right-hand target for a plain compiler type alias."""
+    if declaration.get("kind") != "type":
+        return None
+    match = PLAIN_ALIAS_RE.fullmatch(str(declaration.get("signature", "")))
+    if not match or match.group(1).casefold() in {
+        "class",
+        "interface",
+        "object",
+        "record",
+    }:
+        return None
+    return match.group(1)
+
+
+def matching_alias_reviews(
+    unit_name: str,
+    declaration: dict[str, object],
+    decision: dict[str, object],
+) -> list[dict[str, object]]:
+    """Return exact alias-review records selecting one snapshot row."""
+    return [
+        item
+        for item in decision.get("alias_reviews", [])
+        if selector_matches(unit_name, declaration, item["selector"])
+    ]
+
+
 def classify_declaration(
     unit_name: str,
     declaration: dict[str, object],
@@ -127,4 +160,3 @@ def apply_decisions(
         replacement = compatibility.get("replacement")
         if replacement:
             declaration["preferred_replacement"] = replacement
-

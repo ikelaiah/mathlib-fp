@@ -8,6 +8,8 @@ import unittest
 from api_decision import (
     apply_decisions,
     generic_surfaces,
+    matching_alias_reviews,
+    plain_alias_target,
     selector_matches,
 )
 
@@ -59,6 +61,58 @@ class ApiDecisionTests(unittest.TestCase):
         self.assertEqual("implementation", declarations[1]["classification"])
         self.assertEqual("compatibility", declarations[2]["classification"])
         self.assertEqual("retain", declarations[2]["compatibility_decision"])
+
+    def test_plain_alias_detection_excludes_composite_declarations(self) -> None:
+        alias = {
+            "kind": "type",
+            "signature": "TPressureKit=TFluidDynamicsKit",
+        }
+        qualified = {
+            "kind": "type",
+            "signature": "EPressureError=EngineeringLib.Common.EFluidDynamicsError",
+        }
+        composite = {"kind": "type", "signature": "TFacade=class"}
+        interface = {"kind": "type", "signature": "IMatrix=interface"}
+        self.assertEqual("TFluidDynamicsKit", plain_alias_target(alias))
+        self.assertEqual(
+            "EngineeringLib.Common.EFluidDynamicsError",
+            plain_alias_target(qualified),
+        )
+        self.assertIsNone(plain_alias_target(composite))
+        self.assertIsNone(plain_alias_target(interface))
+
+    def test_alias_review_selector_is_owner_and_unit_exact(self) -> None:
+        decision = {
+            "alias_reviews": [
+                {
+                    "id": "pressure-kit",
+                    "selector": {
+                        "unit": "EngineeringLib.Pressure",
+                        "name": "TPressureKit",
+                        "owner": None,
+                        "kind": "type",
+                    },
+                }
+            ]
+        }
+        alias = {
+            "owner": None,
+            "name": "TPressureKit",
+            "kind": "type",
+            "signature": "TPressureKit=TFluidDynamicsKit",
+        }
+        self.assertEqual(
+            ["pressure-kit"],
+            [
+                item["id"]
+                for item in matching_alias_reviews(
+                    "EngineeringLib.Pressure", alias, decision
+                )
+            ],
+        )
+        self.assertEqual(
+            [], matching_alias_reviews("EngineeringLib.Velocity", alias, decision)
+        )
 
 
 if __name__ == "__main__":
