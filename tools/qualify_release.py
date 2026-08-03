@@ -202,12 +202,14 @@ def documentation_gates(
     qualification: Qualification, compiler: str, release: str,
 ) -> None:
     for script in (
+        "test_api_decision.py",
         "test_api_snapshot.py",
         "test_doc_examples.py",
         "test_example_output.py",
         "test_build_docs.py",
         "test_built_docs.py",
         "check_docs.py",
+        "check_api_decision.py",
     ):
         qualification.run(
             script.removesuffix(".py"),

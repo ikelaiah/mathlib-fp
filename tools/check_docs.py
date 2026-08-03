@@ -12,9 +12,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.2"
+CURRENT_RELEASE = "1.9.3"
 API_BASELINE_RELEASE = "1.9.0"
-HISTORICAL_RELEASES = ["1.9.1", API_BASELINE_RELEASE]
+HISTORICAL_RELEASES = ["1.9.2", "1.9.1", API_BASELINE_RELEASE]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -116,6 +116,18 @@ def main() -> int:
         if not (DOCS / name).is_file():
             errors.append(f"missing 1.9.2 learning document: docs/{name}")
 
+    required_decision_pages = (
+        "API_COMMON_PATHS_2.0.md",
+        "API_CONVENTIONS_2.0.md",
+        "API_DIFF_1.9_TO_2.0.md",
+        "api-decision-2.0.json",
+        "api-diff-1.9-to-2.0.json",
+        "PR_NOTES_1.9.3.md",
+    )
+    for name in required_decision_pages:
+        if not (DOCS / name).is_file():
+            errors.append(f"missing 1.9.3 API-decision document: docs/{name}")
+
     recipes = (DOCS / "RECIPES.md").read_text(encoding="utf-8")
     for query in REQUIRED_PROBLEM_QUERIES:
         if query.casefold() not in recipes.casefold():
@@ -153,7 +165,8 @@ def main() -> int:
     try:
         snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
         assert snapshot["release"] == API_BASELINE_RELEASE
-        assert snapshot["schema_version"] == 2
+        assert snapshot["schema_version"] == 3
+        assert snapshot["decision_release"] == CURRENT_RELEASE
         assert snapshot["identity"] == [
             "unit",
             "owner",
@@ -205,11 +218,11 @@ def main() -> int:
                         )
                     identities.add(identity)
                     if declaration["classification"] not in {
-                        "primary",
+                        "recommended",
+                        "advanced",
                         "compatibility",
-                        "deprecated",
                         "experimental",
-                        "internal",
+                        "implementation",
                     }:
                         errors.append(
                             f"{relative}: invalid API classification for "
@@ -218,7 +231,10 @@ def main() -> int:
                     owner = declaration["owner"]
                     if (
                         owner is not None
-                        and owner_classes.get(owner) in {"compatibility", "internal"}
+                        and owner_classes.get(owner) in {
+                            "compatibility",
+                            "implementation",
+                        }
                         and declaration["classification"] != owner_classes[owner]
                     ):
                         errors.append(
@@ -229,23 +245,7 @@ def main() -> int:
                     if replacement and replacement not in snapshot_symbols:
                         # Check globally after all units have been collected.
                         pass
-        assert isinstance(snapshot["deprecations"], list)
-        for deprecated in snapshot["deprecations"]:
-            declaration_key = deprecated["declaration"]
-            replacement_key = deprecated["replacement"]
-            assert isinstance(declaration_key, dict)
-            assert isinstance(replacement_key, dict)
-            for selector in (declaration_key, replacement_key):
-                matches = [
-                    item
-                    for unit_name, item in snapshot_declarations
-                    if unit_name == selector["unit"]
-                    and item["owner"] == selector["owner"]
-                    and item["kind"] == selector["kind"]
-                    and item["name"] == selector["name"]
-                    and item["signature"] == selector["signature"]
-                ]
-                assert len(matches) == 1
+        assert snapshot["unresolved_decisions"] == []
         for unit_name, declaration in snapshot_declarations:
             replacement = declaration.get("preferred_replacement")
             if replacement and replacement not in snapshot_symbols:
@@ -262,6 +262,8 @@ def main() -> int:
     for unit_name, declaration in snapshot_declarations:
         owner = declaration["owner"] or "(unit)"
         replacement = declaration.get("preferred_replacement", "—")
+        compatibility_decision = declaration.get("compatibility_decision", "—")
+        compatibility_note = declaration.get("compatibility_note", "—")
 
         def code(value: object) -> str:
             return (
@@ -279,7 +281,9 @@ def main() -> int:
                     code(declaration["name"]),
                     code(declaration["signature"]),
                     code(declaration["classification"]),
+                    code(compatibility_decision),
                     code(replacement),
+                    code(compatibility_note),
                 ]
             )
             + " |"
@@ -674,7 +678,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="2"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="3"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:

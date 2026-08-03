@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "decision_release": "1.9.3",
+  "baseline": "docs/public-api-1.9.json",
+  "candidate": "2.0",
+  "consequences": {
+    "source": {
+      "decision": "no_change",
+      "items": []
+    },
+    "behaviour": {
+      "decision": "no_change",
+      "items": []
+    },
+    "warnings": {
+      "decision": "no_change",
+      "items": []
+    },
+    "packaging": {
+      "decision": "no_change",
+      "items": []
+    },
+    "documentary_defaults": {
+      "decision": "change",
+      "items": [
+        {
+          "id": "curated-common-map",
+          "consequence": "The 13 output-checked double-real/common workflows are shown before advanced stable declarations."
+        },
+        {
+          "id": "generic-support-label",
+          "consequence": "Public generic declarations required by FPC specialization are labelled implementation support and are omitted from application examples."
+        },
+        {
+          "id": "compatibility-guidance",
+          "consequence": "Every compatibility declaration resolves to a named typed replacement plus semantic differences or to an explicit retain decision."
+        },
+        {
+          "id": "all-domain-conventions",
+          "consequence": "All domains inherit one resolved convention set and publish domain-specific decisions without changing compiled defaults."
+        }
+      ]
+    }
+  },
+  "future_minor_routes": [
+    {
+      "release": "1.10.0",
+      "capability": "Ergonomic 2-D and 3-D vector rotation",
+      "effect_on_this_diff": "none"
+    }
+  ],
+  "unresolved": []
+}

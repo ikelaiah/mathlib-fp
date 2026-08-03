@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Exact 1.9.2 tag to publish
+        description: Exact 1.9.3 tag to publish
         required: true
-        default: v1.9.2
+        default: v1.9.3
   release:
     types: [published]
 
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.2'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.3'
     runs-on: ubuntu-latest
     steps:
       - name: Check out current documentation source
@@ -42,6 +42,12 @@ jobs:
           ref: v1.9.1
           path: historical-1.9.1
 
+      - name: Check out immutable 1.9.2 documentation source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v1.9.2
+          path: historical-1.9.2
+
       - name: Build preserved and current versioned sites
         run: |
           python3 current/tools/build_docs.py \
@@ -53,14 +59,20 @@ jobs:
             --versions current/docs/versions.json \
             --release 1.9.1 --output site/1.9.1 --site-root site
           python3 current/tools/build_docs.py \
+            --source historical-1.9.2/docs \
+            --versions current/docs/versions.json \
+            --release 1.9.2 --output site/1.9.2 --site-root site
+          python3 current/tools/build_docs.py \
             --source current/docs \
             --versions current/docs/versions.json \
-            --release 1.9.2 --output site/1.9.2 --site-root site \
-            --offline-archive artifacts/mathlib-fp-docs-1.9.2.zip
+            --release 1.9.3 --output site/1.9.3 --site-root site \
+            --offline-archive artifacts/mathlib-fp-docs-1.9.3.zip
+          python3 -c 'import json; assert json.load(open("site/1.9.3/release.json"))["release"] == "1.9.3"'
           python3 -c 'import json; assert json.load(open("site/1.9.2/release.json"))["release"] == "1.9.2"'
           python3 -c 'import json; assert json.load(open("site/1.9.1/release.json"))["release"] == "1.9.1"'
           python3 -c 'import json; assert json.load(open("site/1.9.0/release.json"))["release"] == "1.9.0"'
-          grep -q 'Current release: 1.9.2' site/index.html
+          grep -q 'Current release: 1.9.3' site/index.html
+          grep -q '1.9.2/index.html' site/index.html
           grep -q '1.9.1/index.html' site/index.html
           grep -q '1.9.0/index.html' site/index.html
           python3 current/tools/check_built_docs.py --site site
@@ -76,11 +88,11 @@ jobs:
       - name: Publish offline documentation artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: mathlib-fp-docs-1.9.2
+          name: mathlib-fp-docs-1.9.3
           if-no-files-found: error
           path: |
-            artifacts/mathlib-fp-docs-1.9.2.zip
-            artifacts/mathlib-fp-docs-1.9.2.zip.sha256
+            artifacts/mathlib-fp-docs-1.9.3.zip
+            artifacts/mathlib-fp-docs-1.9.3.zip.sha256
 
       - name: Attach offline documentation to release
         if: github.event_name == 'release'
@@ -88,11 +100,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            artifacts/mathlib-fp-docs-1.9.2.zip \
-            artifacts/mathlib-fp-docs-1.9.2.zip.sha256 --clobber
+            artifacts/mathlib-fp-docs-1.9.3.zip \
+            artifacts/mathlib-fp-docs-1.9.3.zip.sha256 --clobber
 
   deploy:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.2'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.3'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

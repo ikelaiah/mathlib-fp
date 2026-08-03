@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.3] - 2026-08-04
+
+### Documentation
+
+- Completed the proposed 2.0 API decision by classifying every exact 1.9
+  declaration, publishing a 13-domain common-path map, and resolving shared
+  naming, shape, ownership, error, tolerance, outcome, RNG, callback, and
+  thread-safety conventions.
+- Gave every compatibility declaration a named typed replacement with semantic
+  differences or an explicit retain decision, and published an exact empty
+  source/behavior/warning/packaging diff separate from documentary defaults.
+- Routed ergonomic 2-D and 3-D vector rotation to focused 1.10.0 design work
+  without adding an unreviewed patch-release declaration.
+
+### Validation
+
+- Added exact decision, selector/overload, generic-owner, domain/unit,
+  compatibility, common-example, convention, and proposed-diff checks to the
+  release qualification suite.
+- Regenerated the exhaustive 2,880-row API reference with five-way
+  classifications and compatibility decision/note columns while preserving all
+  frozen 1.9 interface hashes.
+
 ## [1.9.2] - 2026-08-02
 
 ### Documentation

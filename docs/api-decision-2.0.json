@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "decision_release": "1.9.3",
+  "api_baseline_release": "1.9.0",
+  "required_concerns": [
+    "naming",
+    "indexing",
+    "shape",
+    "units",
+    "ownership",
+    "mutation",
+    "aliasing",
+    "exceptions",
+    "defaults",
+    "tolerances",
+    "outcomes",
+    "rng_state",
+    "cancellation",
+    "progress",
+    "thread_safety"
+  ],
+  "global_conventions": {
+    "naming": "Use domain units and descriptive T/I/E prefixes; show double-real allocating calls first, named scalar facades for typed alternatives, and never present generic specialization scaffolding as an application entry point.",
+    "indexing": "Public arrays and typed containers are zero-based; typed dimensions and indices use SizeInt, while retained Integer signatures remain compatibility contracts.",
+    "shape": "State rows before columns, preserve rank and scalar kind unless conversion is explicit, and never hide reshape, transpose, densification, or broadcasting.",
+    "units": "Name or document physical, angular, financial, temporal, and statistical units at the entry point; conversions are explicit and angle APIs use radians unless their name says otherwise.",
+    "ownership": "Factories and allocating calls return owned values or reference-counted handles; caller streams, callbacks, and state remain caller-owned, and any retained reference is stated explicitly.",
+    "mutation": "Simple allocating calls leave inputs unchanged; mutable matrices, views, workspaces, streaming objects, filters, and model state are named and documented rather than described as immutable.",
+    "aliasing": "Destination and view overloads state exact alias support, reject unsafe partial overlap before mutation, and do not leave a partial result after validation failure.",
+    "exceptions": "Invalid parameters, domains, shapes, and ownership contracts raise the domain-specific exception naming the operation and violated condition.",
+    "defaults": "Runtime defaults remain the compiled 1.9 values and are stated in declarations or options records; documentation priority does not silently change numerical behaviour.",
+    "tolerances": "Use documented absolute, relative, and algorithm-specific tolerances with scale-aware tests; an automatic sentinel such as -1 is accepted only where its formula is part of the contract.",
+    "outcomes": "Expected non-convergence, infeasibility, cancellation, or breakdown is reported through a status/result with diagnostics; invalid contracts raise exceptions.",
+    "rng_state": "Randomized recommended paths accept an explicit seed or local reproducible state and do not consume a hidden process-global stream.",
+    "cancellation": "Long-running algorithms expose cancellation through their documented options or monitor and return the latest complete result with a cancellation status; APIs without cancellation say so.",
+    "progress": "Progress callbacks are optional, synchronous, caller-owned, and may observe only complete iterates; callback exceptions propagate without publishing a partial destination.",
+    "thread_safety": "Pure and stateless operations are reentrant; mutable state, streams, workspaces, views, filters, and RNG objects require separate instances or caller synchronization."
+  },
+  "common_paths": [
+    {
+      "id": "mathbase-double-real",
+      "domain": "MathBase",
+      "entry_point": "TTrigKit and MathBase.Precision double-real functions",
+      "example_document": "docs/MathBase.md",
+      "contract_document": "docs/MathBase.md",
+      "selectors": [
+        {"unit": "MathBase.Trigonometry", "surface": "TTrigKit"},
+        {"unit": "MathBase.Precision", "name": "NormalCDF", "owner": null}
+      ]
+    },
+    {
+      "id": "algebra-dense-double-solve",
+      "domain": "AlgebraLib",
+      "entry_point": "TDenseDoubleMatrix plus Solve",
+      "example_document": "docs/TypedDenseMatrices.md",
+      "contract_document": "docs/DenseLinearAlgebra.md",
+      "selectors": [
+        {"unit": "AlgebraLib.DenseMatrices", "surface": "IDenseDoubleMatrix"},
+        {"unit": "AlgebraLib.DenseMatrices", "surface": "TDenseDoubleMatrix"},
+        {"unit": "AlgebraLib.DenseSolvers", "name": "Solve", "owner": null, "signature_contains": "IDenseDoubleMatrix"}
+      ]
+    },
+    {
+      "id": "finance-amortization",
+      "domain": "FinanceLib",
+      "entry_point": "TFinanceKit",
+      "example_document": "docs/FinanceLib.md",
+      "contract_document": "docs/FinanceLib.md",
+      "selectors": [
+        {"unit": "FinanceLib.Interest", "surface": "TFinanceKit"}
+      ]
+    },
+    {
+      "id": "stats-descriptive",
+      "domain": "StatsLib",
+      "entry_point": "TStatsKit with TDoubleArray",
+      "example_document": "docs/StatsLib.md",
+      "contract_document": "docs/StatsLib.md",
+      "selectors": [
+        {"unit": "StatsLib.Stats", "surface": "TStatsKit"},
+        {"unit": "StatsLib.Stats", "surface": "TDescriptiveStats"},
+        {"unit": "MathBase.SharedTypes", "surface": "TDoubleArray"},
+        {"unit": "MathBase.SharedTypes", "surface": "TDoublePair"}
+      ]
+    },
+    {
+      "id": "engineering-typed-calculations",
+      "domain": "EngineeringLib",
+      "entry_point": "TFluidDynamicsKit, TThermodynamicsKit, and TUnitConversionKit",
+      "example_document": "docs/EngineeringLib.md",
+      "contract_document": "docs/EngineeringLib.md",
+      "selectors": [
+        {"unit": "EngineeringLib.FluidDynamics", "surface": "TFluidDynamicsKit"},
+        {"unit": "EngineeringLib.Thermodynamics", "surface": "TThermodynamicsKit"},
+        {"unit": "EngineeringLib.UnitConversion", "surface": "TUnitConversionKit"}
+      ]
+    },
+    {
+      "id": "numerics-scalar-and-ode",
+      "domain": "NumericsLib",
+      "entry_point": "TNumericsKit",
+      "example_document": "docs/NumericsLib.md",
+      "contract_document": "docs/NumericsLib.md",
+      "selectors": [
+        {"unit": "NumericsLib.Numerics", "surface": "TNumericsKit"},
+        {"unit": "NumericsLib.Numerics", "surface": "TCubicSpline"},
+        {"unit": "NumericsLib.Numerics", "surface": "TODESolution"},
+        {"unit": "MathBase.SharedTypes", "surface": "TDoubleArray"}
+      ]
+    },
+    {
+      "id": "probability-normal-cdf",
+      "domain": "ProbabilityLib",
+      "entry_point": "TProbabilityKit",
+      "example_document": "docs/ProbabilityLib.md",
+      "contract_document": "docs/ProbabilityLib.md",
+      "selectors": [
+        {"unit": "ProbabilityLib.Distributions", "surface": "TProbabilityKit"}
+      ]
+    },
+    {
+      "id": "combinatorics-counting",
+      "domain": "CombinatoricsLib",
+      "entry_point": "TCombinatoricsKit",
+      "example_document": "docs/CombinatoricsLib.md",
+      "contract_document": "docs/CombinatoricsLib.md",
+      "selectors": [
+        {"unit": "CombinatoricsLib.Combinatorics", "surface": "TCombinatoricsKit"}
+      ]
+    },
+    {
+      "id": "optimization-scalar",
+      "domain": "OptimizationLib",
+      "entry_point": "TOptimizationKit",
+      "example_document": "docs/OptimizationLib.md",
+      "contract_document": "docs/OptimizationLib.md",
+      "selectors": [
+        {"unit": "OptimizationLib.Optimization", "surface": "TOptimizationKit"}
+      ]
+    },
+    {
+      "id": "time-series-smoothing",
+      "domain": "TimeSeriesLib",
+      "entry_point": "TTimeSeriesKit with TDoubleArray",
+      "example_document": "docs/TimeSeriesLib.md",
+      "contract_document": "docs/TimeSeriesLib.md",
+      "selectors": [
+        {"unit": "TimeSeriesLib.TimeSeries", "surface": "TTimeSeriesKit"},
+        {"unit": "MathBase.SharedTypes", "surface": "TDoubleArray"}
+      ]
+    },
+    {
+      "id": "machine-learning-linear-regression",
+      "domain": "MLLib",
+      "entry_point": "TMLKit.LinearRegression",
+      "example_document": "docs/MLLib.md",
+      "contract_document": "docs/MLLib.md",
+      "selectors": [
+        {"unit": "MLLib.MachineLearning", "surface": "TMLKit"},
+        {"unit": "MLLib.MachineLearning", "surface": "TDoubleMatrix"},
+        {"unit": "MLLib.MachineLearning", "surface": "TLinearModel"},
+        {"unit": "MathBase.SharedTypes", "surface": "TDoubleArray"}
+      ]
+    },
+    {
+      "id": "interchange-dense-round-trip",
+      "domain": "InterchangeLib",
+      "entry_point": "SaveBinary and LoadDoubleMatrixBinary",
+      "example_document": "docs/Interchange.md",
+      "contract_document": "docs/Interchange.md",
+      "selectors": [
+        {"unit": "AlgebraLib.DenseMatrices", "surface": "IDenseDoubleMatrix"},
+        {"unit": "AlgebraLib.DenseMatrices", "surface": "TDenseDoubleMatrix"},
+        {"unit": "MathBase.Interchange", "name": "SaveBinary", "owner": null, "signature_contains": "IDenseDoubleMatrix"},
+        {"unit": "MathBase.Interchange", "name": "LoadDoubleMatrixBinary", "owner": null}
+      ]
+    },
+    {
+      "id": "geometry-vector",
+      "domain": "GeometryLib",
+      "entry_point": "TVector2D",
+      "example_document": "docs/GeometryLib.md",
+      "contract_document": "docs/GeometryLib.md",
+      "selectors": [
+        {"unit": "GeometryLib.Geometry", "surface": "TVector2D"}
+      ]
+    }
+  ],
+  "domains": [
+    {
+      "name": "MathBase",
+      "units": ["MathBase.Complex", "MathBase.Iteration", "MathBase.MathConstants", "MathBase.Precision", "MathBase.Random", "MathBase.SharedTypes", "MathBase.Trigonometry"],
+      "common_path_ids": ["mathbase-double-real"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "Keep focused scalar functions, TComplex value records, shared dynamic arrays, and stateless kit facades; do not add a MathBase umbrella.",
+        "units": "Trigonometric core functions use radians and named conversion functions cross degrees, grads, and radians.",
+        "ownership": "Scalar records are values; returned dynamic arrays are caller-owned managed values; TLocalRandom is explicit mutable caller state.",
+        "outcomes": "IEEE scalar edge behaviour is documented per function; iterative helpers use TIterationStatus rather than an invented Boolean success convention."
+      }
+    },
+    {
+      "name": "AlgebraLib",
+      "units": ["AlgebraLib.DenseDecompositions", "AlgebraLib.DenseKernels", "AlgebraLib.DenseMatrices", "AlgebraLib.DenseSolvers", "AlgebraLib.Determinants", "AlgebraLib.IterativeSolvers", "AlgebraLib.LinearOperators", "AlgebraLib.Matrices", "AlgebraLib.PartialEigensystems", "AlgebraLib.SparseMatrices", "AlgebraLib.StructuredSolvers", "AlgebraLib.VectorKernels", "AlgebraLib.Vectors"],
+      "common_path_ids": ["algebra-dense-double-solve"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "Document TDenseDoubleMatrix and double-real Solve first; named single/complex, sparse, structured, operator, factor, workspace, and diagnostic facades are advanced stable paths.",
+        "shape": "Matrices are rows by columns and vectors are explicit n by 1 matrices at operator boundaries; sparse and structured storage never densifies implicitly.",
+        "ownership": "Typed matrix handles retain reference-counted storage; factories deep-copy caller arrays, views retain their owner, and factors retain immutable snapshots as documented.",
+        "aliasing": "Views are mutable aliases; Into and solve destinations accept only documented exact in-place cases and reject unsafe partial overlap.",
+        "outcomes": "Direct invalid/singular contracts raise typed errors; iterative and partial-spectrum methods return status and residual diagnostics."
+      }
+    },
+    {
+      "name": "FinanceLib",
+      "units": ["FinanceLib.Bonds", "FinanceLib.Interest", "FinanceLib.NPV"],
+      "common_path_ids": ["finance-amortization"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TFinanceKit is the recommended facade; FinanceLib.Bonds and FinanceLib.NPV remain retained focused alias units.",
+        "units": "Rates are decimals and time arguments explicitly mean periods or years; currency has no implicit denomination conversion.",
+        "ownership": "Schedules and ratio records are returned as owned managed values and inputs are not retained.",
+        "outcomes": "Undefined ratios and unbracketed or non-convergent financial roots raise EFinanceError with the failing condition."
+      }
+    },
+    {
+      "name": "StatsLib",
+      "units": ["StatsLib.Inference", "StatsLib.Stats", "StatsLib.Streaming"],
+      "common_path_ids": ["stats-descriptive"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TStatsKit with TDoubleArray is the common descriptive route; TInferenceKit and TOnlineStatistics are advanced stable routes.",
+        "shape": "Samples are zero-based vectors; model matrices use observations by variables and paired samples require equal length.",
+        "ownership": "Batch results own their arrays; TOnlineStatistics is explicit mutable accumulator state and does not retain input arrays.",
+        "rng_state": "Bootstrap and randomized statistics use explicit seeds or local state and preserve the process-wide random stream.",
+        "outcomes": "Invalid samples raise statistical domain errors; inference and regression return structured estimates and diagnostics."
+      }
+    },
+    {
+      "name": "EngineeringLib",
+      "units": ["EngineeringLib.Common", "EngineeringLib.DSP", "EngineeringLib.FluidDynamics", "EngineeringLib.Pressure", "EngineeringLib.Signal", "EngineeringLib.Thermodynamics", "EngineeringLib.UnitConversion", "EngineeringLib.Velocity"],
+      "common_path_ids": ["engineering-typed-calculations"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "Use the domain kit named for the calculation; TDSPKit and explicit streaming/filter types are the advanced signal path.",
+        "units": "Each engineering routine documents its physical units; TUnitConversionKit uses typed unit enums and canonical case-sensitive symbols.",
+        "ownership": "Stateless kit results are values; streaming FIR, biquad, and overlap processors are mutable caller-owned instances.",
+        "mutation": "Batch calculations leave inputs unchanged; streaming processors mutate only their named retained state.",
+        "thread_safety": "Static calculations are reentrant; each concurrent stream or filter requires its own instance."
+      }
+    },
+    {
+      "name": "NumericsLib",
+      "units": ["NumericsLib.Differentiation", "NumericsLib.Interpolation", "NumericsLib.Modelling", "NumericsLib.Numerics"],
+      "common_path_ids": ["numerics-scalar-and-ode"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TNumericsKit is the common scalar route; interpolation, differentiation, and modelling expose focused constructors, options, results, and diagnostic helpers.",
+        "shape": "Vector callbacks and result series use zero-based arrays with validated equal dimensions; grids state axis order at construction.",
+        "ownership": "Interpolators and fitted results own copied coefficients; callbacks remain caller-owned and are not retained beyond the call unless the contract says so.",
+        "tolerances": "Adaptive integration, roots, fitting, and ODEs use their documented absolute/relative or scale-aware tests rather than one library-wide epsilon.",
+        "outcomes": "Modern adaptive and modelling APIs expose convergence/status records; retained scalar compatibility routines keep their documented convergence exception."
+      }
+    },
+    {
+      "name": "ProbabilityLib",
+      "units": ["ProbabilityLib.Distributions"],
+      "common_path_ids": ["probability-normal-cdf"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TProbabilityKit remains the stateless distribution facade and double-real common path.",
+        "units": "Distribution parameters and variates share the caller's documented unit; probabilities are dimensionless in [0,1].",
+        "ownership": "Scalar calls allocate no retained state and sampling outputs are owned managed arrays.",
+        "outcomes": "Invalid distribution parameters raise EProbabilityError; boundary probabilities follow each distribution contract."
+      }
+    },
+    {
+      "name": "CombinatoricsLib",
+      "units": ["CombinatoricsLib.Combinatorics"],
+      "common_path_ids": ["combinatorics-counting"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TCombinatoricsKit is the common counting facade; generated permutation, subset, factor, and triangle arrays remain descriptive result types.",
+        "indexing": "Generated sequences and result arrays are zero-based while mathematical n and k parameters retain their conventional meanings.",
+        "ownership": "Generated arrays are owned managed values and input arrays are not retained.",
+        "outcomes": "Invalid domains and representational overflow raise ECombinatoricsError rather than wrap silently."
+      }
+    },
+    {
+      "name": "OptimizationLib",
+      "units": ["OptimizationLib.Convex", "OptimizationLib.Optimization"],
+      "common_path_ids": ["optimization-scalar"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TOptimizationKit.GoldenSection is the common scalar path; multivariate, workspace, constrained, Pareto, and TConvexOptimizationKit APIs are advanced stable paths.",
+        "shape": "Decision vectors are zero-based and constraint/Jacobian dimensions must match the model declared by the caller.",
+        "ownership": "Allocating results own iterates and diagnostics; workspaces and progress callbacks remain caller-owned and are reusable only under their documented shape contract.",
+        "outcomes": "Feasibility, convergence, limits, cancellation, and numerical breakdown use result statuses; malformed models raise typed exceptions.",
+        "progress": "Progress callbacks synchronously observe complete iterates and must not concurrently mutate the active inputs or workspace."
+      }
+    },
+    {
+      "name": "TimeSeriesLib",
+      "units": ["TimeSeriesLib.StateSpace", "TimeSeriesLib.TimeSeries"],
+      "common_path_ids": ["time-series-smoothing"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TTimeSeriesKit is the common batch route; scalar and multivariate Kalman configuration/filter/result types form the advanced state-space route.",
+        "indexing": "Arrays are ordered from earliest to latest observation and zero-based; forecast horizons count steps beyond the last observation.",
+        "units": "Sample spacing, seasonal period, and state units are caller-declared and must remain consistent across a model.",
+        "ownership": "Batch outputs own their arrays; Kalman filters are mutable caller-owned state and configurations are copied at construction.",
+        "thread_safety": "Batch functions are reentrant; mutable filter instances cannot be shared concurrently without synchronization."
+      }
+    },
+    {
+      "name": "MLLib",
+      "units": ["MLLib.Analysis", "MLLib.MachineLearning"],
+      "common_path_ids": ["machine-learning-linear-regression"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "TMLKit.LinearRegression is the common modelling route; TAnalysisKit typed preprocessing, forests, clustering, PCA, and neighbor structures are advanced stable paths.",
+        "shape": "Model matrices use observations by features, targets align by observation, and prediction feature counts must match training.",
+        "ownership": "Fitted models and result arrays own their learned values; transformation models do not retain caller datasets.",
+        "rng_state": "Randomized splits, clustering, and forests require documented seeds or local state for replay.",
+        "outcomes": "Invalid data and shapes raise typed errors; fitted models expose diagnostics rather than a Boolean success flag."
+      }
+    },
+    {
+      "name": "InterchangeLib",
+      "units": ["InterchangeLib.Models", "MathBase.Expressions", "MathBase.Interchange"],
+      "common_path_ids": ["interchange-dense-round-trip"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "Use format-specific Write/Read or Save/Load pairs; typed Load names state the scalar result and model persistence names the model kind.",
+        "shape": "Serialized dimensions are rows by columns and are validated against independent element and per-axis limits before allocation.",
+        "ownership": "Streams remain caller-owned; successful loads allocate independent values and failures leave destination/result variables unchanged.",
+        "defaults": "Element, dimension, expression, and model limits remain explicit constants or arguments and are never relaxed from file contents.",
+        "outcomes": "Malformed versions, checksums, shapes, tokens, or models raise the interchange/expression exception naming the rejected condition."
+      }
+    },
+    {
+      "name": "GeometryLib",
+      "units": ["GeometryLib.Geometry"],
+      "common_path_ids": ["geometry-vector"],
+      "inherits_global": true,
+      "specific_decisions": {
+        "naming": "Keep distinct point, vector, segment, line, plane, polygon, circle, sphere, box, and transform value types; TVector2D is the common arithmetic example.",
+        "units": "Coordinates, distances, radii, and transform translations use one caller-consistent unit; angle arguments use radians unless named otherwise.",
+        "ownership": "Fixed geometry records are copied values; polygon vertex arrays are owned managed values according to their constructor contract.",
+        "mutation": "Operators and geometry calculations return values and do not mutate operands.",
+        "thread_safety": "Value operations are reentrant when callers do not concurrently mutate the same record or managed-array storage."
+      }
+    }
+  ],
+  "compatibility_notes": {
+    "legacy-dense-matrix": "The typed replacement is not a cast: convert with TDenseDoubleMatrix.FromIMatrix or ToIMatrix, which deep-copies. Typed storage uses SizeInt shapes, explicit kernels/factors/results, and documented views instead of the combined mutable IMatrix method surface.",
+    "legacy-sparse-matrix": "TSparseDoubleMatrix constructs canonical CSR/CSC values returned as ISparseDoubleMatrix. TMatrixKitSparse remains an IMatrix-compatible mutable representation; conversion must enumerate/copy and must not be treated as a zero-copy CSR cast.",
+    "focused-bond-alias-unit": "Retain FinanceLib.Bonds as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TFinanceKit amortization types, so retaining it has no numerical or ownership difference.",
+    "focused-npv-alias-unit": "Retain FinanceLib.NPV as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TDoubleArray, so retaining it has no numerical or ownership difference."
+  },
+  "compatibility_decisions": [
+    {
+      "id": "replace-imatrix",
+      "selector": {"unit": "AlgebraLib.Matrices", "surface": "IMatrix"},
+      "decision": "replace",
+      "replacement": "IDenseDoubleMatrix",
+      "note": "legacy-dense-matrix"
+    },
+    {
+      "id": "replace-tmatrixkit",
+      "selector": {"unit": "AlgebraLib.Matrices", "surface": "TMatrixKit"},
+      "decision": "replace",
+      "replacement": "TDenseDoubleMatrix",
+      "note": "legacy-dense-matrix"
+    },
+    {
+      "id": "replace-tmatrixkitsparse",
+      "selector": {"unit": "AlgebraLib.Matrices", "surface": "TMatrixKitSparse"},
+      "decision": "replace",
+      "replacement": "TSparseDoubleMatrix",
+      "note": "legacy-sparse-matrix"
+    },
+    {
+      "id": "retain-finance-bonds",
+      "selector": {"unit": "FinanceLib.Bonds"},
+      "decision": "retain",
+      "note": "focused-bond-alias-unit"
+    },
+    {
+      "id": "retain-finance-npv",
+      "selector": {"unit": "FinanceLib.NPV"},
+      "decision": "retain",
+      "note": "focused-npv-alias-unit"
+    }
+  ],
+  "experimental_selectors": [],
+  "unresolved_decisions": [],
+  "future_minor_capabilities": [
+    {
+      "release": "1.10.0",
+      "capability": "Ergonomic 2-D and 3-D vector rotation",
+      "reason": "The common geometry review still requires manual coordinate reconstruction; 3-D also needs an explicit choice among axis-angle, quaternion, and matrix semantics.",
+      "api_status": "A focused 1.10.0 design must choose the public names, orientation conventions, units, normalization rules, and contracts; 1.9.x adds no declaration."
+    }
+  ]
+}

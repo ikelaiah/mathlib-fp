@@ -7,3295 +7,3295 @@ machine-readable contract is
 
 A declaration is identified by unit, owner, kind, name, and normalized
 signature. Private/protected members are excluded; declarations marked
-`internal` remain listed because their interface presence affects
+`implementation` remain listed because their interface presence affects
 generic specialization and the unit-interface hash.
 
 ## Classification totals
 
 | Classification | Declarations |
 | --- | ---: |
+| `advanced` | 1786 |
 | `compatibility` | 127 |
-| `deprecated` | 0 |
 | `experimental` | 0 |
-| `internal` | 325 |
-| `primary` | 2428 |
+| `implementation` | 431 |
+| `recommended` | 536 |
 
 ## AlgebraLib.DenseDecompositions
 
 Source: [`src/AlgebraLib.DenseDecompositions.pas`](../src/AlgebraLib.DenseDecompositions.pas)  
 Interface SHA-256: `22c91ef478349504453ef2986593b25d3ce45c8daeac4bd10cb71f66652a2f95`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `FactorHermitianEigen` | `function FactorHermitianEigen(const A:IDenseComplexMatrix):IDenseComplexHermitianEigen` | `primary` | `—` |
-| `(unit)` | `function` | `FactorHermitianEigen` | `function FactorHermitianEigen(const A:IDenseSingleComplexMatrix):IDenseSingleComplexHermitianEigen` | `primary` | `—` |
-| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseComplexMatrix;const Tolerance:Double=-1.0):IDenseComplexQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseDoubleMatrix;const Tolerance:Double=-1.0):IDenseDoubleQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseSingleComplexMatrix;const Tolerance:Double=-1.0):IDenseSingleComplexQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseSingleMatrix;const Tolerance:Double=-1.0):IDenseSingleQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseComplexMatrix;const Tolerance:Double=-1.0):IDenseComplexQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseDoubleMatrix;const Tolerance:Double=-1.0):IDenseDoubleQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseSingleComplexMatrix;const Tolerance:Double=-1.0):IDenseSingleComplexQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseSingleMatrix;const Tolerance:Double=-1.0):IDenseSingleQR` | `primary` | `—` |
-| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseComplexMatrix;const Tolerance:Double=-1.0):IDenseComplexSVD` | `primary` | `—` |
-| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseDoubleMatrix;const Tolerance:Double=-1.0):IDenseDoubleSVD` | `primary` | `—` |
-| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseSingleComplexMatrix;const Tolerance:Double=-1.0):IDenseSingleComplexSVD` | `primary` | `—` |
-| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseSingleMatrix;const Tolerance:Double=-1.0):IDenseSingleSVD` | `primary` | `—` |
-| `(unit)` | `function` | `FactorSymmetricEigen` | `function FactorSymmetricEigen(const A:IDenseDoubleMatrix):IDenseDoubleSymmetricEigen` | `primary` | `—` |
-| `(unit)` | `function` | `FactorSymmetricEigen` | `function FactorSymmetricEigen(const A:IDenseSingleMatrix):IDenseSingleSymmetricEigen` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseComplexHermitianEigen` | `IDenseComplexHermitianEigen=specialize IDenseHermitianEigenFactorization<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseComplexQR` | `IDenseComplexQR=specialize IDenseQRFactorization<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseComplexSVD` | `IDenseComplexSVD=specialize IDenseSVDFactorization<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseDoubleQR` | `IDenseDoubleQR=specialize IDenseQRFactorization<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseDoubleSVD` | `IDenseDoubleSVD=specialize IDenseSVDFactorization<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseDoubleSymmetricEigen` | `IDenseDoubleSymmetricEigen=specialize IDenseHermitianEigenFactorization<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `IDenseHermitianEigenFactorization` | `generic IDenseHermitianEigenFactorization<T>=interface` | `primary` | `—` |
-| `(unit)` | `interface` | `IDenseQRFactorization` | `generic IDenseQRFactorization<T>=interface` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleComplexHermitianEigen` | `IDenseSingleComplexHermitianEigen=specialize IDenseHermitianEigenFactorization<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleComplexQR` | `IDenseSingleComplexQR=specialize IDenseQRFactorization<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleComplexSVD` | `IDenseSingleComplexSVD=specialize IDenseSVDFactorization<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleQR` | `IDenseSingleQR=specialize IDenseQRFactorization<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleSVD` | `IDenseSingleSVD=specialize IDenseSVDFactorization<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleSymmetricEigen` | `IDenseSingleSymmetricEigen=specialize IDenseHermitianEigenFactorization<Single>` | `primary` | `—` |
-| `(unit)` | `interface` | `IDenseSVDFactorization` | `generic IDenseSVDFactorization<T>=interface` | `primary` | `—` |
-| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseComplexMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseDoubleMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseSingleComplexMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseSingleMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `type` | `TDenseDiagonal` | `TDenseDiagonal=(ddNonUnit,ddUnit)` | `primary` | `—` |
-| `(unit)` | `record` | `TDenseSolveDiagnostics` | `TDenseSolveDiagnostics=record` | `primary` | `—` |
-| `(unit)` | `type` | `TDenseTranspose` | `TDenseTranspose=(dtNoTranspose,dtTranspose,dtConjugateTranspose)` | `primary` | `—` |
-| `(unit)` | `type` | `TDenseTriangle` | `TDenseTriangle=(dtLower,dtUpper)` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `property` | `Converged` | `property Converged:Boolean read GetConverged` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `property` | `Eigenvalues` | `property Eigenvalues:TDoubleArray read GetEigenvalues` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `property` | `Eigenvectors` | `property Eigenvectors:specialize IDenseMatrix<T> read GetEigenvectors` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `function` | `GetConverged` | `function GetConverged:Boolean` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `function` | `GetEigenvalues` | `function GetEigenvalues:TDoubleArray` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `function` | `GetEigenvectors` | `function GetEigenvectors:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `function` | `GetSize` | `function GetSize:SizeInt` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `function` | `GetSweeps` | `function GetSweeps:SizeInt` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `property` | `Size` | `property Size:SizeInt read GetSize` | `primary` | `—` |
-| `IDenseHermitianEigenFactorization` | `property` | `Sweeps` | `property Sweeps:SizeInt read GetSweeps` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetCols` | `function GetCols:SizeInt` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetIsColumnPivoted` | `function GetIsColumnPivoted:Boolean` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetNumericalRank` | `function GetNumericalRank:SizeInt` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetPermutation` | `function GetPermutation:TSizeIntArray` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetQ` | `function GetQ:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetR` | `function GetR:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetRows` | `function GetRows:SizeInt` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `GetTolerance` | `function GetTolerance:Double` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `IsColumnPivoted` | `property IsColumnPivoted:Boolean read GetIsColumnPivoted` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `NumericalRank` | `property NumericalRank:SizeInt read GetNumericalRank` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `Permutation` | `property Permutation:TSizeIntArray read GetPermutation` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `Q` | `property Q:specialize IDenseMatrix<T> read GetQ` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `R` | `property R:specialize IDenseMatrix<T> read GetR` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `SolveLeastSquares` | `function SolveLeastSquares(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseQRFactorization` | `function` | `SolveLeastSquaresWithInfo` | `function SolveLeastSquaresWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseQRFactorization` | `property` | `Tolerance` | `property Tolerance:Double read GetTolerance` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetCols` | `function GetCols:SizeInt` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetNumericalRank` | `function GetNumericalRank:SizeInt` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetRows` | `function GetRows:SizeInt` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetSingularValues` | `function GetSingularValues:TDoubleArray` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetSweeps` | `function GetSweeps:SizeInt` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetTolerance` | `function GetTolerance:Double` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetU` | `function GetU:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `GetV` | `function GetV:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `NumericalRank` | `property NumericalRank:SizeInt read GetNumericalRank` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `SingularValues` | `property SingularValues:TDoubleArray read GetSingularValues` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `SolveMinimumNorm` | `function SolveMinimumNorm(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseSVDFactorization` | `function` | `SolveMinimumNormWithInfo` | `function SolveMinimumNormWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `Sweeps` | `property Sweeps:SizeInt read GetSweeps` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `Tolerance` | `property Tolerance:Double read GetTolerance` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `U` | `property U:specialize IDenseMatrix<T> read GetU` | `primary` | `—` |
-| `IDenseSVDFactorization` | `property` | `V` | `property V:specialize IDenseMatrix<T> read GetV` | `primary` | `—` |
-| `TDenseDiagonal` | `enum-value` | `ddNonUnit` | `ddNonUnit` | `primary` | `—` |
-| `TDenseDiagonal` | `enum-value` | `ddUnit` | `ddUnit` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `BackwardError` | `BackwardError:Double` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `ConditionIndicator` | `ConditionIndicator:Double` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `IsRankDeficient` | `IsRankDeficient:Boolean` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `Method` | `Method:string` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `NumericalRank` | `NumericalRank:SizeInt` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `ResidualNorm` | `ResidualNorm:Double` | `primary` | `—` |
-| `TDenseSolveDiagnostics` | `field` | `Tolerance` | `Tolerance:Double` | `primary` | `—` |
-| `TDenseTranspose` | `enum-value` | `dtConjugateTranspose` | `dtConjugateTranspose` | `primary` | `—` |
-| `TDenseTranspose` | `enum-value` | `dtNoTranspose` | `dtNoTranspose` | `primary` | `—` |
-| `TDenseTranspose` | `enum-value` | `dtTranspose` | `dtTranspose` | `primary` | `—` |
-| `TDenseTriangle` | `enum-value` | `dtLower` | `dtLower` | `primary` | `—` |
-| `TDenseTriangle` | `enum-value` | `dtUpper` | `dtUpper` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `FactorHermitianEigen` | `function FactorHermitianEigen(const A:IDenseComplexMatrix):IDenseComplexHermitianEigen` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorHermitianEigen` | `function FactorHermitianEigen(const A:IDenseSingleComplexMatrix):IDenseSingleComplexHermitianEigen` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseComplexMatrix;const Tolerance:Double=-1.0):IDenseComplexQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseDoubleMatrix;const Tolerance:Double=-1.0):IDenseDoubleQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseSingleComplexMatrix;const Tolerance:Double=-1.0):IDenseSingleComplexQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorPivotedQR` | `function FactorPivotedQR(const A:IDenseSingleMatrix;const Tolerance:Double=-1.0):IDenseSingleQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseComplexMatrix;const Tolerance:Double=-1.0):IDenseComplexQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseDoubleMatrix;const Tolerance:Double=-1.0):IDenseDoubleQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseSingleComplexMatrix;const Tolerance:Double=-1.0):IDenseSingleComplexQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorQR` | `function FactorQR(const A:IDenseSingleMatrix;const Tolerance:Double=-1.0):IDenseSingleQR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseComplexMatrix;const Tolerance:Double=-1.0):IDenseComplexSVD` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseDoubleMatrix;const Tolerance:Double=-1.0):IDenseDoubleSVD` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseSingleComplexMatrix;const Tolerance:Double=-1.0):IDenseSingleComplexSVD` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorSVD` | `function FactorSVD(const A:IDenseSingleMatrix;const Tolerance:Double=-1.0):IDenseSingleSVD` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorSymmetricEigen` | `function FactorSymmetricEigen(const A:IDenseDoubleMatrix):IDenseDoubleSymmetricEigen` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorSymmetricEigen` | `function FactorSymmetricEigen(const A:IDenseSingleMatrix):IDenseSingleSymmetricEigen` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseComplexHermitianEigen` | `IDenseComplexHermitianEigen=specialize IDenseHermitianEigenFactorization<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseComplexQR` | `IDenseComplexQR=specialize IDenseQRFactorization<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseComplexSVD` | `IDenseComplexSVD=specialize IDenseSVDFactorization<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseDoubleQR` | `IDenseDoubleQR=specialize IDenseQRFactorization<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseDoubleSVD` | `IDenseDoubleSVD=specialize IDenseSVDFactorization<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseDoubleSymmetricEigen` | `IDenseDoubleSymmetricEigen=specialize IDenseHermitianEigenFactorization<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IDenseHermitianEigenFactorization` | `generic IDenseHermitianEigenFactorization<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IDenseQRFactorization` | `generic IDenseQRFactorization<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleComplexHermitianEigen` | `IDenseSingleComplexHermitianEigen=specialize IDenseHermitianEigenFactorization<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleComplexQR` | `IDenseSingleComplexQR=specialize IDenseQRFactorization<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleComplexSVD` | `IDenseSingleComplexSVD=specialize IDenseSVDFactorization<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleQR` | `IDenseSingleQR=specialize IDenseQRFactorization<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleSVD` | `IDenseSingleSVD=specialize IDenseSVDFactorization<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleSymmetricEigen` | `IDenseSingleSymmetricEigen=specialize IDenseHermitianEigenFactorization<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IDenseSVDFactorization` | `generic IDenseSVDFactorization<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LeastSquares` | `function LeastSquares(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `MinimumNormSolve` | `function MinimumNormSolve(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `RankRevealingLeastSquares` | `function RankRevealingLeastSquares(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics;const Tolerance:Double=-1.0):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseComplexMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseDoubleMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseSingleComplexMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveTriangular` | `function SolveTriangular(const A,B:IDenseSingleMatrix;const Triangle:TDenseTriangle;const Transpose:TDenseTranspose=dtNoTranspose;const Diagonal:TDenseDiagonal=ddNonUnit):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDenseDiagonal` | `TDenseDiagonal=(ddNonUnit,ddUnit)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDenseSolveDiagnostics` | `TDenseSolveDiagnostics=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDenseTranspose` | `TDenseTranspose=(dtNoTranspose,dtTranspose,dtConjugateTranspose)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDenseTriangle` | `TDenseTriangle=(dtLower,dtUpper)` | `advanced` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `property` | `Converged` | `property Converged:Boolean read GetConverged` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `property` | `Eigenvalues` | `property Eigenvalues:TDoubleArray read GetEigenvalues` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `property` | `Eigenvectors` | `property Eigenvectors:specialize IDenseMatrix<T> read GetEigenvectors` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `function` | `GetConverged` | `function GetConverged:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `function` | `GetEigenvalues` | `function GetEigenvalues:TDoubleArray` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `function` | `GetEigenvectors` | `function GetEigenvectors:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `function` | `GetSweeps` | `function GetSweeps:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `property` | `Size` | `property Size:SizeInt read GetSize` | `implementation` | `—` | `—` | `—` |
+| `IDenseHermitianEigenFactorization` | `property` | `Sweeps` | `property Sweeps:SizeInt read GetSweeps` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetIsColumnPivoted` | `function GetIsColumnPivoted:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetNumericalRank` | `function GetNumericalRank:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetPermutation` | `function GetPermutation:TSizeIntArray` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetQ` | `function GetQ:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetR` | `function GetR:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `GetTolerance` | `function GetTolerance:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `IsColumnPivoted` | `property IsColumnPivoted:Boolean read GetIsColumnPivoted` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `NumericalRank` | `property NumericalRank:SizeInt read GetNumericalRank` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `Permutation` | `property Permutation:TSizeIntArray read GetPermutation` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `Q` | `property Q:specialize IDenseMatrix<T> read GetQ` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `R` | `property R:specialize IDenseMatrix<T> read GetR` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `SolveLeastSquares` | `function SolveLeastSquares(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `function` | `SolveLeastSquaresWithInfo` | `function SolveLeastSquaresWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseQRFactorization` | `property` | `Tolerance` | `property Tolerance:Double read GetTolerance` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetNumericalRank` | `function GetNumericalRank:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetSingularValues` | `function GetSingularValues:TDoubleArray` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetSweeps` | `function GetSweeps:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetTolerance` | `function GetTolerance:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetU` | `function GetU:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `GetV` | `function GetV:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `NumericalRank` | `property NumericalRank:SizeInt read GetNumericalRank` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `SingularValues` | `property SingularValues:TDoubleArray read GetSingularValues` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `SolveMinimumNorm` | `function SolveMinimumNorm(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `function` | `SolveMinimumNormWithInfo` | `function SolveMinimumNormWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `Sweeps` | `property Sweeps:SizeInt read GetSweeps` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `Tolerance` | `property Tolerance:Double read GetTolerance` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `U` | `property U:specialize IDenseMatrix<T> read GetU` | `implementation` | `—` | `—` | `—` |
+| `IDenseSVDFactorization` | `property` | `V` | `property V:specialize IDenseMatrix<T> read GetV` | `implementation` | `—` | `—` | `—` |
+| `TDenseDiagonal` | `enum-value` | `ddNonUnit` | `ddNonUnit` | `advanced` | `—` | `—` | `—` |
+| `TDenseDiagonal` | `enum-value` | `ddUnit` | `ddUnit` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `BackwardError` | `BackwardError:Double` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `ConditionIndicator` | `ConditionIndicator:Double` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `IsRankDeficient` | `IsRankDeficient:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `Method` | `Method:string` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `NumericalRank` | `NumericalRank:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `ResidualNorm` | `ResidualNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TDenseSolveDiagnostics` | `field` | `Tolerance` | `Tolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TDenseTranspose` | `enum-value` | `dtConjugateTranspose` | `dtConjugateTranspose` | `advanced` | `—` | `—` | `—` |
+| `TDenseTranspose` | `enum-value` | `dtNoTranspose` | `dtNoTranspose` | `advanced` | `—` | `—` | `—` |
+| `TDenseTranspose` | `enum-value` | `dtTranspose` | `dtTranspose` | `advanced` | `—` | `—` | `—` |
+| `TDenseTriangle` | `enum-value` | `dtLower` | `dtLower` | `advanced` | `—` | `—` | `—` |
+| `TDenseTriangle` | `enum-value` | `dtUpper` | `dtUpper` | `advanced` | `—` | `—` | `—` |
 
 ## AlgebraLib.DenseKernels
 
 Source: [`src/AlgebraLib.DenseKernels.pas`](../src/AlgebraLib.DenseKernels.pas)  
 Interface SHA-256: `ca15637537ad37e7208ba46c575c7b2ced1bc22a2b64b86441c0927be0e80870`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseComplexMatrix;const Operation:TComplexUnaryKernel):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseDoubleMatrix;const Operation:TDoubleUnaryKernel):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseSingleComplexMatrix;const Operation:TSingleComplexUnaryKernel):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseSingleMatrix;const Operation:TSingleUnaryKernel):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseComplexMatrix;const Operation:TComplexUnaryKernel)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseDoubleMatrix;const Operation:TDoubleUnaryKernel)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseSingleComplexMatrix;const Operation:TSingleComplexUnaryKernel)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseSingleMatrix;const Operation:TSingleUnaryKernel)` | `primary` | `—` |
-| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:Double;const X,Y:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:Single;const X,Y:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:TComplex;const X,Y:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:TSingleComplex;const X,Y:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:Double;const X,Y,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:Single;const X,Y,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:TComplex;const X,Y,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:TSingleComplex;const X,Y,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `Conjugate` | `function Conjugate(const A:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Conjugate` | `function Conjugate(const A:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `ConjugateInto` | `procedure ConjugateInto(const A,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ConjugateInto` | `procedure ConjugateInto(const A,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `ConjugateTranspose` | `function ConjugateTranspose(const A:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConjugateTranspose` | `function ConjugateTranspose(const A:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `ConjugateTransposeInto` | `procedure ConjugateTransposeInto(const A,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ConjugateTransposeInto` | `procedure ConjugateTransposeInto(const A,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `constant` | `DENSE_MULTIPLY_AUTO_THRESHOLD` | `DENSE_MULTIPLY_AUTO_THRESHOLD=131072` | `primary` | `—` |
-| `(unit)` | `constant` | `DENSE_MULTIPLY_BLOCK_SIZE` | `DENSE_MULTIPLY_BLOCK_SIZE=32` | `primary` | `—` |
-| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseComplexMatrix):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseDoubleMatrix):Double` | `primary` | `—` |
-| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseSingleComplexMatrix):TSingleComplex` | `primary` | `—` |
-| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseSingleMatrix):Single` | `primary` | `—` |
-| `(unit)` | `function` | `DotConjugate` | `function DotConjugate(const A,B:IDenseComplexMatrix):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `DotConjugate` | `function DotConjugate(const A,B:IDenseSingleComplexMatrix):TSingleComplex` | `primary` | `—` |
-| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseComplexMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseDoubleMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseSingleComplexMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseSingleMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseComplexMatrix):Double` | `primary` | `—` |
-| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseDoubleMatrix):Double` | `primary` | `—` |
-| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseSingleComplexMatrix):Single` | `primary` | `—` |
-| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseSingleMatrix):Single` | `primary` | `—` |
-| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseComplexMatrix;const Scalar:TComplex):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseDoubleMatrix;const Scalar:Double):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseSingleComplexMatrix;const Scalar:TSingleComplex):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseSingleMatrix;const Scalar:Single):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseComplexMatrix;const Scalar:TComplex)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseDoubleMatrix;const Scalar:Double)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseSingleComplexMatrix;const Scalar:TSingleComplex)` | `primary` | `—` |
-| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseSingleMatrix;const Scalar:Single)` | `primary` | `—` |
-| `(unit)` | `function` | `SelectedMultiplyPath` | `function SelectedMultiplyPath(const Rows,InnerDimension,Columns:SizeInt):TDenseMultiplyPath` | `primary` | `—` |
-| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseComplexMatrix):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseDoubleMatrix):Double` | `primary` | `—` |
-| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseSingleComplexMatrix):TSingleComplex` | `primary` | `—` |
-| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseSingleMatrix):Single` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexUnaryKernel` | `TComplexUnaryKernel=function(const Value:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `type` | `TDenseMultiplyPath` | `TDenseMultiplyPath=(dmpPortable,dmpBlocked)` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleUnaryKernel` | `TDoubleUnaryKernel=function(const Value:Double):Double` | `primary` | `—` |
-| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexUnaryKernel` | `TSingleComplexUnaryKernel=function(const Value:TSingleComplex):TSingleComplex` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleUnaryKernel` | `TSingleUnaryKernel=function(const Value:Single):Single` | `primary` | `—` |
-| `TDenseMultiplyPath` | `enum-value` | `dmpBlocked` | `dmpBlocked` | `primary` | `—` |
-| `TDenseMultiplyPath` | `enum-value` | `dmpPortable` | `dmpPortable` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Add` | `function Add(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AddInto` | `procedure AddInto(const A,B,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseComplexMatrix;const Operation:TComplexUnaryKernel):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseDoubleMatrix;const Operation:TDoubleUnaryKernel):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseSingleComplexMatrix;const Operation:TSingleComplexUnaryKernel):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Apply` | `function Apply(const A:IDenseSingleMatrix;const Operation:TSingleUnaryKernel):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseComplexMatrix;const Operation:TComplexUnaryKernel)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseDoubleMatrix;const Operation:TDoubleUnaryKernel)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseSingleComplexMatrix;const Operation:TSingleComplexUnaryKernel)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ApplyInto` | `procedure ApplyInto(const A,Destination:IDenseSingleMatrix;const Operation:TSingleUnaryKernel)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:Double;const X,Y:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:Single;const X,Y:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:TComplex;const X,Y:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Axpy` | `function Axpy(const Alpha:TSingleComplex;const X,Y:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:Double;const X,Y,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:Single;const X,Y,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:TComplex;const X,Y,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `AxpyInto` | `procedure AxpyInto(const Alpha:TSingleComplex;const X,Y,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Conjugate` | `function Conjugate(const A:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Conjugate` | `function Conjugate(const A:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ConjugateInto` | `procedure ConjugateInto(const A,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ConjugateInto` | `procedure ConjugateInto(const A,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConjugateTranspose` | `function ConjugateTranspose(const A:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConjugateTranspose` | `function ConjugateTranspose(const A:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ConjugateTransposeInto` | `procedure ConjugateTransposeInto(const A,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ConjugateTransposeInto` | `procedure ConjugateTransposeInto(const A,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `CopyInto` | `procedure CopyInto(const A,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `DENSE_MULTIPLY_AUTO_THRESHOLD` | `DENSE_MULTIPLY_AUTO_THRESHOLD=131072` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `DENSE_MULTIPLY_BLOCK_SIZE` | `DENSE_MULTIPLY_BLOCK_SIZE=32` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseComplexMatrix):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseDoubleMatrix):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseSingleComplexMatrix):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Dot` | `function Dot(const A,B:IDenseSingleMatrix):Single` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DotConjugate` | `function DotConjugate(const A,B:IDenseComplexMatrix):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DotConjugate` | `function DotConjugate(const A,B:IDenseSingleComplexMatrix):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ElementWiseMultiplyInto` | `procedure ElementWiseMultiplyInto(const A,B,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Multiply` | `function Multiply(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyAutoInto` | `procedure MultiplyAutoInto(const A,B,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseComplexMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseDoubleMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseSingleComplexMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyBlockedInto` | `procedure MultiplyBlockedInto(const A,B,Destination:IDenseSingleMatrix;const BlockSize:SizeInt=DENSE_MULTIPLY_BLOCK_SIZE)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `MultiplyInto` | `procedure MultiplyInto(const A,B,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseComplexMatrix):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseDoubleMatrix):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseSingleComplexMatrix):Single` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Norm2` | `function Norm2(const A:IDenseSingleMatrix):Single` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseComplexMatrix;const Scalar:TComplex):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseDoubleMatrix;const Scalar:Double):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseSingleComplexMatrix;const Scalar:TSingleComplex):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Scale` | `function Scale(const A:IDenseSingleMatrix;const Scalar:Single):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseComplexMatrix;const Scalar:TComplex)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseDoubleMatrix;const Scalar:Double)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseSingleComplexMatrix;const Scalar:TSingleComplex)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `ScaleInto` | `procedure ScaleInto(const A,Destination:IDenseSingleMatrix;const Scalar:Single)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SelectedMultiplyPath` | `function SelectedMultiplyPath(const Rows,InnerDimension,Columns:SizeInt):TDenseMultiplyPath` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Subtract` | `function Subtract(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SubtractInto` | `procedure SubtractInto(const A,B,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseComplexMatrix):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseDoubleMatrix):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseSingleComplexMatrix):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Sum` | `function Sum(const A:IDenseSingleMatrix):Single` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexUnaryKernel` | `TComplexUnaryKernel=function(const Value:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDenseMultiplyPath` | `TDenseMultiplyPath=(dmpPortable,dmpBlocked)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleUnaryKernel` | `TDoubleUnaryKernel=function(const Value:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Transpose` | `function Transpose(const A:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `TransposeInto` | `procedure TransposeInto(const A,Destination:IDenseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexUnaryKernel` | `TSingleComplexUnaryKernel=function(const Value:TSingleComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleUnaryKernel` | `TSingleUnaryKernel=function(const Value:Single):Single` | `advanced` | `—` | `—` | `—` |
+| `TDenseMultiplyPath` | `enum-value` | `dmpBlocked` | `dmpBlocked` | `advanced` | `—` | `—` | `—` |
+| `TDenseMultiplyPath` | `enum-value` | `dmpPortable` | `dmpPortable` | `advanced` | `—` | `—` | `—` |
 
 ## AlgebraLib.DenseMatrices
 
 Source: [`src/AlgebraLib.DenseMatrices.pas`](../src/AlgebraLib.DenseMatrices.pas)  
 Interface SHA-256: `61b095e413bd523943bd018682ac9d2f70c26954eff820786583013822eb5d23`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `ConvertToComplex` | `function ConvertToComplex(const Matrix:IDenseDoubleMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToComplex` | `function ConvertToComplex(const Matrix:IDenseSingleMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToDouble` | `function ConvertToDouble(const Matrix:IDenseSingleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToDoubleComplex` | `function ConvertToDoubleComplex(const Matrix:IDenseSingleComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToReal` | `function ConvertToReal(const Matrix:IDenseComplexMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToReal` | `function ConvertToReal(const Matrix:IDenseSingleComplexMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToSingle` | `function ConvertToSingle(const Matrix:IDenseDoubleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ConvertToSingleComplex` | `function ConvertToSingleComplex(const Matrix:IDenseComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `constant` | `DENSE_ALIGNMENT` | `DENSE_ALIGNMENT=32` | `primary` | `—` |
-| `(unit)` | `function` | `DenseInterfaceCast` | `generic function DenseInterfaceCast<S,T>(const Matrix:specialize IDenseMatrix<S>):specialize IDenseMatrix<T>` | `internal` | `—` |
-| `(unit)` | `type` | `EDenseMatrixError` | `EDenseMatrixError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseComplexMatrix` | `IDenseComplexMatrix=specialize IDenseMatrix<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseDoubleMatrix` | `IDenseDoubleMatrix=specialize IDenseMatrix<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `IDenseMatrix` | `generic IDenseMatrix<T>=interface` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleComplexMatrix` | `IDenseSingleComplexMatrix=specialize IDenseMatrix<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleMatrix` | `IDenseSingleMatrix=specialize IDenseMatrix<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexMatrixArray` | `TComplexMatrixArray=array of array of TComplex` | `primary` | `—` |
-| `(unit)` | `class` | `TDenseComplexMatrix` | `TDenseComplexMatrix=class` | `primary` | `—` |
-| `(unit)` | `class` | `TDenseDoubleMatrix` | `TDenseDoubleMatrix=class` | `primary` | `—` |
-| `(unit)` | `record` | `TDenseShape` | `TDenseShape=record` | `primary` | `—` |
-| `(unit)` | `class` | `TDenseSingleComplexMatrix` | `TDenseSingleComplexMatrix=class` | `primary` | `—` |
-| `(unit)` | `class` | `TDenseSingleMatrix` | `TDenseSingleMatrix=class` | `primary` | `—` |
-| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseComplexMatrix):TComplexMatrixArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseDoubleMatrix):TMatrixArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseSingleComplexMatrix):TSingleComplexMatrixArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseSingleMatrix):TSingleMatrixArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToIMatrix` | `function ToIMatrix(const Matrix:IDenseDoubleMatrix):IMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseComplexMatrix):TComplexArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseDoubleMatrix):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseSingleComplexMatrix):TSingleComplexArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseSingleMatrix):TSingleArray` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexMatrixArray` | `TSingleComplexMatrixArray=array of array of TSingleComplex` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleMatrixArray` | `TSingleMatrixArray=array of array of Single` | `primary` | `—` |
-| `(unit)` | `type` | `TSizeIntArray` | `TSizeIntArray=array of SizeInt` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallComplexMatrix2` | `TSmallComplexMatrix2=specialize TSmallDenseMatrix2<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallComplexMatrix2Batch` | `TSmallComplexMatrix2Batch=array of TSmallComplexMatrix2` | `primary` | `—` |
-| `(unit)` | `record` | `TSmallDenseMatrix2` | `generic TSmallDenseMatrix2<T>=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallDoubleMatrix2` | `TSmallDoubleMatrix2=specialize TSmallDenseMatrix2<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallDoubleMatrix2Batch` | `TSmallDoubleMatrix2Batch=array of TSmallDoubleMatrix2` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallSingleComplexMatrix2` | `TSmallSingleComplexMatrix2=specialize TSmallDenseMatrix2<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallSingleComplexMatrix2Batch` | `TSmallSingleComplexMatrix2Batch=array of TSmallSingleComplexMatrix2` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallSingleMatrix2` | `TSmallSingleMatrix2=specialize TSmallDenseMatrix2<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSmallSingleMatrix2Batch` | `TSmallSingleMatrix2Batch=array of TSmallSingleMatrix2` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `Clone` | `function Clone:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseMatrix` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `ColumnView` | `function ColumnView(const Col:SizeInt):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseMatrix` | `property` | `DataPointer` | `property DataPointer:Pointer read GetDataPointer` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `DiagonalView` | `function DiagonalView(const Offset:SizeInt=0):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `GetCols` | `function GetCols:SizeInt` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `GetDataPointer` | `function GetDataPointer:Pointer` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `GetIsContiguous` | `function GetIsContiguous:Boolean` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `GetRows` | `function GetRows:SizeInt` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `GetStorageIdentity` | `function GetStorageIdentity:Pointer` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `primary` | `—` |
-| `IDenseMatrix` | `property` | `IsContiguous` | `property IsContiguous:Boolean read GetIsContiguous` | `primary` | `—` |
-| `IDenseMatrix` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `RowView` | `function RowView(const Row:SizeInt):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseMatrix` | `procedure` | `SetValue` | `procedure SetValue(const Row,Col:SizeInt;const Value:T)` | `primary` | `—` |
-| `IDenseMatrix` | `property` | `StorageIdentity` | `property StorageIdentity:Pointer read GetStorageIdentity` | `primary` | `—` |
-| `IDenseMatrix` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue write SetValue` | `primary` | `—` |
-| `IDenseMatrix` | `function` | `View` | `function View(const StartRow,StartCol,RowCount,ColCount:SizeInt):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `TDenseComplexMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TComplexMatrixArray):IDenseComplexMatrix` | `primary` | `—` |
-| `TDenseComplexMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of TComplex):IDenseComplexMatrix` | `primary` | `—` |
-| `TDenseComplexMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TComplexArray;const AsColumn:Boolean=True):IDenseComplexMatrix` | `primary` | `—` |
-| `TDenseComplexMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseComplexMatrix` | `primary` | `—` |
-| `TDenseDoubleMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TMatrixArray):IDenseDoubleMatrix` | `primary` | `—` |
-| `TDenseDoubleMatrix` | `function` | `FromIMatrix` | `class function FromIMatrix(const Values:IMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `TDenseDoubleMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of Double):IDenseDoubleMatrix` | `primary` | `—` |
-| `TDenseDoubleMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TDoubleArray;const AsColumn:Boolean=True):IDenseDoubleMatrix` | `primary` | `—` |
-| `TDenseDoubleMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseDoubleMatrix` | `primary` | `—` |
-| `TDenseShape` | `field` | `Cols` | `Cols:SizeInt` | `primary` | `—` |
-| `TDenseShape` | `function` | `Create` | `class function Create(const ARows,ACols:SizeInt):TDenseShape` | `primary` | `—` |
-| `TDenseShape` | `function` | `ElementCount` | `function ElementCount:SizeUInt` | `primary` | `—` |
-| `TDenseShape` | `field` | `Rows` | `Rows:SizeInt` | `primary` | `—` |
-| `TDenseSingleComplexMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TSingleComplexMatrixArray):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `TDenseSingleComplexMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of TSingleComplex):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `TDenseSingleComplexMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TSingleComplexArray;const AsColumn:Boolean=True):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `TDenseSingleComplexMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `TDenseSingleMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TSingleMatrixArray):IDenseSingleMatrix` | `primary` | `—` |
-| `TDenseSingleMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of Single):IDenseSingleMatrix` | `primary` | `—` |
-| `TDenseSingleMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TSingleArray;const AsColumn:Boolean=True):IDenseSingleMatrix` | `primary` | `—` |
-| `TDenseSingleMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseSingleMatrix` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `operator` | `*` | `class operator *(const A,B:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `operator` | `*` | `class operator *(const A:specialize TSmallDenseMatrix2<T>;const Scalar:T):specialize TSmallDenseMatrix2<T>` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `operator` | `*` | `class operator *(const Scalar:T;const A:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `operator` | `+` | `class operator +(const A,B:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `operator` | `-` | `class operator -(const A,B:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `function` | `Create` | `class function Create(const M00,M01,M10,M11:T):specialize TSmallDenseMatrix2<T>` | `primary` | `—` |
-| `TSmallDenseMatrix2` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `ConvertToComplex` | `function ConvertToComplex(const Matrix:IDenseDoubleMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToComplex` | `function ConvertToComplex(const Matrix:IDenseSingleMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToDouble` | `function ConvertToDouble(const Matrix:IDenseSingleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToDoubleComplex` | `function ConvertToDoubleComplex(const Matrix:IDenseSingleComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToReal` | `function ConvertToReal(const Matrix:IDenseComplexMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToReal` | `function ConvertToReal(const Matrix:IDenseSingleComplexMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToSingle` | `function ConvertToSingle(const Matrix:IDenseDoubleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ConvertToSingleComplex` | `function ConvertToSingleComplex(const Matrix:IDenseComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `DENSE_ALIGNMENT` | `DENSE_ALIGNMENT=32` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DenseInterfaceCast` | `generic function DenseInterfaceCast<S,T>(const Matrix:specialize IDenseMatrix<S>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EDenseMatrixError` | `EDenseMatrixError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseComplexMatrix` | `IDenseComplexMatrix=specialize IDenseMatrix<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseDoubleMatrix` | `IDenseDoubleMatrix=specialize IDenseMatrix<Double>` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IDenseMatrix` | `generic IDenseMatrix<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleComplexMatrix` | `IDenseSingleComplexMatrix=specialize IDenseMatrix<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleMatrix` | `IDenseSingleMatrix=specialize IDenseMatrix<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexMatrixArray` | `TComplexMatrixArray=array of array of TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDenseComplexMatrix` | `TDenseComplexMatrix=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDenseDoubleMatrix` | `TDenseDoubleMatrix=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDenseShape` | `TDenseShape=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDenseSingleComplexMatrix` | `TDenseSingleComplexMatrix=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDenseSingleMatrix` | `TDenseSingleMatrix=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseComplexMatrix):TComplexMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseDoubleMatrix):TMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseSingleComplexMatrix):TSingleComplexMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToArray` | `function ToArray(const Matrix:IDenseSingleMatrix):TSingleMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToIMatrix` | `function ToIMatrix(const Matrix:IDenseDoubleMatrix):IMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseComplexMatrix):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseDoubleMatrix):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseSingleComplexMatrix):TSingleComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToVector` | `function ToVector(const Matrix:IDenseSingleMatrix):TSingleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexMatrixArray` | `TSingleComplexMatrixArray=array of array of TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleMatrixArray` | `TSingleMatrixArray=array of array of Single` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSizeIntArray` | `TSizeIntArray=array of SizeInt` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallComplexMatrix2` | `TSmallComplexMatrix2=specialize TSmallDenseMatrix2<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallComplexMatrix2Batch` | `TSmallComplexMatrix2Batch=array of TSmallComplexMatrix2` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSmallDenseMatrix2` | `generic TSmallDenseMatrix2<T>=record` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallDoubleMatrix2` | `TSmallDoubleMatrix2=specialize TSmallDenseMatrix2<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallDoubleMatrix2Batch` | `TSmallDoubleMatrix2Batch=array of TSmallDoubleMatrix2` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallSingleComplexMatrix2` | `TSmallSingleComplexMatrix2=specialize TSmallDenseMatrix2<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallSingleComplexMatrix2Batch` | `TSmallSingleComplexMatrix2Batch=array of TSmallSingleComplexMatrix2` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallSingleMatrix2` | `TSmallSingleMatrix2=specialize TSmallDenseMatrix2<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmallSingleMatrix2Batch` | `TSmallSingleMatrix2Batch=array of TSmallSingleMatrix2` | `advanced` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `Clone` | `function Clone:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `ColumnView` | `function ColumnView(const Col:SizeInt):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `property` | `DataPointer` | `property DataPointer:Pointer read GetDataPointer` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `DiagonalView` | `function DiagonalView(const Offset:SizeInt=0):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `GetDataPointer` | `function GetDataPointer:Pointer` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `GetIsContiguous` | `function GetIsContiguous:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `GetStorageIdentity` | `function GetStorageIdentity:Pointer` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `property` | `IsContiguous` | `property IsContiguous:Boolean read GetIsContiguous` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `RowView` | `function RowView(const Row:SizeInt):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `procedure` | `SetValue` | `procedure SetValue(const Row,Col:SizeInt;const Value:T)` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `property` | `StorageIdentity` | `property StorageIdentity:Pointer read GetStorageIdentity` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue write SetValue` | `implementation` | `—` | `—` | `—` |
+| `IDenseMatrix` | `function` | `View` | `function View(const StartRow,StartCol,RowCount,ColCount:SizeInt):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TDenseComplexMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TComplexMatrixArray):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseComplexMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of TComplex):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseComplexMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TComplexArray;const AsColumn:Boolean=True):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseComplexMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseDoubleMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TMatrixArray):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TDenseDoubleMatrix` | `function` | `FromIMatrix` | `class function FromIMatrix(const Values:IMatrix):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TDenseDoubleMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of Double):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TDenseDoubleMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TDoubleArray;const AsColumn:Boolean=True):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TDenseDoubleMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TDenseShape` | `field` | `Cols` | `Cols:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TDenseShape` | `function` | `Create` | `class function Create(const ARows,ACols:SizeInt):TDenseShape` | `advanced` | `—` | `—` | `—` |
+| `TDenseShape` | `function` | `ElementCount` | `function ElementCount:SizeUInt` | `advanced` | `—` | `—` | `—` |
+| `TDenseShape` | `field` | `Rows` | `Rows:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleComplexMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TSingleComplexMatrixArray):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleComplexMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of TSingleComplex):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleComplexMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TSingleComplexArray;const AsColumn:Boolean=True):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleComplexMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleMatrix` | `function` | `FromArray` | `class function FromArray(const Values:TSingleMatrixArray):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleMatrix` | `function` | `FromValues` | `class function FromValues(const Rows,Cols:SizeInt;const Values:array of Single):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleMatrix` | `function` | `FromVector` | `class function FromVector(const Values:TSingleArray;const AsColumn:Boolean=True):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDenseSingleMatrix` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `operator` | `*` | `class operator *(const A,B:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `implementation` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `operator` | `*` | `class operator *(const A:specialize TSmallDenseMatrix2<T>;const Scalar:T):specialize TSmallDenseMatrix2<T>` | `implementation` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `operator` | `*` | `class operator *(const Scalar:T;const A:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `implementation` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `operator` | `+` | `class operator +(const A,B:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `implementation` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `operator` | `-` | `class operator -(const A,B:specialize TSmallDenseMatrix2<T>):specialize TSmallDenseMatrix2<T>` | `implementation` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `function` | `Create` | `class function Create(const M00,M01,M10,M11:T):specialize TSmallDenseMatrix2<T>` | `implementation` | `—` | `—` | `—` |
+| `TSmallDenseMatrix2` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue` | `implementation` | `—` | `—` | `—` |
 
 ## AlgebraLib.DenseSolvers
 
 Source: [`src/AlgebraLib.DenseSolvers.pas`](../src/AlgebraLib.DenseSolvers.pas)  
 Interface SHA-256: `482a32d391f57762787cced31b47957a20d27322cede4d4d24d432c499d53b1e`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseComplexMatrix):IDenseComplexCholesky` | `primary` | `—` |
-| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseDoubleMatrix):IDenseDoubleCholesky` | `primary` | `—` |
-| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseSingleComplexMatrix):IDenseSingleComplexCholesky` | `primary` | `—` |
-| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseSingleMatrix):IDenseSingleCholesky` | `primary` | `—` |
-| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseComplexMatrix):IDenseComplexLU` | `primary` | `—` |
-| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseDoubleMatrix):IDenseDoubleLU` | `primary` | `—` |
-| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseSingleComplexMatrix):IDenseSingleComplexLU` | `primary` | `—` |
-| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseSingleMatrix):IDenseSingleLU` | `primary` | `—` |
-| `(unit)` | `interface` | `IDenseCholeskyFactorization` | `generic IDenseCholeskyFactorization<T>=interface` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseComplexCholesky` | `IDenseComplexCholesky=specialize IDenseCholeskyFactorization<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseComplexLU` | `IDenseComplexLU=specialize IDenseLUFactorization<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseDoubleCholesky` | `IDenseDoubleCholesky=specialize IDenseCholeskyFactorization<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseDoubleLU` | `IDenseDoubleLU=specialize IDenseLUFactorization<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `IDenseLUFactorization` | `generic IDenseLUFactorization<T>=interface` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleCholesky` | `IDenseSingleCholesky=specialize IDenseCholeskyFactorization<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleComplexCholesky` | `IDenseSingleComplexCholesky=specialize IDenseCholeskyFactorization<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleComplexLU` | `IDenseSingleComplexLU=specialize IDenseLUFactorization<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDenseSingleLU` | `IDenseSingleLU=specialize IDenseLUFactorization<Single>` | `primary` | `—` |
-| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleMatrix` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `function` | `GetL` | `function GetL:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `function` | `GetSize` | `function GetSize:SizeInt` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `property` | `L` | `property L:specialize IDenseMatrix<T> read GetL` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `property` | `Size` | `property Size:SizeInt read GetSize` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `function` | `Solve` | `function Solve(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseCholeskyFactorization` | `function` | `SolveWithInfo` | `function SolveWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetIsIllConditioned` | `function GetIsIllConditioned:Boolean` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetL` | `function GetL:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetPermutation` | `function GetPermutation:TSizeIntArray` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetPivotRatio` | `function GetPivotRatio:Double` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetSize` | `function GetSize:SizeInt` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `GetU` | `function GetU:specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `IsIllConditioned` | `property IsIllConditioned:Boolean read GetIsIllConditioned` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `L` | `property L:specialize IDenseMatrix<T> read GetL` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `Permutation` | `property Permutation:TSizeIntArray read GetPermutation` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `PivotRatio` | `property PivotRatio:Double read GetPivotRatio` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `Size` | `property Size:SizeInt read GetSize` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `Solve` | `function Solve(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseLUFactorization` | `function` | `SolveWithInfo` | `function SolveWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `primary` | `—` |
-| `IDenseLUFactorization` | `property` | `U` | `property U:specialize IDenseMatrix<T> read GetU` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseComplexMatrix):IDenseComplexCholesky` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseDoubleMatrix):IDenseDoubleCholesky` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseSingleComplexMatrix):IDenseSingleComplexCholesky` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorCholesky` | `function FactorCholesky(const A:IDenseSingleMatrix):IDenseSingleCholesky` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseComplexMatrix):IDenseComplexLU` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseDoubleMatrix):IDenseDoubleLU` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseSingleComplexMatrix):IDenseSingleComplexLU` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `FactorLU` | `function FactorLU(const A:IDenseSingleMatrix):IDenseSingleLU` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IDenseCholeskyFactorization` | `generic IDenseCholeskyFactorization<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseComplexCholesky` | `IDenseComplexCholesky=specialize IDenseCholeskyFactorization<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseComplexLU` | `IDenseComplexLU=specialize IDenseLUFactorization<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseDoubleCholesky` | `IDenseDoubleCholesky=specialize IDenseCholeskyFactorization<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseDoubleLU` | `IDenseDoubleLU=specialize IDenseLUFactorization<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IDenseLUFactorization` | `generic IDenseLUFactorization<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleCholesky` | `IDenseSingleCholesky=specialize IDenseCholeskyFactorization<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleComplexCholesky` | `IDenseSingleComplexCholesky=specialize IDenseCholeskyFactorization<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleComplexLU` | `IDenseSingleComplexLU=specialize IDenseLUFactorization<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDenseSingleLU` | `IDenseSingleLU=specialize IDenseLUFactorization<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseComplexMatrix):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseDoubleMatrix):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseSingleComplexMatrix):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Solve` | `function Solve(const A,B:IDenseSingleMatrix):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolvePositiveDefinite` | `function SolvePositiveDefinite(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseDoubleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseSingleComplexMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SolveWithInfo` | `function SolveWithInfo(const A,B:IDenseSingleMatrix;out Diagnostics:TDenseSolveDiagnostics):IDenseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `function` | `GetL` | `function GetL:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `property` | `L` | `property L:specialize IDenseMatrix<T> read GetL` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `property` | `Size` | `property Size:SizeInt read GetSize` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `function` | `Solve` | `function Solve(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseCholeskyFactorization` | `function` | `SolveWithInfo` | `function SolveWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `ConditionIndicator` | `property ConditionIndicator:Double read GetConditionIndicator` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetConditionIndicator` | `function GetConditionIndicator:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetIsIllConditioned` | `function GetIsIllConditioned:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetL` | `function GetL:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetPermutation` | `function GetPermutation:TSizeIntArray` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetPivotRatio` | `function GetPivotRatio:Double` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `GetU` | `function GetU:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `IsIllConditioned` | `property IsIllConditioned:Boolean read GetIsIllConditioned` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `L` | `property L:specialize IDenseMatrix<T> read GetL` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `Permutation` | `property Permutation:TSizeIntArray read GetPermutation` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `PivotRatio` | `property PivotRatio:Double read GetPivotRatio` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `Size` | `property Size:SizeInt read GetSize` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `Solve` | `function Solve(const B:specialize IDenseMatrix<T>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `function` | `SolveWithInfo` | `function SolveWithInfo(const B:specialize IDenseMatrix<T>;out Diagnostics:TDenseSolveDiagnostics):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `IDenseLUFactorization` | `property` | `U` | `property U:specialize IDenseMatrix<T> read GetU` | `implementation` | `—` | `—` | `—` |
 
 ## AlgebraLib.Determinants
 
 Source: [`src/AlgebraLib.Determinants.pas`](../src/AlgebraLib.Determinants.pas)  
 Interface SHA-256: `3b6da7a77613265189df699e0f9d987a1a10d43e6f0aaf0435792e15645dbe8d`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `TIterSolverMethod` | `TIterSolverMethod=TIterativeMethod` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `TIterSolverMethod` | `TIterSolverMethod=TIterativeMethod` | `advanced` | `—` | `—` | `—` |
 
 ## AlgebraLib.IterativeSolvers
 
 Source: [`src/AlgebraLib.IterativeSolvers.pas`](../src/AlgebraLib.IterativeSolvers.pas)  
 Interface SHA-256: `6079df3e3fc24477a6d09573fc833accce9e52e52b8cab87e7ac614fd4d15707`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EIterativeSolverError` | `EIterativeSolverError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `interface` | `IIterationMonitor` | `IIterationMonitor=interface` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexIterativeSolver` | `TComplexIterativeSolver=specialize TIterativeSolver<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexIterativeWorkspace` | `TComplexIterativeWorkspace=specialize TIterativeWorkspace<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexLinearSolveResult` | `TComplexLinearSolveResult=specialize TLinearSolveResult<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleIterativeSolver` | `TDoubleIterativeSolver=specialize TIterativeSolver<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleIterativeWorkspace` | `TDoubleIterativeWorkspace=specialize TIterativeWorkspace<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleLinearSolveResult` | `TDoubleLinearSolveResult=specialize TLinearSolveResult<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TIterativeMethod` | `TIterativeMethod=(imConjugateGradient,imMINRES,imGMRES,imBiCGSTAB,imLSQR)` | `primary` | `—` |
-| `(unit)` | `class` | `TIterativeSolver` | `generic TIterativeSolver<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TIterativeVector` | `generic TIterativeVector<T>=array of T` | `internal` | `—` |
-| `(unit)` | `type` | `TIterativeVectorList` | `generic TIterativeVectorList<T>=array of specialize TIterativeVector<T>` | `internal` | `—` |
-| `(unit)` | `class` | `TIterativeWorkspace` | `generic TIterativeWorkspace<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TLinearBreakdownReason` | `TLinearBreakdownReason=(lbrNone,lbrNonFiniteValue,lbrZeroDenominator,lbrNonPositiveCurvature,lbrNonPositivePreconditioner,lbrArnoldiInvariantSubspace,lbrLanczosBreakdown)` | `primary` | `—` |
-| `(unit)` | `record` | `TLinearSolveDiagnostics` | `TLinearSolveDiagnostics=record` | `primary` | `—` |
-| `(unit)` | `record` | `TLinearSolveOptions` | `TLinearSolveOptions=record` | `primary` | `—` |
-| `(unit)` | `record` | `TLinearSolveResult` | `generic TLinearSolveResult<T>=record` | `internal` | `—` |
-| `(unit)` | `type` | `TSingleComplexIterativeSolver` | `TSingleComplexIterativeSolver=specialize TIterativeSolver<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexIterativeWorkspace` | `TSingleComplexIterativeWorkspace=specialize TIterativeWorkspace<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexLinearSolveResult` | `TSingleComplexLinearSolveResult=specialize TLinearSolveResult<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleIterativeSolver` | `TSingleIterativeSolver=specialize TIterativeSolver<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleIterativeWorkspace` | `TSingleIterativeWorkspace=specialize TIterativeWorkspace<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleLinearSolveResult` | `TSingleLinearSolveResult=specialize TLinearSolveResult<Single>` | `primary` | `—` |
-| `IIterationMonitor` | `procedure` | `ReportProgress` | `procedure ReportProgress(const Method:TIterativeMethod;const Iteration,ProductCount:SizeInt;const ResidualNorm,StoppingThreshold:Double)` | `primary` | `—` |
-| `IIterationMonitor` | `function` | `ShouldCancel` | `function ShouldCancel:Boolean` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imBiCGSTAB` | `imBiCGSTAB` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imConjugateGradient` | `imConjugateGradient` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imGMRES` | `imGMRES` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imLSQR` | `imLSQR` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imMINRES` | `imMINRES` | `primary` | `—` |
-| `TIterativeSolver` | `function` | `BiCGSTAB` | `class function BiCGSTAB(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `BiCGSTABInto` | `class function BiCGSTABInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `ConjugateGradient` | `class function ConjugateGradient(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `ConjugateGradientInto` | `class function ConjugateGradientInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `GMRES` | `class function GMRES(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `GMRESInto` | `class function GMRESInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `LSQR` | `class function LSQR(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions):TResult` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `LSQRInto` | `class function LSQRInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions):TLinearSolveDiagnostics` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `MINRES` | `class function MINRES(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `internal` | `—` |
-| `TIterativeSolver` | `function` | `MINRESInto` | `class function MINRESInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `internal` | `—` |
-| `TIterativeWorkspace` | `function` | `Basis` | `function Basis(const Index:SizeInt):specialize TIterativeVector<T>` | `internal` | `—` |
-| `TIterativeWorkspace` | `procedure` | `BeginUse` | `procedure BeginUse` | `internal` | `—` |
-| `TIterativeWorkspace` | `property` | `Cols` | `property Cols:SizeInt read FCols` | `internal` | `—` |
-| `TIterativeWorkspace` | `destructor` | `Destroy` | `destructor Destroy` | `internal` | `—` |
-| `TIterativeWorkspace` | `procedure` | `EndUse` | `procedure EndUse` | `internal` | `—` |
-| `TIterativeWorkspace` | `function` | `GetH` | `function GetH(const Row,Col:SizeInt):T` | `internal` | `—` |
-| `TIterativeWorkspace` | `procedure` | `Prepare` | `procedure Prepare(const Rows,Cols,RestartSize:SizeInt)` | `internal` | `—` |
-| `TIterativeWorkspace` | `property` | `RestartSize` | `property RestartSize:SizeInt read FRestart` | `internal` | `—` |
-| `TIterativeWorkspace` | `property` | `Rows` | `property Rows:SizeInt read FRows` | `internal` | `—` |
-| `TIterativeWorkspace` | `procedure` | `SetH` | `procedure SetH(const Row,Col:SizeInt;const Value:T)` | `internal` | `—` |
-| `TIterativeWorkspace` | `function` | `Vector` | `function Vector(const Index:SizeInt):specialize TIterativeVector<T>` | `internal` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrArnoldiInvariantSubspace` | `lbrArnoldiInvariantSubspace` | `primary` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrLanczosBreakdown` | `lbrLanczosBreakdown` | `primary` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrNone` | `lbrNone` | `primary` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrNonFiniteValue` | `lbrNonFiniteValue` | `primary` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrNonPositiveCurvature` | `lbrNonPositiveCurvature` | `primary` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrNonPositivePreconditioner` | `lbrNonPositivePreconditioner` | `primary` | `—` |
-| `TLinearBreakdownReason` | `enum-value` | `lbrZeroDenominator` | `lbrZeroDenominator` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `AchievedRelativeResidual` | `AchievedRelativeResidual:Double` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `BreakdownReason` | `BreakdownReason:TLinearBreakdownReason` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `ConvergenceConfirmed` | `ConvergenceConfirmed:Boolean` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `FinalNormalResidualNorm` | `FinalNormalResidualNorm:Double` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `FinalResidualNorm` | `FinalResidualNorm:Double` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `InitialNormalResidualNorm` | `InitialNormalResidualNorm:Double` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `InitialResidualNorm` | `InitialResidualNorm:Double` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `Iterations` | `Iterations:SizeInt` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `Method` | `Method:TIterativeMethod` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `ProductCount` | `ProductCount:SizeInt` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `RequestedTolerance` | `RequestedTolerance:Double` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `ResidualConfirmed` | `ResidualConfirmed:Boolean` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `ResidualRefreshCount` | `ResidualRefreshCount:SizeInt` | `primary` | `—` |
-| `TLinearSolveDiagnostics` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `BreakdownTolerance` | `BreakdownTolerance:Double` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `ConfirmConvergence` | `ConfirmConvergence:Boolean` | `primary` | `—` |
-| `TLinearSolveOptions` | `function` | `Default` | `class function Default:TLinearSolveOptions` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `MaxIterations` | `MaxIterations:SizeInt` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `Monitor` | `Monitor:IIterationMonitor` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `ResidualRefresh` | `ResidualRefresh:SizeInt` | `primary` | `—` |
-| `TLinearSolveOptions` | `field` | `RestartSize` | `RestartSize:SizeInt` | `primary` | `—` |
-| `TLinearSolveResult` | `field` | `Diagnostics` | `Diagnostics:TLinearSolveDiagnostics` | `internal` | `—` |
-| `TLinearSolveResult` | `field` | `Solution` | `Solution:specialize IDenseMatrix<T>` | `internal` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EIterativeSolverError` | `EIterativeSolverError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IIterationMonitor` | `IIterationMonitor=interface` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexIterativeSolver` | `TComplexIterativeSolver=specialize TIterativeSolver<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexIterativeWorkspace` | `TComplexIterativeWorkspace=specialize TIterativeWorkspace<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexLinearSolveResult` | `TComplexLinearSolveResult=specialize TLinearSolveResult<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleIterativeSolver` | `TDoubleIterativeSolver=specialize TIterativeSolver<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleIterativeWorkspace` | `TDoubleIterativeWorkspace=specialize TIterativeWorkspace<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleLinearSolveResult` | `TDoubleLinearSolveResult=specialize TLinearSolveResult<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TIterativeMethod` | `TIterativeMethod=(imConjugateGradient,imMINRES,imGMRES,imBiCGSTAB,imLSQR)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TIterativeSolver` | `generic TIterativeSolver<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TIterativeVector` | `generic TIterativeVector<T>=array of T` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TIterativeVectorList` | `generic TIterativeVectorList<T>=array of specialize TIterativeVector<T>` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TIterativeWorkspace` | `generic TIterativeWorkspace<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TLinearBreakdownReason` | `TLinearBreakdownReason=(lbrNone,lbrNonFiniteValue,lbrZeroDenominator,lbrNonPositiveCurvature,lbrNonPositivePreconditioner,lbrArnoldiInvariantSubspace,lbrLanczosBreakdown)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLinearSolveDiagnostics` | `TLinearSolveDiagnostics=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLinearSolveOptions` | `TLinearSolveOptions=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLinearSolveResult` | `generic TLinearSolveResult<T>=record` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexIterativeSolver` | `TSingleComplexIterativeSolver=specialize TIterativeSolver<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexIterativeWorkspace` | `TSingleComplexIterativeWorkspace=specialize TIterativeWorkspace<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexLinearSolveResult` | `TSingleComplexLinearSolveResult=specialize TLinearSolveResult<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleIterativeSolver` | `TSingleIterativeSolver=specialize TIterativeSolver<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleIterativeWorkspace` | `TSingleIterativeWorkspace=specialize TIterativeWorkspace<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleLinearSolveResult` | `TSingleLinearSolveResult=specialize TLinearSolveResult<Single>` | `advanced` | `—` | `—` | `—` |
+| `IIterationMonitor` | `procedure` | `ReportProgress` | `procedure ReportProgress(const Method:TIterativeMethod;const Iteration,ProductCount:SizeInt;const ResidualNorm,StoppingThreshold:Double)` | `advanced` | `—` | `—` | `—` |
+| `IIterationMonitor` | `function` | `ShouldCancel` | `function ShouldCancel:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imBiCGSTAB` | `imBiCGSTAB` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imConjugateGradient` | `imConjugateGradient` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imGMRES` | `imGMRES` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imLSQR` | `imLSQR` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imMINRES` | `imMINRES` | `advanced` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `BiCGSTAB` | `class function BiCGSTAB(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `BiCGSTABInto` | `class function BiCGSTABInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `ConjugateGradient` | `class function ConjugateGradient(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `ConjugateGradientInto` | `class function ConjugateGradientInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `GMRES` | `class function GMRES(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `GMRESInto` | `class function GMRESInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `LSQR` | `class function LSQR(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions):TResult` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `LSQRInto` | `class function LSQRInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions):TLinearSolveDiagnostics` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `MINRES` | `class function MINRES(const A:TOperator;const B:TDense;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TResult` | `implementation` | `—` | `—` | `—` |
+| `TIterativeSolver` | `function` | `MINRESInto` | `class function MINRESInto(const A:TOperator;const B,Solution:TDense;const Workspace:TWorkspace;const Options:TLinearSolveOptions;const Preconditioner:TPreconditioner=nil):TLinearSolveDiagnostics` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `function` | `Basis` | `function Basis(const Index:SizeInt):specialize TIterativeVector<T>` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `procedure` | `BeginUse` | `procedure BeginUse` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `property` | `Cols` | `property Cols:SizeInt read FCols` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `destructor` | `Destroy` | `destructor Destroy` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `procedure` | `EndUse` | `procedure EndUse` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `function` | `GetH` | `function GetH(const Row,Col:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `procedure` | `Prepare` | `procedure Prepare(const Rows,Cols,RestartSize:SizeInt)` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `property` | `RestartSize` | `property RestartSize:SizeInt read FRestart` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `property` | `Rows` | `property Rows:SizeInt read FRows` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `procedure` | `SetH` | `procedure SetH(const Row,Col:SizeInt;const Value:T)` | `implementation` | `—` | `—` | `—` |
+| `TIterativeWorkspace` | `function` | `Vector` | `function Vector(const Index:SizeInt):specialize TIterativeVector<T>` | `implementation` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrArnoldiInvariantSubspace` | `lbrArnoldiInvariantSubspace` | `advanced` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrLanczosBreakdown` | `lbrLanczosBreakdown` | `advanced` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrNone` | `lbrNone` | `advanced` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrNonFiniteValue` | `lbrNonFiniteValue` | `advanced` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrNonPositiveCurvature` | `lbrNonPositiveCurvature` | `advanced` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrNonPositivePreconditioner` | `lbrNonPositivePreconditioner` | `advanced` | `—` | `—` | `—` |
+| `TLinearBreakdownReason` | `enum-value` | `lbrZeroDenominator` | `lbrZeroDenominator` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `AchievedRelativeResidual` | `AchievedRelativeResidual:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `BreakdownReason` | `BreakdownReason:TLinearBreakdownReason` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `ConvergenceConfirmed` | `ConvergenceConfirmed:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `FinalNormalResidualNorm` | `FinalNormalResidualNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `FinalResidualNorm` | `FinalResidualNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `InitialNormalResidualNorm` | `InitialNormalResidualNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `InitialResidualNorm` | `InitialResidualNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `Iterations` | `Iterations:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `Method` | `Method:TIterativeMethod` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `ProductCount` | `ProductCount:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `RequestedTolerance` | `RequestedTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `ResidualConfirmed` | `ResidualConfirmed:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `ResidualRefreshCount` | `ResidualRefreshCount:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveDiagnostics` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `BreakdownTolerance` | `BreakdownTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `ConfirmConvergence` | `ConfirmConvergence:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `function` | `Default` | `class function Default:TLinearSolveOptions` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `MaxIterations` | `MaxIterations:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `Monitor` | `Monitor:IIterationMonitor` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `ResidualRefresh` | `ResidualRefresh:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveOptions` | `field` | `RestartSize` | `RestartSize:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TLinearSolveResult` | `field` | `Diagnostics` | `Diagnostics:TLinearSolveDiagnostics` | `implementation` | `—` | `—` | `—` |
+| `TLinearSolveResult` | `field` | `Solution` | `Solution:specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
 
 ## AlgebraLib.LinearOperators
 
 Source: [`src/AlgebraLib.LinearOperators.pas`](../src/AlgebraLib.LinearOperators.pas)  
 Interface SHA-256: `abbab8d8456e9a2e07bdecfed5dee1f8f8afd88a35806aadeb95f300808e1db4`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ELinearOperatorError` | `ELinearOperatorError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `EPreconditionerError` | `EPreconditionerError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `IComplexPreconditioner` | `IComplexPreconditioner=specialize IPreconditioner<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IDoublePreconditioner` | `IDoublePreconditioner=specialize IPreconditioner<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `ILinearComplexOperator` | `ILinearComplexOperator=specialize ILinearOperator<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ILinearDoubleOperator` | `ILinearDoubleOperator=specialize ILinearOperator<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `ILinearOperator` | `generic ILinearOperator<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `ILinearSingleComplexOperator` | `ILinearSingleComplexOperator=specialize ILinearOperator<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ILinearSingleOperator` | `ILinearSingleOperator=specialize ILinearOperator<Single>` | `primary` | `—` |
-| `(unit)` | `interface` | `IMatrixFreeAction` | `generic IMatrixFreeAction<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `IMatrixFreeComplexAction` | `IMatrixFreeComplexAction=specialize IMatrixFreeAction<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IMatrixFreeDoubleAction` | `IMatrixFreeDoubleAction=specialize IMatrixFreeAction<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `IMatrixFreeSingleAction` | `IMatrixFreeSingleAction=specialize IMatrixFreeAction<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `IMatrixFreeSingleComplexAction` | `IMatrixFreeSingleComplexAction=specialize IMatrixFreeAction<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `interface` | `IPreconditioner` | `generic IPreconditioner<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `ISingleComplexPreconditioner` | `ISingleComplexPreconditioner=specialize IPreconditioner<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ISinglePreconditioner` | `ISinglePreconditioner=specialize IPreconditioner<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexLinearOperator` | `TComplexLinearOperator=specialize TLinearOperatorFactory<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexPreconditioner` | `TComplexPreconditioner=specialize TPreconditionerFactory<TComplex>` | `primary` | `—` |
-| `(unit)` | `class` | `TDenseLinearOperator` | `generic TDenseLinearOperator<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `class` | `TDiagonalPreconditioner` | `generic TDiagonalPreconditioner<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `type` | `TDoubleLinearOperator` | `TDoubleLinearOperator=specialize TLinearOperatorFactory<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TDoublePreconditioner` | `TDoublePreconditioner=specialize TPreconditionerFactory<Double>` | `primary` | `—` |
-| `(unit)` | `class` | `TIC0Preconditioner` | `generic TIC0Preconditioner<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `class` | `TIdentityPreconditioner` | `generic TIdentityPreconditioner<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `class` | `TILU0Preconditioner` | `generic TILU0Preconditioner<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `class` | `TLinearOperatorFactory` | `generic TLinearOperatorFactory<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TLinearOperatorOwnership` | `TLinearOperatorOwnership=(looRetainedImmutable,looRetainedMutable,looDelegated)` | `primary` | `—` |
-| `(unit)` | `class` | `TLinearScalar` | `generic TLinearScalar<T>=class` | `internal` | `—` |
-| `(unit)` | `class` | `TMatrixFreeLinearOperator` | `generic TMatrixFreeLinearOperator<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `class` | `TPreconditionerFactory` | `generic TPreconditionerFactory<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TPreconditionerKind` | `TPreconditionerKind=(pkIdentity,pkDiagonal,pkIncompleteCholesky,pkILU0)` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexLinearOperator` | `TSingleComplexLinearOperator=specialize TLinearOperatorFactory<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexPreconditioner` | `TSingleComplexPreconditioner=specialize TPreconditionerFactory<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleLinearOperator` | `TSingleLinearOperator=specialize TLinearOperatorFactory<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSinglePreconditioner` | `TSinglePreconditioner=specialize TPreconditionerFactory<Single>` | `primary` | `—` |
-| `(unit)` | `class` | `TSparseLinearOperator` | `generic TSparseLinearOperator<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `class` | `TStructuredLinearOperator` | `generic TStructuredLinearOperator<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `ILinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `ILinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `ILinearOperator` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `internal` | `—` |
-| `ILinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `ILinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `ILinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `internal` | `—` |
-| `ILinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `ILinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `ILinearOperator` | `property` | `IsReentrant` | `property IsReentrant:Boolean read GetIsReentrant` | `internal` | `—` |
-| `ILinearOperator` | `property` | `Ownership` | `property Ownership:TLinearOperatorOwnership read GetOwnership` | `internal` | `—` |
-| `ILinearOperator` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `internal` | `—` |
-| `ILinearOperator` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `internal` | `—` |
-| `IMatrixFreeAction` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `IMatrixFreeAction` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `IMatrixFreeAction` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `IMatrixFreeAction` | `property` | `IsReentrant` | `property IsReentrant:Boolean read GetIsReentrant` | `internal` | `—` |
-| `IPreconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `IPreconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `IPreconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `internal` | `—` |
-| `IPreconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `IPreconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `IPreconditioner` | `property` | `IsReentrant` | `property IsReentrant:Boolean read GetIsReentrant` | `internal` | `—` |
-| `IPreconditioner` | `property` | `Kind` | `property Kind:TPreconditionerKind read GetKind` | `internal` | `—` |
-| `IPreconditioner` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `internal` | `—` |
-| `IPreconditioner` | `property` | `Size` | `property Size:SizeInt read GetSize` | `internal` | `—` |
-| `TDenseLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TDenseLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TDenseLinearOperator` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TDenseLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `TDenseLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TDenseLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `internal` | `—` |
-| `TDenseLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `TDenseLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TDiagonalPreconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TDiagonalPreconditioner` | `constructor` | `Create` | `constructor Create(const Diagonal:array of T;const PivotTolerance:Double)` | `internal` | `—` |
-| `TDiagonalPreconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TDiagonalPreconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `internal` | `—` |
-| `TDiagonalPreconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TDiagonalPreconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TIC0Preconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TIC0Preconditioner` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double)` | `internal` | `—` |
-| `TIC0Preconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TIC0Preconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `internal` | `—` |
-| `TIC0Preconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TIC0Preconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TIdentityPreconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TIdentityPreconditioner` | `constructor` | `Create` | `constructor Create(const ASize:SizeInt)` | `internal` | `—` |
-| `TIdentityPreconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TIdentityPreconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `internal` | `—` |
-| `TIdentityPreconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TIdentityPreconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TILU0Preconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TILU0Preconditioner` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double)` | `internal` | `—` |
-| `TILU0Preconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TILU0Preconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `internal` | `—` |
-| `TILU0Preconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TILU0Preconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TLinearOperatorFactory` | `function` | `FromDense` | `class function FromDense(const Matrix:specialize IDenseMatrix<T>):specialize ILinearOperator<T>` | `internal` | `—` |
-| `TLinearOperatorFactory` | `function` | `FromSparse` | `class function FromSparse(const Matrix:specialize ISparseMatrix<T>):specialize ILinearOperator<T>` | `internal` | `—` |
-| `TLinearOperatorFactory` | `function` | `FromStructured` | `class function FromStructured(const Matrix:specialize IStructuredMatrix<T>):specialize ILinearOperator<T>` | `internal` | `—` |
-| `TLinearOperatorFactory` | `function` | `MatrixFree` | `class function MatrixFree(const Rows,Cols:SizeInt;const Action:specialize IMatrixFreeAction<T>):specialize ILinearOperator<T>` | `internal` | `—` |
-| `TLinearOperatorOwnership` | `enum-value` | `looDelegated` | `looDelegated` | `primary` | `—` |
-| `TLinearOperatorOwnership` | `enum-value` | `looRetainedImmutable` | `looRetainedImmutable` | `primary` | `—` |
-| `TLinearOperatorOwnership` | `enum-value` | `looRetainedMutable` | `looRetainedMutable` | `primary` | `—` |
-| `TLinearScalar` | `function` | `AbsSquared` | `class function AbsSquared(const Value:T):Double` | `internal` | `—` |
-| `TLinearScalar` | `function` | `Conjugate` | `class function Conjugate(const Value:T):T` | `internal` | `—` |
-| `TLinearScalar` | `function` | `FromDouble` | `class function FromDouble(const Value:Double):T` | `internal` | `—` |
-| `TLinearScalar` | `function` | `ImaginaryPart` | `class function ImaginaryPart(const Value:T):Double` | `internal` | `—` |
-| `TLinearScalar` | `function` | `IsFinite` | `class function IsFinite(const Value:T):Boolean` | `internal` | `—` |
-| `TLinearScalar` | `function` | `Kind` | `class function Kind:TSparseScalarKind` | `internal` | `—` |
-| `TLinearScalar` | `function` | `Magnitude` | `class function Magnitude(const Value:T):Double` | `internal` | `—` |
-| `TLinearScalar` | `function` | `One` | `class function One:T` | `internal` | `—` |
-| `TLinearScalar` | `function` | `RealPart` | `class function RealPart(const Value:T):Double` | `internal` | `—` |
-| `TLinearScalar` | `procedure` | `ValidateApplyShapes` | `class procedure ValidateApplyShapes(const Input,Destination:specialize IDenseMatrix<T>;const InputRows,OutputRows:SizeInt;const Operation:string)` | `internal` | `—` |
-| `TLinearScalar` | `procedure` | `ValidatePreconditionerVector` | `class procedure ValidatePreconditionerVector(const Input,Destination:specialize IDenseMatrix<T>;const Size:SizeInt;const Operation:string)` | `internal` | `—` |
-| `TLinearScalar` | `function` | `Zero` | `class function Zero:T` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `constructor` | `Create` | `constructor Create(const Rows,Cols:SizeInt;const Action:specialize IMatrixFreeAction<T>)` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `TMatrixFreeLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TPreconditionerFactory` | `function` | `Diagonal` | `class function Diagonal(const Values:array of T;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `internal` | `—` |
-| `TPreconditionerFactory` | `function` | `Identity` | `class function Identity(const Size:SizeInt):specialize IPreconditioner<T>` | `internal` | `—` |
-| `TPreconditionerFactory` | `function` | `ILU0` | `class function ILU0(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `internal` | `—` |
-| `TPreconditionerFactory` | `function` | `IncompleteCholesky0` | `class function IncompleteCholesky0(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `internal` | `—` |
-| `TPreconditionerFactory` | `function` | `SparseDiagonal` | `class function SparseDiagonal(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `internal` | `—` |
-| `TPreconditionerKind` | `enum-value` | `pkDiagonal` | `pkDiagonal` | `primary` | `—` |
-| `TPreconditionerKind` | `enum-value` | `pkIdentity` | `pkIdentity` | `primary` | `—` |
-| `TPreconditionerKind` | `enum-value` | `pkILU0` | `pkILU0` | `primary` | `—` |
-| `TPreconditionerKind` | `enum-value` | `pkIncompleteCholesky` | `pkIncompleteCholesky` | `primary` | `—` |
-| `TSparseLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TSparseLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TSparseLinearOperator` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>)` | `internal` | `—` |
-| `TSparseLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `TSparseLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TSparseLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `internal` | `—` |
-| `TSparseLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `TSparseLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TStructuredLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TStructuredLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TStructuredLinearOperator` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IStructuredMatrix<T>)` | `internal` | `—` |
-| `TStructuredLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `TStructuredLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `internal` | `—` |
-| `TStructuredLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `internal` | `—` |
-| `TStructuredLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `TStructuredLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ELinearOperatorError` | `ELinearOperatorError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EPreconditionerError` | `EPreconditionerError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IComplexPreconditioner` | `IComplexPreconditioner=specialize IPreconditioner<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IDoublePreconditioner` | `IDoublePreconditioner=specialize IPreconditioner<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ILinearComplexOperator` | `ILinearComplexOperator=specialize ILinearOperator<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ILinearDoubleOperator` | `ILinearDoubleOperator=specialize ILinearOperator<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `ILinearOperator` | `generic ILinearOperator<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ILinearSingleComplexOperator` | `ILinearSingleComplexOperator=specialize ILinearOperator<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ILinearSingleOperator` | `ILinearSingleOperator=specialize ILinearOperator<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IMatrixFreeAction` | `generic IMatrixFreeAction<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IMatrixFreeComplexAction` | `IMatrixFreeComplexAction=specialize IMatrixFreeAction<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IMatrixFreeDoubleAction` | `IMatrixFreeDoubleAction=specialize IMatrixFreeAction<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IMatrixFreeSingleAction` | `IMatrixFreeSingleAction=specialize IMatrixFreeAction<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IMatrixFreeSingleComplexAction` | `IMatrixFreeSingleComplexAction=specialize IMatrixFreeAction<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IPreconditioner` | `generic IPreconditioner<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISingleComplexPreconditioner` | `ISingleComplexPreconditioner=specialize IPreconditioner<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISinglePreconditioner` | `ISinglePreconditioner=specialize IPreconditioner<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexLinearOperator` | `TComplexLinearOperator=specialize TLinearOperatorFactory<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexPreconditioner` | `TComplexPreconditioner=specialize TPreconditionerFactory<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDenseLinearOperator` | `generic TDenseLinearOperator<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDiagonalPreconditioner` | `generic TDiagonalPreconditioner<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleLinearOperator` | `TDoubleLinearOperator=specialize TLinearOperatorFactory<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoublePreconditioner` | `TDoublePreconditioner=specialize TPreconditionerFactory<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TIC0Preconditioner` | `generic TIC0Preconditioner<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TIdentityPreconditioner` | `generic TIdentityPreconditioner<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TILU0Preconditioner` | `generic TILU0Preconditioner<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TLinearOperatorFactory` | `generic TLinearOperatorFactory<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TLinearOperatorOwnership` | `TLinearOperatorOwnership=(looRetainedImmutable,looRetainedMutable,looDelegated)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TLinearScalar` | `generic TLinearScalar<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TMatrixFreeLinearOperator` | `generic TMatrixFreeLinearOperator<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TPreconditionerFactory` | `generic TPreconditionerFactory<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPreconditionerKind` | `TPreconditionerKind=(pkIdentity,pkDiagonal,pkIncompleteCholesky,pkILU0)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexLinearOperator` | `TSingleComplexLinearOperator=specialize TLinearOperatorFactory<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexPreconditioner` | `TSingleComplexPreconditioner=specialize TPreconditionerFactory<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleLinearOperator` | `TSingleLinearOperator=specialize TLinearOperatorFactory<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSinglePreconditioner` | `TSinglePreconditioner=specialize TPreconditionerFactory<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSparseLinearOperator` | `generic TSparseLinearOperator<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TStructuredLinearOperator` | `generic TStructuredLinearOperator<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `property` | `IsReentrant` | `property IsReentrant:Boolean read GetIsReentrant` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `property` | `Ownership` | `property Ownership:TLinearOperatorOwnership read GetOwnership` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `implementation` | `—` | `—` | `—` |
+| `ILinearOperator` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IMatrixFreeAction` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `IMatrixFreeAction` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `IMatrixFreeAction` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IMatrixFreeAction` | `property` | `IsReentrant` | `property IsReentrant:Boolean read GetIsReentrant` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `property` | `IsReentrant` | `property IsReentrant:Boolean read GetIsReentrant` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `property` | `Kind` | `property Kind:TPreconditionerKind read GetKind` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IPreconditioner` | `property` | `Size` | `property Size:SizeInt read GetSize` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TDenseLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TDiagonalPreconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TDiagonalPreconditioner` | `constructor` | `Create` | `constructor Create(const Diagonal:array of T;const PivotTolerance:Double)` | `implementation` | `—` | `—` | `—` |
+| `TDiagonalPreconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TDiagonalPreconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `implementation` | `—` | `—` | `—` |
+| `TDiagonalPreconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TDiagonalPreconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TIC0Preconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TIC0Preconditioner` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double)` | `implementation` | `—` | `—` | `—` |
+| `TIC0Preconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TIC0Preconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `implementation` | `—` | `—` | `—` |
+| `TIC0Preconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TIC0Preconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TIdentityPreconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TIdentityPreconditioner` | `constructor` | `Create` | `constructor Create(const ASize:SizeInt)` | `implementation` | `—` | `—` | `—` |
+| `TIdentityPreconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TIdentityPreconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `implementation` | `—` | `—` | `—` |
+| `TIdentityPreconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TIdentityPreconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TILU0Preconditioner` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TILU0Preconditioner` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double)` | `implementation` | `—` | `—` | `—` |
+| `TILU0Preconditioner` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TILU0Preconditioner` | `function` | `GetKind` | `function GetKind:TPreconditionerKind` | `implementation` | `—` | `—` | `—` |
+| `TILU0Preconditioner` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TILU0Preconditioner` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TLinearOperatorFactory` | `function` | `FromDense` | `class function FromDense(const Matrix:specialize IDenseMatrix<T>):specialize ILinearOperator<T>` | `implementation` | `—` | `—` | `—` |
+| `TLinearOperatorFactory` | `function` | `FromSparse` | `class function FromSparse(const Matrix:specialize ISparseMatrix<T>):specialize ILinearOperator<T>` | `implementation` | `—` | `—` | `—` |
+| `TLinearOperatorFactory` | `function` | `FromStructured` | `class function FromStructured(const Matrix:specialize IStructuredMatrix<T>):specialize ILinearOperator<T>` | `implementation` | `—` | `—` | `—` |
+| `TLinearOperatorFactory` | `function` | `MatrixFree` | `class function MatrixFree(const Rows,Cols:SizeInt;const Action:specialize IMatrixFreeAction<T>):specialize ILinearOperator<T>` | `implementation` | `—` | `—` | `—` |
+| `TLinearOperatorOwnership` | `enum-value` | `looDelegated` | `looDelegated` | `advanced` | `—` | `—` | `—` |
+| `TLinearOperatorOwnership` | `enum-value` | `looRetainedImmutable` | `looRetainedImmutable` | `advanced` | `—` | `—` | `—` |
+| `TLinearOperatorOwnership` | `enum-value` | `looRetainedMutable` | `looRetainedMutable` | `advanced` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `AbsSquared` | `class function AbsSquared(const Value:T):Double` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `Conjugate` | `class function Conjugate(const Value:T):T` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `FromDouble` | `class function FromDouble(const Value:Double):T` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `ImaginaryPart` | `class function ImaginaryPart(const Value:T):Double` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `IsFinite` | `class function IsFinite(const Value:T):Boolean` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `Kind` | `class function Kind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `Magnitude` | `class function Magnitude(const Value:T):Double` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `One` | `class function One:T` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `RealPart` | `class function RealPart(const Value:T):Double` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `procedure` | `ValidateApplyShapes` | `class procedure ValidateApplyShapes(const Input,Destination:specialize IDenseMatrix<T>;const InputRows,OutputRows:SizeInt;const Operation:string)` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `procedure` | `ValidatePreconditionerVector` | `class procedure ValidatePreconditionerVector(const Input,Destination:specialize IDenseMatrix<T>;const Size:SizeInt;const Operation:string)` | `implementation` | `—` | `—` | `—` |
+| `TLinearScalar` | `function` | `Zero` | `class function Zero:T` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `constructor` | `Create` | `constructor Create(const Rows,Cols:SizeInt;const Action:specialize IMatrixFreeAction<T>)` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TMatrixFreeLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TPreconditionerFactory` | `function` | `Diagonal` | `class function Diagonal(const Values:array of T;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `implementation` | `—` | `—` | `—` |
+| `TPreconditionerFactory` | `function` | `Identity` | `class function Identity(const Size:SizeInt):specialize IPreconditioner<T>` | `implementation` | `—` | `—` | `—` |
+| `TPreconditionerFactory` | `function` | `ILU0` | `class function ILU0(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `implementation` | `—` | `—` | `—` |
+| `TPreconditionerFactory` | `function` | `IncompleteCholesky0` | `class function IncompleteCholesky0(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `implementation` | `—` | `—` | `—` |
+| `TPreconditionerFactory` | `function` | `SparseDiagonal` | `class function SparseDiagonal(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IPreconditioner<T>` | `implementation` | `—` | `—` | `—` |
+| `TPreconditionerKind` | `enum-value` | `pkDiagonal` | `pkDiagonal` | `advanced` | `—` | `—` | `—` |
+| `TPreconditionerKind` | `enum-value` | `pkIdentity` | `pkIdentity` | `advanced` | `—` | `—` | `—` |
+| `TPreconditionerKind` | `enum-value` | `pkILU0` | `pkILU0` | `advanced` | `—` | `—` | `—` |
+| `TPreconditionerKind` | `enum-value` | `pkIncompleteCholesky` | `pkIncompleteCholesky` | `advanced` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `procedure` | `Apply` | `procedure Apply(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `procedure` | `ApplyAdjoint` | `procedure ApplyAdjoint(const Input,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IStructuredMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `function` | `GetIsReentrant` | `function GetIsReentrant:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `function` | `GetOwnership` | `function GetOwnership:TLinearOperatorOwnership` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TStructuredLinearOperator` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
 
 ## AlgebraLib.Matrices
 
 Source: [`src/AlgebraLib.Matrices.pas`](../src/AlgebraLib.Matrices.pas)  
 Interface SHA-256: `9693f80e64fe84df6ddcfa09a97e66e25891f4da323b403e2ea43c7e8824bdba`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `constant` | `BLOCK_SIZE` | `BLOCK_SIZE=64` | `primary` | `—` |
-| `(unit)` | `constant` | `DEBUG_MODE` | `DEBUG_MODE=False` | `primary` | `—` |
-| `(unit)` | `type` | `EMatrixError` | `EMatrixError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `interface` | `IMatrix` | `IMatrix=interface` | `compatibility` | `IDenseDoubleMatrix` |
-| `(unit)` | `type` | `IMatrix` | `IMatrix=interface` | `compatibility` | `IDenseDoubleMatrix` |
-| `(unit)` | `constant` | `MAX_MULTIPLY_THREADS` | `MAX_MULTIPLY_THREADS=8` | `primary` | `—` |
-| `(unit)` | `record` | `TCholeskyDecomposition` | `TCholeskyDecomposition=record` | `primary` | `—` |
-| `(unit)` | `record` | `TEigenDecomposition` | `TEigenDecomposition=record` | `primary` | `—` |
-| `(unit)` | `record` | `TEigenpair` | `TEigenpair=record` | `primary` | `—` |
-| `(unit)` | `constant` | `THREAD_OPERATION_THRESHOLD` | `THREAD_OPERATION_THRESHOLD=262144` | `primary` | `—` |
-| `(unit)` | `type` | `TIterativeMethod` | `TIterativeMethod=(imConjugateGradient,imGaussSeidel,imJacobi)` | `primary` | `—` |
-| `(unit)` | `record` | `TLUDecomposition` | `TLUDecomposition=record` | `primary` | `—` |
-| `(unit)` | `type` | `TMatrixArray` | `TMatrixArray=array of array of Double` | `primary` | `—` |
-| `(unit)` | `class` | `TMatrixKit` | `TMatrixKit=class(TInterfacedObject,IMatrix)` | `compatibility` | `TDenseDoubleMatrix` |
-| `(unit)` | `class` | `TMatrixKitSparse` | `TMatrixKitSparse=class(TMatrixKit)` | `compatibility` | `TSparseDoubleMatrix` |
-| `(unit)` | `record` | `TQRDecomposition` | `TQRDecomposition=record` | `primary` | `—` |
-| `(unit)` | `record` | `TSparseElement` | `TSparseElement=record` | `primary` | `—` |
-| `(unit)` | `record` | `TSVD` | `TSVD=record` | `primary` | `—` |
-| `IMatrix` | `function` | `Add` | `function Add(const Other:IMatrix):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Cholesky` | `function Cholesky:TCholeskyDecomposition` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `property` | `Cols` | `property Cols:Integer read GetCols` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Condition` | `function Condition:Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Correlation` | `function Correlation:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Covariance` | `function Covariance:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `CrossProduct` | `function CrossProduct(const Other:IMatrix):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Determinant` | `function Determinant:Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `DotProduct` | `function DotProduct(const Other:IMatrix):Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `EigenDecomposition` | `function EigenDecomposition:TEigenDecomposition` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `ElementWiseDivide` | `function ElementWiseDivide(const Other:IMatrix):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const Other:IMatrix):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Exp` | `function Exp:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `GetCols` | `function GetCols:Integer` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `GetSubMatrix` | `function GetSubMatrix(StartRow,StartCol,NumRows,NumCols:Integer):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `GetValue` | `function GetValue(Row,Col:Integer):Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Inverse` | `function Inverse:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsColumnVector` | `function IsColumnVector:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsDiagonal` | `function IsDiagonal:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsOrthogonal` | `function IsOrthogonal:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsPositiveDefinite` | `function IsPositiveDefinite:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsPositiveSemidefinite` | `function IsPositiveSemidefinite:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsRowVector` | `function IsRowVector:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsSquare` | `function IsSquare:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsSymmetric` | `function IsSymmetric:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsTriangular` | `function IsTriangular(Upper:Boolean=True):Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `IsVector` | `function IsVector:Boolean` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `LU` | `function LU:TLUDecomposition` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Mean` | `function Mean(Axis:Integer=-1):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Multiply` | `function Multiply(const Other:IMatrix):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Normalize` | `function Normalize:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `NormFrobenius` | `function NormFrobenius:Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `NormInf` | `function NormInf:Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `NormOne` | `function NormOne:Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Power` | `function Power(exponent:Double):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `PowerMethod` | `function PowerMethod(MaxIterations:Integer=100;Tolerance:Double=1e-10):TEigenpair` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `PseudoInverse` | `function PseudoInverse:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `QR` | `function QR:TQRDecomposition` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Rank` | `function Rank:Integer` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `property` | `Rows` | `property Rows:Integer read GetRows` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `ScalarMultiply` | `function ScalarMultiply(const Scalar:Double):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `procedure` | `SetSubMatrix` | `procedure SetSubMatrix(StartRow,StartCol:Integer;const SubMatrix:IMatrix)` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `procedure` | `SetValue` | `procedure SetValue(Row,Col:Integer;const Value:Double)` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `SolveIterative` | `function SolveIterative(const B:IMatrix;Method:TIterativeMethod=imConjugateGradient;MaxIterations:Integer=1000;Tolerance:Double=1e-10):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Subtract` | `function Subtract(const Other:IMatrix):IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `SVD` | `function SVD:TSVD` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `ToString` | `function ToString:string` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Trace` | `function Trace:Double` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `function` | `Transpose` | `function Transpose:IMatrix` | `compatibility` | `IDenseDoubleMatrix` |
-| `IMatrix` | `property` | `Values` | `property Values[Row,Col:Integer]:Double read GetValue write SetValue` | `compatibility` | `IDenseDoubleMatrix` |
-| `TCholeskyDecomposition` | `field` | `L` | `L:IMatrix` | `primary` | `—` |
-| `TCholeskyDecomposition` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TEigenDecomposition` | `field` | `EigenValues` | `EigenValues:array of Double` | `primary` | `—` |
-| `TEigenDecomposition` | `field` | `EigenVectors` | `EigenVectors:IMatrix` | `primary` | `—` |
-| `TEigenDecomposition` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TEigenpair` | `field` | `EigenValue` | `EigenValue:Double` | `primary` | `—` |
-| `TEigenpair` | `field` | `EigenVector` | `EigenVector:IMatrix` | `primary` | `—` |
-| `TEigenpair` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imConjugateGradient` | `imConjugateGradient` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imGaussSeidel` | `imGaussSeidel` | `primary` | `—` |
-| `TIterativeMethod` | `enum-value` | `imJacobi` | `imJacobi` | `primary` | `—` |
-| `TLUDecomposition` | `field` | `L` | `L:IMatrix` | `primary` | `—` |
-| `TLUDecomposition` | `field` | `P` | `P:array of Integer` | `primary` | `—` |
-| `TLUDecomposition` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TLUDecomposition` | `field` | `U` | `U:IMatrix` | `primary` | `—` |
-| `TMatrixKit` | `function` | `Add` | `function Add(const Other:IMatrix):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Cholesky` | `function Cholesky:TCholeskyDecomposition` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Condition` | `function Condition:Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Correlation` | `function Correlation:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Covariance` | `function Covariance:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `constructor` | `Create` | `constructor Create(const ARows,ACols:Integer)` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateBandMatrix` | `class function CreateBandMatrix(Size,LowerBand,UpperBand:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateDiagonal` | `class function CreateDiagonal(const Diagonal:array of Double):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateFromArray` | `class function CreateFromArray(const Data:TMatrixArray):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateHilbert` | `class function CreateHilbert(Size:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateRandom` | `class function CreateRandom(Rows,Cols:Integer;Min,Max:Double):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateRandom` | `class function CreateRandom(Rows,Cols:Integer;Min,Max:Double;Seed:LongWord):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateSparse` | `class function CreateSparse(Rows,Cols:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateSymmetric` | `class function CreateSymmetric(const Data:TMatrixArray):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateToeplitz` | `class function CreateToeplitz(const FirstRow,FirstCol:TDoubleArray):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CreateVandermonde` | `class function CreateVandermonde(const Vector:TDoubleArray):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `CrossProduct` | `function CrossProduct(const Other:IMatrix):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `destructor` | `Destroy` | `destructor Destroy` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Determinant` | `function Determinant:Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `DotProduct` | `function DotProduct(const Other:IMatrix):Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `EigenDecomposition` | `function EigenDecomposition:TEigenDecomposition` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `ElementWiseDivide` | `function ElementWiseDivide(const Other:IMatrix):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const Other:IMatrix):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Exp` | `function Exp:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `GetSubMatrix` | `function GetSubMatrix(StartRow,StartCol,NumRows,NumCols:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Identity` | `class function Identity(const Size:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Inverse` | `function Inverse:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsColumnVector` | `function IsColumnVector:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsDiagonal` | `function IsDiagonal:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsOrthogonal` | `function IsOrthogonal:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsPositiveDefinite` | `function IsPositiveDefinite:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsPositiveSemidefinite` | `function IsPositiveSemidefinite:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsRowVector` | `function IsRowVector:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsSquare` | `function IsSquare:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsSymmetric` | `function IsSymmetric:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsTriangular` | `function IsTriangular(Upper:Boolean=True):Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `IsVector` | `function IsVector:Boolean` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `LU` | `function LU:TLUDecomposition` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Mean` | `function Mean(Axis:Integer=-1):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Multiply` | `function Multiply(const Other:IMatrix):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Normalize` | `function Normalize:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `NormFrobenius` | `function NormFrobenius:Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `NormInf` | `function NormInf:Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `NormOne` | `function NormOne:Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Ones` | `class function Ones(const Rows,Cols:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Power` | `function Power(exponent:Double):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `PowerMethod` | `function PowerMethod(MaxIterations:Integer=100;Tolerance:Double=1e-10):TEigenpair` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `PseudoInverse` | `function PseudoInverse:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `QR` | `function QR:TQRDecomposition` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Rank` | `function Rank:Integer` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `ScalarMultiply` | `function ScalarMultiply(const Scalar:Double):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `procedure` | `SetSubMatrix` | `procedure SetSubMatrix(StartRow,StartCol:Integer;const SubMatrix:IMatrix)` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `SolveIterative` | `function SolveIterative(const B:IMatrix;Method:TIterativeMethod=imConjugateGradient;MaxIterations:Integer=1000;Tolerance:Double=1e-10):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Subtract` | `function Subtract(const Other:IMatrix):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `SVD` | `function SVD:TSVD` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `ToString` | `function ToString:string` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Trace` | `function Trace:Double` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Transpose` | `function Transpose:IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKit` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:Integer):IMatrix` | `compatibility` | `TDenseDoubleMatrix` |
-| `TMatrixKitSparse` | `function` | `Add` | `function Add(const Other:IMatrix):IMatrix` | `compatibility` | `TSparseDoubleMatrix` |
-| `TMatrixKitSparse` | `procedure` | `AddElement` | `procedure AddElement(Row,Col:Integer;Value:Double)` | `compatibility` | `TSparseDoubleMatrix` |
-| `TMatrixKitSparse` | `procedure` | `CompactStorage` | `procedure CompactStorage` | `compatibility` | `TSparseDoubleMatrix` |
-| `TMatrixKitSparse` | `constructor` | `Create` | `constructor Create(Rows,Cols:Integer)` | `compatibility` | `TSparseDoubleMatrix` |
-| `TMatrixKitSparse` | `destructor` | `Destroy` | `destructor Destroy` | `compatibility` | `TSparseDoubleMatrix` |
-| `TMatrixKitSparse` | `function` | `GetValue` | `function GetValue(Row,Col:Integer):Double` | `compatibility` | `TSparseDoubleMatrix` |
-| `TMatrixKitSparse` | `procedure` | `SetValue` | `procedure SetValue(Row,Col:Integer;const Value:Double)` | `compatibility` | `TSparseDoubleMatrix` |
-| `TQRDecomposition` | `field` | `Q` | `Q:IMatrix` | `primary` | `—` |
-| `TQRDecomposition` | `field` | `R` | `R:IMatrix` | `primary` | `—` |
-| `TQRDecomposition` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TSparseElement` | `field` | `Col` | `Col:Integer` | `primary` | `—` |
-| `TSparseElement` | `field` | `Row` | `Row:Integer` | `primary` | `—` |
-| `TSparseElement` | `field` | `Value` | `Value:Double` | `primary` | `—` |
-| `TSVD` | `field` | `S` | `S:IMatrix` | `primary` | `—` |
-| `TSVD` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TSVD` | `field` | `U` | `U:IMatrix` | `primary` | `—` |
-| `TSVD` | `field` | `V` | `V:IMatrix` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `constant` | `BLOCK_SIZE` | `BLOCK_SIZE=64` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `DEBUG_MODE` | `DEBUG_MODE=False` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EMatrixError` | `EMatrixError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IMatrix` | `IMatrix=interface` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `(unit)` | `type` | `IMatrix` | `IMatrix=interface` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `(unit)` | `constant` | `MAX_MULTIPLY_THREADS` | `MAX_MULTIPLY_THREADS=8` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCholeskyDecomposition` | `TCholeskyDecomposition=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TEigenDecomposition` | `TEigenDecomposition=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TEigenpair` | `TEigenpair=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `THREAD_OPERATION_THRESHOLD` | `THREAD_OPERATION_THRESHOLD=262144` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TIterativeMethod` | `TIterativeMethod=(imConjugateGradient,imGaussSeidel,imJacobi)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLUDecomposition` | `TLUDecomposition=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TMatrixArray` | `TMatrixArray=array of array of Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TMatrixKit` | `TMatrixKit=class(TInterfacedObject,IMatrix)` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `(unit)` | `class` | `TMatrixKitSparse` | `TMatrixKitSparse=class(TMatrixKit)` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `(unit)` | `record` | `TQRDecomposition` | `TQRDecomposition=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSparseElement` | `TSparseElement=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSVD` | `TSVD=record` | `advanced` | `—` | `—` | `—` |
+| `IMatrix` | `function` | `Add` | `function Add(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Cholesky` | `function Cholesky:TCholeskyDecomposition` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `property` | `Cols` | `property Cols:Integer read GetCols` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Condition` | `function Condition:Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Correlation` | `function Correlation:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Covariance` | `function Covariance:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `CrossProduct` | `function CrossProduct(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Determinant` | `function Determinant:Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `DotProduct` | `function DotProduct(const Other:IMatrix):Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `EigenDecomposition` | `function EigenDecomposition:TEigenDecomposition` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `ElementWiseDivide` | `function ElementWiseDivide(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Exp` | `function Exp:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `GetCols` | `function GetCols:Integer` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `GetSubMatrix` | `function GetSubMatrix(StartRow,StartCol,NumRows,NumCols:Integer):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `GetValue` | `function GetValue(Row,Col:Integer):Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Inverse` | `function Inverse:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsColumnVector` | `function IsColumnVector:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsDiagonal` | `function IsDiagonal:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsOrthogonal` | `function IsOrthogonal:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsPositiveDefinite` | `function IsPositiveDefinite:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsPositiveSemidefinite` | `function IsPositiveSemidefinite:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsRowVector` | `function IsRowVector:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsSquare` | `function IsSquare:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsSymmetric` | `function IsSymmetric:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsTriangular` | `function IsTriangular(Upper:Boolean=True):Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `IsVector` | `function IsVector:Boolean` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `LU` | `function LU:TLUDecomposition` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Mean` | `function Mean(Axis:Integer=-1):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Multiply` | `function Multiply(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Normalize` | `function Normalize:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `NormFrobenius` | `function NormFrobenius:Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `NormInf` | `function NormInf:Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `NormOne` | `function NormOne:Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Power` | `function Power(exponent:Double):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `PowerMethod` | `function PowerMethod(MaxIterations:Integer=100;Tolerance:Double=1e-10):TEigenpair` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `PseudoInverse` | `function PseudoInverse:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `QR` | `function QR:TQRDecomposition` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Rank` | `function Rank:Integer` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `property` | `Rows` | `property Rows:Integer read GetRows` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `ScalarMultiply` | `function ScalarMultiply(const Scalar:Double):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `procedure` | `SetSubMatrix` | `procedure SetSubMatrix(StartRow,StartCol:Integer;const SubMatrix:IMatrix)` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `procedure` | `SetValue` | `procedure SetValue(Row,Col:Integer;const Value:Double)` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `SolveIterative` | `function SolveIterative(const B:IMatrix;Method:TIterativeMethod=imConjugateGradient;MaxIterations:Integer=1000;Tolerance:Double=1e-10):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Subtract` | `function Subtract(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `SVD` | `function SVD:TSVD` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `ToString` | `function ToString:string` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Trace` | `function Trace:Double` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `function` | `Transpose` | `function Transpose:IMatrix` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `IMatrix` | `property` | `Values` | `property Values[Row,Col:Integer]:Double read GetValue write SetValue` | `compatibility` | `replace` | `IDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TCholeskyDecomposition` | `field` | `L` | `L:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TCholeskyDecomposition` | `function` | `ToString` | `function ToString:string` | `advanced` | `—` | `—` | `—` |
+| `TEigenDecomposition` | `field` | `EigenValues` | `EigenValues:array of Double` | `advanced` | `—` | `—` | `—` |
+| `TEigenDecomposition` | `field` | `EigenVectors` | `EigenVectors:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TEigenDecomposition` | `function` | `ToString` | `function ToString:string` | `advanced` | `—` | `—` | `—` |
+| `TEigenpair` | `field` | `EigenValue` | `EigenValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TEigenpair` | `field` | `EigenVector` | `EigenVector:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TEigenpair` | `function` | `ToString` | `function ToString:string` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imConjugateGradient` | `imConjugateGradient` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imGaussSeidel` | `imGaussSeidel` | `advanced` | `—` | `—` | `—` |
+| `TIterativeMethod` | `enum-value` | `imJacobi` | `imJacobi` | `advanced` | `—` | `—` | `—` |
+| `TLUDecomposition` | `field` | `L` | `L:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TLUDecomposition` | `field` | `P` | `P:array of Integer` | `advanced` | `—` | `—` | `—` |
+| `TLUDecomposition` | `function` | `ToString` | `function ToString:string` | `advanced` | `—` | `—` | `—` |
+| `TLUDecomposition` | `field` | `U` | `U:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMatrixKit` | `function` | `Add` | `function Add(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Cholesky` | `function Cholesky:TCholeskyDecomposition` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Condition` | `function Condition:Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Correlation` | `function Correlation:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Covariance` | `function Covariance:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `constructor` | `Create` | `constructor Create(const ARows,ACols:Integer)` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateBandMatrix` | `class function CreateBandMatrix(Size,LowerBand,UpperBand:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateDiagonal` | `class function CreateDiagonal(const Diagonal:array of Double):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateFromArray` | `class function CreateFromArray(const Data:TMatrixArray):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateHilbert` | `class function CreateHilbert(Size:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateRandom` | `class function CreateRandom(Rows,Cols:Integer;Min,Max:Double):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateRandom` | `class function CreateRandom(Rows,Cols:Integer;Min,Max:Double;Seed:LongWord):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateSparse` | `class function CreateSparse(Rows,Cols:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateSymmetric` | `class function CreateSymmetric(const Data:TMatrixArray):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateToeplitz` | `class function CreateToeplitz(const FirstRow,FirstCol:TDoubleArray):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CreateVandermonde` | `class function CreateVandermonde(const Vector:TDoubleArray):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `CrossProduct` | `function CrossProduct(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `destructor` | `Destroy` | `destructor Destroy` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Determinant` | `function Determinant:Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `DotProduct` | `function DotProduct(const Other:IMatrix):Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `EigenDecomposition` | `function EigenDecomposition:TEigenDecomposition` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `ElementWiseDivide` | `function ElementWiseDivide(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `ElementWiseMultiply` | `function ElementWiseMultiply(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Exp` | `function Exp:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `GetSubMatrix` | `function GetSubMatrix(StartRow,StartCol,NumRows,NumCols:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Identity` | `class function Identity(const Size:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Inverse` | `function Inverse:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsColumnVector` | `function IsColumnVector:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsDiagonal` | `function IsDiagonal:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsOrthogonal` | `function IsOrthogonal:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsPositiveDefinite` | `function IsPositiveDefinite:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsPositiveSemidefinite` | `function IsPositiveSemidefinite:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsRowVector` | `function IsRowVector:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsSquare` | `function IsSquare:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsSymmetric` | `function IsSymmetric:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsTriangular` | `function IsTriangular(Upper:Boolean=True):Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `IsVector` | `function IsVector:Boolean` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `LU` | `function LU:TLUDecomposition` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Mean` | `function Mean(Axis:Integer=-1):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Multiply` | `function Multiply(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Normalize` | `function Normalize:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `NormFrobenius` | `function NormFrobenius:Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `NormInf` | `function NormInf:Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `NormOne` | `function NormOne:Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Ones` | `class function Ones(const Rows,Cols:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Power` | `function Power(exponent:Double):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `PowerMethod` | `function PowerMethod(MaxIterations:Integer=100;Tolerance:Double=1e-10):TEigenpair` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `PseudoInverse` | `function PseudoInverse:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `QR` | `function QR:TQRDecomposition` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Rank` | `function Rank:Integer` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `ScalarMultiply` | `function ScalarMultiply(const Scalar:Double):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `procedure` | `SetSubMatrix` | `procedure SetSubMatrix(StartRow,StartCol:Integer;const SubMatrix:IMatrix)` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `SolveIterative` | `function SolveIterative(const B:IMatrix;Method:TIterativeMethod=imConjugateGradient;MaxIterations:Integer=1000;Tolerance:Double=1e-10):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Subtract` | `function Subtract(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `SVD` | `function SVD:TSVD` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `ToString` | `function ToString:string` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Trace` | `function Trace:Double` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Transpose` | `function Transpose:IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKit` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:Integer):IMatrix` | `compatibility` | `replace` | `TDenseDoubleMatrix` | `legacy-dense-matrix` |
+| `TMatrixKitSparse` | `function` | `Add` | `function Add(const Other:IMatrix):IMatrix` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TMatrixKitSparse` | `procedure` | `AddElement` | `procedure AddElement(Row,Col:Integer;Value:Double)` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TMatrixKitSparse` | `procedure` | `CompactStorage` | `procedure CompactStorage` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TMatrixKitSparse` | `constructor` | `Create` | `constructor Create(Rows,Cols:Integer)` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TMatrixKitSparse` | `destructor` | `Destroy` | `destructor Destroy` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TMatrixKitSparse` | `function` | `GetValue` | `function GetValue(Row,Col:Integer):Double` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TMatrixKitSparse` | `procedure` | `SetValue` | `procedure SetValue(Row,Col:Integer;const Value:Double)` | `compatibility` | `replace` | `TSparseDoubleMatrix` | `legacy-sparse-matrix` |
+| `TQRDecomposition` | `field` | `Q` | `Q:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TQRDecomposition` | `field` | `R` | `R:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TQRDecomposition` | `function` | `ToString` | `function ToString:string` | `advanced` | `—` | `—` | `—` |
+| `TSparseElement` | `field` | `Col` | `Col:Integer` | `advanced` | `—` | `—` | `—` |
+| `TSparseElement` | `field` | `Row` | `Row:Integer` | `advanced` | `—` | `—` | `—` |
+| `TSparseElement` | `field` | `Value` | `Value:Double` | `advanced` | `—` | `—` | `—` |
+| `TSVD` | `field` | `S` | `S:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TSVD` | `function` | `ToString` | `function ToString:string` | `advanced` | `—` | `—` | `—` |
+| `TSVD` | `field` | `U` | `U:IMatrix` | `advanced` | `—` | `—` | `—` |
+| `TSVD` | `field` | `V` | `V:IMatrix` | `advanced` | `—` | `—` | `—` |
 
 ## AlgebraLib.PartialEigensystems
 
 Source: [`src/AlgebraLib.PartialEigensystems.pas`](../src/AlgebraLib.PartialEigensystems.pas)  
 Interface SHA-256: `c294bce8f96956d913f2a956d9e5b477d09c026826c7db2d8f75f68bb3e26f69`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EPartialEigensystemError` | `EPartialEigensystemError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexPartialEigenSolver` | `TComplexPartialEigenSolver=specialize TPartialEigenSolver<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexRows` | `TComplexRows=array of TComplexArray` | `primary` | `—` |
-| `(unit)` | `type` | `TDoublePartialEigenSolver` | `TDoublePartialEigenSolver=specialize TPartialEigenSolver<Double>` | `primary` | `—` |
-| `(unit)` | `class` | `TPartialEigenSolver` | `generic TPartialEigenSolver<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TSingleComplexPartialEigenSolver` | `TSingleComplexPartialEigenSolver=specialize TPartialEigenSolver<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSinglePartialEigenSolver` | `TSinglePartialEigenSolver=specialize TPartialEigenSolver<Single>` | `primary` | `—` |
-| `(unit)` | `class` | `TSmallComplexEigen` | `TSmallComplexEigen=class` | `primary` | `—` |
-| `(unit)` | `type` | `TSpectralMethod` | `TSpectralMethod=(smRestartedLanczos,smRestartedArnoldi)` | `primary` | `—` |
-| `(unit)` | `record` | `TSpectralOptions` | `TSpectralOptions=record` | `primary` | `—` |
-| `(unit)` | `record` | `TSpectralResult` | `TSpectralResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSpectralTarget` | `TSpectralTarget=(stLargestMagnitude)` | `primary` | `—` |
-| `(unit)` | `type` | `TSpectralVector` | `generic TSpectralVector<T>=array of T` | `internal` | `—` |
-| `(unit)` | `type` | `TSpectralVectors` | `generic TSpectralVectors<T>=array of specialize TSpectralVector<T>` | `internal` | `—` |
-| `TPartialEigenSolver` | `function` | `Arnoldi` | `class function Arnoldi(const OperatorValue:TOperator;const Options:TSpectralOptions):TSpectralResult` | `internal` | `—` |
-| `TPartialEigenSolver` | `function` | `Lanczos` | `class function Lanczos(const OperatorValue:TOperator;const Options:TSpectralOptions):TSpectralResult` | `internal` | `—` |
-| `TSmallComplexEigen` | `procedure` | `Solve` | `class procedure Solve(const Matrix:TComplexRows;out Eigenvalues:TComplexArray;out Eigenvectors:TComplexRows;const Tolerance:Double=1.0e-13;const MaximumIterations:SizeInt=4000)` | `primary` | `—` |
-| `TSpectralMethod` | `enum-value` | `smRestartedArnoldi` | `smRestartedArnoldi` | `primary` | `—` |
-| `TSpectralMethod` | `enum-value` | `smRestartedLanczos` | `smRestartedLanczos` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `BreakdownTolerance` | `BreakdownTolerance:Double` | `primary` | `—` |
-| `TSpectralOptions` | `function` | `Default` | `class function Default:TSpectralOptions` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `EigenpairCount` | `EigenpairCount:SizeInt` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `KrylovDimension` | `KrylovDimension:SizeInt` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `MaximumRestarts` | `MaximumRestarts:SizeInt` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `StartingSeed` | `StartingSeed:QWord` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `Target` | `Target:TSpectralTarget` | `primary` | `—` |
-| `TSpectralOptions` | `field` | `Tolerance` | `Tolerance:Double` | `primary` | `—` |
-| `TSpectralResult` | `field` | `ConvergedCount` | `ConvergedCount:SizeInt` | `primary` | `—` |
-| `TSpectralResult` | `field` | `Eigenvalues` | `Eigenvalues:TComplexArray` | `primary` | `—` |
-| `TSpectralResult` | `field` | `Eigenvectors` | `Eigenvectors:IDenseComplexMatrix` | `primary` | `—` |
-| `TSpectralResult` | `field` | `Method` | `Method:TSpectralMethod` | `primary` | `—` |
-| `TSpectralResult` | `field` | `ProductCount` | `ProductCount:SizeInt` | `primary` | `—` |
-| `TSpectralResult` | `field` | `ResidualNorms` | `ResidualNorms:TDoubleArray` | `primary` | `—` |
-| `TSpectralResult` | `field` | `RestartCount` | `RestartCount:SizeInt` | `primary` | `—` |
-| `TSpectralResult` | `field` | `StartingSeed` | `StartingSeed:QWord` | `primary` | `—` |
-| `TSpectralResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TSpectralTarget` | `enum-value` | `stLargestMagnitude` | `stLargestMagnitude` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EPartialEigensystemError` | `EPartialEigensystemError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexPartialEigenSolver` | `TComplexPartialEigenSolver=specialize TPartialEigenSolver<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexRows` | `TComplexRows=array of TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoublePartialEigenSolver` | `TDoublePartialEigenSolver=specialize TPartialEigenSolver<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TPartialEigenSolver` | `generic TPartialEigenSolver<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexPartialEigenSolver` | `TSingleComplexPartialEigenSolver=specialize TPartialEigenSolver<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSinglePartialEigenSolver` | `TSinglePartialEigenSolver=specialize TPartialEigenSolver<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSmallComplexEigen` | `TSmallComplexEigen=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSpectralMethod` | `TSpectralMethod=(smRestartedLanczos,smRestartedArnoldi)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSpectralOptions` | `TSpectralOptions=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSpectralResult` | `TSpectralResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSpectralTarget` | `TSpectralTarget=(stLargestMagnitude)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSpectralVector` | `generic TSpectralVector<T>=array of T` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSpectralVectors` | `generic TSpectralVectors<T>=array of specialize TSpectralVector<T>` | `implementation` | `—` | `—` | `—` |
+| `TPartialEigenSolver` | `function` | `Arnoldi` | `class function Arnoldi(const OperatorValue:TOperator;const Options:TSpectralOptions):TSpectralResult` | `implementation` | `—` | `—` | `—` |
+| `TPartialEigenSolver` | `function` | `Lanczos` | `class function Lanczos(const OperatorValue:TOperator;const Options:TSpectralOptions):TSpectralResult` | `implementation` | `—` | `—` | `—` |
+| `TSmallComplexEigen` | `procedure` | `Solve` | `class procedure Solve(const Matrix:TComplexRows;out Eigenvalues:TComplexArray;out Eigenvectors:TComplexRows;const Tolerance:Double=1.0e-13;const MaximumIterations:SizeInt=4000)` | `advanced` | `—` | `—` | `—` |
+| `TSpectralMethod` | `enum-value` | `smRestartedArnoldi` | `smRestartedArnoldi` | `advanced` | `—` | `—` | `—` |
+| `TSpectralMethod` | `enum-value` | `smRestartedLanczos` | `smRestartedLanczos` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `BreakdownTolerance` | `BreakdownTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `function` | `Default` | `class function Default:TSpectralOptions` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `EigenpairCount` | `EigenpairCount:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `KrylovDimension` | `KrylovDimension:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `MaximumRestarts` | `MaximumRestarts:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `StartingSeed` | `StartingSeed:QWord` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `Target` | `Target:TSpectralTarget` | `advanced` | `—` | `—` | `—` |
+| `TSpectralOptions` | `field` | `Tolerance` | `Tolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `ConvergedCount` | `ConvergedCount:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `Eigenvalues` | `Eigenvalues:TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `Eigenvectors` | `Eigenvectors:IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `Method` | `Method:TSpectralMethod` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `ProductCount` | `ProductCount:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `ResidualNorms` | `ResidualNorms:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `RestartCount` | `RestartCount:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `StartingSeed` | `StartingSeed:QWord` | `advanced` | `—` | `—` | `—` |
+| `TSpectralResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TSpectralTarget` | `enum-value` | `stLargestMagnitude` | `stLargestMagnitude` | `advanced` | `—` | `—` | `—` |
 
 ## AlgebraLib.SparseMatrices
 
 Source: [`src/AlgebraLib.SparseMatrices.pas`](../src/AlgebraLib.SparseMatrices.pas)  
 Interface SHA-256: `18c1b6712121b70e343782b4409e715fb6eb1c3edb32b7f0e7661000328705c0`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ESparseMatrixError` | `ESparseMatrixError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `ISparseComplexMatrix` | `ISparseComplexMatrix=specialize ISparseMatrix<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ISparseDoubleMatrix` | `ISparseDoubleMatrix=specialize ISparseMatrix<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `ISparseMatrix` | `generic ISparseMatrix<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `ISparseSingleComplexMatrix` | `ISparseSingleComplexMatrix=specialize ISparseMatrix<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ISparseSingleMatrix` | `ISparseSingleMatrix=specialize ISparseMatrix<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `IStructuredComplexMatrix` | `IStructuredComplexMatrix=specialize IStructuredMatrix<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IStructuredDoubleMatrix` | `IStructuredDoubleMatrix=specialize IStructuredMatrix<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `IStructuredMatrix` | `generic IStructuredMatrix<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `IStructuredSingleComplexMatrix` | `IStructuredSingleComplexMatrix=specialize IStructuredMatrix<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IStructuredSingleMatrix` | `IStructuredSingleMatrix=specialize IStructuredMatrix<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseComplexMatrix` | `TSparseComplexMatrix=specialize TSparseMatrixFactory<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseComplexTripletBuilder` | `TSparseComplexTripletBuilder=specialize TSparseTripletBuilder<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseDoubleMatrix` | `TSparseDoubleMatrix=specialize TSparseMatrixFactory<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseDoubleTripletBuilder` | `TSparseDoubleTripletBuilder=specialize TSparseTripletBuilder<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseFormat` | `TSparseFormat=(sfCSR,sfCSC)` | `primary` | `—` |
-| `(unit)` | `class` | `TSparseMatrixFactory` | `generic TSparseMatrixFactory<T>=class` | `internal` | `—` |
-| `(unit)` | `class` | `TSparseMatrixStorage` | `generic TSparseMatrixStorage<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `type` | `TSparseScalarKind` | `TSparseScalarKind=(sskSingle,sskDouble,sskSingleComplex,sskComplex)` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseSingleComplexMatrix` | `TSparseSingleComplexMatrix=specialize TSparseMatrixFactory<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseSingleComplexTripletBuilder` | `TSparseSingleComplexTripletBuilder=specialize TSparseTripletBuilder<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseSingleMatrix` | `TSparseSingleMatrix=specialize TSparseMatrixFactory<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseSingleTripletBuilder` | `TSparseSingleTripletBuilder=specialize TSparseTripletBuilder<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseSizeIntArray` | `TSparseSizeIntArray=array of SizeInt` | `primary` | `—` |
-| `(unit)` | `type` | `TSparseStoredZeroPolicy` | `TSparseStoredZeroPolicy=(szDrop,szKeep)` | `primary` | `—` |
-| `(unit)` | `record` | `TSparseTriplet` | `generic TSparseTriplet<T>=record` | `internal` | `—` |
-| `(unit)` | `type` | `TSparseTripletArray` | `generic TSparseTripletArray<T>=array of specialize TSparseTriplet<T>` | `internal` | `—` |
-| `(unit)` | `class` | `TSparseTripletBuilder` | `generic TSparseTripletBuilder<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TSparseValueArray` | `generic TSparseValueArray<T>=array of T` | `internal` | `—` |
-| `(unit)` | `type` | `TStructuredComplexMatrix` | `TStructuredComplexMatrix=specialize TStructuredMatrixFactory<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TStructuredDoubleMatrix` | `TStructuredDoubleMatrix=specialize TStructuredMatrixFactory<Double>` | `primary` | `—` |
-| `(unit)` | `class` | `TStructuredMatrixFactory` | `generic TStructuredMatrixFactory<T>=class` | `internal` | `—` |
-| `(unit)` | `type` | `TStructuredMatrixKind` | `TStructuredMatrixKind=(smDiagonal,smTridiagonal,smBand)` | `primary` | `—` |
-| `(unit)` | `class` | `TStructuredMatrixStorage` | `generic TStructuredMatrixStorage<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `type` | `TStructuredSingleComplexMatrix` | `TStructuredSingleComplexMatrix=specialize TStructuredMatrixFactory<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TStructuredSingleMatrix` | `TStructuredSingleMatrix=specialize TStructuredMatrixFactory<Single>` | `primary` | `—` |
-| `ISparseMatrix` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `internal` | `—` |
-| `ISparseMatrix` | `property` | `Format` | `property Format:TSparseFormat read GetFormat` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetFormat` | `function GetFormat:TSparseFormat` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetInnerIndex` | `function GetInnerIndex(const Position:SizeInt):SizeInt` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetNonZeroCount` | `function GetNonZeroCount:SizeInt` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetOuterPointer` | `function GetOuterPointer(const Position:SizeInt):SizeInt` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetStoredValue` | `function GetStoredValue(const Position:SizeInt):T` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetStoredZeroPolicy` | `function GetStoredZeroPolicy:TSparseStoredZeroPolicy` | `internal` | `—` |
-| `ISparseMatrix` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `internal` | `—` |
-| `ISparseMatrix` | `property` | `NonZeroCount` | `property NonZeroCount:SizeInt read GetNonZeroCount` | `internal` | `—` |
-| `ISparseMatrix` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `internal` | `—` |
-| `ISparseMatrix` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `internal` | `—` |
-| `ISparseMatrix` | `property` | `StoredZeroPolicy` | `property StoredZeroPolicy:TSparseStoredZeroPolicy read GetStoredZeroPolicy` | `internal` | `—` |
-| `ISparseMatrix` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetKind` | `function GetKind:TStructuredMatrixKind` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `internal` | `—` |
-| `IStructuredMatrix` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `Kind` | `property Kind:TStructuredMatrixKind read GetKind` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `LowerBandwidth` | `property LowerBandwidth:SizeInt read GetLowerBandwidth` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `UpperBandwidth` | `property UpperBandwidth:SizeInt read GetUpperBandwidth` | `internal` | `—` |
-| `IStructuredMatrix` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue` | `internal` | `—` |
-| `TSparseFormat` | `enum-value` | `sfCSC` | `sfCSC` | `primary` | `—` |
-| `TSparseFormat` | `enum-value` | `sfCSR` | `sfCSR` | `primary` | `—` |
-| `TSparseMatrixFactory` | `function` | `Add` | `class function Add(const A,B:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Column` | `class function Column(const A:specialize ISparseMatrix<T>;const ColumnIndex:SizeInt):specialize IDenseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `ConjugateTranspose` | `class function ConjugateTranspose(const A:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Convert` | `class function Convert(const Matrix:specialize ISparseMatrix<T>;const Format:TSparseFormat):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `FromCSC` | `class function FromCSC(const Rows,Cols:SizeInt;const ColumnPointers,RowIndices:array of SizeInt;const Values:array of T;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `FromCSR` | `class function FromCSR(const Rows,Cols:SizeInt;const RowPointers,ColumnIndices:array of SizeInt;const Values:array of T;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `FromDense` | `class function FromDense(const Matrix:specialize IDenseMatrix<T>;const Format:TSparseFormat=sfCSR;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `FromTriplets` | `class function FromTriplets(const Rows,Cols:SizeInt;const TripletRows,TripletCols:array of SizeInt;const TripletValues:array of T;const Format:TSparseFormat=sfCSR;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Multiply` | `class function Multiply(const A,B:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `procedure` | `MultiplyDenseInto` | `class procedure MultiplyDenseInto(const A:specialize ISparseMatrix<T>;const X,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Norm2` | `class function Norm2(const A:specialize ISparseMatrix<T>):Double` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Row` | `class function Row(const A:specialize ISparseMatrix<T>;const RowIndex:SizeInt):specialize IDenseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Scale` | `class function Scale(const A:specialize ISparseMatrix<T>;const Scalar:T):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `ToDense` | `class function ToDense(const Matrix:specialize ISparseMatrix<T>):specialize IDenseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Transpose` | `class function Transpose(const A:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixFactory` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt;const Format:TSparseFormat=sfCSR):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `CheckedCount` | `class function CheckedCount(const A,B,ElementSize:SizeInt;const Operation:string):SizeUInt` | `internal` | `—` |
-| `TSparseMatrixStorage` | `constructor` | `Create` | `constructor Create(const Rows,Cols:SizeInt;const Format:TSparseFormat;const Kind:TSparseScalarKind;const Outer,Inner:array of SizeInt;const Values:array of T;const ZeroPolicy:TSparseStoredZeroPolicy)` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetFormat` | `function GetFormat:TSparseFormat` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetInnerIndex` | `function GetInnerIndex(const Position:SizeInt):SizeInt` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetNonZeroCount` | `function GetNonZeroCount:SizeInt` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetOuterPointer` | `function GetOuterPointer(const Position:SizeInt):SizeInt` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetStoredValue` | `function GetStoredValue(const Position:SizeInt):T` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetStoredZeroPolicy` | `function GetStoredZeroPolicy:TSparseStoredZeroPolicy` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `internal` | `—` |
-| `TSparseMatrixStorage` | `procedure` | `RequireIndex` | `class procedure RequireIndex(const Index,Limit:SizeInt;const Name,Operation:string)` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `ScalarAbsSquared` | `class function ScalarAbsSquared(const Value:T;const Kind:TSparseScalarKind):Double` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `ScalarConjugate` | `class function ScalarConjugate(const Value:T;const Kind:TSparseScalarKind):T` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `ScalarIsFinite` | `class function ScalarIsFinite(const Value:T;const Kind:TSparseScalarKind):Boolean` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `ScalarIsZero` | `class function ScalarIsZero(const Value:T):Boolean` | `internal` | `—` |
-| `TSparseMatrixStorage` | `function` | `ScalarKindOf` | `class function ScalarKindOf:TSparseScalarKind` | `internal` | `—` |
-| `TSparseScalarKind` | `enum-value` | `sskComplex` | `sskComplex` | `primary` | `—` |
-| `TSparseScalarKind` | `enum-value` | `sskDouble` | `sskDouble` | `primary` | `—` |
-| `TSparseScalarKind` | `enum-value` | `sskSingle` | `sskSingle` | `primary` | `—` |
-| `TSparseScalarKind` | `enum-value` | `sskSingleComplex` | `sskSingleComplex` | `primary` | `—` |
-| `TSparseStoredZeroPolicy` | `enum-value` | `szDrop` | `szDrop` | `primary` | `—` |
-| `TSparseStoredZeroPolicy` | `enum-value` | `szKeep` | `szKeep` | `primary` | `—` |
-| `TSparseTriplet` | `field` | `Col` | `Col:SizeInt` | `internal` | `—` |
-| `TSparseTriplet` | `field` | `Row` | `Row:SizeInt` | `internal` | `—` |
-| `TSparseTriplet` | `field` | `Sequence` | `Sequence:SizeInt` | `internal` | `—` |
-| `TSparseTriplet` | `field` | `Value` | `Value:T` | `internal` | `—` |
-| `TSparseTripletBuilder` | `procedure` | `Add` | `procedure Add(const Row,Col:SizeInt;const Value:T)` | `internal` | `—` |
-| `TSparseTripletBuilder` | `procedure` | `Clear` | `procedure Clear` | `internal` | `—` |
-| `TSparseTripletBuilder` | `property` | `Cols` | `property Cols:SizeInt read FCols` | `internal` | `—` |
-| `TSparseTripletBuilder` | `property` | `Count` | `property Count:SizeInt read FCount` | `internal` | `—` |
-| `TSparseTripletBuilder` | `constructor` | `Create` | `constructor Create(const Rows,Cols:SizeInt)` | `internal` | `—` |
-| `TSparseTripletBuilder` | `property` | `Rows` | `property Rows:SizeInt read FRows` | `internal` | `—` |
-| `TSparseTripletBuilder` | `function` | `ToCSC` | `function ToCSC(const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TSparseTripletBuilder` | `function` | `ToCSR` | `function ToCSR(const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TStructuredMatrixFactory` | `function` | `Band` | `class function Band(const Rows,Cols,LowerBandwidth,UpperBandwidth:SizeInt;const CompactValues:array of T):specialize IStructuredMatrix<T>` | `internal` | `—` |
-| `TStructuredMatrixFactory` | `function` | `Diagonal` | `class function Diagonal(const Rows,Cols:SizeInt;const DiagonalValues:array of T):specialize IStructuredMatrix<T>` | `internal` | `—` |
-| `TStructuredMatrixFactory` | `procedure` | `MultiplyDenseInto` | `class procedure MultiplyDenseInto(const A:specialize IStructuredMatrix<T>;const X,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TStructuredMatrixFactory` | `function` | `ToDense` | `class function ToDense(const Matrix:specialize IStructuredMatrix<T>):specialize IDenseMatrix<T>` | `internal` | `—` |
-| `TStructuredMatrixFactory` | `function` | `ToSparse` | `class function ToSparse(const Matrix:specialize IStructuredMatrix<T>;const Format:TSparseFormat=sfCSR):specialize ISparseMatrix<T>` | `internal` | `—` |
-| `TStructuredMatrixFactory` | `function` | `Tridiagonal` | `class function Tridiagonal(const Lower,DiagonalValues,Upper:array of T):specialize IStructuredMatrix<T>` | `internal` | `—` |
-| `TStructuredMatrixKind` | `enum-value` | `smBand` | `smBand` | `primary` | `—` |
-| `TStructuredMatrixKind` | `enum-value` | `smDiagonal` | `smDiagonal` | `primary` | `—` |
-| `TStructuredMatrixKind` | `enum-value` | `smTridiagonal` | `smTridiagonal` | `primary` | `—` |
-| `TStructuredMatrixStorage` | `constructor` | `Create` | `constructor Create(const Rows,Cols,LowerBandwidth,UpperBandwidth:SizeInt;const Kind:TStructuredMatrixKind;const ScalarKind:TSparseScalarKind;const Values:array of T)` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetCols` | `function GetCols:SizeInt` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetKind` | `function GetKind:TStructuredMatrixKind` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetRows` | `function GetRows:SizeInt` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `internal` | `—` |
-| `TStructuredMatrixStorage` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `internal` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ESparseMatrixError` | `ESparseMatrixError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseComplexMatrix` | `ISparseComplexMatrix=specialize ISparseMatrix<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseDoubleMatrix` | `ISparseDoubleMatrix=specialize ISparseMatrix<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `ISparseMatrix` | `generic ISparseMatrix<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseSingleComplexMatrix` | `ISparseSingleComplexMatrix=specialize ISparseMatrix<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseSingleMatrix` | `ISparseSingleMatrix=specialize ISparseMatrix<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredComplexMatrix` | `IStructuredComplexMatrix=specialize IStructuredMatrix<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredDoubleMatrix` | `IStructuredDoubleMatrix=specialize IStructuredMatrix<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IStructuredMatrix` | `generic IStructuredMatrix<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredSingleComplexMatrix` | `IStructuredSingleComplexMatrix=specialize IStructuredMatrix<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredSingleMatrix` | `IStructuredSingleMatrix=specialize IStructuredMatrix<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseComplexMatrix` | `TSparseComplexMatrix=specialize TSparseMatrixFactory<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseComplexTripletBuilder` | `TSparseComplexTripletBuilder=specialize TSparseTripletBuilder<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseDoubleMatrix` | `TSparseDoubleMatrix=specialize TSparseMatrixFactory<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseDoubleTripletBuilder` | `TSparseDoubleTripletBuilder=specialize TSparseTripletBuilder<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseFormat` | `TSparseFormat=(sfCSR,sfCSC)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSparseMatrixFactory` | `generic TSparseMatrixFactory<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSparseMatrixStorage` | `generic TSparseMatrixStorage<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseScalarKind` | `TSparseScalarKind=(sskSingle,sskDouble,sskSingleComplex,sskComplex)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseSingleComplexMatrix` | `TSparseSingleComplexMatrix=specialize TSparseMatrixFactory<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseSingleComplexTripletBuilder` | `TSparseSingleComplexTripletBuilder=specialize TSparseTripletBuilder<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseSingleMatrix` | `TSparseSingleMatrix=specialize TSparseMatrixFactory<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseSingleTripletBuilder` | `TSparseSingleTripletBuilder=specialize TSparseTripletBuilder<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseSizeIntArray` | `TSparseSizeIntArray=array of SizeInt` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseStoredZeroPolicy` | `TSparseStoredZeroPolicy=(szDrop,szKeep)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSparseTriplet` | `generic TSparseTriplet<T>=record` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseTripletArray` | `generic TSparseTripletArray<T>=array of specialize TSparseTriplet<T>` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSparseTripletBuilder` | `generic TSparseTripletBuilder<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseValueArray` | `generic TSparseValueArray<T>=array of T` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TStructuredComplexMatrix` | `TStructuredComplexMatrix=specialize TStructuredMatrixFactory<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TStructuredDoubleMatrix` | `TStructuredDoubleMatrix=specialize TStructuredMatrixFactory<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TStructuredMatrixFactory` | `generic TStructuredMatrixFactory<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TStructuredMatrixKind` | `TStructuredMatrixKind=(smDiagonal,smTridiagonal,smBand)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TStructuredMatrixStorage` | `generic TStructuredMatrixStorage<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TStructuredSingleComplexMatrix` | `TStructuredSingleComplexMatrix=specialize TStructuredMatrixFactory<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TStructuredSingleMatrix` | `TStructuredSingleMatrix=specialize TStructuredMatrixFactory<Single>` | `advanced` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `Format` | `property Format:TSparseFormat read GetFormat` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetFormat` | `function GetFormat:TSparseFormat` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetInnerIndex` | `function GetInnerIndex(const Position:SizeInt):SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetNonZeroCount` | `function GetNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetOuterPointer` | `function GetOuterPointer(const Position:SizeInt):SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetStoredValue` | `function GetStoredValue(const Position:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetStoredZeroPolicy` | `function GetStoredZeroPolicy:TSparseStoredZeroPolicy` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `NonZeroCount` | `property NonZeroCount:SizeInt read GetNonZeroCount` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `StoredZeroPolicy` | `property StoredZeroPolicy:TSparseStoredZeroPolicy read GetStoredZeroPolicy` | `implementation` | `—` | `—` | `—` |
+| `ISparseMatrix` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `Cols` | `property Cols:SizeInt read GetCols` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetKind` | `function GetKind:TStructuredMatrixKind` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `Kind` | `property Kind:TStructuredMatrixKind read GetKind` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `LowerBandwidth` | `property LowerBandwidth:SizeInt read GetLowerBandwidth` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `Rows` | `property Rows:SizeInt read GetRows` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `UpperBandwidth` | `property UpperBandwidth:SizeInt read GetUpperBandwidth` | `implementation` | `—` | `—` | `—` |
+| `IStructuredMatrix` | `property` | `Values` | `property Values[const Row,Col:SizeInt]:T read GetValue` | `implementation` | `—` | `—` | `—` |
+| `TSparseFormat` | `enum-value` | `sfCSC` | `sfCSC` | `advanced` | `—` | `—` | `—` |
+| `TSparseFormat` | `enum-value` | `sfCSR` | `sfCSR` | `advanced` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Add` | `class function Add(const A,B:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Column` | `class function Column(const A:specialize ISparseMatrix<T>;const ColumnIndex:SizeInt):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `ConjugateTranspose` | `class function ConjugateTranspose(const A:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Convert` | `class function Convert(const Matrix:specialize ISparseMatrix<T>;const Format:TSparseFormat):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `FromCSC` | `class function FromCSC(const Rows,Cols:SizeInt;const ColumnPointers,RowIndices:array of SizeInt;const Values:array of T;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `FromCSR` | `class function FromCSR(const Rows,Cols:SizeInt;const RowPointers,ColumnIndices:array of SizeInt;const Values:array of T;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `FromDense` | `class function FromDense(const Matrix:specialize IDenseMatrix<T>;const Format:TSparseFormat=sfCSR;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `FromTriplets` | `class function FromTriplets(const Rows,Cols:SizeInt;const TripletRows,TripletCols:array of SizeInt;const TripletValues:array of T;const Format:TSparseFormat=sfCSR;const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Multiply` | `class function Multiply(const A,B:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `procedure` | `MultiplyDenseInto` | `class procedure MultiplyDenseInto(const A:specialize ISparseMatrix<T>;const X,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Norm2` | `class function Norm2(const A:specialize ISparseMatrix<T>):Double` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Row` | `class function Row(const A:specialize ISparseMatrix<T>;const RowIndex:SizeInt):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Scale` | `class function Scale(const A:specialize ISparseMatrix<T>;const Scalar:T):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `ToDense` | `class function ToDense(const Matrix:specialize ISparseMatrix<T>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Transpose` | `class function Transpose(const A:specialize ISparseMatrix<T>):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixFactory` | `function` | `Zeros` | `class function Zeros(const Rows,Cols:SizeInt;const Format:TSparseFormat=sfCSR):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `CheckedCount` | `class function CheckedCount(const A,B,ElementSize:SizeInt;const Operation:string):SizeUInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `constructor` | `Create` | `constructor Create(const Rows,Cols:SizeInt;const Format:TSparseFormat;const Kind:TSparseScalarKind;const Outer,Inner:array of SizeInt;const Values:array of T;const ZeroPolicy:TSparseStoredZeroPolicy)` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetFormat` | `function GetFormat:TSparseFormat` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetInnerIndex` | `function GetInnerIndex(const Position:SizeInt):SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetNonZeroCount` | `function GetNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetOuterPointer` | `function GetOuterPointer(const Position:SizeInt):SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetStoredValue` | `function GetStoredValue(const Position:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetStoredZeroPolicy` | `function GetStoredZeroPolicy:TSparseStoredZeroPolicy` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `procedure` | `RequireIndex` | `class procedure RequireIndex(const Index,Limit:SizeInt;const Name,Operation:string)` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `ScalarAbsSquared` | `class function ScalarAbsSquared(const Value:T;const Kind:TSparseScalarKind):Double` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `ScalarConjugate` | `class function ScalarConjugate(const Value:T;const Kind:TSparseScalarKind):T` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `ScalarIsFinite` | `class function ScalarIsFinite(const Value:T;const Kind:TSparseScalarKind):Boolean` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `ScalarIsZero` | `class function ScalarIsZero(const Value:T):Boolean` | `implementation` | `—` | `—` | `—` |
+| `TSparseMatrixStorage` | `function` | `ScalarKindOf` | `class function ScalarKindOf:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TSparseScalarKind` | `enum-value` | `sskComplex` | `sskComplex` | `advanced` | `—` | `—` | `—` |
+| `TSparseScalarKind` | `enum-value` | `sskDouble` | `sskDouble` | `advanced` | `—` | `—` | `—` |
+| `TSparseScalarKind` | `enum-value` | `sskSingle` | `sskSingle` | `advanced` | `—` | `—` | `—` |
+| `TSparseScalarKind` | `enum-value` | `sskSingleComplex` | `sskSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSparseStoredZeroPolicy` | `enum-value` | `szDrop` | `szDrop` | `advanced` | `—` | `—` | `—` |
+| `TSparseStoredZeroPolicy` | `enum-value` | `szKeep` | `szKeep` | `advanced` | `—` | `—` | `—` |
+| `TSparseTriplet` | `field` | `Col` | `Col:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseTriplet` | `field` | `Row` | `Row:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseTriplet` | `field` | `Sequence` | `Sequence:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseTriplet` | `field` | `Value` | `Value:T` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `procedure` | `Add` | `procedure Add(const Row,Col:SizeInt;const Value:T)` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `procedure` | `Clear` | `procedure Clear` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `property` | `Cols` | `property Cols:SizeInt read FCols` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `property` | `Count` | `property Count:SizeInt read FCount` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `constructor` | `Create` | `constructor Create(const Rows,Cols:SizeInt)` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `property` | `Rows` | `property Rows:SizeInt read FRows` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `function` | `ToCSC` | `function ToCSC(const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseTripletBuilder` | `function` | `ToCSR` | `function ToCSR(const ZeroPolicy:TSparseStoredZeroPolicy=szDrop):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixFactory` | `function` | `Band` | `class function Band(const Rows,Cols,LowerBandwidth,UpperBandwidth:SizeInt;const CompactValues:array of T):specialize IStructuredMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixFactory` | `function` | `Diagonal` | `class function Diagonal(const Rows,Cols:SizeInt;const DiagonalValues:array of T):specialize IStructuredMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixFactory` | `procedure` | `MultiplyDenseInto` | `class procedure MultiplyDenseInto(const A:specialize IStructuredMatrix<T>;const X,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixFactory` | `function` | `ToDense` | `class function ToDense(const Matrix:specialize IStructuredMatrix<T>):specialize IDenseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixFactory` | `function` | `ToSparse` | `class function ToSparse(const Matrix:specialize IStructuredMatrix<T>;const Format:TSparseFormat=sfCSR):specialize ISparseMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixFactory` | `function` | `Tridiagonal` | `class function Tridiagonal(const Lower,DiagonalValues,Upper:array of T):specialize IStructuredMatrix<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixKind` | `enum-value` | `smBand` | `smBand` | `advanced` | `—` | `—` | `—` |
+| `TStructuredMatrixKind` | `enum-value` | `smDiagonal` | `smDiagonal` | `advanced` | `—` | `—` | `—` |
+| `TStructuredMatrixKind` | `enum-value` | `smTridiagonal` | `smTridiagonal` | `advanced` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `constructor` | `Create` | `constructor Create(const Rows,Cols,LowerBandwidth,UpperBandwidth:SizeInt;const Kind:TStructuredMatrixKind;const ScalarKind:TSparseScalarKind;const Values:array of T)` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetCols` | `function GetCols:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetKind` | `function GetKind:TStructuredMatrixKind` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetRows` | `function GetRows:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TStructuredMatrixStorage` | `function` | `GetValue` | `function GetValue(const Row,Col:SizeInt):T` | `implementation` | `—` | `—` | `—` |
 
 ## AlgebraLib.StructuredSolvers
 
 Source: [`src/AlgebraLib.StructuredSolvers.pas`](../src/AlgebraLib.StructuredSolvers.pas)  
 Interface SHA-256: `27e137e9cd250b58e2bc2a33d98514aa6d30c74bbefaf993e03a18cde805ad92`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ESparseDirectSolveError` | `ESparseDirectSolveError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `EStructuredSolveError` | `EStructuredSolveError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `ISparseComplexLUFactor` | `ISparseComplexLUFactor=specialize ISparseLUFactor<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ISparseDoubleLUFactor` | `ISparseDoubleLUFactor=specialize ISparseLUFactor<Double>` | `primary` | `—` |
-| `(unit)` | `interface` | `ISparseLUFactor` | `generic ISparseLUFactor<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `ISparseSingleComplexLUFactor` | `ISparseSingleComplexLUFactor=specialize ISparseLUFactor<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `ISparseSingleLUFactor` | `ISparseSingleLUFactor=specialize ISparseLUFactor<Single>` | `primary` | `—` |
-| `(unit)` | `type` | `IStructuredComplexDirectFactor` | `IStructuredComplexDirectFactor=specialize IStructuredDirectFactor<TComplex>` | `primary` | `—` |
-| `(unit)` | `interface` | `IStructuredDirectFactor` | `generic IStructuredDirectFactor<T>=interface` | `internal` | `—` |
-| `(unit)` | `type` | `IStructuredDoubleDirectFactor` | `IStructuredDoubleDirectFactor=specialize IStructuredDirectFactor<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `IStructuredSingleComplexDirectFactor` | `IStructuredSingleComplexDirectFactor=specialize IStructuredDirectFactor<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `IStructuredSingleDirectFactor` | `IStructuredSingleDirectFactor=specialize IStructuredDirectFactor<Single>` | `primary` | `—` |
-| `(unit)` | `class` | `TBandFactor` | `generic TBandFactor<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `type` | `TComplexStructuredSolver` | `TComplexStructuredSolver=specialize TStructuredSolverFactory<TComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleStructuredSolver` | `TDoubleStructuredSolver=specialize TStructuredSolverFactory<Double>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexStructuredSolver` | `TSingleComplexStructuredSolver=specialize TStructuredSolverFactory<TSingleComplex>` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleStructuredSolver` | `TSingleStructuredSolver=specialize TStructuredSolverFactory<Single>` | `primary` | `—` |
-| `(unit)` | `record` | `TSparseFactorRow` | `generic TSparseFactorRow<T>=record` | `internal` | `—` |
-| `(unit)` | `type` | `TSparseFactorRows` | `generic TSparseFactorRows<T>=array of specialize TSparseFactorRow<T>` | `internal` | `—` |
-| `(unit)` | `class` | `TSparseLUFactor` | `generic TSparseLUFactor<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `(unit)` | `type` | `TSparseOrdering` | `TSparseOrdering=(soNatural)` | `primary` | `—` |
-| `(unit)` | `class` | `TStructuredSolverFactory` | `generic TStructuredSolverFactory<T>=class` | `internal` | `—` |
-| `(unit)` | `class` | `TTridiagonalFactor` | `generic TTridiagonalFactor<T>=class(TInterfacedObject,` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `FactorNonZeroCount` | `property FactorNonZeroCount:SizeInt read GetFactorNonZeroCount` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `FillNonZeroCount` | `property FillNonZeroCount:SizeInt read GetFillNonZeroCount` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetFactorNonZeroCount` | `function GetFactorNonZeroCount:SizeInt` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetFillNonZeroCount` | `function GetFillNonZeroCount:SizeInt` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetOrdering` | `function GetOrdering:TSparseOrdering` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetOriginalNonZeroCount` | `function GetOriginalNonZeroCount:SizeInt` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `ISparseLUFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `InterchangeCount` | `property InterchangeCount:SizeInt read GetInterchangeCount` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `MinimumPivotMagnitude` | `property MinimumPivotMagnitude:Double read GetMinimumPivotMagnitude` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `Ordering` | `property Ordering:TSparseOrdering read GetOrdering` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `OriginalNonZeroCount` | `property OriginalNonZeroCount:SizeInt read GetOriginalNonZeroCount` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `internal` | `—` |
-| `ISparseLUFactor` | `property` | `Size` | `property Size:SizeInt read GetSize` | `internal` | `—` |
-| `ISparseLUFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetPivotingUsed` | `function GetPivotingUsed:Boolean` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `IStructuredDirectFactor` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `InterchangeCount` | `property InterchangeCount:SizeInt read GetInterchangeCount` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `LowerBandwidth` | `property LowerBandwidth:SizeInt read GetLowerBandwidth` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `MinimumPivotMagnitude` | `property MinimumPivotMagnitude:Double read GetMinimumPivotMagnitude` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `PivotingUsed` | `property PivotingUsed:Boolean read GetPivotingUsed` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `Size` | `property Size:SizeInt read GetSize` | `internal` | `—` |
-| `IStructuredDirectFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `IStructuredDirectFactor` | `property` | `UpperBandwidth` | `property UpperBandwidth:SizeInt read GetUpperBandwidth` | `internal` | `—` |
-| `TBandFactor` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double)` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetPivotingUsed` | `function GetPivotingUsed:Boolean` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TBandFactor` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `internal` | `—` |
-| `TBandFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TSparseFactorRow` | `field` | `Columns` | `Columns:TSparseSizeIntArray` | `internal` | `—` |
-| `TSparseFactorRow` | `field` | `Count` | `Count:SizeInt` | `internal` | `—` |
-| `TSparseFactorRow` | `field` | `Values` | `Values:specialize TSparseValueArray<T>` | `internal` | `—` |
-| `TSparseLUFactor` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double)` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetFactorNonZeroCount` | `function GetFactorNonZeroCount:SizeInt` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetFillNonZeroCount` | `function GetFillNonZeroCount:SizeInt` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetOrdering` | `function GetOrdering:TSparseOrdering` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetOriginalNonZeroCount` | `function GetOriginalNonZeroCount:SizeInt` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TSparseLUFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TSparseLUFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
-| `TSparseOrdering` | `enum-value` | `soNatural` | `soNatural` | `primary` | `—` |
-| `TStructuredSolverFactory` | `function` | `FactorBand` | `class function FactorBand(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IStructuredDirectFactor<T>` | `internal` | `—` |
-| `TStructuredSolverFactory` | `function` | `FactorSparseLU` | `class function FactorSparseLU(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize ISparseLUFactor<T>` | `internal` | `—` |
-| `TStructuredSolverFactory` | `function` | `FactorTridiagonal` | `class function FactorTridiagonal(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IStructuredDirectFactor<T>` | `internal` | `—` |
-| `TTridiagonalFactor` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double)` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetPivotingUsed` | `function GetPivotingUsed:Boolean` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `internal` | `—` |
-| `TTridiagonalFactor` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `internal` | `—` |
-| `TTridiagonalFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `internal` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ESparseDirectSolveError` | `ESparseDirectSolveError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EStructuredSolveError` | `EStructuredSolveError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseComplexLUFactor` | `ISparseComplexLUFactor=specialize ISparseLUFactor<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseDoubleLUFactor` | `ISparseDoubleLUFactor=specialize ISparseLUFactor<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `ISparseLUFactor` | `generic ISparseLUFactor<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseSingleComplexLUFactor` | `ISparseSingleComplexLUFactor=specialize ISparseLUFactor<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ISparseSingleLUFactor` | `ISparseSingleLUFactor=specialize ISparseLUFactor<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredComplexDirectFactor` | `IStructuredComplexDirectFactor=specialize IStructuredDirectFactor<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `interface` | `IStructuredDirectFactor` | `generic IStructuredDirectFactor<T>=interface` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredDoubleDirectFactor` | `IStructuredDoubleDirectFactor=specialize IStructuredDirectFactor<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredSingleComplexDirectFactor` | `IStructuredSingleComplexDirectFactor=specialize IStructuredDirectFactor<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IStructuredSingleDirectFactor` | `IStructuredSingleDirectFactor=specialize IStructuredDirectFactor<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TBandFactor` | `generic TBandFactor<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexStructuredSolver` | `TComplexStructuredSolver=specialize TStructuredSolverFactory<TComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleStructuredSolver` | `TDoubleStructuredSolver=specialize TStructuredSolverFactory<Double>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexStructuredSolver` | `TSingleComplexStructuredSolver=specialize TStructuredSolverFactory<TSingleComplex>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleStructuredSolver` | `TSingleStructuredSolver=specialize TStructuredSolverFactory<Single>` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSparseFactorRow` | `generic TSparseFactorRow<T>=record` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseFactorRows` | `generic TSparseFactorRows<T>=array of specialize TSparseFactorRow<T>` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSparseLUFactor` | `generic TSparseLUFactor<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSparseOrdering` | `TSparseOrdering=(soNatural)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TStructuredSolverFactory` | `generic TStructuredSolverFactory<T>=class` | `implementation` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TTridiagonalFactor` | `generic TTridiagonalFactor<T>=class(TInterfacedObject,` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `FactorNonZeroCount` | `property FactorNonZeroCount:SizeInt read GetFactorNonZeroCount` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `FillNonZeroCount` | `property FillNonZeroCount:SizeInt read GetFillNonZeroCount` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetFactorNonZeroCount` | `function GetFactorNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetFillNonZeroCount` | `function GetFillNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetOrdering` | `function GetOrdering:TSparseOrdering` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetOriginalNonZeroCount` | `function GetOriginalNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `InterchangeCount` | `property InterchangeCount:SizeInt read GetInterchangeCount` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `MinimumPivotMagnitude` | `property MinimumPivotMagnitude:Double read GetMinimumPivotMagnitude` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `Ordering` | `property Ordering:TSparseOrdering read GetOrdering` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `OriginalNonZeroCount` | `property OriginalNonZeroCount:SizeInt read GetOriginalNonZeroCount` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `property` | `Size` | `property Size:SizeInt read GetSize` | `implementation` | `—` | `—` | `—` |
+| `ISparseLUFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetPivotingUsed` | `function GetPivotingUsed:Boolean` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `InterchangeCount` | `property InterchangeCount:SizeInt read GetInterchangeCount` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `LowerBandwidth` | `property LowerBandwidth:SizeInt read GetLowerBandwidth` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `MinimumPivotMagnitude` | `property MinimumPivotMagnitude:Double read GetMinimumPivotMagnitude` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `PivotingUsed` | `property PivotingUsed:Boolean read GetPivotingUsed` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `ScalarKind` | `property ScalarKind:TSparseScalarKind read GetScalarKind` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `Size` | `property Size:SizeInt read GetSize` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `IStructuredDirectFactor` | `property` | `UpperBandwidth` | `property UpperBandwidth:SizeInt read GetUpperBandwidth` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double)` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetPivotingUsed` | `function GetPivotingUsed:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TBandFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TSparseFactorRow` | `field` | `Columns` | `Columns:TSparseSizeIntArray` | `implementation` | `—` | `—` | `—` |
+| `TSparseFactorRow` | `field` | `Count` | `Count:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseFactorRow` | `field` | `Values` | `Values:specialize TSparseValueArray<T>` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `constructor` | `Create` | `constructor Create(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double)` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetFactorNonZeroCount` | `function GetFactorNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetFillNonZeroCount` | `function GetFillNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetOrdering` | `function GetOrdering:TSparseOrdering` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetOriginalNonZeroCount` | `function GetOriginalNonZeroCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TSparseLUFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
+| `TSparseOrdering` | `enum-value` | `soNatural` | `soNatural` | `advanced` | `—` | `—` | `—` |
+| `TStructuredSolverFactory` | `function` | `FactorBand` | `class function FactorBand(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IStructuredDirectFactor<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredSolverFactory` | `function` | `FactorSparseLU` | `class function FactorSparseLU(const Matrix:specialize ISparseMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize ISparseLUFactor<T>` | `implementation` | `—` | `—` | `—` |
+| `TStructuredSolverFactory` | `function` | `FactorTridiagonal` | `class function FactorTridiagonal(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double=1.0e-14):specialize IStructuredDirectFactor<T>` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `constructor` | `Create` | `constructor Create(const Matrix:specialize IStructuredMatrix<T>;const PivotTolerance:Double)` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetInterchangeCount` | `function GetInterchangeCount:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetLowerBandwidth` | `function GetLowerBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetMinimumPivotMagnitude` | `function GetMinimumPivotMagnitude:Double` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetPivotingUsed` | `function GetPivotingUsed:Boolean` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetScalarKind` | `function GetScalarKind:TSparseScalarKind` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetSize` | `function GetSize:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `function` | `GetUpperBandwidth` | `function GetUpperBandwidth:SizeInt` | `implementation` | `—` | `—` | `—` |
+| `TTridiagonalFactor` | `procedure` | `SolveInto` | `procedure SolveInto(const RightHandSide,Destination:specialize IDenseMatrix<T>)` | `implementation` | `—` | `—` | `—` |
 
 ## AlgebraLib.VectorKernels
 
 Source: [`src/AlgebraLib.VectorKernels.pas`](../src/AlgebraLib.VectorKernels.pas)  
 Interface SHA-256: `d343f85841a63a54dcb0eb12c85432db587def837375ceaf23bfc6c5c482f48e`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EVectorError` | `EVectorError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexVector` | `TComplexVector=TComplexArray` | `primary` | `—` |
-| `(unit)` | `type` | `TRealVector` | `TRealVector=TDoubleArray` | `primary` | `—` |
-| `(unit)` | `class` | `TVectorKit` | `TVectorKit=class` | `primary` | `—` |
-| `TVectorKit` | `function` | `Add` | `class function Add(const A,B:TComplexVector):TComplexVector` | `primary` | `—` |
-| `TVectorKit` | `function` | `Add` | `class function Add(const A,B:TRealVector):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `AddInto` | `class procedure AddInto(const A,B:TComplexVector;var Destination:TComplexVector)` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `AddInto` | `class procedure AddInto(const A,B:TRealVector;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `Axpy` | `class function Axpy(const Alpha:Double;const X,Y:TRealVector):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `function` | `Axpy` | `class function Axpy(const Alpha:TComplex;const X,Y:TComplexVector):TComplexVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `AxpyInto` | `class procedure AxpyInto(const Alpha:Double;const X,Y:TRealVector;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `AxpyInto` | `class procedure AxpyInto(const Alpha:TComplex;const X,Y:TComplexVector;var Destination:TComplexVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `Dot` | `class function Dot(const A,B:TComplexVector):TComplex` | `primary` | `—` |
-| `TVectorKit` | `function` | `Dot` | `class function Dot(const A,B:TRealVector):Double` | `primary` | `—` |
-| `TVectorKit` | `function` | `DotConjugate` | `class function DotConjugate(const A,B:TComplexVector):TComplex` | `primary` | `—` |
-| `TVectorKit` | `function` | `ElementWiseDivide` | `class function ElementWiseDivide(const A,B:TRealVector):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `ElementWiseDivideInto` | `class procedure ElementWiseDivideInto(const A,B:TRealVector;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `ElementWiseMultiply` | `class function ElementWiseMultiply(const A,B:TRealVector):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `ElementWiseMultiplyInto` | `class procedure ElementWiseMultiplyInto(const A,B:TRealVector;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `Max` | `class function Max(const A:TRealVector):Double` | `primary` | `—` |
-| `TVectorKit` | `function` | `Mean` | `class function Mean(const A:TRealVector):Double` | `primary` | `—` |
-| `TVectorKit` | `function` | `Min` | `class function Min(const A:TRealVector):Double` | `primary` | `—` |
-| `TVectorKit` | `function` | `Norm2` | `class function Norm2(const A:TComplexVector):Double` | `primary` | `—` |
-| `TVectorKit` | `function` | `Norm2` | `class function Norm2(const A:TRealVector):Double` | `primary` | `—` |
-| `TVectorKit` | `function` | `Normalize` | `class function Normalize(const A:TComplexVector):TComplexVector` | `primary` | `—` |
-| `TVectorKit` | `function` | `Normalize` | `class function Normalize(const A:TRealVector):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `NormalizeInto` | `class procedure NormalizeInto(const A:TComplexVector;var Destination:TComplexVector)` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `NormalizeInto` | `class procedure NormalizeInto(const A:TRealVector;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `Scale` | `class function Scale(const A:TComplexVector;const Scalar:TComplex):TComplexVector` | `primary` | `—` |
-| `TVectorKit` | `function` | `Scale` | `class function Scale(const A:TRealVector;const Scalar:Double):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `ScaleInto` | `class procedure ScaleInto(const A:TComplexVector;const Scalar:TComplex;var Destination:TComplexVector)` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `ScaleInto` | `class procedure ScaleInto(const A:TRealVector;const Scalar:Double;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `Subtract` | `class function Subtract(const A,B:TComplexVector):TComplexVector` | `primary` | `—` |
-| `TVectorKit` | `function` | `Subtract` | `class function Subtract(const A,B:TRealVector):TRealVector` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `SubtractInto` | `class procedure SubtractInto(const A,B:TComplexVector;var Destination:TComplexVector)` | `primary` | `—` |
-| `TVectorKit` | `procedure` | `SubtractInto` | `class procedure SubtractInto(const A,B:TRealVector;var Destination:TRealVector)` | `primary` | `—` |
-| `TVectorKit` | `function` | `Sum` | `class function Sum(const A:TRealVector):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EVectorError` | `EVectorError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexVector` | `TComplexVector=TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TRealVector` | `TRealVector=TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TVectorKit` | `TVectorKit=class` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Add` | `class function Add(const A,B:TComplexVector):TComplexVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Add` | `class function Add(const A,B:TRealVector):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `AddInto` | `class procedure AddInto(const A,B:TComplexVector;var Destination:TComplexVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `AddInto` | `class procedure AddInto(const A,B:TRealVector;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Axpy` | `class function Axpy(const Alpha:Double;const X,Y:TRealVector):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Axpy` | `class function Axpy(const Alpha:TComplex;const X,Y:TComplexVector):TComplexVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `AxpyInto` | `class procedure AxpyInto(const Alpha:Double;const X,Y:TRealVector;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `AxpyInto` | `class procedure AxpyInto(const Alpha:TComplex;const X,Y:TComplexVector;var Destination:TComplexVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Dot` | `class function Dot(const A,B:TComplexVector):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Dot` | `class function Dot(const A,B:TRealVector):Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `DotConjugate` | `class function DotConjugate(const A,B:TComplexVector):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `ElementWiseDivide` | `class function ElementWiseDivide(const A,B:TRealVector):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `ElementWiseDivideInto` | `class procedure ElementWiseDivideInto(const A,B:TRealVector;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `ElementWiseMultiply` | `class function ElementWiseMultiply(const A,B:TRealVector):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `ElementWiseMultiplyInto` | `class procedure ElementWiseMultiplyInto(const A,B:TRealVector;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Max` | `class function Max(const A:TRealVector):Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Mean` | `class function Mean(const A:TRealVector):Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Min` | `class function Min(const A:TRealVector):Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Norm2` | `class function Norm2(const A:TComplexVector):Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Norm2` | `class function Norm2(const A:TRealVector):Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Normalize` | `class function Normalize(const A:TComplexVector):TComplexVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Normalize` | `class function Normalize(const A:TRealVector):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `NormalizeInto` | `class procedure NormalizeInto(const A:TComplexVector;var Destination:TComplexVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `NormalizeInto` | `class procedure NormalizeInto(const A:TRealVector;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Scale` | `class function Scale(const A:TComplexVector;const Scalar:TComplex):TComplexVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Scale` | `class function Scale(const A:TRealVector;const Scalar:Double):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `ScaleInto` | `class procedure ScaleInto(const A:TComplexVector;const Scalar:TComplex;var Destination:TComplexVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `ScaleInto` | `class procedure ScaleInto(const A:TRealVector;const Scalar:Double;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Subtract` | `class function Subtract(const A,B:TComplexVector):TComplexVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Subtract` | `class function Subtract(const A,B:TRealVector):TRealVector` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `SubtractInto` | `class procedure SubtractInto(const A,B:TComplexVector;var Destination:TComplexVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `procedure` | `SubtractInto` | `class procedure SubtractInto(const A,B:TRealVector;var Destination:TRealVector)` | `advanced` | `—` | `—` | `—` |
+| `TVectorKit` | `function` | `Sum` | `class function Sum(const A:TRealVector):Double` | `advanced` | `—` | `—` | `—` |
 
 ## AlgebraLib.Vectors
 
 Source: [`src/AlgebraLib.Vectors.pas`](../src/AlgebraLib.Vectors.pas)  
 Interface SHA-256: `f2948879070ad4f48e4505f67e0a3765420e0ca31ff0ab3c6878e666d91c5dc5`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EVectorError` | `EVectorError=AlgebraLib.VectorKernels.EVectorError` | `primary` | `—` |
-| `(unit)` | `type` | `IVector` | `IVector=IMatrix` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexVector` | `TComplexVector=TComplexArray` | `primary` | `—` |
-| `(unit)` | `type` | `TRealVector` | `TRealVector=TDoubleArray` | `primary` | `—` |
-| `(unit)` | `type` | `TVector` | `TVector=TMatrixKit` | `primary` | `—` |
-| `(unit)` | `type` | `TVectorKit` | `TVectorKit=AlgebraLib.VectorKernels.TVectorKit` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EVectorError` | `EVectorError=AlgebraLib.VectorKernels.EVectorError` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `IVector` | `IVector=IMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexVector` | `TComplexVector=TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TRealVector` | `TRealVector=TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVector` | `TVector=TMatrixKit` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVectorKit` | `TVectorKit=AlgebraLib.VectorKernels.TVectorKit` | `advanced` | `—` | `—` | `—` |
 
 ## CombinatoricsLib.Combinatorics
 
 Source: [`src/CombinatoricsLib.Combinatorics.pas`](../src/CombinatoricsLib.Combinatorics.pas)  
 Interface SHA-256: `4c73ea2e6c68defa6dd2c7f38d1668dcba907b26cb39214b543459652c1b4781`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ECombinatoricsError` | `ECombinatoricsError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TCombination` | `TCombination=array of Integer` | `primary` | `—` |
-| `(unit)` | `type` | `TCombinationList` | `TCombinationList=array of TCombination` | `primary` | `—` |
-| `(unit)` | `class` | `TCombinatoricsKit` | `TCombinatoricsKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TPascalRow` | `TPascalRow=array of Int64` | `primary` | `—` |
-| `(unit)` | `type` | `TPascalTriangle` | `TPascalTriangle=array of TPascalRow` | `primary` | `—` |
-| `(unit)` | `type` | `TPermutation` | `TPermutation=array of Integer` | `primary` | `—` |
-| `(unit)` | `type` | `TPermutationList` | `TPermutationList=array of TPermutation` | `primary` | `—` |
-| `(unit)` | `record` | `TPrimeFactor` | `TPrimeFactor=record` | `primary` | `—` |
-| `(unit)` | `type` | `TPrimeFactorArray` | `TPrimeFactorArray=array of TPrimeFactor` | `primary` | `—` |
-| `(unit)` | `type` | `TSubset` | `TSubset=array of Integer` | `primary` | `—` |
-| `(unit)` | `type` | `TSubsetList` | `TSubsetList=array of TSubset` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `BellNumber` | `class function BellNumber(N:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `CatalanNumber` | `class function CatalanNumber(N:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Combination` | `class function Combination(N,K:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Combinations` | `class function Combinations(N,K:Integer):TCombinationList` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `DerangementCount` | `class function DerangementCount(N:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `EulerTotient` | `class function EulerTotient(N:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `ExtendedGCD` | `class function ExtendedGCD(A,B:Int64;out X,Y:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Factorial` | `class function Factorial(N:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Fibonacci` | `class function Fibonacci(N:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `GCD` | `class function GCD(A,B:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `IsPrime` | `class function IsPrime(N:Int64):Boolean` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `LCM` | `class function LCM(A,B:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `LogCombination` | `class function LogCombination(N,K:Integer):Double` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `LogFactorial` | `class function LogFactorial(N:Integer):Double` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Lucas` | `class function Lucas(N:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `ModInverse` | `class function ModInverse(A,M:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `ModPow` | `class function ModPow(A,B,M:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Multinomial` | `class function Multinomial(N:Integer;const K:TIntegerArray):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `NextPermutation` | `class function NextPermutation(var Items:TIntegerArray):Boolean` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `NextPrime` | `class function NextPrime(N:Int64):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `PascalRow` | `class function PascalRow(N:Integer):TPascalRow` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `PascalTriangle` | `class function PascalTriangle(N:Integer):TPascalTriangle` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Permutation` | `class function Permutation(N,K:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Permutations` | `class function Permutations(const Items:TIntegerArray):TPermutationList` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `PowerSet` | `class function PowerSet(N:Integer):TSubsetList` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `PrimeFactors` | `class function PrimeFactors(N:Int64):TPrimeFactorArray` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `Sieve` | `class function Sieve(Limit:Int64):TPascalRow` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `StirlingFirst` | `class function StirlingFirst(N,K:Integer):Int64` | `primary` | `—` |
-| `TCombinatoricsKit` | `function` | `StirlingSecond` | `class function StirlingSecond(N,K:Integer):Int64` | `primary` | `—` |
-| `TPrimeFactor` | `field` | `Exponent` | `Exponent:Integer` | `primary` | `—` |
-| `TPrimeFactor` | `field` | `Prime` | `Prime:Int64` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ECombinatoricsError` | `ECombinatoricsError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TCombination` | `TCombination=array of Integer` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TCombinationList` | `TCombinationList=array of TCombination` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TCombinatoricsKit` | `TCombinatoricsKit=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPascalRow` | `TPascalRow=array of Int64` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPascalTriangle` | `TPascalTriangle=array of TPascalRow` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPermutation` | `TPermutation=array of Integer` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPermutationList` | `TPermutationList=array of TPermutation` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPrimeFactor` | `TPrimeFactor=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPrimeFactorArray` | `TPrimeFactorArray=array of TPrimeFactor` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSubset` | `TSubset=array of Integer` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSubsetList` | `TSubsetList=array of TSubset` | `advanced` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `BellNumber` | `class function BellNumber(N:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `CatalanNumber` | `class function CatalanNumber(N:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Combination` | `class function Combination(N,K:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Combinations` | `class function Combinations(N,K:Integer):TCombinationList` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `DerangementCount` | `class function DerangementCount(N:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `EulerTotient` | `class function EulerTotient(N:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `ExtendedGCD` | `class function ExtendedGCD(A,B:Int64;out X,Y:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Factorial` | `class function Factorial(N:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Fibonacci` | `class function Fibonacci(N:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `GCD` | `class function GCD(A,B:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `IsPrime` | `class function IsPrime(N:Int64):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `LCM` | `class function LCM(A,B:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `LogCombination` | `class function LogCombination(N,K:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `LogFactorial` | `class function LogFactorial(N:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Lucas` | `class function Lucas(N:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `ModInverse` | `class function ModInverse(A,M:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `ModPow` | `class function ModPow(A,B,M:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Multinomial` | `class function Multinomial(N:Integer;const K:TIntegerArray):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `NextPermutation` | `class function NextPermutation(var Items:TIntegerArray):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `NextPrime` | `class function NextPrime(N:Int64):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `PascalRow` | `class function PascalRow(N:Integer):TPascalRow` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `PascalTriangle` | `class function PascalTriangle(N:Integer):TPascalTriangle` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Permutation` | `class function Permutation(N,K:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Permutations` | `class function Permutations(const Items:TIntegerArray):TPermutationList` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `PowerSet` | `class function PowerSet(N:Integer):TSubsetList` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `PrimeFactors` | `class function PrimeFactors(N:Int64):TPrimeFactorArray` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `Sieve` | `class function Sieve(Limit:Int64):TPascalRow` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `StirlingFirst` | `class function StirlingFirst(N,K:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TCombinatoricsKit` | `function` | `StirlingSecond` | `class function StirlingSecond(N,K:Integer):Int64` | `recommended` | `—` | `—` | `—` |
+| `TPrimeFactor` | `field` | `Exponent` | `Exponent:Integer` | `advanced` | `—` | `—` | `—` |
+| `TPrimeFactor` | `field` | `Prime` | `Prime:Int64` | `advanced` | `—` | `—` | `—` |
 
 ## EngineeringLib.Common
 
 Source: [`src/EngineeringLib.Common.pas`](../src/EngineeringLib.Common.pas)  
 Interface SHA-256: `40da5189dadf272d9bf13848a282b6fdedbafec3a56dda318cb9ede720a7702b`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EEngineeringError` | `EEngineeringError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `EFluidDynamicsError` | `EFluidDynamicsError=class(EEngineeringError)` | `primary` | `—` |
-| `(unit)` | `type` | `ESignalError` | `ESignalError=class(EEngineeringError)` | `primary` | `—` |
-| `(unit)` | `type` | `EThermodynamicsError` | `EThermodynamicsError=class(EEngineeringError)` | `primary` | `—` |
-| `(unit)` | `type` | `EUnitConversionError` | `EUnitConversionError=class(EEngineeringError)` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EEngineeringError` | `EEngineeringError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EFluidDynamicsError` | `EFluidDynamicsError=class(EEngineeringError)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ESignalError` | `ESignalError=class(EEngineeringError)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EThermodynamicsError` | `EThermodynamicsError=class(EEngineeringError)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EUnitConversionError` | `EUnitConversionError=class(EEngineeringError)` | `advanced` | `—` | `—` | `—` |
 
 ## EngineeringLib.DSP
 
 Source: [`src/EngineeringLib.DSP.pas`](../src/EngineeringLib.DSP.pas)  
 Interface SHA-256: `b9475b4c6545d2335f86040353cc9ee72c785194b67b0d50d862094d5d27d804`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EDSPError` | `EDSPError=class(ESignalError)` | `primary` | `—` |
-| `(unit)` | `record` | `TBiquadCoefficients` | `TBiquadCoefficients=record` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexBatch` | `TComplexBatch=array of TComplexArray` | `primary` | `—` |
-| `(unit)` | `type` | `TConvolutionMethod` | `TConvolutionMethod=(cmAutomatic,cmDirect,cmFFT)` | `primary` | `—` |
-| `(unit)` | `record` | `TCrossSpectralEstimate` | `TCrossSpectralEstimate=record` | `primary` | `—` |
-| `(unit)` | `class` | `TDSPKit` | `TDSPKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TFFTNormalization` | `TFFTNormalization=(fnBackward,fnForward,fnUnitary,fnNone)` | `primary` | `—` |
-| `(unit)` | `record` | `TOverlapAddConvolver` | `TOverlapAddConvolver=record` | `primary` | `—` |
-| `(unit)` | `record` | `TOverlapSaveConvolver` | `TOverlapSaveConvolver=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexBatch` | `TSingleComplexBatch=array of TSingleComplexArray` | `primary` | `—` |
-| `(unit)` | `record` | `TSpectralEstimate` | `TSpectralEstimate=record` | `primary` | `—` |
-| `(unit)` | `record` | `TStreamingBiquad` | `TStreamingBiquad=record` | `primary` | `—` |
-| `(unit)` | `record` | `TStreamingFIR` | `TStreamingFIR=record` | `primary` | `—` |
-| `(unit)` | `record` | `TWindowMetrics` | `TWindowMetrics=record` | `primary` | `—` |
-| `TBiquadCoefficients` | `field` | `A1` | `A1:Double` | `primary` | `—` |
-| `TBiquadCoefficients` | `field` | `A2` | `A2:Double` | `primary` | `—` |
-| `TBiquadCoefficients` | `field` | `B0` | `B0:Double` | `primary` | `—` |
-| `TBiquadCoefficients` | `field` | `B1` | `B1:Double` | `primary` | `—` |
-| `TBiquadCoefficients` | `field` | `B2` | `B2:Double` | `primary` | `—` |
-| `TConvolutionMethod` | `enum-value` | `cmAutomatic` | `cmAutomatic` | `primary` | `—` |
-| `TConvolutionMethod` | `enum-value` | `cmDirect` | `cmDirect` | `primary` | `—` |
-| `TConvolutionMethod` | `enum-value` | `cmFFT` | `cmFFT` | `primary` | `—` |
-| `TCrossSpectralEstimate` | `field` | `Coherence` | `Coherence:TDoubleArray` | `primary` | `—` |
-| `TCrossSpectralEstimate` | `field` | `CrossPower` | `CrossPower:TComplexArray` | `primary` | `—` |
-| `TCrossSpectralEstimate` | `field` | `Frequencies` | `Frequencies:TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `AnalyticSignal` | `class function AnalyticSignal(const Input:TDoubleArray):TComplexArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `Convolve` | `class function Convolve(const A,B:TDoubleArray;const Method:TConvolutionMethod=cmAutomatic):TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `Correlate` | `class function Correlate(const A,B:TDoubleArray;const Method:TConvolutionMethod=cmAutomatic):TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `CrossSpectrum` | `class function CrossSpectrum(const A,B:TDoubleArray;const SegmentLength,Overlap:SizeInt;const SampleRate:Double=1.0;const WindowType:TWindowType=wtHann):TCrossSpectralEstimate` | `primary` | `—` |
-| `TDSPKit` | `function` | `DesignButterworthLowPass` | `class function DesignButterworthLowPass(const NormalizedCutoff:Double):TBiquadCoefficients` | `primary` | `—` |
-| `TDSPKit` | `function` | `DFTReference` | `class function DFTReference(const Input:TComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TComplexArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `GetWindowMetrics` | `class function GetWindowMetrics(const Window:TDoubleArray):TWindowMetrics` | `primary` | `—` |
-| `TDSPKit` | `function` | `HaarTransform` | `class function HaarTransform(const Input:TDoubleArray;const Inverse:Boolean=False):TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `InverseRealTransform` | `class function InverseRealTransform(const Input:TComplexArray;const Normalization:TFFTNormalization=fnBackward):TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `Periodogram` | `class function Periodogram(const Input:TDoubleArray;const SampleRate:Double=1.0;const WindowType:TWindowType=wtHann):TSpectralEstimate` | `primary` | `—` |
-| `TDSPKit` | `function` | `RealTransform` | `class function RealTransform(const Input:TDoubleArray;const Normalization:TFFTNormalization=fnBackward):TComplexArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `RealTransform` | `class function RealTransform(const Input:TSingleArray;const Normalization:TFFTNormalization=fnBackward):TSingleComplexArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `ResampleLinear` | `class function ResampleLinear(const Input:TDoubleArray;const OutputLength:SizeInt):TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `ResampleRational` | `class function ResampleRational(const Input:TDoubleArray;const UpFactor,DownFactor:SizeInt):TDoubleArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `SelectedConvolutionMethod` | `class function SelectedConvolutionMethod(const LengthA,LengthB:SizeInt):TConvolutionMethod` | `primary` | `—` |
-| `TDSPKit` | `function` | `ShortTimeFourierTransform` | `class function ShortTimeFourierTransform(const Input:TDoubleArray;const FrameLength,HopLength:SizeInt;const WindowType:TWindowType=wtHann):IDenseComplexMatrix` | `primary` | `—` |
-| `TDSPKit` | `function` | `Transform` | `class function Transform(const Input:TComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TComplexArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `Transform` | `class function Transform(const Input:TSingleComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TSingleComplexArray` | `primary` | `—` |
-| `TDSPKit` | `function` | `Transform2D` | `class function Transform2D(const Input:IDenseComplexMatrix;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):IDenseComplexMatrix` | `primary` | `—` |
-| `TDSPKit` | `function` | `TransformBatch` | `class function TransformBatch(const Input:TComplexBatch;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TComplexBatch` | `primary` | `—` |
-| `TDSPKit` | `function` | `TransformBatch` | `class function TransformBatch(const Input:TSingleComplexBatch;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TSingleComplexBatch` | `primary` | `—` |
-| `TDSPKit` | `procedure` | `TransformInto` | `class procedure TransformInto(const Input:TComplexArray;var Destination:TComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward)` | `primary` | `—` |
-| `TDSPKit` | `function` | `Welch` | `class function Welch(const Input:TDoubleArray;const SegmentLength,Overlap:SizeInt;const SampleRate:Double=1.0;const WindowType:TWindowType=wtHann):TSpectralEstimate` | `primary` | `—` |
-| `TFFTNormalization` | `enum-value` | `fnBackward` | `fnBackward` | `primary` | `—` |
-| `TFFTNormalization` | `enum-value` | `fnForward` | `fnForward` | `primary` | `—` |
-| `TFFTNormalization` | `enum-value` | `fnNone` | `fnNone` | `primary` | `—` |
-| `TFFTNormalization` | `enum-value` | `fnUnitary` | `fnUnitary` | `primary` | `—` |
-| `TOverlapAddConvolver` | `function` | `Create` | `class function Create(const Impulse:TDoubleArray;const Method:TConvolutionMethod=cmFFT):TOverlapAddConvolver` | `primary` | `—` |
-| `TOverlapAddConvolver` | `function` | `Flush` | `function Flush:TDoubleArray` | `primary` | `—` |
-| `TOverlapAddConvolver` | `function` | `Impulse` | `function Impulse:TDoubleArray` | `primary` | `—` |
-| `TOverlapAddConvolver` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TOverlapAddConvolver` | `procedure` | `Reset` | `procedure Reset` | `primary` | `—` |
-| `TOverlapAddConvolver` | `procedure` | `RestoreTail` | `procedure RestoreTail(const Values:TDoubleArray)` | `primary` | `—` |
-| `TOverlapAddConvolver` | `function` | `StateSize` | `function StateSize:SizeInt` | `primary` | `—` |
-| `TOverlapAddConvolver` | `function` | `Tail` | `function Tail:TDoubleArray` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `function` | `Create` | `class function Create(const Impulse:TDoubleArray;const Method:TConvolutionMethod=cmFFT):TOverlapSaveConvolver` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `function` | `History` | `function History:TDoubleArray` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `function` | `Impulse` | `function Impulse:TDoubleArray` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `procedure` | `Reset` | `procedure Reset` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `procedure` | `RestoreHistory` | `procedure RestoreHistory(const Values:TDoubleArray)` | `primary` | `—` |
-| `TOverlapSaveConvolver` | `function` | `StateSize` | `function StateSize:SizeInt` | `primary` | `—` |
-| `TSpectralEstimate` | `field` | `Frequencies` | `Frequencies:TDoubleArray` | `primary` | `—` |
-| `TSpectralEstimate` | `field` | `Power` | `Power:TDoubleArray` | `primary` | `—` |
-| `TStreamingBiquad` | `function` | `Create` | `class function Create(const Coefficients:TBiquadCoefficients):TStreamingBiquad` | `primary` | `—` |
-| `TStreamingBiquad` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TStreamingBiquad` | `procedure` | `Reset` | `procedure Reset` | `primary` | `—` |
-| `TStreamingBiquad` | `property` | `Z1` | `property Z1:Double read FZ1` | `primary` | `—` |
-| `TStreamingBiquad` | `property` | `Z2` | `property Z2:Double read FZ2` | `primary` | `—` |
-| `TStreamingFIR` | `function` | `Coefficients` | `function Coefficients:TDoubleArray` | `primary` | `—` |
-| `TStreamingFIR` | `function` | `Create` | `class function Create(const Coefficients:TDoubleArray):TStreamingFIR` | `primary` | `—` |
-| `TStreamingFIR` | `function` | `History` | `function History:TDoubleArray` | `primary` | `—` |
-| `TStreamingFIR` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TStreamingFIR` | `procedure` | `Reset` | `procedure Reset` | `primary` | `—` |
-| `TStreamingFIR` | `procedure` | `RestoreHistory` | `procedure RestoreHistory(const Values:TDoubleArray)` | `primary` | `—` |
-| `TStreamingFIR` | `function` | `StateSize` | `function StateSize:SizeInt` | `primary` | `—` |
-| `TWindowMetrics` | `field` | `CoherentGain` | `CoherentGain:Double` | `primary` | `—` |
-| `TWindowMetrics` | `field` | `EquivalentNoiseBandwidth` | `EquivalentNoiseBandwidth:Double` | `primary` | `—` |
-| `TWindowMetrics` | `field` | `RMSGain` | `RMSGain:Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EDSPError` | `EDSPError=class(ESignalError)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TBiquadCoefficients` | `TBiquadCoefficients=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexBatch` | `TComplexBatch=array of TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TConvolutionMethod` | `TConvolutionMethod=(cmAutomatic,cmDirect,cmFFT)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCrossSpectralEstimate` | `TCrossSpectralEstimate=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDSPKit` | `TDSPKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TFFTNormalization` | `TFFTNormalization=(fnBackward,fnForward,fnUnitary,fnNone)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOverlapAddConvolver` | `TOverlapAddConvolver=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOverlapSaveConvolver` | `TOverlapSaveConvolver=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexBatch` | `TSingleComplexBatch=array of TSingleComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSpectralEstimate` | `TSpectralEstimate=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TStreamingBiquad` | `TStreamingBiquad=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TStreamingFIR` | `TStreamingFIR=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TWindowMetrics` | `TWindowMetrics=record` | `advanced` | `—` | `—` | `—` |
+| `TBiquadCoefficients` | `field` | `A1` | `A1:Double` | `advanced` | `—` | `—` | `—` |
+| `TBiquadCoefficients` | `field` | `A2` | `A2:Double` | `advanced` | `—` | `—` | `—` |
+| `TBiquadCoefficients` | `field` | `B0` | `B0:Double` | `advanced` | `—` | `—` | `—` |
+| `TBiquadCoefficients` | `field` | `B1` | `B1:Double` | `advanced` | `—` | `—` | `—` |
+| `TBiquadCoefficients` | `field` | `B2` | `B2:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvolutionMethod` | `enum-value` | `cmAutomatic` | `cmAutomatic` | `advanced` | `—` | `—` | `—` |
+| `TConvolutionMethod` | `enum-value` | `cmDirect` | `cmDirect` | `advanced` | `—` | `—` | `—` |
+| `TConvolutionMethod` | `enum-value` | `cmFFT` | `cmFFT` | `advanced` | `—` | `—` | `—` |
+| `TCrossSpectralEstimate` | `field` | `Coherence` | `Coherence:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCrossSpectralEstimate` | `field` | `CrossPower` | `CrossPower:TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TCrossSpectralEstimate` | `field` | `Frequencies` | `Frequencies:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `AnalyticSignal` | `class function AnalyticSignal(const Input:TDoubleArray):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Convolve` | `class function Convolve(const A,B:TDoubleArray;const Method:TConvolutionMethod=cmAutomatic):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Correlate` | `class function Correlate(const A,B:TDoubleArray;const Method:TConvolutionMethod=cmAutomatic):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `CrossSpectrum` | `class function CrossSpectrum(const A,B:TDoubleArray;const SegmentLength,Overlap:SizeInt;const SampleRate:Double=1.0;const WindowType:TWindowType=wtHann):TCrossSpectralEstimate` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `DesignButterworthLowPass` | `class function DesignButterworthLowPass(const NormalizedCutoff:Double):TBiquadCoefficients` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `DFTReference` | `class function DFTReference(const Input:TComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `GetWindowMetrics` | `class function GetWindowMetrics(const Window:TDoubleArray):TWindowMetrics` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `HaarTransform` | `class function HaarTransform(const Input:TDoubleArray;const Inverse:Boolean=False):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `InverseRealTransform` | `class function InverseRealTransform(const Input:TComplexArray;const Normalization:TFFTNormalization=fnBackward):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Periodogram` | `class function Periodogram(const Input:TDoubleArray;const SampleRate:Double=1.0;const WindowType:TWindowType=wtHann):TSpectralEstimate` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `RealTransform` | `class function RealTransform(const Input:TDoubleArray;const Normalization:TFFTNormalization=fnBackward):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `RealTransform` | `class function RealTransform(const Input:TSingleArray;const Normalization:TFFTNormalization=fnBackward):TSingleComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `ResampleLinear` | `class function ResampleLinear(const Input:TDoubleArray;const OutputLength:SizeInt):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `ResampleRational` | `class function ResampleRational(const Input:TDoubleArray;const UpFactor,DownFactor:SizeInt):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `SelectedConvolutionMethod` | `class function SelectedConvolutionMethod(const LengthA,LengthB:SizeInt):TConvolutionMethod` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `ShortTimeFourierTransform` | `class function ShortTimeFourierTransform(const Input:TDoubleArray;const FrameLength,HopLength:SizeInt;const WindowType:TWindowType=wtHann):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Transform` | `class function Transform(const Input:TComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Transform` | `class function Transform(const Input:TSingleComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TSingleComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Transform2D` | `class function Transform2D(const Input:IDenseComplexMatrix;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `TransformBatch` | `class function TransformBatch(const Input:TComplexBatch;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TComplexBatch` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `TransformBatch` | `class function TransformBatch(const Input:TSingleComplexBatch;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward):TSingleComplexBatch` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `procedure` | `TransformInto` | `class procedure TransformInto(const Input:TComplexArray;var Destination:TComplexArray;const Inverse:Boolean=False;const Normalization:TFFTNormalization=fnBackward)` | `advanced` | `—` | `—` | `—` |
+| `TDSPKit` | `function` | `Welch` | `class function Welch(const Input:TDoubleArray;const SegmentLength,Overlap:SizeInt;const SampleRate:Double=1.0;const WindowType:TWindowType=wtHann):TSpectralEstimate` | `advanced` | `—` | `—` | `—` |
+| `TFFTNormalization` | `enum-value` | `fnBackward` | `fnBackward` | `advanced` | `—` | `—` | `—` |
+| `TFFTNormalization` | `enum-value` | `fnForward` | `fnForward` | `advanced` | `—` | `—` | `—` |
+| `TFFTNormalization` | `enum-value` | `fnNone` | `fnNone` | `advanced` | `—` | `—` | `—` |
+| `TFFTNormalization` | `enum-value` | `fnUnitary` | `fnUnitary` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `function` | `Create` | `class function Create(const Impulse:TDoubleArray;const Method:TConvolutionMethod=cmFFT):TOverlapAddConvolver` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `function` | `Flush` | `function Flush:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `function` | `Impulse` | `function Impulse:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `procedure` | `Reset` | `procedure Reset` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `procedure` | `RestoreTail` | `procedure RestoreTail(const Values:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `function` | `StateSize` | `function StateSize:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TOverlapAddConvolver` | `function` | `Tail` | `function Tail:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `function` | `Create` | `class function Create(const Impulse:TDoubleArray;const Method:TConvolutionMethod=cmFFT):TOverlapSaveConvolver` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `function` | `History` | `function History:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `function` | `Impulse` | `function Impulse:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `procedure` | `Reset` | `procedure Reset` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `procedure` | `RestoreHistory` | `procedure RestoreHistory(const Values:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TOverlapSaveConvolver` | `function` | `StateSize` | `function StateSize:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TSpectralEstimate` | `field` | `Frequencies` | `Frequencies:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSpectralEstimate` | `field` | `Power` | `Power:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStreamingBiquad` | `function` | `Create` | `class function Create(const Coefficients:TBiquadCoefficients):TStreamingBiquad` | `advanced` | `—` | `—` | `—` |
+| `TStreamingBiquad` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStreamingBiquad` | `procedure` | `Reset` | `procedure Reset` | `advanced` | `—` | `—` | `—` |
+| `TStreamingBiquad` | `property` | `Z1` | `property Z1:Double read FZ1` | `advanced` | `—` | `—` | `—` |
+| `TStreamingBiquad` | `property` | `Z2` | `property Z2:Double read FZ2` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `function` | `Coefficients` | `function Coefficients:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `function` | `Create` | `class function Create(const Coefficients:TDoubleArray):TStreamingFIR` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `function` | `History` | `function History:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `function` | `ProcessBlock` | `function ProcessBlock(const Input:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `procedure` | `Reset` | `procedure Reset` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `procedure` | `RestoreHistory` | `procedure RestoreHistory(const Values:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TStreamingFIR` | `function` | `StateSize` | `function StateSize:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TWindowMetrics` | `field` | `CoherentGain` | `CoherentGain:Double` | `advanced` | `—` | `—` | `—` |
+| `TWindowMetrics` | `field` | `EquivalentNoiseBandwidth` | `EquivalentNoiseBandwidth:Double` | `advanced` | `—` | `—` | `—` |
+| `TWindowMetrics` | `field` | `RMSGain` | `RMSGain:Double` | `advanced` | `—` | `—` | `—` |
 
 ## EngineeringLib.FluidDynamics
 
 Source: [`src/EngineeringLib.FluidDynamics.pas`](../src/EngineeringLib.FluidDynamics.pas)  
 Interface SHA-256: `cee0ec867efb769522f50b593be8d0edef2aea915abb08812be928de55fa0a7e`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `class` | `TFluidDynamicsKit` | `TFluidDynamicsKit=class` | `primary` | `—` |
-| `TFluidDynamicsKit` | `nested-const` | `AirDensity` | `AirDensity=1.225` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `BernoulliHeight` | `class function BernoulliHeight(Density:Double;Pressure1:Double;Velocity1:Double;Height1:Double;Pressure2:Double;Velocity2:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `BernoulliPressure` | `class function BernoulliPressure(Density:Double;Pressure1:Double;Velocity1:Double;Height1:Double;Velocity2:Double;Height2:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `BernoulliVelocity` | `class function BernoulliVelocity(Density:Double;Pressure1:Double;Velocity1:Double;Height1:Double;Pressure2:Double;Height2:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `BlasiusFrictionFactor` | `class function BlasiusFrictionFactor(ReynoldsNumberValue:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `CalculateVolumeFlowRate` | `class function CalculateVolumeFlowRate(Area:Double;Velocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `ChezyVelocity` | `class function ChezyVelocity(ChezyCoefficient:Double;HydraulicRadius:Double;ChannelSlope:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `CriticalDepthRectangular` | `class function CriticalDepthRectangular(UnitDischarge:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `DensityWater` | `class function DensityWater:Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `DragForce` | `class function DragForce(DragCoefficient:Double;Density:Double;Velocity:Double;ReferenceArea:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `DynamicPressure` | `class function DynamicPressure(Density:Double;Velocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `nested-const` | `DynamicViscosityAir` | `DynamicViscosityAir=1.81E-5` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `DynamicViscosityWater` | `class function DynamicViscosityWater:Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `EulerNumber` | `class function EulerNumber(PressureDifference:Double;Density:Double;Velocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `FrictionHeadLoss` | `class function FrictionHeadLoss(FrictionFactor:Double;Length:Double;Diameter:Double;Velocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `FroudeNumber` | `class function FroudeNumber(Velocity:Double;CharacteristicLength:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `nested-const` | `GravityAcceleration` | `GravityAcceleration=9.80665` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `HazenWilliamsHeadLoss` | `class function HazenWilliamsHeadLoss(Length:Double;Diameter:Double;FlowRate:Double;CHW:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `IsentropicAreaRatio` | `class function IsentropicAreaRatio(MachNumberValue:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `nested-const` | `KinematicViscosityAir` | `KinematicViscosityAir=1.48E-5` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `KinematicViscosityWater` | `class function KinematicViscosityWater:Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `LaminarFrictionFactor` | `class function LaminarFrictionFactor(ReynoldsNumberValue:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `LiftForce` | `class function LiftForce(LiftCoefficient:Double;Density:Double;Velocity:Double;ReferenceArea:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `MachNumber` | `class function MachNumber(Velocity:Double;SpeedOfSound:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `ManningVelocity` | `class function ManningVelocity(ManningCoefficient:Double;HydraulicRadius:Double;ChannelSlope:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `MassFlowRate` | `class function MassFlowRate(Density:Double;Area:Double;Velocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `MassFlowRate` | `class function MassFlowRate(Density:Double;VolumeFlowRate:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `NusseltNumber` | `class function NusseltNumber(HeatTransferCoefficient:Double;CharacteristicLength:Double;ThermalConductivity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `OpenChannelFroudeNumber` | `class function OpenChannelFroudeNumber(Velocity:Double;Depth:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `PrandtlNumber` | `class function PrandtlNumber(DynamicViscosity:Double;SpecificHeat:Double;ThermalConductivity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `PressureCoefficient` | `class function PressureCoefficient(Pressure:Double;FreeStreamPressure:Double;FreeStreamDensity:Double;FreeStreamVelocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `PumpHead` | `class function PumpHead(PressureDiff:Double;Density:Double;InletVelocity:Double;OutletVelocity:Double;HeightDiff:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `PumpPower` | `class function PumpPower(Density:Double;FlowRate:Double;Head:Double;Efficiency:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `PumpSpecificSpeed` | `class function PumpSpecificSpeed(RPM:Double;FlowRate:Double;Head:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `ReynoldsNumber` | `class function ReynoldsNumber(Density:Double;Velocity:Double;CharacteristicLength:Double;DynamicViscosity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `ReynoldsNumberKinematic` | `class function ReynoldsNumberKinematic(Velocity:Double;CharacteristicLength:Double;KinematicViscosity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `SpeedOfSound` | `class function SpeedOfSound(SpecificHeatRatio:Double;GasConstant:Double;Temperature:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `StagnationPressure` | `class function StagnationPressure(StaticPressure:Double;DynamicPressureValue:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `StagnationPressureRatio` | `class function StagnationPressureRatio(MachNumberValue:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `StagnationTemperatureRatio` | `class function StagnationTemperatureRatio(MachNumberValue:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `StrouhalNumber` | `class function StrouhalNumber(Frequency:Double;CharacteristicLength:Double;Velocity:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `TurbinePower` | `class function TurbinePower(Efficiency:Double;Density:Double;FlowRate:Double;Head:Double):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `TurbulentFrictionFactor` | `class function TurbulentFrictionFactor(ReynoldsNumberValue:Double;RelativeRoughness:Double;Tolerance:Double=1E-6;MaxIterations:Integer=100):Double` | `primary` | `—` |
-| `TFluidDynamicsKit` | `nested-const` | `WaterDensity` | `WaterDensity=997.0` | `primary` | `—` |
-| `TFluidDynamicsKit` | `function` | `WeberNumber` | `class function WeberNumber(Density:Double;Velocity:Double;CharacteristicLength:Double;SurfaceTension:Double):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `class` | `TFluidDynamicsKit` | `TFluidDynamicsKit=class` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `nested-const` | `AirDensity` | `AirDensity=1.225` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `BernoulliHeight` | `class function BernoulliHeight(Density:Double;Pressure1:Double;Velocity1:Double;Height1:Double;Pressure2:Double;Velocity2:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `BernoulliPressure` | `class function BernoulliPressure(Density:Double;Pressure1:Double;Velocity1:Double;Height1:Double;Velocity2:Double;Height2:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `BernoulliVelocity` | `class function BernoulliVelocity(Density:Double;Pressure1:Double;Velocity1:Double;Height1:Double;Pressure2:Double;Height2:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `BlasiusFrictionFactor` | `class function BlasiusFrictionFactor(ReynoldsNumberValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `CalculateVolumeFlowRate` | `class function CalculateVolumeFlowRate(Area:Double;Velocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `ChezyVelocity` | `class function ChezyVelocity(ChezyCoefficient:Double;HydraulicRadius:Double;ChannelSlope:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `CriticalDepthRectangular` | `class function CriticalDepthRectangular(UnitDischarge:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `DensityWater` | `class function DensityWater:Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `DragForce` | `class function DragForce(DragCoefficient:Double;Density:Double;Velocity:Double;ReferenceArea:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `DynamicPressure` | `class function DynamicPressure(Density:Double;Velocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `nested-const` | `DynamicViscosityAir` | `DynamicViscosityAir=1.81E-5` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `DynamicViscosityWater` | `class function DynamicViscosityWater:Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `EulerNumber` | `class function EulerNumber(PressureDifference:Double;Density:Double;Velocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `FrictionHeadLoss` | `class function FrictionHeadLoss(FrictionFactor:Double;Length:Double;Diameter:Double;Velocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `FroudeNumber` | `class function FroudeNumber(Velocity:Double;CharacteristicLength:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `nested-const` | `GravityAcceleration` | `GravityAcceleration=9.80665` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `HazenWilliamsHeadLoss` | `class function HazenWilliamsHeadLoss(Length:Double;Diameter:Double;FlowRate:Double;CHW:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `IsentropicAreaRatio` | `class function IsentropicAreaRatio(MachNumberValue:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `nested-const` | `KinematicViscosityAir` | `KinematicViscosityAir=1.48E-5` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `KinematicViscosityWater` | `class function KinematicViscosityWater:Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `LaminarFrictionFactor` | `class function LaminarFrictionFactor(ReynoldsNumberValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `LiftForce` | `class function LiftForce(LiftCoefficient:Double;Density:Double;Velocity:Double;ReferenceArea:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `MachNumber` | `class function MachNumber(Velocity:Double;SpeedOfSound:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `ManningVelocity` | `class function ManningVelocity(ManningCoefficient:Double;HydraulicRadius:Double;ChannelSlope:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `MassFlowRate` | `class function MassFlowRate(Density:Double;Area:Double;Velocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `MassFlowRate` | `class function MassFlowRate(Density:Double;VolumeFlowRate:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `NusseltNumber` | `class function NusseltNumber(HeatTransferCoefficient:Double;CharacteristicLength:Double;ThermalConductivity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `OpenChannelFroudeNumber` | `class function OpenChannelFroudeNumber(Velocity:Double;Depth:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `PrandtlNumber` | `class function PrandtlNumber(DynamicViscosity:Double;SpecificHeat:Double;ThermalConductivity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `PressureCoefficient` | `class function PressureCoefficient(Pressure:Double;FreeStreamPressure:Double;FreeStreamDensity:Double;FreeStreamVelocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `PumpHead` | `class function PumpHead(PressureDiff:Double;Density:Double;InletVelocity:Double;OutletVelocity:Double;HeightDiff:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `PumpPower` | `class function PumpPower(Density:Double;FlowRate:Double;Head:Double;Efficiency:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `PumpSpecificSpeed` | `class function PumpSpecificSpeed(RPM:Double;FlowRate:Double;Head:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `ReynoldsNumber` | `class function ReynoldsNumber(Density:Double;Velocity:Double;CharacteristicLength:Double;DynamicViscosity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `ReynoldsNumberKinematic` | `class function ReynoldsNumberKinematic(Velocity:Double;CharacteristicLength:Double;KinematicViscosity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `SpeedOfSound` | `class function SpeedOfSound(SpecificHeatRatio:Double;GasConstant:Double;Temperature:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `StagnationPressure` | `class function StagnationPressure(StaticPressure:Double;DynamicPressureValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `StagnationPressureRatio` | `class function StagnationPressureRatio(MachNumberValue:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `StagnationTemperatureRatio` | `class function StagnationTemperatureRatio(MachNumberValue:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `StrouhalNumber` | `class function StrouhalNumber(Frequency:Double;CharacteristicLength:Double;Velocity:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `TurbinePower` | `class function TurbinePower(Efficiency:Double;Density:Double;FlowRate:Double;Head:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `TurbulentFrictionFactor` | `class function TurbulentFrictionFactor(ReynoldsNumberValue:Double;RelativeRoughness:Double;Tolerance:Double=1E-6;MaxIterations:Integer=100):Double` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `nested-const` | `WaterDensity` | `WaterDensity=997.0` | `recommended` | `—` | `—` | `—` |
+| `TFluidDynamicsKit` | `function` | `WeberNumber` | `class function WeberNumber(Density:Double;Velocity:Double;CharacteristicLength:Double;SurfaceTension:Double):Double` | `recommended` | `—` | `—` | `—` |
 
 ## EngineeringLib.Pressure
 
 Source: [`src/EngineeringLib.Pressure.pas`](../src/EngineeringLib.Pressure.pas)  
 Interface SHA-256: `7ba319719acd1c24c9fd1ec661ddd8f495b2a713b22684740bfdcb788f50aa68`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EPressureError` | `EPressureError=EngineeringLib.Common.EFluidDynamicsError` | `primary` | `—` |
-| `(unit)` | `type` | `TPressureKit` | `TPressureKit=TFluidDynamicsKit` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EPressureError` | `EPressureError=EngineeringLib.Common.EFluidDynamicsError` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPressureKit` | `TPressureKit=TFluidDynamicsKit` | `advanced` | `—` | `—` | `—` |
 
 ## EngineeringLib.Signal
 
 Source: [`src/EngineeringLib.Signal.pas`](../src/EngineeringLib.Signal.pas)  
 Interface SHA-256: `f72fc090374b3768dae2687625113e921622e1c30b028c7b24a79c4415f58d50`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `TDoubleArray` | `TDoubleArray=MathBase.SharedTypes.TDoubleArray` | `primary` | `—` |
-| `(unit)` | `class` | `TSignalKit` | `TSignalKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TWindowType` | `TWindowType=(wtRectangular,wtHamming,wtHann,wtBlackman)` | `primary` | `—` |
-| `TSignalKit` | `function` | `ApplyFIRFilter` | `class function ApplyFIRFilter(const Signal,Coeffs:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `function` | `ApplyWindow` | `class function ApplyWindow(const InputSignal,Window:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `CalculateFFT` | `class procedure CalculateFFT(const InputSignal:TDoubleArray;out OutputSpectrum:TComplexArray)` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `CalculateFFT` | `class procedure CalculateFFT(const InputSignal:TDoubleArray;out OutRealPart,OutImagPart:TDoubleArray)` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `CalculateFFTMagnitudePhase` | `class procedure CalculateFFTMagnitudePhase(const InputSignal:TDoubleArray;out Magnitude,Phase:TDoubleArray)` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `CalculateIFFT` | `class procedure CalculateIFFT(const InputSpectrum:TComplexArray;out OutputSignal:TDoubleArray)` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `CalculateIFFT` | `class procedure CalculateIFFT(const InRealPart,InImagPart:TDoubleArray;out OutputSignal:TDoubleArray)` | `primary` | `—` |
-| `TSignalKit` | `function` | `DesignFIRBandPass` | `class function DesignFIRBandPass(LowCutoff,HighCutoff:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `function` | `DesignFIRBandStop` | `class function DesignFIRBandStop(LowCutoff,HighCutoff:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `function` | `DesignFIRHighPass` | `class function DesignFIRHighPass(CutoffFreq:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `function` | `DesignFIRLowPass` | `class function DesignFIRLowPass(CutoffFreq:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `FFT` | `class procedure FFT(var Data:TComplexArray;Inverse:Boolean=False)` | `primary` | `—` |
-| `TSignalKit` | `procedure` | `FFT` | `class procedure FFT(var RealPart,ImagPart:TDoubleArray;Inverse:Boolean=False)` | `primary` | `—` |
-| `TSignalKit` | `function` | `GenerateWindow` | `class function GenerateWindow(WindowType:TWindowType;Size:Integer):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `function` | `MovingAverage` | `class function MovingAverage(const InputSignal:TDoubleArray;WindowSize:Integer):TDoubleArray` | `primary` | `—` |
-| `TSignalKit` | `function` | `RootMeanSquare` | `class function RootMeanSquare(const InputSignal:TDoubleArray):Double` | `primary` | `—` |
-| `TSignalKit` | `function` | `SignalEnergy` | `class function SignalEnergy(const InputSignal:TDoubleArray):Double` | `primary` | `—` |
-| `TSignalKit` | `function` | `SignalPower` | `class function SignalPower(const InputSignal:TDoubleArray):Double` | `primary` | `—` |
-| `TWindowType` | `enum-value` | `wtBlackman` | `wtBlackman` | `primary` | `—` |
-| `TWindowType` | `enum-value` | `wtHamming` | `wtHamming` | `primary` | `—` |
-| `TWindowType` | `enum-value` | `wtHann` | `wtHann` | `primary` | `—` |
-| `TWindowType` | `enum-value` | `wtRectangular` | `wtRectangular` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `TDoubleArray` | `TDoubleArray=MathBase.SharedTypes.TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TSignalKit` | `TSignalKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TWindowType` | `TWindowType=(wtRectangular,wtHamming,wtHann,wtBlackman)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `ApplyFIRFilter` | `class function ApplyFIRFilter(const Signal,Coeffs:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `ApplyWindow` | `class function ApplyWindow(const InputSignal,Window:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `CalculateFFT` | `class procedure CalculateFFT(const InputSignal:TDoubleArray;out OutputSpectrum:TComplexArray)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `CalculateFFT` | `class procedure CalculateFFT(const InputSignal:TDoubleArray;out OutRealPart,OutImagPart:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `CalculateFFTMagnitudePhase` | `class procedure CalculateFFTMagnitudePhase(const InputSignal:TDoubleArray;out Magnitude,Phase:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `CalculateIFFT` | `class procedure CalculateIFFT(const InputSpectrum:TComplexArray;out OutputSignal:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `CalculateIFFT` | `class procedure CalculateIFFT(const InRealPart,InImagPart:TDoubleArray;out OutputSignal:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `DesignFIRBandPass` | `class function DesignFIRBandPass(LowCutoff,HighCutoff:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `DesignFIRBandStop` | `class function DesignFIRBandStop(LowCutoff,HighCutoff:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `DesignFIRHighPass` | `class function DesignFIRHighPass(CutoffFreq:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `DesignFIRLowPass` | `class function DesignFIRLowPass(CutoffFreq:Double;Order:Integer;WindowType:TWindowType=wtHamming):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `FFT` | `class procedure FFT(var Data:TComplexArray;Inverse:Boolean=False)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `procedure` | `FFT` | `class procedure FFT(var RealPart,ImagPart:TDoubleArray;Inverse:Boolean=False)` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `GenerateWindow` | `class function GenerateWindow(WindowType:TWindowType;Size:Integer):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `MovingAverage` | `class function MovingAverage(const InputSignal:TDoubleArray;WindowSize:Integer):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `RootMeanSquare` | `class function RootMeanSquare(const InputSignal:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `SignalEnergy` | `class function SignalEnergy(const InputSignal:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `TSignalKit` | `function` | `SignalPower` | `class function SignalPower(const InputSignal:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `TWindowType` | `enum-value` | `wtBlackman` | `wtBlackman` | `advanced` | `—` | `—` | `—` |
+| `TWindowType` | `enum-value` | `wtHamming` | `wtHamming` | `advanced` | `—` | `—` | `—` |
+| `TWindowType` | `enum-value` | `wtHann` | `wtHann` | `advanced` | `—` | `—` | `—` |
+| `TWindowType` | `enum-value` | `wtRectangular` | `wtRectangular` | `advanced` | `—` | `—` | `—` |
 
 ## EngineeringLib.Thermodynamics
 
 Source: [`src/EngineeringLib.Thermodynamics.pas`](../src/EngineeringLib.Thermodynamics.pas)  
 Interface SHA-256: `930001a78df5eb686e412d3fbd03f2d8d3658bbcdbb300307c0a5dd15b69fd81`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `class` | `TThermodynamicsKit` | `TThermodynamicsKit=class` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `AdiabaticPressure` | `class function AdiabaticPressure(InitialPressure,InitialVolume,FinalVolume:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `AdiabaticTemperature` | `class function AdiabaticTemperature(InitialTemp,InitialVolume,FinalVolume:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `AdiabaticTemperatureFromPressure` | `class function AdiabaticTemperatureFromPressure(InitialTemp,InitialPressure,FinalPressure:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `AdiabaticVolume` | `class function AdiabaticVolume(InitialPressure,InitialVolume,FinalPressure:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `nested-const` | `AvogadroConstant` | `AvogadroConstant=6.02214076E23` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `BarToPascal` | `class function BarToPascal(Bar:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `nested-const` | `BoltzmannConstant` | `BoltzmannConstant=1.380649E-23` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `BraytonCycleEfficiency` | `class function BraytonCycleEfficiency(PressureRatio:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `CarnotEfficiency` | `class function CarnotEfficiency(HotTempK:Double;ColdTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `CelsiusToKelvin` | `class function CelsiusToKelvin(TempC:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `CoefficientOfPerformanceHeatPump` | `class function CoefficientOfPerformanceHeatPump(HotHeatDelivered:Double;WorkInput:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `CoefficientOfPerformanceRefrigeration` | `class function CoefficientOfPerformanceRefrigeration(ColdHeatExtracted:Double;WorkInput:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `CriticalPressureRatio` | `class function CriticalPressureRatio(SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `DewPointTemperature` | `class function DewPointTemperature(TemperatureC:Double;RelativeHumidityPercent:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `DieselCycleEfficiency` | `class function DieselCycleEfficiency(CompressionRatio:Double;CutoffRatio:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `EntropyChangeHeating` | `class function EntropyChangeHeating(Mass:Double;SpecificHeatCapacity:Double;InitialTempK:Double;FinalTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `EntropyChangeIsothermalExpansion` | `class function EntropyChangeIsothermalExpansion(Moles:Double;InitialVolume:Double;FinalVolume:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `EntropyChangeReversible` | `class function EntropyChangeReversible(HeatTransfer:Double;AbsoluteTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HeatConductionRate` | `class function HeatConductionRate(ThermalConductivity:Double;Area:Double;TempDifference:Double;Thickness:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HeatConvectionRate` | `class function HeatConvectionRate(ConvectionCoefficient:Double;Area:Double;TempDifference:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HeatEnergyChange` | `class function HeatEnergyChange(Mass:Double;SpecificHeatCapacity:Double;TempChange:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HeatOfFusion` | `class function HeatOfFusion(Mass:Double;LatentHeatOfFusion:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HeatOfVaporization` | `class function HeatOfVaporization(Mass:Double;LatentHeatOfVaporization:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HeatRadiationRate` | `class function HeatRadiationRate(Emissivity:Double;Area:Double;SurfaceTempK:Double;SurroundingsTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `HumidityRatio` | `class function HumidityRatio(VaporPressure:Double;AtmosphericPressure:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `nested-const` | `IdealGasConstant` | `IdealGasConstant=8.314462618` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IdealGasMoles` | `class function IdealGasMoles(Pressure:Double;Volume:Double;AbsoluteTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IdealGasPressure` | `class function IdealGasPressure(Moles:Double;Volume:Double;AbsoluteTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IdealGasTemperature` | `class function IdealGasTemperature(Pressure:Double;Volume:Double;Moles:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IdealGasVolume` | `class function IdealGasVolume(Moles:Double;Pressure:Double;AbsoluteTempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IsentropicDensityRatio` | `class function IsentropicDensityRatio(MachNumber:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IsentropicPressureRatio` | `class function IsentropicPressureRatio(MachNumber:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `IsentropicTemperatureRatio` | `class function IsentropicTemperatureRatio(MachNumber:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `KelvinToCelsius` | `class function KelvinToCelsius(TempK:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `MachNumberFromPressureRatio` | `class function MachNumberFromPressureRatio(PressureRatio:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `MoistAirEnthalpy` | `class function MoistAirEnthalpy(TemperatureC:Double;HumidityRatioValue:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `OttoCycleEfficiency` | `class function OttoCycleEfficiency(CompressionRatio:Double;SpecificHeatRatio:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `PascalToBar` | `class function PascalToBar(Pascal:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `RankineCycleEfficiency` | `class function RankineCycleEfficiency(TurbineWorkOutput:Double;PumpWorkInput:Double;HeatInput:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `RelativeHumidity` | `class function RelativeHumidity(ActualVaporPressure:Double;SaturatedVaporPressure:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `SaturatedVaporPressure` | `class function SaturatedVaporPressure(TemperatureC:Double):Double` | `primary` | `—` |
-| `TThermodynamicsKit` | `nested-const` | `StandardAtmosphere` | `StandardAtmosphere=101325` | `primary` | `—` |
-| `TThermodynamicsKit` | `nested-const` | `StandardTempK` | `StandardTempK=273.15` | `primary` | `—` |
-| `TThermodynamicsKit` | `nested-const` | `StefanBoltzmannConstant` | `StefanBoltzmannConstant=5.670374419E-8` | `primary` | `—` |
-| `TThermodynamicsKit` | `function` | `ThermalEfficiency` | `class function ThermalEfficiency(WorkOutput:Double;HeatInput:Double):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `class` | `TThermodynamicsKit` | `TThermodynamicsKit=class` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `AdiabaticPressure` | `class function AdiabaticPressure(InitialPressure,InitialVolume,FinalVolume:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `AdiabaticTemperature` | `class function AdiabaticTemperature(InitialTemp,InitialVolume,FinalVolume:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `AdiabaticTemperatureFromPressure` | `class function AdiabaticTemperatureFromPressure(InitialTemp,InitialPressure,FinalPressure:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `AdiabaticVolume` | `class function AdiabaticVolume(InitialPressure,InitialVolume,FinalPressure:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `nested-const` | `AvogadroConstant` | `AvogadroConstant=6.02214076E23` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `BarToPascal` | `class function BarToPascal(Bar:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `nested-const` | `BoltzmannConstant` | `BoltzmannConstant=1.380649E-23` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `BraytonCycleEfficiency` | `class function BraytonCycleEfficiency(PressureRatio:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `CarnotEfficiency` | `class function CarnotEfficiency(HotTempK:Double;ColdTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `CelsiusToKelvin` | `class function CelsiusToKelvin(TempC:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `CoefficientOfPerformanceHeatPump` | `class function CoefficientOfPerformanceHeatPump(HotHeatDelivered:Double;WorkInput:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `CoefficientOfPerformanceRefrigeration` | `class function CoefficientOfPerformanceRefrigeration(ColdHeatExtracted:Double;WorkInput:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `CriticalPressureRatio` | `class function CriticalPressureRatio(SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `DewPointTemperature` | `class function DewPointTemperature(TemperatureC:Double;RelativeHumidityPercent:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `DieselCycleEfficiency` | `class function DieselCycleEfficiency(CompressionRatio:Double;CutoffRatio:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `EntropyChangeHeating` | `class function EntropyChangeHeating(Mass:Double;SpecificHeatCapacity:Double;InitialTempK:Double;FinalTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `EntropyChangeIsothermalExpansion` | `class function EntropyChangeIsothermalExpansion(Moles:Double;InitialVolume:Double;FinalVolume:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `EntropyChangeReversible` | `class function EntropyChangeReversible(HeatTransfer:Double;AbsoluteTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HeatConductionRate` | `class function HeatConductionRate(ThermalConductivity:Double;Area:Double;TempDifference:Double;Thickness:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HeatConvectionRate` | `class function HeatConvectionRate(ConvectionCoefficient:Double;Area:Double;TempDifference:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HeatEnergyChange` | `class function HeatEnergyChange(Mass:Double;SpecificHeatCapacity:Double;TempChange:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HeatOfFusion` | `class function HeatOfFusion(Mass:Double;LatentHeatOfFusion:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HeatOfVaporization` | `class function HeatOfVaporization(Mass:Double;LatentHeatOfVaporization:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HeatRadiationRate` | `class function HeatRadiationRate(Emissivity:Double;Area:Double;SurfaceTempK:Double;SurroundingsTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `HumidityRatio` | `class function HumidityRatio(VaporPressure:Double;AtmosphericPressure:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `nested-const` | `IdealGasConstant` | `IdealGasConstant=8.314462618` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IdealGasMoles` | `class function IdealGasMoles(Pressure:Double;Volume:Double;AbsoluteTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IdealGasPressure` | `class function IdealGasPressure(Moles:Double;Volume:Double;AbsoluteTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IdealGasTemperature` | `class function IdealGasTemperature(Pressure:Double;Volume:Double;Moles:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IdealGasVolume` | `class function IdealGasVolume(Moles:Double;Pressure:Double;AbsoluteTempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IsentropicDensityRatio` | `class function IsentropicDensityRatio(MachNumber:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IsentropicPressureRatio` | `class function IsentropicPressureRatio(MachNumber:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `IsentropicTemperatureRatio` | `class function IsentropicTemperatureRatio(MachNumber:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `KelvinToCelsius` | `class function KelvinToCelsius(TempK:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `MachNumberFromPressureRatio` | `class function MachNumberFromPressureRatio(PressureRatio:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `MoistAirEnthalpy` | `class function MoistAirEnthalpy(TemperatureC:Double;HumidityRatioValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `OttoCycleEfficiency` | `class function OttoCycleEfficiency(CompressionRatio:Double;SpecificHeatRatio:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `PascalToBar` | `class function PascalToBar(Pascal:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `RankineCycleEfficiency` | `class function RankineCycleEfficiency(TurbineWorkOutput:Double;PumpWorkInput:Double;HeatInput:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `RelativeHumidity` | `class function RelativeHumidity(ActualVaporPressure:Double;SaturatedVaporPressure:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `SaturatedVaporPressure` | `class function SaturatedVaporPressure(TemperatureC:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `nested-const` | `StandardAtmosphere` | `StandardAtmosphere=101325` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `nested-const` | `StandardTempK` | `StandardTempK=273.15` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `nested-const` | `StefanBoltzmannConstant` | `StefanBoltzmannConstant=5.670374419E-8` | `recommended` | `—` | `—` | `—` |
+| `TThermodynamicsKit` | `function` | `ThermalEfficiency` | `class function ThermalEfficiency(WorkOutput:Double;HeatInput:Double):Double` | `recommended` | `—` | `—` | `—` |
 
 ## EngineeringLib.UnitConversion
 
 Source: [`src/EngineeringLib.UnitConversion.pas`](../src/EngineeringLib.UnitConversion.pas)  
 Interface SHA-256: `1463bdaa57cb84eb3f3045fb577ed85088f9c1f9c48e8759e60861203383fe4a`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `TAngleUnit` | `TAngleUnit=(anDegree,anRadian,anGradian,anMinuteOfArc,anSecondOfArc,anRevolution)` | `primary` | `—` |
-| `(unit)` | `type` | `TAreaUnit` | `TAreaUnit=(auSquareMeter,auSquareKilometer,auHectare,auAre,auSquareMile,auAcre,auSquareYard,auSquareFoot,auSquareInch)` | `primary` | `—` |
-| `(unit)` | `type` | `TDensityUnit` | `TDensityUnit=(deKilogramPerCubicMeter,deGramPerCubicCentimeter,dePoundPerCubicFoot,dePoundPerCubicInch)` | `primary` | `—` |
-| `(unit)` | `type` | `TElectricalCurrentUnit` | `TElectricalCurrentUnit=(ecAmpere,ecMilliampere,ecMicroampere)` | `primary` | `—` |
-| `(unit)` | `type` | `TElectricalPotentialUnit` | `TElectricalPotentialUnit=(epVolt,epKilovolt,epMillivolt,epMicrovolt)` | `primary` | `—` |
-| `(unit)` | `type` | `TEnergyUnit` | `TEnergyUnit=(euJoule,euKilojoule,euCalorie,euKilocalorie,euWattHour,euKilowattHour,euElectronvolt,euBTU,euTherm,euFootPound)` | `primary` | `—` |
-| `(unit)` | `type` | `TForceUnit` | `TForceUnit=(fuNewton,fuKilonewton,fuPoundForce,fuDyne,fuKilogramForce)` | `primary` | `—` |
-| `(unit)` | `type` | `TFrequencyUnit` | `TFrequencyUnit=(frHertz,frKilohertz,frMegahertz,frGigahertz,frCyclePerSecond)` | `primary` | `—` |
-| `(unit)` | `type` | `TLengthUnit` | `TLengthUnit=(luMeter,luKilometer,luCentimeter,luMillimeter,luMicrometer,luNanometer,luMile,luYard,luFoot,luInch,luNauticalMile,luAngstrom,luLightYear)` | `primary` | `—` |
-| `(unit)` | `type` | `TMassUnit` | `TMassUnit=(muKilogram,muGram,muMilligram,muMicrogram,muTonne,muPound,muOunce,muStone,muUSton,muImperialTon)` | `primary` | `—` |
-| `(unit)` | `type` | `TPowerUnit` | `TPowerUnit=(puWatt,puKilowatt,puMegawatt,puHorsepower,puBTUPerHour)` | `primary` | `—` |
-| `(unit)` | `type` | `TPressureUnit` | `TPressureUnit=(prPascal,prKilopascal,prBar,prAtmosphere,prTorr,prPSI)` | `primary` | `—` |
-| `(unit)` | `type` | `TStringArray` | `TStringArray=array of string` | `primary` | `—` |
-| `(unit)` | `type` | `TTemperatureUnit` | `TTemperatureUnit=(tpKelvin,tpCelsius,tpFahrenheit,tpRankine,tpReaumur)` | `primary` | `—` |
-| `(unit)` | `type` | `TTimeUnit` | `TTimeUnit=(tuSecond,tuMinute,tuHour,tuDay,tuWeek,tuMonth,tuYear,tuMillisecond,tuMicrosecond,tuNanosecond)` | `primary` | `—` |
-| `(unit)` | `class` | `TUnitConversionKit` | `TUnitConversionKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TUnitType` | `TUnitType=(utLength,utMass,utTime,utTemperature,utForce,utEnergy,utPower,utPressure,utVelocity,utArea,utVolume,utAngle,utDensity,utElectricalCurrent,utElectricalPotential,utFrequency)` | `primary` | `—` |
-| `(unit)` | `type` | `TVelocityUnit` | `TVelocityUnit=(vuMeterPerSecond,vuKilometerPerHour,vuMilePerHour,vuFootPerSecond,vuKnot)` | `primary` | `—` |
-| `(unit)` | `type` | `TVolumeUnit` | `TVolumeUnit=(voLiter,voCubicMeter,voMilliliter,voCubicCentimeter,voGallonUS,voGallonUK,voFluidOunceUS,voFluidOunceUK,voCubicFoot,voCubicInch)` | `primary` | `—` |
-| `TAngleUnit` | `enum-value` | `anDegree` | `anDegree` | `primary` | `—` |
-| `TAngleUnit` | `enum-value` | `anGradian` | `anGradian` | `primary` | `—` |
-| `TAngleUnit` | `enum-value` | `anMinuteOfArc` | `anMinuteOfArc` | `primary` | `—` |
-| `TAngleUnit` | `enum-value` | `anRadian` | `anRadian` | `primary` | `—` |
-| `TAngleUnit` | `enum-value` | `anRevolution` | `anRevolution` | `primary` | `—` |
-| `TAngleUnit` | `enum-value` | `anSecondOfArc` | `anSecondOfArc` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auAcre` | `auAcre` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auAre` | `auAre` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auHectare` | `auHectare` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auSquareFoot` | `auSquareFoot` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auSquareInch` | `auSquareInch` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auSquareKilometer` | `auSquareKilometer` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auSquareMeter` | `auSquareMeter` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auSquareMile` | `auSquareMile` | `primary` | `—` |
-| `TAreaUnit` | `enum-value` | `auSquareYard` | `auSquareYard` | `primary` | `—` |
-| `TDensityUnit` | `enum-value` | `deGramPerCubicCentimeter` | `deGramPerCubicCentimeter` | `primary` | `—` |
-| `TDensityUnit` | `enum-value` | `deKilogramPerCubicMeter` | `deKilogramPerCubicMeter` | `primary` | `—` |
-| `TDensityUnit` | `enum-value` | `dePoundPerCubicFoot` | `dePoundPerCubicFoot` | `primary` | `—` |
-| `TDensityUnit` | `enum-value` | `dePoundPerCubicInch` | `dePoundPerCubicInch` | `primary` | `—` |
-| `TElectricalCurrentUnit` | `enum-value` | `ecAmpere` | `ecAmpere` | `primary` | `—` |
-| `TElectricalCurrentUnit` | `enum-value` | `ecMicroampere` | `ecMicroampere` | `primary` | `—` |
-| `TElectricalCurrentUnit` | `enum-value` | `ecMilliampere` | `ecMilliampere` | `primary` | `—` |
-| `TElectricalPotentialUnit` | `enum-value` | `epKilovolt` | `epKilovolt` | `primary` | `—` |
-| `TElectricalPotentialUnit` | `enum-value` | `epMicrovolt` | `epMicrovolt` | `primary` | `—` |
-| `TElectricalPotentialUnit` | `enum-value` | `epMillivolt` | `epMillivolt` | `primary` | `—` |
-| `TElectricalPotentialUnit` | `enum-value` | `epVolt` | `epVolt` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euBTU` | `euBTU` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euCalorie` | `euCalorie` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euElectronvolt` | `euElectronvolt` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euFootPound` | `euFootPound` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euJoule` | `euJoule` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euKilocalorie` | `euKilocalorie` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euKilojoule` | `euKilojoule` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euKilowattHour` | `euKilowattHour` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euTherm` | `euTherm` | `primary` | `—` |
-| `TEnergyUnit` | `enum-value` | `euWattHour` | `euWattHour` | `primary` | `—` |
-| `TForceUnit` | `enum-value` | `fuDyne` | `fuDyne` | `primary` | `—` |
-| `TForceUnit` | `enum-value` | `fuKilogramForce` | `fuKilogramForce` | `primary` | `—` |
-| `TForceUnit` | `enum-value` | `fuKilonewton` | `fuKilonewton` | `primary` | `—` |
-| `TForceUnit` | `enum-value` | `fuNewton` | `fuNewton` | `primary` | `—` |
-| `TForceUnit` | `enum-value` | `fuPoundForce` | `fuPoundForce` | `primary` | `—` |
-| `TFrequencyUnit` | `enum-value` | `frCyclePerSecond` | `frCyclePerSecond` | `primary` | `—` |
-| `TFrequencyUnit` | `enum-value` | `frGigahertz` | `frGigahertz` | `primary` | `—` |
-| `TFrequencyUnit` | `enum-value` | `frHertz` | `frHertz` | `primary` | `—` |
-| `TFrequencyUnit` | `enum-value` | `frKilohertz` | `frKilohertz` | `primary` | `—` |
-| `TFrequencyUnit` | `enum-value` | `frMegahertz` | `frMegahertz` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luAngstrom` | `luAngstrom` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luCentimeter` | `luCentimeter` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luFoot` | `luFoot` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luInch` | `luInch` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luKilometer` | `luKilometer` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luLightYear` | `luLightYear` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luMeter` | `luMeter` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luMicrometer` | `luMicrometer` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luMile` | `luMile` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luMillimeter` | `luMillimeter` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luNanometer` | `luNanometer` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luNauticalMile` | `luNauticalMile` | `primary` | `—` |
-| `TLengthUnit` | `enum-value` | `luYard` | `luYard` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muGram` | `muGram` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muImperialTon` | `muImperialTon` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muKilogram` | `muKilogram` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muMicrogram` | `muMicrogram` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muMilligram` | `muMilligram` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muOunce` | `muOunce` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muPound` | `muPound` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muStone` | `muStone` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muTonne` | `muTonne` | `primary` | `—` |
-| `TMassUnit` | `enum-value` | `muUSton` | `muUSton` | `primary` | `—` |
-| `TPowerUnit` | `enum-value` | `puBTUPerHour` | `puBTUPerHour` | `primary` | `—` |
-| `TPowerUnit` | `enum-value` | `puHorsepower` | `puHorsepower` | `primary` | `—` |
-| `TPowerUnit` | `enum-value` | `puKilowatt` | `puKilowatt` | `primary` | `—` |
-| `TPowerUnit` | `enum-value` | `puMegawatt` | `puMegawatt` | `primary` | `—` |
-| `TPowerUnit` | `enum-value` | `puWatt` | `puWatt` | `primary` | `—` |
-| `TPressureUnit` | `enum-value` | `prAtmosphere` | `prAtmosphere` | `primary` | `—` |
-| `TPressureUnit` | `enum-value` | `prBar` | `prBar` | `primary` | `—` |
-| `TPressureUnit` | `enum-value` | `prKilopascal` | `prKilopascal` | `primary` | `—` |
-| `TPressureUnit` | `enum-value` | `prPascal` | `prPascal` | `primary` | `—` |
-| `TPressureUnit` | `enum-value` | `prPSI` | `prPSI` | `primary` | `—` |
-| `TPressureUnit` | `enum-value` | `prTorr` | `prTorr` | `primary` | `—` |
-| `TTemperatureUnit` | `enum-value` | `tpCelsius` | `tpCelsius` | `primary` | `—` |
-| `TTemperatureUnit` | `enum-value` | `tpFahrenheit` | `tpFahrenheit` | `primary` | `—` |
-| `TTemperatureUnit` | `enum-value` | `tpKelvin` | `tpKelvin` | `primary` | `—` |
-| `TTemperatureUnit` | `enum-value` | `tpRankine` | `tpRankine` | `primary` | `—` |
-| `TTemperatureUnit` | `enum-value` | `tpReaumur` | `tpReaumur` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuDay` | `tuDay` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuHour` | `tuHour` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuMicrosecond` | `tuMicrosecond` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuMillisecond` | `tuMillisecond` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuMinute` | `tuMinute` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuMonth` | `tuMonth` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuNanosecond` | `tuNanosecond` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuSecond` | `tuSecond` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuWeek` | `tuWeek` | `primary` | `—` |
-| `TTimeUnit` | `enum-value` | `tuYear` | `tuYear` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `AreUnitNamesCompatible` | `class function AreUnitNamesCompatible(AUnitName1,AUnitName2:string):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `AreUnitsCompatible` | `class function AreUnitsCompatible(UnitType1,UnitType2:TUnitType):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `CelsiusToFahrenheit` | `class function CelsiusToFahrenheit(Celsius:Double):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertAngle` | `class function ConvertAngle(Value:Double;FromUnit,ToUnit:TAngleUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertArea` | `class function ConvertArea(Value:Double;FromUnit,ToUnit:TAreaUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertDensity` | `class function ConvertDensity(Value:Double;FromUnit,ToUnit:TDensityUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertElectricalCurrent` | `class function ConvertElectricalCurrent(Value:Double;FromUnit,ToUnit:TElectricalCurrentUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertElectricalPotential` | `class function ConvertElectricalPotential(Value:Double;FromUnit,ToUnit:TElectricalPotentialUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertEnergy` | `class function ConvertEnergy(Value:Double;FromUnit,ToUnit:TEnergyUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertForce` | `class function ConvertForce(Value:Double;FromUnit,ToUnit:TForceUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertFrequency` | `class function ConvertFrequency(Value:Double;FromUnit,ToUnit:TFrequencyUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertLength` | `class function ConvertLength(Value:Double;FromUnit,ToUnit:TLengthUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertMass` | `class function ConvertMass(Value:Double;FromUnit,ToUnit:TMassUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertPower` | `class function ConvertPower(Value:Double;FromUnit,ToUnit:TPowerUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertPressure` | `class function ConvertPressure(Value:Double;FromUnit,ToUnit:TPressureUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertTemperature` | `class function ConvertTemperature(Value:Double;FromUnit,ToUnit:TTemperatureUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertTime` | `class function ConvertTime(Value:Double;FromUnit,ToUnit:TTimeUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertVelocity` | `class function ConvertVelocity(Value:Double;FromUnit,ToUnit:TVelocityUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `ConvertVolume` | `class function ConvertVolume(Value:Double;FromUnit,ToUnit:TVolumeUnit):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `FahrenheitToCelsius` | `class function FahrenheitToCelsius(Fahrenheit:Double):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `FormatWithScientificNotation` | `class function FormatWithScientificNotation(Value:Double;AUnitName:string;SignificantDigits:Integer=3):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `FormatWithUnit` | `class function FormatWithUnit(Value:Double;AUnitName:string;Decimals:Integer=2):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetAllUnitsOfType` | `class function GetAllUnitsOfType(UnitType:TUnitType):TStringArray` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetAllUnitTypes` | `class function GetAllUnitTypes:TStringArray` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetAngleUnitName` | `class function GetAngleUnitName(Unit_:TAngleUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetAreaUnitName` | `class function GetAreaUnitName(Unit_:TAreaUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetBaseUnit` | `class function GetBaseUnit(UnitType:TUnitType):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetDensityUnitName` | `class function GetDensityUnitName(Unit_:TDensityUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetElectricalCurrentUnitName` | `class function GetElectricalCurrentUnitName(Unit_:TElectricalCurrentUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetElectricalPotentialUnitName` | `class function GetElectricalPotentialUnitName(Unit_:TElectricalPotentialUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetEnergyUnitName` | `class function GetEnergyUnitName(Unit_:TEnergyUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetForceUnitName` | `class function GetForceUnitName(Unit_:TForceUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetFrequencyUnitName` | `class function GetFrequencyUnitName(Unit_:TFrequencyUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetLengthUnitName` | `class function GetLengthUnitName(Unit_:TLengthUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetMassUnitName` | `class function GetMassUnitName(Unit_:TMassUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetPowerUnitName` | `class function GetPowerUnitName(Unit_:TPowerUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetPressureUnitName` | `class function GetPressureUnitName(Unit_:TPressureUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetTemperatureUnitName` | `class function GetTemperatureUnitName(Unit_:TTemperatureUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetTimeUnitName` | `class function GetTimeUnitName(Unit_:TTimeUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetUnitTypeFromUnitName` | `class function GetUnitTypeFromUnitName(AUnitName:string):TUnitType` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetVelocityUnitName` | `class function GetVelocityUnitName(Unit_:TVelocityUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `GetVolumeUnitName` | `class function GetVolumeUnitName(Unit_:TVolumeUnit):string` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `KilogramsToPounds` | `class function KilogramsToPounds(Kilograms:Double):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `KilometersToMiles` | `class function KilometersToMiles(Kilometers:Double):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `MilesToKilometers` | `class function MilesToKilometers(Miles:Double):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `PoundsToKilograms` | `class function PoundsToKilograms(Pounds:Double):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `RoundToSignificantDigits` | `class function RoundToSignificantDigits(Value:Double;SignificantDigits:Integer):Double` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryConvertByUnitName` | `class function TryConvertByUnitName(Value:Double;FromAUnitName,ToAUnitName:string;out ConvertedValue:Double):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetAngleUnitFromName` | `class function TryGetAngleUnitFromName(AUnitName:string;out Unit_:TAngleUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetAreaUnitFromName` | `class function TryGetAreaUnitFromName(AUnitName:string;out Unit_:TAreaUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetDensityUnitFromName` | `class function TryGetDensityUnitFromName(AUnitName:string;out Unit_:TDensityUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetElectricalCurrentUnitFromName` | `class function TryGetElectricalCurrentUnitFromName(AUnitName:string;out Unit_:TElectricalCurrentUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetElectricalPotentialUnitFromName` | `class function TryGetElectricalPotentialUnitFromName(AUnitName:string;out Unit_:TElectricalPotentialUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetEnergyUnitFromName` | `class function TryGetEnergyUnitFromName(AUnitName:string;out Unit_:TEnergyUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetForceUnitFromName` | `class function TryGetForceUnitFromName(AUnitName:string;out Unit_:TForceUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetFrequencyUnitFromName` | `class function TryGetFrequencyUnitFromName(AUnitName:string;out Unit_:TFrequencyUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetLengthUnitFromName` | `class function TryGetLengthUnitFromName(AUnitName:string;out Unit_:TLengthUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetMassUnitFromName` | `class function TryGetMassUnitFromName(AUnitName:string;out Unit_:TMassUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetPowerUnitFromName` | `class function TryGetPowerUnitFromName(AUnitName:string;out Unit_:TPowerUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetPressureUnitFromName` | `class function TryGetPressureUnitFromName(AUnitName:string;out Unit_:TPressureUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetTemperatureUnitFromName` | `class function TryGetTemperatureUnitFromName(AUnitName:string;out Unit_:TTemperatureUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetTimeUnitFromName` | `class function TryGetTimeUnitFromName(AUnitName:string;out Unit_:TTimeUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetVelocityUnitFromName` | `class function TryGetVelocityUnitFromName(AUnitName:string;out Unit_:TVelocityUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryGetVolumeUnitFromName` | `class function TryGetVolumeUnitFromName(AUnitName:string;out Unit_:TVolumeUnit):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryParseAndConvert` | `class function TryParseAndConvert(const ValueStr,ToAUnitName:string;out ConvertedValue:Double):Boolean` | `primary` | `—` |
-| `TUnitConversionKit` | `function` | `TryParseValueWithUnit` | `class function TryParseValueWithUnit(const ValueStr:string;out Value:Double;out AUnitName:string):Boolean` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utAngle` | `utAngle` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utArea` | `utArea` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utDensity` | `utDensity` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utElectricalCurrent` | `utElectricalCurrent` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utElectricalPotential` | `utElectricalPotential` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utEnergy` | `utEnergy` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utForce` | `utForce` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utFrequency` | `utFrequency` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utLength` | `utLength` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utMass` | `utMass` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utPower` | `utPower` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utPressure` | `utPressure` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utTemperature` | `utTemperature` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utTime` | `utTime` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utVelocity` | `utVelocity` | `primary` | `—` |
-| `TUnitType` | `enum-value` | `utVolume` | `utVolume` | `primary` | `—` |
-| `TVelocityUnit` | `enum-value` | `vuFootPerSecond` | `vuFootPerSecond` | `primary` | `—` |
-| `TVelocityUnit` | `enum-value` | `vuKilometerPerHour` | `vuKilometerPerHour` | `primary` | `—` |
-| `TVelocityUnit` | `enum-value` | `vuKnot` | `vuKnot` | `primary` | `—` |
-| `TVelocityUnit` | `enum-value` | `vuMeterPerSecond` | `vuMeterPerSecond` | `primary` | `—` |
-| `TVelocityUnit` | `enum-value` | `vuMilePerHour` | `vuMilePerHour` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voCubicCentimeter` | `voCubicCentimeter` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voCubicFoot` | `voCubicFoot` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voCubicInch` | `voCubicInch` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voCubicMeter` | `voCubicMeter` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voFluidOunceUK` | `voFluidOunceUK` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voFluidOunceUS` | `voFluidOunceUS` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voGallonUK` | `voGallonUK` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voGallonUS` | `voGallonUS` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voLiter` | `voLiter` | `primary` | `—` |
-| `TVolumeUnit` | `enum-value` | `voMilliliter` | `voMilliliter` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `TAngleUnit` | `TAngleUnit=(anDegree,anRadian,anGradian,anMinuteOfArc,anSecondOfArc,anRevolution)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TAreaUnit` | `TAreaUnit=(auSquareMeter,auSquareKilometer,auHectare,auAre,auSquareMile,auAcre,auSquareYard,auSquareFoot,auSquareInch)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDensityUnit` | `TDensityUnit=(deKilogramPerCubicMeter,deGramPerCubicCentimeter,dePoundPerCubicFoot,dePoundPerCubicInch)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TElectricalCurrentUnit` | `TElectricalCurrentUnit=(ecAmpere,ecMilliampere,ecMicroampere)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TElectricalPotentialUnit` | `TElectricalPotentialUnit=(epVolt,epKilovolt,epMillivolt,epMicrovolt)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TEnergyUnit` | `TEnergyUnit=(euJoule,euKilojoule,euCalorie,euKilocalorie,euWattHour,euKilowattHour,euElectronvolt,euBTU,euTherm,euFootPound)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TForceUnit` | `TForceUnit=(fuNewton,fuKilonewton,fuPoundForce,fuDyne,fuKilogramForce)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TFrequencyUnit` | `TFrequencyUnit=(frHertz,frKilohertz,frMegahertz,frGigahertz,frCyclePerSecond)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TLengthUnit` | `TLengthUnit=(luMeter,luKilometer,luCentimeter,luMillimeter,luMicrometer,luNanometer,luMile,luYard,luFoot,luInch,luNauticalMile,luAngstrom,luLightYear)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TMassUnit` | `TMassUnit=(muKilogram,muGram,muMilligram,muMicrogram,muTonne,muPound,muOunce,muStone,muUSton,muImperialTon)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPowerUnit` | `TPowerUnit=(puWatt,puKilowatt,puMegawatt,puHorsepower,puBTUPerHour)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPressureUnit` | `TPressureUnit=(prPascal,prKilopascal,prBar,prAtmosphere,prTorr,prPSI)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TStringArray` | `TStringArray=array of string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TTemperatureUnit` | `TTemperatureUnit=(tpKelvin,tpCelsius,tpFahrenheit,tpRankine,tpReaumur)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TTimeUnit` | `TTimeUnit=(tuSecond,tuMinute,tuHour,tuDay,tuWeek,tuMonth,tuYear,tuMillisecond,tuMicrosecond,tuNanosecond)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TUnitConversionKit` | `TUnitConversionKit=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TUnitType` | `TUnitType=(utLength,utMass,utTime,utTemperature,utForce,utEnergy,utPower,utPressure,utVelocity,utArea,utVolume,utAngle,utDensity,utElectricalCurrent,utElectricalPotential,utFrequency)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVelocityUnit` | `TVelocityUnit=(vuMeterPerSecond,vuKilometerPerHour,vuMilePerHour,vuFootPerSecond,vuKnot)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVolumeUnit` | `TVolumeUnit=(voLiter,voCubicMeter,voMilliliter,voCubicCentimeter,voGallonUS,voGallonUK,voFluidOunceUS,voFluidOunceUK,voCubicFoot,voCubicInch)` | `advanced` | `—` | `—` | `—` |
+| `TAngleUnit` | `enum-value` | `anDegree` | `anDegree` | `advanced` | `—` | `—` | `—` |
+| `TAngleUnit` | `enum-value` | `anGradian` | `anGradian` | `advanced` | `—` | `—` | `—` |
+| `TAngleUnit` | `enum-value` | `anMinuteOfArc` | `anMinuteOfArc` | `advanced` | `—` | `—` | `—` |
+| `TAngleUnit` | `enum-value` | `anRadian` | `anRadian` | `advanced` | `—` | `—` | `—` |
+| `TAngleUnit` | `enum-value` | `anRevolution` | `anRevolution` | `advanced` | `—` | `—` | `—` |
+| `TAngleUnit` | `enum-value` | `anSecondOfArc` | `anSecondOfArc` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auAcre` | `auAcre` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auAre` | `auAre` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auHectare` | `auHectare` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auSquareFoot` | `auSquareFoot` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auSquareInch` | `auSquareInch` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auSquareKilometer` | `auSquareKilometer` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auSquareMeter` | `auSquareMeter` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auSquareMile` | `auSquareMile` | `advanced` | `—` | `—` | `—` |
+| `TAreaUnit` | `enum-value` | `auSquareYard` | `auSquareYard` | `advanced` | `—` | `—` | `—` |
+| `TDensityUnit` | `enum-value` | `deGramPerCubicCentimeter` | `deGramPerCubicCentimeter` | `advanced` | `—` | `—` | `—` |
+| `TDensityUnit` | `enum-value` | `deKilogramPerCubicMeter` | `deKilogramPerCubicMeter` | `advanced` | `—` | `—` | `—` |
+| `TDensityUnit` | `enum-value` | `dePoundPerCubicFoot` | `dePoundPerCubicFoot` | `advanced` | `—` | `—` | `—` |
+| `TDensityUnit` | `enum-value` | `dePoundPerCubicInch` | `dePoundPerCubicInch` | `advanced` | `—` | `—` | `—` |
+| `TElectricalCurrentUnit` | `enum-value` | `ecAmpere` | `ecAmpere` | `advanced` | `—` | `—` | `—` |
+| `TElectricalCurrentUnit` | `enum-value` | `ecMicroampere` | `ecMicroampere` | `advanced` | `—` | `—` | `—` |
+| `TElectricalCurrentUnit` | `enum-value` | `ecMilliampere` | `ecMilliampere` | `advanced` | `—` | `—` | `—` |
+| `TElectricalPotentialUnit` | `enum-value` | `epKilovolt` | `epKilovolt` | `advanced` | `—` | `—` | `—` |
+| `TElectricalPotentialUnit` | `enum-value` | `epMicrovolt` | `epMicrovolt` | `advanced` | `—` | `—` | `—` |
+| `TElectricalPotentialUnit` | `enum-value` | `epMillivolt` | `epMillivolt` | `advanced` | `—` | `—` | `—` |
+| `TElectricalPotentialUnit` | `enum-value` | `epVolt` | `epVolt` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euBTU` | `euBTU` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euCalorie` | `euCalorie` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euElectronvolt` | `euElectronvolt` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euFootPound` | `euFootPound` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euJoule` | `euJoule` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euKilocalorie` | `euKilocalorie` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euKilojoule` | `euKilojoule` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euKilowattHour` | `euKilowattHour` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euTherm` | `euTherm` | `advanced` | `—` | `—` | `—` |
+| `TEnergyUnit` | `enum-value` | `euWattHour` | `euWattHour` | `advanced` | `—` | `—` | `—` |
+| `TForceUnit` | `enum-value` | `fuDyne` | `fuDyne` | `advanced` | `—` | `—` | `—` |
+| `TForceUnit` | `enum-value` | `fuKilogramForce` | `fuKilogramForce` | `advanced` | `—` | `—` | `—` |
+| `TForceUnit` | `enum-value` | `fuKilonewton` | `fuKilonewton` | `advanced` | `—` | `—` | `—` |
+| `TForceUnit` | `enum-value` | `fuNewton` | `fuNewton` | `advanced` | `—` | `—` | `—` |
+| `TForceUnit` | `enum-value` | `fuPoundForce` | `fuPoundForce` | `advanced` | `—` | `—` | `—` |
+| `TFrequencyUnit` | `enum-value` | `frCyclePerSecond` | `frCyclePerSecond` | `advanced` | `—` | `—` | `—` |
+| `TFrequencyUnit` | `enum-value` | `frGigahertz` | `frGigahertz` | `advanced` | `—` | `—` | `—` |
+| `TFrequencyUnit` | `enum-value` | `frHertz` | `frHertz` | `advanced` | `—` | `—` | `—` |
+| `TFrequencyUnit` | `enum-value` | `frKilohertz` | `frKilohertz` | `advanced` | `—` | `—` | `—` |
+| `TFrequencyUnit` | `enum-value` | `frMegahertz` | `frMegahertz` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luAngstrom` | `luAngstrom` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luCentimeter` | `luCentimeter` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luFoot` | `luFoot` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luInch` | `luInch` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luKilometer` | `luKilometer` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luLightYear` | `luLightYear` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luMeter` | `luMeter` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luMicrometer` | `luMicrometer` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luMile` | `luMile` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luMillimeter` | `luMillimeter` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luNanometer` | `luNanometer` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luNauticalMile` | `luNauticalMile` | `advanced` | `—` | `—` | `—` |
+| `TLengthUnit` | `enum-value` | `luYard` | `luYard` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muGram` | `muGram` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muImperialTon` | `muImperialTon` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muKilogram` | `muKilogram` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muMicrogram` | `muMicrogram` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muMilligram` | `muMilligram` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muOunce` | `muOunce` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muPound` | `muPound` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muStone` | `muStone` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muTonne` | `muTonne` | `advanced` | `—` | `—` | `—` |
+| `TMassUnit` | `enum-value` | `muUSton` | `muUSton` | `advanced` | `—` | `—` | `—` |
+| `TPowerUnit` | `enum-value` | `puBTUPerHour` | `puBTUPerHour` | `advanced` | `—` | `—` | `—` |
+| `TPowerUnit` | `enum-value` | `puHorsepower` | `puHorsepower` | `advanced` | `—` | `—` | `—` |
+| `TPowerUnit` | `enum-value` | `puKilowatt` | `puKilowatt` | `advanced` | `—` | `—` | `—` |
+| `TPowerUnit` | `enum-value` | `puMegawatt` | `puMegawatt` | `advanced` | `—` | `—` | `—` |
+| `TPowerUnit` | `enum-value` | `puWatt` | `puWatt` | `advanced` | `—` | `—` | `—` |
+| `TPressureUnit` | `enum-value` | `prAtmosphere` | `prAtmosphere` | `advanced` | `—` | `—` | `—` |
+| `TPressureUnit` | `enum-value` | `prBar` | `prBar` | `advanced` | `—` | `—` | `—` |
+| `TPressureUnit` | `enum-value` | `prKilopascal` | `prKilopascal` | `advanced` | `—` | `—` | `—` |
+| `TPressureUnit` | `enum-value` | `prPascal` | `prPascal` | `advanced` | `—` | `—` | `—` |
+| `TPressureUnit` | `enum-value` | `prPSI` | `prPSI` | `advanced` | `—` | `—` | `—` |
+| `TPressureUnit` | `enum-value` | `prTorr` | `prTorr` | `advanced` | `—` | `—` | `—` |
+| `TTemperatureUnit` | `enum-value` | `tpCelsius` | `tpCelsius` | `advanced` | `—` | `—` | `—` |
+| `TTemperatureUnit` | `enum-value` | `tpFahrenheit` | `tpFahrenheit` | `advanced` | `—` | `—` | `—` |
+| `TTemperatureUnit` | `enum-value` | `tpKelvin` | `tpKelvin` | `advanced` | `—` | `—` | `—` |
+| `TTemperatureUnit` | `enum-value` | `tpRankine` | `tpRankine` | `advanced` | `—` | `—` | `—` |
+| `TTemperatureUnit` | `enum-value` | `tpReaumur` | `tpReaumur` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuDay` | `tuDay` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuHour` | `tuHour` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuMicrosecond` | `tuMicrosecond` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuMillisecond` | `tuMillisecond` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuMinute` | `tuMinute` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuMonth` | `tuMonth` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuNanosecond` | `tuNanosecond` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuSecond` | `tuSecond` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuWeek` | `tuWeek` | `advanced` | `—` | `—` | `—` |
+| `TTimeUnit` | `enum-value` | `tuYear` | `tuYear` | `advanced` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `AreUnitNamesCompatible` | `class function AreUnitNamesCompatible(AUnitName1,AUnitName2:string):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `AreUnitsCompatible` | `class function AreUnitsCompatible(UnitType1,UnitType2:TUnitType):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `CelsiusToFahrenheit` | `class function CelsiusToFahrenheit(Celsius:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertAngle` | `class function ConvertAngle(Value:Double;FromUnit,ToUnit:TAngleUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertArea` | `class function ConvertArea(Value:Double;FromUnit,ToUnit:TAreaUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertDensity` | `class function ConvertDensity(Value:Double;FromUnit,ToUnit:TDensityUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertElectricalCurrent` | `class function ConvertElectricalCurrent(Value:Double;FromUnit,ToUnit:TElectricalCurrentUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertElectricalPotential` | `class function ConvertElectricalPotential(Value:Double;FromUnit,ToUnit:TElectricalPotentialUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertEnergy` | `class function ConvertEnergy(Value:Double;FromUnit,ToUnit:TEnergyUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertForce` | `class function ConvertForce(Value:Double;FromUnit,ToUnit:TForceUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertFrequency` | `class function ConvertFrequency(Value:Double;FromUnit,ToUnit:TFrequencyUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertLength` | `class function ConvertLength(Value:Double;FromUnit,ToUnit:TLengthUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertMass` | `class function ConvertMass(Value:Double;FromUnit,ToUnit:TMassUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertPower` | `class function ConvertPower(Value:Double;FromUnit,ToUnit:TPowerUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertPressure` | `class function ConvertPressure(Value:Double;FromUnit,ToUnit:TPressureUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertTemperature` | `class function ConvertTemperature(Value:Double;FromUnit,ToUnit:TTemperatureUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertTime` | `class function ConvertTime(Value:Double;FromUnit,ToUnit:TTimeUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertVelocity` | `class function ConvertVelocity(Value:Double;FromUnit,ToUnit:TVelocityUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `ConvertVolume` | `class function ConvertVolume(Value:Double;FromUnit,ToUnit:TVolumeUnit):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `FahrenheitToCelsius` | `class function FahrenheitToCelsius(Fahrenheit:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `FormatWithScientificNotation` | `class function FormatWithScientificNotation(Value:Double;AUnitName:string;SignificantDigits:Integer=3):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `FormatWithUnit` | `class function FormatWithUnit(Value:Double;AUnitName:string;Decimals:Integer=2):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetAllUnitsOfType` | `class function GetAllUnitsOfType(UnitType:TUnitType):TStringArray` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetAllUnitTypes` | `class function GetAllUnitTypes:TStringArray` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetAngleUnitName` | `class function GetAngleUnitName(Unit_:TAngleUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetAreaUnitName` | `class function GetAreaUnitName(Unit_:TAreaUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetBaseUnit` | `class function GetBaseUnit(UnitType:TUnitType):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetDensityUnitName` | `class function GetDensityUnitName(Unit_:TDensityUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetElectricalCurrentUnitName` | `class function GetElectricalCurrentUnitName(Unit_:TElectricalCurrentUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetElectricalPotentialUnitName` | `class function GetElectricalPotentialUnitName(Unit_:TElectricalPotentialUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetEnergyUnitName` | `class function GetEnergyUnitName(Unit_:TEnergyUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetForceUnitName` | `class function GetForceUnitName(Unit_:TForceUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetFrequencyUnitName` | `class function GetFrequencyUnitName(Unit_:TFrequencyUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetLengthUnitName` | `class function GetLengthUnitName(Unit_:TLengthUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetMassUnitName` | `class function GetMassUnitName(Unit_:TMassUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetPowerUnitName` | `class function GetPowerUnitName(Unit_:TPowerUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetPressureUnitName` | `class function GetPressureUnitName(Unit_:TPressureUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetTemperatureUnitName` | `class function GetTemperatureUnitName(Unit_:TTemperatureUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetTimeUnitName` | `class function GetTimeUnitName(Unit_:TTimeUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetUnitTypeFromUnitName` | `class function GetUnitTypeFromUnitName(AUnitName:string):TUnitType` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetVelocityUnitName` | `class function GetVelocityUnitName(Unit_:TVelocityUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `GetVolumeUnitName` | `class function GetVolumeUnitName(Unit_:TVolumeUnit):string` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `KilogramsToPounds` | `class function KilogramsToPounds(Kilograms:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `KilometersToMiles` | `class function KilometersToMiles(Kilometers:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `MilesToKilometers` | `class function MilesToKilometers(Miles:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `PoundsToKilograms` | `class function PoundsToKilograms(Pounds:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `RoundToSignificantDigits` | `class function RoundToSignificantDigits(Value:Double;SignificantDigits:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryConvertByUnitName` | `class function TryConvertByUnitName(Value:Double;FromAUnitName,ToAUnitName:string;out ConvertedValue:Double):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetAngleUnitFromName` | `class function TryGetAngleUnitFromName(AUnitName:string;out Unit_:TAngleUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetAreaUnitFromName` | `class function TryGetAreaUnitFromName(AUnitName:string;out Unit_:TAreaUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetDensityUnitFromName` | `class function TryGetDensityUnitFromName(AUnitName:string;out Unit_:TDensityUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetElectricalCurrentUnitFromName` | `class function TryGetElectricalCurrentUnitFromName(AUnitName:string;out Unit_:TElectricalCurrentUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetElectricalPotentialUnitFromName` | `class function TryGetElectricalPotentialUnitFromName(AUnitName:string;out Unit_:TElectricalPotentialUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetEnergyUnitFromName` | `class function TryGetEnergyUnitFromName(AUnitName:string;out Unit_:TEnergyUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetForceUnitFromName` | `class function TryGetForceUnitFromName(AUnitName:string;out Unit_:TForceUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetFrequencyUnitFromName` | `class function TryGetFrequencyUnitFromName(AUnitName:string;out Unit_:TFrequencyUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetLengthUnitFromName` | `class function TryGetLengthUnitFromName(AUnitName:string;out Unit_:TLengthUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetMassUnitFromName` | `class function TryGetMassUnitFromName(AUnitName:string;out Unit_:TMassUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetPowerUnitFromName` | `class function TryGetPowerUnitFromName(AUnitName:string;out Unit_:TPowerUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetPressureUnitFromName` | `class function TryGetPressureUnitFromName(AUnitName:string;out Unit_:TPressureUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetTemperatureUnitFromName` | `class function TryGetTemperatureUnitFromName(AUnitName:string;out Unit_:TTemperatureUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetTimeUnitFromName` | `class function TryGetTimeUnitFromName(AUnitName:string;out Unit_:TTimeUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetVelocityUnitFromName` | `class function TryGetVelocityUnitFromName(AUnitName:string;out Unit_:TVelocityUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryGetVolumeUnitFromName` | `class function TryGetVolumeUnitFromName(AUnitName:string;out Unit_:TVolumeUnit):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryParseAndConvert` | `class function TryParseAndConvert(const ValueStr,ToAUnitName:string;out ConvertedValue:Double):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitConversionKit` | `function` | `TryParseValueWithUnit` | `class function TryParseValueWithUnit(const ValueStr:string;out Value:Double;out AUnitName:string):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utAngle` | `utAngle` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utArea` | `utArea` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utDensity` | `utDensity` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utElectricalCurrent` | `utElectricalCurrent` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utElectricalPotential` | `utElectricalPotential` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utEnergy` | `utEnergy` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utForce` | `utForce` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utFrequency` | `utFrequency` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utLength` | `utLength` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utMass` | `utMass` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utPower` | `utPower` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utPressure` | `utPressure` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utTemperature` | `utTemperature` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utTime` | `utTime` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utVelocity` | `utVelocity` | `advanced` | `—` | `—` | `—` |
+| `TUnitType` | `enum-value` | `utVolume` | `utVolume` | `advanced` | `—` | `—` | `—` |
+| `TVelocityUnit` | `enum-value` | `vuFootPerSecond` | `vuFootPerSecond` | `advanced` | `—` | `—` | `—` |
+| `TVelocityUnit` | `enum-value` | `vuKilometerPerHour` | `vuKilometerPerHour` | `advanced` | `—` | `—` | `—` |
+| `TVelocityUnit` | `enum-value` | `vuKnot` | `vuKnot` | `advanced` | `—` | `—` | `—` |
+| `TVelocityUnit` | `enum-value` | `vuMeterPerSecond` | `vuMeterPerSecond` | `advanced` | `—` | `—` | `—` |
+| `TVelocityUnit` | `enum-value` | `vuMilePerHour` | `vuMilePerHour` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voCubicCentimeter` | `voCubicCentimeter` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voCubicFoot` | `voCubicFoot` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voCubicInch` | `voCubicInch` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voCubicMeter` | `voCubicMeter` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voFluidOunceUK` | `voFluidOunceUK` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voFluidOunceUS` | `voFluidOunceUS` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voGallonUK` | `voGallonUK` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voGallonUS` | `voGallonUS` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voLiter` | `voLiter` | `advanced` | `—` | `—` | `—` |
+| `TVolumeUnit` | `enum-value` | `voMilliliter` | `voMilliliter` | `advanced` | `—` | `—` | `—` |
 
 ## EngineeringLib.Velocity
 
 Source: [`src/EngineeringLib.Velocity.pas`](../src/EngineeringLib.Velocity.pas)  
 Interface SHA-256: `c71d42a545d7c3c47bbd80231ded89b3699be4c8b7169ad42bd2c145d8497551`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EVelocityError` | `EVelocityError=EngineeringLib.Common.EFluidDynamicsError` | `primary` | `—` |
-| `(unit)` | `type` | `TVelocityKit` | `TVelocityKit=TFluidDynamicsKit` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EVelocityError` | `EVelocityError=EngineeringLib.Common.EFluidDynamicsError` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVelocityKit` | `TVelocityKit=TFluidDynamicsKit` | `advanced` | `—` | `—` | `—` |
 
 ## FinanceLib.Bonds
 
 Source: [`src/FinanceLib.Bonds.pas`](../src/FinanceLib.Bonds.pas)  
 Interface SHA-256: `ee28d157c511c65c2b2f268f35f6e57f9d84eb1e6b109ff19e6cc04d14c429c0`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EBondError` | `EBondError=EFinanceError` | `compatibility` | `—` |
-| `(unit)` | `type` | `TBondKit` | `TBondKit=TFinanceKit` | `compatibility` | `—` |
-| `(unit)` | `type` | `TBondPayment` | `TBondPayment=TFinanceKit.TAmortizationPayment` | `compatibility` | `—` |
-| `(unit)` | `type` | `TBondSchedule` | `TBondSchedule=TFinanceKit.TAmortizationArray` | `compatibility` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EBondError` | `EBondError=EFinanceError` | `compatibility` | `retain` | `—` | `focused-bond-alias-unit` |
+| `(unit)` | `type` | `TBondKit` | `TBondKit=TFinanceKit` | `compatibility` | `retain` | `—` | `focused-bond-alias-unit` |
+| `(unit)` | `type` | `TBondPayment` | `TBondPayment=TFinanceKit.TAmortizationPayment` | `compatibility` | `retain` | `—` | `focused-bond-alias-unit` |
+| `(unit)` | `type` | `TBondSchedule` | `TBondSchedule=TFinanceKit.TAmortizationArray` | `compatibility` | `retain` | `—` | `focused-bond-alias-unit` |
 
 ## FinanceLib.Interest
 
 Source: [`src/FinanceLib.Interest.pas`](../src/FinanceLib.Interest.pas)  
 Interface SHA-256: `6c7265b16ed7a41d966a2582d202138f135a0110ad97c769e4a73d9a62d15cec`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EFinanceError` | `EFinanceError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TDuPontAnalysis` | `TDuPontAnalysis=record` | `primary` | `—` |
-| `(unit)` | `class` | `TFinanceKit` | `TFinanceKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TLeverageRatios` | `TLeverageRatios=record` | `primary` | `—` |
-| `(unit)` | `record` | `TOperatingLeverage` | `TOperatingLeverage=record` | `primary` | `—` |
-| `(unit)` | `type` | `TOptionType` | `TOptionType=(otCall,otPut)` | `primary` | `—` |
-| `(unit)` | `record` | `TProfitabilityRatios` | `TProfitabilityRatios=record` | `primary` | `—` |
-| `(unit)` | `record` | `TRiskMetrics` | `TRiskMetrics=record` | `primary` | `—` |
-| `(unit)` | `record` | `TWorkingCapitalRatios` | `TWorkingCapitalRatios=record` | `primary` | `—` |
-| `TDuPontAnalysis` | `field` | `AssetTurnover` | `AssetTurnover:Double` | `primary` | `—` |
-| `TDuPontAnalysis` | `field` | `EquityMultiplier` | `EquityMultiplier:Double` | `primary` | `—` |
-| `TDuPontAnalysis` | `field` | `ProfitMargin` | `ProfitMargin:Double` | `primary` | `—` |
-| `TDuPontAnalysis` | `field` | `ROE` | `ROE:Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `AmortizationSchedule` | `class function AmortizationSchedule(const ALoanAmount,ARate:Double;const ANumberOfPayments:Integer;const ADecimals:Integer=4):TAmortizationArray` | `primary` | `—` |
-| `TFinanceKit` | `function` | `BlackScholes` | `class function BlackScholes(const ASpotPrice,AStrikePrice,ARiskFreeRate,AVolatility,ATimeToMaturity:Double;const AOptionType:TOptionType;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `BondPrice` | `class function BondPrice(const AFaceValue,ACouponRate,AYieldRate:Double;const APeriodsPerYear,AYearsToMaturity:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `BondYieldToMaturity` | `class function BondYieldToMaturity(const ABondPrice,AFaceValue,ACouponRate:Double;const APeriodsPerYear,AYearsToMaturity:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `BreakEvenRevenue` | `class function BreakEvenRevenue(const AFixedCosts,APricePerUnit,AVariableCostPerUnit:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `BreakEvenUnits` | `class function BreakEvenUnits(const AFixedCosts,APricePerUnit,AVariableCostPerUnit:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `CAPM` | `class function CAPM(const ARiskFreeRate,ABeta,AExpectedMarketReturn:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `CompoundInterest` | `class function CompoundInterest(const APrincipal,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `DecliningBalanceDepreciation` | `class function DecliningBalanceDepreciation(const ACost,ASalvage:Double;const ALife:Integer;const APeriod:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `DuPontAnalysis` | `class function DuPontAnalysis(const ANetIncome,ASales,ATotalAssets,ATotalEquity:Double;const ADecimals:Integer=4):TDuPontAnalysis` | `primary` | `—` |
-| `TFinanceKit` | `function` | `EffectiveAnnualRate` | `class function EffectiveAnnualRate(const ANominalRate:Double;const ACompoundingsPerYear:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `FutureValue` | `class function FutureValue(const APresentValue,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `GordonGrowthModel` | `class function GordonGrowthModel(const ACurrentDividend,AGrowthRate,ARequiredReturn:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `InternalRateOfReturn` | `class function InternalRateOfReturn(const AInitialInvestment:Double;const ACashFlows:TDoubleArray;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `LeverageRatios` | `class function LeverageRatios(const ATotalDebt,ATotalAssets,ATotalEquity,AEBIT,AInterestExpense:Double;const ADecimals:Integer=4):TLeverageRatios` | `primary` | `—` |
-| `TFinanceKit` | `function` | `ModifiedDuration` | `class function ModifiedDuration(const AFaceValue,ACouponRate,AYieldRate:Double;const APeriodsPerYear,AYearsToMaturity:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `NetPresentValue` | `class function NetPresentValue(const AInitialInvestment:Double;const ACashFlows:TDoubleArray;const Rate:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `OperatingLeverage` | `class function OperatingLeverage(const AQuantity,APricePerUnit,AVariableCostPerUnit,AFixedCosts:Double;const ADecimals:Integer=4):TOperatingLeverage` | `primary` | `—` |
-| `TFinanceKit` | `function` | `Payment` | `class function Payment(const APresentValue,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `PresentValue` | `class function PresentValue(const AFutureValue,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `ProfitabilityRatios` | `class function ProfitabilityRatios(const ARevenue,ACOGS,AEBIT,ANetIncome,ATotalAssets,ACurrentLiabilities:Double;const ADecimals:Integer=4):TProfitabilityRatios` | `primary` | `—` |
-| `TFinanceKit` | `function` | `ReturnOnEquity` | `class function ReturnOnEquity(const ANetIncome,AShareholdersEquity:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `ReturnOnInvestment` | `class function ReturnOnInvestment(const AGain,ACost:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `RiskMetrics` | `class function RiskMetrics(const APortfolioReturn,ARiskFreeRate,AMarketReturn,ABeta,APortfolioStdDev,ABenchmarkReturn,ATrackingError:Double;const ADecimals:Integer=4):TRiskMetrics` | `primary` | `—` |
-| `TFinanceKit` | `function` | `StraightLineDepreciation` | `class function StraightLineDepreciation(const ACost,ASalvage:Double;const ALife:Integer;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `nested-type` | `TAmortizationArray` | `TAmortizationArray=array of TAmortizationPayment` | `primary` | `—` |
-| `TFinanceKit` | `nested-type` | `TAmortizationPayment` | `TAmortizationPayment=record PaymentNumber:Integer` | `primary` | `—` |
-| `TFinanceKit` | `function` | `WACC` | `class function WACC(const AEquityValue,ADebtValue,ACostOfEquity,ACostOfDebt,ATaxRate:Double;const ADecimals:Integer=4):Double` | `primary` | `—` |
-| `TFinanceKit` | `function` | `WorkingCapitalRatios` | `class function WorkingCapitalRatios(const ACurrentAssets,ACurrentLiabilities,AInventory,ACash,ASales:Double;const ADecimals:Integer=4):TWorkingCapitalRatios` | `primary` | `—` |
-| `TLeverageRatios` | `field` | `DebtRatio` | `DebtRatio:Double` | `primary` | `—` |
-| `TLeverageRatios` | `field` | `DebtToEquityRatio` | `DebtToEquityRatio:Double` | `primary` | `—` |
-| `TLeverageRatios` | `field` | `EquityMultiplier` | `EquityMultiplier:Double` | `primary` | `—` |
-| `TLeverageRatios` | `field` | `TimesInterestEarned` | `TimesInterestEarned:Double` | `primary` | `—` |
-| `TOperatingLeverage` | `field` | `BreakEvenPoint` | `BreakEvenPoint:Double` | `primary` | `—` |
-| `TOperatingLeverage` | `field` | `DOL` | `DOL:Double` | `primary` | `—` |
-| `TOperatingLeverage` | `field` | `OperatingLeverage` | `OperatingLeverage:Double` | `primary` | `—` |
-| `TOptionType` | `enum-value` | `otCall` | `otCall` | `primary` | `—` |
-| `TOptionType` | `enum-value` | `otPut` | `otPut` | `primary` | `—` |
-| `TProfitabilityRatios` | `field` | `GrossMargin` | `GrossMargin:Double` | `primary` | `—` |
-| `TProfitabilityRatios` | `field` | `NetProfitMargin` | `NetProfitMargin:Double` | `primary` | `—` |
-| `TProfitabilityRatios` | `field` | `OperatingMargin` | `OperatingMargin:Double` | `primary` | `—` |
-| `TProfitabilityRatios` | `field` | `ROA` | `ROA:Double` | `primary` | `—` |
-| `TProfitabilityRatios` | `field` | `ROCE` | `ROCE:Double` | `primary` | `—` |
-| `TRiskMetrics` | `field` | `InformationRatio` | `InformationRatio:Double` | `primary` | `—` |
-| `TRiskMetrics` | `field` | `JensenAlpha` | `JensenAlpha:Double` | `primary` | `—` |
-| `TRiskMetrics` | `field` | `SharpeRatio` | `SharpeRatio:Double` | `primary` | `—` |
-| `TRiskMetrics` | `field` | `TreynorRatio` | `TreynorRatio:Double` | `primary` | `—` |
-| `TWorkingCapitalRatios` | `field` | `CashRatio` | `CashRatio:Double` | `primary` | `—` |
-| `TWorkingCapitalRatios` | `field` | `CurrentRatio` | `CurrentRatio:Double` | `primary` | `—` |
-| `TWorkingCapitalRatios` | `field` | `QuickRatio` | `QuickRatio:Double` | `primary` | `—` |
-| `TWorkingCapitalRatios` | `field` | `WorkingCapitalTurnover` | `WorkingCapitalTurnover:Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EFinanceError` | `EFinanceError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDuPontAnalysis` | `TDuPontAnalysis=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TFinanceKit` | `TFinanceKit=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLeverageRatios` | `TLeverageRatios=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOperatingLeverage` | `TOperatingLeverage=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TOptionType` | `TOptionType=(otCall,otPut)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TProfitabilityRatios` | `TProfitabilityRatios=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TRiskMetrics` | `TRiskMetrics=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TWorkingCapitalRatios` | `TWorkingCapitalRatios=record` | `advanced` | `—` | `—` | `—` |
+| `TDuPontAnalysis` | `field` | `AssetTurnover` | `AssetTurnover:Double` | `advanced` | `—` | `—` | `—` |
+| `TDuPontAnalysis` | `field` | `EquityMultiplier` | `EquityMultiplier:Double` | `advanced` | `—` | `—` | `—` |
+| `TDuPontAnalysis` | `field` | `ProfitMargin` | `ProfitMargin:Double` | `advanced` | `—` | `—` | `—` |
+| `TDuPontAnalysis` | `field` | `ROE` | `ROE:Double` | `advanced` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `AmortizationSchedule` | `class function AmortizationSchedule(const ALoanAmount,ARate:Double;const ANumberOfPayments:Integer;const ADecimals:Integer=4):TAmortizationArray` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `BlackScholes` | `class function BlackScholes(const ASpotPrice,AStrikePrice,ARiskFreeRate,AVolatility,ATimeToMaturity:Double;const AOptionType:TOptionType;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `BondPrice` | `class function BondPrice(const AFaceValue,ACouponRate,AYieldRate:Double;const APeriodsPerYear,AYearsToMaturity:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `BondYieldToMaturity` | `class function BondYieldToMaturity(const ABondPrice,AFaceValue,ACouponRate:Double;const APeriodsPerYear,AYearsToMaturity:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `BreakEvenRevenue` | `class function BreakEvenRevenue(const AFixedCosts,APricePerUnit,AVariableCostPerUnit:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `BreakEvenUnits` | `class function BreakEvenUnits(const AFixedCosts,APricePerUnit,AVariableCostPerUnit:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `CAPM` | `class function CAPM(const ARiskFreeRate,ABeta,AExpectedMarketReturn:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `CompoundInterest` | `class function CompoundInterest(const APrincipal,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `DecliningBalanceDepreciation` | `class function DecliningBalanceDepreciation(const ACost,ASalvage:Double;const ALife:Integer;const APeriod:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `DuPontAnalysis` | `class function DuPontAnalysis(const ANetIncome,ASales,ATotalAssets,ATotalEquity:Double;const ADecimals:Integer=4):TDuPontAnalysis` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `EffectiveAnnualRate` | `class function EffectiveAnnualRate(const ANominalRate:Double;const ACompoundingsPerYear:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `FutureValue` | `class function FutureValue(const APresentValue,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `GordonGrowthModel` | `class function GordonGrowthModel(const ACurrentDividend,AGrowthRate,ARequiredReturn:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `InternalRateOfReturn` | `class function InternalRateOfReturn(const AInitialInvestment:Double;const ACashFlows:TDoubleArray;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `LeverageRatios` | `class function LeverageRatios(const ATotalDebt,ATotalAssets,ATotalEquity,AEBIT,AInterestExpense:Double;const ADecimals:Integer=4):TLeverageRatios` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `ModifiedDuration` | `class function ModifiedDuration(const AFaceValue,ACouponRate,AYieldRate:Double;const APeriodsPerYear,AYearsToMaturity:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `NetPresentValue` | `class function NetPresentValue(const AInitialInvestment:Double;const ACashFlows:TDoubleArray;const Rate:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `OperatingLeverage` | `class function OperatingLeverage(const AQuantity,APricePerUnit,AVariableCostPerUnit,AFixedCosts:Double;const ADecimals:Integer=4):TOperatingLeverage` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `Payment` | `class function Payment(const APresentValue,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `PresentValue` | `class function PresentValue(const AFutureValue,ARate:Double;const APeriods:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `ProfitabilityRatios` | `class function ProfitabilityRatios(const ARevenue,ACOGS,AEBIT,ANetIncome,ATotalAssets,ACurrentLiabilities:Double;const ADecimals:Integer=4):TProfitabilityRatios` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `ReturnOnEquity` | `class function ReturnOnEquity(const ANetIncome,AShareholdersEquity:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `ReturnOnInvestment` | `class function ReturnOnInvestment(const AGain,ACost:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `RiskMetrics` | `class function RiskMetrics(const APortfolioReturn,ARiskFreeRate,AMarketReturn,ABeta,APortfolioStdDev,ABenchmarkReturn,ATrackingError:Double;const ADecimals:Integer=4):TRiskMetrics` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `StraightLineDepreciation` | `class function StraightLineDepreciation(const ACost,ASalvage:Double;const ALife:Integer;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `nested-type` | `TAmortizationArray` | `TAmortizationArray=array of TAmortizationPayment` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `nested-type` | `TAmortizationPayment` | `TAmortizationPayment=record PaymentNumber:Integer` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `WACC` | `class function WACC(const AEquityValue,ADebtValue,ACostOfEquity,ACostOfDebt,ATaxRate:Double;const ADecimals:Integer=4):Double` | `recommended` | `—` | `—` | `—` |
+| `TFinanceKit` | `function` | `WorkingCapitalRatios` | `class function WorkingCapitalRatios(const ACurrentAssets,ACurrentLiabilities,AInventory,ACash,ASales:Double;const ADecimals:Integer=4):TWorkingCapitalRatios` | `recommended` | `—` | `—` | `—` |
+| `TLeverageRatios` | `field` | `DebtRatio` | `DebtRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TLeverageRatios` | `field` | `DebtToEquityRatio` | `DebtToEquityRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TLeverageRatios` | `field` | `EquityMultiplier` | `EquityMultiplier:Double` | `advanced` | `—` | `—` | `—` |
+| `TLeverageRatios` | `field` | `TimesInterestEarned` | `TimesInterestEarned:Double` | `advanced` | `—` | `—` | `—` |
+| `TOperatingLeverage` | `field` | `BreakEvenPoint` | `BreakEvenPoint:Double` | `advanced` | `—` | `—` | `—` |
+| `TOperatingLeverage` | `field` | `DOL` | `DOL:Double` | `advanced` | `—` | `—` | `—` |
+| `TOperatingLeverage` | `field` | `OperatingLeverage` | `OperatingLeverage:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptionType` | `enum-value` | `otCall` | `otCall` | `advanced` | `—` | `—` | `—` |
+| `TOptionType` | `enum-value` | `otPut` | `otPut` | `advanced` | `—` | `—` | `—` |
+| `TProfitabilityRatios` | `field` | `GrossMargin` | `GrossMargin:Double` | `advanced` | `—` | `—` | `—` |
+| `TProfitabilityRatios` | `field` | `NetProfitMargin` | `NetProfitMargin:Double` | `advanced` | `—` | `—` | `—` |
+| `TProfitabilityRatios` | `field` | `OperatingMargin` | `OperatingMargin:Double` | `advanced` | `—` | `—` | `—` |
+| `TProfitabilityRatios` | `field` | `ROA` | `ROA:Double` | `advanced` | `—` | `—` | `—` |
+| `TProfitabilityRatios` | `field` | `ROCE` | `ROCE:Double` | `advanced` | `—` | `—` | `—` |
+| `TRiskMetrics` | `field` | `InformationRatio` | `InformationRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TRiskMetrics` | `field` | `JensenAlpha` | `JensenAlpha:Double` | `advanced` | `—` | `—` | `—` |
+| `TRiskMetrics` | `field` | `SharpeRatio` | `SharpeRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TRiskMetrics` | `field` | `TreynorRatio` | `TreynorRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TWorkingCapitalRatios` | `field` | `CashRatio` | `CashRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TWorkingCapitalRatios` | `field` | `CurrentRatio` | `CurrentRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TWorkingCapitalRatios` | `field` | `QuickRatio` | `QuickRatio:Double` | `advanced` | `—` | `—` | `—` |
+| `TWorkingCapitalRatios` | `field` | `WorkingCapitalTurnover` | `WorkingCapitalTurnover:Double` | `advanced` | `—` | `—` | `—` |
 
 ## FinanceLib.NPV
 
 Source: [`src/FinanceLib.NPV.pas`](../src/FinanceLib.NPV.pas)  
 Interface SHA-256: `c6fbf1c36ed0f3448519e41d05b75df2788985053e91aee7e1dc11aaaf2df48d`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ENPVError` | `ENPVError=EFinanceError` | `compatibility` | `—` |
-| `(unit)` | `type` | `TNPVCashFlows` | `TNPVCashFlows=TDoubleArray` | `compatibility` | `—` |
-| `(unit)` | `type` | `TNPVKit` | `TNPVKit=TFinanceKit` | `compatibility` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ENPVError` | `ENPVError=EFinanceError` | `compatibility` | `retain` | `—` | `focused-npv-alias-unit` |
+| `(unit)` | `type` | `TNPVCashFlows` | `TNPVCashFlows=TDoubleArray` | `compatibility` | `retain` | `—` | `focused-npv-alias-unit` |
+| `(unit)` | `type` | `TNPVKit` | `TNPVKit=TFinanceKit` | `compatibility` | `retain` | `—` | `focused-npv-alias-unit` |
 
 ## GeometryLib.Geometry
 
 Source: [`src/GeometryLib.Geometry.pas`](../src/GeometryLib.Geometry.pas)  
 Interface SHA-256: `f4bba8d9ae9084c71d6502e4e59bfa6e4fa32abaca2fdc9f60fcf6ab022347a2`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EGeometryError` | `EGeometryError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `constant` | `GEO_EPS` | `GEO_EPS=1e-10` | `primary` | `—` |
-| `(unit)` | `record` | `TBoundingBox2D` | `TBoundingBox2D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TCircle2D` | `TCircle2D=record` | `primary` | `—` |
-| `(unit)` | `class` | `TGeometryKit` | `TGeometryKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TLine2D` | `TLine2D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TPlane3D` | `TPlane3D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TPoint2D` | `TPoint2D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TPoint3D` | `TPoint3D=record` | `primary` | `—` |
-| `(unit)` | `type` | `TPolygon2D` | `TPolygon2D=array of TPoint2D` | `primary` | `—` |
-| `(unit)` | `record` | `TSegment2D` | `TSegment2D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TSegment3D` | `TSegment3D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TSphere3D` | `TSphere3D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TVector2D` | `TVector2D=record` | `primary` | `—` |
-| `(unit)` | `record` | `TVector3D` | `TVector3D=record` | `primary` | `—` |
-| `TBoundingBox2D` | `function` | `Area` | `function Area:Double` | `primary` | `—` |
-| `TBoundingBox2D` | `function` | `ContainsPoint` | `function ContainsPoint(const P:TPoint2D):Boolean` | `primary` | `—` |
-| `TBoundingBox2D` | `function` | `Height` | `function Height:Double` | `primary` | `—` |
-| `TBoundingBox2D` | `field` | `MaxX` | `MaxX:Double` | `primary` | `—` |
-| `TBoundingBox2D` | `field` | `MaxY` | `MaxY:Double` | `primary` | `—` |
-| `TBoundingBox2D` | `field` | `MinX` | `MinX:Double` | `primary` | `—` |
-| `TBoundingBox2D` | `field` | `MinY` | `MinY:Double` | `primary` | `—` |
-| `TBoundingBox2D` | `function` | `Width` | `function Width:Double` | `primary` | `—` |
-| `TCircle2D` | `function` | `Area` | `function Area:Double` | `primary` | `—` |
-| `TCircle2D` | `field` | `Centre` | `Centre:TPoint2D` | `primary` | `—` |
-| `TCircle2D` | `function` | `Circumference` | `function Circumference:Double` | `primary` | `—` |
-| `TCircle2D` | `function` | `ContainsPoint` | `function ContainsPoint(const P:TPoint2D):Boolean` | `primary` | `—` |
-| `TCircle2D` | `function` | `Create` | `class function Create(const ACentre:TPoint2D;ARadius:Double):TCircle2D` | `primary` | `—` |
-| `TCircle2D` | `field` | `Radius` | `Radius:Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `AngleBetween2D` | `class function AngleBetween2D(const V1,V2:TVector2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `AngleBetween3D` | `class function AngleBetween3D(const V1,V2:TVector3D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `BoundingBox2D` | `class function BoundingBox2D(const Points:TPolygon2D):TBoundingBox2D` | `primary` | `—` |
-| `TGeometryKit` | `function` | `ConvexHull` | `class function ConvexHull(const Points:TPolygon2D):TPolygon2D` | `primary` | `—` |
-| `TGeometryKit` | `function` | `IsConvex` | `class function IsConvex(const Poly:TPolygon2D):Boolean` | `primary` | `—` |
-| `TGeometryKit` | `function` | `LineIntersect2D` | `class function LineIntersect2D(const A1,A2,B1,B2:TPoint2D;out Pt:TPoint2D):Boolean` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointInPolygon` | `class function PointInPolygon(const P:TPoint2D;const Poly:TPolygon2D):Boolean` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointToLine2D` | `class function PointToLine2D(const P,A,B:TPoint2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointToPlane3D` | `class function PointToPlane3D(const P:TPoint3D;const Plane:TPlane3D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointToPoint2D` | `class function PointToPoint2D(const A,B:TPoint2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointToPoint3D` | `class function PointToPoint3D(const A,B:TPoint3D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointToSegment2D` | `class function PointToSegment2D(const P,A,B:TPoint2D;out T:Double):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PointToSegment3D` | `class function PointToSegment3D(const P,A,B:TPoint3D;out T:Double):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PolygonArea` | `class function PolygonArea(const Poly:TPolygon2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PolygonCentroid` | `class function PolygonCentroid(const Poly:TPolygon2D):TPoint2D` | `primary` | `—` |
-| `TGeometryKit` | `function` | `PolygonPerimeter` | `class function PolygonPerimeter(const Poly:TPolygon2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `RayCircleIntersect` | `class function RayCircleIntersect(const Origin,Direction:TPoint2D;const C:TCircle2D;out T1,T2:Double):Integer` | `primary` | `—` |
-| `TGeometryKit` | `function` | `Rotate2D` | `class function Rotate2D(const Poly:TPolygon2D;Angle:Double;const Centre:TPoint2D):TPolygon2D` | `primary` | `—` |
-| `TGeometryKit` | `function` | `Scale2D` | `class function Scale2D(const Poly:TPolygon2D;SX,SY:Double):TPolygon2D` | `primary` | `—` |
-| `TGeometryKit` | `function` | `SegmentCircleIntersect` | `class function SegmentCircleIntersect(const P,Q:TPoint2D;const C:TCircle2D):Boolean` | `primary` | `—` |
-| `TGeometryKit` | `function` | `SegmentIntersect2D` | `class function SegmentIntersect2D(const A1,A2,B1,B2:TPoint2D;out Pt:TPoint2D;out T:Double):Boolean` | `primary` | `—` |
-| `TGeometryKit` | `function` | `SegmentsIntersect2D` | `class function SegmentsIntersect2D(const A1,A2,B1,B2:TPoint2D):Boolean` | `primary` | `—` |
-| `TGeometryKit` | `function` | `SegmentToSegment2D` | `class function SegmentToSegment2D(const A1,A2,B1,B2:TPoint2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `Translate2D` | `class function Translate2D(const Poly:TPolygon2D;DX,DY:Double):TPolygon2D` | `primary` | `—` |
-| `TGeometryKit` | `function` | `TriangleArea2D` | `class function TriangleArea2D(const A,B,C:TPoint2D):Double` | `primary` | `—` |
-| `TGeometryKit` | `function` | `TriangleArea3D` | `class function TriangleArea3D(const A,B,C:TPoint3D):Double` | `primary` | `—` |
-| `TLine2D` | `field` | `A` | `A:Double` | `primary` | `—` |
-| `TLine2D` | `field` | `B` | `B:Double` | `primary` | `—` |
-| `TLine2D` | `field` | `C` | `C:Double` | `primary` | `—` |
-| `TLine2D` | `function` | `ClosestPoint` | `function ClosestPoint(const P:TPoint2D):TPoint2D` | `primary` | `—` |
-| `TLine2D` | `function` | `Distance` | `function Distance(const P:TPoint2D):Double` | `primary` | `—` |
-| `TLine2D` | `function` | `FromPoints` | `class function FromPoints(const P,Q:TPoint2D):TLine2D` | `primary` | `—` |
-| `TLine2D` | `function` | `SignedDistance` | `function SignedDistance(const P:TPoint2D):Double` | `primary` | `—` |
-| `TPlane3D` | `field` | `A` | `A:Double` | `primary` | `—` |
-| `TPlane3D` | `field` | `B` | `B:Double` | `primary` | `—` |
-| `TPlane3D` | `field` | `C` | `C:Double` | `primary` | `—` |
-| `TPlane3D` | `function` | `ClosestPoint` | `function ClosestPoint(const P:TPoint3D):TPoint3D` | `primary` | `—` |
-| `TPlane3D` | `field` | `D` | `D:Double` | `primary` | `—` |
-| `TPlane3D` | `function` | `Distance` | `function Distance(const P:TPoint3D):Double` | `primary` | `—` |
-| `TPlane3D` | `function` | `FromPointNormal` | `class function FromPointNormal(const P:TPoint3D;const N:TVector3D):TPlane3D` | `primary` | `—` |
-| `TPlane3D` | `function` | `FromThreePoints` | `class function FromThreePoints(const P1,P2,P3:TPoint3D):TPlane3D` | `primary` | `—` |
-| `TPlane3D` | `function` | `SignedDistance` | `function SignedDistance(const P:TPoint3D):Double` | `primary` | `—` |
-| `TPoint2D` | `function` | `Create` | `class function Create(AX,AY:Double):TPoint2D` | `primary` | `—` |
-| `TPoint2D` | `function` | `DistanceTo` | `function DistanceTo(const Other:TPoint2D):Double` | `primary` | `—` |
-| `TPoint2D` | `function` | `ToString` | `function ToString:String` | `primary` | `—` |
-| `TPoint2D` | `field` | `X` | `X:Double` | `primary` | `—` |
-| `TPoint2D` | `field` | `Y` | `Y:Double` | `primary` | `—` |
-| `TPoint3D` | `function` | `Create` | `class function Create(AX,AY,AZ:Double):TPoint3D` | `primary` | `—` |
-| `TPoint3D` | `function` | `DistanceTo` | `function DistanceTo(const Other:TPoint3D):Double` | `primary` | `—` |
-| `TPoint3D` | `function` | `ToString` | `function ToString:String` | `primary` | `—` |
-| `TPoint3D` | `field` | `X` | `X:Double` | `primary` | `—` |
-| `TPoint3D` | `field` | `Y` | `Y:Double` | `primary` | `—` |
-| `TPoint3D` | `field` | `Z` | `Z:Double` | `primary` | `—` |
-| `TSegment2D` | `function` | `Create` | `class function Create(const AP,AQ:TPoint2D):TSegment2D` | `primary` | `—` |
-| `TSegment2D` | `function` | `Direction` | `function Direction:TVector2D` | `primary` | `—` |
-| `TSegment2D` | `function` | `Length` | `function Length:Double` | `primary` | `—` |
-| `TSegment2D` | `function` | `Midpoint` | `function Midpoint:TPoint2D` | `primary` | `—` |
-| `TSegment2D` | `field` | `P` | `P:TPoint2D` | `primary` | `—` |
-| `TSegment2D` | `field` | `Q` | `Q:TPoint2D` | `primary` | `—` |
-| `TSegment2D` | `function` | `ToString` | `function ToString:String` | `primary` | `—` |
-| `TSegment3D` | `function` | `Create` | `class function Create(const AP,AQ:TPoint3D):TSegment3D` | `primary` | `—` |
-| `TSegment3D` | `function` | `Length` | `function Length:Double` | `primary` | `—` |
-| `TSegment3D` | `function` | `Midpoint` | `function Midpoint:TPoint3D` | `primary` | `—` |
-| `TSegment3D` | `field` | `P` | `P:TPoint3D` | `primary` | `—` |
-| `TSegment3D` | `field` | `Q` | `Q:TPoint3D` | `primary` | `—` |
-| `TSphere3D` | `field` | `Centre` | `Centre:TPoint3D` | `primary` | `—` |
-| `TSphere3D` | `function` | `ContainsPoint` | `function ContainsPoint(const P:TPoint3D):Boolean` | `primary` | `—` |
-| `TSphere3D` | `function` | `Create` | `class function Create(const ACentre:TPoint3D;ARadius:Double):TSphere3D` | `primary` | `—` |
-| `TSphere3D` | `field` | `Radius` | `Radius:Double` | `primary` | `—` |
-| `TSphere3D` | `function` | `SurfaceArea` | `function SurfaceArea:Double` | `primary` | `—` |
-| `TSphere3D` | `function` | `Volume` | `function Volume:Double` | `primary` | `—` |
-| `TVector2D` | `operator` | `*` | `class operator *(const A:TVector2D;const Scalar:Double):TVector2D` | `primary` | `—` |
-| `TVector2D` | `operator` | `*` | `class operator *(const Scalar:Double;const A:TVector2D):TVector2D` | `primary` | `—` |
-| `TVector2D` | `operator` | `+` | `class operator +(const A,B:TVector2D):TVector2D` | `primary` | `—` |
-| `TVector2D` | `operator` | `-` | `class operator -(const A,B:TVector2D):TVector2D` | `primary` | `—` |
-| `TVector2D` | `operator` | `-` | `class operator -(const A:TVector2D):TVector2D` | `primary` | `—` |
-| `TVector2D` | `operator` | `/` | `class operator /(const A:TVector2D;const Scalar:Double):TVector2D` | `primary` | `—` |
-| `TVector2D` | `function` | `Create` | `class function Create(AX,AY:Double):TVector2D` | `primary` | `—` |
-| `TVector2D` | `function` | `Cross` | `function Cross(const V:TVector2D):Double` | `primary` | `—` |
-| `TVector2D` | `function` | `Dot` | `function Dot(const V:TVector2D):Double` | `primary` | `—` |
-| `TVector2D` | `function` | `FromPoints` | `class function FromPoints(const P,Q:TPoint2D):TVector2D` | `primary` | `—` |
-| `TVector2D` | `function` | `Magnitude` | `function Magnitude:Double` | `primary` | `—` |
-| `TVector2D` | `function` | `Normalise` | `function Normalise:TVector2D` | `primary` | `—` |
-| `TVector2D` | `function` | `Perpendicular` | `function Perpendicular:TVector2D` | `primary` | `—` |
-| `TVector2D` | `function` | `ToString` | `function ToString:String` | `primary` | `—` |
-| `TVector2D` | `field` | `X` | `X:Double` | `primary` | `—` |
-| `TVector2D` | `field` | `Y` | `Y:Double` | `primary` | `—` |
-| `TVector3D` | `operator` | `*` | `class operator *(const A:TVector3D;const Scalar:Double):TVector3D` | `primary` | `—` |
-| `TVector3D` | `operator` | `*` | `class operator *(const Scalar:Double;const A:TVector3D):TVector3D` | `primary` | `—` |
-| `TVector3D` | `operator` | `+` | `class operator +(const A,B:TVector3D):TVector3D` | `primary` | `—` |
-| `TVector3D` | `operator` | `-` | `class operator -(const A,B:TVector3D):TVector3D` | `primary` | `—` |
-| `TVector3D` | `operator` | `-` | `class operator -(const A:TVector3D):TVector3D` | `primary` | `—` |
-| `TVector3D` | `operator` | `/` | `class operator /(const A:TVector3D;const Scalar:Double):TVector3D` | `primary` | `—` |
-| `TVector3D` | `function` | `Create` | `class function Create(AX,AY,AZ:Double):TVector3D` | `primary` | `—` |
-| `TVector3D` | `function` | `Cross` | `function Cross(const V:TVector3D):TVector3D` | `primary` | `—` |
-| `TVector3D` | `function` | `Dot` | `function Dot(const V:TVector3D):Double` | `primary` | `—` |
-| `TVector3D` | `function` | `FromPoints` | `class function FromPoints(const P,Q:TPoint3D):TVector3D` | `primary` | `—` |
-| `TVector3D` | `function` | `Magnitude` | `function Magnitude:Double` | `primary` | `—` |
-| `TVector3D` | `function` | `Normalise` | `function Normalise:TVector3D` | `primary` | `—` |
-| `TVector3D` | `function` | `ToString` | `function ToString:String` | `primary` | `—` |
-| `TVector3D` | `field` | `X` | `X:Double` | `primary` | `—` |
-| `TVector3D` | `field` | `Y` | `Y:Double` | `primary` | `—` |
-| `TVector3D` | `field` | `Z` | `Z:Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EGeometryError` | `EGeometryError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `GEO_EPS` | `GEO_EPS=1e-10` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TBoundingBox2D` | `TBoundingBox2D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCircle2D` | `TCircle2D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TGeometryKit` | `TGeometryKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLine2D` | `TLine2D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPlane3D` | `TPlane3D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPoint2D` | `TPoint2D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPoint3D` | `TPoint3D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TPolygon2D` | `TPolygon2D=array of TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSegment2D` | `TSegment2D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSegment3D` | `TSegment3D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSphere3D` | `TSphere3D=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TVector2D` | `TVector2D=record` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TVector3D` | `TVector3D=record` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `function` | `Area` | `function Area:Double` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `function` | `ContainsPoint` | `function ContainsPoint(const P:TPoint2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `function` | `Height` | `function Height:Double` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `field` | `MaxX` | `MaxX:Double` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `field` | `MaxY` | `MaxY:Double` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `field` | `MinX` | `MinX:Double` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `field` | `MinY` | `MinY:Double` | `advanced` | `—` | `—` | `—` |
+| `TBoundingBox2D` | `function` | `Width` | `function Width:Double` | `advanced` | `—` | `—` | `—` |
+| `TCircle2D` | `function` | `Area` | `function Area:Double` | `advanced` | `—` | `—` | `—` |
+| `TCircle2D` | `field` | `Centre` | `Centre:TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TCircle2D` | `function` | `Circumference` | `function Circumference:Double` | `advanced` | `—` | `—` | `—` |
+| `TCircle2D` | `function` | `ContainsPoint` | `function ContainsPoint(const P:TPoint2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TCircle2D` | `function` | `Create` | `class function Create(const ACentre:TPoint2D;ARadius:Double):TCircle2D` | `advanced` | `—` | `—` | `—` |
+| `TCircle2D` | `field` | `Radius` | `Radius:Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `AngleBetween2D` | `class function AngleBetween2D(const V1,V2:TVector2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `AngleBetween3D` | `class function AngleBetween3D(const V1,V2:TVector3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `BoundingBox2D` | `class function BoundingBox2D(const Points:TPolygon2D):TBoundingBox2D` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `ConvexHull` | `class function ConvexHull(const Points:TPolygon2D):TPolygon2D` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `IsConvex` | `class function IsConvex(const Poly:TPolygon2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `LineIntersect2D` | `class function LineIntersect2D(const A1,A2,B1,B2:TPoint2D;out Pt:TPoint2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointInPolygon` | `class function PointInPolygon(const P:TPoint2D;const Poly:TPolygon2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointToLine2D` | `class function PointToLine2D(const P,A,B:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointToPlane3D` | `class function PointToPlane3D(const P:TPoint3D;const Plane:TPlane3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointToPoint2D` | `class function PointToPoint2D(const A,B:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointToPoint3D` | `class function PointToPoint3D(const A,B:TPoint3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointToSegment2D` | `class function PointToSegment2D(const P,A,B:TPoint2D;out T:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PointToSegment3D` | `class function PointToSegment3D(const P,A,B:TPoint3D;out T:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PolygonArea` | `class function PolygonArea(const Poly:TPolygon2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PolygonCentroid` | `class function PolygonCentroid(const Poly:TPolygon2D):TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `PolygonPerimeter` | `class function PolygonPerimeter(const Poly:TPolygon2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `RayCircleIntersect` | `class function RayCircleIntersect(const Origin,Direction:TPoint2D;const C:TCircle2D;out T1,T2:Double):Integer` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `Rotate2D` | `class function Rotate2D(const Poly:TPolygon2D;Angle:Double;const Centre:TPoint2D):TPolygon2D` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `Scale2D` | `class function Scale2D(const Poly:TPolygon2D;SX,SY:Double):TPolygon2D` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `SegmentCircleIntersect` | `class function SegmentCircleIntersect(const P,Q:TPoint2D;const C:TCircle2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `SegmentIntersect2D` | `class function SegmentIntersect2D(const A1,A2,B1,B2:TPoint2D;out Pt:TPoint2D;out T:Double):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `SegmentsIntersect2D` | `class function SegmentsIntersect2D(const A1,A2,B1,B2:TPoint2D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `SegmentToSegment2D` | `class function SegmentToSegment2D(const A1,A2,B1,B2:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `Translate2D` | `class function Translate2D(const Poly:TPolygon2D;DX,DY:Double):TPolygon2D` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `TriangleArea2D` | `class function TriangleArea2D(const A,B,C:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TGeometryKit` | `function` | `TriangleArea3D` | `class function TriangleArea3D(const A,B,C:TPoint3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `field` | `A` | `A:Double` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `field` | `B` | `B:Double` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `field` | `C` | `C:Double` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `function` | `ClosestPoint` | `function ClosestPoint(const P:TPoint2D):TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `function` | `Distance` | `function Distance(const P:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `function` | `FromPoints` | `class function FromPoints(const P,Q:TPoint2D):TLine2D` | `advanced` | `—` | `—` | `—` |
+| `TLine2D` | `function` | `SignedDistance` | `function SignedDistance(const P:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `field` | `A` | `A:Double` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `field` | `B` | `B:Double` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `field` | `C` | `C:Double` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `function` | `ClosestPoint` | `function ClosestPoint(const P:TPoint3D):TPoint3D` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `field` | `D` | `D:Double` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `function` | `Distance` | `function Distance(const P:TPoint3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `function` | `FromPointNormal` | `class function FromPointNormal(const P:TPoint3D;const N:TVector3D):TPlane3D` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `function` | `FromThreePoints` | `class function FromThreePoints(const P1,P2,P3:TPoint3D):TPlane3D` | `advanced` | `—` | `—` | `—` |
+| `TPlane3D` | `function` | `SignedDistance` | `function SignedDistance(const P:TPoint3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint2D` | `function` | `Create` | `class function Create(AX,AY:Double):TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TPoint2D` | `function` | `DistanceTo` | `function DistanceTo(const Other:TPoint2D):Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint2D` | `function` | `ToString` | `function ToString:String` | `advanced` | `—` | `—` | `—` |
+| `TPoint2D` | `field` | `X` | `X:Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint2D` | `field` | `Y` | `Y:Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint3D` | `function` | `Create` | `class function Create(AX,AY,AZ:Double):TPoint3D` | `advanced` | `—` | `—` | `—` |
+| `TPoint3D` | `function` | `DistanceTo` | `function DistanceTo(const Other:TPoint3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint3D` | `function` | `ToString` | `function ToString:String` | `advanced` | `—` | `—` | `—` |
+| `TPoint3D` | `field` | `X` | `X:Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint3D` | `field` | `Y` | `Y:Double` | `advanced` | `—` | `—` | `—` |
+| `TPoint3D` | `field` | `Z` | `Z:Double` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `function` | `Create` | `class function Create(const AP,AQ:TPoint2D):TSegment2D` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `function` | `Direction` | `function Direction:TVector2D` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `function` | `Length` | `function Length:Double` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `function` | `Midpoint` | `function Midpoint:TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `field` | `P` | `P:TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `field` | `Q` | `Q:TPoint2D` | `advanced` | `—` | `—` | `—` |
+| `TSegment2D` | `function` | `ToString` | `function ToString:String` | `advanced` | `—` | `—` | `—` |
+| `TSegment3D` | `function` | `Create` | `class function Create(const AP,AQ:TPoint3D):TSegment3D` | `advanced` | `—` | `—` | `—` |
+| `TSegment3D` | `function` | `Length` | `function Length:Double` | `advanced` | `—` | `—` | `—` |
+| `TSegment3D` | `function` | `Midpoint` | `function Midpoint:TPoint3D` | `advanced` | `—` | `—` | `—` |
+| `TSegment3D` | `field` | `P` | `P:TPoint3D` | `advanced` | `—` | `—` | `—` |
+| `TSegment3D` | `field` | `Q` | `Q:TPoint3D` | `advanced` | `—` | `—` | `—` |
+| `TSphere3D` | `field` | `Centre` | `Centre:TPoint3D` | `advanced` | `—` | `—` | `—` |
+| `TSphere3D` | `function` | `ContainsPoint` | `function ContainsPoint(const P:TPoint3D):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TSphere3D` | `function` | `Create` | `class function Create(const ACentre:TPoint3D;ARadius:Double):TSphere3D` | `advanced` | `—` | `—` | `—` |
+| `TSphere3D` | `field` | `Radius` | `Radius:Double` | `advanced` | `—` | `—` | `—` |
+| `TSphere3D` | `function` | `SurfaceArea` | `function SurfaceArea:Double` | `advanced` | `—` | `—` | `—` |
+| `TSphere3D` | `function` | `Volume` | `function Volume:Double` | `advanced` | `—` | `—` | `—` |
+| `TVector2D` | `operator` | `*` | `class operator *(const A:TVector2D;const Scalar:Double):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `operator` | `*` | `class operator *(const Scalar:Double;const A:TVector2D):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `operator` | `+` | `class operator +(const A,B:TVector2D):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `operator` | `-` | `class operator -(const A,B:TVector2D):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `operator` | `-` | `class operator -(const A:TVector2D):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `operator` | `/` | `class operator /(const A:TVector2D;const Scalar:Double):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Create` | `class function Create(AX,AY:Double):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Cross` | `function Cross(const V:TVector2D):Double` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Dot` | `function Dot(const V:TVector2D):Double` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `FromPoints` | `class function FromPoints(const P,Q:TPoint2D):TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Magnitude` | `function Magnitude:Double` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Normalise` | `function Normalise:TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Perpendicular` | `function Perpendicular:TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `ToString` | `function ToString:String` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `field` | `X` | `X:Double` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `field` | `Y` | `Y:Double` | `recommended` | `—` | `—` | `—` |
+| `TVector3D` | `operator` | `*` | `class operator *(const A:TVector3D;const Scalar:Double):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `operator` | `*` | `class operator *(const Scalar:Double;const A:TVector3D):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `operator` | `+` | `class operator +(const A,B:TVector3D):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `operator` | `-` | `class operator -(const A,B:TVector3D):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `operator` | `-` | `class operator -(const A:TVector3D):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `operator` | `/` | `class operator /(const A:TVector3D;const Scalar:Double):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `Create` | `class function Create(AX,AY,AZ:Double):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `Cross` | `function Cross(const V:TVector3D):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `Dot` | `function Dot(const V:TVector3D):Double` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `FromPoints` | `class function FromPoints(const P,Q:TPoint3D):TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `Magnitude` | `function Magnitude:Double` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `Normalise` | `function Normalise:TVector3D` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `function` | `ToString` | `function ToString:String` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `field` | `X` | `X:Double` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `field` | `Y` | `Y:Double` | `advanced` | `—` | `—` | `—` |
+| `TVector3D` | `field` | `Z` | `Z:Double` | `advanced` | `—` | `—` | `—` |
 
 ## InterchangeLib.Models
 
 Source: [`src/InterchangeLib.Models.pas`](../src/InterchangeLib.Models.pas)  
 Interface SHA-256: `bca8bc1a3add64031172bdd67a2f163f012d70699157f4d308c982a70b082dc0`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `constant` | `DEFAULT_MAX_MODEL_ELEMENTS` | `DEFAULT_MAX_MODEL_ELEMENTS=16000000` | `primary` | `—` |
-| `(unit)` | `type` | `EModelInterchangeError` | `EModelInterchangeError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `function` | `LoadCubicSpline` | `function LoadCubicSpline(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TCubicSplineInterpolator` | `primary` | `—` |
-| `(unit)` | `function` | `LoadScalarKalman` | `function LoadScalarKalman(const Stream:TStream):TScalarKalmanFilter` | `primary` | `—` |
-| `(unit)` | `function` | `LoadStandardization` | `function LoadStandardization(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TStandardizationModel` | `primary` | `—` |
-| `(unit)` | `function` | `LoadStreamingFIR` | `function LoadStreamingFIR(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TStreamingFIR` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveCubicSpline` | `procedure SaveCubicSpline(const Stream:TStream;const Model:TCubicSplineInterpolator)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveScalarKalman` | `procedure SaveScalarKalman(const Stream:TStream;const Model:TScalarKalmanFilter)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveStandardization` | `procedure SaveStandardization(const Stream:TStream;const Model:TStandardizationModel)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveStreamingFIR` | `procedure SaveStreamingFIR(const Stream:TStream;const Model:TStreamingFIR)` | `primary` | `—` |
-| `(unit)` | `function` | `SummarizeCubicSpline` | `function SummarizeCubicSpline(const Model:TCubicSplineInterpolator):String` | `primary` | `—` |
-| `(unit)` | `function` | `SummarizeScalarKalman` | `function SummarizeScalarKalman(const Model:TScalarKalmanFilter):String` | `primary` | `—` |
-| `(unit)` | `function` | `SummarizeStandardization` | `function SummarizeStandardization(const Model:TStandardizationModel):String` | `primary` | `—` |
-| `(unit)` | `function` | `SummarizeStreamingFIR` | `function SummarizeStreamingFIR(const Model:TStreamingFIR):String` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `constant` | `DEFAULT_MAX_MODEL_ELEMENTS` | `DEFAULT_MAX_MODEL_ELEMENTS=16000000` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EModelInterchangeError` | `EModelInterchangeError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadCubicSpline` | `function LoadCubicSpline(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TCubicSplineInterpolator` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadScalarKalman` | `function LoadScalarKalman(const Stream:TStream):TScalarKalmanFilter` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadStandardization` | `function LoadStandardization(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TStandardizationModel` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadStreamingFIR` | `function LoadStreamingFIR(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TStreamingFIR` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveCubicSpline` | `procedure SaveCubicSpline(const Stream:TStream;const Model:TCubicSplineInterpolator)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveScalarKalman` | `procedure SaveScalarKalman(const Stream:TStream;const Model:TScalarKalmanFilter)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveStandardization` | `procedure SaveStandardization(const Stream:TStream;const Model:TStandardizationModel)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveStreamingFIR` | `procedure SaveStreamingFIR(const Stream:TStream;const Model:TStreamingFIR)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SummarizeCubicSpline` | `function SummarizeCubicSpline(const Model:TCubicSplineInterpolator):String` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SummarizeScalarKalman` | `function SummarizeScalarKalman(const Model:TScalarKalmanFilter):String` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SummarizeStandardization` | `function SummarizeStandardization(const Model:TStandardizationModel):String` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `SummarizeStreamingFIR` | `function SummarizeStreamingFIR(const Model:TStreamingFIR):String` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.Complex
 
 Source: [`src/MathBase.Complex.pas`](../src/MathBase.Complex.pas)  
 Interface SHA-256: `58ab9d4c1e42bf1890afdc80ac4bf898783d896e94e972d9ad6ccdf5ea148239`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `CAcos` | `function CAcos(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CAcosh` | `function CAcosh(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CAsin` | `function CAsin(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CAsinh` | `function CAsinh(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CAtan` | `function CAtan(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CAtanh` | `function CAtanh(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CCos` | `function CCos(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CCosh` | `function CCosh(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CExp` | `function CExp(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CLog` | `function CLog(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CPow` | `function CPow(const Base,Exponent:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CPow` | `function CPow(const Base:TComplex;const Exponent:Double):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CSin` | `function CSin(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CSinh` | `function CSinh(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CSqrt` | `function CSqrt(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CTan` | `function CTan(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `CTanh` | `function CTanh(const Z:TComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `record` | `TComplex` | `TComplex=record` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexArray` | `TComplexArray=array of TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `ToComplex` | `function ToComplex(const Z:TSingleComplex):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `ToSingleComplex` | `function ToSingleComplex(const Z:TComplex):TSingleComplex` | `primary` | `—` |
-| `(unit)` | `record` | `TSingleComplex` | `TSingleComplex=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleComplexArray` | `TSingleComplexArray=array of TSingleComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `*` | `class operator *(const A,B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `*` | `class operator *(const A:Double;const B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `*` | `class operator *(const A:TComplex;const B:Double):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `+` | `class operator +(const A,B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `+` | `class operator +(const A:Double;const B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `+` | `class operator +(const A:TComplex;const B:Double):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `-` | `class operator -(const A,B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `-` | `class operator -(const A:Double;const B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `-` | `class operator -(const A:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `-` | `class operator -(const A:TComplex;const B:Double):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `/` | `class operator /(const A,B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `/` | `class operator /(const A:Double;const B:TComplex):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `/` | `class operator /(const A:TComplex;const B:Double):TComplex` | `primary` | `—` |
-| `TComplex` | `operator` | `<>` | `class operator <>(const A,B:TComplex):Boolean` | `primary` | `—` |
-| `TComplex` | `operator` | `=` | `class operator=(const A,B:TComplex):Boolean` | `primary` | `—` |
-| `TComplex` | `function` | `Argument` | `function Argument:Double` | `primary` | `—` |
-| `TComplex` | `function` | `Conjugate` | `function Conjugate:TComplex` | `primary` | `—` |
-| `TComplex` | `function` | `Create` | `class function Create(const ARe,AIm:Double):TComplex` | `primary` | `—` |
-| `TComplex` | `function` | `FromPolar` | `class function FromPolar(const Radius,Angle:Double):TComplex` | `primary` | `—` |
-| `TComplex` | `field` | `Im` | `Im:Double` | `primary` | `—` |
-| `TComplex` | `function` | `ImaginaryUnit` | `class function ImaginaryUnit:TComplex` | `primary` | `—` |
-| `TComplex` | `function` | `IsFinite` | `function IsFinite:Boolean` | `primary` | `—` |
-| `TComplex` | `function` | `Magnitude` | `function Magnitude:Double` | `primary` | `—` |
-| `TComplex` | `function` | `One` | `class function One:TComplex` | `primary` | `—` |
-| `TComplex` | `field` | `Re` | `Re:Double` | `primary` | `—` |
-| `TComplex` | `function` | `SqrMagnitude` | `function SqrMagnitude:Double` | `primary` | `—` |
-| `TComplex` | `function` | `Zero` | `class function Zero:TComplex` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `*` | `class operator *(const A,B:TSingleComplex):TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `+` | `class operator +(const A,B:TSingleComplex):TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `-` | `class operator -(const A,B:TSingleComplex):TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `-` | `class operator -(const A:TSingleComplex):TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `/` | `class operator /(const A,B:TSingleComplex):TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `<>` | `class operator <>(const A,B:TSingleComplex):Boolean` | `primary` | `—` |
-| `TSingleComplex` | `operator` | `=` | `class operator=(const A,B:TSingleComplex):Boolean` | `primary` | `—` |
-| `TSingleComplex` | `function` | `Conjugate` | `function Conjugate:TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `function` | `Create` | `class function Create(const ARe,AIm:Single):TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `field` | `Im` | `Im:Single` | `primary` | `—` |
-| `TSingleComplex` | `function` | `IsFinite` | `function IsFinite:Boolean` | `primary` | `—` |
-| `TSingleComplex` | `function` | `Magnitude` | `function Magnitude:Single` | `primary` | `—` |
-| `TSingleComplex` | `function` | `One` | `class function One:TSingleComplex` | `primary` | `—` |
-| `TSingleComplex` | `field` | `Re` | `Re:Single` | `primary` | `—` |
-| `TSingleComplex` | `function` | `SqrMagnitude` | `function SqrMagnitude:Single` | `primary` | `—` |
-| `TSingleComplex` | `function` | `Zero` | `class function Zero:TSingleComplex` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `CAcos` | `function CAcos(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CAcosh` | `function CAcosh(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CAsin` | `function CAsin(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CAsinh` | `function CAsinh(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CAtan` | `function CAtan(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CAtanh` | `function CAtanh(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CCos` | `function CCos(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CCosh` | `function CCosh(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CExp` | `function CExp(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CLog` | `function CLog(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CPow` | `function CPow(const Base,Exponent:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CPow` | `function CPow(const Base:TComplex;const Exponent:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CSin` | `function CSin(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CSinh` | `function CSinh(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CSqrt` | `function CSqrt(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CTan` | `function CTan(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `CTanh` | `function CTanh(const Z:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TComplex` | `TComplex=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexArray` | `TComplexArray=array of TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToComplex` | `function ToComplex(const Z:TSingleComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToSingleComplex` | `function ToSingleComplex(const Z:TComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSingleComplex` | `TSingleComplex=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleComplexArray` | `TSingleComplexArray=array of TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `*` | `class operator *(const A,B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `*` | `class operator *(const A:Double;const B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `*` | `class operator *(const A:TComplex;const B:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `+` | `class operator +(const A,B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `+` | `class operator +(const A:Double;const B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `+` | `class operator +(const A:TComplex;const B:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `-` | `class operator -(const A,B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `-` | `class operator -(const A:Double;const B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `-` | `class operator -(const A:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `-` | `class operator -(const A:TComplex;const B:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `/` | `class operator /(const A,B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `/` | `class operator /(const A:Double;const B:TComplex):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `/` | `class operator /(const A:TComplex;const B:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `<>` | `class operator <>(const A,B:TComplex):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `operator` | `=` | `class operator=(const A,B:TComplex):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `Argument` | `function Argument:Double` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `Conjugate` | `function Conjugate:TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `Create` | `class function Create(const ARe,AIm:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `FromPolar` | `class function FromPolar(const Radius,Angle:Double):TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `field` | `Im` | `Im:Double` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `ImaginaryUnit` | `class function ImaginaryUnit:TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `IsFinite` | `function IsFinite:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `Magnitude` | `function Magnitude:Double` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `One` | `class function One:TComplex` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `field` | `Re` | `Re:Double` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `SqrMagnitude` | `function SqrMagnitude:Double` | `advanced` | `—` | `—` | `—` |
+| `TComplex` | `function` | `Zero` | `class function Zero:TComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `*` | `class operator *(const A,B:TSingleComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `+` | `class operator +(const A,B:TSingleComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `-` | `class operator -(const A,B:TSingleComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `-` | `class operator -(const A:TSingleComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `/` | `class operator /(const A,B:TSingleComplex):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `<>` | `class operator <>(const A,B:TSingleComplex):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `operator` | `=` | `class operator=(const A,B:TSingleComplex):Boolean` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `Conjugate` | `function Conjugate:TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `Create` | `class function Create(const ARe,AIm:Single):TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `field` | `Im` | `Im:Single` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `IsFinite` | `function IsFinite:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `Magnitude` | `function Magnitude:Single` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `One` | `class function One:TSingleComplex` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `field` | `Re` | `Re:Single` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `SqrMagnitude` | `function SqrMagnitude:Single` | `advanced` | `—` | `—` | `—` |
+| `TSingleComplex` | `function` | `Zero` | `class function Zero:TSingleComplex` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.Expressions
 
 Source: [`src/MathBase.Expressions.pas`](../src/MathBase.Expressions.pas)  
 Interface SHA-256: `43870a1ff854d7e352970b98cbcd4c36a4d9f0bd50b570de91213f3052f0b76d`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EExpressionError` | `EExpressionError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `class` | `TExpressionEvaluator` | `TExpressionEvaluator=class` | `primary` | `—` |
-| `(unit)` | `record` | `TExpressionLimits` | `TExpressionLimits=record` | `primary` | `—` |
-| `(unit)` | `record` | `TExpressionSymbol` | `TExpressionSymbol=record` | `primary` | `—` |
-| `(unit)` | `type` | `TExpressionSymbols` | `TExpressionSymbols=array of TExpressionSymbol` | `primary` | `—` |
-| `(unit)` | `record` | `TExpressionValue` | `TExpressionValue=record` | `primary` | `—` |
-| `(unit)` | `type` | `TExpressionValueKind` | `TExpressionValueKind=(evScalar,evVector,evMatrix)` | `primary` | `—` |
-| `TExpressionEvaluator` | `function` | `Evaluate` | `class function Evaluate(const Text:String;const Symbols:array of TExpressionSymbol;const Limits:TExpressionLimits):TExpressionValue` | `primary` | `—` |
-| `TExpressionLimits` | `function` | `Defaults` | `class function Defaults:TExpressionLimits` | `primary` | `—` |
-| `TExpressionLimits` | `field` | `MaxDepth` | `MaxDepth:Integer` | `primary` | `—` |
-| `TExpressionLimits` | `field` | `MaxElements` | `MaxElements:Int64` | `primary` | `—` |
-| `TExpressionLimits` | `field` | `MaxOperations` | `MaxOperations:Int64` | `primary` | `—` |
-| `TExpressionLimits` | `field` | `MaxTextLength` | `MaxTextLength:Integer` | `primary` | `—` |
-| `TExpressionSymbol` | `field` | `Name` | `Name:String` | `primary` | `—` |
-| `TExpressionSymbol` | `field` | `Value` | `Value:TExpressionValue` | `primary` | `—` |
-| `TExpressionValue` | `function` | `FromMatrix` | `class function FromMatrix(const Value:IDenseDoubleMatrix):TExpressionValue` | `primary` | `—` |
-| `TExpressionValue` | `function` | `FromScalar` | `class function FromScalar(const Value:Double):TExpressionValue` | `primary` | `—` |
-| `TExpressionValue` | `function` | `FromVector` | `class function FromVector(const Value:TDoubleArray):TExpressionValue` | `primary` | `—` |
-| `TExpressionValue` | `field` | `Kind` | `Kind:TExpressionValueKind` | `primary` | `—` |
-| `TExpressionValue` | `field` | `Matrix` | `Matrix:IDenseDoubleMatrix` | `primary` | `—` |
-| `TExpressionValue` | `field` | `Scalar` | `Scalar:Double` | `primary` | `—` |
-| `TExpressionValue` | `field` | `Vector` | `Vector:TDoubleArray` | `primary` | `—` |
-| `TExpressionValueKind` | `enum-value` | `evMatrix` | `evMatrix` | `primary` | `—` |
-| `TExpressionValueKind` | `enum-value` | `evScalar` | `evScalar` | `primary` | `—` |
-| `TExpressionValueKind` | `enum-value` | `evVector` | `evVector` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EExpressionError` | `EExpressionError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TExpressionEvaluator` | `TExpressionEvaluator=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TExpressionLimits` | `TExpressionLimits=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TExpressionSymbol` | `TExpressionSymbol=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TExpressionSymbols` | `TExpressionSymbols=array of TExpressionSymbol` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TExpressionValue` | `TExpressionValue=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TExpressionValueKind` | `TExpressionValueKind=(evScalar,evVector,evMatrix)` | `advanced` | `—` | `—` | `—` |
+| `TExpressionEvaluator` | `function` | `Evaluate` | `class function Evaluate(const Text:String;const Symbols:array of TExpressionSymbol;const Limits:TExpressionLimits):TExpressionValue` | `advanced` | `—` | `—` | `—` |
+| `TExpressionLimits` | `function` | `Defaults` | `class function Defaults:TExpressionLimits` | `advanced` | `—` | `—` | `—` |
+| `TExpressionLimits` | `field` | `MaxDepth` | `MaxDepth:Integer` | `advanced` | `—` | `—` | `—` |
+| `TExpressionLimits` | `field` | `MaxElements` | `MaxElements:Int64` | `advanced` | `—` | `—` | `—` |
+| `TExpressionLimits` | `field` | `MaxOperations` | `MaxOperations:Int64` | `advanced` | `—` | `—` | `—` |
+| `TExpressionLimits` | `field` | `MaxTextLength` | `MaxTextLength:Integer` | `advanced` | `—` | `—` | `—` |
+| `TExpressionSymbol` | `field` | `Name` | `Name:String` | `advanced` | `—` | `—` | `—` |
+| `TExpressionSymbol` | `field` | `Value` | `Value:TExpressionValue` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `function` | `FromMatrix` | `class function FromMatrix(const Value:IDenseDoubleMatrix):TExpressionValue` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `function` | `FromScalar` | `class function FromScalar(const Value:Double):TExpressionValue` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `function` | `FromVector` | `class function FromVector(const Value:TDoubleArray):TExpressionValue` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `field` | `Kind` | `Kind:TExpressionValueKind` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `field` | `Matrix` | `Matrix:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `field` | `Scalar` | `Scalar:Double` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValue` | `field` | `Vector` | `Vector:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValueKind` | `enum-value` | `evMatrix` | `evMatrix` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValueKind` | `enum-value` | `evScalar` | `evScalar` | `advanced` | `—` | `—` | `—` |
+| `TExpressionValueKind` | `enum-value` | `evVector` | `evVector` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.Interchange
 
 Source: [`src/MathBase.Interchange.pas`](../src/MathBase.Interchange.pas)  
 Interface SHA-256: `023a74575eccf18849f8b148ea115a64c3996c089866ed15e2a5626a440f7883`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `ComplexToInvariant` | `function ComplexToInvariant(const Value:TComplex):string` | `primary` | `—` |
-| `(unit)` | `function` | `ComplexVectorToInvariant` | `function ComplexVectorToInvariant(const Values:TComplexArray):string` | `primary` | `—` |
-| `(unit)` | `constant` | `DEFAULT_MAX_INTERCHANGE_ELEMENTS` | `DEFAULT_MAX_INTERCHANGE_ELEMENTS=16000000` | `primary` | `—` |
-| `(unit)` | `constant` | `DEFAULT_MAX_SPARSE_DIMENSION` | `DEFAULT_MAX_SPARSE_DIMENSION=16000000` | `primary` | `—` |
-| `(unit)` | `function` | `DenseMatrixToInvariant` | `function DenseMatrixToInvariant(const Matrix:IDenseDoubleMatrix):string` | `primary` | `—` |
-| `(unit)` | `function` | `Describe` | `function Describe(const Matrix:IDenseComplexMatrix):TValueMetadata` | `primary` | `—` |
-| `(unit)` | `function` | `Describe` | `function Describe(const Matrix:IDenseDoubleMatrix):TValueMetadata` | `primary` | `—` |
-| `(unit)` | `function` | `Describe` | `function Describe(const Values:TComplexArray):TValueMetadata` | `primary` | `—` |
-| `(unit)` | `function` | `Describe` | `function Describe(const Values:TDoubleArray):TValueMetadata` | `primary` | `—` |
-| `(unit)` | `function` | `DoubleVectorToInvariant` | `function DoubleVectorToInvariant(const Values:TDoubleArray):string` | `primary` | `—` |
-| `(unit)` | `type` | `EInterchangeError` | `EInterchangeError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `function` | `LoadComplexMatrixBinary` | `function LoadComplexMatrixBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LoadComplexVectorBinary` | `function LoadComplexVectorBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TComplexArray` | `primary` | `—` |
-| `(unit)` | `function` | `LoadDoubleMatrixBinary` | `function LoadDoubleMatrixBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LoadDoubleVectorBinary` | `function LoadDoubleVectorBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `function` | `LoadRandomStateBinary` | `function LoadRandomStateBinary(const Stream:TStream):TRandomState` | `primary` | `—` |
-| `(unit)` | `function` | `LoadSparseComplexBinary` | `function LoadSparseComplexBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LoadSparseDoubleBinary` | `function LoadSparseDoubleBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LoadSparseSingleBinary` | `function LoadSparseSingleBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseSingleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `LoadSparseSingleComplexBinary` | `function LoadSparseSingleComplexBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseSingleComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ParseComplexInvariant` | `function ParseComplexInvariant(const Text:string):TComplex` | `primary` | `—` |
-| `(unit)` | `function` | `ParseComplexVectorInvariant` | `function ParseComplexVectorInvariant(const Text:string;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TComplexArray` | `primary` | `—` |
-| `(unit)` | `function` | `ParseDenseMatrixInvariant` | `function ParseDenseMatrixInvariant(const Text:string;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ParseDoubleVectorInvariant` | `function ParseDoubleVectorInvariant(const Text:string;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `function` | `ReadDelimitedMatrix` | `function ReadDelimitedMatrix(const Stream:TStream;const Delimiter:Char=',';const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ReadMatrixMarketComplex` | `function ReadMatrixMarketComplex(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ReadMatrixMarketDouble` | `function ReadMatrixMarketDouble(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ReadSparseMatrixMarketComplex` | `function ReadSparseMatrixMarketComplex(const Stream:TStream;const Format:TSparseFormat=sfCSR;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseComplexMatrix` | `primary` | `—` |
-| `(unit)` | `function` | `ReadSparseMatrixMarketDouble` | `function ReadSparseMatrixMarketDouble(const Stream:TStream;const Format:TSparseFormat=sfCSR;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Matrix:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Matrix:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Values:TComplexArray)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Values:TDoubleArray)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveRandomStateBinary` | `procedure SaveRandomStateBinary(const Stream:TStream;const State:TRandomState)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseSingleComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseSingleMatrix)` | `primary` | `—` |
-| `(unit)` | `function` | `Summarize` | `function Summarize(const Matrix:IDenseDoubleMatrix;const MaximumRows:SizeInt=4;const MaximumColumns:SizeInt=6):string` | `primary` | `—` |
-| `(unit)` | `function` | `Summarize` | `function Summarize(const Values:TComplexArray;const MaximumValues:SizeInt=8):string` | `primary` | `—` |
-| `(unit)` | `function` | `Summarize` | `function Summarize(const Values:TDoubleArray;const MaximumValues:SizeInt=8):string` | `primary` | `—` |
-| `(unit)` | `type` | `TInterchangeScalarType` | `TInterchangeScalarType=(istFloat64,istComplex128)` | `primary` | `—` |
-| `(unit)` | `type` | `TInterchangeValueKind` | `TInterchangeValueKind=(ivkVector,ivkMatrix)` | `primary` | `—` |
-| `(unit)` | `record` | `TValueMetadata` | `TValueMetadata=record` | `primary` | `—` |
-| `(unit)` | `procedure` | `WriteDelimitedMatrix` | `procedure WriteDelimitedMatrix(const Stream:TStream;const Matrix:IDenseDoubleMatrix;const Delimiter:Char=',')` | `primary` | `—` |
-| `(unit)` | `procedure` | `WriteMatrixMarket` | `procedure WriteMatrixMarket(const Stream:TStream;const Matrix:IDenseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `WriteMatrixMarket` | `procedure WriteMatrixMarket(const Stream:TStream;const Matrix:IDenseDoubleMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `WriteSparseMatrixMarket` | `procedure WriteSparseMatrixMarket(const Stream:TStream;const Matrix:ISparseComplexMatrix)` | `primary` | `—` |
-| `(unit)` | `procedure` | `WriteSparseMatrixMarket` | `procedure WriteSparseMatrixMarket(const Stream:TStream;const Matrix:ISparseDoubleMatrix)` | `primary` | `—` |
-| `TInterchangeScalarType` | `enum-value` | `istComplex128` | `istComplex128` | `primary` | `—` |
-| `TInterchangeScalarType` | `enum-value` | `istFloat64` | `istFloat64` | `primary` | `—` |
-| `TInterchangeValueKind` | `enum-value` | `ivkMatrix` | `ivkMatrix` | `primary` | `—` |
-| `TInterchangeValueKind` | `enum-value` | `ivkVector` | `ivkVector` | `primary` | `—` |
-| `TValueMetadata` | `field` | `Columns` | `Columns:SizeInt` | `primary` | `—` |
-| `TValueMetadata` | `field` | `Elements` | `Elements:QWord` | `primary` | `—` |
-| `TValueMetadata` | `field` | `Kind` | `Kind:TInterchangeValueKind` | `primary` | `—` |
-| `TValueMetadata` | `field` | `Rows` | `Rows:SizeInt` | `primary` | `—` |
-| `TValueMetadata` | `field` | `ScalarType` | `ScalarType:TInterchangeScalarType` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `ComplexToInvariant` | `function ComplexToInvariant(const Value:TComplex):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ComplexVectorToInvariant` | `function ComplexVectorToInvariant(const Values:TComplexArray):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `DEFAULT_MAX_INTERCHANGE_ELEMENTS` | `DEFAULT_MAX_INTERCHANGE_ELEMENTS=16000000` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `DEFAULT_MAX_SPARSE_DIMENSION` | `DEFAULT_MAX_SPARSE_DIMENSION=16000000` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DenseMatrixToInvariant` | `function DenseMatrixToInvariant(const Matrix:IDenseDoubleMatrix):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Describe` | `function Describe(const Matrix:IDenseComplexMatrix):TValueMetadata` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Describe` | `function Describe(const Matrix:IDenseDoubleMatrix):TValueMetadata` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Describe` | `function Describe(const Values:TComplexArray):TValueMetadata` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Describe` | `function Describe(const Values:TDoubleArray):TValueMetadata` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DoubleVectorToInvariant` | `function DoubleVectorToInvariant(const Values:TDoubleArray):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EInterchangeError` | `EInterchangeError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadComplexMatrixBinary` | `function LoadComplexMatrixBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadComplexVectorBinary` | `function LoadComplexVectorBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadDoubleMatrixBinary` | `function LoadDoubleMatrixBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadDoubleVectorBinary` | `function LoadDoubleVectorBinary(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadRandomStateBinary` | `function LoadRandomStateBinary(const Stream:TStream):TRandomState` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadSparseComplexBinary` | `function LoadSparseComplexBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadSparseDoubleBinary` | `function LoadSparseDoubleBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadSparseSingleBinary` | `function LoadSparseSingleBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseSingleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `LoadSparseSingleComplexBinary` | `function LoadSparseSingleComplexBinary(const Stream:TStream;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseSingleComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ParseComplexInvariant` | `function ParseComplexInvariant(const Text:string):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ParseComplexVectorInvariant` | `function ParseComplexVectorInvariant(const Text:string;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ParseDenseMatrixInvariant` | `function ParseDenseMatrixInvariant(const Text:string;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ParseDoubleVectorInvariant` | `function ParseDoubleVectorInvariant(const Text:string;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ReadDelimitedMatrix` | `function ReadDelimitedMatrix(const Stream:TStream;const Delimiter:Char=',';const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ReadMatrixMarketComplex` | `function ReadMatrixMarketComplex(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ReadMatrixMarketDouble` | `function ReadMatrixMarketDouble(const Stream:TStream;const MaxElements:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ReadSparseMatrixMarketComplex` | `function ReadSparseMatrixMarketComplex(const Stream:TStream;const Format:TSparseFormat=sfCSR;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseComplexMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ReadSparseMatrixMarketDouble` | `function ReadSparseMatrixMarketDouble(const Stream:TStream;const Format:TSparseFormat=sfCSR;const MaxNonZeros:QWord=DEFAULT_MAX_INTERCHANGE_ELEMENTS;const MaxDimension:QWord=DEFAULT_MAX_SPARSE_DIMENSION):ISparseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Matrix:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Matrix:IDenseDoubleMatrix)` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Values:TComplexArray)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveBinary` | `procedure SaveBinary(const Stream:TStream;const Values:TDoubleArray)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveRandomStateBinary` | `procedure SaveRandomStateBinary(const Stream:TStream;const State:TRandomState)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseSingleComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `SaveSparseBinary` | `procedure SaveSparseBinary(const Stream:TStream;const Matrix:ISparseSingleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Summarize` | `function Summarize(const Matrix:IDenseDoubleMatrix;const MaximumRows:SizeInt=4;const MaximumColumns:SizeInt=6):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Summarize` | `function Summarize(const Values:TComplexArray;const MaximumValues:SizeInt=8):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Summarize` | `function Summarize(const Values:TDoubleArray;const MaximumValues:SizeInt=8):string` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TInterchangeScalarType` | `TInterchangeScalarType=(istFloat64,istComplex128)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TInterchangeValueKind` | `TInterchangeValueKind=(ivkVector,ivkMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TValueMetadata` | `TValueMetadata=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `WriteDelimitedMatrix` | `procedure WriteDelimitedMatrix(const Stream:TStream;const Matrix:IDenseDoubleMatrix;const Delimiter:Char=',')` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `WriteMatrixMarket` | `procedure WriteMatrixMarket(const Stream:TStream;const Matrix:IDenseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `WriteMatrixMarket` | `procedure WriteMatrixMarket(const Stream:TStream;const Matrix:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `WriteSparseMatrixMarket` | `procedure WriteSparseMatrixMarket(const Stream:TStream;const Matrix:ISparseComplexMatrix)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `procedure` | `WriteSparseMatrixMarket` | `procedure WriteSparseMatrixMarket(const Stream:TStream;const Matrix:ISparseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `TInterchangeScalarType` | `enum-value` | `istComplex128` | `istComplex128` | `advanced` | `—` | `—` | `—` |
+| `TInterchangeScalarType` | `enum-value` | `istFloat64` | `istFloat64` | `advanced` | `—` | `—` | `—` |
+| `TInterchangeValueKind` | `enum-value` | `ivkMatrix` | `ivkMatrix` | `advanced` | `—` | `—` | `—` |
+| `TInterchangeValueKind` | `enum-value` | `ivkVector` | `ivkVector` | `advanced` | `—` | `—` | `—` |
+| `TValueMetadata` | `field` | `Columns` | `Columns:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TValueMetadata` | `field` | `Elements` | `Elements:QWord` | `advanced` | `—` | `—` | `—` |
+| `TValueMetadata` | `field` | `Kind` | `Kind:TInterchangeValueKind` | `advanced` | `—` | `—` | `—` |
+| `TValueMetadata` | `field` | `Rows` | `Rows:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TValueMetadata` | `field` | `ScalarType` | `ScalarType:TInterchangeScalarType` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.Iteration
 
 Source: [`src/MathBase.Iteration.pas`](../src/MathBase.Iteration.pas)  
 Interface SHA-256: `a5a331e44c03161a6b809fae6fbf0f8589e40a65ee8a5760069d229575764453`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `IterationStatusName` | `function IterationStatusName(const Status:TIterationStatus):String` | `primary` | `—` |
-| `(unit)` | `type` | `TIterationStatus` | `TIterationStatus=(isUnknown,isConverged,isAcceptableLimit,isStagnation,isNumericalBreakdown,isInfeasible,isUnbounded,isIterationLimit,isCancelled)` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isAcceptableLimit` | `isAcceptableLimit` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isCancelled` | `isCancelled` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isConverged` | `isConverged` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isInfeasible` | `isInfeasible` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isIterationLimit` | `isIterationLimit` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isNumericalBreakdown` | `isNumericalBreakdown` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isStagnation` | `isStagnation` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isUnbounded` | `isUnbounded` | `primary` | `—` |
-| `TIterationStatus` | `enum-value` | `isUnknown` | `isUnknown` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `IterationStatusName` | `function IterationStatusName(const Status:TIterationStatus):String` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TIterationStatus` | `TIterationStatus=(isUnknown,isConverged,isAcceptableLimit,isStagnation,isNumericalBreakdown,isInfeasible,isUnbounded,isIterationLimit,isCancelled)` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isAcceptableLimit` | `isAcceptableLimit` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isCancelled` | `isCancelled` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isConverged` | `isConverged` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isInfeasible` | `isInfeasible` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isIterationLimit` | `isIterationLimit` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isNumericalBreakdown` | `isNumericalBreakdown` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isStagnation` | `isStagnation` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isUnbounded` | `isUnbounded` | `advanced` | `—` | `—` | `—` |
+| `TIterationStatus` | `enum-value` | `isUnknown` | `isUnknown` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.MathConstants
 
 Source: [`src/MathBase.MathConstants.pas`](../src/MathBase.MathConstants.pas)  
 Interface SHA-256: `7b665b0a608e253add891b24dc2659ae170bcbdee7c0fea44245be2d344f4e6a`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `constant` | `AvogadroConst` | `AvogadroConst=6.02214076e23` | `primary` | `—` |
-| `(unit)` | `constant` | `BoltzmannConst` | `BoltzmannConst=1.380649e-23` | `primary` | `—` |
-| `(unit)` | `constant` | `IdealGasConst` | `IdealGasConst=8.314462618` | `primary` | `—` |
-| `(unit)` | `constant` | `MathE` | `MathE=2.71828182845904523536` | `primary` | `—` |
-| `(unit)` | `constant` | `MathLn10` | `MathLn10=2.30258509299404568402` | `primary` | `—` |
-| `(unit)` | `constant` | `MathLn2` | `MathLn2=0.69314718055994530942` | `primary` | `—` |
-| `(unit)` | `constant` | `MathPhi` | `MathPhi=1.61803398874989484820` | `primary` | `—` |
-| `(unit)` | `constant` | `MathPi` | `MathPi=3.14159265358979323846` | `primary` | `—` |
-| `(unit)` | `constant` | `MathSqrt2` | `MathSqrt2=1.41421356237309504880` | `primary` | `—` |
-| `(unit)` | `constant` | `StandardAtmosphere` | `StandardAtmosphere=101325.0` | `primary` | `—` |
-| `(unit)` | `constant` | `StandardGravity` | `StandardGravity=9.80665` | `primary` | `—` |
-| `(unit)` | `constant` | `StandardTemperature` | `StandardTemperature=273.15` | `primary` | `—` |
-| `(unit)` | `constant` | `StefanBoltzmannConst` | `StefanBoltzmannConst=5.670374419e-8` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `constant` | `AvogadroConst` | `AvogadroConst=6.02214076e23` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `BoltzmannConst` | `BoltzmannConst=1.380649e-23` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `IdealGasConst` | `IdealGasConst=8.314462618` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `MathE` | `MathE=2.71828182845904523536` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `MathLn10` | `MathLn10=2.30258509299404568402` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `MathLn2` | `MathLn2=0.69314718055994530942` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `MathPhi` | `MathPhi=1.61803398874989484820` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `MathPi` | `MathPi=3.14159265358979323846` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `MathSqrt2` | `MathSqrt2=1.41421356237309504880` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `StandardAtmosphere` | `StandardAtmosphere=101325.0` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `StandardGravity` | `StandardGravity=9.80665` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `StandardTemperature` | `StandardTemperature=273.15` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `constant` | `StefanBoltzmannConst` | `StefanBoltzmannConst=5.670374419e-8` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.Precision
 
 Source: [`src/MathBase.Precision.pas`](../src/MathBase.Precision.pas)  
 Interface SHA-256: `eb14f7d7c9eea0fadd0ef460a10275937ebb0d7deb7dfde4ef94443c51b08714`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `Beta` | `function Beta(const Z,W:Double):Double` | `primary` | `—` |
-| `(unit)` | `function` | `BetaInc` | `function BetaInc(const A,B,X:Double):Double` | `primary` | `—` |
-| `(unit)` | `function` | `Erf` | `function Erf(const X:Double):Double` | `primary` | `—` |
-| `(unit)` | `function` | `GammaLn` | `function GammaLn(const X:Double):Double` | `primary` | `—` |
-| `(unit)` | `function` | `NormalCDF` | `function NormalCDF(const X:Double):Double` | `primary` | `—` |
-| `(unit)` | `function` | `StudentT` | `function StudentT(const DF:Integer;const X:Double):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `Beta` | `function Beta(const Z,W:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `BetaInc` | `function BetaInc(const A,B,X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `Erf` | `function Erf(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `GammaLn` | `function GammaLn(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `NormalCDF` | `function NormalCDF(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `function` | `StudentT` | `function StudentT(const DF:Integer;const X:Double):Double` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.Random
 
 Source: [`src/MathBase.Random.pas`](../src/MathBase.Random.pas)  
 Interface SHA-256: `c228dd158893139a0c37e41ac208949cf7ba39860628a165660f063698089e74`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ERandomStateError` | `ERandomStateError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TLocalRandom` | `TLocalRandom=record` | `primary` | `—` |
-| `(unit)` | `record` | `TRandomState` | `TRandomState=record` | `primary` | `—` |
-| `TLocalRandom` | `function` | `GetState` | `function GetState:TRandomState` | `primary` | `—` |
-| `TLocalRandom` | `function` | `NextDouble` | `function NextDouble:Double` | `primary` | `—` |
-| `TLocalRandom` | `function` | `NextInteger` | `function NextInteger(const UpperExclusive:SizeUInt):SizeUInt` | `primary` | `—` |
-| `TLocalRandom` | `function` | `NextNormal` | `function NextNormal:Double` | `primary` | `—` |
-| `TLocalRandom` | `function` | `NextSingle` | `function NextSingle:Single` | `primary` | `—` |
-| `TLocalRandom` | `function` | `NextUInt32` | `function NextUInt32:LongWord` | `primary` | `—` |
-| `TLocalRandom` | `function` | `NextUInt64` | `function NextUInt64:QWord` | `primary` | `—` |
-| `TLocalRandom` | `procedure` | `Reseed` | `procedure Reseed(const Seed:QWord)` | `primary` | `—` |
-| `TLocalRandom` | `function` | `Seeded` | `class function Seeded(const Seed:QWord):TLocalRandom` | `primary` | `—` |
-| `TLocalRandom` | `procedure` | `SetState` | `procedure SetState(const State:TRandomState)` | `primary` | `—` |
-| `TLocalRandom` | `function` | `Split` | `function Split:TLocalRandom` | `primary` | `—` |
-| `TRandomState` | `field` | `Words` | `Words:array[0..3]of QWord` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ERandomStateError` | `ERandomStateError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLocalRandom` | `TLocalRandom=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TRandomState` | `TRandomState=record` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `GetState` | `function GetState:TRandomState` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `NextDouble` | `function NextDouble:Double` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `NextInteger` | `function NextInteger(const UpperExclusive:SizeUInt):SizeUInt` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `NextNormal` | `function NextNormal:Double` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `NextSingle` | `function NextSingle:Single` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `NextUInt32` | `function NextUInt32:LongWord` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `NextUInt64` | `function NextUInt64:QWord` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `procedure` | `Reseed` | `procedure Reseed(const Seed:QWord)` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `Seeded` | `class function Seeded(const Seed:QWord):TLocalRandom` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `procedure` | `SetState` | `procedure SetState(const State:TRandomState)` | `advanced` | `—` | `—` | `—` |
+| `TLocalRandom` | `function` | `Split` | `function Split:TLocalRandom` | `advanced` | `—` | `—` | `—` |
+| `TRandomState` | `field` | `Words` | `Words:array[0..3]of QWord` | `advanced` | `—` | `—` | `—` |
 
 ## MathBase.SharedTypes
 
 Source: [`src/MathBase.SharedTypes.pas`](../src/MathBase.SharedTypes.pas)  
 Interface SHA-256: `a416e6f148fdf45b0a25fd7dc97b7ea887729fae7f191d22ba53483c99cf59a6`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `TDoubleArray` | `TDoubleArray=array of Double` | `primary` | `—` |
-| `(unit)` | `record` | `TDoublePair` | `TDoublePair=record` | `primary` | `—` |
-| `(unit)` | `type` | `TExtendedArray` | `TExtendedArray=array of Extended` | `primary` | `—` |
-| `(unit)` | `type` | `TIntegerArray` | `TIntegerArray=array of Integer` | `primary` | `—` |
-| `(unit)` | `function` | `ToDoubleArray` | `function ToDoubleArray(const Data:TExtendedArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToDoubleArray` | `function ToDoubleArray(const Data:TIntegerArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `function` | `ToDoubleArray` | `function ToDoubleArray(const Data:TSingleArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `type` | `TSingleArray` | `TSingleArray=array of Single` | `primary` | `—` |
-| `TDoublePair` | `field` | `Lower` | `Lower:Double` | `primary` | `—` |
-| `TDoublePair` | `field` | `Upper` | `Upper:Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `TDoubleArray` | `TDoubleArray=array of Double` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDoublePair` | `TDoublePair=record` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TExtendedArray` | `TExtendedArray=array of Extended` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TIntegerArray` | `TIntegerArray=array of Integer` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToDoubleArray` | `function ToDoubleArray(const Data:TExtendedArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToDoubleArray` | `function ToDoubleArray(const Data:TIntegerArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `ToDoubleArray` | `function ToDoubleArray(const Data:TSingleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSingleArray` | `TSingleArray=array of Single` | `advanced` | `—` | `—` | `—` |
+| `TDoublePair` | `field` | `Lower` | `Lower:Double` | `recommended` | `—` | `—` | `—` |
+| `TDoublePair` | `field` | `Upper` | `Upper:Double` | `recommended` | `—` | `—` | `—` |
 
 ## MathBase.Trigonometry
 
 Source: [`src/MathBase.Trigonometry.pas`](../src/MathBase.Trigonometry.pas)  
 Interface SHA-256: `828196cd105971ed00a3370ce97ae8512c373dbfc8a80817af90b4e4a536e447`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `class` | `TTrigKit` | `TTrigKit=class` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcCos` | `class function ArcCos(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcCosh` | `class function ArcCosh(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcSin` | `class function ArcSin(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcSinh` | `class function ArcSinh(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcTan` | `class function ArcTan(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcTan2` | `class function ArcTan2(const Y,X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ArcTanh` | `class function ArcTanh(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `ChordLength` | `class function ChordLength(const Radius,Angle:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `CircularSectorArea` | `class function CircularSectorArea(const Radius,Angle:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `CircularSegmentArea` | `class function CircularSegmentArea(const Radius,Angle:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Cos` | `class function Cos(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Cosh` | `class function Cosh(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Cot` | `class function Cot(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Csc` | `class function Csc(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `DegToRad` | `class function DegToRad(const Degrees:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `GradToRad` | `class function GradToRad(const Grads:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Hypotenuse` | `class function Hypotenuse(const A,B:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `NormalizeAngle` | `class function NormalizeAngle(const Angle:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `NormalizeAngleDeg` | `class function NormalizeAngleDeg(const Angle:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `RadToDeg` | `class function RadToDeg(const Radians:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `RadToGrad` | `class function RadToGrad(const Radians:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Sec` | `class function Sec(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Sin` | `class function Sin(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Sinh` | `class function Sinh(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Tan` | `class function Tan(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `Tanh` | `class function Tanh(const X:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `TriangleArea` | `class function TriangleArea(const Base,Height:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `TriangleAreaSAS` | `class function TriangleAreaSAS(const SideA,Angle,SideB:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `TriangleAreaSSS` | `class function TriangleAreaSSS(const A,B,C:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `TriangleCircumRadius` | `class function TriangleCircumRadius(const A,B,C:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `TriangleInRadius` | `class function TriangleInRadius(const A,B,C:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `TrianglePerimeter` | `class function TrianglePerimeter(const A,B,C:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `VectorAngle` | `class function VectorAngle(const X1,Y1,X2,Y2:Double):Double` | `primary` | `—` |
-| `TTrigKit` | `function` | `VectorMagnitude` | `class function VectorMagnitude(const X,Y:Double):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `class` | `TTrigKit` | `TTrigKit=class` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcCos` | `class function ArcCos(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcCosh` | `class function ArcCosh(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcSin` | `class function ArcSin(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcSinh` | `class function ArcSinh(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcTan` | `class function ArcTan(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcTan2` | `class function ArcTan2(const Y,X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ArcTanh` | `class function ArcTanh(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `ChordLength` | `class function ChordLength(const Radius,Angle:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `CircularSectorArea` | `class function CircularSectorArea(const Radius,Angle:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `CircularSegmentArea` | `class function CircularSegmentArea(const Radius,Angle:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Cos` | `class function Cos(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Cosh` | `class function Cosh(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Cot` | `class function Cot(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Csc` | `class function Csc(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `DegToRad` | `class function DegToRad(const Degrees:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `GradToRad` | `class function GradToRad(const Grads:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Hypotenuse` | `class function Hypotenuse(const A,B:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `NormalizeAngle` | `class function NormalizeAngle(const Angle:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `NormalizeAngleDeg` | `class function NormalizeAngleDeg(const Angle:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `RadToDeg` | `class function RadToDeg(const Radians:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `RadToGrad` | `class function RadToGrad(const Radians:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Sec` | `class function Sec(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Sin` | `class function Sin(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Sinh` | `class function Sinh(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Tan` | `class function Tan(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `Tanh` | `class function Tanh(const X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `TriangleArea` | `class function TriangleArea(const Base,Height:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `TriangleAreaSAS` | `class function TriangleAreaSAS(const SideA,Angle,SideB:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `TriangleAreaSSS` | `class function TriangleAreaSSS(const A,B,C:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `TriangleCircumRadius` | `class function TriangleCircumRadius(const A,B,C:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `TriangleInRadius` | `class function TriangleInRadius(const A,B,C:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `TrianglePerimeter` | `class function TrianglePerimeter(const A,B,C:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `VectorAngle` | `class function VectorAngle(const X1,Y1,X2,Y2:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TTrigKit` | `function` | `VectorMagnitude` | `class function VectorMagnitude(const X,Y:Double):Double` | `recommended` | `—` | `—` | `—` |
 
 ## MLLib.Analysis
 
 Source: [`src/MLLib.Analysis.pas`](../src/MLLib.Analysis.pas)  
 Interface SHA-256: `0b107a3183b456089fe369788d7cdacda2e402a3859a0f3468bea604e82069b3`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EAnalysisError` | `EAnalysisError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `class` | `TAnalysisKit` | `TAnalysisKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TBinaryLDAResult` | `TBinaryLDAResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TDecisionForest` | `TDecisionForest=record` | `primary` | `—` |
-| `(unit)` | `record` | `TDecisionTreeModel` | `TDecisionTreeModel=record` | `primary` | `—` |
-| `(unit)` | `record` | `TDecisionTreeNode` | `TDecisionTreeNode=record` | `primary` | `—` |
-| `(unit)` | `type` | `TDecisionTreeNodes` | `TDecisionTreeNodes=array of TDecisionTreeNode` | `primary` | `—` |
-| `(unit)` | `type` | `TDecisionTrees` | `TDecisionTrees=array of TDecisionTreeModel` | `primary` | `—` |
-| `(unit)` | `type` | `TForestTask` | `TForestTask=(ftClassification,ftRegression)` | `primary` | `—` |
-| `(unit)` | `record` | `THierarchicalClustering` | `THierarchicalClustering=record` | `primary` | `—` |
-| `(unit)` | `type` | `THierarchicalLinkage` | `THierarchicalLinkage=(hlSingle,hlComplete,hlAverage)` | `primary` | `—` |
-| `(unit)` | `class` | `TKDTree` | `TKDTree=class` | `primary` | `—` |
-| `(unit)` | `record` | `TKMeansPlusPlusResult` | `TKMeansPlusPlusResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TNeighborResult` | `TNeighborResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TPCAResult` | `TPCAResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TStandardizationModel` | `TStandardizationModel=record` | `primary` | `—` |
-| `(unit)` | `record` | `TValidationSplit` | `TValidationSplit=record` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `CreateValidationSplit` | `class function CreateValidationSplit(const SampleCount:SizeInt;const ValidationFraction:Double;const Seed:QWord=42):TValidationSplit` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `CutHierarchy` | `class function CutHierarchy(const Model:THierarchicalClustering;const ClusterCount:Integer):TIntegerArray` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `FitBinaryLDA` | `class function FitBinaryLDA(const Data:IDenseDoubleMatrix;const Labels:TIntegerArray;const NegativeClass,PositiveClass:Integer;const Ridge:Double=1E-9):TBinaryLDAResult` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `FitClassificationForest` | `class function FitClassificationForest(const Data:IDenseDoubleMatrix;const Labels:TIntegerArray;const TreeCount:Integer=32;const MaximumDepth:Integer=8;const MinimumLeafSize:Integer=2;const Seed:QWord=42):TDecisionForest` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `FitRegressionForest` | `class function FitRegressionForest(const Data:IDenseDoubleMatrix;const Targets:TDoubleArray;const TreeCount:Integer=32;const MaximumDepth:Integer=8;const MinimumLeafSize:Integer=2;const Seed:QWord=42):TDecisionForest` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `FitStandardization` | `class function FitStandardization(const TrainingData:IDenseDoubleMatrix):TStandardizationModel` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `HierarchicalCluster` | `class function HierarchicalCluster(const Data:IDenseDoubleMatrix;const Linkage:THierarchicalLinkage=hlAverage):THierarchicalClustering` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `KFoldAssignments` | `class function KFoldAssignments(const SampleCount,FoldCount:SizeInt;const Seed:QWord=42):TIntegerArray` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `KMeansPlusPlus` | `class function KMeansPlusPlus(const Data:IDenseDoubleMatrix;const ClusterCount:SizeInt;const Seed:QWord=42;const MaximumIterations:SizeInt=300;const Tolerance:Double=1E-8):TKMeansPlusPlusResult` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `PCA` | `class function PCA(const Data:IDenseDoubleMatrix;const ComponentCount:SizeInt):TPCAResult` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `PredictBinaryLDA` | `class function PredictBinaryLDA(const Model:TBinaryLDAResult;const Data:IDenseDoubleMatrix):TIntegerArray` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `PredictForestClasses` | `class function PredictForestClasses(const Model:TDecisionForest;const Data:IDenseDoubleMatrix):TIntegerArray` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `PredictForestValues` | `class function PredictForestValues(const Model:TDecisionForest;const Data:IDenseDoubleMatrix):TDoubleArray` | `primary` | `—` |
-| `TAnalysisKit` | `function` | `TransformStandardized` | `class function TransformStandardized(const Model:TStandardizationModel;const Data:IDenseDoubleMatrix):IDenseDoubleMatrix` | `primary` | `—` |
-| `TBinaryLDAResult` | `field` | `Direction` | `Direction:TDoubleArray` | `primary` | `—` |
-| `TBinaryLDAResult` | `field` | `NegativeClass` | `NegativeClass:Integer` | `primary` | `—` |
-| `TBinaryLDAResult` | `field` | `PositiveClass` | `PositiveClass:Integer` | `primary` | `—` |
-| `TBinaryLDAResult` | `field` | `Threshold` | `Threshold:Double` | `primary` | `—` |
-| `TDecisionForest` | `field` | `ClassCount` | `ClassCount:Integer` | `primary` | `—` |
-| `TDecisionForest` | `field` | `FeatureImportances` | `FeatureImportances:TDoubleArray` | `primary` | `—` |
-| `TDecisionForest` | `field` | `OOBScore` | `OOBScore:Double` | `primary` | `—` |
-| `TDecisionForest` | `field` | `Seed` | `Seed:QWord` | `primary` | `—` |
-| `TDecisionForest` | `field` | `Task` | `Task:TForestTask` | `primary` | `—` |
-| `TDecisionForest` | `field` | `Trees` | `Trees:TDecisionTrees` | `primary` | `—` |
-| `TDecisionTreeModel` | `field` | `Nodes` | `Nodes:TDecisionTreeNodes` | `primary` | `—` |
-| `TDecisionTreeNode` | `field` | `Feature` | `Feature:Integer` | `primary` | `—` |
-| `TDecisionTreeNode` | `field` | `IsLeaf` | `IsLeaf:Boolean` | `primary` | `—` |
-| `TDecisionTreeNode` | `field` | `LeftNode` | `LeftNode:Integer` | `primary` | `—` |
-| `TDecisionTreeNode` | `field` | `Prediction` | `Prediction:Double` | `primary` | `—` |
-| `TDecisionTreeNode` | `field` | `RightNode` | `RightNode:Integer` | `primary` | `—` |
-| `TDecisionTreeNode` | `field` | `Threshold` | `Threshold:Double` | `primary` | `—` |
-| `TForestTask` | `enum-value` | `ftClassification` | `ftClassification` | `primary` | `—` |
-| `TForestTask` | `enum-value` | `ftRegression` | `ftRegression` | `primary` | `—` |
-| `THierarchicalClustering` | `field` | `ClusterSizes` | `ClusterSizes:TIntegerArray` | `primary` | `—` |
-| `THierarchicalClustering` | `field` | `Distances` | `Distances:TDoubleArray` | `primary` | `—` |
-| `THierarchicalClustering` | `field` | `MergeLeft` | `MergeLeft:TIntegerArray` | `primary` | `—` |
-| `THierarchicalClustering` | `field` | `MergeRight` | `MergeRight:TIntegerArray` | `primary` | `—` |
-| `THierarchicalClustering` | `field` | `SampleCount` | `SampleCount:Integer` | `primary` | `—` |
-| `THierarchicalLinkage` | `enum-value` | `hlAverage` | `hlAverage` | `primary` | `—` |
-| `THierarchicalLinkage` | `enum-value` | `hlComplete` | `hlComplete` | `primary` | `—` |
-| `THierarchicalLinkage` | `enum-value` | `hlSingle` | `hlSingle` | `primary` | `—` |
-| `TKDTree` | `function` | `Count` | `function Count:SizeInt` | `primary` | `—` |
-| `TKDTree` | `constructor` | `Create` | `constructor Create(const Data:IDenseDoubleMatrix)` | `primary` | `—` |
-| `TKDTree` | `function` | `Dimensions` | `function Dimensions:SizeInt` | `primary` | `—` |
-| `TKDTree` | `function` | `Query` | `function Query(const Point:TDoubleArray;const NeighborCount:SizeInt=1):TNeighborResult` | `primary` | `—` |
-| `TKMeansPlusPlusResult` | `field` | `Centroids` | `Centroids:IDenseDoubleMatrix` | `primary` | `—` |
-| `TKMeansPlusPlusResult` | `field` | `Converged` | `Converged:Boolean` | `primary` | `—` |
-| `TKMeansPlusPlusResult` | `field` | `Inertia` | `Inertia:Double` | `primary` | `—` |
-| `TKMeansPlusPlusResult` | `field` | `Iterations` | `Iterations:SizeInt` | `primary` | `—` |
-| `TKMeansPlusPlusResult` | `field` | `Labels` | `Labels:TIntegerArray` | `primary` | `—` |
-| `TNeighborResult` | `field` | `Indices` | `Indices:TIntegerArray` | `primary` | `—` |
-| `TNeighborResult` | `field` | `SquaredDistances` | `SquaredDistances:TDoubleArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `Components` | `Components:IDenseDoubleMatrix` | `primary` | `—` |
-| `TPCAResult` | `field` | `ExplainedRatio` | `ExplainedRatio:TDoubleArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `ExplainedVariance` | `ExplainedVariance:TDoubleArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `Mean` | `Mean:TDoubleArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `Scores` | `Scores:IDenseDoubleMatrix` | `primary` | `—` |
-| `TPCAResult` | `field` | `SingularValues` | `SingularValues:TDoubleArray` | `primary` | `—` |
-| `TStandardizationModel` | `field` | `Means` | `Means:TDoubleArray` | `primary` | `—` |
-| `TStandardizationModel` | `field` | `Scales` | `Scales:TDoubleArray` | `primary` | `—` |
-| `TValidationSplit` | `field` | `TrainingRows` | `TrainingRows:TIntegerArray` | `primary` | `—` |
-| `TValidationSplit` | `field` | `ValidationRows` | `ValidationRows:TIntegerArray` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EAnalysisError` | `EAnalysisError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TAnalysisKit` | `TAnalysisKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TBinaryLDAResult` | `TBinaryLDAResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDecisionForest` | `TDecisionForest=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDecisionTreeModel` | `TDecisionTreeModel=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDecisionTreeNode` | `TDecisionTreeNode=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDecisionTreeNodes` | `TDecisionTreeNodes=array of TDecisionTreeNode` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDecisionTrees` | `TDecisionTrees=array of TDecisionTreeModel` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TForestTask` | `TForestTask=(ftClassification,ftRegression)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `THierarchicalClustering` | `THierarchicalClustering=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `THierarchicalLinkage` | `THierarchicalLinkage=(hlSingle,hlComplete,hlAverage)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TKDTree` | `TKDTree=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TKMeansPlusPlusResult` | `TKMeansPlusPlusResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TNeighborResult` | `TNeighborResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPCAResult` | `TPCAResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TStandardizationModel` | `TStandardizationModel=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TValidationSplit` | `TValidationSplit=record` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `CreateValidationSplit` | `class function CreateValidationSplit(const SampleCount:SizeInt;const ValidationFraction:Double;const Seed:QWord=42):TValidationSplit` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `CutHierarchy` | `class function CutHierarchy(const Model:THierarchicalClustering;const ClusterCount:Integer):TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `FitBinaryLDA` | `class function FitBinaryLDA(const Data:IDenseDoubleMatrix;const Labels:TIntegerArray;const NegativeClass,PositiveClass:Integer;const Ridge:Double=1E-9):TBinaryLDAResult` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `FitClassificationForest` | `class function FitClassificationForest(const Data:IDenseDoubleMatrix;const Labels:TIntegerArray;const TreeCount:Integer=32;const MaximumDepth:Integer=8;const MinimumLeafSize:Integer=2;const Seed:QWord=42):TDecisionForest` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `FitRegressionForest` | `class function FitRegressionForest(const Data:IDenseDoubleMatrix;const Targets:TDoubleArray;const TreeCount:Integer=32;const MaximumDepth:Integer=8;const MinimumLeafSize:Integer=2;const Seed:QWord=42):TDecisionForest` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `FitStandardization` | `class function FitStandardization(const TrainingData:IDenseDoubleMatrix):TStandardizationModel` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `HierarchicalCluster` | `class function HierarchicalCluster(const Data:IDenseDoubleMatrix;const Linkage:THierarchicalLinkage=hlAverage):THierarchicalClustering` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `KFoldAssignments` | `class function KFoldAssignments(const SampleCount,FoldCount:SizeInt;const Seed:QWord=42):TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `KMeansPlusPlus` | `class function KMeansPlusPlus(const Data:IDenseDoubleMatrix;const ClusterCount:SizeInt;const Seed:QWord=42;const MaximumIterations:SizeInt=300;const Tolerance:Double=1E-8):TKMeansPlusPlusResult` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `PCA` | `class function PCA(const Data:IDenseDoubleMatrix;const ComponentCount:SizeInt):TPCAResult` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `PredictBinaryLDA` | `class function PredictBinaryLDA(const Model:TBinaryLDAResult;const Data:IDenseDoubleMatrix):TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `PredictForestClasses` | `class function PredictForestClasses(const Model:TDecisionForest;const Data:IDenseDoubleMatrix):TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `PredictForestValues` | `class function PredictForestValues(const Model:TDecisionForest;const Data:IDenseDoubleMatrix):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TAnalysisKit` | `function` | `TransformStandardized` | `class function TransformStandardized(const Model:TStandardizationModel;const Data:IDenseDoubleMatrix):IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TBinaryLDAResult` | `field` | `Direction` | `Direction:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TBinaryLDAResult` | `field` | `NegativeClass` | `NegativeClass:Integer` | `advanced` | `—` | `—` | `—` |
+| `TBinaryLDAResult` | `field` | `PositiveClass` | `PositiveClass:Integer` | `advanced` | `—` | `—` | `—` |
+| `TBinaryLDAResult` | `field` | `Threshold` | `Threshold:Double` | `advanced` | `—` | `—` | `—` |
+| `TDecisionForest` | `field` | `ClassCount` | `ClassCount:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDecisionForest` | `field` | `FeatureImportances` | `FeatureImportances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDecisionForest` | `field` | `OOBScore` | `OOBScore:Double` | `advanced` | `—` | `—` | `—` |
+| `TDecisionForest` | `field` | `Seed` | `Seed:QWord` | `advanced` | `—` | `—` | `—` |
+| `TDecisionForest` | `field` | `Task` | `Task:TForestTask` | `advanced` | `—` | `—` | `—` |
+| `TDecisionForest` | `field` | `Trees` | `Trees:TDecisionTrees` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeModel` | `field` | `Nodes` | `Nodes:TDecisionTreeNodes` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeNode` | `field` | `Feature` | `Feature:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeNode` | `field` | `IsLeaf` | `IsLeaf:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeNode` | `field` | `LeftNode` | `LeftNode:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeNode` | `field` | `Prediction` | `Prediction:Double` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeNode` | `field` | `RightNode` | `RightNode:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDecisionTreeNode` | `field` | `Threshold` | `Threshold:Double` | `advanced` | `—` | `—` | `—` |
+| `TForestTask` | `enum-value` | `ftClassification` | `ftClassification` | `advanced` | `—` | `—` | `—` |
+| `TForestTask` | `enum-value` | `ftRegression` | `ftRegression` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalClustering` | `field` | `ClusterSizes` | `ClusterSizes:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalClustering` | `field` | `Distances` | `Distances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalClustering` | `field` | `MergeLeft` | `MergeLeft:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalClustering` | `field` | `MergeRight` | `MergeRight:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalClustering` | `field` | `SampleCount` | `SampleCount:Integer` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalLinkage` | `enum-value` | `hlAverage` | `hlAverage` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalLinkage` | `enum-value` | `hlComplete` | `hlComplete` | `advanced` | `—` | `—` | `—` |
+| `THierarchicalLinkage` | `enum-value` | `hlSingle` | `hlSingle` | `advanced` | `—` | `—` | `—` |
+| `TKDTree` | `function` | `Count` | `function Count:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TKDTree` | `constructor` | `Create` | `constructor Create(const Data:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `TKDTree` | `function` | `Dimensions` | `function Dimensions:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TKDTree` | `function` | `Query` | `function Query(const Point:TDoubleArray;const NeighborCount:SizeInt=1):TNeighborResult` | `advanced` | `—` | `—` | `—` |
+| `TKMeansPlusPlusResult` | `field` | `Centroids` | `Centroids:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TKMeansPlusPlusResult` | `field` | `Converged` | `Converged:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TKMeansPlusPlusResult` | `field` | `Inertia` | `Inertia:Double` | `advanced` | `—` | `—` | `—` |
+| `TKMeansPlusPlusResult` | `field` | `Iterations` | `Iterations:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TKMeansPlusPlusResult` | `field` | `Labels` | `Labels:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TNeighborResult` | `field` | `Indices` | `Indices:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TNeighborResult` | `field` | `SquaredDistances` | `SquaredDistances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `Components` | `Components:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `ExplainedRatio` | `ExplainedRatio:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `ExplainedVariance` | `ExplainedVariance:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `Mean` | `Mean:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `Scores` | `Scores:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `SingularValues` | `SingularValues:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStandardizationModel` | `field` | `Means` | `Means:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TStandardizationModel` | `field` | `Scales` | `Scales:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TValidationSplit` | `field` | `TrainingRows` | `TrainingRows:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TValidationSplit` | `field` | `ValidationRows` | `ValidationRows:TIntegerArray` | `advanced` | `—` | `—` | `—` |
 
 ## MLLib.MachineLearning
 
 Source: [`src/MLLib.MachineLearning.pas`](../src/MLLib.MachineLearning.pas)  
 Interface SHA-256: `a2c2e6db5103bb5362aaf157d32a8dc7ac7a222cda378e8a9834868ca56c5921`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EMLError` | `EMLError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TConfusionMatrix` | `TConfusionMatrix=record` | `primary` | `—` |
-| `(unit)` | `record` | `TDBSCANResult` | `TDBSCANResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleMatrix` | `TDoubleMatrix=array of TDoubleArray` | `primary` | `—` |
-| `(unit)` | `record` | `TKMeansResult` | `TKMeansResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TLinearModel` | `TLinearModel=record` | `primary` | `—` |
-| `(unit)` | `class` | `TMLKit` | `TMLKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TPCAResult` | `TPCAResult=record` | `primary` | `—` |
-| `TConfusionMatrix` | `field` | `Counts` | `Counts:TDoubleMatrix` | `primary` | `—` |
-| `TConfusionMatrix` | `field` | `NClasses` | `NClasses:Integer` | `primary` | `—` |
-| `TDBSCANResult` | `field` | `Labels` | `Labels:TIntegerArray` | `primary` | `—` |
-| `TDBSCANResult` | `field` | `NClusters` | `NClusters:Integer` | `primary` | `—` |
-| `TKMeansResult` | `field` | `Centroids` | `Centroids:TDoubleMatrix` | `primary` | `—` |
-| `TKMeansResult` | `field` | `Inertia` | `Inertia:Double` | `primary` | `—` |
-| `TKMeansResult` | `field` | `Iters` | `Iters:Integer` | `primary` | `—` |
-| `TKMeansResult` | `field` | `Labels` | `Labels:TIntegerArray` | `primary` | `—` |
-| `TLinearModel` | `field` | `Coefficients` | `Coefficients:TDoubleArray` | `primary` | `—` |
-| `TLinearModel` | `field` | `Intercept` | `Intercept:Double` | `primary` | `—` |
-| `TLinearModel` | `field` | `RSquared` | `RSquared:Double` | `primary` | `—` |
-| `TMLKit` | `function` | `Accuracy` | `class function Accuracy(const YTrue,YPred:TIntegerArray):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `BuildConfusionMatrix` | `class function BuildConfusionMatrix(const YTrue,YPred:TIntegerArray;NClasses:Integer):TConfusionMatrix` | `primary` | `—` |
-| `TMLKit` | `function` | `DBSCAN` | `class function DBSCAN(const X:TDoubleMatrix;Eps:Double;MinPts:Integer):TDBSCANResult` | `primary` | `—` |
-| `TMLKit` | `function` | `F1Score` | `class function F1Score(const YTrue,YPred:TIntegerArray;ClassLabel:Integer):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `KMeans` | `class function KMeans(const X:TDoubleMatrix;K:Integer;MaxIter:Integer=300;Seed:Integer=42):TKMeansResult` | `primary` | `—` |
-| `TMLKit` | `function` | `KNearestNeighbours` | `class function KNearestNeighbours(const TrainX:TDoubleMatrix;const TrainY:TIntegerArray;const TestX:TDoubleMatrix;K:Integer):TIntegerArray` | `primary` | `—` |
-| `TMLKit` | `function` | `LinearPredict` | `class function LinearPredict(const Model:TLinearModel;const Xnew:TDoubleMatrix):TDoubleArray` | `primary` | `—` |
-| `TMLKit` | `function` | `LinearRegression` | `class function LinearRegression(const X:TDoubleMatrix;const Y:TDoubleArray):TLinearModel` | `primary` | `—` |
-| `TMLKit` | `function` | `LogisticPredict` | `class function LogisticPredict(const Model:TLinearModel;const Xnew:TDoubleMatrix):TIntegerArray` | `primary` | `—` |
-| `TMLKit` | `function` | `LogisticRegression` | `class function LogisticRegression(const TrainX:TDoubleMatrix;const TrainY:TIntegerArray;LR:Double=0.1;MaxIter:Integer=1000;Tol:Double=1e-5):TLinearModel` | `primary` | `—` |
-| `TMLKit` | `function` | `MAE` | `class function MAE(const YTrue,YPred:TDoubleArray):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `MSE` | `class function MSE(const YTrue,YPred:TDoubleArray):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `NaiveBayes` | `class function NaiveBayes(const TrainX:TDoubleMatrix;const TrainY:TIntegerArray;const TestX:TDoubleMatrix):TIntegerArray` | `primary` | `—` |
-| `TMLKit` | `function` | `Normalise` | `class function Normalise(const X:TDoubleMatrix):TDoubleMatrix` | `primary` | `—` |
-| `TMLKit` | `function` | `OneHotEncode` | `class function OneHotEncode(const Labels:TIntegerArray;NClasses:Integer):TDoubleMatrix` | `primary` | `—` |
-| `TMLKit` | `function` | `PCA` | `class function PCA(const X:TDoubleMatrix;NComponents:Integer;MaxIter:Integer=1000;Tol:Double=1e-8):TPCAResult` | `primary` | `—` |
-| `TMLKit` | `function` | `PCATransform` | `class function PCATransform(const PCARes:TPCAResult;const X:TDoubleMatrix):TDoubleMatrix` | `primary` | `—` |
-| `TMLKit` | `function` | `PolynomialFeatures` | `class function PolynomialFeatures(const X:TDoubleArray;Degree:Integer):TDoubleMatrix` | `primary` | `—` |
-| `TMLKit` | `function` | `PolynomialFeatures` | `class function PolynomialFeatures(const X:TDoubleArray;Degree:Integer;IncludeBias:Boolean):TDoubleMatrix` | `primary` | `—` |
-| `TMLKit` | `function` | `Precision` | `class function Precision(const YTrue,YPred:TIntegerArray;ClassLabel:Integer):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `R2Score` | `class function R2Score(const YTrue,YPred:TDoubleArray):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `Recall` | `class function Recall(const YTrue,YPred:TIntegerArray;ClassLabel:Integer):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `RidgeRegression` | `class function RidgeRegression(const X:TDoubleMatrix;const Y:TDoubleArray;Lambda:Double):TLinearModel` | `primary` | `—` |
-| `TMLKit` | `function` | `RMSE` | `class function RMSE(const YTrue,YPred:TDoubleArray):Double` | `primary` | `—` |
-| `TMLKit` | `function` | `Standardise` | `class function Standardise(const X:TDoubleMatrix):TDoubleMatrix` | `primary` | `—` |
-| `TMLKit` | `procedure` | `TrainTestSplit` | `class procedure TrainTestSplit(const X:TDoubleMatrix;const Y:TIntegerArray;TestFraction:Double;Seed:Integer;out TrainX:TDoubleMatrix;out TrainY:TIntegerArray;out TestX:TDoubleMatrix;out TestY:TIntegerArray)` | `primary` | `—` |
-| `TPCAResult` | `field` | `Components` | `Components:TDoubleMatrix` | `primary` | `—` |
-| `TPCAResult` | `field` | `ExplainedRatio` | `ExplainedRatio:TDoubleArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `ExplainedVariance` | `ExplainedVariance:TDoubleArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `Iterations` | `Iterations:TIntegerArray` | `primary` | `—` |
-| `TPCAResult` | `field` | `Mean` | `Mean:TDoubleArray` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EMLError` | `EMLError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TConfusionMatrix` | `TConfusionMatrix=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDBSCANResult` | `TDBSCANResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleMatrix` | `TDoubleMatrix=array of TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TKMeansResult` | `TKMeansResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLinearModel` | `TLinearModel=record` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TMLKit` | `TMLKit=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPCAResult` | `TPCAResult=record` | `advanced` | `—` | `—` | `—` |
+| `TConfusionMatrix` | `field` | `Counts` | `Counts:TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TConfusionMatrix` | `field` | `NClasses` | `NClasses:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDBSCANResult` | `field` | `Labels` | `Labels:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TDBSCANResult` | `field` | `NClusters` | `NClusters:Integer` | `advanced` | `—` | `—` | `—` |
+| `TKMeansResult` | `field` | `Centroids` | `Centroids:TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TKMeansResult` | `field` | `Inertia` | `Inertia:Double` | `advanced` | `—` | `—` | `—` |
+| `TKMeansResult` | `field` | `Iters` | `Iters:Integer` | `advanced` | `—` | `—` | `—` |
+| `TKMeansResult` | `field` | `Labels` | `Labels:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TLinearModel` | `field` | `Coefficients` | `Coefficients:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TLinearModel` | `field` | `Intercept` | `Intercept:Double` | `recommended` | `—` | `—` | `—` |
+| `TLinearModel` | `field` | `RSquared` | `RSquared:Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `Accuracy` | `class function Accuracy(const YTrue,YPred:TIntegerArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `BuildConfusionMatrix` | `class function BuildConfusionMatrix(const YTrue,YPred:TIntegerArray;NClasses:Integer):TConfusionMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `DBSCAN` | `class function DBSCAN(const X:TDoubleMatrix;Eps:Double;MinPts:Integer):TDBSCANResult` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `F1Score` | `class function F1Score(const YTrue,YPred:TIntegerArray;ClassLabel:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `KMeans` | `class function KMeans(const X:TDoubleMatrix;K:Integer;MaxIter:Integer=300;Seed:Integer=42):TKMeansResult` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `KNearestNeighbours` | `class function KNearestNeighbours(const TrainX:TDoubleMatrix;const TrainY:TIntegerArray;const TestX:TDoubleMatrix;K:Integer):TIntegerArray` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `LinearPredict` | `class function LinearPredict(const Model:TLinearModel;const Xnew:TDoubleMatrix):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `LinearRegression` | `class function LinearRegression(const X:TDoubleMatrix;const Y:TDoubleArray):TLinearModel` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `LogisticPredict` | `class function LogisticPredict(const Model:TLinearModel;const Xnew:TDoubleMatrix):TIntegerArray` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `LogisticRegression` | `class function LogisticRegression(const TrainX:TDoubleMatrix;const TrainY:TIntegerArray;LR:Double=0.1;MaxIter:Integer=1000;Tol:Double=1e-5):TLinearModel` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `MAE` | `class function MAE(const YTrue,YPred:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `MSE` | `class function MSE(const YTrue,YPred:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `NaiveBayes` | `class function NaiveBayes(const TrainX:TDoubleMatrix;const TrainY:TIntegerArray;const TestX:TDoubleMatrix):TIntegerArray` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `Normalise` | `class function Normalise(const X:TDoubleMatrix):TDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `OneHotEncode` | `class function OneHotEncode(const Labels:TIntegerArray;NClasses:Integer):TDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `PCA` | `class function PCA(const X:TDoubleMatrix;NComponents:Integer;MaxIter:Integer=1000;Tol:Double=1e-8):TPCAResult` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `PCATransform` | `class function PCATransform(const PCARes:TPCAResult;const X:TDoubleMatrix):TDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `PolynomialFeatures` | `class function PolynomialFeatures(const X:TDoubleArray;Degree:Integer):TDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `PolynomialFeatures` | `class function PolynomialFeatures(const X:TDoubleArray;Degree:Integer;IncludeBias:Boolean):TDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `Precision` | `class function Precision(const YTrue,YPred:TIntegerArray;ClassLabel:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `R2Score` | `class function R2Score(const YTrue,YPred:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `Recall` | `class function Recall(const YTrue,YPred:TIntegerArray;ClassLabel:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `RidgeRegression` | `class function RidgeRegression(const X:TDoubleMatrix;const Y:TDoubleArray;Lambda:Double):TLinearModel` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `RMSE` | `class function RMSE(const YTrue,YPred:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `function` | `Standardise` | `class function Standardise(const X:TDoubleMatrix):TDoubleMatrix` | `recommended` | `—` | `—` | `—` |
+| `TMLKit` | `procedure` | `TrainTestSplit` | `class procedure TrainTestSplit(const X:TDoubleMatrix;const Y:TIntegerArray;TestFraction:Double;Seed:Integer;out TrainX:TDoubleMatrix;out TrainY:TIntegerArray;out TestX:TDoubleMatrix;out TestY:TIntegerArray)` | `recommended` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `Components` | `Components:TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `ExplainedRatio` | `ExplainedRatio:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `ExplainedVariance` | `ExplainedVariance:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `Iterations` | `Iterations:TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `TPCAResult` | `field` | `Mean` | `Mean:TDoubleArray` | `advanced` | `—` | `—` | `—` |
 
 ## NumericsLib.Differentiation
 
 Source: [`src/NumericsLib.Differentiation.pas`](../src/NumericsLib.Differentiation.pas)  
 Interface SHA-256: `f8e1c2ea7bad43c15fbe8ad64d72d01d13044740be4fe1026fecd6e81d2eaeb7`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `function` | `DualCos` | `function DualCos(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualCosh` | `function DualCosh(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualExp` | `function DualExp(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualLn` | `function DualLn(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualPower` | `function DualPower(const X:TDual;const P:Double):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualSin` | `function DualSin(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualSinh` | `function DualSinh(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualSqrt` | `function DualSqrt(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualTan` | `function DualTan(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `function` | `DualTanh` | `function DualTanh(const X:TDual):TDual` | `primary` | `—` |
-| `(unit)` | `type` | `EDifferentiationError` | `EDifferentiationError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TComplexScalarVectorFunction` | `TComplexScalarVectorFunction=function(const X:TComplexArray):TComplex` | `primary` | `—` |
-| `(unit)` | `record` | `TDerivativeCheckResult` | `TDerivativeCheckResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TDifferenceMethod` | `TDifferenceMethod=(dmForward,dmCentral,dmComplexStep)` | `primary` | `—` |
-| `(unit)` | `class` | `TDifferentiationKit` | `TDifferentiationKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TDoubleMatrix` | `TDoubleMatrix=array of TDoubleArray` | `primary` | `—` |
-| `(unit)` | `record` | `TDual` | `TDual=record` | `primary` | `—` |
-| `(unit)` | `type` | `TDualArray` | `TDualArray=array of TDual` | `primary` | `—` |
-| `(unit)` | `type` | `TDualFunction` | `TDualFunction=function(const X:TDualArray):TDual` | `primary` | `—` |
-| `(unit)` | `type` | `TDualVectorFunction` | `TDualVectorFunction=function(const X:TDualArray):TDualArray` | `primary` | `—` |
-| `(unit)` | `type` | `TGradientFunction` | `TGradientFunction=function(const X:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `record` | `TJacobianCheckResult` | `TJacobianCheckResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TJacobianMatrixFunction` | `TJacobianMatrixFunction=function(const X:TDoubleArray):TDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `type` | `TScalarVectorFunction` | `TScalarVectorFunction=function(const X:TDoubleArray):Double` | `primary` | `—` |
-| `(unit)` | `type` | `TVectorFunction` | `TVectorFunction=function(const X:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TDerivativeCheckResult` | `field` | `AbsoluteError` | `AbsoluteError:Double` | `primary` | `—` |
-| `TDerivativeCheckResult` | `field` | `AnalyticValue` | `AnalyticValue:Double` | `primary` | `—` |
-| `TDerivativeCheckResult` | `field` | `Passed` | `Passed:Boolean` | `primary` | `—` |
-| `TDerivativeCheckResult` | `field` | `ReferenceValue` | `ReferenceValue:Double` | `primary` | `—` |
-| `TDerivativeCheckResult` | `field` | `RelativeError` | `RelativeError:Double` | `primary` | `—` |
-| `TDerivativeCheckResult` | `field` | `WorstIndex` | `WorstIndex:Integer` | `primary` | `—` |
-| `TDifferenceMethod` | `enum-value` | `dmCentral` | `dmCentral` | `primary` | `—` |
-| `TDifferenceMethod` | `enum-value` | `dmComplexStep` | `dmComplexStep` | `primary` | `—` |
-| `TDifferenceMethod` | `enum-value` | `dmForward` | `dmForward` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `AutoGradient` | `class function AutoGradient(F:TDualFunction;const X:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `AutoJacobian` | `class function AutoJacobian(F:TDualVectorFunction;const X:TDoubleArray):TDoubleMatrix` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `CheckGradient` | `class function CheckGradient(F:TScalarVectorFunction;Grad:TGradientFunction;const X:TDoubleArray;RelativeTolerance:Double=1E-5;AbsoluteTolerance:Double=1E-7):TDerivativeCheckResult` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `CheckJacobian` | `class function CheckJacobian(F:TVectorFunction;AnalyticJacobian:TJacobianMatrixFunction;const X:TDoubleArray;RelativeTolerance:Double=1E-5;AbsoluteTolerance:Double=1E-7):TJacobianCheckResult` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `ComplexStepGradient` | `class function ComplexStepGradient(F:TComplexScalarVectorFunction;const X:TDoubleArray;Step:Double=1E-20):TDoubleArray` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `Gradient` | `class function Gradient(F:TScalarVectorFunction;const X:TDoubleArray;Method:TDifferenceMethod=dmCentral;RelativeStep:Double=0.0):TDoubleArray` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `Hessian` | `class function Hessian(F:TScalarVectorFunction;const X:TDoubleArray;RelativeStep:Double=0.0):TDoubleMatrix` | `primary` | `—` |
-| `TDifferentiationKit` | `function` | `Jacobian` | `class function Jacobian(F:TVectorFunction;const X:TDoubleArray;Method:TDifferenceMethod=dmCentral;RelativeStep:Double=0.0):TDoubleMatrix` | `primary` | `—` |
-| `TDual` | `operator` | `*` | `class operator *(const A,B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `*` | `class operator *(const A:Double;const B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `*` | `class operator *(const A:TDual;const B:Double):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `+` | `class operator +(const A,B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `+` | `class operator +(const A:Double;const B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `+` | `class operator +(const A:TDual;const B:Double):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `-` | `class operator -(const A,B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `-` | `class operator -(const A:Double;const B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `-` | `class operator -(const A:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `-` | `class operator -(const A:TDual;const B:Double):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `/` | `class operator /(const A,B:TDual):TDual` | `primary` | `—` |
-| `TDual` | `operator` | `/` | `class operator /(const A:TDual;const B:Double):TDual` | `primary` | `—` |
-| `TDual` | `function` | `Create` | `class function Create(const AValue,ADerivative:Double):TDual` | `primary` | `—` |
-| `TDual` | `field` | `Derivative` | `Derivative:Double` | `primary` | `—` |
-| `TDual` | `field` | `Value` | `Value:Double` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `AbsoluteError` | `AbsoluteError:Double` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `AnalyticValue` | `AnalyticValue:Double` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `Passed` | `Passed:Boolean` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `ReferenceValue` | `ReferenceValue:Double` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `RelativeError` | `RelativeError:Double` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `WorstColumn` | `WorstColumn:Integer` | `primary` | `—` |
-| `TJacobianCheckResult` | `field` | `WorstRow` | `WorstRow:Integer` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `function` | `DualCos` | `function DualCos(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualCosh` | `function DualCosh(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualExp` | `function DualExp(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualLn` | `function DualLn(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualPower` | `function DualPower(const X:TDual;const P:Double):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualSin` | `function DualSin(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualSinh` | `function DualSinh(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualSqrt` | `function DualSqrt(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualTan` | `function DualTan(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `function` | `DualTanh` | `function DualTanh(const X:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `EDifferentiationError` | `EDifferentiationError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TComplexScalarVectorFunction` | `TComplexScalarVectorFunction=function(const X:TComplexArray):TComplex` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDerivativeCheckResult` | `TDerivativeCheckResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDifferenceMethod` | `TDifferenceMethod=(dmForward,dmCentral,dmComplexStep)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TDifferentiationKit` | `TDifferentiationKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDoubleMatrix` | `TDoubleMatrix=array of TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDual` | `TDual=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDualArray` | `TDualArray=array of TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDualFunction` | `TDualFunction=function(const X:TDualArray):TDual` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDualVectorFunction` | `TDualVectorFunction=function(const X:TDualArray):TDualArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TGradientFunction` | `TGradientFunction=function(const X:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TJacobianCheckResult` | `TJacobianCheckResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TJacobianMatrixFunction` | `TJacobianMatrixFunction=function(const X:TDoubleArray):TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TScalarVectorFunction` | `TScalarVectorFunction=function(const X:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVectorFunction` | `TVectorFunction=function(const X:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDerivativeCheckResult` | `field` | `AbsoluteError` | `AbsoluteError:Double` | `advanced` | `—` | `—` | `—` |
+| `TDerivativeCheckResult` | `field` | `AnalyticValue` | `AnalyticValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TDerivativeCheckResult` | `field` | `Passed` | `Passed:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TDerivativeCheckResult` | `field` | `ReferenceValue` | `ReferenceValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TDerivativeCheckResult` | `field` | `RelativeError` | `RelativeError:Double` | `advanced` | `—` | `—` | `—` |
+| `TDerivativeCheckResult` | `field` | `WorstIndex` | `WorstIndex:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDifferenceMethod` | `enum-value` | `dmCentral` | `dmCentral` | `advanced` | `—` | `—` | `—` |
+| `TDifferenceMethod` | `enum-value` | `dmComplexStep` | `dmComplexStep` | `advanced` | `—` | `—` | `—` |
+| `TDifferenceMethod` | `enum-value` | `dmForward` | `dmForward` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `AutoGradient` | `class function AutoGradient(F:TDualFunction;const X:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `AutoJacobian` | `class function AutoJacobian(F:TDualVectorFunction;const X:TDoubleArray):TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `CheckGradient` | `class function CheckGradient(F:TScalarVectorFunction;Grad:TGradientFunction;const X:TDoubleArray;RelativeTolerance:Double=1E-5;AbsoluteTolerance:Double=1E-7):TDerivativeCheckResult` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `CheckJacobian` | `class function CheckJacobian(F:TVectorFunction;AnalyticJacobian:TJacobianMatrixFunction;const X:TDoubleArray;RelativeTolerance:Double=1E-5;AbsoluteTolerance:Double=1E-7):TJacobianCheckResult` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `ComplexStepGradient` | `class function ComplexStepGradient(F:TComplexScalarVectorFunction;const X:TDoubleArray;Step:Double=1E-20):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `Gradient` | `class function Gradient(F:TScalarVectorFunction;const X:TDoubleArray;Method:TDifferenceMethod=dmCentral;RelativeStep:Double=0.0):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `Hessian` | `class function Hessian(F:TScalarVectorFunction;const X:TDoubleArray;RelativeStep:Double=0.0):TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDifferentiationKit` | `function` | `Jacobian` | `class function Jacobian(F:TVectorFunction;const X:TDoubleArray;Method:TDifferenceMethod=dmCentral;RelativeStep:Double=0.0):TDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `*` | `class operator *(const A,B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `*` | `class operator *(const A:Double;const B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `*` | `class operator *(const A:TDual;const B:Double):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `+` | `class operator +(const A,B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `+` | `class operator +(const A:Double;const B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `+` | `class operator +(const A:TDual;const B:Double):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `-` | `class operator -(const A,B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `-` | `class operator -(const A:Double;const B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `-` | `class operator -(const A:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `-` | `class operator -(const A:TDual;const B:Double):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `/` | `class operator /(const A,B:TDual):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `operator` | `/` | `class operator /(const A:TDual;const B:Double):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `function` | `Create` | `class function Create(const AValue,ADerivative:Double):TDual` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `field` | `Derivative` | `Derivative:Double` | `advanced` | `—` | `—` | `—` |
+| `TDual` | `field` | `Value` | `Value:Double` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `AbsoluteError` | `AbsoluteError:Double` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `AnalyticValue` | `AnalyticValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `Passed` | `Passed:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `ReferenceValue` | `ReferenceValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `RelativeError` | `RelativeError:Double` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `WorstColumn` | `WorstColumn:Integer` | `advanced` | `—` | `—` | `—` |
+| `TJacobianCheckResult` | `field` | `WorstRow` | `WorstRow:Integer` | `advanced` | `—` | `—` | `—` |
 
 ## NumericsLib.Interpolation
 
 Source: [`src/NumericsLib.Interpolation.pas`](../src/NumericsLib.Interpolation.pas)  
 Interface SHA-256: `d5387826d1524550260e1552538359fbc3144e90b417e833abd42d27be049f50`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EInterpolationError` | `EInterpolationError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TBarycentricInterpolator` | `TBarycentricInterpolator=record` | `primary` | `—` |
-| `(unit)` | `type` | `TCubicInterpolationKind` | `TCubicInterpolationKind=(cikPchip,cikAkima)` | `primary` | `—` |
-| `(unit)` | `record` | `TCubicInterpolator` | `TCubicInterpolator=record` | `primary` | `—` |
-| `(unit)` | `record` | `TCubicSplineInterpolator` | `TCubicSplineInterpolator=record` | `primary` | `—` |
-| `(unit)` | `record` | `TGridSurface` | `TGridSurface=record` | `primary` | `—` |
-| `(unit)` | `class` | `TInterpolationKit` | `TInterpolationKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TInterpolationMatrix` | `TInterpolationMatrix=array of TDoubleArray` | `primary` | `—` |
-| `(unit)` | `record` | `TRationalInterpolationResult` | `TRationalInterpolationResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TScatteredInterpolator` | `TScatteredInterpolator=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSplineBoundaryKind` | `TSplineBoundaryKind=(sbNatural,sbClamped,sbNotAKnot)` | `primary` | `—` |
-| `TBarycentricInterpolator` | `function` | `Build` | `class function Build(const XKnots,YKnots:TDoubleArray):TBarycentricInterpolator` | `primary` | `—` |
-| `TBarycentricInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX:Double):Double` | `primary` | `—` |
-| `TBarycentricInterpolator` | `field` | `Weights` | `Weights:TDoubleArray` | `primary` | `—` |
-| `TBarycentricInterpolator` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TBarycentricInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `primary` | `—` |
-| `TCubicInterpolationKind` | `enum-value` | `cikAkima` | `cikAkima` | `primary` | `—` |
-| `TCubicInterpolationKind` | `enum-value` | `cikPchip` | `cikPchip` | `primary` | `—` |
-| `TCubicInterpolator` | `function` | `Antiderivative` | `function Antiderivative(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicInterpolator` | `function` | `BuildAkima` | `class function BuildAkima(const XKnots,YKnots:TDoubleArray):TCubicInterpolator` | `primary` | `—` |
-| `TCubicInterpolator` | `function` | `BuildPchip` | `class function BuildPchip(const XKnots,YKnots:TDoubleArray):TCubicInterpolator` | `primary` | `—` |
-| `TCubicInterpolator` | `function` | `Derivative` | `function Derivative(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicInterpolator` | `function` | `Integrate` | `function Integrate(const A,B:Double):Double` | `primary` | `—` |
-| `TCubicInterpolator` | `field` | `Kind` | `Kind:TCubicInterpolationKind` | `primary` | `—` |
-| `TCubicInterpolator` | `field` | `Slopes` | `Slopes:TDoubleArray` | `primary` | `—` |
-| `TCubicInterpolator` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TCubicInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `function` | `Antiderivative` | `function Antiderivative(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `field` | `Boundary` | `Boundary:TSplineBoundaryKind` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `function` | `Build` | `class function Build(const XKnots,YKnots:TDoubleArray;BoundaryKind:TSplineBoundaryKind=sbNatural;LeftDerivative:Double=0.0;RightDerivative:Double=0.0):TCubicSplineInterpolator` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `field` | `CubicCoefficients` | `CubicCoefficients:TDoubleArray` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `function` | `Derivative` | `function Derivative(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `function` | `Integrate` | `function Integrate(const A,B:Double):Double` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `field` | `LinearCoefficients` | `LinearCoefficients:TDoubleArray` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `field` | `QuadraticCoefficients` | `QuadraticCoefficients:TDoubleArray` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `function` | `SecondDerivative` | `function SecondDerivative(const AtX:Double):Double` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TCubicSplineInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `primary` | `—` |
-| `TGridSurface` | `function` | `Bicubic` | `function Bicubic(const AtX,AtY:Double):Double` | `primary` | `—` |
-| `TGridSurface` | `function` | `Bilinear` | `function Bilinear(const AtX,AtY:Double):Double` | `primary` | `—` |
-| `TGridSurface` | `function` | `Build` | `class function Build(const XKnots,YKnots:TDoubleArray;const GridValues:TInterpolationMatrix):TGridSurface` | `primary` | `—` |
-| `TGridSurface` | `field` | `Values` | `Values:TInterpolationMatrix` | `primary` | `—` |
-| `TGridSurface` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TGridSurface` | `field` | `Y` | `Y:TDoubleArray` | `primary` | `—` |
-| `TInterpolationKit` | `function` | `InverseDistance` | `class function InverseDistance(const XCoord,YCoord,ZValues:TDoubleArray;X,Y:Double;Power:Double=2.0):Double` | `primary` | `—` |
-| `TInterpolationKit` | `function` | `Rational` | `class function Rational(const XKnots,YKnots:TDoubleArray;X:Double):TRationalInterpolationResult` | `primary` | `—` |
-| `TRationalInterpolationResult` | `field` | `ErrorEstimate` | `ErrorEstimate:Double` | `primary` | `—` |
-| `TRationalInterpolationResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TRationalInterpolationResult` | `field` | `Value` | `Value:Double` | `primary` | `—` |
-| `TScatteredInterpolator` | `function` | `BuildRBF` | `class function BuildRBF(const XCoord,YCoord,ZValues:TDoubleArray;ShapeParameter:Double=1.0):TScatteredInterpolator` | `primary` | `—` |
-| `TScatteredInterpolator` | `function` | `BuildThinPlate` | `class function BuildThinPlate(const XCoord,YCoord,ZValues:TDoubleArray):TScatteredInterpolator` | `primary` | `—` |
-| `TScatteredInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX,AtY:Double):Double` | `primary` | `—` |
-| `TScatteredInterpolator` | `field` | `Shape` | `Shape:Double` | `primary` | `—` |
-| `TScatteredInterpolator` | `field` | `ThinPlate` | `ThinPlate:Boolean` | `primary` | `—` |
-| `TScatteredInterpolator` | `field` | `Values` | `Values:TDoubleArray` | `primary` | `—` |
-| `TScatteredInterpolator` | `field` | `Weights` | `Weights:TDoubleArray` | `primary` | `—` |
-| `TScatteredInterpolator` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TScatteredInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `primary` | `—` |
-| `TSplineBoundaryKind` | `enum-value` | `sbClamped` | `sbClamped` | `primary` | `—` |
-| `TSplineBoundaryKind` | `enum-value` | `sbNatural` | `sbNatural` | `primary` | `—` |
-| `TSplineBoundaryKind` | `enum-value` | `sbNotAKnot` | `sbNotAKnot` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EInterpolationError` | `EInterpolationError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TBarycentricInterpolator` | `TBarycentricInterpolator=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TCubicInterpolationKind` | `TCubicInterpolationKind=(cikPchip,cikAkima)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCubicInterpolator` | `TCubicInterpolator=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCubicSplineInterpolator` | `TCubicSplineInterpolator=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TGridSurface` | `TGridSurface=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TInterpolationKit` | `TInterpolationKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TInterpolationMatrix` | `TInterpolationMatrix=array of TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TRationalInterpolationResult` | `TRationalInterpolationResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TScatteredInterpolator` | `TScatteredInterpolator=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSplineBoundaryKind` | `TSplineBoundaryKind=(sbNatural,sbClamped,sbNotAKnot)` | `advanced` | `—` | `—` | `—` |
+| `TBarycentricInterpolator` | `function` | `Build` | `class function Build(const XKnots,YKnots:TDoubleArray):TBarycentricInterpolator` | `advanced` | `—` | `—` | `—` |
+| `TBarycentricInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TBarycentricInterpolator` | `field` | `Weights` | `Weights:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TBarycentricInterpolator` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TBarycentricInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolationKind` | `enum-value` | `cikAkima` | `cikAkima` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolationKind` | `enum-value` | `cikPchip` | `cikPchip` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `function` | `Antiderivative` | `function Antiderivative(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `function` | `BuildAkima` | `class function BuildAkima(const XKnots,YKnots:TDoubleArray):TCubicInterpolator` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `function` | `BuildPchip` | `class function BuildPchip(const XKnots,YKnots:TDoubleArray):TCubicInterpolator` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `function` | `Derivative` | `function Derivative(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `function` | `Integrate` | `function Integrate(const A,B:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `field` | `Kind` | `Kind:TCubicInterpolationKind` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `field` | `Slopes` | `Slopes:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `function` | `Antiderivative` | `function Antiderivative(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `field` | `Boundary` | `Boundary:TSplineBoundaryKind` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `function` | `Build` | `class function Build(const XKnots,YKnots:TDoubleArray;BoundaryKind:TSplineBoundaryKind=sbNatural;LeftDerivative:Double=0.0;RightDerivative:Double=0.0):TCubicSplineInterpolator` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `field` | `CubicCoefficients` | `CubicCoefficients:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `function` | `Derivative` | `function Derivative(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `function` | `Integrate` | `function Integrate(const A,B:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `field` | `LinearCoefficients` | `LinearCoefficients:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `field` | `QuadraticCoefficients` | `QuadraticCoefficients:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `function` | `SecondDerivative` | `function SecondDerivative(const AtX:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCubicSplineInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TGridSurface` | `function` | `Bicubic` | `function Bicubic(const AtX,AtY:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TGridSurface` | `function` | `Bilinear` | `function Bilinear(const AtX,AtY:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TGridSurface` | `function` | `Build` | `class function Build(const XKnots,YKnots:TDoubleArray;const GridValues:TInterpolationMatrix):TGridSurface` | `advanced` | `—` | `—` | `—` |
+| `TGridSurface` | `field` | `Values` | `Values:TInterpolationMatrix` | `advanced` | `—` | `—` | `—` |
+| `TGridSurface` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TGridSurface` | `field` | `Y` | `Y:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TInterpolationKit` | `function` | `InverseDistance` | `class function InverseDistance(const XCoord,YCoord,ZValues:TDoubleArray;X,Y:Double;Power:Double=2.0):Double` | `advanced` | `—` | `—` | `—` |
+| `TInterpolationKit` | `function` | `Rational` | `class function Rational(const XKnots,YKnots:TDoubleArray;X:Double):TRationalInterpolationResult` | `advanced` | `—` | `—` | `—` |
+| `TRationalInterpolationResult` | `field` | `ErrorEstimate` | `ErrorEstimate:Double` | `advanced` | `—` | `—` | `—` |
+| `TRationalInterpolationResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TRationalInterpolationResult` | `field` | `Value` | `Value:Double` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `function` | `BuildRBF` | `class function BuildRBF(const XCoord,YCoord,ZValues:TDoubleArray;ShapeParameter:Double=1.0):TScatteredInterpolator` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `function` | `BuildThinPlate` | `class function BuildThinPlate(const XCoord,YCoord,ZValues:TDoubleArray):TScatteredInterpolator` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `function` | `Evaluate` | `function Evaluate(const AtX,AtY:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `field` | `Shape` | `Shape:Double` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `field` | `ThinPlate` | `ThinPlate:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `field` | `Values` | `Values:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `field` | `Weights` | `Weights:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TScatteredInterpolator` | `field` | `Y` | `Y:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSplineBoundaryKind` | `enum-value` | `sbClamped` | `sbClamped` | `advanced` | `—` | `—` | `—` |
+| `TSplineBoundaryKind` | `enum-value` | `sbNatural` | `sbNatural` | `advanced` | `—` | `—` | `—` |
+| `TSplineBoundaryKind` | `enum-value` | `sbNotAKnot` | `sbNotAKnot` | `advanced` | `—` | `—` | `—` |
 
 ## NumericsLib.Modelling
 
 Source: [`src/NumericsLib.Modelling.pas`](../src/NumericsLib.Modelling.pas)  
 Interface SHA-256: `4dcd7399b9167afced9b2fe00c280c7555072879600a6e893d7c755714f8e494`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EModellingError` | `EModellingError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TAdaptiveODEOptions` | `TAdaptiveODEOptions=record` | `primary` | `—` |
-| `(unit)` | `record` | `TAdaptiveODESolution` | `TAdaptiveODESolution=record` | `primary` | `—` |
-| `(unit)` | `record` | `TFitResult` | `TFitResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TIntegrationResult` | `TIntegrationResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TJacobianFunction` | `TJacobianFunction=function(const Parameters:TDoubleArray):TModelMatrix` | `primary` | `—` |
-| `(unit)` | `type` | `TLinearBasisFunction` | `TLinearBasisFunction=function(X:Double;BasisIndex:Integer):Double` | `primary` | `—` |
-| `(unit)` | `class` | `TModellingKit` | `TModellingKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TModelMatrix` | `TModelMatrix=array of TDoubleArray` | `primary` | `—` |
-| `(unit)` | `type` | `TMultidimensionalIntegrand` | `TMultidimensionalIntegrand=function(const X:TDoubleArray):Double` | `primary` | `—` |
-| `(unit)` | `record` | `TNonlinearFitOptions` | `TNonlinearFitOptions=record` | `primary` | `—` |
-| `(unit)` | `type` | `TODEEventFunction` | `TODEEventFunction=function(T:Double;const Y:TDoubleArray):Double` | `primary` | `—` |
-| `(unit)` | `type` | `TODEVectorFunction` | `TODEVectorFunction=function(T:Double;const Y:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `record` | `TPolynomialRootResult` | `TPolynomialRootResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TProgressFunction` | `TProgressFunction=function(Iteration,Evaluations:Integer;Measure:Double):Boolean` | `primary` | `—` |
-| `(unit)` | `type` | `TResidualFunction` | `TResidualFunction=function(const Parameters:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `type` | `TRobustLoss` | `TRobustLoss=(rlSquared,rlHuber,rlSoftL1)` | `primary` | `—` |
-| `(unit)` | `type` | `TScalarIntegrand` | `TScalarIntegrand=function(X:Double):Double` | `primary` | `—` |
-| `(unit)` | `record` | `TSplineFitResult` | `TSplineFitResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TVectorEquationFunction` | `TVectorEquationFunction=function(const X:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `type` | `TVectorJacobianFunction` | `TVectorJacobianFunction=function(const X:TDoubleArray):TModelMatrix` | `primary` | `—` |
-| `(unit)` | `record` | `TVectorRootResult` | `TVectorRootResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TVectorSeries` | `TVectorSeries=array of TDoubleArray` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `AbsoluteTolerances` | `AbsoluteTolerances:TDoubleArray` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `function` | `Defaults` | `class function Defaults:TAdaptiveODEOptions` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `Event` | `Event:TODEEventFunction` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `EventDirection` | `EventDirection:Integer` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `InitialStep` | `InitialStep:Double` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `MaximumStep` | `MaximumStep:Double` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `MaxSteps` | `MaxSteps:Integer` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `MinimumStep` | `MinimumStep:Double` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `Progress` | `Progress:TProgressFunction` | `primary` | `—` |
-| `TAdaptiveODEOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `AcceptedSteps` | `AcceptedSteps:Integer` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `Derivatives` | `Derivatives:TVectorSeries` | `primary` | `—` |
-| `TAdaptiveODESolution` | `function` | `Evaluate` | `function Evaluate(Time:Double):TDoubleArray` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `EventFound` | `EventFound:Boolean` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `EventState` | `EventState:TDoubleArray` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `EventTime` | `EventTime:Double` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `RejectedSteps` | `RejectedSteps:Integer` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `T` | `T:TDoubleArray` | `primary` | `—` |
-| `TAdaptiveODESolution` | `field` | `Y` | `Y:TVectorSeries` | `primary` | `—` |
-| `TFitResult` | `field` | `Covariance` | `Covariance:TModelMatrix` | `primary` | `—` |
-| `TFitResult` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Integer` | `primary` | `—` |
-| `TFitResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TFitResult` | `field` | `GradientNorm` | `GradientNorm:Double` | `primary` | `—` |
-| `TFitResult` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TFitResult` | `field` | `Parameters` | `Parameters:TDoubleArray` | `primary` | `—` |
-| `TFitResult` | `field` | `Rank` | `Rank:Integer` | `primary` | `—` |
-| `TFitResult` | `field` | `Residuals` | `Residuals:TDoubleArray` | `primary` | `—` |
-| `TFitResult` | `field` | `ResidualSumSquares` | `ResidualSumSquares:Double` | `primary` | `—` |
-| `TFitResult` | `field` | `RSquared` | `RSquared:Double` | `primary` | `—` |
-| `TFitResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TIntegrationResult` | `field` | `ErrorEstimate` | `ErrorEstimate:Double` | `primary` | `—` |
-| `TIntegrationResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TIntegrationResult` | `field` | `Intervals` | `Intervals:Integer` | `primary` | `—` |
-| `TIntegrationResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TIntegrationResult` | `field` | `Value` | `Value:Double` | `primary` | `—` |
-| `TModellingKit` | `function` | `FitLinearBasis` | `class function FitLinearBasis(const X,Y:TDoubleArray;BasisCount:Integer;Basis:TLinearBasisFunction;const Weights:TDoubleArray):TFitResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `FitNonlinear` | `class function FitNonlinear(Residual:TResidualFunction;Jacobian:TJacobianFunction;const InitialParameters:TDoubleArray;const Options:TNonlinearFitOptions):TFitResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `FitNonlinearAuto` | `class function FitNonlinearAuto(Residual:TDualVectorFunction;const InitialParameters:TDoubleArray;const Options:TNonlinearFitOptions):TFitResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `FitPolynomial` | `class function FitPolynomial(const X,Y:TDoubleArray;Degree:Integer;const Weights:TDoubleArray):TFitResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `FitSplineBasis` | `class function FitSplineBasis(const X,Y,InteriorKnots:TDoubleArray;const Weights:TDoubleArray):TSplineFitResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `IntegrateAdaptive` | `class function IntegrateAdaptive(F:TScalarIntegrand;A,B:Double;AbsoluteTolerance:Double=1E-10;RelativeTolerance:Double=1E-8;MaxIntervals:Integer=1000):TIntegrationResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `IntegrateCubature` | `class function IntegrateCubature(F:TMultidimensionalIntegrand;const LowerBounds,UpperBounds:TDoubleArray;Order:Integer=5;MaxEvaluations:Integer=1000000):TIntegrationResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `IntegrateImproper` | `class function IntegrateImproper(F:TScalarIntegrand;A,B:Double;AbsoluteTolerance:Double=1E-9;RelativeTolerance:Double=1E-7;MaxIntervals:Integer=2000):TIntegrationResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `IntegrateMonteCarlo` | `class function IntegrateMonteCarlo(F:TMultidimensionalIntegrand;const LowerBounds,UpperBounds:TDoubleArray;Samples:Integer;var Random:TLocalRandom):TIntegrationResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `IntegrateQuasiMonteCarlo` | `class function IntegrateQuasiMonteCarlo(F:TMultidimensionalIntegrand;const LowerBounds,UpperBounds:TDoubleArray;Samples:Integer;Seed:Integer=0):TIntegrationResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `SolveODE` | `class function SolveODE(F:TODEVectorFunction;T0:Double;const Y0:TDoubleArray;T1:Double;const Options:TAdaptiveODEOptions):TAdaptiveODESolution` | `primary` | `—` |
-| `TModellingKit` | `function` | `SolvePolynomial` | `class function SolvePolynomial(const Coefficients:TDoubleArray;AbsoluteTolerance:Double=1E-12;RelativeTolerance:Double=1E-10;MaxIterations:Integer=2000):TPolynomialRootResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `SolveSystem` | `class function SolveSystem(F:TVectorEquationFunction;Jacobian:TVectorJacobianFunction;const InitialX:TDoubleArray;AbsoluteTolerance:Double=1E-10;RelativeTolerance:Double=1E-8;MaxIterations:Integer=100;Progress:TProgressFunction=nil):TVectorRootResult` | `primary` | `—` |
-| `TModellingKit` | `function` | `SolveSystemAuto` | `class function SolveSystemAuto(F:TDualVectorFunction;const InitialX:TDoubleArray;AbsoluteTolerance:Double=1E-10;RelativeTolerance:Double=1E-8;MaxIterations:Integer=100;Progress:TProgressFunction=nil):TVectorRootResult` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `CheckDerivative` | `CheckDerivative:Boolean` | `primary` | `—` |
-| `TNonlinearFitOptions` | `function` | `Defaults` | `class function Defaults:TNonlinearFitOptions` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `GradientTolerance` | `GradientTolerance:Double` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `InitialDamping` | `InitialDamping:Double` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `Loss` | `Loss:TRobustLoss` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `LossScale` | `LossScale:Double` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `LowerBounds` | `LowerBounds:TDoubleArray` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `MaxIterations` | `MaxIterations:Integer` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `ParameterScales` | `ParameterScales:TDoubleArray` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `Progress` | `Progress:TProgressFunction` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `primary` | `—` |
-| `TNonlinearFitOptions` | `field` | `UpperBounds` | `UpperBounds:TDoubleArray` | `primary` | `—` |
-| `TPolynomialRootResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TPolynomialRootResult` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TPolynomialRootResult` | `field` | `Residuals` | `Residuals:TDoubleArray` | `primary` | `—` |
-| `TPolynomialRootResult` | `field` | `Roots` | `Roots:TComplexArray` | `primary` | `—` |
-| `TPolynomialRootResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TRobustLoss` | `enum-value` | `rlHuber` | `rlHuber` | `primary` | `—` |
-| `TRobustLoss` | `enum-value` | `rlSoftL1` | `rlSoftL1` | `primary` | `—` |
-| `TRobustLoss` | `enum-value` | `rlSquared` | `rlSquared` | `primary` | `—` |
-| `TSplineFitResult` | `function` | `Evaluate` | `function Evaluate(const X:Double):Double` | `primary` | `—` |
-| `TSplineFitResult` | `field` | `Fit` | `Fit:TFitResult` | `primary` | `—` |
-| `TSplineFitResult` | `field` | `InteriorKnots` | `InteriorKnots:TDoubleArray` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `Residual` | `Residual:TDoubleArray` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `ResidualNorm` | `ResidualNorm:Double` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `StepNorm` | `StepNorm:Double` | `primary` | `—` |
-| `TVectorRootResult` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EModellingError` | `EModellingError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TAdaptiveODEOptions` | `TAdaptiveODEOptions=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TAdaptiveODESolution` | `TAdaptiveODESolution=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TFitResult` | `TFitResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TIntegrationResult` | `TIntegrationResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TJacobianFunction` | `TJacobianFunction=function(const Parameters:TDoubleArray):TModelMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TLinearBasisFunction` | `TLinearBasisFunction=function(X:Double;BasisIndex:Integer):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TModellingKit` | `TModellingKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TModelMatrix` | `TModelMatrix=array of TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TMultidimensionalIntegrand` | `TMultidimensionalIntegrand=function(const X:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TNonlinearFitOptions` | `TNonlinearFitOptions=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TODEEventFunction` | `TODEEventFunction=function(T:Double;const Y:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TODEVectorFunction` | `TODEVectorFunction=function(T:Double;const Y:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TPolynomialRootResult` | `TPolynomialRootResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TProgressFunction` | `TProgressFunction=function(Iteration,Evaluations:Integer;Measure:Double):Boolean` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TResidualFunction` | `TResidualFunction=function(const Parameters:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TRobustLoss` | `TRobustLoss=(rlSquared,rlHuber,rlSoftL1)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TScalarIntegrand` | `TScalarIntegrand=function(X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSplineFitResult` | `TSplineFitResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVectorEquationFunction` | `TVectorEquationFunction=function(const X:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVectorJacobianFunction` | `TVectorJacobianFunction=function(const X:TDoubleArray):TModelMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TVectorRootResult` | `TVectorRootResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TVectorSeries` | `TVectorSeries=array of TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `AbsoluteTolerances` | `AbsoluteTolerances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `function` | `Defaults` | `class function Defaults:TAdaptiveODEOptions` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `Event` | `Event:TODEEventFunction` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `EventDirection` | `EventDirection:Integer` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `InitialStep` | `InitialStep:Double` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `MaximumStep` | `MaximumStep:Double` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `MaxSteps` | `MaxSteps:Integer` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `MinimumStep` | `MinimumStep:Double` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `Progress` | `Progress:TProgressFunction` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODEOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `AcceptedSteps` | `AcceptedSteps:Integer` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `Derivatives` | `Derivatives:TVectorSeries` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `function` | `Evaluate` | `function Evaluate(Time:Double):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `EventFound` | `EventFound:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `EventState` | `EventState:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `EventTime` | `EventTime:Double` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `RejectedSteps` | `RejectedSteps:Integer` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `T` | `T:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TAdaptiveODESolution` | `field` | `Y` | `Y:TVectorSeries` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Covariance` | `Covariance:TModelMatrix` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Integer` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `GradientNorm` | `GradientNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Parameters` | `Parameters:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Rank` | `Rank:Integer` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Residuals` | `Residuals:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `ResidualSumSquares` | `ResidualSumSquares:Double` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `RSquared` | `RSquared:Double` | `advanced` | `—` | `—` | `—` |
+| `TFitResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TIntegrationResult` | `field` | `ErrorEstimate` | `ErrorEstimate:Double` | `advanced` | `—` | `—` | `—` |
+| `TIntegrationResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TIntegrationResult` | `field` | `Intervals` | `Intervals:Integer` | `advanced` | `—` | `—` | `—` |
+| `TIntegrationResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TIntegrationResult` | `field` | `Value` | `Value:Double` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `FitLinearBasis` | `class function FitLinearBasis(const X,Y:TDoubleArray;BasisCount:Integer;Basis:TLinearBasisFunction;const Weights:TDoubleArray):TFitResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `FitNonlinear` | `class function FitNonlinear(Residual:TResidualFunction;Jacobian:TJacobianFunction;const InitialParameters:TDoubleArray;const Options:TNonlinearFitOptions):TFitResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `FitNonlinearAuto` | `class function FitNonlinearAuto(Residual:TDualVectorFunction;const InitialParameters:TDoubleArray;const Options:TNonlinearFitOptions):TFitResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `FitPolynomial` | `class function FitPolynomial(const X,Y:TDoubleArray;Degree:Integer;const Weights:TDoubleArray):TFitResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `FitSplineBasis` | `class function FitSplineBasis(const X,Y,InteriorKnots:TDoubleArray;const Weights:TDoubleArray):TSplineFitResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `IntegrateAdaptive` | `class function IntegrateAdaptive(F:TScalarIntegrand;A,B:Double;AbsoluteTolerance:Double=1E-10;RelativeTolerance:Double=1E-8;MaxIntervals:Integer=1000):TIntegrationResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `IntegrateCubature` | `class function IntegrateCubature(F:TMultidimensionalIntegrand;const LowerBounds,UpperBounds:TDoubleArray;Order:Integer=5;MaxEvaluations:Integer=1000000):TIntegrationResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `IntegrateImproper` | `class function IntegrateImproper(F:TScalarIntegrand;A,B:Double;AbsoluteTolerance:Double=1E-9;RelativeTolerance:Double=1E-7;MaxIntervals:Integer=2000):TIntegrationResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `IntegrateMonteCarlo` | `class function IntegrateMonteCarlo(F:TMultidimensionalIntegrand;const LowerBounds,UpperBounds:TDoubleArray;Samples:Integer;var Random:TLocalRandom):TIntegrationResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `IntegrateQuasiMonteCarlo` | `class function IntegrateQuasiMonteCarlo(F:TMultidimensionalIntegrand;const LowerBounds,UpperBounds:TDoubleArray;Samples:Integer;Seed:Integer=0):TIntegrationResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `SolveODE` | `class function SolveODE(F:TODEVectorFunction;T0:Double;const Y0:TDoubleArray;T1:Double;const Options:TAdaptiveODEOptions):TAdaptiveODESolution` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `SolvePolynomial` | `class function SolvePolynomial(const Coefficients:TDoubleArray;AbsoluteTolerance:Double=1E-12;RelativeTolerance:Double=1E-10;MaxIterations:Integer=2000):TPolynomialRootResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `SolveSystem` | `class function SolveSystem(F:TVectorEquationFunction;Jacobian:TVectorJacobianFunction;const InitialX:TDoubleArray;AbsoluteTolerance:Double=1E-10;RelativeTolerance:Double=1E-8;MaxIterations:Integer=100;Progress:TProgressFunction=nil):TVectorRootResult` | `advanced` | `—` | `—` | `—` |
+| `TModellingKit` | `function` | `SolveSystemAuto` | `class function SolveSystemAuto(F:TDualVectorFunction;const InitialX:TDoubleArray;AbsoluteTolerance:Double=1E-10;RelativeTolerance:Double=1E-8;MaxIterations:Integer=100;Progress:TProgressFunction=nil):TVectorRootResult` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `CheckDerivative` | `CheckDerivative:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `function` | `Defaults` | `class function Defaults:TNonlinearFitOptions` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `GradientTolerance` | `GradientTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `InitialDamping` | `InitialDamping:Double` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `Loss` | `Loss:TRobustLoss` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `LossScale` | `LossScale:Double` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `LowerBounds` | `LowerBounds:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `MaxIterations` | `MaxIterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `ParameterScales` | `ParameterScales:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `Progress` | `Progress:TProgressFunction` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TNonlinearFitOptions` | `field` | `UpperBounds` | `UpperBounds:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPolynomialRootResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TPolynomialRootResult` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TPolynomialRootResult` | `field` | `Residuals` | `Residuals:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TPolynomialRootResult` | `field` | `Roots` | `Roots:TComplexArray` | `advanced` | `—` | `—` | `—` |
+| `TPolynomialRootResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TRobustLoss` | `enum-value` | `rlHuber` | `rlHuber` | `advanced` | `—` | `—` | `—` |
+| `TRobustLoss` | `enum-value` | `rlSoftL1` | `rlSoftL1` | `advanced` | `—` | `—` | `—` |
+| `TRobustLoss` | `enum-value` | `rlSquared` | `rlSquared` | `advanced` | `—` | `—` | `—` |
+| `TSplineFitResult` | `function` | `Evaluate` | `function Evaluate(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TSplineFitResult` | `field` | `Fit` | `Fit:TFitResult` | `advanced` | `—` | `—` | `—` |
+| `TSplineFitResult` | `field` | `InteriorKnots` | `InteriorKnots:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `Residual` | `Residual:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `ResidualNorm` | `ResidualNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `StepNorm` | `StepNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TVectorRootResult` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
 
 ## NumericsLib.Numerics
 
 Source: [`src/NumericsLib.Numerics.pas`](../src/NumericsLib.Numerics.pas)  
 Interface SHA-256: `5c160336ebac2511438e747e52dff1a153dc028741e08278cfab1a51b0c285a4`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ENumericsConvergenceError` | `ENumericsConvergenceError=class(EInvalidArgument)` | `primary` | `—` |
-| `(unit)` | `type` | `ENumericsError` | `ENumericsError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TCubicSpline` | `TCubicSpline=record` | `primary` | `—` |
-| `(unit)` | `class` | `TNumericsKit` | `TNumericsKit=class` | `primary` | `—` |
-| `(unit)` | `type` | `TODEFunc` | `TODEFunc=function(T,Y:Double):Double` | `primary` | `—` |
-| `(unit)` | `record` | `TODESolution` | `TODESolution=record` | `primary` | `—` |
-| `(unit)` | `record` | `TRootResult` | `TRootResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TScalarFunc` | `TScalarFunc=function(X:Double):Double` | `primary` | `—` |
-| `TCubicSpline` | `field` | `A` | `A:TDoubleArray` | `primary` | `—` |
-| `TCubicSpline` | `field` | `B` | `B:TDoubleArray` | `primary` | `—` |
-| `TCubicSpline` | `field` | `C` | `C:TDoubleArray` | `primary` | `—` |
-| `TCubicSpline` | `field` | `D` | `D:TDoubleArray` | `primary` | `—` |
-| `TCubicSpline` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TNumericsKit` | `function` | `Bisection` | `class function Bisection(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `BisectionResult` | `class function BisectionResult(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `primary` | `—` |
-| `TNumericsKit` | `function` | `Brent` | `class function Brent(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `BrentResult` | `class function BrentResult(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `primary` | `—` |
-| `TNumericsKit` | `function` | `CubicSplineBuild` | `class function CubicSplineBuild(const XKnots,YKnots:TDoubleArray):TCubicSpline` | `primary` | `—` |
-| `TNumericsKit` | `function` | `CubicSplineEval` | `class function CubicSplineEval(const S:TCubicSpline;X:Double):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `EulerSolve` | `class function EulerSolve(F:TODEFunc;T0,Y0,T1:Double;N:Integer):TODESolution` | `primary` | `—` |
-| `TNumericsKit` | `function` | `EulerStep` | `class function EulerStep(F:TODEFunc;T0,Y0,H:Double):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `GaussLegendre5` | `class function GaussLegendre5(F:TScalarFunc;A,B:Double):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `LagrangeInterp` | `class function LagrangeInterp(const XKnots,YKnots:TDoubleArray;X:Double):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `LinearInterp` | `class function LinearInterp(const XKnots,YKnots:TDoubleArray;X:Double):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `NewtonRaphson` | `class function NewtonRaphson(F,DF:TScalarFunc;X0:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `NewtonRaphsonResult` | `class function NewtonRaphsonResult(F,DF:TScalarFunc;X0:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `primary` | `—` |
-| `TNumericsKit` | `function` | `RK4Solve` | `class function RK4Solve(F:TODEFunc;T0,Y0,T1:Double;N:Integer):TODESolution` | `primary` | `—` |
-| `TNumericsKit` | `function` | `RK4Step` | `class function RK4Step(F:TODEFunc;T0,Y0,H:Double):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `Secant` | `class function Secant(F:TScalarFunc;X0,X1:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `SecantResult` | `class function SecantResult(F:TScalarFunc;X0,X1:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `primary` | `—` |
-| `TNumericsKit` | `function` | `SimpsonRule` | `class function SimpsonRule(F:TScalarFunc;A,B:Double;N:Integer=1000):Double` | `primary` | `—` |
-| `TNumericsKit` | `function` | `TrapezoidalRule` | `class function TrapezoidalRule(F:TScalarFunc;A,B:Double;N:Integer=1000):Double` | `primary` | `—` |
-| `TODESolution` | `field` | `T` | `T:TDoubleArray` | `primary` | `—` |
-| `TODESolution` | `field` | `Y` | `Y:TDoubleArray` | `primary` | `—` |
-| `TRootResult` | `field` | `Converged` | `Converged:Boolean` | `primary` | `—` |
-| `TRootResult` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TRootResult` | `field` | `Residual` | `Residual:Double` | `primary` | `—` |
-| `TRootResult` | `field` | `Root` | `Root:Double` | `primary` | `—` |
-| `TRootResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ENumericsConvergenceError` | `ENumericsConvergenceError=class(EInvalidArgument)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `ENumericsError` | `ENumericsError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCubicSpline` | `TCubicSpline=record` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TNumericsKit` | `TNumericsKit=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TODEFunc` | `TODEFunc=function(T,Y:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TODESolution` | `TODESolution=record` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TRootResult` | `TRootResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TScalarFunc` | `TScalarFunc=function(X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TCubicSpline` | `field` | `A` | `A:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TCubicSpline` | `field` | `B` | `B:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TCubicSpline` | `field` | `C` | `C:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TCubicSpline` | `field` | `D` | `D:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TCubicSpline` | `field` | `X` | `X:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `Bisection` | `class function Bisection(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `BisectionResult` | `class function BisectionResult(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `Brent` | `class function Brent(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `BrentResult` | `class function BrentResult(F:TScalarFunc;A,B:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `CubicSplineBuild` | `class function CubicSplineBuild(const XKnots,YKnots:TDoubleArray):TCubicSpline` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `CubicSplineEval` | `class function CubicSplineEval(const S:TCubicSpline;X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `EulerSolve` | `class function EulerSolve(F:TODEFunc;T0,Y0,T1:Double;N:Integer):TODESolution` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `EulerStep` | `class function EulerStep(F:TODEFunc;T0,Y0,H:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `GaussLegendre5` | `class function GaussLegendre5(F:TScalarFunc;A,B:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `LagrangeInterp` | `class function LagrangeInterp(const XKnots,YKnots:TDoubleArray;X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `LinearInterp` | `class function LinearInterp(const XKnots,YKnots:TDoubleArray;X:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `NewtonRaphson` | `class function NewtonRaphson(F,DF:TScalarFunc;X0:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `NewtonRaphsonResult` | `class function NewtonRaphsonResult(F,DF:TScalarFunc;X0:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `RK4Solve` | `class function RK4Solve(F:TODEFunc;T0,Y0,T1:Double;N:Integer):TODESolution` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `RK4Step` | `class function RK4Step(F:TODEFunc;T0,Y0,H:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `Secant` | `class function Secant(F:TScalarFunc;X0,X1:Double;Tol:Double=1E-10;MaxIter:Integer=100):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `SecantResult` | `class function SecantResult(F:TScalarFunc;X0,X1:Double;Tol:Double=1E-10;MaxIter:Integer=100):TRootResult` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `SimpsonRule` | `class function SimpsonRule(F:TScalarFunc;A,B:Double;N:Integer=1000):Double` | `recommended` | `—` | `—` | `—` |
+| `TNumericsKit` | `function` | `TrapezoidalRule` | `class function TrapezoidalRule(F:TScalarFunc;A,B:Double;N:Integer=1000):Double` | `recommended` | `—` | `—` | `—` |
+| `TODESolution` | `field` | `T` | `T:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TODESolution` | `field` | `Y` | `Y:TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TRootResult` | `field` | `Converged` | `Converged:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TRootResult` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TRootResult` | `field` | `Residual` | `Residual:Double` | `advanced` | `—` | `—` | `—` |
+| `TRootResult` | `field` | `Root` | `Root:Double` | `advanced` | `—` | `—` | `—` |
+| `TRootResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
 
 ## OptimizationLib.Convex
 
 Source: [`src/OptimizationLib.Convex.pas`](../src/OptimizationLib.Convex.pas)  
 Interface SHA-256: `de66e5609b4e00d01439d571ece66c919ae46aa8f13470263c2e2937dd398340`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EConvexOptimizationError` | `EConvexOptimizationError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TConvexMatrix` | `TConvexMatrix=array of TDoubleArray` | `primary` | `—` |
-| `(unit)` | `class` | `TConvexOptimizationKit` | `TConvexOptimizationKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TConvexOptions` | `TConvexOptions=record` | `primary` | `—` |
-| `(unit)` | `type` | `TConvexProgress` | `TConvexProgress=function(Iteration,Evaluations:Integer;Objective,Feasibility:Double):Boolean` | `primary` | `—` |
-| `(unit)` | `record` | `TConvexResult` | `TConvexResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TQuadraticProgram` | `TQuadraticProgram=record` | `primary` | `—` |
-| `(unit)` | `record` | `TSecondOrderCone` | `TSecondOrderCone=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSecondOrderCones` | `TSecondOrderCones=array of TSecondOrderCone` | `primary` | `—` |
-| `TConvexOptimizationKit` | `function` | `SolveQuadraticProgram` | `class function SolveQuadraticProgram(const Model:TQuadraticProgram;const Options:TConvexOptions):TConvexResult` | `primary` | `—` |
-| `TConvexOptimizationKit` | `function` | `SolveSecondOrderConeProgram` | `class function SolveSecondOrderConeProgram(const C:TDoubleArray;const Cones:TSecondOrderCones;const Options:TConvexOptions):TConvexResult` | `primary` | `—` |
-| `TConvexOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `primary` | `—` |
-| `TConvexOptions` | `function` | `Defaults` | `class function Defaults:TConvexOptions` | `primary` | `—` |
-| `TConvexOptions` | `field` | `FeasibilityTolerance` | `FeasibilityTolerance:Double` | `primary` | `—` |
-| `TConvexOptions` | `field` | `InitialX` | `InitialX:TDoubleArray` | `primary` | `—` |
-| `TConvexOptions` | `field` | `MaxIterations` | `MaxIterations:Integer` | `primary` | `—` |
-| `TConvexOptions` | `field` | `Progress` | `Progress:TConvexProgress` | `primary` | `—` |
-| `TConvexOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `primary` | `—` |
-| `TConvexResult` | `field` | `BestObjective` | `BestObjective:Double` | `primary` | `—` |
-| `TConvexResult` | `field` | `BestX` | `BestX:TDoubleArray` | `primary` | `—` |
-| `TConvexResult` | `field` | `Certificate` | `Certificate:TDoubleArray` | `primary` | `—` |
-| `TConvexResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TConvexResult` | `field` | `Feasibility` | `Feasibility:Double` | `primary` | `—` |
-| `TConvexResult` | `field` | `GradientNorm` | `GradientNorm:Double` | `primary` | `—` |
-| `TConvexResult` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TConvexResult` | `field` | `Objective` | `Objective:Double` | `primary` | `—` |
-| `TConvexResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TConvexResult` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `C` | `C:TDoubleArray` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `EqualityA` | `EqualityA:TConvexMatrix` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `EqualityB` | `EqualityB:TDoubleArray` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `InequalityA` | `InequalityA:TConvexMatrix` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `InequalityB` | `InequalityB:TDoubleArray` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `LowerBounds` | `LowerBounds:TDoubleArray` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `Q` | `Q:TConvexMatrix` | `primary` | `—` |
-| `TQuadraticProgram` | `field` | `UpperBounds` | `UpperBounds:TDoubleArray` | `primary` | `—` |
-| `TSecondOrderCone` | `field` | `A` | `A:TConvexMatrix` | `primary` | `—` |
-| `TSecondOrderCone` | `field` | `B` | `B:TDoubleArray` | `primary` | `—` |
-| `TSecondOrderCone` | `field` | `D` | `D:TDoubleArray` | `primary` | `—` |
-| `TSecondOrderCone` | `field` | `E` | `E:Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EConvexOptimizationError` | `EConvexOptimizationError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TConvexMatrix` | `TConvexMatrix=array of TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TConvexOptimizationKit` | `TConvexOptimizationKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TConvexOptions` | `TConvexOptions=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TConvexProgress` | `TConvexProgress=function(Iteration,Evaluations:Integer;Objective,Feasibility:Double):Boolean` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TConvexResult` | `TConvexResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TQuadraticProgram` | `TQuadraticProgram=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSecondOrderCone` | `TSecondOrderCone=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSecondOrderCones` | `TSecondOrderCones=array of TSecondOrderCone` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptimizationKit` | `function` | `SolveQuadraticProgram` | `class function SolveQuadraticProgram(const Model:TQuadraticProgram;const Options:TConvexOptions):TConvexResult` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptimizationKit` | `function` | `SolveSecondOrderConeProgram` | `class function SolveSecondOrderConeProgram(const C:TDoubleArray;const Cones:TSecondOrderCones;const Options:TConvexOptions):TConvexResult` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `function` | `Defaults` | `class function Defaults:TConvexOptions` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `field` | `FeasibilityTolerance` | `FeasibilityTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `field` | `InitialX` | `InitialX:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `field` | `MaxIterations` | `MaxIterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `field` | `Progress` | `Progress:TConvexProgress` | `advanced` | `—` | `—` | `—` |
+| `TConvexOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `BestObjective` | `BestObjective:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `BestX` | `BestX:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `Certificate` | `Certificate:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `Feasibility` | `Feasibility:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `GradientNorm` | `GradientNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `Objective` | `Objective:Double` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TConvexResult` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `C` | `C:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `EqualityA` | `EqualityA:TConvexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `EqualityB` | `EqualityB:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `InequalityA` | `InequalityA:TConvexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `InequalityB` | `InequalityB:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `LowerBounds` | `LowerBounds:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `Q` | `Q:TConvexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TQuadraticProgram` | `field` | `UpperBounds` | `UpperBounds:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSecondOrderCone` | `field` | `A` | `A:TConvexMatrix` | `advanced` | `—` | `—` | `—` |
+| `TSecondOrderCone` | `field` | `B` | `B:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSecondOrderCone` | `field` | `D` | `D:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSecondOrderCone` | `field` | `E` | `E:Double` | `advanced` | `—` | `—` | `—` |
 
 ## OptimizationLib.Optimization
 
 Source: [`src/OptimizationLib.Optimization.pas`](../src/OptimizationLib.Optimization.pas)  
 Interface SHA-256: `2a0dc52718192c1e8b964e319d45145aea8f612e8686cd65861d716f037b7a0c`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EOptimizationError` | `EOptimizationError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TConstraintFunc` | `TConstraintFunc=function(const X:TDoubleArray):Double` | `primary` | `—` |
-| `(unit)` | `type` | `TConstraintKind` | `TConstraintKind=(ckInequality,ckEquality)` | `primary` | `—` |
-| `(unit)` | `type` | `TGradFunc` | `TGradFunc=function(const X:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `(unit)` | `record` | `TLPResult` | `TLPResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TLPStatus` | `TLPStatus=(lpsOptimal,lpsUnbounded,lpsIterationLimit,lpsUnsupportedStart,lpsInfeasible)` | `primary` | `—` |
-| `(unit)` | `record` | `TMultiObjectiveResult` | `TMultiObjectiveResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TMultivarFunc` | `TMultivarFunc=function(const X:TDoubleArray):Double` | `primary` | `—` |
-| `(unit)` | `type` | `TMultivarFunctions` | `TMultivarFunctions=array of TMultivarFunc` | `primary` | `—` |
-| `(unit)` | `type` | `TObjectiveMatrix` | `TObjectiveMatrix=array of TDoubleArray` | `primary` | `—` |
-| `(unit)` | `class` | `TOptimizationKit` | `TOptimizationKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TOptimizationOptions` | `TOptimizationOptions=record` | `primary` | `—` |
-| `(unit)` | `type` | `TOptimizationProgress` | `TOptimizationProgress=function(Iteration,Evaluations:Integer;Objective,GradientNorm,Feasibility:Double):Boolean` | `primary` | `—` |
-| `(unit)` | `record` | `TOptimizationWorkspace` | `TOptimizationWorkspace=record` | `primary` | `—` |
-| `(unit)` | `record` | `TOptResult` | `TOptResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TOptResults` | `TOptResults=array of TOptResult` | `primary` | `—` |
-| `(unit)` | `record` | `TSmoothConstraint` | `TSmoothConstraint=record` | `primary` | `—` |
-| `(unit)` | `type` | `TSmoothConstraints` | `TSmoothConstraints=array of TSmoothConstraint` | `primary` | `—` |
-| `(unit)` | `type` | `TUnivarFunc` | `TUnivarFunc=function(X:Double):Double` | `primary` | `—` |
-| `TConstraintKind` | `enum-value` | `ckEquality` | `ckEquality` | `primary` | `—` |
-| `TConstraintKind` | `enum-value` | `ckInequality` | `ckInequality` | `primary` | `—` |
-| `TLPResult` | `field` | `Feasible` | `Feasible:Boolean` | `primary` | `—` |
-| `TLPResult` | `field` | `Iters` | `Iters:Integer` | `primary` | `—` |
-| `TLPResult` | `field` | `ObjVal` | `ObjVal:Double` | `primary` | `—` |
-| `TLPResult` | `field` | `Status` | `Status:TLPStatus` | `primary` | `—` |
-| `TLPResult` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TLPStatus` | `enum-value` | `lpsInfeasible` | `lpsInfeasible` | `primary` | `—` |
-| `TLPStatus` | `enum-value` | `lpsIterationLimit` | `lpsIterationLimit` | `primary` | `—` |
-| `TLPStatus` | `enum-value` | `lpsOptimal` | `lpsOptimal` | `primary` | `—` |
-| `TLPStatus` | `enum-value` | `lpsUnbounded` | `lpsUnbounded` | `primary` | `—` |
-| `TLPStatus` | `enum-value` | `lpsUnsupportedStart` | `lpsUnsupportedStart` | `primary` | `—` |
-| `TMultiObjectiveResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TMultiObjectiveResult` | `field` | `ObjectiveValues` | `ObjectiveValues:TObjectiveMatrix` | `primary` | `—` |
-| `TMultiObjectiveResult` | `field` | `Points` | `Points:TOptResults` | `primary` | `—` |
-| `TMultiObjectiveResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `Adam` | `class function Adam(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;LR:Double=0.001;Beta1:Double=0.9;Beta2:Double=0.999;Eps:Double=1E-8;Tol:Double=1E-6;MaxIter:Integer=10000):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `BoundedLBFGS` | `class function BoundedLBFGS(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `BoundedLBFGSWithWorkspace` | `class function BoundedLBFGSWithWorkspace(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions;var Workspace:TOptimizationWorkspace):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `BrentMinimize` | `class function BrentMinimize(F:TUnivarFunc;A,B:Double;Tol:Double=1E-8;MaxIter:Integer=200):Double` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `ExplorePareto` | `class function ExplorePareto(const Objectives:TMultivarFunctions;const InitialPoints,Weights:array of TDoubleArray;const Options:TOptimizationOptions):TMultiObjectiveResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `GoldenSection` | `class function GoldenSection(F:TUnivarFunc;A,B:Double;Tol:Double=1E-8;MaxIter:Integer=200):Double` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `GradientDescent` | `class function GradientDescent(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;LR:Double=0.1;Tol:Double=1E-6;MaxIter:Integer=5000):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `LBFGS` | `class function LBFGS(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;M:Integer=10;Tol:Double=1E-6;MaxIter:Integer=1000):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `LBFGSAuto` | `class function LBFGSAuto(F:TDualFunction;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `Maximize` | `class function Maximize(F:TMultivarFunc;const X0:TDoubleArray;Scale:Double=1.0;Tol:Double=1E-8;MaxIter:Integer=10000):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `MultiStart` | `class function MultiStart(F:TMultivarFunc;Grad:TGradFunc;const InitialPoints:array of TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `NelderMead` | `class function NelderMead(F:TMultivarFunc;const X0:TDoubleArray;Scale:Double=1.0;Tol:Double=1E-8;MaxIter:Integer=10000):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `NonlinearConjugateGradient` | `class function NonlinearConjugateGradient(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `NumGrad` | `class function NumGrad(F:TMultivarFunc;const X:TDoubleArray;H:Double=1E-5):TDoubleArray` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `PenaltyMethod` | `class function PenaltyMethod(F:TMultivarFunc;const Constraints:array of TConstraintFunc;const X0:TDoubleArray;Mu:Double=1.0;Tol:Double=1E-6;MaxIter:Integer=5000):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `SimplexLP` | `class function SimplexLP(const C:TDoubleArray;const A:array of TDoubleArray;const B:TDoubleArray):TLPResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `SimulatedAnnealing` | `class function SimulatedAnnealing(F:TMultivarFunc;const X0:TDoubleArray;T0:Double=100.0;TMin:Double=1E-8;CoolRate:Double=0.995;StepSize:Double=0.1;MaxIter:Integer=100000;Seed:Integer=42):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `SolveConstrained` | `class function SolveConstrained(F:TMultivarFunc;Grad:TGradFunc;const Constraints:TSmoothConstraints;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `primary` | `—` |
-| `TOptimizationKit` | `function` | `TrustRegion` | `class function TrustRegion(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `primary` | `—` |
-| `TOptimizationOptions` | `function` | `Defaults` | `class function Defaults:TOptimizationOptions` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `GradientTolerance` | `GradientTolerance:Double` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `HistorySize` | `HistorySize:Integer` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `InitialStep` | `InitialStep:Double` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `InitialTrustRadius` | `InitialTrustRadius:Double` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `LowerBounds` | `LowerBounds:TDoubleArray` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `MaxEvaluations` | `MaxEvaluations:Integer` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `MaxIterations` | `MaxIterations:Integer` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `Progress` | `Progress:TOptimizationProgress` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `Seed` | `Seed:QWord` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `StartCount` | `StartCount:Integer` | `primary` | `—` |
-| `TOptimizationOptions` | `field` | `UpperBounds` | `UpperBounds:TDoubleArray` | `primary` | `—` |
-| `TOptimizationWorkspace` | `procedure` | `Clear` | `procedure Clear` | `primary` | `—` |
-| `TOptimizationWorkspace` | `field` | `Runs` | `Runs:Integer` | `primary` | `—` |
-| `TOptimizationWorkspace` | `field` | `TotalEvaluations` | `TotalEvaluations:Int64` | `primary` | `—` |
-| `TOptimizationWorkspace` | `field` | `WarmStartX` | `WarmStartX:TDoubleArray` | `primary` | `—` |
-| `TOptResult` | `field` | `BestFVal` | `BestFVal:Double` | `primary` | `—` |
-| `TOptResult` | `field` | `BestX` | `BestX:TDoubleArray` | `primary` | `—` |
-| `TOptResult` | `field` | `ConstraintViolation` | `ConstraintViolation:Double` | `primary` | `—` |
-| `TOptResult` | `field` | `Converged` | `Converged:Boolean` | `primary` | `—` |
-| `TOptResult` | `field` | `Evaluations` | `Evaluations:Integer` | `primary` | `—` |
-| `TOptResult` | `field` | `FVal` | `FVal:Double` | `primary` | `—` |
-| `TOptResult` | `field` | `GradientNorm` | `GradientNorm:Double` | `primary` | `—` |
-| `TOptResult` | `field` | `Iters` | `Iters:Integer` | `primary` | `—` |
-| `TOptResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TOptResult` | `field` | `X` | `X:TDoubleArray` | `primary` | `—` |
-| `TSmoothConstraint` | `field` | `Gradient` | `Gradient:TGradFunc` | `primary` | `—` |
-| `TSmoothConstraint` | `field` | `Kind` | `Kind:TConstraintKind` | `primary` | `—` |
-| `TSmoothConstraint` | `field` | `Tolerance` | `Tolerance:Double` | `primary` | `—` |
-| `TSmoothConstraint` | `field` | `Value` | `Value:TConstraintFunc` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EOptimizationError` | `EOptimizationError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TConstraintFunc` | `TConstraintFunc=function(const X:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TConstraintKind` | `TConstraintKind=(ckInequality,ckEquality)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TGradFunc` | `TGradFunc=function(const X:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLPResult` | `TLPResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TLPStatus` | `TLPStatus=(lpsOptimal,lpsUnbounded,lpsIterationLimit,lpsUnsupportedStart,lpsInfeasible)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TMultiObjectiveResult` | `TMultiObjectiveResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TMultivarFunc` | `TMultivarFunc=function(const X:TDoubleArray):Double` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TMultivarFunctions` | `TMultivarFunctions=array of TMultivarFunc` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TObjectiveMatrix` | `TObjectiveMatrix=array of TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TOptimizationKit` | `TOptimizationKit=class` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOptimizationOptions` | `TOptimizationOptions=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TOptimizationProgress` | `TOptimizationProgress=function(Iteration,Evaluations:Integer;Objective,GradientNorm,Feasibility:Double):Boolean` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOptimizationWorkspace` | `TOptimizationWorkspace=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOptResult` | `TOptResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TOptResults` | `TOptResults=array of TOptResult` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TSmoothConstraint` | `TSmoothConstraint=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TSmoothConstraints` | `TSmoothConstraints=array of TSmoothConstraint` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TUnivarFunc` | `TUnivarFunc=function(X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TConstraintKind` | `enum-value` | `ckEquality` | `ckEquality` | `advanced` | `—` | `—` | `—` |
+| `TConstraintKind` | `enum-value` | `ckInequality` | `ckInequality` | `advanced` | `—` | `—` | `—` |
+| `TLPResult` | `field` | `Feasible` | `Feasible:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TLPResult` | `field` | `Iters` | `Iters:Integer` | `advanced` | `—` | `—` | `—` |
+| `TLPResult` | `field` | `ObjVal` | `ObjVal:Double` | `advanced` | `—` | `—` | `—` |
+| `TLPResult` | `field` | `Status` | `Status:TLPStatus` | `advanced` | `—` | `—` | `—` |
+| `TLPResult` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TLPStatus` | `enum-value` | `lpsInfeasible` | `lpsInfeasible` | `advanced` | `—` | `—` | `—` |
+| `TLPStatus` | `enum-value` | `lpsIterationLimit` | `lpsIterationLimit` | `advanced` | `—` | `—` | `—` |
+| `TLPStatus` | `enum-value` | `lpsOptimal` | `lpsOptimal` | `advanced` | `—` | `—` | `—` |
+| `TLPStatus` | `enum-value` | `lpsUnbounded` | `lpsUnbounded` | `advanced` | `—` | `—` | `—` |
+| `TLPStatus` | `enum-value` | `lpsUnsupportedStart` | `lpsUnsupportedStart` | `advanced` | `—` | `—` | `—` |
+| `TMultiObjectiveResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TMultiObjectiveResult` | `field` | `ObjectiveValues` | `ObjectiveValues:TObjectiveMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultiObjectiveResult` | `field` | `Points` | `Points:TOptResults` | `advanced` | `—` | `—` | `—` |
+| `TMultiObjectiveResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `Adam` | `class function Adam(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;LR:Double=0.001;Beta1:Double=0.9;Beta2:Double=0.999;Eps:Double=1E-8;Tol:Double=1E-6;MaxIter:Integer=10000):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `BoundedLBFGS` | `class function BoundedLBFGS(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `BoundedLBFGSWithWorkspace` | `class function BoundedLBFGSWithWorkspace(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions;var Workspace:TOptimizationWorkspace):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `BrentMinimize` | `class function BrentMinimize(F:TUnivarFunc;A,B:Double;Tol:Double=1E-8;MaxIter:Integer=200):Double` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `ExplorePareto` | `class function ExplorePareto(const Objectives:TMultivarFunctions;const InitialPoints,Weights:array of TDoubleArray;const Options:TOptimizationOptions):TMultiObjectiveResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `GoldenSection` | `class function GoldenSection(F:TUnivarFunc;A,B:Double;Tol:Double=1E-8;MaxIter:Integer=200):Double` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `GradientDescent` | `class function GradientDescent(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;LR:Double=0.1;Tol:Double=1E-6;MaxIter:Integer=5000):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `LBFGS` | `class function LBFGS(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;M:Integer=10;Tol:Double=1E-6;MaxIter:Integer=1000):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `LBFGSAuto` | `class function LBFGSAuto(F:TDualFunction;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `Maximize` | `class function Maximize(F:TMultivarFunc;const X0:TDoubleArray;Scale:Double=1.0;Tol:Double=1E-8;MaxIter:Integer=10000):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `MultiStart` | `class function MultiStart(F:TMultivarFunc;Grad:TGradFunc;const InitialPoints:array of TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `NelderMead` | `class function NelderMead(F:TMultivarFunc;const X0:TDoubleArray;Scale:Double=1.0;Tol:Double=1E-8;MaxIter:Integer=10000):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `NonlinearConjugateGradient` | `class function NonlinearConjugateGradient(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `NumGrad` | `class function NumGrad(F:TMultivarFunc;const X:TDoubleArray;H:Double=1E-5):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `PenaltyMethod` | `class function PenaltyMethod(F:TMultivarFunc;const Constraints:array of TConstraintFunc;const X0:TDoubleArray;Mu:Double=1.0;Tol:Double=1E-6;MaxIter:Integer=5000):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `SimplexLP` | `class function SimplexLP(const C:TDoubleArray;const A:array of TDoubleArray;const B:TDoubleArray):TLPResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `SimulatedAnnealing` | `class function SimulatedAnnealing(F:TMultivarFunc;const X0:TDoubleArray;T0:Double=100.0;TMin:Double=1E-8;CoolRate:Double=0.995;StepSize:Double=0.1;MaxIter:Integer=100000;Seed:Integer=42):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `SolveConstrained` | `class function SolveConstrained(F:TMultivarFunc;Grad:TGradFunc;const Constraints:TSmoothConstraints;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationKit` | `function` | `TrustRegion` | `class function TrustRegion(F:TMultivarFunc;Grad:TGradFunc;const X0:TDoubleArray;const Options:TOptimizationOptions):TOptResult` | `recommended` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `AbsoluteTolerance` | `AbsoluteTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `function` | `Defaults` | `class function Defaults:TOptimizationOptions` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `GradientTolerance` | `GradientTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `HistorySize` | `HistorySize:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `InitialStep` | `InitialStep:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `InitialTrustRadius` | `InitialTrustRadius:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `LowerBounds` | `LowerBounds:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `MaxEvaluations` | `MaxEvaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `MaxIterations` | `MaxIterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `Progress` | `Progress:TOptimizationProgress` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `RelativeTolerance` | `RelativeTolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `Seed` | `Seed:QWord` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `StartCount` | `StartCount:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationOptions` | `field` | `UpperBounds` | `UpperBounds:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationWorkspace` | `procedure` | `Clear` | `procedure Clear` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationWorkspace` | `field` | `Runs` | `Runs:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationWorkspace` | `field` | `TotalEvaluations` | `TotalEvaluations:Int64` | `advanced` | `—` | `—` | `—` |
+| `TOptimizationWorkspace` | `field` | `WarmStartX` | `WarmStartX:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `BestFVal` | `BestFVal:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `BestX` | `BestX:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `ConstraintViolation` | `ConstraintViolation:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `Converged` | `Converged:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `Evaluations` | `Evaluations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `FVal` | `FVal:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `GradientNorm` | `GradientNorm:Double` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `Iters` | `Iters:Integer` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TOptResult` | `field` | `X` | `X:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TSmoothConstraint` | `field` | `Gradient` | `Gradient:TGradFunc` | `advanced` | `—` | `—` | `—` |
+| `TSmoothConstraint` | `field` | `Kind` | `Kind:TConstraintKind` | `advanced` | `—` | `—` | `—` |
+| `TSmoothConstraint` | `field` | `Tolerance` | `Tolerance:Double` | `advanced` | `—` | `—` | `—` |
+| `TSmoothConstraint` | `field` | `Value` | `Value:TConstraintFunc` | `advanced` | `—` | `—` | `—` |
 
 ## ProbabilityLib.Distributions
 
 Source: [`src/ProbabilityLib.Distributions.pas`](../src/ProbabilityLib.Distributions.pas)  
 Interface SHA-256: `e84d2cfef03612ee25cf4d4f735d9a18c20dc667e748247acc2a731b5951e2ef`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EProbabilityError` | `EProbabilityError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `class` | `TProbabilityKit` | `TProbabilityKit=class` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BetaCDF` | `class function BetaCDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BetaMean` | `class function BetaMean(const Alpha,Beta:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BetaPDF` | `class function BetaPDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BetaSurvival` | `class function BetaSurvival(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BetaVariance` | `class function BetaVariance(const Alpha,Beta:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BinomialCDF` | `class function BinomialCDF(const K,N:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BinomialMean` | `class function BinomialMean(const N:Integer;const P:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BinomialPMF` | `class function BinomialPMF(const K,N:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BinomialSurvival` | `class function BinomialSurvival(const K,N:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `BinomialVariance` | `class function BinomialVariance(const N:Integer;const P:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ChiSquaredCDF` | `class function ChiSquaredCDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ChiSquaredMean` | `class function ChiSquaredMean(DF:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ChiSquaredPDF` | `class function ChiSquaredPDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ChiSquaredSurvival` | `class function ChiSquaredSurvival(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ChiSquaredVariance` | `class function ChiSquaredVariance(DF:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ExponentialCDF` | `class function ExponentialCDF(const X,Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ExponentialMean` | `class function ExponentialMean(const Lambda:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ExponentialPDF` | `class function ExponentialPDF(const X,Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ExponentialSurvival` | `class function ExponentialSurvival(const X,Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `ExponentialVariance` | `class function ExponentialVariance(const Lambda:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `FCDF` | `class function FCDF(const X:Double;DF1,DF2:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `FMean` | `class function FMean(DF1,DF2:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `FPDF` | `class function FPDF(const X:Double;DF1,DF2:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `FSurvival` | `class function FSurvival(const X:Double;DF1,DF2:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `FVariance` | `class function FVariance(DF1,DF2:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GammaCDF` | `class function GammaCDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GammaMean` | `class function GammaMean(const Alpha,Beta:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GammaPDF` | `class function GammaPDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GammaSurvival` | `class function GammaSurvival(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GammaVariance` | `class function GammaVariance(const Alpha,Beta:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GeometricCDF` | `class function GeometricCDF(const K:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GeometricMean` | `class function GeometricMean(const P:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GeometricPMF` | `class function GeometricPMF(const K:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GeometricSurvival` | `class function GeometricSurvival(const K:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `GeometricVariance` | `class function GeometricVariance(const P:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `HypergeometricCDF` | `class function HypergeometricCDF(const K,PopSize,SuccPop,SampleN:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `HypergeometricMean` | `class function HypergeometricMean(PopSize,SuccPop,SampleN:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `HypergeometricPMF` | `class function HypergeometricPMF(const K,PopSize,SuccPop,SampleN:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `HypergeometricVariance` | `class function HypergeometricVariance(PopSize,SuccPop,SampleN:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `LogNormalCDF` | `class function LogNormalCDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `LogNormalMean` | `class function LogNormalMean(const Mu,Sigma:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `LogNormalPDF` | `class function LogNormalPDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `LogNormalSurvival` | `class function LogNormalSurvival(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `LogNormalVariance` | `class function LogNormalVariance(const Mu,Sigma:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NegBinomialCDF` | `class function NegBinomialCDF(const K,R:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NegBinomialMean` | `class function NegBinomialMean(const R:Integer;const P:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NegBinomialPMF` | `class function NegBinomialPMF(const K,R:Integer;const P:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NegBinomialVariance` | `class function NegBinomialVariance(const R:Integer;const P:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NormalCDF` | `class function NormalCDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NormalMean` | `class function NormalMean(const Mu,Sigma:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NormalPDF` | `class function NormalPDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NormalSurvival` | `class function NormalSurvival(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `NormalVariance` | `class function NormalVariance(const Mu,Sigma:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `PoissonCDF` | `class function PoissonCDF(const K:Integer;const Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `PoissonMean` | `class function PoissonMean(const Lambda:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `PoissonPMF` | `class function PoissonPMF(const K:Integer;const Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `PoissonSurvival` | `class function PoissonSurvival(const K:Integer;const Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `PoissonVariance` | `class function PoissonVariance(const Lambda:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `StudentTCDF` | `class function StudentTCDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `StudentTMean` | `class function StudentTMean(DF:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `StudentTPDF` | `class function StudentTPDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `StudentTSurvival` | `class function StudentTSurvival(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `StudentTTwoTail` | `class function StudentTTwoTail(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `StudentTVariance` | `class function StudentTVariance(DF:Integer):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `UniformCDF` | `class function UniformCDF(const X,A,B:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `UniformMean` | `class function UniformMean(const A,B:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `UniformPDF` | `class function UniformPDF(const X,A,B:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `UniformSurvival` | `class function UniformSurvival(const X,A,B:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `UniformVariance` | `class function UniformVariance(const A,B:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `WeibullCDF` | `class function WeibullCDF(const X,K,Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `WeibullMean` | `class function WeibullMean(const K,Lambda:Double):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `WeibullPDF` | `class function WeibullPDF(const X,K,Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `WeibullSurvival` | `class function WeibullSurvival(const X,K,Lambda:Double;ADecimals:Integer=-1):Double` | `primary` | `—` |
-| `TProbabilityKit` | `function` | `WeibullVariance` | `class function WeibullVariance(const K,Lambda:Double):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EProbabilityError` | `EProbabilityError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TProbabilityKit` | `TProbabilityKit=class` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BetaCDF` | `class function BetaCDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BetaMean` | `class function BetaMean(const Alpha,Beta:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BetaPDF` | `class function BetaPDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BetaSurvival` | `class function BetaSurvival(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BetaVariance` | `class function BetaVariance(const Alpha,Beta:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BinomialCDF` | `class function BinomialCDF(const K,N:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BinomialMean` | `class function BinomialMean(const N:Integer;const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BinomialPMF` | `class function BinomialPMF(const K,N:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BinomialSurvival` | `class function BinomialSurvival(const K,N:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `BinomialVariance` | `class function BinomialVariance(const N:Integer;const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ChiSquaredCDF` | `class function ChiSquaredCDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ChiSquaredMean` | `class function ChiSquaredMean(DF:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ChiSquaredPDF` | `class function ChiSquaredPDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ChiSquaredSurvival` | `class function ChiSquaredSurvival(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ChiSquaredVariance` | `class function ChiSquaredVariance(DF:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ExponentialCDF` | `class function ExponentialCDF(const X,Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ExponentialMean` | `class function ExponentialMean(const Lambda:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ExponentialPDF` | `class function ExponentialPDF(const X,Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ExponentialSurvival` | `class function ExponentialSurvival(const X,Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `ExponentialVariance` | `class function ExponentialVariance(const Lambda:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `FCDF` | `class function FCDF(const X:Double;DF1,DF2:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `FMean` | `class function FMean(DF1,DF2:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `FPDF` | `class function FPDF(const X:Double;DF1,DF2:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `FSurvival` | `class function FSurvival(const X:Double;DF1,DF2:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `FVariance` | `class function FVariance(DF1,DF2:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GammaCDF` | `class function GammaCDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GammaMean` | `class function GammaMean(const Alpha,Beta:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GammaPDF` | `class function GammaPDF(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GammaSurvival` | `class function GammaSurvival(const X,Alpha,Beta:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GammaVariance` | `class function GammaVariance(const Alpha,Beta:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GeometricCDF` | `class function GeometricCDF(const K:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GeometricMean` | `class function GeometricMean(const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GeometricPMF` | `class function GeometricPMF(const K:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GeometricSurvival` | `class function GeometricSurvival(const K:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `GeometricVariance` | `class function GeometricVariance(const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `HypergeometricCDF` | `class function HypergeometricCDF(const K,PopSize,SuccPop,SampleN:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `HypergeometricMean` | `class function HypergeometricMean(PopSize,SuccPop,SampleN:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `HypergeometricPMF` | `class function HypergeometricPMF(const K,PopSize,SuccPop,SampleN:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `HypergeometricVariance` | `class function HypergeometricVariance(PopSize,SuccPop,SampleN:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `LogNormalCDF` | `class function LogNormalCDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `LogNormalMean` | `class function LogNormalMean(const Mu,Sigma:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `LogNormalPDF` | `class function LogNormalPDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `LogNormalSurvival` | `class function LogNormalSurvival(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `LogNormalVariance` | `class function LogNormalVariance(const Mu,Sigma:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NegBinomialCDF` | `class function NegBinomialCDF(const K,R:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NegBinomialMean` | `class function NegBinomialMean(const R:Integer;const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NegBinomialPMF` | `class function NegBinomialPMF(const K,R:Integer;const P:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NegBinomialVariance` | `class function NegBinomialVariance(const R:Integer;const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NormalCDF` | `class function NormalCDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NormalMean` | `class function NormalMean(const Mu,Sigma:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NormalPDF` | `class function NormalPDF(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NormalSurvival` | `class function NormalSurvival(const X,Mu,Sigma:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `NormalVariance` | `class function NormalVariance(const Mu,Sigma:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `PoissonCDF` | `class function PoissonCDF(const K:Integer;const Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `PoissonMean` | `class function PoissonMean(const Lambda:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `PoissonPMF` | `class function PoissonPMF(const K:Integer;const Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `PoissonSurvival` | `class function PoissonSurvival(const K:Integer;const Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `PoissonVariance` | `class function PoissonVariance(const Lambda:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `StudentTCDF` | `class function StudentTCDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `StudentTMean` | `class function StudentTMean(DF:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `StudentTPDF` | `class function StudentTPDF(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `StudentTSurvival` | `class function StudentTSurvival(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `StudentTTwoTail` | `class function StudentTTwoTail(const X:Double;DF:Integer;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `StudentTVariance` | `class function StudentTVariance(DF:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `UniformCDF` | `class function UniformCDF(const X,A,B:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `UniformMean` | `class function UniformMean(const A,B:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `UniformPDF` | `class function UniformPDF(const X,A,B:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `UniformSurvival` | `class function UniformSurvival(const X,A,B:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `UniformVariance` | `class function UniformVariance(const A,B:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `WeibullCDF` | `class function WeibullCDF(const X,K,Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `WeibullMean` | `class function WeibullMean(const K,Lambda:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `WeibullPDF` | `class function WeibullPDF(const X,K,Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `WeibullSurvival` | `class function WeibullSurvival(const X,K,Lambda:Double;ADecimals:Integer=-1):Double` | `recommended` | `—` | `—` | `—` |
+| `TProbabilityKit` | `function` | `WeibullVariance` | `class function WeibullVariance(const K,Lambda:Double):Double` | `recommended` | `—` | `—` | `—` |
 
 ## StatsLib.Inference
 
 Source: [`src/StatsLib.Inference.pas`](../src/StatsLib.Inference.pas)  
 Interface SHA-256: `c53d9dcac00bba7e6fb4f50b653ad7dc5e775b5146bedda6043a4f7e2217c847`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EInferenceError` | `EInferenceError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TANOVAResult` | `TANOVAResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TBinomialDistribution` | `TBinomialDistribution=record` | `primary` | `—` |
-| `(unit)` | `record` | `TContingencyResult` | `TContingencyResult=record` | `primary` | `—` |
-| `(unit)` | `type` | `TCountMatrix` | `TCountMatrix=array of TIntegerArray` | `primary` | `—` |
-| `(unit)` | `record` | `TDistributionEstimate` | `TDistributionEstimate=record` | `primary` | `—` |
-| `(unit)` | `record` | `TExponentialDistribution` | `TExponentialDistribution=record` | `primary` | `—` |
-| `(unit)` | `class` | `TInferenceKit` | `TInferenceKit=class` | `primary` | `—` |
-| `(unit)` | `record` | `TInferenceTestResult` | `TInferenceTestResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TLogisticRegressionResult` | `TLogisticRegressionResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TNormalDistribution` | `TNormalDistribution=record` | `primary` | `—` |
-| `(unit)` | `record` | `TRegressionDiagnostics` | `TRegressionDiagnostics=record` | `primary` | `—` |
-| `TANOVAResult` | `field` | `BetweenDegreesOfFreedom` | `BetweenDegreesOfFreedom:Integer` | `primary` | `—` |
-| `TANOVAResult` | `field` | `EtaSquared` | `EtaSquared:Double` | `primary` | `—` |
-| `TANOVAResult` | `field` | `FStatistic` | `FStatistic:Double` | `primary` | `—` |
-| `TANOVAResult` | `field` | `PValue` | `PValue:Double` | `primary` | `—` |
-| `TANOVAResult` | `field` | `WithinDegreesOfFreedom` | `WithinDegreesOfFreedom:Integer` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `CDF` | `function CDF(const Successes:Integer):Double` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `Create` | `class function Create(const TrialCount:Integer;const SuccessProbability:Double):TBinomialDistribution` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `LogPMF` | `function LogPMF(const Successes:Integer):Double` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `PMF` | `function PMF(const Successes:Integer):Double` | `primary` | `—` |
-| `TBinomialDistribution` | `field` | `Probability` | `Probability:Double` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `Quantile` | `function Quantile(const CumulativeProbability:Double):Integer` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `Sample` | `function Sample(var Random:TLocalRandom):Integer` | `primary` | `—` |
-| `TBinomialDistribution` | `function` | `Survival` | `function Survival(const Successes:Integer):Double` | `primary` | `—` |
-| `TBinomialDistribution` | `field` | `Trials` | `Trials:Integer` | `primary` | `—` |
-| `TContingencyResult` | `field` | `ChiSquare` | `ChiSquare:Double` | `primary` | `—` |
-| `TContingencyResult` | `field` | `CramersV` | `CramersV:Double` | `primary` | `—` |
-| `TContingencyResult` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Integer` | `primary` | `—` |
-| `TContingencyResult` | `field` | `PValue` | `PValue:Double` | `primary` | `—` |
-| `TDistributionEstimate` | `field` | `Identifiable` | `Identifiable:Boolean` | `primary` | `—` |
-| `TDistributionEstimate` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TDistributionEstimate` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `primary` | `—` |
-| `TDistributionEstimate` | `field` | `Parameters` | `Parameters:TDoubleArray` | `primary` | `—` |
-| `TDistributionEstimate` | `field` | `StandardErrors` | `StandardErrors:TDoubleArray` | `primary` | `—` |
-| `TDistributionEstimate` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `CDF` | `function CDF(const X:Double):Double` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `Create` | `class function Create(const RateValue:Double):TExponentialDistribution` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `LogPDF` | `function LogPDF(const X:Double):Double` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `PDF` | `function PDF(const X:Double):Double` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `Quantile` | `function Quantile(const Probability:Double):Double` | `primary` | `—` |
-| `TExponentialDistribution` | `field` | `Rate` | `Rate:Double` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `Sample` | `function Sample(var Random:TLocalRandom):Double` | `primary` | `—` |
-| `TExponentialDistribution` | `function` | `Survival` | `function Survival(const X:Double):Double` | `primary` | `—` |
-| `TInferenceKit` | `function` | `AdjustBenjaminiHochberg` | `class function AdjustBenjaminiHochberg(const PValues:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TInferenceKit` | `function` | `AdjustBonferroni` | `class function AdjustBonferroni(const PValues:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TInferenceKit` | `function` | `ChiSquareContingency` | `class function ChiSquareContingency(const Counts:TCountMatrix):TContingencyResult` | `primary` | `—` |
-| `TInferenceKit` | `function` | `EstimateBinomial` | `class function EstimateBinomial(const Successes,Trials:Integer):TDistributionEstimate` | `primary` | `—` |
-| `TInferenceKit` | `function` | `EstimateExponential` | `class function EstimateExponential(const Samples:TDoubleArray):TDistributionEstimate` | `primary` | `—` |
-| `TInferenceKit` | `function` | `EstimateGamma` | `class function EstimateGamma(const Samples:TDoubleArray):TDistributionEstimate` | `primary` | `—` |
-| `TInferenceKit` | `function` | `EstimateNormal` | `class function EstimateNormal(const Samples:TDoubleArray):TDistributionEstimate` | `primary` | `—` |
-| `TInferenceKit` | `function` | `FitLogistic` | `class function FitLogistic(const Design:IDenseDoubleMatrix;const Labels:TIntegerArray;const MaxIterations:Integer=100;const Tolerance:Double=1E-8):TLogisticRegressionResult` | `primary` | `—` |
-| `TInferenceKit` | `function` | `FitOLS` | `class function FitOLS(const Design:IDenseDoubleMatrix;const Response:TDoubleArray):TRegressionDiagnostics` | `primary` | `—` |
-| `TInferenceKit` | `function` | `MannWhitneyU` | `class function MannWhitneyU(const A,B:TDoubleArray):TInferenceTestResult` | `primary` | `—` |
-| `TInferenceKit` | `function` | `OneSampleT` | `class function OneSampleT(const Samples:TDoubleArray;const NullMean:Double=0;const ConfidenceLevel:Double=0.95):TInferenceTestResult` | `primary` | `—` |
-| `TInferenceKit` | `function` | `OneWayANOVA` | `class function OneWayANOVA(const Groups:array of TDoubleArray):TANOVAResult` | `primary` | `—` |
-| `TInferenceKit` | `function` | `PairedT` | `class function PairedT(const A,B:TDoubleArray;const ConfidenceLevel:Double=0.95):TInferenceTestResult` | `primary` | `—` |
-| `TInferenceKit` | `function` | `WelchT` | `class function WelchT(const A,B:TDoubleArray;const ConfidenceLevel:Double=0.95):TInferenceTestResult` | `primary` | `—` |
-| `TInferenceTestResult` | `field` | `ConfidenceHigh` | `ConfidenceHigh:Double` | `primary` | `—` |
-| `TInferenceTestResult` | `field` | `ConfidenceLow` | `ConfidenceLow:Double` | `primary` | `—` |
-| `TInferenceTestResult` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Double` | `primary` | `—` |
-| `TInferenceTestResult` | `field` | `EffectSize` | `EffectSize:Double` | `primary` | `—` |
-| `TInferenceTestResult` | `field` | `PValue` | `PValue:Double` | `primary` | `—` |
-| `TInferenceTestResult` | `field` | `Statistic` | `Statistic:Double` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `Coefficients` | `Coefficients:TDoubleArray` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `Deviance` | `Deviance:Double` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `Identifiable` | `Identifiable:Boolean` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `Iterations` | `Iterations:Integer` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `Probabilities` | `Probabilities:TDoubleArray` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `StandardErrors` | `StandardErrors:TDoubleArray` | `primary` | `—` |
-| `TLogisticRegressionResult` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `CDF` | `function CDF(const X:Double):Double` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `Create` | `class function Create(const MeanValue,StandardDeviationValue:Double):TNormalDistribution` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `LogPDF` | `function LogPDF(const X:Double):Double` | `primary` | `—` |
-| `TNormalDistribution` | `field` | `Mean` | `Mean:Double` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `PDF` | `function PDF(const X:Double):Double` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `Quantile` | `function Quantile(const Probability:Double):Double` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `Sample` | `function Sample(var Random:TLocalRandom):Double` | `primary` | `—` |
-| `TNormalDistribution` | `field` | `StandardDeviation` | `StandardDeviation:Double` | `primary` | `—` |
-| `TNormalDistribution` | `function` | `Survival` | `function Survival(const X:Double):Double` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `AdjustedRSquared` | `AdjustedRSquared:Double` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `Coefficients` | `Coefficients:TDoubleArray` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Integer` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `Fitted` | `Fitted:TDoubleArray` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `Rank` | `Rank:Integer` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `Residuals` | `Residuals:TDoubleArray` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `RSquared` | `RSquared:Double` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `StandardErrors` | `StandardErrors:TDoubleArray` | `primary` | `—` |
-| `TRegressionDiagnostics` | `field` | `Status` | `Status:TIterationStatus` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EInferenceError` | `EInferenceError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TANOVAResult` | `TANOVAResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TBinomialDistribution` | `TBinomialDistribution=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TContingencyResult` | `TContingencyResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TCountMatrix` | `TCountMatrix=array of TIntegerArray` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDistributionEstimate` | `TDistributionEstimate=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TExponentialDistribution` | `TExponentialDistribution=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TInferenceKit` | `TInferenceKit=class` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TInferenceTestResult` | `TInferenceTestResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLogisticRegressionResult` | `TLogisticRegressionResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TNormalDistribution` | `TNormalDistribution=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TRegressionDiagnostics` | `TRegressionDiagnostics=record` | `advanced` | `—` | `—` | `—` |
+| `TANOVAResult` | `field` | `BetweenDegreesOfFreedom` | `BetweenDegreesOfFreedom:Integer` | `advanced` | `—` | `—` | `—` |
+| `TANOVAResult` | `field` | `EtaSquared` | `EtaSquared:Double` | `advanced` | `—` | `—` | `—` |
+| `TANOVAResult` | `field` | `FStatistic` | `FStatistic:Double` | `advanced` | `—` | `—` | `—` |
+| `TANOVAResult` | `field` | `PValue` | `PValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TANOVAResult` | `field` | `WithinDegreesOfFreedom` | `WithinDegreesOfFreedom:Integer` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `CDF` | `function CDF(const Successes:Integer):Double` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `Create` | `class function Create(const TrialCount:Integer;const SuccessProbability:Double):TBinomialDistribution` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `LogPMF` | `function LogPMF(const Successes:Integer):Double` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `PMF` | `function PMF(const Successes:Integer):Double` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `field` | `Probability` | `Probability:Double` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `Quantile` | `function Quantile(const CumulativeProbability:Double):Integer` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `Sample` | `function Sample(var Random:TLocalRandom):Integer` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `function` | `Survival` | `function Survival(const Successes:Integer):Double` | `advanced` | `—` | `—` | `—` |
+| `TBinomialDistribution` | `field` | `Trials` | `Trials:Integer` | `advanced` | `—` | `—` | `—` |
+| `TContingencyResult` | `field` | `ChiSquare` | `ChiSquare:Double` | `advanced` | `—` | `—` | `—` |
+| `TContingencyResult` | `field` | `CramersV` | `CramersV:Double` | `advanced` | `—` | `—` | `—` |
+| `TContingencyResult` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Integer` | `advanced` | `—` | `—` | `—` |
+| `TContingencyResult` | `field` | `PValue` | `PValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TDistributionEstimate` | `field` | `Identifiable` | `Identifiable:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TDistributionEstimate` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TDistributionEstimate` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `advanced` | `—` | `—` | `—` |
+| `TDistributionEstimate` | `field` | `Parameters` | `Parameters:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDistributionEstimate` | `field` | `StandardErrors` | `StandardErrors:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDistributionEstimate` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `CDF` | `function CDF(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `Create` | `class function Create(const RateValue:Double):TExponentialDistribution` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `LogPDF` | `function LogPDF(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `PDF` | `function PDF(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `Quantile` | `function Quantile(const Probability:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `field` | `Rate` | `Rate:Double` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `Sample` | `function Sample(var Random:TLocalRandom):Double` | `advanced` | `—` | `—` | `—` |
+| `TExponentialDistribution` | `function` | `Survival` | `function Survival(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `AdjustBenjaminiHochberg` | `class function AdjustBenjaminiHochberg(const PValues:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `AdjustBonferroni` | `class function AdjustBonferroni(const PValues:TDoubleArray):TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `ChiSquareContingency` | `class function ChiSquareContingency(const Counts:TCountMatrix):TContingencyResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `EstimateBinomial` | `class function EstimateBinomial(const Successes,Trials:Integer):TDistributionEstimate` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `EstimateExponential` | `class function EstimateExponential(const Samples:TDoubleArray):TDistributionEstimate` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `EstimateGamma` | `class function EstimateGamma(const Samples:TDoubleArray):TDistributionEstimate` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `EstimateNormal` | `class function EstimateNormal(const Samples:TDoubleArray):TDistributionEstimate` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `FitLogistic` | `class function FitLogistic(const Design:IDenseDoubleMatrix;const Labels:TIntegerArray;const MaxIterations:Integer=100;const Tolerance:Double=1E-8):TLogisticRegressionResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `FitOLS` | `class function FitOLS(const Design:IDenseDoubleMatrix;const Response:TDoubleArray):TRegressionDiagnostics` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `MannWhitneyU` | `class function MannWhitneyU(const A,B:TDoubleArray):TInferenceTestResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `OneSampleT` | `class function OneSampleT(const Samples:TDoubleArray;const NullMean:Double=0;const ConfidenceLevel:Double=0.95):TInferenceTestResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `OneWayANOVA` | `class function OneWayANOVA(const Groups:array of TDoubleArray):TANOVAResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `PairedT` | `class function PairedT(const A,B:TDoubleArray;const ConfidenceLevel:Double=0.95):TInferenceTestResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceKit` | `function` | `WelchT` | `class function WelchT(const A,B:TDoubleArray;const ConfidenceLevel:Double=0.95):TInferenceTestResult` | `advanced` | `—` | `—` | `—` |
+| `TInferenceTestResult` | `field` | `ConfidenceHigh` | `ConfidenceHigh:Double` | `advanced` | `—` | `—` | `—` |
+| `TInferenceTestResult` | `field` | `ConfidenceLow` | `ConfidenceLow:Double` | `advanced` | `—` | `—` | `—` |
+| `TInferenceTestResult` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Double` | `advanced` | `—` | `—` | `—` |
+| `TInferenceTestResult` | `field` | `EffectSize` | `EffectSize:Double` | `advanced` | `—` | `—` | `—` |
+| `TInferenceTestResult` | `field` | `PValue` | `PValue:Double` | `advanced` | `—` | `—` | `—` |
+| `TInferenceTestResult` | `field` | `Statistic` | `Statistic:Double` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `Coefficients` | `Coefficients:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `Deviance` | `Deviance:Double` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `Identifiable` | `Identifiable:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `Iterations` | `Iterations:Integer` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `Probabilities` | `Probabilities:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `StandardErrors` | `StandardErrors:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TLogisticRegressionResult` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `CDF` | `function CDF(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `Create` | `class function Create(const MeanValue,StandardDeviationValue:Double):TNormalDistribution` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `LogPDF` | `function LogPDF(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `field` | `Mean` | `Mean:Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `PDF` | `function PDF(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `Quantile` | `function Quantile(const Probability:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `Sample` | `function Sample(var Random:TLocalRandom):Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `field` | `StandardDeviation` | `StandardDeviation:Double` | `advanced` | `—` | `—` | `—` |
+| `TNormalDistribution` | `function` | `Survival` | `function Survival(const X:Double):Double` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `AdjustedRSquared` | `AdjustedRSquared:Double` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `Coefficients` | `Coefficients:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `DegreesOfFreedom` | `DegreesOfFreedom:Integer` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `Fitted` | `Fitted:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `Rank` | `Rank:Integer` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `Residuals` | `Residuals:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `RSquared` | `RSquared:Double` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `StandardErrors` | `StandardErrors:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TRegressionDiagnostics` | `field` | `Status` | `Status:TIterationStatus` | `advanced` | `—` | `—` | `—` |
 
 ## StatsLib.Stats
 
 Source: [`src/StatsLib.Stats.pas`](../src/StatsLib.Stats.pas)  
 Interface SHA-256: `f0b020f9f127af2aca2996221b997fbcc2a23db6ff2daa456515a0cb7d80aaf5`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EStatsError` | `EStatsError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TDescriptiveStats` | `TDescriptiveStats=record` | `primary` | `—` |
-| `(unit)` | `class` | `TStatsKit` | `TStatsKit=class` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `CV` | `CV:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `IQR` | `IQR:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Kurtosis` | `Kurtosis:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Max` | `Max:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Mean` | `Mean:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Median` | `Median:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Min` | `Min:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Mode` | `Mode:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `N` | `N:Integer` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Q1` | `Q1:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Q3` | `Q3:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Range` | `Range:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `SEM` | `SEM:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Skewness` | `Skewness:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `StdDev` | `StdDev:Double` | `primary` | `—` |
-| `TDescriptiveStats` | `function` | `ToString` | `function ToString:string` | `primary` | `—` |
-| `TDescriptiveStats` | `function` | `ToStringWide` | `function ToStringWide:string` | `primary` | `—` |
-| `TDescriptiveStats` | `field` | `Variance` | `Variance:Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `BootstrapConfidenceInterval` | `class function BootstrapConfidenceInterval(const Data:TDoubleArray;const Alpha:Double;const Iterations:Integer;const Seed:LongWord):TDoublePair` | `primary` | `—` |
-| `TStatsKit` | `function` | `BootstrapConfidenceInterval` | `class function BootstrapConfidenceInterval(const Data:TDoubleArray;const Alpha:Double=0.05;const Iterations:Integer=1000):TDoublePair` | `primary` | `—` |
-| `TStatsKit` | `function` | `BootstrapMean` | `class function BootstrapMean(const Data:TDoubleArray;const Iterations:Integer):TDoubleArray` | `primary` | `—` |
-| `TStatsKit` | `function` | `BootstrapMean` | `class function BootstrapMean(const Data:TDoubleArray;const Iterations:Integer;const Seed:LongWord):TDoubleArray` | `primary` | `—` |
-| `TStatsKit` | `function` | `CoefficientOfVariation` | `class function CoefficientOfVariation(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `CohensD` | `class function CohensD(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Covariance` | `class function Covariance(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Describe` | `class function Describe(const Data:TDoubleArray):TDescriptiveStats` | `primary` | `—` |
-| `TStatsKit` | `function` | `GeometricMean` | `class function GeometricMean(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `HarmonicMean` | `class function HarmonicMean(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `HedgesG` | `class function HedgesG(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `HuberM` | `class function HuberM(const Data:TDoubleArray;const K:Double=1.5):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `InterquartileRange` | `class function InterquartileRange(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `IsNormal` | `class function IsNormal(const Data:TDoubleArray;const Alpha:Double=0.05):Boolean` | `primary` | `—` |
-| `TStatsKit` | `function` | `KendallTau` | `class function KendallTau(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `KolmogorovSmirnovTest` | `class function KolmogorovSmirnovTest(const Data:TDoubleArray;out KSPValue:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Kurtosis` | `class function Kurtosis(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `MannWhitneyU` | `class function MannWhitneyU(const X,Y:TDoubleArray;out UPValue:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Mean` | `class function Mean(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Median` | `class function Median(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `MedianAbsoluteDeviation` | `class function MedianAbsoluteDeviation(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Mode` | `class function Mode(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `PearsonCorrelation` | `class function PearsonCorrelation(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Percentile` | `class function Percentile(const Data:TDoubleArray;const P:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Quantile` | `class function Quantile(const Data:TDoubleArray;const Q:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Quartile1` | `class function Quartile1(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Quartile3` | `class function Quartile3(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Range` | `class function Range(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `RobustStandardDeviation` | `class function RobustStandardDeviation(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `SampleStandardDeviation` | `class function SampleStandardDeviation(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `SampleVariance` | `class function SampleVariance(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `ShapiroWilkTest` | `class function ShapiroWilkTest(const Data:TDoubleArray;out WPValue:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `SignTest` | `class function SignTest(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Skewness` | `class function Skewness(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `procedure` | `Sort` | `class procedure Sort(var Data:TDoubleArray)` | `primary` | `—` |
-| `TStatsKit` | `function` | `SpearmanCorrelation` | `class function SpearmanCorrelation(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `StandardDeviation` | `class function StandardDeviation(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `StandardErrorOfMean` | `class function StandardErrorOfMean(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `procedure` | `Standardize` | `class procedure Standardize(var Data:TDoubleArray)` | `primary` | `—` |
-| `TStatsKit` | `function` | `Sum` | `class function Sum(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `SumOfSquares` | `class function SumOfSquares(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `TrimmedMean` | `class function TrimmedMean(const Data:TDoubleArray;const Percent:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `TTest` | `class function TTest(const X,Y:TDoubleArray;out TPValue:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `Variance` | `class function Variance(const Data:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `WilcoxonSignedRank` | `class function WilcoxonSignedRank(const X,Y:TDoubleArray):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `WinsorizedMean` | `class function WinsorizedMean(const Data:TDoubleArray;const Percent:Double):Double` | `primary` | `—` |
-| `TStatsKit` | `function` | `ZScore` | `class function ZScore(const Value,AMean,StdDev:Double):Double` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EStatsError` | `EStatsError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDescriptiveStats` | `TDescriptiveStats=record` | `recommended` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TStatsKit` | `TStatsKit=class` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `CV` | `CV:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `IQR` | `IQR:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Kurtosis` | `Kurtosis:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Max` | `Max:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Mean` | `Mean:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Median` | `Median:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Min` | `Min:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Mode` | `Mode:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `N` | `N:Integer` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Q1` | `Q1:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Q3` | `Q3:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Range` | `Range:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `SEM` | `SEM:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Skewness` | `Skewness:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `StdDev` | `StdDev:Double` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `function` | `ToString` | `function ToString:string` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `function` | `ToStringWide` | `function ToStringWide:string` | `recommended` | `—` | `—` | `—` |
+| `TDescriptiveStats` | `field` | `Variance` | `Variance:Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `BootstrapConfidenceInterval` | `class function BootstrapConfidenceInterval(const Data:TDoubleArray;const Alpha:Double;const Iterations:Integer;const Seed:LongWord):TDoublePair` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `BootstrapConfidenceInterval` | `class function BootstrapConfidenceInterval(const Data:TDoubleArray;const Alpha:Double=0.05;const Iterations:Integer=1000):TDoublePair` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `BootstrapMean` | `class function BootstrapMean(const Data:TDoubleArray;const Iterations:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `BootstrapMean` | `class function BootstrapMean(const Data:TDoubleArray;const Iterations:Integer;const Seed:LongWord):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `CoefficientOfVariation` | `class function CoefficientOfVariation(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `CohensD` | `class function CohensD(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Covariance` | `class function Covariance(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Describe` | `class function Describe(const Data:TDoubleArray):TDescriptiveStats` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `GeometricMean` | `class function GeometricMean(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `HarmonicMean` | `class function HarmonicMean(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `HedgesG` | `class function HedgesG(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `HuberM` | `class function HuberM(const Data:TDoubleArray;const K:Double=1.5):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `InterquartileRange` | `class function InterquartileRange(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `IsNormal` | `class function IsNormal(const Data:TDoubleArray;const Alpha:Double=0.05):Boolean` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `KendallTau` | `class function KendallTau(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `KolmogorovSmirnovTest` | `class function KolmogorovSmirnovTest(const Data:TDoubleArray;out KSPValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Kurtosis` | `class function Kurtosis(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `MannWhitneyU` | `class function MannWhitneyU(const X,Y:TDoubleArray;out UPValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Mean` | `class function Mean(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Median` | `class function Median(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `MedianAbsoluteDeviation` | `class function MedianAbsoluteDeviation(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Mode` | `class function Mode(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `PearsonCorrelation` | `class function PearsonCorrelation(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Percentile` | `class function Percentile(const Data:TDoubleArray;const P:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Quantile` | `class function Quantile(const Data:TDoubleArray;const Q:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Quartile1` | `class function Quartile1(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Quartile3` | `class function Quartile3(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Range` | `class function Range(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `RobustStandardDeviation` | `class function RobustStandardDeviation(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `SampleStandardDeviation` | `class function SampleStandardDeviation(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `SampleVariance` | `class function SampleVariance(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `ShapiroWilkTest` | `class function ShapiroWilkTest(const Data:TDoubleArray;out WPValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `SignTest` | `class function SignTest(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Skewness` | `class function Skewness(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `procedure` | `Sort` | `class procedure Sort(var Data:TDoubleArray)` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `SpearmanCorrelation` | `class function SpearmanCorrelation(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `StandardDeviation` | `class function StandardDeviation(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `StandardErrorOfMean` | `class function StandardErrorOfMean(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `procedure` | `Standardize` | `class procedure Standardize(var Data:TDoubleArray)` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Sum` | `class function Sum(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `SumOfSquares` | `class function SumOfSquares(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `TrimmedMean` | `class function TrimmedMean(const Data:TDoubleArray;const Percent:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `TTest` | `class function TTest(const X,Y:TDoubleArray;out TPValue:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `Variance` | `class function Variance(const Data:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `WilcoxonSignedRank` | `class function WilcoxonSignedRank(const X,Y:TDoubleArray):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `WinsorizedMean` | `class function WinsorizedMean(const Data:TDoubleArray;const Percent:Double):Double` | `recommended` | `—` | `—` | `—` |
+| `TStatsKit` | `function` | `ZScore` | `class function ZScore(const Value,AMean,StdDev:Double):Double` | `recommended` | `—` | `—` | `—` |
 
 ## StatsLib.Streaming
 
 Source: [`src/StatsLib.Streaming.pas`](../src/StatsLib.Streaming.pas)  
 Interface SHA-256: `fce473cf688ebd0b0ef5054889e9026cdf5cb8bae6fba81af51607ff8f721f39`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EStreamingStatsError` | `EStreamingStatsError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TNonFinitePolicy` | `TNonFinitePolicy=(nfpReject,nfpIgnore)` | `primary` | `—` |
-| `(unit)` | `record` | `TOnlineStatistics` | `TOnlineStatistics=record` | `primary` | `—` |
-| `TNonFinitePolicy` | `enum-value` | `nfpIgnore` | `nfpIgnore` | `primary` | `—` |
-| `TNonFinitePolicy` | `enum-value` | `nfpReject` | `nfpReject` | `primary` | `—` |
-| `TOnlineStatistics` | `procedure` | `Add` | `procedure Add(const Value:Double)` | `primary` | `—` |
-| `TOnlineStatistics` | `procedure` | `AddWeighted` | `procedure AddWeighted(const Value,Weight:Double)` | `primary` | `—` |
-| `TOnlineStatistics` | `procedure` | `Clear` | `procedure Clear` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `Count` | `property Count:QWord read FCount` | `primary` | `—` |
-| `TOnlineStatistics` | `function` | `Create` | `class function Create(const NonFinitePolicy:TNonFinitePolicy=nfpReject):TOnlineStatistics` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `Maximum` | `property Maximum:Double read GetMaximum` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `Mean` | `property Mean:Double read GetMean` | `primary` | `—` |
-| `TOnlineStatistics` | `procedure` | `Merge` | `procedure Merge(const Other:TOnlineStatistics)` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `Minimum` | `property Minimum:Double read GetMinimum` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `NonFinitePolicy` | `property NonFinitePolicy:TNonFinitePolicy read FPolicy` | `primary` | `—` |
-| `TOnlineStatistics` | `function` | `PopulationStandardDeviation` | `function PopulationStandardDeviation:Double` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `PopulationVariance` | `property PopulationVariance:Double read GetPopulationVariance` | `primary` | `—` |
-| `TOnlineStatistics` | `function` | `SampleStandardDeviation` | `function SampleStandardDeviation:Double` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `SampleVariance` | `property SampleVariance:Double read GetSampleVariance` | `primary` | `—` |
-| `TOnlineStatistics` | `property` | `WeightSum` | `property WeightSum:Double read FWeightSum` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EStreamingStatsError` | `EStreamingStatsError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TNonFinitePolicy` | `TNonFinitePolicy=(nfpReject,nfpIgnore)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TOnlineStatistics` | `TOnlineStatistics=record` | `advanced` | `—` | `—` | `—` |
+| `TNonFinitePolicy` | `enum-value` | `nfpIgnore` | `nfpIgnore` | `advanced` | `—` | `—` | `—` |
+| `TNonFinitePolicy` | `enum-value` | `nfpReject` | `nfpReject` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `procedure` | `Add` | `procedure Add(const Value:Double)` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `procedure` | `AddWeighted` | `procedure AddWeighted(const Value,Weight:Double)` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `procedure` | `Clear` | `procedure Clear` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `Count` | `property Count:QWord read FCount` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `function` | `Create` | `class function Create(const NonFinitePolicy:TNonFinitePolicy=nfpReject):TOnlineStatistics` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `Maximum` | `property Maximum:Double read GetMaximum` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `Mean` | `property Mean:Double read GetMean` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `procedure` | `Merge` | `procedure Merge(const Other:TOnlineStatistics)` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `Minimum` | `property Minimum:Double read GetMinimum` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `NonFinitePolicy` | `property NonFinitePolicy:TNonFinitePolicy read FPolicy` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `function` | `PopulationStandardDeviation` | `function PopulationStandardDeviation:Double` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `PopulationVariance` | `property PopulationVariance:Double read GetPopulationVariance` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `function` | `SampleStandardDeviation` | `function SampleStandardDeviation:Double` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `SampleVariance` | `property SampleVariance:Double read GetSampleVariance` | `advanced` | `—` | `—` | `—` |
+| `TOnlineStatistics` | `property` | `WeightSum` | `property WeightSum:Double read FWeightSum` | `advanced` | `—` | `—` | `—` |
 
 ## TimeSeriesLib.StateSpace
 
 Source: [`src/TimeSeriesLib.StateSpace.pas`](../src/TimeSeriesLib.StateSpace.pas)  
 Interface SHA-256: `7133e9bbfb69f95b36be6a3566699d0d506fbc0cde3fe4e9c1c2850e810ba6c9`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EStateSpaceError` | `EStateSpaceError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `type` | `TDenseDoubleMatrixArray` | `TDenseDoubleMatrixArray=array of IDenseDoubleMatrix` | `primary` | `—` |
-| `(unit)` | `record` | `TKalmanForecast` | `TKalmanForecast=record` | `primary` | `—` |
-| `(unit)` | `record` | `TKalmanSeriesResult` | `TKalmanSeriesResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TMultivariateKalmanConfiguration` | `TMultivariateKalmanConfiguration=record` | `primary` | `—` |
-| `(unit)` | `record` | `TMultivariateKalmanFilter` | `TMultivariateKalmanFilter=record` | `primary` | `—` |
-| `(unit)` | `record` | `TMultivariateKalmanForecast` | `TMultivariateKalmanForecast=record` | `primary` | `—` |
-| `(unit)` | `record` | `TMultivariateKalmanSeriesResult` | `TMultivariateKalmanSeriesResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TMultivariateKalmanStep` | `TMultivariateKalmanStep=record` | `primary` | `—` |
-| `(unit)` | `record` | `TScalarKalmanConfiguration` | `TScalarKalmanConfiguration=record` | `primary` | `—` |
-| `(unit)` | `record` | `TScalarKalmanFilter` | `TScalarKalmanFilter=record` | `primary` | `—` |
-| `TKalmanForecast` | `field` | `Means` | `Means:TDoubleArray` | `primary` | `—` |
-| `TKalmanForecast` | `field` | `Variances` | `Variances:TDoubleArray` | `primary` | `—` |
-| `TKalmanSeriesResult` | `field` | `Estimates` | `Estimates:TDoubleArray` | `primary` | `—` |
-| `TKalmanSeriesResult` | `field` | `Innovations` | `Innovations:TDoubleArray` | `primary` | `—` |
-| `TKalmanSeriesResult` | `field` | `InnovationVariances` | `InnovationVariances:TDoubleArray` | `primary` | `—` |
-| `TKalmanSeriesResult` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `primary` | `—` |
-| `TKalmanSeriesResult` | `field` | `Variances` | `Variances:TDoubleArray` | `primary` | `—` |
-| `TMultivariateKalmanConfiguration` | `function` | `Create` | `class function Create(const ATransition,AObservation,AProcessCovariance,AMeasurementCovariance:IDenseDoubleMatrix):TMultivariateKalmanConfiguration` | `primary` | `—` |
-| `TMultivariateKalmanConfiguration` | `field` | `MeasurementCovariance` | `MeasurementCovariance:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanConfiguration` | `field` | `Observation` | `Observation:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanConfiguration` | `field` | `ProcessCovariance` | `ProcessCovariance:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanConfiguration` | `field` | `Transition` | `Transition:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `Create` | `class function Create(const Configuration:TMultivariateKalmanConfiguration;const InitialMean:TDoubleArray;const InitialCovariance:IDenseDoubleMatrix):TMultivariateKalmanFilter` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `Forecast` | `function Forecast(const StepCount:SizeInt):TMultivariateKalmanForecast` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `procedure` | `Predict` | `procedure Predict` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `Process` | `function Process(const Measurements:IDenseDoubleMatrix):TMultivariateKalmanSeriesResult` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `procedure` | `Reset` | `procedure Reset(const InitialMean:TDoubleArray;const InitialCovariance:IDenseDoubleMatrix)` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `StateCovariance` | `function StateCovariance:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `StateMean` | `function StateMean:TDoubleArray` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `StateSize` | `function StateSize:SizeInt` | `primary` | `—` |
-| `TMultivariateKalmanFilter` | `function` | `Update` | `function Update(const Measurement:TDoubleArray):TMultivariateKalmanStep` | `primary` | `—` |
-| `TMultivariateKalmanForecast` | `field` | `ObservationCovariances` | `ObservationCovariances:TDenseDoubleMatrixArray` | `primary` | `—` |
-| `TMultivariateKalmanForecast` | `field` | `ObservationMeans` | `ObservationMeans:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanSeriesResult` | `field` | `InnovationCovariances` | `InnovationCovariances:TDenseDoubleMatrixArray` | `primary` | `—` |
-| `TMultivariateKalmanSeriesResult` | `field` | `Innovations` | `Innovations:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanSeriesResult` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `primary` | `—` |
-| `TMultivariateKalmanSeriesResult` | `field` | `StateCovariances` | `StateCovariances:TDenseDoubleMatrixArray` | `primary` | `—` |
-| `TMultivariateKalmanSeriesResult` | `field` | `StateMeans` | `StateMeans:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanStep` | `field` | `Innovation` | `Innovation:TDoubleArray` | `primary` | `—` |
-| `TMultivariateKalmanStep` | `field` | `InnovationCovariance` | `InnovationCovariance:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanStep` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `primary` | `—` |
-| `TMultivariateKalmanStep` | `field` | `StateCovariance` | `StateCovariance:IDenseDoubleMatrix` | `primary` | `—` |
-| `TMultivariateKalmanStep` | `field` | `StateMean` | `StateMean:TDoubleArray` | `primary` | `—` |
-| `TScalarKalmanConfiguration` | `function` | `Create` | `class function Create(const ATransition,AObservation,AProcessVariance,AMeasurementVariance:Double):TScalarKalmanConfiguration` | `primary` | `—` |
-| `TScalarKalmanConfiguration` | `field` | `MeasurementVariance` | `MeasurementVariance:Double` | `primary` | `—` |
-| `TScalarKalmanConfiguration` | `field` | `Observation` | `Observation:Double` | `primary` | `—` |
-| `TScalarKalmanConfiguration` | `field` | `ProcessVariance` | `ProcessVariance:Double` | `primary` | `—` |
-| `TScalarKalmanConfiguration` | `field` | `Transition` | `Transition:Double` | `primary` | `—` |
-| `TScalarKalmanFilter` | `property` | `Configuration` | `property Configuration:TScalarKalmanConfiguration read FConfiguration` | `primary` | `—` |
-| `TScalarKalmanFilter` | `function` | `Create` | `class function Create(const Configuration:TScalarKalmanConfiguration;const InitialEstimate,InitialVariance:Double):TScalarKalmanFilter` | `primary` | `—` |
-| `TScalarKalmanFilter` | `property` | `Estimate` | `property Estimate:Double read FEstimate` | `primary` | `—` |
-| `TScalarKalmanFilter` | `function` | `Forecast` | `function Forecast(const StepCount:SizeInt):TKalmanForecast` | `primary` | `—` |
-| `TScalarKalmanFilter` | `procedure` | `Predict` | `procedure Predict` | `primary` | `—` |
-| `TScalarKalmanFilter` | `function` | `Process` | `function Process(const Measurements:TDoubleArray):TKalmanSeriesResult` | `primary` | `—` |
-| `TScalarKalmanFilter` | `procedure` | `Reset` | `procedure Reset(const InitialEstimate,InitialVariance:Double)` | `primary` | `—` |
-| `TScalarKalmanFilter` | `procedure` | `Update` | `procedure Update(const Measurement:Double)` | `primary` | `—` |
-| `TScalarKalmanFilter` | `property` | `Variance` | `property Variance:Double read FCovariance` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `EStateSpaceError` | `EStateSpaceError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDenseDoubleMatrixArray` | `TDenseDoubleMatrixArray=array of IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TKalmanForecast` | `TKalmanForecast=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TKalmanSeriesResult` | `TKalmanSeriesResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TMultivariateKalmanConfiguration` | `TMultivariateKalmanConfiguration=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TMultivariateKalmanFilter` | `TMultivariateKalmanFilter=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TMultivariateKalmanForecast` | `TMultivariateKalmanForecast=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TMultivariateKalmanSeriesResult` | `TMultivariateKalmanSeriesResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TMultivariateKalmanStep` | `TMultivariateKalmanStep=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TScalarKalmanConfiguration` | `TScalarKalmanConfiguration=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TScalarKalmanFilter` | `TScalarKalmanFilter=record` | `advanced` | `—` | `—` | `—` |
+| `TKalmanForecast` | `field` | `Means` | `Means:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TKalmanForecast` | `field` | `Variances` | `Variances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TKalmanSeriesResult` | `field` | `Estimates` | `Estimates:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TKalmanSeriesResult` | `field` | `Innovations` | `Innovations:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TKalmanSeriesResult` | `field` | `InnovationVariances` | `InnovationVariances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TKalmanSeriesResult` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `advanced` | `—` | `—` | `—` |
+| `TKalmanSeriesResult` | `field` | `Variances` | `Variances:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanConfiguration` | `function` | `Create` | `class function Create(const ATransition,AObservation,AProcessCovariance,AMeasurementCovariance:IDenseDoubleMatrix):TMultivariateKalmanConfiguration` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanConfiguration` | `field` | `MeasurementCovariance` | `MeasurementCovariance:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanConfiguration` | `field` | `Observation` | `Observation:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanConfiguration` | `field` | `ProcessCovariance` | `ProcessCovariance:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanConfiguration` | `field` | `Transition` | `Transition:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `Create` | `class function Create(const Configuration:TMultivariateKalmanConfiguration;const InitialMean:TDoubleArray;const InitialCovariance:IDenseDoubleMatrix):TMultivariateKalmanFilter` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `Forecast` | `function Forecast(const StepCount:SizeInt):TMultivariateKalmanForecast` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `procedure` | `Predict` | `procedure Predict` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `Process` | `function Process(const Measurements:IDenseDoubleMatrix):TMultivariateKalmanSeriesResult` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `procedure` | `Reset` | `procedure Reset(const InitialMean:TDoubleArray;const InitialCovariance:IDenseDoubleMatrix)` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `StateCovariance` | `function StateCovariance:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `StateMean` | `function StateMean:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `StateSize` | `function StateSize:SizeInt` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanFilter` | `function` | `Update` | `function Update(const Measurement:TDoubleArray):TMultivariateKalmanStep` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanForecast` | `field` | `ObservationCovariances` | `ObservationCovariances:TDenseDoubleMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanForecast` | `field` | `ObservationMeans` | `ObservationMeans:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanSeriesResult` | `field` | `InnovationCovariances` | `InnovationCovariances:TDenseDoubleMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanSeriesResult` | `field` | `Innovations` | `Innovations:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanSeriesResult` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanSeriesResult` | `field` | `StateCovariances` | `StateCovariances:TDenseDoubleMatrixArray` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanSeriesResult` | `field` | `StateMeans` | `StateMeans:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanStep` | `field` | `Innovation` | `Innovation:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanStep` | `field` | `InnovationCovariance` | `InnovationCovariance:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanStep` | `field` | `LogLikelihood` | `LogLikelihood:Double` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanStep` | `field` | `StateCovariance` | `StateCovariance:IDenseDoubleMatrix` | `advanced` | `—` | `—` | `—` |
+| `TMultivariateKalmanStep` | `field` | `StateMean` | `StateMean:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanConfiguration` | `function` | `Create` | `class function Create(const ATransition,AObservation,AProcessVariance,AMeasurementVariance:Double):TScalarKalmanConfiguration` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanConfiguration` | `field` | `MeasurementVariance` | `MeasurementVariance:Double` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanConfiguration` | `field` | `Observation` | `Observation:Double` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanConfiguration` | `field` | `ProcessVariance` | `ProcessVariance:Double` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanConfiguration` | `field` | `Transition` | `Transition:Double` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `property` | `Configuration` | `property Configuration:TScalarKalmanConfiguration read FConfiguration` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `function` | `Create` | `class function Create(const Configuration:TScalarKalmanConfiguration;const InitialEstimate,InitialVariance:Double):TScalarKalmanFilter` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `property` | `Estimate` | `property Estimate:Double read FEstimate` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `function` | `Forecast` | `function Forecast(const StepCount:SizeInt):TKalmanForecast` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `procedure` | `Predict` | `procedure Predict` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `function` | `Process` | `function Process(const Measurements:TDoubleArray):TKalmanSeriesResult` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `procedure` | `Reset` | `procedure Reset(const InitialEstimate,InitialVariance:Double)` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `procedure` | `Update` | `procedure Update(const Measurement:Double)` | `advanced` | `—` | `—` | `—` |
+| `TScalarKalmanFilter` | `property` | `Variance` | `property Variance:Double read FCovariance` | `advanced` | `—` | `—` | `—` |
 
 ## TimeSeriesLib.TimeSeries
 
 Source: [`src/TimeSeriesLib.TimeSeries.pas`](../src/TimeSeriesLib.TimeSeries.pas)  
 Interface SHA-256: `5e8da110e07ec2589e3cba88e9552fb00718baa65953ecbcca5fdaacd66e96a2`
 
-| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |
-| --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `ETimeSeriesError` | `ETimeSeriesError=class(Exception)` | `primary` | `—` |
-| `(unit)` | `record` | `TADFResult` | `TADFResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TARIMAModel` | `TARIMAModel=record` | `primary` | `—` |
-| `(unit)` | `record` | `TCUSUMResult` | `TCUSUMResult=record` | `primary` | `—` |
-| `(unit)` | `record` | `TDecomposition` | `TDecomposition=record` | `primary` | `—` |
-| `(unit)` | `type` | `TDecompType` | `TDecompType=(dtAdditive,dtMultiplicative)` | `primary` | `—` |
-| `(unit)` | `record` | `TLinearTrend` | `TLinearTrend=record` | `primary` | `—` |
-| `(unit)` | `class` | `TTimeSeriesKit` | `TTimeSeriesKit=class` | `primary` | `—` |
-| `TADFResult` | `field` | `Crit10Pct` | `Crit10Pct:Double` | `primary` | `—` |
-| `TADFResult` | `field` | `Crit1Pct` | `Crit1Pct:Double` | `primary` | `—` |
-| `TADFResult` | `field` | `Crit5Pct` | `Crit5Pct:Double` | `primary` | `—` |
-| `TADFResult` | `field` | `IsStationary` | `IsStationary:Boolean` | `primary` | `—` |
-| `TADFResult` | `field` | `Statistic` | `Statistic:Double` | `primary` | `—` |
-| `TARIMAModel` | `field` | `ARCoeffs` | `ARCoeffs:TDoubleArray` | `primary` | `—` |
-| `TARIMAModel` | `field` | `D` | `D:Integer` | `primary` | `—` |
-| `TARIMAModel` | `field` | `MACoeffs` | `MACoeffs:TDoubleArray` | `primary` | `—` |
-| `TARIMAModel` | `field` | `Mu` | `Mu:Double` | `primary` | `—` |
-| `TARIMAModel` | `field` | `P` | `P:Integer` | `primary` | `—` |
-| `TARIMAModel` | `field` | `Q` | `Q:Integer` | `primary` | `—` |
-| `TARIMAModel` | `field` | `Sigma2` | `Sigma2:Double` | `primary` | `—` |
-| `TCUSUMResult` | `field` | `ChangePoint` | `ChangePoint:Integer` | `primary` | `—` |
-| `TCUSUMResult` | `field` | `CUSUMValues` | `CUSUMValues:TDoubleArray` | `primary` | `—` |
-| `TCUSUMResult` | `field` | `Detected` | `Detected:Boolean` | `primary` | `—` |
-| `TDecomposition` | `field` | `DecompType` | `DecompType:TDecompType` | `primary` | `—` |
-| `TDecomposition` | `field` | `Residual` | `Residual:TDoubleArray` | `primary` | `—` |
-| `TDecomposition` | `field` | `Seasonal` | `Seasonal:TDoubleArray` | `primary` | `—` |
-| `TDecomposition` | `field` | `Trend` | `Trend:TDoubleArray` | `primary` | `—` |
-| `TDecompType` | `enum-value` | `dtAdditive` | `dtAdditive` | `primary` | `—` |
-| `TDecompType` | `enum-value` | `dtMultiplicative` | `dtMultiplicative` | `primary` | `—` |
-| `TLinearTrend` | `field` | `Intercept` | `Intercept:Double` | `primary` | `—` |
-| `TLinearTrend` | `field` | `RSquared` | `RSquared:Double` | `primary` | `—` |
-| `TLinearTrend` | `field` | `Slope` | `Slope:Double` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ACF` | `class function ACF(const Y:TDoubleArray;MaxLag:Integer):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ARFit` | `class function ARFit(const Y:TDoubleArray;P:Integer):TARIMAModel` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ARForecast` | `class function ARForecast(const Model:TARIMAModel;const History:TDoubleArray;H:Integer):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ARIMAFit` | `class function ARIMAFit(const Y:TDoubleArray;P,D,Q:Integer):TARIMAModel` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ARIMAForecast` | `class function ARIMAForecast(const Model:TARIMAModel;const OriginalY:TDoubleArray;H:Integer):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `AugmentedDickeyFuller` | `class function AugmentedDickeyFuller(const Y:TDoubleArray;Lags:Integer=1):TADFResult` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `CUSUMDetect` | `class function CUSUMDetect(const Y:TDoubleArray;Threshold:Double=4.0;Target:Double=NaN):TCUSUMResult` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `Decompose` | `class function Decompose(const Y:TDoubleArray;Period:Integer;DType:TDecompType=dtAdditive):TDecomposition` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `DetrendLinear` | `class function DetrendLinear(const Y:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `Difference` | `class function Difference(const Y:TDoubleArray;D:Integer=1):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `DoubleExponentialSmoothing` | `class function DoubleExponentialSmoothing(const Y:TDoubleArray;Alpha,Beta:Double):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ExponentialSmoothing` | `class function ExponentialSmoothing(const Y:TDoubleArray;Alpha:Double;InitValue:Double=NaN):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `HoltWintersForecast` | `class function HoltWintersForecast(const Y:TDoubleArray;Alpha,Beta,Gamma:Double;Period,H:Integer;DType:TDecompType=dtAdditive):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `LinearTrend` | `class function LinearTrend(const Y:TDoubleArray):TLinearTrend` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `LjungBox` | `class function LjungBox(const Y:TDoubleArray;MaxLag:Integer):Double` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `MAFit` | `class function MAFit(const Y:TDoubleArray;Q:Integer):TARIMAModel` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `PACF` | `class function PACF(const Y:TDoubleArray;MaxLag:Integer):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `Periodogram` | `class function Periodogram(const Y:TDoubleArray):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `PeriodogramPeak` | `class function PeriodogramPeak(const Y:TDoubleArray;MinPeriod:Integer=2;MaxPeriod:Integer=0):Integer` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `RollingZScore` | `class function RollingZScore(const Y:TDoubleArray;Window:Integer;Threshold:Double=3.0):TIntegerArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `SeasonalStrength` | `class function SeasonalStrength(const Decomp:TDecomposition):Double` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `SimpleMovingAverage` | `class function SimpleMovingAverage(const Y:TDoubleArray;Window:Integer):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `TripleExponentialSmoothing` | `class function TripleExponentialSmoothing(const Y:TDoubleArray;Alpha,Beta,Gamma:Double;Period:Integer;DType:TDecompType=dtAdditive):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `Undifference` | `class function Undifference(const DiffY:TDoubleArray;const InitVals:TDoubleArray;D:Integer=1):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `WeightedMovingAverage` | `class function WeightedMovingAverage(const Y:TDoubleArray;Window:Integer):TDoubleArray` | `primary` | `—` |
-| `TTimeSeriesKit` | `function` | `ZScoreAnomalies` | `class function ZScoreAnomalies(const Y:TDoubleArray;Threshold:Double=3.0):TIntegerArray` | `primary` | `—` |
+| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `(unit)` | `type` | `ETimeSeriesError` | `ETimeSeriesError=class(Exception)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TADFResult` | `TADFResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TARIMAModel` | `TARIMAModel=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TCUSUMResult` | `TCUSUMResult=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TDecomposition` | `TDecomposition=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `type` | `TDecompType` | `TDecompType=(dtAdditive,dtMultiplicative)` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `record` | `TLinearTrend` | `TLinearTrend=record` | `advanced` | `—` | `—` | `—` |
+| `(unit)` | `class` | `TTimeSeriesKit` | `TTimeSeriesKit=class` | `recommended` | `—` | `—` | `—` |
+| `TADFResult` | `field` | `Crit10Pct` | `Crit10Pct:Double` | `advanced` | `—` | `—` | `—` |
+| `TADFResult` | `field` | `Crit1Pct` | `Crit1Pct:Double` | `advanced` | `—` | `—` | `—` |
+| `TADFResult` | `field` | `Crit5Pct` | `Crit5Pct:Double` | `advanced` | `—` | `—` | `—` |
+| `TADFResult` | `field` | `IsStationary` | `IsStationary:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TADFResult` | `field` | `Statistic` | `Statistic:Double` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `ARCoeffs` | `ARCoeffs:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `D` | `D:Integer` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `MACoeffs` | `MACoeffs:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `Mu` | `Mu:Double` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `P` | `P:Integer` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `Q` | `Q:Integer` | `advanced` | `—` | `—` | `—` |
+| `TARIMAModel` | `field` | `Sigma2` | `Sigma2:Double` | `advanced` | `—` | `—` | `—` |
+| `TCUSUMResult` | `field` | `ChangePoint` | `ChangePoint:Integer` | `advanced` | `—` | `—` | `—` |
+| `TCUSUMResult` | `field` | `CUSUMValues` | `CUSUMValues:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TCUSUMResult` | `field` | `Detected` | `Detected:Boolean` | `advanced` | `—` | `—` | `—` |
+| `TDecomposition` | `field` | `DecompType` | `DecompType:TDecompType` | `advanced` | `—` | `—` | `—` |
+| `TDecomposition` | `field` | `Residual` | `Residual:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDecomposition` | `field` | `Seasonal` | `Seasonal:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDecomposition` | `field` | `Trend` | `Trend:TDoubleArray` | `advanced` | `—` | `—` | `—` |
+| `TDecompType` | `enum-value` | `dtAdditive` | `dtAdditive` | `advanced` | `—` | `—` | `—` |
+| `TDecompType` | `enum-value` | `dtMultiplicative` | `dtMultiplicative` | `advanced` | `—` | `—` | `—` |
+| `TLinearTrend` | `field` | `Intercept` | `Intercept:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearTrend` | `field` | `RSquared` | `RSquared:Double` | `advanced` | `—` | `—` | `—` |
+| `TLinearTrend` | `field` | `Slope` | `Slope:Double` | `advanced` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ACF` | `class function ACF(const Y:TDoubleArray;MaxLag:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ARFit` | `class function ARFit(const Y:TDoubleArray;P:Integer):TARIMAModel` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ARForecast` | `class function ARForecast(const Model:TARIMAModel;const History:TDoubleArray;H:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ARIMAFit` | `class function ARIMAFit(const Y:TDoubleArray;P,D,Q:Integer):TARIMAModel` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ARIMAForecast` | `class function ARIMAForecast(const Model:TARIMAModel;const OriginalY:TDoubleArray;H:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `AugmentedDickeyFuller` | `class function AugmentedDickeyFuller(const Y:TDoubleArray;Lags:Integer=1):TADFResult` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `CUSUMDetect` | `class function CUSUMDetect(const Y:TDoubleArray;Threshold:Double=4.0;Target:Double=NaN):TCUSUMResult` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `Decompose` | `class function Decompose(const Y:TDoubleArray;Period:Integer;DType:TDecompType=dtAdditive):TDecomposition` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `DetrendLinear` | `class function DetrendLinear(const Y:TDoubleArray):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `Difference` | `class function Difference(const Y:TDoubleArray;D:Integer=1):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `DoubleExponentialSmoothing` | `class function DoubleExponentialSmoothing(const Y:TDoubleArray;Alpha,Beta:Double):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ExponentialSmoothing` | `class function ExponentialSmoothing(const Y:TDoubleArray;Alpha:Double;InitValue:Double=NaN):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `HoltWintersForecast` | `class function HoltWintersForecast(const Y:TDoubleArray;Alpha,Beta,Gamma:Double;Period,H:Integer;DType:TDecompType=dtAdditive):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `LinearTrend` | `class function LinearTrend(const Y:TDoubleArray):TLinearTrend` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `LjungBox` | `class function LjungBox(const Y:TDoubleArray;MaxLag:Integer):Double` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `MAFit` | `class function MAFit(const Y:TDoubleArray;Q:Integer):TARIMAModel` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `PACF` | `class function PACF(const Y:TDoubleArray;MaxLag:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `Periodogram` | `class function Periodogram(const Y:TDoubleArray):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `PeriodogramPeak` | `class function PeriodogramPeak(const Y:TDoubleArray;MinPeriod:Integer=2;MaxPeriod:Integer=0):Integer` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `RollingZScore` | `class function RollingZScore(const Y:TDoubleArray;Window:Integer;Threshold:Double=3.0):TIntegerArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `SeasonalStrength` | `class function SeasonalStrength(const Decomp:TDecomposition):Double` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `SimpleMovingAverage` | `class function SimpleMovingAverage(const Y:TDoubleArray;Window:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `TripleExponentialSmoothing` | `class function TripleExponentialSmoothing(const Y:TDoubleArray;Alpha,Beta,Gamma:Double;Period:Integer;DType:TDecompType=dtAdditive):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `Undifference` | `class function Undifference(const DiffY:TDoubleArray;const InitVals:TDoubleArray;D:Integer=1):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `WeightedMovingAverage` | `class function WeightedMovingAverage(const Y:TDoubleArray;Window:Integer):TDoubleArray` | `recommended` | `—` | `—` | `—` |
+| `TTimeSeriesKit` | `function` | `ZScoreAnomalies` | `class function ZScoreAnomalies(const Y:TDoubleArray;Threshold:Double=3.0):TIntegerArray` | `recommended` | `—` | `—` | `—` |

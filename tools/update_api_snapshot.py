@@ -9,82 +9,14 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from api_decision import CLASSIFICATIONS, apply_decisions, load_decision
+
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "src"
 OUTPUT = ROOT / "docs" / "public-api-1.9.json"
 REFERENCE_OUTPUT = ROOT / "docs" / "API_REFERENCE_1.9.md"
-
-CLASSIFICATIONS = {
-    "primary",
-    "compatibility",
-    "deprecated",
-    "experimental",
-    "internal",
-}
-
-COMPATIBILITY_UNITS = {
-    "FinanceLib.Bonds",
-    "FinanceLib.NPV",
-}
-
-COMPATIBILITY_SYMBOLS = {
-    "IMatrix",
-    "TMatrixKit",
-    "TMatrixKitSparse",
-}
-
-COMPATIBILITY_REPLACEMENTS = {
-    "IMatrix": "IDenseDoubleMatrix",
-    "TMatrixKit": "TDenseDoubleMatrix",
-    "TMatrixKitSparse": "TSparseDoubleMatrix",
-}
-
-INTERNAL_SYMBOLS = {
-    # Public only because FPC generic specializations need the declarations.
-    # Applications should use the named scalar aliases and factory facades.
-    "TBandFactor",
-    "TDenseLinearOperator",
-    "TDiagonalPreconditioner",
-    "DenseInterfaceCast",
-    "TIdentityPreconditioner",
-    "ILinearOperator",
-    "IMatrixFreeAction",
-    "IPreconditioner",
-    "ISparseLUFactor",
-    "ISparseMatrix",
-    "IStructuredDirectFactor",
-    "IStructuredMatrix",
-    "TILU0Preconditioner",
-    "TIC0Preconditioner",
-    "TIterativeSolver",
-    "TIterativeWorkspace",
-    "TIterativeVector",
-    "TIterativeVectorList",
-    "TLinearOperatorFactory",
-    "TLinearScalar",
-    "TLinearSolveResult",
-    "TMatrixFreeLinearOperator",
-    "TPartialEigenSolver",
-    "TPreconditionerFactory",
-    "TSparseFactorRow",
-    "TSparseFactorRows",
-    "TSparseLinearOperator",
-    "TSparseLUFactor",
-    "TSparseMatrixFactory",
-    "TSparseMatrixStorage",
-    "TSparseTriplet",
-    "TSparseTripletArray",
-    "TSparseTripletBuilder",
-    "TSparseValueArray",
-    "TSpectralVector",
-    "TSpectralVectors",
-    "TStructuredLinearOperator",
-    "TStructuredMatrixFactory",
-    "TStructuredMatrixStorage",
-    "TStructuredSolverFactory",
-    "TTridiagonalFactor",
-}
+DECISION_INPUT = ROOT / "docs" / "api-decision-2.0.json"
 
 
 @dataclass(frozen=True)
@@ -212,19 +144,6 @@ def find_composites(source: str) -> list[Composite]:
     return composites
 
 
-def classify(unit_name: str, name: str, owner: str | None) -> str:
-    effective = owner or name
-    if effective in INTERNAL_SYMBOLS or name in INTERNAL_SYMBOLS:
-        return "internal"
-    if (
-        unit_name in COMPATIBILITY_UNITS
-        or effective in COMPATIBILITY_SYMBOLS
-        or name in COMPATIBILITY_SYMBOLS
-    ):
-        return "compatibility"
-    return "primary"
-
-
 def declaration(
     unit_name: str,
     owner: str | None,
@@ -237,11 +156,7 @@ def declaration(
         "name": name,
         "kind": kind,
         "signature": normalize_signature(signature),
-        "classification": classify(unit_name, name, owner),
     }
-    replacement = COMPATIBILITY_REPLACEMENTS.get(owner or name)
-    if replacement:
-        result["preferred_replacement"] = replacement
     return result
 
 
@@ -537,7 +452,7 @@ def write_reference(snapshot: dict[str, object]) -> None:
         "",
         "A declaration is identified by unit, owner, kind, name, and normalized",
         "signature. Private/protected members are excluded; declarations marked",
-        "`internal` remain listed because their interface presence affects",
+        "`implementation` remain listed because their interface presence affects",
         "generic specialization and the unit-interface hash.",
         "",
         "## Classification totals",
@@ -559,13 +474,15 @@ def write_reference(snapshot: dict[str, object]) -> None:
                 f"Source: [`{source}`](../{source})  ",
                 f"Interface SHA-256: `{unit['interface_sha256']}`",
                 "",
-                "| Owner | Kind | Name | Normalized signature | Classification | Preferred replacement |",
-                "| --- | --- | --- | --- | --- | --- |",
+                "| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- |",
             ]
         )
         for item in unit["declarations"]:
             owner = item["owner"] if item["owner"] is not None else "(unit)"
             replacement = item.get("preferred_replacement", "—")
+            compatibility_decision = item.get("compatibility_decision", "—")
+            compatibility_note = item.get("compatibility_note", "—")
             lines.append(
                 "| "
                 + " | ".join(
@@ -575,7 +492,9 @@ def write_reference(snapshot: dict[str, object]) -> None:
                         markdown_code(item["name"]),
                         markdown_code(item["signature"]),
                         markdown_code(item["classification"]),
+                        markdown_code(compatibility_decision),
                         markdown_code(replacement),
+                        markdown_code(compatibility_note),
                     ]
                 )
                 + " |"
@@ -584,6 +503,7 @@ def write_reference(snapshot: dict[str, object]) -> None:
 
 
 def main() -> int:
+    decision = load_decision(DECISION_INPUT)
     units = []
     declaration_count = 0
     for path in sorted(SOURCE.glob("*.pas"), key=lambda p: p.name.casefold()):
@@ -594,16 +514,20 @@ def main() -> int:
         unit_name = unit_match.group(1).strip()
         public = interface_text(raw)
         unit_declarations = extract_declarations(unit_name, public)
+        apply_decisions(unit_name, unit_declarations, decision)
         declaration_count += len(unit_declarations)
+        classification_summary = {
+            classification: sum(
+                item["classification"] == classification
+                for item in unit_declarations
+            )
+            for classification in sorted(CLASSIFICATIONS)
+        }
         units.append(
             {
                 "unit": unit_name,
                 "source": path.relative_to(ROOT).as_posix(),
-                "classification": (
-                    "compatibility"
-                    if unit_name in COMPATIBILITY_UNITS
-                    else "primary"
-                ),
+                "classification_summary": classification_summary,
                 "interface_sha256": hashlib.sha256(
                     public.encode("utf-8")
                 ).hexdigest(),
@@ -612,18 +536,20 @@ def main() -> int:
         )
 
     snapshot = {
-        "schema_version": 2,
+        "schema_version": 3,
         "release": "1.9.0",
+        "decision_release": decision["decision_release"],
         "generated_by": "tools/update_api_snapshot.py",
         "identity": ["unit", "owner", "kind", "name", "signature"],
         "classification_notes": {
-            "primary": "recommended stable 1.9 entry point",
-            "compatibility": "maintained 1.x surface with a preferred typed replacement where applicable",
-            "deprecated": "source-compatible but scheduled for replacement",
+            "recommended": "curated common 2.0 path with a concise checked example",
+            "advanced": "stable application path shown after the common route",
+            "compatibility": "maintained 1.x surface with a replacement or explicit retain decision",
             "experimental": "not covered by the stable compatibility promise",
-            "internal": "generic implementation support; use a named scalar facade",
+            "implementation": "generic specialization support; use a named application facade",
         },
-        "deprecations": [],
+        "compatibility_notes": decision["compatibility_notes"],
+        "unresolved_decisions": decision["unresolved_decisions"],
         "units": units,
     }
     OUTPUT.write_text(

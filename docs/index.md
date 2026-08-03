@@ -13,6 +13,17 @@ allocating path and link the advanced controls separately.
 
 ## Releases
 
+- [mathlib-fp 1.9.3 release notes](RELEASE_NOTES_1.9.3.md) — complete 2.0 API
+  decision, curated common paths, all-domain conventions, compatibility
+  closure, and exact proposed diff.
+- [1.9.3 PR notes](PR_NOTES_1.9.3.md) — review boundary, implementation
+  discipline, completion-gate mapping, and PR-readiness checklist.
+- [1.9.3 qualification report](QUALIFICATION_1.9.3.md) — exact declaration,
+  common-program, compatibility, diff, local, and clean-archive gates.
+- [Curated 2.0 common paths](API_COMMON_PATHS_2.0.md),
+  [complete conventions](API_CONVENTIONS_2.0.md), and
+  [exact proposed diff](API_DIFF_1.9_TO_2.0.md).
+
 - [mathlib-fp 1.9.2 release notes](RELEASE_NOTES_1.9.2.md) — beginner guide,
   task recipes, stable-domain learning routes, and checked problem-oriented
   search.
