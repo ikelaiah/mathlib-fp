@@ -1,7 +1,8 @@
 # mathlib-fp 1.9.3 qualification
 
-Status on 2026-08-04: **all 71 local release-qualification gates passed;
-final Linux and Windows checksummed clean-archive CI is pending**.
+Status on 2026-08-04: **all 71 local release-qualification gates passed**.
+Release requires the Linux and Windows checksummed clean-archive CI jobs to
+pass against the exact candidate commit before the `v1.9.3` tag is created.
 
 ## Completion-gate evidence
 

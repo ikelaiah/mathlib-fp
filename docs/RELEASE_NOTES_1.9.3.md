@@ -1,5 +1,7 @@
 # mathlib-fp v1.9.3
 
+**Release date:** 2026-08-04
+
 Version 1.9.3 completes the proposed 2.0 API decision without changing the
 frozen 1.9 public surface or numerical behavior.
 
