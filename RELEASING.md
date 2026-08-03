@@ -28,11 +28,13 @@ Use this checklist for every mathlib-fp release.
   the current release without replacing an older directory.
 - [ ] Verify every output-producing runnable documentation fence and every
   release-facing example output contract, including final success markers.
-- [ ] Run milestone-specific automated evidence. For 1.9.2, verify all 13
-  beginner/advanced routes with `python tools/check_docs.py`, compile and run
-  every beginner program and claimed output with
-  `python tools/check_doc_examples.py --compiler fpc`, and check the generated
-  problem-oriented search index from the checksummed clean archive.
+- [ ] Run milestone-specific automated evidence. For 1.9.3, regenerate the
+  exact API snapshot/reference, require a clean second generation, run
+  `python tools/test_api_decision.py` and
+  `python tools/check_api_decision.py`, then compile/run every selected common
+  program with `python tools/check_doc_examples.py --compiler fpc`. Confirm no
+  `src/` interface diff and review the exact source/behavior/warning/packaging
+  consequences before the checksummed clean-archive qualification.
 - [ ] Build the deterministic offline documentation ZIP, verify its SHA-256,
   extract it without network access, and compare its `release.json`, examples,
   signatures, and limitations with repository Markdown.

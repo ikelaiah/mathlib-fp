@@ -7,7 +7,10 @@ compares every source-unit interface hash with
 owner and normalized signature, so overloaded routines and same-named members
 are audited independently rather than collapsed into a name set.
 The generated [`API_REFERENCE_1.9.md`](API_REFERENCE_1.9.md) renders all 2,880
-of those exact declaration identities for human review.
+of those exact declaration identities for human review. Its schema-3 decision
+overlay classifies every row as recommended, advanced, compatibility,
+experimental, or generic implementation support without changing the frozen
+interface hashes.
 
 | Surface | Contract fields checked | Evidence | Result |
 | --- | --- | --- | --- |
@@ -21,8 +24,9 @@ of those exact declaration identities for human review.
 | Sparse interchange | real/complex coordinate subset, four-scalar binary overloads, version/checksum/canonical validation, independent nonzero and per-axis dimension caps before shape-sized allocation, and stream result atomicity | `TestSparseInterchange.pas`; `Interchange.md`; `SparseLinearAlgebra.md` | Verified |
 | `TMatrixKitSparse` | compatibility status, unchanged behavior, explicit conversion | migration example; `SparseLinearAlgebra.md` | Verified compatibility |
 | Migration workflows | run-checked dense and sparse solves, fitting, interpolation, optimisation, DSP, and streaming statistics with explicit semantic differences | `23_api_migration_preview.pas`; `MIGRATING_TO_2.0_PREVIEW.md` | Verified preview only |
-| 2.0 candidate | classification, candidate conventions, owner/kind/signature-aware freeze, overload preservation, exact generated reference, no 1.9 removals/default changes | `API_CANDIDATE_2.0.md`; API snapshot/reference; extractor regressions | Verified preview only |
-| Documentation execution | all Pascal fences inventoried; all self-contained programs compiled and run; every output-producing runnable fence has checked exact/ordered output; release-facing examples check statuses and final markers | `test_doc_examples.py`; `check_doc_examples.py`; `check_example_output.py`; `QUALIFICATION_1.9.2.md` | Verified |
+| Exact compiler aliases | all 21 plain `=` aliases; behavior, defaults, ownership, exception identity, numerical results, retain/canonical decision, and 1.9.7 routing | `api-decision-2.0.json`; generated `API_REFERENCE_1.9.md`; decision checker/regressions | Verified review-only; no deprecations |
+| 2.0 decision | five-way classification of every exact row, all-domain conventions, complete compatibility decisions, checked common paths, exact empty compiled diff, no 1.9 removals/default changes | `API_CANDIDATE_2.0.md`; decision/diff JSON; API snapshot/reference; decision and extractor regressions | Verified complete |
+| Documentation execution | all Pascal fences inventoried; all self-contained programs compiled and run; every output-producing runnable fence has checked exact/ordered output; release-facing examples check statuses and final markers | `test_doc_examples.py`; `check_doc_examples.py`; `check_example_output.py`; `QUALIFICATION_1.9.3.md` | Verified |
 | Repeated-solve allocation | warm-up plus 20 `Into` solves, sampled peak and retained heap deltas, fixed 65,536-byte failure ceiling | `BenchmarkRunner.lpr`; `QUALIFICATION_1.9.0.md` | Verified on qualified Win64 host |
 
 The audit found no stable 1.9 documentation/declaration mismatch. Operations

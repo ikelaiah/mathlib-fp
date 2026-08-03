@@ -35,7 +35,7 @@ end.
 
 
 class SnapshotExtractorTests(unittest.TestCase):
-    def test_owner_overload_visibility_and_inherited_classification(self) -> None:
+    def test_owner_overload_visibility_and_exact_identity(self) -> None:
         declarations = extract_declarations("Fixture", FIXTURE.split("implementation")[0])
         open_declarations = [
             item for item in declarations if item["name"].casefold() == "open"
@@ -52,8 +52,9 @@ class SnapshotExtractorTests(unittest.TestCase):
         self.assertEqual(2, len({item["signature"] for item in first_overloads}))
         self.assertFalse(any(item["name"] == "Hidden" for item in declarations))
         legacy = next(item for item in declarations if item["name"] == "Legacy")
-        self.assertEqual("compatibility", legacy["classification"])
-        self.assertEqual("IDenseDoubleMatrix", legacy["preferred_replacement"])
+        self.assertEqual("IMatrix", legacy["owner"])
+        self.assertEqual("procedure Legacy", legacy["signature"])
+        self.assertNotIn("classification", legacy)
         self.assertTrue(any(item["name"] == "PublicLimit" for item in declarations))
 
 

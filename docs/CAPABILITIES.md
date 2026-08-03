@@ -49,7 +49,7 @@ The machine-readable source for this page is
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-Unsupported entries are not counted in the 1.9.2 completeness claim. The
+Unsupported entries are not counted in the 1.9.3 completeness claim. The
 [dense solver-selection guide](DenseLinearAlgebra.md#choose-a-dense-solver)
 and [sparse solver-selection guide](SparseLinearAlgebra.md#choose-an-iterative-solver)
 name the stable linear-algebra boundaries. The

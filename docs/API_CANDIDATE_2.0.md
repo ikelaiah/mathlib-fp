@@ -1,88 +1,124 @@
-# Candidate 2.0 API contract
+# Complete 2.0 API decision
 
-This document is the reviewable API candidate published by mathlib-fp 1.9.0.
-It is a migration runway, not a 2.0 implementation. Version 1.9 does not remove
-maintained 1.x APIs or change their defaults.
+Version 1.9.3 completes the all-domain decision over the frozen 1.9 public API.
+It is a compatibility and documentation decision, not a 2.0 implementation:
+no maintained declaration, compiled default, warning, behavior, or package
+membership changes in this patch release.
 
-## Proposed primary conventions
+Choose an ordinary workflow from the
+[`curated common-path map`](API_COMMON_PATHS_2.0.md). Use the generated
+[`declaration reference`](API_REFERENCE_1.9.md) when an exact overload,
+advanced control, compatibility entry, or specialization detail matters.
 
-| Concern | Candidate convention |
+## Decision artifacts
+
+| Artifact | Authority |
 | --- | --- |
-| Entry units | Domain-specific units such as `AlgebraLib.DenseMatrices`, `AlgebraLib.SparseMatrices`, `AlgebraLib.LinearOperators`, and solver units; no global registration unit |
-| Naming | Named scalar facades (`TDenseDoubleMatrix`, `TSparseDoubleMatrix`, `TDoubleIterativeSolver`) over generic implementation types |
-| Indices/shapes | Zero-based checked `SizeInt`; rows then columns; vectors are explicit `n x 1` typed dense matrices at operator boundaries |
-| Ownership | Interface values state whether storage is owned, retained immutable, retained mutable, or delegated; factories say when they deep-copy |
-| Mutation/aliasing | Immutable values by default; mutable dense storage and workspaces are explicit; `Into` procedures reject unsafe aliasing |
-| Tolerances | Options records contain absolute/relative and algorithm-specific tolerances; formulas and defaults are public contracts |
-| Outcomes | Expected convergence/nonconvergence is a result status plus diagnostics; invalid contracts raise domain-specific exceptions |
-| Exceptions | Errors name the operation, bad parameter/shape, and required condition |
-| RNG | Algorithms receive or own explicit reproducible local state/seed; no hidden global random stream |
-| Cancellation/progress | Optional monitor/callback in options; cancellation returns a status and latest complete iterate |
-| Thread safety | Immutable values are reentrant; mutable workspaces/state require separate instances or caller synchronization |
+| [`public-api-1.9.json`](public-api-1.9.json) | Exact 2,880-row unit/owner/kind/name/signature baseline plus the classification and compatibility decision for every row |
+| [`API_REFERENCE_1.9.md`](API_REFERENCE_1.9.md) | Generated human-readable rendering of every exact row |
+| [`api-decision-2.0.json`](api-decision-2.0.json) | Normative common selectors, all-domain conventions, exact alias reviews, compatibility decisions, and separately routed capability |
+| [`API_CONVENTIONS_2.0.md`](API_CONVENTIONS_2.0.md) | Reviewed explanation of shared and domain-specific decisions |
+| [`api-diff-1.9-to-2.0.json`](api-diff-1.9-to-2.0.json) | Machine-readable source/behaviour/warning/packaging/documentary consequences |
+| [`API_DIFF_1.9_TO_2.0.md`](API_DIFF_1.9_TO_2.0.md) | Human-readable exact proposed diff |
 
-The candidate favours simple allocating overloads for first use and explicit
-destination/workspace overloads for repeated work. An API must not hide a
-dense conversion, factor rebuild, external runtime, or global mutable state.
+`tools/update_api_snapshot.py` regenerates the snapshot and reference from
+every `src/*.pas` interface plus the reviewed decision selectors.
+`tools/check_api_decision.py` independently verifies exact coverage, convention
+closure, exact alias coverage, compatibility mappings, common examples, and
+diff categories.
 
-## 1.x classification
+## Five complete classifications
 
-The complete machine-readable inventory is
-[`public-api-1.9.json`](public-api-1.9.json). Its unit-interface SHA-256 hashes
-are checked by `tools/check_docs.py`. Schema 2 identifies each declaration by
-unit, owner, declaration kind, name, and normalized signature. Overloads and
-same-named members on different types are therefore separate contract entries;
-compatibility and internal classifications propagate to their owned members.
-The generated human-readable
-[`API_REFERENCE_1.9.md`](API_REFERENCE_1.9.md) contains one row for every exact
-snapshot declaration; the documentation checker rejects a missing or stale
-row.
-`tools/test_api_snapshot.py` regression-tests extraction, visibility, overload,
-owner, and classification behavior.
+- **Recommended** declarations form the concise common paths. Each path has an
+  output-checked, compile/run-checked complete program.
+- **Advanced** declarations are stable application API for more scalar kinds,
+  storage formats, diagnostics, reusable state, and specialist workflows.
+- **Compatibility** declarations remain supported and carry exactly one named
+  replacement plus semantic-difference note or an explicit retain decision.
+- **Experimental** declarations are outside the stable promise. The current
+  snapshot contains none.
+- **Implementation** declarations are exposed only because Free Pascal generic
+  specialization needs them. Their named specializations/facades are the
+  application surface.
 
-- **Primary** is the recommended stable typed 1.9 surface.
-- **Compatibility** remains maintained through 1.9.x but has a preferred typed
-  path. This includes legacy `IMatrix`, `TMatrixKit`, `TMatrixKitSparse`, and
-  the legacy finance entry units.
-- **Deprecated** means source-compatible but scheduled for replacement. There
-  are no formally deprecated public entries in 1.9.0, so the snapshot's
-  deprecation/replacement list is empty.
-- **Experimental** is outside the stable compatibility promise. No newly
-  shipped 1.9 numerical entry point is classified experimental.
-- **Internal** identifies generic implementation scaffolding exposed only for
-  FPC specialization; applications should use a named scalar facade.
+The classifier is owner- and signature-aware. It distinguishes overloads such
+as double-real `Solve` from same-named scalar variants and propagates generic
+implementation status to the members of each generic public owner.
 
-Compatibility is not deprecation. Any future deprecation requires a named
-replacement, tests, migration notes, and the promised 1.9.x compatibility
-period.
+## Primary conventions
 
-## Candidate entry points
+The complete convention matrix is in
+[`API_CONVENTIONS_2.0.md`](API_CONVENTIONS_2.0.md). Its resolved concerns are:
+naming, indexing, shape, units, ownership, mutation, aliasing, exceptions,
+compiled defaults, tolerances, outcomes, RNG state, cancellation, progress,
+and thread safety. All 13 domains inherit the shared decisions and record their
+specific application; every snapshot unit is assigned to exactly one domain.
 
-The candidate typed linear-algebra path is:
+The common teaching route remains double-real and allocating. Named
+single/complex facades, sparse and structured containers, views, destinations,
+workspaces, callbacks, and diagnostics remain stable one step deeper. No route
+hides a scalar conversion, dense conversion, retained callback, factor rebuild,
+external runtime, or global mutable registry.
 
-- dense storage/kernels/decompositions/solvers in the existing
-  `AlgebraLib.Dense*` units;
-- CSR/CSC and compact structured storage in `AlgebraLib.SparseMatrices`;
-- stored and matrix-free operations/preconditioners in
-  `AlgebraLib.LinearOperators`;
-- diagnostic Krylov methods in `AlgebraLib.IterativeSolvers`;
-- reusable compact/sparse factors in `AlgebraLib.StructuredSolvers`;
-- largest-magnitude partial eigensystems in
-  `AlgebraLib.PartialEigensystems`.
+## Compatibility decisions
 
-Other domains retain their current stable 1.x typed or kit entry points while
-the candidate is evaluated. The compile-checked
-[`23_api_migration_preview.pas`](../examples/23_api_migration_preview.pas)
-covers dense construction, interpolation/fitting, optimisation, DSP,
-statistics, and sparse conversion.
+`IMatrix`, `TMatrixKit`, and `TMatrixKitSparse` stay source-compatible. New code
+uses `IDenseDoubleMatrix`, `TDenseDoubleMatrix`, and `TSparseDoubleMatrix`
+respectively, with explicit copying conversions and documented semantic
+differences. This guidance is not a deprecation or removal schedule.
 
-## Freeze rule
+`FinanceLib.Bonds` and `FinanceLib.NPV` are explicitly retained. Their public
+types are exact aliases into `FinanceLib.Interest`/shared arrays, so the focused
+entry units add no conflicting numerical, ownership, or default behavior.
 
-`docs/public-api-1.9.json` is the 1.9 candidate freeze. A changed interface hash
-must be accompanied by a regenerated snapshot and a documented compatibility
-or correctness reason in release/PR notes. The snapshot does not authorize
-breaking changes: actual removals, renamed defaults, or a new primary umbrella
-belong to a separately reviewed 2.0 release.
+The snapshot contains 21 plain `=` compiler aliases. Every alias has one exact
+review in the generated declaration reference. The shared compiler-identity
+profile records identical behavior, defaults, ownership, exception identity,
+and numerical results. Seventeen aliases are explicitly retained.
+`TPressureKit`, `EPressureError`, `TVelocityKit`, and `EVelocityError` are
+review-only canonicalization candidates: new code prefers
+`TFluidDynamicsKit`/`EFluidDynamicsError`, while 1.9.7 must confirm migration
+and packaging before any deprecation decision. Version 1.9.3 adds no warning,
+removal, or package move.
 
-Remaining numerical gaps are listed in
-[`capabilities.json`](capabilities.json) and the
-[1.9 qualification report](QUALIFICATION_1.9.0.md).
+Every one of the 131 exact compatibility declaration rows carries its decision
+and semantic-note identifier in the generated reference.
+
+## Exact proposed diff
+
+The compiled 1.9-to-2.0 proposal is empty:
+
+- no source declaration change;
+- no behavior or compiled-default change;
+- no warning/deprecation change;
+- no packaging change.
+
+The documentary defaults change: common paths appear first, advanced stable
+paths remain visible, compatibility differences are explicit, and generic
+support is no longer presented as an application choice. See the
+[`exact diff`](API_DIFF_1.9_TO_2.0.md).
+
+## Complete-program review
+
+The 13 selected programs cover MathBase, dense algebra, finance, statistics,
+engineering, numerics, probability, combinatorics, optimisation, time series,
+machine learning, interchange, and geometry. Documentation qualification
+compiles and executes them, checks their expected output, and rejects generic
+implementation declarations in those programs.
+
+The review found no wrapper that must be added inside 1.9.x. Ergonomic 2-D and
+3-D vector rotation is useful but is routed to a separate 1.10.0 design. That
+review must decide 3-D representation plus orientation, units, normalization,
+non-finite behavior, and public naming before any declaration is proposed.
+
+## Freeze and compatibility rule
+
+The snapshot remains the 1.9 interface freeze. A changed interface hash needs
+a regenerated snapshot and a documented compatibility or correctness reason;
+this decision does not authorize breaking changes. A maintained 1.x API is not
+removed merely because a major version is available, and compatibility is not
+deprecation.
+
+There are no unresolved stable declarations, aliases, compiled defaults,
+ownership rules, classifications, compatibility decisions, or replacement
+mappings in this candidate.
