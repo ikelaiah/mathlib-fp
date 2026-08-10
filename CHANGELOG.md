@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.5] - 2026-08-11
+
+### Performance
+
+- Reused the tested native radix-2 FFT kernel inside applied DSP transforms,
+  removing repeated per-butterfly trigonometric evaluation while retaining a
+  readable portable fallback and the existing public contract.
+- Added representative cold and warmed benchmark rows for dense, sparse,
+  iterative, DSP, modelling, statistics, and data-analysis workloads at small
+  and large scales.
+
+### Validation
+
+- Added exact allocation, retained-state, dense-shape, complexity, and checksum
+  gates plus advisory same-run and host-matched prior timing comparisons.
+- Integrated the checked performance evidence into offline release
+  qualification; variable-runner wall-clock movements request review instead
+  of creating false hard failures.
+
+### Documentation
+
+- Published the benchmark conditions, scalar kinds, dimensions, setup rules,
+  tolerances, compiler flags, host metadata, claim mappings, and limitations in
+  machine-readable and human-readable v1.9.5 evidence.
+
 ## [1.9.4] - 2026-08-10
 
 ### Documentation

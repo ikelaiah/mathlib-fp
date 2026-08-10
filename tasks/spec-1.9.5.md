@@ -36,8 +36,8 @@ allocation metric, retained memory/state, and comparison reference.
 
 ## Evidence semantics
 
-- `cold_ns` includes the first measured operation after deterministic fixture
-  construction; `warm_ns_per_iteration` follows an unmeasured warm-up and uses
+- `cold_ms` includes the first measured operation after deterministic fixture
+  construction; `warm_ms` follows an unmeasured warm-up and uses
   repeated prepared calls.
 - Exact logical allocation and retained-state counts are hard gates when the
   API makes them countable. Sampled `GetHeapStatus.TotalAllocated` deltas are

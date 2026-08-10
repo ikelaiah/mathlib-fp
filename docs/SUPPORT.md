@@ -1,6 +1,6 @@
 # Supported platform matrix
 
-Version 1.9.4 uses only Free Pascal source and standard RTL/FCL units.
+Version 1.9.5 uses only Free Pascal source and standard RTL/FCL units.
 
 | Tier | Compiler | OS / CPU | `Single` | `Double` | `Extended` ABI | Qualification |
 | --- | --- | --- | --- | --- | --- | --- |

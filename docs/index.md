@@ -13,6 +13,14 @@ allocating path and link the advanced controls separately.
 
 ## Releases
 
+- [mathlib-fp 1.9.5 release notes](RELEASE_NOTES_1.9.5.md) — checked
+  performance and allocation evidence plus a profiled DSP improvement.
+- [1.9.5 performance evidence](PERFORMANCE_EVIDENCE_1.9.5.md) — benchmark
+  conditions, claim-to-row mapping, exact gates, timing review, and limits.
+- [1.9.5 PR notes](PR_NOTES_1.9.5.md) — implementation and review boundary.
+- [1.9.5 qualification report](QUALIFICATION_1.9.5.md) — local and
+  clean-archive release gates.
+
 - [mathlib-fp 1.9.4 release notes](RELEASE_NOTES_1.9.4.md) — stable-family
   numerical evidence, bounded accuracy/failure claims, and offline validation.
 - [1.9.4 numerical evidence](NUMERICAL_EVIDENCE_1.9.4.md) — evidence

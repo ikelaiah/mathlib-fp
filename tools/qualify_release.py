@@ -211,6 +211,7 @@ def documentation_gates(
         "test_release_state.py",
         "test_numerical_evidence.py",
         "test_numerical_mutation.py",
+        "test_performance_evidence.py",
         "check_docs.py",
         "check_api_decision.py",
         "check_numerical_evidence.py",
@@ -291,6 +292,7 @@ def benchmark_gate(
         "benchmark-compile",
         [
             compiler, "-B", "-O3", "-FcUTF8", f"-Fu{ROOT / 'src'}",
+            f"-Fu{ROOT / 'benchmarks'}",
             f"-FU{directory}", f"-FE{directory}",
             str(ROOT / "benchmarks" / "BenchmarkRunner.lpr"),
         ],
@@ -300,6 +302,17 @@ def benchmark_gate(
         "benchmark-run",
         [str(executable_path(directory, "BenchmarkRunner"))],
         timeout=1800,
+    )
+    qualification.run(
+        "benchmark-validate",
+        [
+            sys.executable,
+            str(ROOT / "tools" / "check_performance_evidence.py"),
+            "--compiler", compiler,
+            "--captured-output", str(qualification.logs / "benchmark-run.log"),
+            "--work-dir", str(directory),
+            "--result", str(qualification.work / "performance-results.json"),
+        ],
     )
 
 
