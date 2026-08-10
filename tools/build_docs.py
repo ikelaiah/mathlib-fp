@@ -104,6 +104,7 @@ title="Switch color theme"><span aria-hidden="true">◐</span><span>Theme</span>
 </div></aside><main id="content" class="doc-content" tabindex="-1">
 {mobile_outline}<div class="doc-prose">{body}</div>
 </main></div>
+<script src="{safe_root}search-index.js"></script>
 <script src="{safe_root}assets/search.js"></script></body></html>"""
 
 
@@ -545,17 +546,15 @@ def main() -> int:
         encoding="utf-8",
     )
     (assets / "search.js").write_text(
-        """const root=document.body.dataset.docRoot||'';
-fetch(root+'search-index.json').then(r=>r.json()).then(items=>{
-const q=document.querySelector('#search');const out=document.querySelector('#results');
-q.addEventListener('input',()=>{const s=q.value.toLowerCase().trim();
-out.innerHTML=s?items.filter(x=>(x.title+' '+x.text).toLowerCase().includes(s))
-.slice(0,20).map(x=>'<a href="'+root+x.url+'">'+x.title+'</a>').join(''):'';});});
-""",
+        (DOC_ASSETS / "search.js").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
+    search_index = json.dumps(entries, ensure_ascii=False)
     (output / "search-index.json").write_text(
-        json.dumps(entries, ensure_ascii=False), encoding="utf-8"
+        search_index, encoding="utf-8"
+    )
+    (output / "search-index.js").write_text(
+        f"globalThis.mathlibSearchIndex={search_index};\n", encoding="utf-8"
     )
     source_ref = str(release_entry(versions, release)["source_ref"])
     (output / "release.json").write_text(

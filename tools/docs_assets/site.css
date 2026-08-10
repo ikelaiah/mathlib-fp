@@ -284,6 +284,16 @@ summary:focus-visible,
   display: none;
 }
 
+.search-result-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-result-list li {
+  margin: 0;
+}
+
 .search-results a {
   display: block;
   padding: 0.75rem 1rem;
