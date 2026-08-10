@@ -161,6 +161,19 @@ class DocumentationBuildTests(unittest.TestCase):
         self.assertIn('aria-live="polite"', page)
         self.assertIn('<details class="mobile-toc">', page)
 
+    def test_release_lists_receive_release_card_class(self) -> None:
+        source = (
+            "## Releases\n\n"
+            "- Version 1.9.4\n\n"
+            "## Design principles\n\n"
+            "- Keep APIs focused\n"
+        )
+
+        body, _ = markdown_to_html(source)
+
+        self.assertEqual(1, body.count('<ul class="release-list">'))
+        self.assertIn("<ul>\n<li>Keep APIs focused</li>", body)
+
 
 if __name__ == "__main__":
     unittest.main()
