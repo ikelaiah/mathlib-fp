@@ -1304,11 +1304,11 @@ remain one clearly labelled step deeper.
   Pascal identifier.
 - All recipe code and claimed output pass from the packaged release.
 
-## Next release: 1.9.3 — Complete 2.0 API decision
+## Previous release: 1.9.3 — Complete 2.0 API decision
 
-Version 1.9.3 converts the 1.9 API inventory into a complete all-domain 2.0
-decision. The exact declaration reference remains exhaustive; a smaller curated
-map tells ordinary users what to choose.
+Released on 2026-08-04, version 1.9.3 converted the 1.9 API inventory into a
+complete all-domain 2.0 decision. The exact declaration reference remains
+exhaustive; a smaller curated map tells ordinary users what to choose.
 
 ### 1.9.3 scope
 
@@ -1345,10 +1345,11 @@ map tells ordinary users what to choose.
 - Any newly required public capability is routed to a separately planned
   1.10.0 minor release and is not added opportunistically to 1.9.x.
 
-## Planned 1.9.4 — Numerical trust closure
+## Previous release: 1.9.4 — Numerical trust closure
 
-Version 1.9.4 closes validation gaps across the existing stable capability
-inventory and makes the evidence understandable outside the test source.
+Released on 2026-08-10, version 1.9.4 closed validation gaps across the
+existing stable capability inventory and made the evidence understandable
+outside the test source.
 
 ### 1.9.4 scope
 
@@ -1379,7 +1380,7 @@ inventory and makes the evidence understandable outside the test source.
 - The release suite remains independent of proprietary software, external
   numerical DLLs, and network access.
 
-## Planned 1.9.5 — Predictable performance
+## Next release: 1.9.5 — Predictable performance
 
 Version 1.9.5 makes performance and allocation behaviour inspectable without
 turning portable Pascal into a secondary implementation.

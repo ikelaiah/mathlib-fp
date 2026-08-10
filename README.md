@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.9.3" src="https://img.shields.io/badge/version-1.9.3-brightgreen.svg">
+  <img alt="Version 1.9.4" src="https://img.shields.io/badge/version-1.9.4-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,17 +26,17 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **1.9.3 is the current release; 1.2.0 was the first public release.** The
+> **1.9.4 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.9.3.md) and
+> [release notes](docs/RELEASE_NOTES_1.9.4.md) and
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-Open the [1.9.3 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.3)
+Open the [1.9.4 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.4)
 or download the source directly as
-[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.3.tar.gz)
-or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.3.zip).
+[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.4.tar.gz)
+or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.4.zip).
 You can also clone the repository:
 
 ```bash

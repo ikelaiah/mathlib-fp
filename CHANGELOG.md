@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.4] - 2026-08-10
+
+### Documentation
+
+- Published a machine-readable numerical-evidence catalogue for every stable
+  capability family, with bounded domains, edge cases, evidence categories,
+  budgets, test links, and reproducible reference provenance.
+- Added a human-readable evidence report that distinguishes exact properties,
+  reference comparisons, residual/reconstruction checks, and feasibility
+  diagnostics without claiming universal numerical proofs.
+
+### Validation
+
+- Added offline catalogue validation to reject missing or malformed coverage,
+  invalid numerical budgets, absent cited sources/tests, and inconsistent
+  high-risk fault-injection records.
+- Added isolated compile-and-test mutation checks for scalar special functions,
+  typed dense direct solving, and Bluestein DSP transforms; each sampled fault
+  must be detected by FPCUnit.
+
 ## [1.9.3] - 2026-08-04
 
 ### Documentation

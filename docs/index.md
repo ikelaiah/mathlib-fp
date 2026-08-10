@@ -13,6 +13,14 @@ allocating path and link the advanced controls separately.
 
 ## Releases
 
+- [mathlib-fp 1.9.4 release notes](RELEASE_NOTES_1.9.4.md) — stable-family
+  numerical evidence, bounded accuracy/failure claims, and offline validation.
+- [1.9.4 numerical evidence](NUMERICAL_EVIDENCE_1.9.4.md) — evidence
+  categories, budgets, provenance, mutation sampling, and limits.
+- [1.9.4 PR notes](PR_NOTES_1.9.4.md) — review boundary and required checks.
+- [1.9.4 qualification report](QUALIFICATION_1.9.4.md) — release gate and
+  clean-archive evidence requirements.
+
 - [mathlib-fp 1.9.3 release notes](RELEASE_NOTES_1.9.3.md) — complete 2.0 API
   decision, curated common paths, all-domain conventions, compatibility
   closure, and exact proposed diff.

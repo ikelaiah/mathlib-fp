@@ -55,14 +55,19 @@ jobs:
           python3 tools/test_build_docs.py
           python3 tools/test_built_docs.py
           python3 tools/test_qualify_release.py
+          python3 tools/test_release_state.py
+          python3 tools/test_numerical_evidence.py
+          python3 tools/test_numerical_mutation.py
           python3 tools/check_docs.py
           python3 tools/check_api_decision.py
+          python3 tools/check_numerical_evidence.py
           python3 tools/check_doc_examples.py --compiler fpc
-          python3 tools/build_docs.py --release 1.9.3 \
-            --output build-temp/docs-site/1.9.3
+          python3 tools/run_numerical_mutation.py --compiler fpc
+          python3 tools/build_docs.py --release 1.9.4 \
+            --output build-temp/docs-site/1.9.4
           python3 tools/check_built_docs.py \
-            --site build-temp/docs-site/1.9.3 --release 1.9.3
-          test -s build-temp/docs-site/1.9.3/search-index.json
+            --site build-temp/docs-site/1.9.4 --release 1.9.4
+          test -s build-temp/docs-site/1.9.4/search-index.json
 
       - name: Compile representative benchmarks
         run: |
@@ -90,11 +95,11 @@ jobs:
       - name: Test typed solve from a checksummed source archive
         run: |
           archive_dir=$(mktemp -d)
-          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.9.3.tar.gz" HEAD
-          sha256sum "$archive_dir/mathlib-fp-1.9.3.tar.gz" > "$archive_dir/mathlib-fp-1.9.3.sha256"
-          sha256sum --check "$archive_dir/mathlib-fp-1.9.3.sha256"
+          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.9.4.tar.gz" HEAD
+          sha256sum "$archive_dir/mathlib-fp-1.9.4.tar.gz" > "$archive_dir/mathlib-fp-1.9.4.sha256"
+          sha256sum --check "$archive_dir/mathlib-fp-1.9.4.sha256"
           mkdir "$archive_dir/source"
-          tar -xzf "$archive_dir/mathlib-fp-1.9.3.tar.gz" -C "$archive_dir/source"
+          tar -xzf "$archive_dir/mathlib-fp-1.9.4.tar.gz" -C "$archive_dir/source"
           cd "$archive_dir/source"
           python3 tools/test_api_decision.py
           python3 tools/test_api_snapshot.py
@@ -103,14 +108,19 @@ jobs:
           python3 tools/test_build_docs.py
           python3 tools/test_built_docs.py
           python3 tools/test_qualify_release.py
+          python3 tools/test_release_state.py
+          python3 tools/test_numerical_evidence.py
+          python3 tools/test_numerical_mutation.py
           python3 tools/check_docs.py
           python3 tools/check_api_decision.py
+          python3 tools/check_numerical_evidence.py
           python3 tools/check_doc_examples.py --compiler fpc
-          python3 tools/build_docs.py --release 1.9.3 \
-            --output build-temp/docs-site/1.9.3 \
-            --offline-archive build-temp/mathlib-fp-docs-1.9.3.zip
+          python3 tools/run_numerical_mutation.py --compiler fpc
+          python3 tools/build_docs.py --release 1.9.4 \
+            --output build-temp/docs-site/1.9.4 \
+            --offline-archive build-temp/mathlib-fp-docs-1.9.4.zip
           python3 tools/check_built_docs.py \
-            --site build-temp/docs-site/1.9.3 --release 1.9.3
+            --site build-temp/docs-site/1.9.4 --release 1.9.4
           mkdir -p example-bin/units
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
             examples/15_typed_dense_solve.pas
@@ -253,19 +263,29 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/test_qualify_release.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_release_state.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_numerical_evidence.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_numerical_mutation.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_docs.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_api_decision.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/check_numerical_evidence.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_doc_examples.py --compiler $env:FPC_WIN64
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/build_docs.py --release 1.9.3 `
-            --output build-temp/docs-site/1.9.3
+          python tools/run_numerical_mutation.py --compiler $env:FPC_WIN64
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/build_docs.py --release 1.9.4 `
+            --output build-temp/docs-site/1.9.4
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_built_docs.py `
-            --site build-temp/docs-site/1.9.3 --release 1.9.3
+            --site build-temp/docs-site/1.9.4 --release 1.9.4
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if (-not (Test-Path build-temp/docs-site/1.9.3/search-index.json)) {
+          if (-not (Test-Path build-temp/docs-site/1.9.4/search-index.json)) {
             throw 'Documentation search index was not generated'
           }
 
