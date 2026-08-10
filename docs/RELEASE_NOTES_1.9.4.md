@@ -1,4 +1,4 @@
-# Release notes: 1.9.4
+# mathlib-fp v1.9.4
 
 ## Numerical trust closure
 

@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Exact 1.9.4 tag to publish
+        description: Source ref for a 1.9.4 documentation rebuild
         required: true
-        default: v1.9.4
+        default: main
   release:
     types: [published]
 
@@ -113,7 +113,8 @@ jobs:
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
             artifacts/mathlib-fp-docs-1.9.4.zip \
-            artifacts/mathlib-fp-docs-1.9.4.zip.sha256 --clobber
+            artifacts/mathlib-fp-docs-1.9.4.zip.sha256 --clobber \
+            --repo "$GITHUB_REPOSITORY"
 
   deploy:
     if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.4'
