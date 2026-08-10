@@ -2,7 +2,7 @@
   "schema_version": 1,
   "release": "1.9.4",
   "inventory": "docs/capabilities.json",
-  "inventory_release": "1.9.3",
+  "inventory_release": "1.9.4",
   "families": [
     {
       "family": "scalar_special_functions",
