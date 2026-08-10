@@ -208,6 +208,7 @@ def documentation_gates(
         "test_example_output.py",
         "test_build_docs.py",
         "test_built_docs.py",
+        "test_release_state.py",
         "test_numerical_evidence.py",
         "test_numerical_mutation.py",
         "check_docs.py",
