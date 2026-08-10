@@ -69,7 +69,7 @@ capabilities.json ──> evidence schema/checker ──> qualification + CI
 
 - CI and qualification invoke the evidence gate.
 - Documentation/site builds for 1.9.4 and all identity checks pass.
-- Full release qualification passed from the release branch: 75 gates, zero
+- Full release qualification passed from the release branch: 76 gates, zero
   failures on Windows 11 x86-64 with FPC 3.2.2, Lazarus 4.8, and Python 3.13.5.
 
 ## Risks and mitigations
