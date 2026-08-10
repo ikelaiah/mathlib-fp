@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 CURRENT_RELEASE = "1.9.4"
+NEXT_RELEASE = "1.9.5"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
 HISTORICAL_RELEASES = ["1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
@@ -54,6 +55,22 @@ def heading_slugs(text: str) -> set[str]:
         value = re.sub(r"[^\w\s-]", "", heading.lower(), flags=re.UNICODE)
         result.add(re.sub(r"\s+", "-", value).strip("-"))
     return result
+
+
+def roadmap_release_state_errors(
+    roadmap: str, current_release: str, next_release: str,
+) -> list[str]:
+    """Return errors when a shipped release is not advanced in the Roadmap."""
+    errors = []
+    if f"## Previous release: {current_release}" not in roadmap:
+        errors.append(
+            f"Roadmap does not record {current_release} as the previous release"
+        )
+    if f"## Next release: {next_release}" not in roadmap:
+        errors.append(
+            f"Roadmap does not name {next_release} as the next release"
+        )
+    return errors
 
 
 def main() -> int:
@@ -704,6 +721,7 @@ def main() -> int:
             errors.append(f"missing release document: {release_file.relative_to(ROOT)}")
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
     support = (DOCS / "SUPPORT.md").read_text(encoding="utf-8")
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     package = (ROOT / "packages" / "lazarus" / "mathlib_fp.lpk").read_text(
@@ -720,6 +738,9 @@ def main() -> int:
     for description, valid in identity_checks.items():
         if not valid:
             errors.append(f"release identity mismatch: {description}")
+    errors.extend(
+        roadmap_release_state_errors(roadmap, CURRENT_RELEASE, NEXT_RELEASE)
+    )
 
     contracts_path = ROOT / "examples" / "output-contracts.json"
     try:
