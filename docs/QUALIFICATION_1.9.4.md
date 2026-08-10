@@ -1,9 +1,9 @@
 # mathlib-fp 1.9.4 qualification
 
-Status: local release qualification is pending for the final candidate commit.
-The release cannot be tagged until the local result below is replaced with the
-candidate's recorded outcome and the Linux and Windows clean-archive workflows
-pass for that same commit.
+Status on 2026-08-10: **all 75 local release-qualification gates passed** on
+Windows 11 x86-64 with FPC 3.2.2, Lazarus 4.8, and Python 3.13.5. The release
+cannot be tagged until the Linux and Windows clean-archive workflows pass for
+the exact candidate commit.
 
 ## Completion-gate evidence
 
@@ -29,6 +29,15 @@ output contracts, documentation and API checks, numerical evidence and
 mutation gates, the versioned documentation build, the Lazarus package, and a
 representative benchmark. All gates are offline and use only Free Pascal,
 standard RTL/FCL units, and Python's standard library.
+
+## Local preflight result
+
+The command passed all 75 gates. It recorded zero failed gates across normal,
+optimised, and checked/heap-traced test suites; examples and output contracts;
+documentation and API checks; the catalogue and three-fault mutation gate; the
+versioned documentation site and offline archive; the Lazarus package; and the
+representative benchmark. The qualification manifest is retained at
+`build-temp/release-qualification/results.json` for the local candidate.
 
 ## Required clean-archive evidence
 

@@ -2,7 +2,8 @@
 
 ## Overview
 
-Turn the existing capability inventory and broad FPCUnit coverage into an
+Completed: the existing capability inventory and broad FPCUnit coverage now
+form an
 offline, release-gated evidence system. Build the evidence contract first;
 then audit capability groups in small, testable slices; finally update release
 metadata and run the full qualification.
@@ -51,23 +52,24 @@ capabilities.json ──> evidence schema/checker ──> qualification + CI
 
 ## Checkpoints
 
-### After tasks 1-2
+### After tasks 1-2 — complete
 
 - Catalogue test is red before the checker and green afterwards.
 - Core and sparse evidence records cover their stable inventory entries.
 - Normal FPCUnit suite and documentation check pass.
 
-### After tasks 3-5
+### After tasks 3-5 — complete
 
 - Every stable capability has exactly one evidence record.
 - Mutation runner proves every selected fault is detected.
 - Optimized and checked/heap test gates pass.
 
-### After tasks 6-7
+### After tasks 6-7 — complete
 
 - CI and qualification invoke the evidence gate.
 - Documentation/site builds for 1.9.4 and all identity checks pass.
-- Full release qualification passes from the release branch.
+- Full release qualification passed from the release branch: 75 gates, zero
+  failures on Windows 11 x86-64 with FPC 3.2.2, Lazarus 4.8, and Python 3.13.5.
 
 ## Risks and mitigations
 
@@ -78,7 +80,8 @@ capabilities.json ──> evidence schema/checker ──> qualification + CI
 | The audit becomes a prose-only catalogue | High | Cross-check every claim with checked paths, named test evidence, budgets, and a release gate. |
 | Full qualification is slow | Medium | Run focused Python/FPCUnit gates per increment; reserve all-gate runs for checkpoints. |
 
-## Open questions
+## Resolved scope
 
-The two decisions in `tasks/spec-1.9.4.md` are required before an evidence gap
-can be downgraded or the existing 1.9.3 tag error is included.
+Evidence gaps block this release, and all stable families have qualifying
+records. The pre-existing `V1.9.3`/`v1.9.3` tag discrepancy is recorded but is
+not changed by this branch.

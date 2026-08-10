@@ -2,8 +2,9 @@
 
 ## Status
 
-Proposed for review. This specification defines the release work on
-`release/v1.9.4`; implementation begins only after it is approved.
+Implemented on `release/v1.9.4`. The user approved the work with “Proceed”;
+the final local qualification passed, while clean-archive CI remains required
+before the release tag is created.
 
 ## Objective
 
@@ -138,9 +139,9 @@ field, and never fetch data during a test or qualification run.
 5. Release metadata consistently names 1.9.4, the roadmap identifies 1.9.4 as
    the next release, and the complete release qualification passes offline.
 
-## Open questions
+## Resolved decisions
 
-1. Should a lack of independent evidence block the release until fixed, or may
-   1.9.4 downgrade the affected capability as the roadmap permits?
-2. Do you want the separate `V1.9.3` versus `v1.9.3` release-tag repair in
-   this branch, or tracked independently?
+1. Evidence gaps block the release; all 28 stable families are qualified, so
+   no maturity downgrade was made.
+2. The separate `V1.9.3` versus `v1.9.3` tag repair remains outside this
+   branch. Historical documentation checks out the existing uppercase tag.

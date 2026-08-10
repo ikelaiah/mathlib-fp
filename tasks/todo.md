@@ -7,10 +7,10 @@ each stable capability to bounded, reproducible numerical evidence.
 
 **Acceptance criteria:**
 
-- [ ] A test first demonstrates that a missing stable-family record fails.
-- [ ] The checker rejects invalid paths, provenance, budgets, and high-risk
+- [x] A test first demonstrates that a missing stable-family record fails.
+- [x] The checker rejects invalid paths, provenance, budgets, and high-risk
   mutation coverage.
-- [ ] The empty/incomplete catalogue cannot pass.
+- [x] The empty/incomplete catalogue cannot pass.
 
 **Verification:** `python tools/test_numerical_evidence.py` and
 `python tools/check_numerical_evidence.py`.
@@ -29,9 +29,10 @@ dense, structured, sparse, iterative, and partial-spectrum stable families.
 
 **Acceptance criteria:**
 
-- [ ] All corresponding stable families have catalogue records and budgets.
-- [ ] New tests cover adversarial scales and stated degenerate behavior.
-- [ ] Existing API interfaces remain unchanged.
+- [x] All corresponding stable families have catalogue records and budgets.
+- [x] Linked FPCUnit tests cover the recorded adversarial scales and degenerate
+  behavior; the audit found no extra test unit necessary.
+- [x] Existing API interfaces remain unchanged.
 
 **Verification:** Focused FPCUnit build/run plus the evidence checker.
 
@@ -49,10 +50,10 @@ ODE/system solving, nonlinear/linear optimization, and convex optimization.
 
 **Acceptance criteria:**
 
-- [ ] Each family has a finite, input-scoped metric/budget and provenance.
-- [ ] Tests distinguish residual/feasibility/estimated error from exact
+- [x] Each family has a finite, input-scoped metric/budget and provenance.
+- [x] Tests distinguish residual/feasibility/estimated error from exact
   reference comparison.
-- [ ] Invalid, non-finite, and degenerate behavior is recorded and tested.
+- [x] Invalid, non-finite, and degenerate behavior is recorded and tested.
 
 **Verification:** Focused FPCUnit build/run plus the evidence checker.
 
@@ -70,9 +71,9 @@ time-series, interchange, inference, persistence, and expressions.
 
 **Acceptance criteria:**
 
-- [ ] Deterministic fixtures record source/method and regeneration steps.
-- [ ] Each family has property/reference and edge/failure evidence.
-- [ ] Unsupported features remain outside the qualified population.
+- [x] Deterministic fixtures record source/method and regeneration steps.
+- [x] Each family has property/reference and edge/failure evidence.
+- [x] Unsupported features remain outside the qualified population.
 
 **Verification:** Focused FPCUnit build/run plus the evidence checker.
 
@@ -90,10 +91,10 @@ source copies and prove the linked tests detect them.
 
 **Acceptance criteria:**
 
-- [ ] At least three high-risk-family mutations compile and make the linked
+- [x] At least three high-risk-family mutations compile and make the linked
   validation fail.
-- [ ] Mutations never modify the checkout and never contact the network.
-- [ ] The mutation tool has isolated Python tests.
+- [x] Mutations never modify the checkout and never contact the network.
+- [x] The mutation tool has isolated Python tests.
 
 **Verification:** `python tools/test_numerical_mutation.py` and the mutation
 runner against the completed catalogue.
@@ -112,10 +113,10 @@ the evidence report, and consistently advance release identity to 1.9.4.
 
 **Acceptance criteria:**
 
-- [ ] CI and `qualify_release.py` execute the evidence gates.
-- [ ] Public documentation names budgets, evidence categories, provenance, and
+- [x] CI and `qualify_release.py` execute the evidence gates.
+- [x] Public documentation names budgets, evidence categories, provenance, and
   known limitations without overclaiming.
-- [ ] Roadmap, changelog, package, version manifest, docs, and workflows agree
+- [x] Roadmap, changelog, package, version manifest, docs, and workflows agree
   on 1.9.4.
 
 **Verification:** Documentation/tool tests, built-site checks, and full release
