@@ -203,8 +203,14 @@ def validate_catalogue(
         errors.append("catalogue.inventory: expected docs/capabilities.json")
     if inventory.get("schema_version") != 1:
         errors.append("inventory.schema_version: expected 1")
-    if inventory.get("release") != RELEASE:
-        errors.append(f"inventory.release: expected {RELEASE}")
+    inventory_release = inventory.get("release")
+    if not isinstance(inventory_release, str) or not inventory_release:
+        errors.append("inventory.release: expected a non-empty string")
+    elif catalogue.get("inventory_release") != inventory_release:
+        errors.append(
+            "catalogue.inventory_release: expected the inventory release "
+            f"{inventory_release}"
+        )
 
     capabilities = inventory.get("capabilities")
     if not isinstance(capabilities, list):

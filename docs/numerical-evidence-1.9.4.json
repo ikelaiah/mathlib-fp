@@ -1,0 +1,934 @@
+{
+  "schema_version": 1,
+  "release": "1.9.4",
+  "inventory": "docs/capabilities.json",
+  "inventory_release": "1.9.3",
+  "families": [
+    {
+      "family": "scalar_special_functions",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite double inputs in each documented function domain; tail cases use the documented absolute or tail-relative measure",
+      "budget": {
+        "kind": "relative_error",
+        "metric": "reference relative error, with the documented absolute fallback near zero",
+        "limit": 2e-13,
+        "unit": "dimensionless output error"
+      },
+      "reference": {
+        "method": "closed-form integer-shape gamma/beta identities, symmetry identities, and independently evaluated tabulated tail values",
+        "source": "TestMathBase precision fixtures and the MathBase special-function contract",
+        "precision": "IEEE-754 binary64 reference literals",
+        "parameters": "integer shapes, x=100 scale case, ordinary BetaInc inputs, normal tails, and Student-t degrees of freedom 1, 2, and 10",
+        "license": "elementary mathematical identities and repository-authored literals; no external data file",
+        "regeneration": "evaluate the stated factorial, symmetry, and distribution identities and run TestMathBase"
+      },
+      "tests": [
+        {
+          "path": "tests/TestMathBase.pas",
+          "assertions": [
+            "BetaInc integer-shape reference",
+            "GammaLn rejects zero",
+            "StudentT at +Infinity"
+          ],
+          "kind": "reference comparison and invalid/non-finite edge coverage"
+        }
+      ],
+      "edge_cases": [
+        "invalid gamma/beta shapes return NaN",
+        "BetaInc clamps x outside [0,1]",
+        "StudentT rejects invalid degrees of freedom and negative x"
+      ],
+      "documentation": "docs/MathBase.md"
+    },
+    {
+      "family": "small_dense_value_arithmetic",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite 2x2 single, double, and complex value matrices",
+      "budget": {
+        "kind": "exact",
+        "metric": "exact value-operation fixture equality",
+        "limit": 0,
+        "unit": "stored scalar values"
+      },
+      "reference": {
+        "method": "hand-calculated 2x2 addition, multiplication, and complex-product fixtures",
+        "source": "TestDenseMatrices small value-record fixture",
+        "precision": "exact binary literals representable by the fixture scalars",
+        "parameters": "two fixed real 2x2 matrices, one complex diagonal product, and a batch copy",
+        "license": "repository-authored arithmetic fixture under MIT",
+        "regeneration": "multiply the stated 2x2 matrices directly and run TestDenseMatrices"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseMatrices.pas",
+          "assertions": [
+            "small expression [0,0]",
+            "small complex product real",
+            "small batch keeps value records"
+          ],
+          "kind": "exact arithmetic and value-semantics comparison"
+        }
+      ],
+      "edge_cases": [
+        "only fixed 2x2 shapes are supported",
+        "batch iteration preserves value records",
+        "complex real and imaginary components are checked separately"
+      ],
+      "documentation": "docs/TypedDenseMatrices.md"
+    },
+    {
+      "family": "typed_dense_storage",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite typed dense matrices and explicitly shaped row, column, and strided views",
+      "budget": {
+        "kind": "exact",
+        "metric": "element-preserving copy and legacy conversion equality",
+        "limit": 0,
+        "unit": "stored scalar values"
+      },
+      "reference": {
+        "method": "exact fixture indexing and deep-copy/legacy conversion comparisons",
+        "source": "TestDenseMatrices storage, view, copy, and conversion fixture",
+        "precision": "exact fixture values",
+        "parameters": "3x4 double storage plus row, column, diagonal, copied, and converted views",
+        "license": "repository-authored fixture under MIT",
+        "regeneration": "construct the documented dense matrix, mutate the source, and compare retained values"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseMatrices.pas",
+          "assertions": [
+            "legacy round trip value",
+            "owned storage is contiguous",
+            "clone is deep copy"
+          ],
+          "kind": "exact storage, conversion, and ownership comparison"
+        }
+      ],
+      "edge_cases": [
+        "negative and overflowing dimensions are rejected",
+        "empty shapes are valid where documented",
+        "views retain explicit stride and alias semantics"
+      ],
+      "documentation": "docs/TypedDenseMatrices.md"
+    },
+    {
+      "family": "typed_dense_kernels",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite conformable typed dense matrices, including empty and mixed-scale multiplication fixtures",
+      "budget": {
+        "kind": "backward_error",
+        "metric": "scale-normalized multiplication residual against a direct scalar oracle",
+        "limit": 1e-14,
+        "unit": "dimensionless residual"
+      },
+      "reference": {
+        "method": "separately traversed direct dense product and algebraic identities",
+        "source": "TestDenseMatrices kernel and backward-error fixture",
+        "precision": "IEEE-754 binary64; single paths retain their documented accumulation behavior",
+        "parameters": "ordinary, empty, odd-shaped, and mixed extreme-scale matrices",
+        "license": "repository-authored oracle fixture under MIT",
+        "regeneration": "compute the product with the scalar reference traversal and run TestDenseMatrices"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseMatrices.pas",
+          "assertions": [
+            "published backward-error style residual",
+            "mixed extreme scales remain representable"
+          ],
+          "kind": "direct-oracle residual and adversarial-scale comparison"
+        }
+      ],
+      "edge_cases": [
+        "empty conformable products have defined dimensions",
+        "mixed extreme finite scales remain representable in the published fixture",
+        "non-finite input is outside the stable kernel contract"
+      ],
+      "documentation": "docs/TypedDenseMatrices.md"
+    },
+    {
+      "family": "typed_direct_solve",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite square typed-dense coefficient matrices with one or more right-hand sides",
+      "budget": {
+        "kind": "backward_error",
+        "metric": "reported LU solve backward error",
+        "limit": 1e-14,
+        "unit": "dimensionless residual"
+      },
+      "reference": {
+        "method": "independent matrix product residual and hand-solved LU/Cholesky fixtures",
+        "source": "TestDenseMatrices and TestDenseDecompositions direct-solve diagnostics",
+        "precision": "IEEE-754 binary64 with scalar-specific test tolerances",
+        "parameters": "ordinary LU, positive-definite Cholesky, singular, and ill-conditioned matrices",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "multiply A by the returned X, normalize the residual, and run the cited tests"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseMatrices.pas",
+          "assertions": [
+            "published backward-error style residual",
+            "singularity reported"
+          ],
+          "kind": "residual, diagnostic, and singular-input comparison"
+        },
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "LU diagnostic solve residual",
+            "LU backward error is bounded"
+          ],
+          "kind": "independently recomputed residual and backward-error check"
+        }
+      ],
+      "edge_cases": [
+        "singular pivots are reported",
+        "positive-definite and general paths remain distinct",
+        "non-finite matrix entries are rejected"
+      ],
+      "documentation": "docs/DenseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_triangular_solve",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite square lower or upper dense factors and conformable one-or-many right-hand sides",
+      "budget": {
+        "kind": "reconstruction_error",
+        "metric": "A times returned X compared with B",
+        "limit": 2e-13,
+        "unit": "maximum matrix-entry error"
+      },
+      "reference": {
+        "method": "direct multiplication reconstruction across lower, upper, transpose, unit, and conjugate-transpose modes",
+        "source": "TestDenseDecompositions triangular operation fixture",
+        "precision": "IEEE-754 binary64 and complex component comparisons",
+        "parameters": "multiple real right-hand sides and a complex conjugate-transpose system",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "multiply each triangular factor by its returned solution and run TestDenseDecompositions"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "lower triangular multiple RHS",
+            "conjugate-transposed upper"
+          ],
+          "kind": "reconstruction comparison across operation variants"
+        }
+      ],
+      "edge_cases": [
+        "unit and non-unit diagonals are distinct",
+        "transpose and conjugate-transpose operations are explicit",
+        "numerically zero non-unit diagonals are rejected"
+      ],
+      "documentation": "docs/DenseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_qr_least_squares",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite tall or square typed-dense matrices with documented rank tolerances",
+      "budget": {
+        "kind": "reconstruction_error",
+        "metric": "QR reconstruction and least-squares solution error",
+        "limit": 2e-13,
+        "unit": "maximum matrix-entry error"
+      },
+      "reference": {
+        "method": "known least-squares solution, Q orthogonality, and independently recomposed Q times R",
+        "source": "TestDenseDecompositions QR and CPQR fixtures",
+        "precision": "IEEE-754 binary64; complex reconstruction uses its documented component tolerance",
+        "parameters": "full-rank, rank-deficient, reused-factor, and complex matrices",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "form Q*R and A*X, then run TestDenseDecompositions"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "QR reconstruction",
+            "least-squares reference",
+            "CPQR permutation identity"
+          ],
+          "kind": "reconstruction, orthogonality, and reference-solution comparison"
+        }
+      ],
+      "edge_cases": [
+        "rank-deficient CPQR reports its numerical rank",
+        "wide QR is rejected with SVD guidance",
+        "empty and singleton factors have explicit behavior"
+      ],
+      "documentation": "docs/DenseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_compact_svd_minimum_norm",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite tall, square, or wide typed-dense matrices with one or more right-hand sides",
+      "budget": {
+        "kind": "reconstruction_error",
+        "metric": "SVD reconstruction and minimum-norm solve residual",
+        "limit": 2e-11,
+        "unit": "maximum matrix-entry error"
+      },
+      "reference": {
+        "method": "independent U*Sigma*V^H recomposition and known minimum-norm systems",
+        "source": "TestDenseDecompositions tall, wide, and complex SVD fixtures",
+        "precision": "IEEE-754 binary64 with documented complex reconstruction tolerance",
+        "parameters": "tall, wide, rank-aware, and complex matrices",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "recompose U*Sigma*V^H, solve the fixed systems, and run TestDenseDecompositions"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "tall SVD reconstruction",
+            "wide minimum-norm residual",
+            "complex SVD reconstruction"
+          ],
+          "kind": "reconstruction, rank, and residual comparison"
+        }
+      ],
+      "edge_cases": [
+        "empty and singleton matrices have explicit compact-factor behavior",
+        "non-finite SVD input is rejected",
+        "rank-deficient solving remains a documented minimum-norm operation"
+      ],
+      "documentation": "docs/DenseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_symmetric_hermitian_eigensystem",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite symmetric real or Hermitian complex typed-dense matrices",
+      "budget": {
+        "kind": "residual",
+        "metric": "eigenpair residual and orthogonality/unitarity reconstruction error",
+        "limit": 2e-12,
+        "unit": "maximum matrix-entry error"
+      },
+      "reference": {
+        "method": "hand-specified spectra, direct A*V comparison, and V*V^H orthogonality checks",
+        "source": "TestDenseDecompositions symmetric and Hermitian eigen fixtures",
+        "precision": "IEEE-754 binary64; tiny-scale fixture uses an absolute 1e-214 tolerance",
+        "parameters": "3x3 real, 2x2 Hermitian, empty, singleton, tiny-scale, repeated-spectrum, and nearly rank-deficient matrices",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "multiply A*V and V*Lambda and run TestDenseDecompositions"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "real eigenpair residual",
+            "real eigenvectors orthogonal",
+            "tiny-scale eigenvalue 0"
+          ],
+          "kind": "eigenpair, orthogonality, repeated-spectrum, and adversarial-scale comparison"
+        }
+      ],
+      "edge_cases": [
+        "empty, singleton, and repeated spectra are explicit",
+        "tiny finite scales retain the tested eigenvalues",
+        "nonsymmetric and non-finite input is rejected"
+      ],
+      "documentation": "docs/DenseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_sparse_linear_algebra",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite CSR, CSC, triplet, and structured sparse matrices with valid dimensions and canonical indices",
+      "budget": {
+        "kind": "exact",
+        "metric": "canonical-storage and sparse-to-dense oracle fixture equality",
+        "limit": 0,
+        "unit": "indices, counts, and exact fixture values"
+      },
+      "reference": {
+        "method": "hand-built sparse triplets and independently inspected dense product entries",
+        "source": "TestSparseMatrices canonical storage and structured-product fixtures",
+        "precision": "exact integer indices and exactly representable fixture values",
+        "parameters": "duplicate triplets, CSR/CSC conversion, zero policy, and tridiagonal product fixtures",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "construct the listed triplets, convert them, compare structural entries, and run TestSparseMatrices"
+      },
+      "tests": [
+        {
+          "path": "tests/TestSparseMatrices.pas",
+          "assertions": [
+            "duplicates combined",
+            "copied canonical indices are immutable",
+            "structured sparse count"
+          ],
+          "kind": "canonicalization, ownership, and sparse-structure comparison"
+        }
+      ],
+      "edge_cases": [
+        "duplicate coordinates are combined deterministically",
+        "stored-zero policy is enforced",
+        "malformed construction is failure-atomic"
+      ],
+      "documentation": "docs/SparseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_iterative_matrix_free_linear_algebra",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite conformable linear operators and vectors satisfying the documented method assumptions",
+      "budget": {
+        "kind": "residual",
+        "metric": "explicitly recomputed final true or normal residual",
+        "limit": 1e-8,
+        "unit": "dimensionless stopping measure"
+      },
+      "reference": {
+        "method": "typed-dense operator oracle, known least-squares solutions, and explicit residual refresh",
+        "source": "TestIterativeSolvers matrix-free and LSQR fixtures",
+        "precision": "scalar-specific FPCUnit tolerances across real/complex single/double paths",
+        "parameters": "ordinary systems, inconsistent least squares, preconditioners, progress callbacks, cancellation, and refresh interval one",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "apply the dense oracle to the final vector, recompute residuals, and run TestIterativeSolvers"
+      },
+      "tests": [
+        {
+          "path": "tests/TestIterativeSolvers.pas",
+          "assertions": [
+            "inconsistent LSQR reaches least-squares stationarity",
+            "large true residual confirmed",
+            "refresh result convergence confirmed"
+          ],
+          "kind": "reference-solution, residual-confirmation, and lifecycle comparison"
+        }
+      ],
+      "edge_cases": [
+        "inconsistent least squares uses normal-residual convergence",
+        "breakdown, iteration limits, and cancellation report statuses",
+        "alias rejection leaves caller storage unchanged"
+      ],
+      "documentation": "docs/SparseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_structured_and_sparse_direct_solve",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite tridiagonal, band, and sparse-LU systems with valid documented structure",
+      "budget": {
+        "kind": "reconstruction_error",
+        "metric": "known in-place structured and sparse solve values",
+        "limit": 1e-12,
+        "unit": "solution entry error"
+      },
+      "reference": {
+        "method": "hand-solved band and sparse-LU systems plus typed-dense residual comparisons",
+        "source": "TestStructuredSolvers structured/direct-solve fixture",
+        "precision": "IEEE-754 binary64 fixed-solution tolerance",
+        "parameters": "band, sparse, multiple-right-hand-side, single, and complex solves with singular variants",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "solve the listed systems independently, multiply by the original factor, and run TestStructuredSolvers"
+      },
+      "tests": [
+        {
+          "path": "tests/TestStructuredSolvers.pas",
+          "assertions": [
+            "band exact in-place solve",
+            "sparse exact in-place solve",
+            "sparse singular construction rejected"
+          ],
+          "kind": "known-solution, singularity, and in-place ownership comparison"
+        }
+      ],
+      "edge_cases": [
+        "zero band pivots are rejected",
+        "singular sparse construction is rejected",
+        "in-place solves and multiple right-hand sides are explicit"
+      ],
+      "documentation": "docs/SparseLinearAlgebra.md"
+    },
+    {
+      "family": "typed_partial_spectral_linear_algebra",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite square sparse matrices for largest-magnitude Lanczos or Arnoldi eigenpairs",
+      "budget": {
+        "kind": "residual",
+        "metric": "independently reported eigenpair 2-norm residual",
+        "limit": 1e-8,
+        "unit": "Euclidean residual norm"
+      },
+      "reference": {
+        "method": "hand-specified diagonal/general spectra and direct A*v minus lambda*v residuals",
+        "source": "TestPartialEigensystems Lanczos and Arnoldi fixtures",
+        "precision": "double residual budget 1e-8; single-complex residual budget 1e-4",
+        "parameters": "real, complex, single, and single-complex largest-magnitude pairs with deterministic seed",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "apply the sparse operator to each returned vector and run TestPartialEigensystems"
+      },
+      "tests": [
+        {
+          "path": "tests/TestPartialEigensystems.pas",
+          "assertions": [
+            "Arnoldi residual checked",
+            "complex Arnoldi residual",
+            "single-complex Lanczos residual"
+          ],
+          "kind": "known-eigenvalue, residual, scalar-coverage, and shape-validation comparison"
+        }
+      ],
+      "edge_cases": [
+        "only largest-magnitude targets are supported",
+        "non-square shapes and invalid requested counts are rejected",
+        "single-complex coverage uses its wider documented budget"
+      ],
+      "documentation": "docs/SparseLinearAlgebra.md"
+    },
+    {
+      "family": "interpolation_and_approximation",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite ordered knots, rectangular grids, or small finite scattered 2-D data in documented interpolation ranges",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "analytic polynomial, spline derivative, and integral fixture error",
+        "limit": 2e-10,
+        "unit": "interpolated output units"
+      },
+      "reference": {
+        "method": "analytic quadratic/cubic polynomials, finite-difference antiderivative check, and exact planar-grid values",
+        "source": "TestNumericalModelling interpolation and scattered-data fixtures",
+        "precision": "IEEE-754 binary64 literals and documented finite-difference step",
+        "parameters": "quadratic barycentric nodes, PCHIP/Akima/cubic-spline knots, rectangular grid, and duplicate scattered node",
+        "license": "repository-authored analytic fixtures under MIT",
+        "regeneration": "evaluate the stated polynomials and spline antiderivatives, then run TestNumericalModelling"
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": ["barycentric quadratic", "clamped spline derivative", "duplicate scattered nodes rejected"],
+          "kind": "analytic reference, derivative/integral, and invalid-data comparison"
+        }
+      ],
+      "edge_cases": ["evaluation clamps outside documented knot ranges", "duplicate scattered nodes are rejected", "dense scattered methods target small data"],
+      "documentation": "docs/NumericalModelling.md"
+    },
+    {
+      "family": "differentiation_and_derivative_checking",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite smooth scalar/vector callbacks with analytic complex-step callbacks where required",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "analytic quadratic derivative agreement",
+        "limit": 1e-12,
+        "unit": "derivative units"
+      },
+      "reference": {
+        "method": "closed-form quadratic derivatives compared independently with complex-step and dual-number paths",
+        "source": "TestNumericalModelling derivative fixture",
+        "precision": "IEEE-754 binary64",
+        "parameters": "smooth quadratic callback and an intentionally invalid derivative callback",
+        "license": "repository-authored analytic fixture under MIT",
+        "regeneration": "differentiate the quadratic analytically and run TestNumericalModelling"
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": ["complex-step quadratic derivative", "dual quadratic derivative"],
+          "kind": "analytic-reference comparison across independent derivative paths"
+        }
+      ],
+      "edge_cases": ["complex-step callbacks must preserve the imaginary perturbation", "forward dual mode is explicit", "bad derivative callbacks have explicit validation"],
+      "documentation": "docs/NumericalModelling.md"
+    },
+    {
+      "family": "numerical_modelling",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite callbacks and documented tolerance/range limits for quadrature, fitting, roots, and non-stiff ODEs",
+      "budget": {
+        "kind": "residual",
+        "metric": "published quadrature, polynomial-root residual, and dense ODE output budget",
+        "limit": 2e-6,
+        "unit": "method-specific output or residual units"
+      },
+      "reference": {
+        "method": "analytic sine/Gaussian integrals, known polynomial roots, linear fit, and exp(t) ODE solution",
+        "source": "TestNumericalModelling modelling fixtures",
+        "precision": "IEEE-754 binary64; ODE dense output uses the stated 2e-6 tolerance",
+        "parameters": "sin on [0,pi], Gaussian improper integral, polynomial roots, y'=y, and finite/non-finite callbacks",
+        "license": "repository-authored analytic fixtures under MIT",
+        "regeneration": "evaluate the closed forms and run TestNumericalModelling"
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": ["adaptive status", "quadratic residual", "dense ODE output"],
+          "kind": "analytic integral/root/ODE reference and residual comparison"
+        }
+      ],
+      "edge_cases": ["non-finite Monte Carlo callbacks raise", "subdivision limits report status", "non-stiff explicit ODE scope is retained"],
+      "documentation": "docs/NumericalModelling.md"
+    },
+    {
+      "family": "diagnostic_nonlinear_and_linear_optimization",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite smooth objectives, gradients, constraints, and documented local-solver option ranges",
+      "budget": {
+        "kind": "feasibility",
+        "metric": "constraint violation of analytic quadratic fixtures",
+        "limit": 1e-5,
+        "unit": "constraint units"
+      },
+      "reference": {
+        "method": "analytic quadratic optimum, bounded solution, constrained feasibility, and phase-I LP outcome",
+        "source": "TestOptimizationLib diagnostic optimization fixtures",
+        "precision": "IEEE-754 binary64 with documented feasibility tolerance",
+        "parameters": "quadratic bowl, active bounds, constrained objective, and feasible/infeasible linear programs",
+        "license": "repository-authored analytic fixtures under MIT",
+        "regeneration": "solve the quadratic and LP fixtures analytically where applicable and run TestOptimizationLib"
+      },
+      "tests": [
+        {
+          "path": "tests/TestOptimizationLib.pas",
+          "assertions": ["nonlinear CG status", "bounded L-BFGS active bound", "constrained feasibility", "phase-I infeasible status"],
+          "kind": "analytic optimum, feasibility, and status comparison"
+        }
+      ],
+      "edge_cases": ["local smooth solvers do not claim global optimality", "iteration exhaustion is explicit", "infeasible and unbounded LP outcomes are distinct"],
+      "documentation": "docs/OptimizationLib.md"
+    },
+    {
+      "family": "dense_convex_optimization",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite dense convex QP and strictly feasible affine second-order cone models",
+      "budget": {
+        "kind": "feasibility",
+        "metric": "QP and unit-cone feasibility residual",
+        "limit": 1e-8,
+        "unit": "constraint units"
+      },
+      "reference": {
+        "method": "hand-specified constrained QP, recession direction, infeasible model, and unit-cone objective",
+        "source": "TestNumericalModelling convex optimization fixtures",
+        "precision": "IEEE-754 binary64 with the QP/SOCP test tolerances",
+        "parameters": "dense feasible, unbounded, infeasible QP cases and one strictly feasible SOCP",
+        "license": "repository-authored analytic fixtures under MIT",
+        "regeneration": "check constraints and stated certificates directly, then run TestNumericalModelling"
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": ["QP feasible", "infeasible QP residual", "SOCP feasible"],
+          "kind": "feasibility, certificate, and explicit-outcome comparison"
+        }
+      ],
+      "edge_cases": ["SOCP requires a strictly feasible start", "unbounded QP certificates are limited to documented recession directions", "general cone infeasibility certificates are unsupported"],
+      "documentation": "docs/ConvexOptimization.md"
+    },
+    {
+      "family": "shared_iteration_diagnostics",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "all declared iteration status values",
+      "budget": {
+        "kind": "exact",
+        "metric": "status enumeration to documented name mapping",
+        "limit": 0,
+        "unit": "exact status string"
+      },
+      "reference": {
+        "method": "complete enumeration of the documented status labels",
+        "source": "TestNumericalModelling iteration status fixture",
+        "precision": "not applicable; exact string mapping",
+        "parameters": "numerical-breakdown and iteration-limit status values",
+        "license": "repository-authored API contract under MIT",
+        "regeneration": "enumerate TIterationStatus and run TestNumericalModelling"
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": ["status name", "limit name"],
+          "kind": "exact API-contract comparison"
+        }
+      ],
+      "edge_cases": ["only statuses applicable to a mathematical method are reported", "status text is stable release evidence", "numerical breakdown is distinct from iteration limit"],
+      "documentation": "docs/NumericalModelling.md"
+    },
+    {
+      "family": "explicit_local_random_state",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "valid nonzero four-word xoshiro256** states and bounded integer ranges",
+      "budget": {
+        "kind": "exact",
+        "metric": "xoshiro256** transition, replay, split, and serialized-state equality",
+        "limit": 0,
+        "unit": "uint64 output and state words"
+      },
+      "reference": {
+        "method": "published xoshiro256** transition vector and SplitMix64 seeded replay",
+        "source": "TestAppliedNumerics ReferenceSequence fixture",
+        "precision": "exact uint64 arithmetic",
+        "parameters": "seed 123456789, five reference words, replay, split, and bounded integers",
+        "license": "xoshiro reference algorithm; checked-in fixture is repository-authored under MIT",
+        "regeneration": "apply the documented transition to the seed state and run TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["xoshiro256** reference vector changed", "restored state reproduces next value", "bounded integer result"],
+          "kind": "exact reference-vector, replay, split, and range comparison"
+        }
+      ],
+      "edge_cases": ["all-zero state is invalid", "generator state is local rather than RTL-global", "the generator is not cryptographic"],
+      "documentation": "docs/AppliedNumerics.md"
+    },
+    {
+      "family": "streaming_descriptive_statistics",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite unweighted or positive-weight double streams under the documented non-finite policy",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "batch versus streaming mean and variance agreement",
+        "limit": 1e-14,
+        "unit": "statistic units"
+      },
+      "reference": {
+        "method": "hand-calculated finite stream and independently merged partial-stream statistics",
+        "source": "TestAppliedNumerics streaming statistics fixtures",
+        "precision": "IEEE-754 binary64",
+        "parameters": "values 1 through 10, weighted 10/20 stream, ignored non-finite inputs, and overflow cases",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "compute the batch moments, merge the two partitions, and run TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["merged M2-derived variance", "ignored non-finite values do not change count", "moment arithmetic overflow uses the typed error"],
+          "kind": "batch-reference, merge-property, non-finite, and overflow comparison"
+        }
+      ],
+      "edge_cases": ["non-finite inputs may be ignored or rejected explicitly", "weight and moment overflow are failure-atomic", "moments stop at variance"],
+      "documentation": "docs/AppliedNumerics.md"
+    },
+    {
+      "family": "applied_dsp",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite scalar and complex signal blocks with documented transform, filter, and overlap shapes",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "direct DFT oracle, round-trip, convolution, and block-equivalence error",
+        "limit": 2e-12,
+        "unit": "signal sample units"
+      },
+      "reference": {
+        "method": "portable O(n^2) DFT oracle, direct convolution, and known spectral/filter responses",
+        "source": "TestAppliedNumerics DSP fixtures",
+        "precision": "double 2e-12 class budgets with wider documented single-precision paths",
+        "parameters": "arbitrary transform length, impulse, direct/FFT convolution, overlap blocks, Haar, and streaming filters",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "run the direct DFT/convolution oracles and TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["Bluestein/reference real", "reference DFT round trip real", "overlap-add bounded tail"],
+          "kind": "independent DFT oracle, round-trip, and bounded-state comparison"
+        }
+      ],
+      "edge_cases": ["non-finite blocks are rejected", "overlap and FIR state remain bounded", "advanced IIR design and wavelet packets remain unsupported"],
+      "documentation": "docs/AppliedNumerics.md"
+    },
+    {
+      "family": "typed_data_analysis",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite dense double observations with rows as observations and documented labels/components",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "deterministic PCA, clustering, transform, and forest fixture error",
+        "limit": 1e-12,
+        "unit": "model output units"
+      },
+      "reference": {
+        "method": "shared dense-factor oracle, hand-separated clusters, seeded reruns, and leakage-safe train/validation fixture",
+        "source": "TestAppliedNumerics typed analysis fixtures",
+        "precision": "IEEE-754 binary64",
+        "parameters": "correlated PCA data, two separated blobs, fixed seeds, validation split, forests, LDA, and KD tree",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "run the deterministic seeded fixtures and compare with their dense/oracle expectations"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["correlated fixture is dominated by first component", "k-means++ converges", "validation row cannot leak into fitted mean"],
+          "kind": "dense-factor, determinism, and leakage-prevention comparison"
+        }
+      ],
+      "edge_cases": ["non-finite features are rejected", "dense in-memory double scope is retained", "impurity importance bias remains documented"],
+      "documentation": "docs/AppliedNumerics.md"
+    },
+    {
+      "family": "linear_gaussian_state_space",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite time-invariant linear-Gaussian scalar or dense multivariate configurations and measurements",
+      "budget": {
+        "kind": "exact",
+        "metric": "finite likelihood, non-negative covariance, and forecast covariance monotonicity",
+        "limit": 0,
+        "unit": "exact logical covariance and finiteness predicates"
+      },
+      "reference": {
+        "method": "closed-form constant-signal scalar filter and dense multivariate innovation/covariance replay",
+        "source": "TestAppliedNumerics Kalman fixtures",
+        "precision": "IEEE-754 binary64 logical and stated numeric comparisons",
+        "parameters": "constant scalar measurements and two-state constant-velocity multivariate measurements",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "run the scalar and multivariate recurrences and TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["finite log likelihood", "non-finite series is rejected", "bounded multivariate state size"],
+          "kind": "closed-form behavior, finite-state, and failure-atomicity comparison"
+        }
+      ],
+      "edge_cases": ["non-finite observations are rejected without state mutation", "forecast uncertainty does not shrink without measurements", "missing data and smoothing are unsupported"],
+      "documentation": "docs/AppliedNumerics.md"
+    },
+    {
+      "family": "numerical_interchange",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite vectors, matrices, sparse values, and valid random states within explicit resource caps",
+      "budget": {
+        "kind": "exact",
+        "metric": "binary/text scalar, metadata, and random-state round-trip equality",
+        "limit": 0,
+        "unit": "serialized values and metadata"
+      },
+      "reference": {
+        "method": "encode/decode round trips plus deliberate CRC, version, header, truncation, and cap corruption",
+        "source": "TestAppliedNumerics and TestSparseInterchange interchange fixtures",
+        "precision": "exact binary payload and metadata comparison",
+        "parameters": "double vectors, sparse real/complex formats, random state, malformed Matrix Market, and resource caps",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "serialize the stated values, corrupt the indicated byte/header, and run the cited tests"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["serialized RNG state reproduces next value", "checksum rejects corrupt payload", "invalid all-zero random state is not persisted"],
+          "kind": "exact round-trip and corrupt-input comparison"
+        },
+        {
+          "path": "tests/TestSparseInterchange.pas",
+          "assertions": ["TestBinaryRejectsVersionChecksumTruncationAndLimits"],
+          "kind": "binary sparse corruption and cap coverage"
+        }
+      ],
+      "edge_cases": ["CRC, version, kind, shape, payload length, and caps are checked before return", "binary format is documented little-endian version 1", "non-finite numeric payloads are rejected"],
+      "documentation": "docs/Interchange.md"
+    },
+    {
+      "family": "statistical_inference_and_regression",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite distribution parameters, samples, dense designs, and binary labels in the documented model domain",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "analytic quantile, test-statistic, ANOVA, contingency, and regression coefficient error",
+        "limit": 2e-12,
+        "unit": "statistic or parameter units"
+      },
+      "reference": {
+        "method": "analytic normal, t-test, ANOVA, chi-square, and exact linear-regression fixtures with seeded sampling",
+        "source": "TestAppliedNumerics inference and regression fixtures",
+        "precision": "IEEE-754 binary64 with stated fixture tolerances",
+        "parameters": "standard normal quantile, grouped samples, contingency counts, rank-deficient OLS, and separated logistic data",
+        "license": "repository-authored analytic fixtures under MIT",
+        "regeneration": "evaluate the stated formulas and run TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["normal quantile reference", "ANOVA F reference", "OLS slope", "separated logistic status is explicit"],
+          "kind": "analytic reference, rank, and non-identifiability comparison"
+        }
+      ],
+      "edge_cases": ["approximate p-values remain documented as portable approximations", "rank deficiency yields explicit diagnostics", "separated logistic data has explicit non-identifiable status"],
+      "documentation": "docs/StatsLib.md"
+    },
+    {
+      "family": "selected_model_persistence",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "supported finite spline, FIR, standardization, and scalar Kalman model values within resource caps",
+      "budget": {
+        "kind": "exact",
+        "metric": "persisted model behavior and retained-state round-trip equality",
+        "limit": 0,
+        "unit": "model output and state values"
+      },
+      "reference": {
+        "method": "save/load behavioral replay and deliberate checksum/resource-cap corruption",
+        "source": "TestAppliedNumerics model persistence fixture",
+        "precision": "exact fixed-fixture equality",
+        "parameters": "cubic spline, streaming FIR, standardization, scalar Kalman, checksum byte, and element cap",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "save/load each supported model, replay its fixture, and run TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["persisted spline derivative", "persisted FIR state first sample", "model checksum rejects corruption"],
+          "kind": "behavioral round-trip and corruption comparison"
+        }
+      ],
+      "edge_cases": ["failed loads preserve caller values", "only selected model classes are persisted", "decompositions, forests, arbitrary graphs, and multivariate Kalman remain unsupported"],
+      "documentation": "docs/Interchange.md"
+    },
+    {
+      "family": "bounded_mathematical_expressions",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "finite bound scalar/vector/matrix symbols and expressions within explicit operation and depth limits",
+      "budget": {
+        "kind": "exact",
+        "metric": "scalar/vector/matrix oracle result and immutable symbol snapshot equality",
+        "limit": 0,
+        "unit": "fixture values"
+      },
+      "reference": {
+        "method": "hand-evaluated scalar, vector, dot-product, and matrix-product expressions",
+        "source": "TestAppliedNumerics bounded expression fixture",
+        "precision": "exact fixture values and IEEE-754 elementary-function tolerance",
+        "parameters": "sin scalar, vector cosine, dot product, matrix multiplication, snapshot mutation, operation limit, assignment, and depth limit",
+        "license": "repository-authored fixtures under MIT",
+        "regeneration": "evaluate the stated expressions manually and run TestAppliedNumerics"
+      },
+      "tests": [
+        {
+          "path": "tests/TestAppliedNumerics.pas",
+          "assertions": ["scalar expression value", "symbol table owns matrix snapshot", "expression operation limit enforced"],
+          "kind": "hand-oracle, immutability, and resource-limit comparison"
+        }
+      ],
+      "edge_cases": ["assignment is not part of the expression language", "depth and operation limits are enforced", "non-finite results are rejected"],
+      "documentation": "docs/Interchange.md"
+    }
+  ]
+}

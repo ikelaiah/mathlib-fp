@@ -93,6 +93,7 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
                     "schema_version": 1,
                     "release": "1.9.4",
                     "inventory": "docs/capabilities.json",
+                    "inventory_release": "1.9.4",
                     "families": records,
                 }
             ),
@@ -169,6 +170,20 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
 
         self.assertEqual(
             [], validate_catalogue(self.root, self.catalogue_path, self.inventory_path)
+        )
+
+    def test_catalogue_records_the_release_of_its_source_inventory(self) -> None:
+        self.write_inventory([{"family": "scalar", "maturity": "stable"}])
+        self.write_catalogue([self.evidence("scalar")])
+        catalogue = json.loads(self.catalogue_path.read_text(encoding="utf-8"))
+        catalogue["inventory_release"] = "1.9.3"
+        self.catalogue_path.write_text(json.dumps(catalogue), encoding="utf-8")
+
+        errors = validate_catalogue(self.root, self.catalogue_path, self.inventory_path)
+
+        self.assertIn(
+            "catalogue.inventory_release: expected the inventory release 1.9.4",
+            errors,
         )
 
     def test_complete_catalogue_is_accepted(self) -> None:
