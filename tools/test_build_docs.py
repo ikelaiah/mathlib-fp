@@ -10,7 +10,12 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from build_docs import load_versions, write_offline_archive, write_site_index
+from build_docs import (
+    load_versions,
+    markdown_to_html,
+    write_offline_archive,
+    write_site_index,
+)
 
 
 class DocumentationBuildTests(unittest.TestCase):
@@ -54,6 +59,7 @@ class DocumentationBuildTests(unittest.TestCase):
         page = (site / "index.html").read_text(encoding="utf-8")
         self.assertIn("Current release: 1.9.3", page)
         self.assertIn('href="1.9.0/index.html"', page)
+        self.assertIn('class="release-list"', page)
 
     def test_offline_archive_is_deterministic_and_self_identifying(self) -> None:
         site = self.root / "site"
@@ -72,6 +78,23 @@ class DocumentationBuildTests(unittest.TestCase):
             self.assertIn(
                 "mathlib-fp-docs-1.9.3/release.json", archive.namelist()
             )
+
+    def test_markdown_table_renders_as_a_semantic_html_table(self) -> None:
+        source = (
+            "| Unit family | Domain |\n"
+            "| --- | --- |\n"
+            "| [MathBase](MathBase.md) | Shared numerics |\n"
+        )
+
+        body, plain = markdown_to_html(source)
+
+        self.assertIn("<table>", body)
+        self.assertIn("<thead>", body)
+        self.assertIn('<th scope="col">Unit family</th>', body)
+        self.assertIn('<a href="MathBase.html">MathBase</a>', body)
+        self.assertIn("<td>Shared numerics</td>", body)
+        self.assertNotIn("table-source", body)
+        self.assertIn("Shared numerics", plain)
 
 
 if __name__ == "__main__":

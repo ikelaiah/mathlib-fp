@@ -68,7 +68,23 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
             output.append("</ul>")
             in_list = False
 
-    for line in source.splitlines():
+    def table_cells(line: str) -> list[str] | None:
+        value = line.strip()
+        if not value.startswith("|"):
+            return None
+        if value.endswith("|"):
+            value = value[:-1]
+        return [cell.strip() for cell in value[1:].split("|")]
+
+    def is_table_divider(cells: list[str] | None, width: int) -> bool:
+        return bool(cells) and len(cells) == width and all(
+            re.fullmatch(r":?-{3,}:?", cell) for cell in cells
+        )
+
+    lines = source.splitlines()
+    line_index = 0
+    while line_index < len(lines):
+        line = lines[line_index]
         if line.startswith("```"):
             flush_paragraph()
             close_list()
@@ -80,10 +96,12 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
                     f'<pre><code class="language-{html.escape(language, quote=True)}">'
                 )
             in_code = not in_code
+            line_index += 1
             continue
         if in_code:
             output.append(html.escape(line) + "\n")
             plain.append(line)
+            line_index += 1
             continue
         heading = re.match(r"^(#{1,6})\s+(.+)$", line)
         if heading:
@@ -107,14 +125,51 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
         elif not line.strip():
             flush_paragraph()
             close_list()
+        elif (
+            (header_cells := table_cells(line)) is not None
+            and line_index + 1 < len(lines)
+            and is_table_divider(
+                table_cells(lines[line_index + 1]), len(header_cells)
+            )
+        ):
+            flush_paragraph()
+            close_list()
+            label = html.escape(
+                f"Scrollable table: {header_cells[0]}", quote=True
+            )
+            output.append(
+                f'<div class="table-wrap" role="region" tabindex="0" '
+                f'aria-label="{label}"><table><thead><tr>'
+            )
+            output.extend(
+                f'<th scope="col">{inline(cell, link_resolver)}</th>'
+                for cell in header_cells
+            )
+            output.append("</tr></thead><tbody>")
+            plain.extend(header_cells)
+            line_index += 2
+            while line_index < len(lines):
+                row_cells = table_cells(lines[line_index])
+                if row_cells is None or len(row_cells) != len(header_cells):
+                    break
+                output.append("<tr>")
+                output.extend(
+                    f"<td>{inline(cell, link_resolver)}</td>"
+                    for cell in row_cells
+                )
+                output.append("</tr>")
+                plain.extend(row_cells)
+                line_index += 1
+            output.append("</tbody></table></div>")
+            continue
         elif line.startswith("|"):
-            # Preserve Markdown tables readably; source remains canonical.
             flush_paragraph()
             close_list()
             output.append(f'<pre class="table-source">{html.escape(line)}</pre>')
             plain.append(line)
         else:
             paragraph.append(line.strip())
+        line_index += 1
     flush_paragraph()
     close_list()
     if in_code:
@@ -269,12 +324,21 @@ def write_site_index(site_root: Path, versions: dict[str, object]) -> None:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="mathlib-release" content="{html.escape(current, quote=True)}">
 <title>mathlib-fp documentation — current release {html.escape(current)}</title>
-<style>body{{font:16px/1.55 system-ui;max-width:50rem;margin:auto;padding:2rem}}</style>
+<style>:root{{color-scheme:light;--ink:#172033;--muted:#536178;--line:#d9e0ea;--surface:#fff;
+--canvas:#f4f7fb;--accent:#126b8d;--accent-dark:#0d4057}}*{{box-sizing:border-box}}body{{margin:0;
+background:linear-gradient(135deg,#e7f3f7 0,#f4f7fb 45%,#f8fafc 100%);color:var(--ink);
+font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}}main{{max-width:52rem;
+margin:clamp(2rem,8vw,7rem) auto;padding:clamp(1.5rem,5vw,3.5rem);background:var(--surface);border:1px solid var(--line);
+border-radius:.65rem;box-shadow:0 18px 45px #17203316}}h1{{margin:0 0 .6rem;color:#102a43;font-size:clamp(2rem,5vw,3rem);
+letter-spacing:-.03em;line-height:1.1}}p{{max-width:65ch}}.release-current{{color:var(--accent-dark);font-size:1.05rem}}
+.release-list{{margin:1.75rem 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}}.release-list li{{border-bottom:1px solid var(--line)}}
+.release-list a{{display:block;padding:.85rem .25rem;color:var(--accent);font-weight:650;text-decoration-thickness:.08em;text-underline-offset:.14em}}
+.release-list a:hover{{color:#074e6b;background:#f3f8fa}}@media(max-width:640px){{main{{margin:1.5rem 1rem;padding:1.5rem}}}}</style>
 </head><body><main><h1>mathlib-fp documentation</h1>
-<p><strong>Current release: {html.escape(current)}</strong></p>
+<p class="release-current"><strong>Current release: {html.escape(current)}</strong></p>
 <p>Choose a release below. Each version keeps the content generated from that
 release's tagged documentation; publishing a newer release does not replace it.</p>
-<ul>{''.join(items)}</ul></main></body></html>"""
+<ul class="release-list">{''.join(items)}</ul></main></body></html>"""
     site_root.mkdir(parents=True, exist_ok=True)
     (site_root / "index.html").write_text(page, encoding="utf-8")
     (site_root / ".nojekyll").write_text("", encoding="utf-8")
@@ -377,12 +441,32 @@ def main() -> int:
     assets = output / "assets"
     assets.mkdir(exist_ok=True)
     (assets / "site.css").write_text(
-        "body{font:16px/1.55 system-ui;max-width:72rem;margin:auto;padding:1rem}"
-        "header{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;"
-        "border-bottom:1px solid #bbb}"
-        "pre{overflow:auto;background:#f5f5f5;padding:.7rem}"
-        "code{background:#f5f5f5}#results a{display:block}"
-        ".table-source{margin:0;padding:.2rem .7rem}",
+        """:root{color-scheme:light;--ink:#172033;--muted:#536178;--line:#d9e0ea;
+--surface:#fff;--canvas:#f4f7fb;--accent:#126b8d;--accent-dark:#0d4057;
+--code:#f1f5f9}*{box-sizing:border-box}body{margin:0;background:var(--canvas);
+color:var(--ink);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;gap:1rem 1.5rem;align-items:center;flex-wrap:wrap;background:var(--accent-dark);
+padding:.85rem max(1.25rem,calc((100vw - 76rem)/2));color:#e8f4f8;box-shadow:0 1px 0 #082c3c}
+header>a{color:#fff;font-weight:700;text-decoration:none;letter-spacing:.01em}header label{font-size:.9rem;
+font-weight:600}header input{width:min(17rem,50vw);margin-left:.45rem;border:1px solid #9cb4bf;
+border-radius:.25rem;padding:.4rem .55rem;font:inherit}header nav{font-size:.86rem}header nav a{color:#d7f2fb}
+main,#results{max-width:76rem;margin:0 auto}main{min-height:calc(100vh - 4rem);background:var(--surface);
+padding:2.5rem max(1.25rem,calc((100vw - 72rem)/2)) 4rem;box-shadow:0 1px 3px #17203312}
+#results{padding:0 max(1.25rem,calc((100vw - 72rem)/2));background:var(--surface)}#results a{display:block;
+padding:.4rem 0;color:var(--accent)}h1,h2,h3{line-height:1.2;color:#102a43}h1{font-size:clamp(2rem,4vw,2.8rem);
+letter-spacing:-.025em;margin:0 0 1.5rem}h2{font-size:1.55rem;margin:2.5rem 0 1rem;padding-top:.4rem}
+h3{font-size:1.2rem;margin:1.8rem 0 .7rem}a{color:var(--accent);text-decoration-thickness:.08em;
+text-underline-offset:.14em}a:hover{color:#074e6b}p,li{max-width:76ch}ul{padding-left:1.35rem}pre{overflow:auto;
+padding:1rem 1.15rem;background:var(--code);border:1px solid var(--line);border-radius:.35rem;line-height:1.5}
+code{background:var(--code);padding:.1em .28em;border-radius:.2rem;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+pre code{padding:0;background:transparent}.table-wrap{overflow-x:auto;margin:1.25rem 0;border:1px solid var(--line);
+border-radius:.4rem;background:var(--surface)}table{width:100%;min-width:42rem;border-collapse:collapse;font-size:.94rem}
+th,td{padding:.75rem .85rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#e8f1f5;
+color:#163a4b;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase}tbody tr:nth-child(even){background:#f8fafc}
+tbody tr:last-child td{border-bottom:0}.table-wrap:focus-visible{outline:3px solid #64b5d2;outline-offset:2px}
+blockquote{margin:1.25rem 0;padding:.25rem 1rem;border-left:4px solid #74a9be;background:#f3f8fa;color:#354a5f}
+@media(max-width:640px){header{padding:.75rem 1rem}header input{width:13rem}main{padding:1.75rem 1rem 3rem}
+h1{font-size:2rem}table{min-width:34rem}th,td{padding:.6rem .7rem}}""",
         encoding="utf-8",
     )
     (assets / "search.js").write_text(
