@@ -96,6 +96,23 @@ class DocumentationBuildTests(unittest.TestCase):
         self.assertNotIn("table-source", body)
         self.assertIn("Shared numerics", plain)
 
+    def test_wrapped_markdown_list_item_stays_inside_list_item(self) -> None:
+        source = (
+            "- Release notes — stable-family\n"
+            "  numerical evidence and offline validation.\n"
+            "- Qualification report — release gate.\n"
+        )
+
+        body, plain = markdown_to_html(source)
+
+        self.assertIn(
+            "<li>Release notes — stable-family numerical evidence and offline "
+            "validation.</li>",
+            body,
+        )
+        self.assertNotIn("<p>numerical evidence", body)
+        self.assertIn("Release notes — stable-family numerical evidence", plain)
+
 
 if __name__ == "__main__":
     unittest.main()

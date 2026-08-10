@@ -52,6 +52,7 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
     output: list[str] = []
     plain: list[str] = []
     paragraph: list[str] = []
+    list_item: list[str] = []
     in_code = False
     in_list = False
 
@@ -62,9 +63,17 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
             plain.append(text)
             paragraph.clear()
 
+    def flush_list_item() -> None:
+        if list_item:
+            text = " ".join(list_item)
+            output.append(f"<li>{inline(text, link_resolver)}</li>")
+            plain.append(text)
+            list_item.clear()
+
     def close_list() -> None:
         nonlocal in_list
         if in_list:
+            flush_list_item()
             output.append("</ul>")
             in_list = False
 
@@ -119,9 +128,12 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
             if not in_list:
                 output.append("<ul>")
                 in_list = True
+            else:
+                flush_list_item()
             item = re.sub(r"^[-*]\s+", "", line)
-            output.append(f"<li>{inline(item, link_resolver)}</li>")
-            plain.append(item)
+            list_item.append(item)
+        elif in_list and re.match(r"^\s{2,}\S", line):
+            list_item.append(line.strip())
         elif not line.strip():
             flush_paragraph()
             close_list()
@@ -168,6 +180,7 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
             output.append(f'<pre class="table-source">{html.escape(line)}</pre>')
             plain.append(line)
         else:
+            close_list()
             paragraph.append(line.strip())
         line_index += 1
     flush_paragraph()
