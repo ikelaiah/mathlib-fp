@@ -11,8 +11,11 @@ import zipfile
 from pathlib import Path
 
 from build_docs import (
+    heading_outline,
     load_versions,
     markdown_to_html,
+    outline_navigation,
+    render_document_page,
     write_offline_archive,
     write_site_index,
 )
@@ -112,6 +115,69 @@ class DocumentationBuildTests(unittest.TestCase):
         )
         self.assertNotIn("<p>numerical evidence", body)
         self.assertIn("Release notes — stable-family numerical evidence", plain)
+
+    def test_heading_outline_ignores_title_and_code_fences(self) -> None:
+        source = (
+            "# Guide\n\n"
+            "## Start here\n\n"
+            "### Choose an API\n\n"
+            "```text\n"
+            "## Not a section\n"
+            "```\n"
+        )
+
+        self.assertEqual(
+            heading_outline(source),
+            [
+                (2, "Start here", "start-here"),
+                (3, "Choose an API", "choose-an-api"),
+            ],
+        )
+
+    def test_outline_navigation_is_accessible_and_links_sections(self) -> None:
+        navigation = outline_navigation(
+            "# Guide\n\n## Start here\n\n### Choose an API\n"
+        )
+
+        self.assertIn('aria-label="On this page"', navigation)
+        self.assertIn('href="#start-here"', navigation)
+        self.assertIn('class="toc-level-3"', navigation)
+
+    def test_document_page_has_accessible_responsive_shell(self) -> None:
+        page = render_document_page(
+            title="Guide",
+            release="1.9.4",
+            root_prefix="",
+            navigation='<nav aria-label="Documentation versions">Versions</nav>',
+            outline='<nav class="toc" aria-label="On this page">Outline</nav>',
+            body='<h1 id="guide">Guide</h1>',
+        )
+
+        self.assertIn('class="skip-link" href="#content"', page)
+        self.assertIn('<aside class="doc-sidebar">', page)
+        self.assertIn('<main id="content"', page)
+        self.assertIn('id="search" type="search"', page)
+        self.assertIn('id="theme-toggle" type="button"', page)
+        self.assertIn(
+            'role="region" aria-label="Search results" aria-live="polite"',
+            page,
+        )
+        self.assertIn('<details class="mobile-toc">', page)
+        self.assertIn('src="search-index.js"', page)
+        self.assertIn('src="assets/search.js"', page)
+
+    def test_release_lists_receive_release_card_class(self) -> None:
+        source = (
+            "## Releases\n\n"
+            "- Version 1.9.4\n\n"
+            "## Design principles\n\n"
+            "- Keep APIs focused\n"
+        )
+
+        body, _ = markdown_to_html(source)
+
+        self.assertEqual(1, body.count('<ul class="release-list">'))
+        self.assertIn("<ul>\n<li>Keep APIs focused</li>", body)
 
 
 if __name__ == "__main__":

@@ -17,12 +17,96 @@ from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_VERSIONS = ROOT / "docs" / "versions.json"
+DOC_ASSETS = Path(__file__).resolve().parent / "docs_assets"
 OUTPUT_MARKER = ".mathlib-docs-output"
 
 
 def slug(text: str) -> str:
     value = re.sub(r"[^\w\s-]", "", text.lower(), flags=re.UNICODE)
     return re.sub(r"\s+", "-", value).strip("-")
+
+
+def heading_outline(source: str) -> list[tuple[int, str, str]]:
+    headings: list[tuple[int, str, str]] = []
+    in_code = False
+    for line in source.splitlines():
+        if line.startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code:
+            continue
+        heading = re.match(r"^(#{2,3})\s+(.+)$", line)
+        if not heading:
+            continue
+        title = heading.group(2).strip()
+        label = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", title)
+        label = re.sub(r"[`*_]", "", label)
+        headings.append((len(heading.group(1)), label, slug(title)))
+    return headings
+
+
+def outline_navigation(source: str) -> str:
+    headings = heading_outline(source)
+    if not headings:
+        return ""
+    items = "".join(
+        f'<li class="toc-level-{level}"><a href="#{html.escape(anchor, quote=True)}">'
+        f"{html.escape(label)}</a></li>"
+        for level, label, anchor in headings
+    )
+    return (
+        '<nav class="toc" aria-label="On this page">'
+        '<p class="toc-title">On this page</p>'
+        f"<ol>{items}</ol></nav>"
+    )
+
+
+def render_document_page(
+    *,
+    title: str,
+    release: str,
+    root_prefix: str,
+    navigation: str,
+    outline: str,
+    body: str,
+) -> str:
+    safe_title = html.escape(title)
+    safe_release = html.escape(release)
+    safe_release_attr = html.escape(release, quote=True)
+    safe_root = html.escape(root_prefix, quote=True)
+    mobile_outline = (
+        f'<details class="mobile-toc"><summary>On this page</summary>{outline}</details>'
+        if outline
+        else ""
+    )
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="mathlib-release" content="{safe_release_attr}">
+<title>{safe_title} — mathlib-fp {safe_release}</title>
+<link rel="stylesheet" href="{safe_root}assets/site.css"></head>
+<body data-doc-root="{safe_root}">
+<a class="skip-link" href="#content">Skip to content</a>
+<header class="site-header"><div class="topbar">
+<a class="brand" href="{safe_root}index.html"><span class="brand-mark" aria-hidden="true">∫</span>
+<span class="brand-name">mathlib-fp</span><span class="brand-version">{safe_release}</span></a>
+<div class="search-box"><label for="search">Search documentation</label>
+<input id="search" type="search" placeholder="Search documentation" autocomplete="off"
+aria-controls="results" aria-expanded="false"><kbd aria-hidden="true">/</kbd></div>
+<div class="header-actions">{navigation}
+<button id="theme-toggle" type="button" aria-label="Switch color theme"
+title="Switch color theme"><span aria-hidden="true">◐</span><span>Theme</span></button></div>
+</div><div id="results" class="search-results" role="region" aria-label="Search results" aria-live="polite"
+hidden></div>
+</header>
+<div class="doc-layout"><aside class="doc-sidebar"><div class="sidebar-sticky">
+<a class="sidebar-home" href="{safe_root}index.html">Documentation home</a>{outline}
+</div></aside><main id="content" class="doc-content" tabindex="-1">
+{mobile_outline}<div class="doc-prose">{body}</div>
+</main></div>
+<script src="{safe_root}search-index.js"></script>
+<script src="{safe_root}assets/search.js"></script></body></html>"""
 
 
 def inline(text: str, link_resolver=None) -> str:
@@ -55,6 +139,7 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
     list_item: list[str] = []
     in_code = False
     in_list = False
+    current_section = ""
 
     def flush_paragraph() -> None:
         if paragraph:
@@ -118,6 +203,8 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
             close_list()
             level = len(heading.group(1))
             title = heading.group(2)
+            if level == 2:
+                current_section = slug(title)
             output.append(
                 f'<h{level} id="{slug(title)}">'
                 f"{inline(title, link_resolver)}</h{level}>"
@@ -126,7 +213,12 @@ def markdown_to_html(source: str, link_resolver=None) -> tuple[str, str]:
         elif re.match(r"^[-*]\s+", line):
             flush_paragraph()
             if not in_list:
-                output.append("<ul>")
+                list_class = (
+                    ' class="release-list"'
+                    if current_section == "releases"
+                    else ""
+                )
+                output.append(f"<ul{list_class}>")
                 in_list = True
             else:
                 flush_list_item()
@@ -431,17 +523,14 @@ def main() -> int:
         navigation = version_navigation(
             versions, release, target.parent, site_root
         )
-        page = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="mathlib-release" content="{html.escape(release, quote=True)}">
-<title>{html.escape(title)} — mathlib-fp {html.escape(release)}</title>
-<link rel="stylesheet" href="{root_prefix}assets/site.css"></head>
-<body data-doc-root="{html.escape(root_prefix, quote=True)}"><header>
-<a href="{root_prefix}index.html">mathlib-fp {html.escape(release)}</a>
-<label>Search <input id="search" type="search"></label>{navigation}</header>
-<div id="results"></div><main>{body}</main>
-<script src="{root_prefix}assets/search.js"></script></body></html>"""
+        page = render_document_page(
+            title=title,
+            release=release,
+            root_prefix=root_prefix,
+            navigation=navigation,
+            outline=outline_navigation(markdown),
+            body=body,
+        )
         target.write_text(page, encoding="utf-8")
         entries.append(
             {
@@ -454,46 +543,19 @@ def main() -> int:
     assets = output / "assets"
     assets.mkdir(exist_ok=True)
     (assets / "site.css").write_text(
-        """:root{color-scheme:light;--ink:#172033;--muted:#536178;--line:#d9e0ea;
---surface:#fff;--canvas:#f4f7fb;--accent:#126b8d;--accent-dark:#0d4057;
---code:#f1f5f9}*{box-sizing:border-box}body{margin:0;background:var(--canvas);
-color:var(--ink);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-header{display:flex;gap:1rem 1.5rem;align-items:center;flex-wrap:wrap;background:var(--accent-dark);
-padding:.85rem max(1.25rem,calc((100vw - 76rem)/2));color:#e8f4f8;box-shadow:0 1px 0 #082c3c}
-header>a{color:#fff;font-weight:700;text-decoration:none;letter-spacing:.01em}header label{font-size:.9rem;
-font-weight:600}header input{width:min(17rem,50vw);margin-left:.45rem;border:1px solid #9cb4bf;
-border-radius:.25rem;padding:.4rem .55rem;font:inherit}header nav{font-size:.86rem}header nav a{color:#d7f2fb}
-main,#results{max-width:76rem;margin:0 auto}main{min-height:calc(100vh - 4rem);background:var(--surface);
-padding:2.5rem max(1.25rem,calc((100vw - 72rem)/2)) 4rem;box-shadow:0 1px 3px #17203312}
-#results{padding:0 max(1.25rem,calc((100vw - 72rem)/2));background:var(--surface)}#results a{display:block;
-padding:.4rem 0;color:var(--accent)}h1,h2,h3{line-height:1.2;color:#102a43}h1{font-size:clamp(2rem,4vw,2.8rem);
-letter-spacing:-.025em;margin:0 0 1.5rem}h2{font-size:1.55rem;margin:2.5rem 0 1rem;padding-top:.4rem}
-h3{font-size:1.2rem;margin:1.8rem 0 .7rem}a{color:var(--accent);text-decoration-thickness:.08em;
-text-underline-offset:.14em}a:hover{color:#074e6b}p,li{max-width:76ch}ul{padding-left:1.35rem}pre{overflow:auto;
-padding:1rem 1.15rem;background:var(--code);border:1px solid var(--line);border-radius:.35rem;line-height:1.5}
-code{background:var(--code);padding:.1em .28em;border-radius:.2rem;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-pre code{padding:0;background:transparent}.table-wrap{overflow-x:auto;margin:1.25rem 0;border:1px solid var(--line);
-border-radius:.4rem;background:var(--surface)}table{width:100%;min-width:42rem;border-collapse:collapse;font-size:.94rem}
-th,td{padding:.75rem .85rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#e8f1f5;
-color:#163a4b;font-size:.82rem;letter-spacing:.02em;text-transform:uppercase}tbody tr:nth-child(even){background:#f8fafc}
-tbody tr:last-child td{border-bottom:0}.table-wrap:focus-visible{outline:3px solid #64b5d2;outline-offset:2px}
-blockquote{margin:1.25rem 0;padding:.25rem 1rem;border-left:4px solid #74a9be;background:#f3f8fa;color:#354a5f}
-@media(max-width:640px){header{padding:.75rem 1rem}header input{width:13rem}main{padding:1.75rem 1rem 3rem}
-h1{font-size:2rem}table{min-width:34rem}th,td{padding:.6rem .7rem}}""",
+        (DOC_ASSETS / "site.css").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
     (assets / "search.js").write_text(
-        """const root=document.body.dataset.docRoot||'';
-fetch(root+'search-index.json').then(r=>r.json()).then(items=>{
-const q=document.querySelector('#search');const out=document.querySelector('#results');
-q.addEventListener('input',()=>{const s=q.value.toLowerCase().trim();
-out.innerHTML=s?items.filter(x=>(x.title+' '+x.text).toLowerCase().includes(s))
-.slice(0,20).map(x=>'<a href="'+root+x.url+'">'+x.title+'</a>').join(''):'';});});
-""",
+        (DOC_ASSETS / "search.js").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
+    search_index = json.dumps(entries, ensure_ascii=False)
     (output / "search-index.json").write_text(
-        json.dumps(entries, ensure_ascii=False), encoding="utf-8"
+        search_index, encoding="utf-8"
+    )
+    (output / "search-index.js").write_text(
+        f"globalThis.mathlibSearchIndex={search_index};\n", encoding="utf-8"
     )
     source_ref = str(release_entry(versions, release)["source_ref"])
     (output / "release.json").write_text(
