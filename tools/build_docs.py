@@ -97,7 +97,8 @@ aria-controls="results" aria-expanded="false"><kbd aria-hidden="true">/</kbd></d
 <div class="header-actions">{navigation}
 <button id="theme-toggle" type="button" aria-label="Switch color theme"
 title="Switch color theme"><span aria-hidden="true">◐</span><span>Theme</span></button></div>
-</div><div id="results" class="search-results" role="status" aria-live="polite" hidden></div>
+</div><div id="results" class="search-results" role="region" aria-label="Search results" aria-live="polite"
+hidden></div>
 </header>
 <div class="doc-layout"><aside class="doc-sidebar"><div class="sidebar-sticky">
 <a class="sidebar-home" href="{safe_root}index.html">Documentation home</a>{outline}

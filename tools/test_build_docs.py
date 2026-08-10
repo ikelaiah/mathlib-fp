@@ -158,7 +158,10 @@ class DocumentationBuildTests(unittest.TestCase):
         self.assertIn('<main id="content"', page)
         self.assertIn('id="search" type="search"', page)
         self.assertIn('id="theme-toggle" type="button"', page)
-        self.assertIn('aria-live="polite"', page)
+        self.assertIn(
+            'role="region" aria-label="Search results" aria-live="polite"',
+            page,
+        )
         self.assertIn('<details class="mobile-toc">', page)
         self.assertIn('src="search-index.js"', page)
         self.assertIn('src="assets/search.js"', page)
