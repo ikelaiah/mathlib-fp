@@ -52,6 +52,7 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
             "risk": risk,
             "input_domain": "finite double inputs in the documented range",
             "budget": {
+                "kind": "absolute_error",
                 "metric": "absolute error",
                 "limit": 2.0e-13,
                 "unit": "output units",
@@ -153,6 +154,21 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
         self.assertIn(
             "scalar.tests[0].assertions[0]: text is absent from tests/TestEvidence.pas",
             errors,
+        )
+
+    def test_exact_budget_requires_and_accepts_a_zero_limit(self) -> None:
+        self.write_inventory([{"family": "state", "maturity": "stable"}])
+        record = self.evidence("state")
+        record["budget"] = {
+            "kind": "exact",
+            "metric": "exact state replay",
+            "limit": 0,
+            "unit": "identical state words",
+        }
+        self.write_catalogue([record])
+
+        self.assertEqual(
+            [], validate_catalogue(self.root, self.catalogue_path, self.inventory_path)
         )
 
     def test_complete_catalogue_is_accepted(self) -> None:

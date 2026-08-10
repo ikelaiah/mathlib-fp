@@ -20,6 +20,15 @@ REFERENCE_FIELDS = (
     "regeneration",
 )
 FAULT_INJECTION_FIELDS = ("source", "needle", "replacement", "test")
+BUDGET_KINDS = {
+    "absolute_error",
+    "relative_error",
+    "residual",
+    "backward_error",
+    "reconstruction_error",
+    "feasibility",
+    "exact",
+}
 
 
 def load_object(path: Path, errors: list[str]) -> dict[str, Any]:
@@ -66,9 +75,18 @@ def validate_budget(record: dict[str, Any], prefix: str, errors: list[str]) -> N
         return
     for field in ("metric", "unit"):
         require_string(budget, field, f"{prefix}.budget", errors)
+    kind = budget.get("kind")
+    if kind not in BUDGET_KINDS:
+        errors.append(
+            f"{prefix}.budget.kind: expected one of {sorted(BUDGET_KINDS)}"
+        )
     limit = budget.get("limit")
-    if isinstance(limit, bool) or not isinstance(limit, (int, float)) or limit <= 0:
-        errors.append(f"{prefix}.budget.limit: expected a positive number")
+    if isinstance(limit, bool) or not isinstance(limit, (int, float)) or limit < 0:
+        errors.append(f"{prefix}.budget.limit: expected a non-negative number")
+    elif kind == "exact" and limit != 0:
+        errors.append(f"{prefix}.budget.limit: exact checks require a zero limit")
+    elif kind != "exact" and limit == 0:
+        errors.append(f"{prefix}.budget.limit: non-exact checks require a positive limit")
 
 
 def validate_reference(record: dict[str, Any], prefix: str, errors: list[str]) -> None:
