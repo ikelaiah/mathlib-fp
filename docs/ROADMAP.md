@@ -1345,7 +1345,7 @@ exhaustive; a smaller curated map tells ordinary users what to choose.
 - Any newly required public capability is routed to a separately planned
   1.10.0 minor release and is not added opportunistically to 1.9.x.
 
-## Previous release: 1.9.4 — Numerical trust closure
+## Historical release: 1.9.4 — Numerical trust closure
 
 Released on 2026-08-10, version 1.9.4 closed validation gaps across the
 existing stable capability inventory and made the evidence understandable
@@ -1380,10 +1380,10 @@ outside the test source.
 - The release suite remains independent of proprietary software, external
   numerical DLLs, and network access.
 
-## Next release: 1.9.5 — Predictable performance
+## Previous release: 1.9.5 — Predictable performance
 
-Version 1.9.5 makes performance and allocation behaviour inspectable without
-turning portable Pascal into a secondary implementation.
+Released on 2026-08-11, version 1.9.5 made performance and allocation behaviour
+inspectable without turning portable Pascal into a secondary implementation.
 
 ### 1.9.5 scope
 
@@ -1415,7 +1415,13 @@ turning portable Pascal into a secondary implementation.
 - The portable implementation remains complete, readable, and tested even when
   an optional faster path is later introduced.
 
-## Planned 1.9.6 — Portability and distribution
+The release publishes 14 checked rows across all required domains, uses exact
+allocation/retained-state/complexity/checksum gates, and records wall-clock
+movements as advisory comparisons. Profiling also identified and removed a
+material applied radix-2 FFT regression while retaining tested portable code.
+See [the v1.9.5 evidence report](PERFORMANCE_EVIDENCE_1.9.5.md).
+
+## Next release: 1.9.6 — Portability and distribution
 
 Version 1.9.6 proves that installation and support claims survive outside a
 maintainer checkout and remain honest about targets without continuous

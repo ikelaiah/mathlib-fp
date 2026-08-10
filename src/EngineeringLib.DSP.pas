@@ -302,7 +302,8 @@ end;
 procedure Radix2Unscaled(var Values: TComplexArray; const Inverse: Boolean);
 var
   N, I, J, Bit, TransformLength, HalfLength, BlockStart: SizeInt;
-  Direction, Angle, Cosine, Sine, ProductRe, ProductIm: Double;
+  Direction, StepAngle, StepRe, StepIm, TwiddleRe, TwiddleIm,
+    NextTwiddleRe, ProductRe, ProductIm: Double;
   Temporary, EvenValue, OddValue: TComplex;
 begin
   N := Length(Values);
@@ -311,6 +312,19 @@ begin
   if (N and (N - 1)) <> 0 then
     raise EDSPError.Create(
       'Radix2Unscaled: transform length must be a power of two.');
+
+  { Reuse the established in-place portable kernel while its Integer indexing
+    can represent the complete array. The SizeInt recurrence below preserves
+    the applied-DSP contract for larger address spaces. The legacy inverse
+    kernel applies 1/N, so undo that normalization here: this helper's contract
+    is deliberately unscaled in both directions. }
+  if N <= High(Integer) then
+  begin
+    TSignalKit.FFT(Values, Inverse);
+    if Inverse then
+      ScaleComplex(Values, N);
+    Exit;
+  end;
 
   J := 0;
   for I := 1 to N - 1 do
@@ -335,22 +349,27 @@ begin
   while TransformLength <= N do
   begin
     HalfLength := TransformLength shr 1;
+    StepAngle := Direction * 2.0 * DSP_PI / TransformLength;
+    StepRe := Cos(StepAngle);
+    StepIm := Sin(StepAngle);
     BlockStart := 0;
     while BlockStart < N do
     begin
+      TwiddleRe := 1.0;
+      TwiddleIm := 0.0;
       for J := 0 to HalfLength - 1 do
       begin
-        Angle := Direction * 2.0 * DSP_PI * J / TransformLength;
-        Cosine := Cos(Angle);
-        Sine := Sin(Angle);
         EvenValue := Values[BlockStart + J];
         OddValue := Values[BlockStart + J + HalfLength];
-        ProductRe := Cosine * OddValue.Re - Sine * OddValue.Im;
-        ProductIm := Cosine * OddValue.Im + Sine * OddValue.Re;
+        ProductRe := TwiddleRe * OddValue.Re - TwiddleIm * OddValue.Im;
+        ProductIm := TwiddleRe * OddValue.Im + TwiddleIm * OddValue.Re;
         Values[BlockStart + J] := TComplex.Create(
           EvenValue.Re + ProductRe, EvenValue.Im + ProductIm);
         Values[BlockStart + J + HalfLength] := TComplex.Create(
           EvenValue.Re - ProductRe, EvenValue.Im - ProductIm);
+        NextTwiddleRe := TwiddleRe * StepRe - TwiddleIm * StepIm;
+        TwiddleIm := TwiddleRe * StepIm + TwiddleIm * StepRe;
+        TwiddleRe := NextTwiddleRe;
       end;
       Inc(BlockStart, TransformLength);
     end;

@@ -1,7 +1,24 @@
 # Portable performance and benchmark policy
 
-Version 1.8 keeps native Pascal scalar code as the correctness baseline while
-adding a reviewable cache-blocked dense multiplication path.
+Version 1.9.5 keeps native Pascal code as the correctness baseline and makes
+representative timing, allocation, retained state, and logical complexity
+reviewable through a checked benchmark contract.
+
+## Checked v1.9.5 evidence
+
+The canonical runner emits 14 `PERF|key=value` rows across dense, sparse,
+matrix-free iterative, DSP, numerical-modelling, statistics, and data-analysis
+workflows. Small setup-sensitive rows and larger throughput/scale rows state
+their scalar kind, dimensions, cold and warmed timing semantics, setup,
+tolerance, allocation metric, retained bytes, working elements, dense-shape
+elements, and deterministic checksum.
+
+`docs/performance-evidence-1.9.5.json` is the release contract. Missing rows,
+checksum drift, and exact allocation/storage/complexity ceilings fail.
+Same-run and matching-host prior timing ratios are advisory: a movement beyond
+its band requests review rather than pretending shared-runner wall time is
+mathematically exact. The human claim map and limitations are in
+[`PERFORMANCE_EVIDENCE_1.9.5.md`](PERFORMANCE_EVIDENCE_1.9.5.md).
 
 ## Matrix multiplication paths
 
@@ -23,7 +40,12 @@ also check deterministic repeat results and unchanged destinations after
 validation failure.
 
 The blocked implementation is serial. No parallel or SIMD path is stable in
-1.8, so every supported target retains the complete portable implementation.
+1.9.5, so every supported target retains the complete portable implementation.
+
+Applied power-of-two DSP transforms reuse the tested native radix-2 FFT kernel
+for supported array sizes. The explicit portable twiddle-recurrence fallback
+remains available for larger `SizeInt` ranges, and public reference/round-trip
+tests cover the dispatch without changing the API.
 
 ## Reproducing benchmarks
 
@@ -38,19 +60,19 @@ The [benchmark runner](../benchmarks/BenchmarkRunner.lpr) reports:
 - the retained 1.7 scalar, geometry, vector, dense solve, SVD, and eigen
   baselines.
 
-Compile with:
+Run the checked contract with:
 
-```sh
-fpc -B -O3 -FcUTF8 -Fusrc -FEbuild-temp/benchmarks \
-  -FUbuild-temp/benchmarks benchmarks/BenchmarkRunner.lpr
-./build-temp/benchmarks/BenchmarkRunner
+```text
+python tools/test_performance_evidence.py
+python tools/check_performance_evidence.py --compiler fpc \
+  --work-dir build-temp/performance
 ```
 
-Compare timing only on the same CPU, compiler, flags, power policy, and
-background-load conditions. Release qualification publishes those settings,
-checksums, working-storage rules, and deltas from the previous stable release.
-A material regression needs an explanation; CI compiles benchmarks but does
-not use noisy wall-clock thresholds as a correctness test.
+Compare timing only on the same CPU, OS, compiler, flags, power policy,
+background load, scalar kind, shape, tolerance, setup, and result-validation
+conditions. Release qualification retains those settings, exact-gate outcomes,
+same-run comparisons, and matching-host deltas from the previous stable
+release in `performance-results.json`.
 
 ## Allocation and scale guidance
 

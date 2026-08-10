@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Source ref for a 1.9.4 documentation rebuild
+        description: Source ref for a 1.9.5 documentation rebuild
         required: true
         default: main
   release:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.4'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.5'
     runs-on: ubuntu-latest
     steps:
       - name: Check out current documentation source
@@ -54,6 +54,12 @@ jobs:
           ref: V1.9.3
           path: historical-1.9.3
 
+      - name: Check out immutable 1.9.4 documentation source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v1.9.4
+          path: historical-1.9.4
+
       - name: Build preserved and current versioned sites
         run: |
           python3 current/tools/build_docs.py \
@@ -73,16 +79,22 @@ jobs:
             --versions current/docs/versions.json \
             --release 1.9.3 --output site/1.9.3 --site-root site
           python3 current/tools/build_docs.py \
+            --source historical-1.9.4/docs \
+            --versions current/docs/versions.json \
+            --release 1.9.4 --output site/1.9.4 --site-root site
+          python3 current/tools/build_docs.py \
             --source current/docs \
             --versions current/docs/versions.json \
-            --release 1.9.4 --output site/1.9.4 --site-root site \
-            --offline-archive artifacts/mathlib-fp-docs-1.9.4.zip
+            --release 1.9.5 --output site/1.9.5 --site-root site \
+            --offline-archive artifacts/mathlib-fp-docs-1.9.5.zip
+          python3 -c 'import json; assert json.load(open("site/1.9.5/release.json"))["release"] == "1.9.5"'
           python3 -c 'import json; assert json.load(open("site/1.9.4/release.json"))["release"] == "1.9.4"'
           python3 -c 'import json; assert json.load(open("site/1.9.3/release.json"))["release"] == "1.9.3"'
           python3 -c 'import json; assert json.load(open("site/1.9.2/release.json"))["release"] == "1.9.2"'
           python3 -c 'import json; assert json.load(open("site/1.9.1/release.json"))["release"] == "1.9.1"'
           python3 -c 'import json; assert json.load(open("site/1.9.0/release.json"))["release"] == "1.9.0"'
-          grep -q 'Current release: 1.9.4' site/index.html
+          grep -q 'Current release: 1.9.5' site/index.html
+          grep -q '1.9.4/index.html' site/index.html
           grep -q '1.9.3/index.html' site/index.html
           grep -q '1.9.2/index.html' site/index.html
           grep -q '1.9.1/index.html' site/index.html
@@ -100,11 +112,11 @@ jobs:
       - name: Publish offline documentation artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: mathlib-fp-docs-1.9.4
+          name: mathlib-fp-docs-1.9.5
           if-no-files-found: error
           path: |
-            artifacts/mathlib-fp-docs-1.9.4.zip
-            artifacts/mathlib-fp-docs-1.9.4.zip.sha256
+            artifacts/mathlib-fp-docs-1.9.5.zip
+            artifacts/mathlib-fp-docs-1.9.5.zip.sha256
 
       - name: Attach offline documentation to release
         if: github.event_name == 'release'
@@ -112,12 +124,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            artifacts/mathlib-fp-docs-1.9.4.zip \
-            artifacts/mathlib-fp-docs-1.9.4.zip.sha256 --clobber \
+            artifacts/mathlib-fp-docs-1.9.5.zip \
+            artifacts/mathlib-fp-docs-1.9.5.zip.sha256 --clobber \
             --repo "$GITHUB_REPOSITORY"
 
   deploy:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.4'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.5'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

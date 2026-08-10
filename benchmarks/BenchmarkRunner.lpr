@@ -22,7 +22,8 @@ uses
   AlgebraLib.VectorKernels,
   EngineeringLib.Signal,
   EngineeringLib.DSP,
-  MLLib.Analysis;
+  MLLib.Analysis,
+  PerformanceBenchmarks;
 
 type
   THeapMonitor = class(TInterfacedObject, IIterationMonitor)
@@ -593,6 +594,11 @@ begin
       RepeatedRetainedHeap, '; repeated_heap_limit_bytes=',
       MaximumRepeatedHeapIncrease,
       '; dense_shape_elements_allocated=0');
+    WritePerformanceRow('sparse-cg-large', 'sparse', 'large', 'double',
+      '100000x100000_nnz100000', InitialSolveMilliseconds,
+      RepeatedSolveMilliseconds, RepeatedSolves, 0, RepeatedRetainedHeap,
+      RetainedSlots, 0, Diagnostics.FinalResidualNorm, 1.0E-10,
+      'prepared_csr_preconditioner_workspace');
     if (Diagnostics.Status <> isConverged) or
        (Diagnostics.FinalResidualNorm > 1.0e-10) or
        (RepeatedPeakHeap > MaximumRepeatedHeapIncrease) or
@@ -683,6 +689,11 @@ begin
       RepeatedRetainedHeap, '; repeated_heap_limit_bytes=',
       MaximumRepeatedHeapIncrease,
       '; dense_shape_elements_allocated=0');
+    WritePerformanceRow('iterative-cg-large', 'iterative', 'large', 'double',
+      '200000x200000_matrix_free', InitialSolveMilliseconds,
+      RepeatedSolveMilliseconds, RepeatedSolves, 0, RepeatedRetainedHeap,
+      RetainedSlots, 0, Diagnostics.FinalResidualNorm, 1.0E-10,
+      'prepared_matrix_free_workspace');
     if (Diagnostics.Status <> isConverged) or
        (Diagnostics.FinalResidualNorm > 1.0e-10) or
        (RepeatedPeakHeap > MaximumRepeatedHeapIncrease) or
@@ -693,6 +704,7 @@ begin
 end;
 
 begin
+  DefaultFormatSettings.DecimalSeparator := '.';
   Writeln('mathlib-fp representative microbenchmarks');
   BenchmarkSort;
   BenchmarkConvexHull;
@@ -708,4 +720,5 @@ begin
   BenchmarkTypedAnalysis;
   BenchmarkLargeSparseSolve;
   BenchmarkLargeMatrixFreeSolve;
+  RunV195PerformanceBenchmarks;
 end.

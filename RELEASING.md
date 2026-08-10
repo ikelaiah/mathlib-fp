@@ -15,8 +15,9 @@ Use this checklist for every mathlib-fp release.
 - [ ] Confirm CI compiles and runs every example and builds the Lazarus package.
 - [ ] Run normal, optimized, runtime-checked, and heap-traced test builds; verify
   the heap-traced run reports zero unfreed blocks.
-- [ ] Compile and run `benchmarks/BenchmarkRunner.lpr` with `-O3`; record results
-  for comparison without treating machine-specific timings as pass thresholds.
+- [ ] Run `tools/check_performance_evidence.py`; require every exact
+  correctness/allocation/storage gate and review same-run and matching-host
+  timing movements without treating machine-specific timings as hard limits.
 - [ ] Confirm the Lazarus package and complete test suite compile and pass for
   both Win64 and Win32.
 - [ ] Install `packages/lazarus/mathlib_fp.lpk` in a clean Lazarus profile and
@@ -35,6 +36,10 @@ Use this checklist for every mathlib-fp release.
   program with `python tools/check_doc_examples.py --compiler fpc`. Confirm no
   `src/` interface diff and review the exact source/behavior/warning/packaging
   consequences before the checksummed clean-archive qualification.
+- [ ] For 1.9.5, run `python tools/test_performance_evidence.py` and
+  `python tools/check_performance_evidence.py --compiler fpc`; confirm every
+  published claim maps to a checked row, investigate every `review` comparison,
+  and retain the generated `performance-results.json` with qualification.
 - [ ] Build the deterministic offline documentation ZIP, verify its SHA-256,
   extract it without network access, and compare its `release.json`, examples,
   signatures, and limitations with repository Markdown.
@@ -88,10 +93,9 @@ python tools/build_docs.py --release X.Y.Z \
 python tools/check_built_docs.py \
   --site build-temp/docs-site/X.Y.Z --release X.Y.Z
 
-mkdir -p benchmarks/lib/release
-fpc -B -O3 -FcUTF8 -Fusrc -FUbenchmarks/lib/release \
-  -FEbenchmarks/lib/release benchmarks/BenchmarkRunner.lpr
-./benchmarks/lib/release/BenchmarkRunner
+python tools/test_performance_evidence.py
+python tools/check_performance_evidence.py --compiler fpc \
+  --work-dir build-temp/performance
 
 lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 ```

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the offline numerical-evidence catalogue for release 1.9.4."""
+"""Validate the retained offline numerical-evidence catalogue for release 1.9.4."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 RELEASE = "1.9.4"
+INVENTORY_RELEASE = "1.9.4"
 REFERENCE_FIELDS = (
     "method",
     "source",
@@ -206,10 +207,10 @@ def validate_catalogue(
     inventory_release = inventory.get("release")
     if not isinstance(inventory_release, str) or not inventory_release:
         errors.append("inventory.release: expected a non-empty string")
-    elif catalogue.get("inventory_release") != inventory_release:
+    if catalogue.get("inventory_release") != INVENTORY_RELEASE:
         errors.append(
             "catalogue.inventory_release: expected the inventory release "
-            f"{inventory_release}"
+            f"{INVENTORY_RELEASE}"
         )
 
     capabilities = inventory.get("capabilities")

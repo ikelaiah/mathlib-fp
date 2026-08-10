@@ -1,88 +1,95 @@
-# Implementation plan: 1.9.4 numerical trust closure
+# Implementation plan: 1.9.5 predictable performance
 
 ## Overview
 
-Completed: the existing capability inventory and broad FPCUnit coverage now
-form an
-offline, release-gated evidence system. Build the evidence contract first;
-then audit capability groups in small, testable slices; finally update release
-metadata and run the full qualification.
+Build a release-owned performance evidence contract around the existing
+portable benchmark runner. The contract records reproducible conditions,
+uniform cold/warmed measurements, allocation and retained-state ceilings,
+same-run comparisons, and prior-release advisory baselines. Qualification will
+fail on missing rows, invalid results, or exact complexity/allocation
+regressions; noisy wall-clock changes will be reported for review.
 
 ## Architecture decisions
 
-- `docs/capabilities.json` remains the single list of stable capabilities;
-  `docs/numerical-evidence-1.9.4.json` adds release-specific evidence rather
-  than duplicating the inventory or encoding free-form claims in Python.
-- The checker is schema- and cross-reference-driven: it validates every stable
-  capability, documentation/test paths, numerical budgets, provenance, and
-  selected fault-injection cases without parsing numerical results from prose.
-- Mutations are applied only to a temporary source copy and must cause the
-  linked FPCUnit suite to fail; no production source has a test-only fault
-  switch.
-- Any discovered functional defect follows test-first repair in a separate
-  focused increment. No public API expansion is part of this plan.
+- Keep numerical workloads in the dependency-free Pascal benchmark runner and
+  use Python standard-library tooling only to compile, execute, validate, and
+  publish its machine-readable rows.
+- Store benchmark contracts in `docs/performance-evidence-1.9.5.json`; generated
+  host results remain qualification artifacts rather than source-controlled
+  claims that accidentally describe every machine.
+- Use exact logical allocation, retained-state, and dense-shape tripwires as
+  hard gates. Treat elapsed-time comparisons as advisory unless they are
+  same-run algorithm comparisons with a deliberately conservative bound.
+- Preserve the frozen 1.9 public API. Change internal numerical code only after
+  repeated profiling demonstrates a material benefit and existing cross-path
+  correctness tests remain green.
 
 ## Dependency graph
 
 ```text
-capabilities.json ──> evidence schema/checker ──> qualification + CI
-                                  │
-                                  ├── core/dense/sparse audit tests
-                                  ├── modelling/optimisation audit tests
-                                  └── applied/statistics/ML/time-series audit tests
-                                               │
-                                               v
-                                   evidence documentation and 1.9.4 metadata
+benchmark workload contract ──> parser/validator tests ──> Pascal row output
+           │                              │                         │
+           └──────────────> qualification runner <──────────────────┘
+                                          │
+                                          v
+                         performance guide, release notes, qualification
 ```
 
 ## Task list
 
-1. Establish the evidence catalogue contract and its failing validation tests.
-2. Audit core scalar, dense, and sparse/iterative families; add targeted
-   oracle/property/edge tests and catalogue records.
-3. Audit modelling and optimisation families; add budgeted reference and
-   adversarial tests and catalogue records.
-4. Audit applied DSP, statistics, ML, time-series, random, and interchange
-   families; add deterministic reference and failure tests and records.
-5. Add and prove sampled temporary-tree mutations for high-risk kernels.
-6. Integrate the evidence gate with qualification/CI and publish the
-   human-readable evidence report.
-7. Advance all release metadata to 1.9.4, mark it previous in the Roadmap, and
-   promote 1.9.5 as the next release; run full local qualification and record
-   the result.
+1. Specify the v1.9.5 benchmark-row and evidence-manifest contracts.
+2. Add failing parser/validator tests for missing domains, malformed rows,
+   allocation ceilings, complexity tripwires, and timing review signals.
+3. Extend the Pascal runner with representative small/large dense, sparse,
+   iterative, DSP, modelling, statistics, and data-analysis rows, including
+   cold/warm timing and deterministic correctness checks.
+4. Add the offline Python performance gate, host/toolchain capture, same-run
+   comparisons, and versioned result JSON.
+5. Profile repeatable candidate hot paths; make only justified internal
+   optimisations and prove portable/candidate equivalence. Record an explicit
+   no-change result when evidence does not justify a source change.
+6. Integrate performance validation into CI and release qualification.
+7. Update performance policy, capability data, README/releasing guidance,
+   changelog, release/PR/qualification notes, documentation index, package and
+   version metadata, then advance the roadmap to 1.9.6.
+8. Run focused checks, the full test suite, documentation builds, package build,
+   and the complete local 1.9.5 qualification; perform a five-axis review.
 
 ## Checkpoints
 
-### After tasks 1-2 — complete
+### After tasks 1-2
 
-- Catalogue test is red before the checker and green afterwards.
-- Core and sparse evidence records cover their stable inventory entries.
-- Normal FPCUnit suite and documentation check pass.
+- Contract tests fail for incomplete or unsafe evidence and pass only for a
+  complete representative fixture.
+- No production numerical source or public interface has changed.
 
-### After tasks 3-5 — complete
+### After tasks 3-5
 
-- Every stable capability has exactly one evidence record.
-- Mutation runner proves every selected fault is detected.
-- Optimized and checked/heap test gates pass.
+- Every required domain has small/large coverage where applicable, cold/warm
+  timing, scalar/shape/tolerance/setup metadata, and deterministic checksums.
+- Exact allocation and complexity ceilings fail mechanically.
+- Any optimisation is backed by repeated same-host evidence and cross-path
+  tests; otherwise the release records that no optimisation was warranted.
 
-### After tasks 6-7 — complete
+### After tasks 6-8
 
-- CI and qualification invoke the evidence gate.
-- Documentation/site builds for 1.9.4 and all identity checks pass.
-- Full release qualification passed from the release branch: 76 gates, zero
-  failures on Windows 11 x86-64 with FPC 3.2.2, Lazarus 4.8, and Python 3.13.5.
+- CI and local qualification produce checked performance-result JSON.
+- All published performance/memory statements resolve to a manifest row and
+  identify conditions and limitations.
+- The full release qualification and final review are clean.
 
 ## Risks and mitigations
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
-| Existing tests lack independent or adversarial evidence | High | Add a small separately implemented oracle or downgrade only with explicit approval and documented scope. |
-| Mutation cases are brittle across FPC versions | Medium | Use deterministic textual mutations of arithmetic expressions and assert a test-suite failure, not an exact output. |
-| The audit becomes a prose-only catalogue | High | Cross-check every claim with checked paths, named test evidence, budgets, and a release gate. |
-| Full qualification is slow | Medium | Run focused Python/FPCUnit gates per increment; reserve all-gate runs for checkpoints. |
+| Hosted-runner timing noise creates false failures | High | Keep prior-baseline timing advisory and use repeated samples plus review bands. |
+| Logical allocation counts overstate exact heap accounting | Medium | Name each metric precisely and use sampled heap deltas only where monitor boundaries make them meaningful. |
+| Benchmark expansion makes qualification too slow | Medium | Use bounded deterministic cases and a quick contract-fixture mode for Python tests. |
+| Optimisation changes numerical order or contracts | High | Profile first, preserve the portable path, and require cross-path numerical tests before accepting it. |
+| Release claims drift from executable evidence | High | Cross-reference every claim and domain through the checked manifest and documentation gate. |
 
-## Resolved scope
+## Scope decision
 
-Evidence gaps block this release, and all stable families have qualifying
-records. The pre-existing `V1.9.3`/`v1.9.3` tag discrepancy is recorded but is
-not changed by this branch.
+The user requested the complete milestone and authorized implementation. No
+new public API, external dependency, platform claim, or optional foreign-library
+comparison is needed for 1.9.5.
