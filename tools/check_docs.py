@@ -12,9 +12,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.3"
+CURRENT_RELEASE = "1.9.4"
 API_BASELINE_RELEASE = "1.9.0"
-HISTORICAL_RELEASES = ["1.9.2", "1.9.1", API_BASELINE_RELEASE]
+API_DECISION_RELEASE = "1.9.3"
+HISTORICAL_RELEASES = ["1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -166,7 +167,7 @@ def main() -> int:
         snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
         assert snapshot["release"] == API_BASELINE_RELEASE
         assert snapshot["schema_version"] == 3
-        assert snapshot["decision_release"] == CURRENT_RELEASE
+        assert snapshot["decision_release"] == API_DECISION_RELEASE
         assert snapshot["identity"] == [
             "unit",
             "owner",
@@ -695,6 +696,7 @@ def main() -> int:
         DOCS / f"RELEASE_NOTES_{CURRENT_RELEASE}.md",
         DOCS / f"PR_NOTES_{CURRENT_RELEASE}.md",
         DOCS / f"QUALIFICATION_{CURRENT_RELEASE}.md",
+        DOCS / f"NUMERICAL_EVIDENCE_{CURRENT_RELEASE}.md",
         DOCS / "FEEDBACK.md",
     ]
     for release_file in release_files:
@@ -713,7 +715,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="3"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="4"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:

@@ -7,7 +7,7 @@
     {
       "family": "scalar_special_functions",
       "status": "qualified",
-      "risk": "standard",
+      "risk": "high",
       "input_domain": "finite double inputs in each documented function domain; tail cases use the documented absolute or tail-relative measure",
       "budget": {
         "kind": "relative_error",
@@ -38,6 +38,15 @@
         "invalid gamma/beta shapes return NaN",
         "BetaInc clamps x outside [0,1]",
         "StudentT rejects invalid degrees of freedom and negative x"
+      ],
+      "fault_injections": [
+        {
+          "source": "src/MathBase.Precision.pas",
+          "needle": "Result := HalfLogTwoPi + (Z + 0.5) * Ln(T) - T + Ln(Sum);",
+          "replacement": "Result := 0.0;",
+          "occurrence": 1,
+          "test": "tests/TestMathBase.pas"
+        }
       ],
       "documentation": "docs/MathBase.md"
     },
@@ -154,7 +163,7 @@
     {
       "family": "typed_direct_solve",
       "status": "qualified",
-      "risk": "standard",
+      "risk": "high",
       "input_domain": "finite square typed-dense coefficient matrices with one or more right-hand sides",
       "budget": {
         "kind": "backward_error",
@@ -192,6 +201,15 @@
         "singular pivots are reported",
         "positive-definite and general paths remain distinct",
         "non-finite matrix entries are rejected"
+      ],
+      "fault_injections": [
+        {
+          "source": "src/AlgebraLib.DenseSolvers.pas",
+          "needle": "Result := Factor.Solve(B);",
+          "replacement": "Result := B.Clone;",
+          "occurrence": 2,
+          "test": "tests/TestDenseMatrices.pas"
+        }
       ],
       "documentation": "docs/DenseLinearAlgebra.md"
     },
@@ -725,7 +743,7 @@
     {
       "family": "applied_dsp",
       "status": "qualified",
-      "risk": "standard",
+      "risk": "high",
       "input_domain": "finite scalar and complex signal blocks with documented transform, filter, and overlap shapes",
       "budget": {
         "kind": "absolute_error",
@@ -749,6 +767,15 @@
         }
       ],
       "edge_cases": ["non-finite blocks are rejected", "overlap and FIR state remain bounded", "advanced IIR design and wavelet packets remain unsupported"],
+      "fault_injections": [
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "Result := BluesteinUnscaled(Input, Inverse);",
+          "replacement": "Result := CopyComplexArray(Input);",
+          "occurrence": 1,
+          "test": "tests/TestAppliedNumerics.pas"
+        }
+      ],
       "documentation": "docs/AppliedNumerics.md"
     },
     {

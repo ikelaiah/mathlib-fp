@@ -208,8 +208,11 @@ def documentation_gates(
         "test_example_output.py",
         "test_build_docs.py",
         "test_built_docs.py",
+        "test_numerical_evidence.py",
+        "test_numerical_mutation.py",
         "check_docs.py",
         "check_api_decision.py",
+        "check_numerical_evidence.py",
     ):
         qualification.run(
             script.removesuffix(".py"),
@@ -221,6 +224,13 @@ def documentation_gates(
             sys.executable, str(ROOT / "tools" / "check_doc_examples.py"),
             "--compiler", compiler,
             "--work-dir", str(qualification.work / "doc-examples"),
+        ],
+    )
+    qualification.run(
+        "numerical-mutation",
+        [
+            sys.executable, str(ROOT / "tools" / "run_numerical_mutation.py"),
+            "--compiler", compiler,
         ],
     )
     site = qualification.work / "docs-site" / release
