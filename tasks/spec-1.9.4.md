@@ -136,8 +136,9 @@ field, and never fetch data during a test or qualification run.
 4. Public documentation distinguishes exact checks, reference comparisons,
    error estimates, and machine-specific observations, and records known
    limitations without upgrading unsupported features.
-5. Release metadata consistently names 1.9.4, the roadmap identifies 1.9.4 as
-   the next release, and the complete release qualification passes offline.
+5. Release metadata consistently names 1.9.4, the Roadmap records it as the
+   previous release and identifies 1.9.5 as next, and the complete release
+   qualification passes offline.
 
 ## Resolved decisions
 

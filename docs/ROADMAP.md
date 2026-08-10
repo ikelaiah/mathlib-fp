@@ -1345,10 +1345,11 @@ exhaustive; a smaller curated map tells ordinary users what to choose.
 - Any newly required public capability is routed to a separately planned
   1.10.0 minor release and is not added opportunistically to 1.9.x.
 
-## Next release: 1.9.4 — Numerical trust closure
+## Previous release: 1.9.4 — Numerical trust closure
 
-Version 1.9.4 closes validation gaps across the existing stable capability
-inventory and makes the evidence understandable outside the test source.
+Released on 2026-08-10, version 1.9.4 closed validation gaps across the
+existing stable capability inventory and made the evidence understandable
+outside the test source.
 
 ### 1.9.4 scope
 
@@ -1379,7 +1380,7 @@ inventory and makes the evidence understandable outside the test source.
 - The release suite remains independent of proprietary software, external
   numerical DLLs, and network access.
 
-## Planned 1.9.5 — Predictable performance
+## Next release: 1.9.5 — Predictable performance
 
 Version 1.9.5 makes performance and allocation behaviour inspectable without
 turning portable Pascal into a secondary implementation.

@@ -47,8 +47,9 @@ capabilities.json ──> evidence schema/checker ──> qualification + CI
 5. Add and prove sampled temporary-tree mutations for high-risk kernels.
 6. Integrate the evidence gate with qualification/CI and publish the
    human-readable evidence report.
-7. Advance all release metadata and Roadmap status to 1.9.4; run full local
-   qualification and record the result.
+7. Advance all release metadata to 1.9.4, mark it previous in the Roadmap, and
+   promote 1.9.5 as the next release; run full local qualification and record
+   the result.
 
 ## Checkpoints
 

@@ -116,8 +116,8 @@ the evidence report, and consistently advance release identity to 1.9.4.
 - [x] CI and `qualify_release.py` execute the evidence gates.
 - [x] Public documentation names budgets, evidence categories, provenance, and
   known limitations without overclaiming.
-- [x] Roadmap, changelog, package, version manifest, docs, and workflows agree
-  on 1.9.4.
+- [x] Roadmap records 1.9.4 as previous and 1.9.5 as next; changelog, package,
+  version manifest, docs, and workflows agree on 1.9.4.
 
 **Verification:** Documentation/tool tests, built-site checks, and full release
 qualification.
