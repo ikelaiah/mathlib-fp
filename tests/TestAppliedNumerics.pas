@@ -24,6 +24,7 @@ type
     procedure TestInferenceDistributionsAndTests;
     procedure TestRegressionDiagnostics;
     procedure TestArbitraryFFTReferenceAndRoundTrip;
+    procedure TestPowerOfTwoFFTReferenceAndRoundTrip;
     procedure TestFFT2DAndSinglePrecision;
     procedure TestConvolutionCorrelationAndResampling;
     procedure TestBatchOverlapAndHaarWorkflows;
@@ -217,6 +218,34 @@ begin
     AssertEquals('arbitrary FFT round trip real', Input[I].Re,
       RoundTrip[I].Re, 2E-12);
     AssertEquals('arbitrary FFT round trip imaginary', Input[I].Im,
+      RoundTrip[I].Im, 2E-12);
+  end;
+end;
+
+procedure TAppliedNumericsTest.TestPowerOfTwoFFTReferenceAndRoundTrip;
+var
+  Input, Fast, Reference, RoundTrip: TComplexArray;
+  I: Integer;
+begin
+  SetLength(Input, 16);
+  for I := 0 to High(Input) do
+    Input[I] := TComplex.Create(Sin(I * 0.23) + I * 0.01,
+      Cos(I * 0.19) - I * 0.02);
+  Fast := TDSPKit.Transform(Input);
+  Reference := TDSPKit.DFTReference(Input);
+  for I := 0 to High(Input) do
+  begin
+    AssertEquals('radix-2/reference real', Reference[I].Re,
+      Fast[I].Re, 2E-12);
+    AssertEquals('radix-2/reference imaginary', Reference[I].Im,
+      Fast[I].Im, 2E-12);
+  end;
+  RoundTrip := TDSPKit.Transform(Fast, True);
+  for I := 0 to High(Input) do
+  begin
+    AssertEquals('radix-2 round trip real', Input[I].Re,
+      RoundTrip[I].Re, 2E-12);
+    AssertEquals('radix-2 round trip imaginary', Input[I].Im,
       RoundTrip[I].Im, 2E-12);
   end;
 end;
