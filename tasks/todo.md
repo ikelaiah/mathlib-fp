@@ -1,130 +1,135 @@
-# 1.9.4 task list
+# 1.9.5 task list
 
-## Task 1: Evidence contract and catalogue checker
+## Task 1: Performance evidence contract
 
-**Description:** Define the checked JSON format and a Python gate that maps
-each stable capability to bounded, reproducible numerical evidence.
+**Description:** Define the checked manifest and row format for reproducible
+performance, allocation, retained-memory, correctness, and setup evidence.
 
 **Acceptance criteria:**
 
-- [x] A test first demonstrates that a missing stable-family record fails.
-- [x] The checker rejects invalid paths, provenance, budgets, and high-risk
-  mutation coverage.
-- [x] The empty/incomplete catalogue cannot pass.
+- [ ] The manifest requires all seven roadmap domains and small/large scale
+  coverage where meaningful.
+- [ ] Every row names scalar kind, shape, tolerance, setup, timing mode,
+  allocation/retained-state semantics, checksum, and comparison policy.
+- [ ] Timing review signals are distinct from hard allocation/complexity gates.
 
-**Verification:** `python tools/test_numerical_evidence.py` and
-`python tools/check_numerical_evidence.py`.
+**Verification:** `python tools/test_performance_evidence.py`.
 
 **Dependencies:** None.
 
-**Files likely touched:** `docs/numerical-evidence-1.9.4.json`,
-`tools/check_numerical_evidence.py`, `tools/test_numerical_evidence.py`.
-
 **Estimated scope:** Medium.
 
-## Task 2: Core, dense, and sparse evidence
+## Task 2: Benchmark rows and exact tripwires
 
-**Description:** Supply independent oracle/property/edge evidence for scalar,
-dense, structured, sparse, iterative, and partial-spectrum stable families.
+**Description:** Extend `BenchmarkRunner` to emit uniform machine-readable
+rows for dense, sparse, iterative, DSP, modelling, statistics, and analysis.
 
 **Acceptance criteria:**
 
-- [x] All corresponding stable families have catalogue records and budgets.
-- [x] Linked FPCUnit tests cover the recorded adversarial scales and degenerate
-  behavior; the audit found no extra test unit necessary.
-- [x] Existing API interfaces remain unchanged.
+- [ ] Rows report cold and warmed timing plus deterministic correctness values.
+- [ ] Exact allocation, retained-state, and inappropriate dense-shape ceilings
+  halt the runner and fail the Python gate.
+- [ ] Small-call and large-throughput workloads are both represented.
 
-**Verification:** Focused FPCUnit build/run plus the evidence checker.
+**Verification:** Compile/run the benchmark at `-O3`, then validate its output.
 
 **Dependencies:** Task 1.
 
-**Files likely touched:** One evidence catalogue, up to three focused test
-units, and the TestRunner only when a new unit is necessary.
+**Estimated scope:** Medium, split between runner infrastructure and workloads.
 
-**Estimated scope:** Medium, split by test unit if it exceeds five files.
+## Task 3: Offline performance validator
 
-## Task 3: Modelling and optimization evidence
-
-**Description:** Audit interpolation, differentiation, integration, fitting,
-ODE/system solving, nonlinear/linear optimization, and convex optimization.
+**Description:** Compile/run the benchmark, capture reproducible host/toolchain
+conditions, validate rows against the manifest, and write versioned JSON.
 
 **Acceptance criteria:**
 
-- [x] Each family has a finite, input-scoped metric/budget and provenance.
-- [x] Tests distinguish residual/feasibility/estimated error from exact
-  reference comparison.
-- [x] Invalid, non-finite, and degenerate behavior is recorded and tested.
+- [ ] Missing/duplicate/malformed rows and hard-ceiling failures are rejected.
+- [ ] Same-run and prior-baseline ratios are calculated with advisory review
+  status for noisy timing.
+- [ ] The tool uses only FPC and Python's standard library and works offline.
 
-**Verification:** Focused FPCUnit build/run plus the evidence checker.
+**Verification:** `python tools/test_performance_evidence.py` and a real
+`python tools/check_performance_evidence.py --compiler fpc` run.
 
-**Dependencies:** Task 1.
-
-**Files likely touched:** Evidence catalogue and up to three modelling or
-optimization test units.
+**Dependencies:** Tasks 1-2.
 
 **Estimated scope:** Medium.
 
-## Task 4: Applied numerical evidence
+## Task 4: Profile-led optimisation decision
 
-**Description:** Audit random state, streaming statistics, DSP, ML,
-time-series, interchange, inference, persistence, and expressions.
-
-**Acceptance criteria:**
-
-- [x] Deterministic fixtures record source/method and regeneration steps.
-- [x] Each family has property/reference and edge/failure evidence.
-- [x] Unsupported features remain outside the qualified population.
-
-**Verification:** Focused FPCUnit build/run plus the evidence checker.
-
-**Dependencies:** Task 1.
-
-**Files likely touched:** Evidence catalogue and up to three focused applied
-test units.
-
-**Estimated scope:** Medium.
-
-## Task 5: Sampled numerical fault injection
-
-**Description:** Run documented, deterministic mutations against temporary
-source copies and prove the linked tests detect them.
+**Description:** Repeat representative hot-path samples and accept an internal
+optimisation only if it gives a material reproducible benefit without changing
+portable results or public interfaces.
 
 **Acceptance criteria:**
 
-- [x] At least three high-risk-family mutations compile and make the linked
-  validation fail.
-- [x] Mutations never modify the checkout and never contact the network.
-- [x] The mutation tool has isolated Python tests.
+- [ ] Profiling commands, repetitions, results, and decision are documented.
+- [ ] Any changed algorithm has a failing regression/cross-path test first and
+  keeps all portable correctness tests green.
+- [ ] If no candidate clears the evidence threshold, no speculative numerical
+  source change is made.
 
-**Verification:** `python tools/test_numerical_mutation.py` and the mutation
-runner against the completed catalogue.
+**Verification:** Focused FPCUnit tests and repeated benchmark comparison.
+
+**Dependencies:** Tasks 2-3.
+
+**Estimated scope:** Small to medium.
+
+## Task 5: Qualification and CI integration
+
+**Description:** Make release qualification produce and validate performance
+evidence while keeping wall-clock changes advisory on hosted runners.
+
+**Acceptance criteria:**
+
+- [ ] Local qualification and the clean-archive workflows invoke the gate.
+- [ ] Performance JSON and logs are retained as qualification artifacts.
+- [ ] Tool unit tests run in ordinary CI.
+
+**Verification:** Python tool tests, workflow/documentation checks, and a
+qualification run with benchmarks enabled.
 
 **Dependencies:** Tasks 1-4.
 
-**Files likely touched:** Mutation runner, its test, evidence catalogue, and
-qualification wiring.
-
 **Estimated scope:** Medium.
 
-## Task 6: Qualification, documentation, and metadata
+## Task 6: Documentation and release identity
 
-**Description:** Gate the release on the catalogue and mutation checks, publish
-the evidence report, and consistently advance release identity to 1.9.4.
+**Description:** Publish the performance evidence guide and consistently
+advance release metadata and documentation to 1.9.5.
 
 **Acceptance criteria:**
 
-- [x] CI and `qualify_release.py` execute the evidence gates.
-- [x] Public documentation names budgets, evidence categories, provenance, and
-  known limitations without overclaiming.
-- [x] Roadmap records 1.9.4 as previous and 1.9.5 as next; changelog, package,
-  version manifest, docs, and workflows agree on 1.9.4.
+- [ ] Every performance/memory claim links to a checked row and conditions.
+- [ ] README, benchmark/releasing guidance, capability inventory, changelog,
+  docs index, release/PR/qualification notes, packages, workflows, and version
+  manifest agree on 1.9.5.
+- [ ] Roadmap records 1.9.5 as previous and 1.9.6 as next.
 
-**Verification:** Documentation/tool tests, built-site checks, and full release
-qualification.
+**Verification:** All documentation tests, site/offline build checks, API
+snapshot checks, and release-state tests.
 
 **Dependencies:** Tasks 1-5.
 
-**Files likely touched:** Split release metadata and workflow updates into
-reviewable commits of no more than five files.
+**Estimated scope:** Large; land as focused metadata/documentation increments.
 
-**Estimated scope:** Large; must be divided into small increments.
+## Task 7: Full qualification and review
+
+**Description:** Run all supported local gates and review the complete diff for
+correctness, simplicity, architecture, security, and performance.
+
+**Acceptance criteria:**
+
+- [ ] Normal, optimized, checked/heap, examples, documentation, package, and
+  performance gates pass.
+- [ ] No public-interface snapshot changes or unexplained material regressions
+  remain.
+- [ ] All critical/required review findings are resolved.
+
+**Verification:** `python tools/qualify_release.py --release 1.9.5 --compiler
+fpc --lazbuild lazbuild` plus `git diff --check` and final diff review.
+
+**Dependencies:** Tasks 1-6.
+
+**Estimated scope:** Medium.
