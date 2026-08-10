@@ -238,11 +238,20 @@ def _comparison_result(
     review_ratio: float,
     enforcement: str,
 ) -> dict[str, object]:
-    ratio = math.inf if baseline_value == 0.0 else candidate_value / baseline_value
-    status = "pass" if ratio <= review_ratio else "review"
+    if baseline_value == 0.0:
+        ratio: float | None = 1.0 if candidate_value == 0.0 else None
+        status = "pass" if candidate_value == 0.0 else "review"
+    else:
+        ratio = candidate_value / baseline_value
+        status = "pass" if ratio <= review_ratio else "review"
     if status == "review" and enforcement == "hard":
+        ratio_text = (
+            "undefined against a zero baseline"
+            if ratio is None
+            else f"{ratio:.6g}"
+        )
         raise EvidenceError(
-            f"benchmark {identifier}: {kind} ratio {ratio:.6g} exceeds "
+            f"benchmark {identifier}: {kind} ratio {ratio_text} exceeds "
             f"hard limit {review_ratio:.6g}"
         )
     return {
@@ -478,7 +487,9 @@ def main() -> int:
             **validated,
         }
         result_path.parent.mkdir(parents=True, exist_ok=True)
-        result_path.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+        result_path.write_text(
+            json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+        )
         print(
             f"Performance evidence {result['status']}: {len(rows)} rows, "
             f"{len(result['comparisons'])} comparisons; results written to {result_path}"

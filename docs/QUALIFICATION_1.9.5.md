@@ -1,6 +1,6 @@
 # mathlib-fp 1.9.5 qualification
 
-Status on 2026-08-11: **local qualification pending final recorded run** on
+Status on 2026-08-11: **all 78 local release-qualification gates passed** on
 Windows 11 x86-64 with FPC 3.2.2, Lazarus 4.8, and Python 3.13.5. The release
 cannot be tagged until Linux and Windows clean-archive workflows pass for the
 exact candidate commit.
@@ -33,9 +33,18 @@ retained as `performance-results.json` alongside the qualification logs.
 
 ## Local result
 
-To be filled from the final qualification manifest. The earlier complete test
-run passed all 932 FPCUnit tests, and the final performance profile passed all
-14 exact rows and 13 advisory comparisons.
+The command passed all 78 gates. It recorded zero failed gates across normal,
+optimised, and checked/heap-traced test suites; all 932 FPCUnit tests passed in
+each applicable run and the heap trace reported no unfreed blocks. Examples,
+output contracts, documentation/API checks, the retained 1.9.4 numerical
+catalogue and mutation gate, the 1.9.5 site/offline archive, Lazarus package,
+raw benchmark, and performance validation also passed.
+
+The final qualification performance artifact contains all 14 required rows and
+13 advisory comparisons, with a `pass` status, a matched prior-baseline host,
+and no timing review. The manifest is retained locally at
+`build-temp/release-qualification/results.json` and the checked performance
+artifact at `build-temp/release-qualification/performance-results.json`.
 
 ## Required clean-archive evidence
 

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import unittest
 
 from check_performance_evidence import (
@@ -189,6 +190,36 @@ class PerformanceEvidenceTests(unittest.TestCase):
         result = validate_evidence(manifest, rows, "test-host")
         self.assertEqual("review", result["status"])
         self.assertEqual("review", result["comparisons"][0]["status"])
+
+    def test_zero_timing_baseline_stays_strict_json(self) -> None:
+        comparison = {
+            "baseline_id": "dense-baseline",
+            "metric": "warm_ms_per_iteration",
+            "review_ratio": 1.5,
+            "enforcement": "advisory",
+        }
+        manifest = {
+            "schema_version": 1,
+            "release": "1.9.5",
+            "required_coverage": {"dense": ["small", "large"]},
+            "benchmarks": [
+                contract("dense-baseline", "dense", "small"),
+                contract(
+                    "dense-candidate", "dense", "large", comparison=comparison
+                ),
+            ],
+        }
+        rows = parse_perf_output(
+            row("dense-baseline", "dense", "small", warm_ms=0)
+            + "\n"
+            + row("dense-candidate", "dense", "large", warm_ms=1)
+        )
+
+        result = validate_evidence(manifest, rows, "test-host")
+
+        self.assertEqual("review", result["status"])
+        self.assertIsNone(result["comparisons"][0]["ratio"])
+        json.dumps(result, allow_nan=False)
 
     def test_matching_prior_host_baseline_is_advisory(self) -> None:
         manifest = {

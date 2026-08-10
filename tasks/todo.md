@@ -7,11 +7,11 @@ performance, allocation, retained-memory, correctness, and setup evidence.
 
 **Acceptance criteria:**
 
-- [ ] The manifest requires all seven roadmap domains and small/large scale
+- [x] The manifest requires all seven roadmap domains and small/large scale
   coverage where meaningful.
-- [ ] Every row names scalar kind, shape, tolerance, setup, timing mode,
+- [x] Every row names scalar kind, shape, tolerance, setup, timing mode,
   allocation/retained-state semantics, checksum, and comparison policy.
-- [ ] Timing review signals are distinct from hard allocation/complexity gates.
+- [x] Timing review signals are distinct from hard allocation/complexity gates.
 
 **Verification:** `python tools/test_performance_evidence.py`.
 
@@ -26,10 +26,10 @@ rows for dense, sparse, iterative, DSP, modelling, statistics, and analysis.
 
 **Acceptance criteria:**
 
-- [ ] Rows report cold and warmed timing plus deterministic correctness values.
-- [ ] Exact allocation, retained-state, and inappropriate dense-shape ceilings
+- [x] Rows report cold and warmed timing plus deterministic correctness values.
+- [x] Exact allocation, retained-state, and inappropriate dense-shape ceilings
   halt the runner and fail the Python gate.
-- [ ] Small-call and large-throughput workloads are both represented.
+- [x] Small-call and large-throughput workloads are both represented.
 
 **Verification:** Compile/run the benchmark at `-O3`, then validate its output.
 
@@ -44,10 +44,10 @@ conditions, validate rows against the manifest, and write versioned JSON.
 
 **Acceptance criteria:**
 
-- [ ] Missing/duplicate/malformed rows and hard-ceiling failures are rejected.
-- [ ] Same-run and prior-baseline ratios are calculated with advisory review
+- [x] Missing/duplicate/malformed rows and hard-ceiling failures are rejected.
+- [x] Same-run and prior-baseline ratios are calculated with advisory review
   status for noisy timing.
-- [ ] The tool uses only FPC and Python's standard library and works offline.
+- [x] The tool uses only FPC and Python's standard library and works offline.
 
 **Verification:** `python tools/test_performance_evidence.py` and a real
 `python tools/check_performance_evidence.py --compiler fpc` run.
@@ -64,10 +64,10 @@ portable results or public interfaces.
 
 **Acceptance criteria:**
 
-- [ ] Profiling commands, repetitions, results, and decision are documented.
-- [ ] Any changed algorithm has a failing regression/cross-path test first and
+- [x] Profiling commands, repetitions, results, and decision are documented.
+- [x] Any changed algorithm has a failing regression/cross-path test first and
   keeps all portable correctness tests green.
-- [ ] If no candidate clears the evidence threshold, no speculative numerical
+- [x] If no candidate clears the evidence threshold, no speculative numerical
   source change is made.
 
 **Verification:** Focused FPCUnit tests and repeated benchmark comparison.
@@ -83,9 +83,9 @@ evidence while keeping wall-clock changes advisory on hosted runners.
 
 **Acceptance criteria:**
 
-- [ ] Local qualification and the clean-archive workflows invoke the gate.
-- [ ] Performance JSON and logs are retained as qualification artifacts.
-- [ ] Tool unit tests run in ordinary CI.
+- [x] Local qualification and the clean-archive workflows invoke the gate.
+- [x] Performance JSON and logs are retained as qualification artifacts.
+- [x] Tool unit tests run in ordinary CI.
 
 **Verification:** Python tool tests, workflow/documentation checks, and a
 qualification run with benchmarks enabled.
@@ -101,11 +101,11 @@ advance release metadata and documentation to 1.9.5.
 
 **Acceptance criteria:**
 
-- [ ] Every performance/memory claim links to a checked row and conditions.
-- [ ] README, benchmark/releasing guidance, capability inventory, changelog,
+- [x] Every performance/memory claim links to a checked row and conditions.
+- [x] README, benchmark/releasing guidance, capability inventory, changelog,
   docs index, release/PR/qualification notes, packages, workflows, and version
   manifest agree on 1.9.5.
-- [ ] Roadmap records 1.9.5 as previous and 1.9.6 as next.
+- [x] Roadmap records 1.9.5 as previous and 1.9.6 as next.
 
 **Verification:** All documentation tests, site/offline build checks, API
 snapshot checks, and release-state tests.
@@ -121,11 +121,11 @@ correctness, simplicity, architecture, security, and performance.
 
 **Acceptance criteria:**
 
-- [ ] Normal, optimized, checked/heap, examples, documentation, package, and
+- [x] Normal, optimized, checked/heap, examples, documentation, package, and
   performance gates pass.
-- [ ] No public-interface snapshot changes or unexplained material regressions
+- [x] No public-interface snapshot changes or unexplained material regressions
   remain.
-- [ ] All critical/required review findings are resolved.
+- [x] All critical/required review findings are resolved.
 
 **Verification:** `python tools/qualify_release.py --release 1.9.5 --compiler
 fpc --lazbuild lazbuild` plus `git diff --check` and final diff review.

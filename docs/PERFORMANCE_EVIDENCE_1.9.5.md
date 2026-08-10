@@ -46,14 +46,14 @@ claim identifier for each row live beside it in the machine-readable contract.
 
 ## Profile-led DSP change
 
-The first checked profile exposed `dsp-fft-large-candidate` at 75.0 ms per
-prepared call versus 9.4 ms for its same-run baseline. Inspection located
-per-butterfly trigonometric evaluation in the applied radix-2 kernel. Reusing
-the already tested native Pascal radix-2 implementation reduced the candidate
-to 6.4 ms per call in the final local profile; the same run measured its
-baseline at 3.2 ms. The host-matched recorded 1.9.4 observation is 78.2 ms, so
-the final candidate/prior ratio was approximately 0.082. These are observations
-on one machine, not portable throughput promises.
+The host-matched 1.9.4 observation records `dsp-fft-large-candidate` at
+78.2 ms per prepared call. Inspection located per-butterfly trigonometric
+evaluation in the applied radix-2 kernel. Reusing the already tested native
+Pascal radix-2 implementation measured 9.4 ms per call in final qualification;
+the same run measured `dsp-fft-large-baseline` at 9.2 ms. The checked
+candidate/prior ratio was approximately 0.120 and the same-run ratio was 1.022,
+both within their advisory bands. These are observations on one Windows
+x86-64 machine with FPC 3.2.2, not portable throughput promises.
 
 The change does not alter a public declaration. A new reference and round-trip
 test covers the public power-of-two path, the complete FPCUnit suite remains

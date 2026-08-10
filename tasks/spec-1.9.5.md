@@ -2,8 +2,9 @@
 
 ## Status
 
-In progress on `feat/v1.9.5-predictable-performance`. The user requested the
-complete milestone and a new branch.
+Completed locally on `feat/v1.9.5-predictable-performance`. All 78 local
+qualification gates pass; clean-archive Linux and Windows CI remains required
+before tagging.
 
 ## Objective
 
