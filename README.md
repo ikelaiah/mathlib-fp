@@ -60,8 +60,14 @@ var
   A, B, ProductMatrix: IDenseDoubleMatrix;
 
 begin
-  A := TDenseDoubleMatrix.FromValues(2, 2, [1.0, 2.0, 3.0, 4.0]);
-  B := TDenseDoubleMatrix.FromValues(2, 2, [5.0, 6.0, 7.0, 8.0]);
+  A := TDenseDoubleMatrix.FromArray([
+    [1.0, 2.0],
+    [3.0, 4.0]
+  ]);
+  B := TDenseDoubleMatrix.FromArray([
+    [5.0, 6.0],
+    [7.0, 8.0]
+  ]);
   ProductMatrix := Multiply(A, B);
 
   Writeln('A * B =');
