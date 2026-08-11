@@ -45,10 +45,12 @@ git clone https://github.com/ikelaiah/mathlib-fp.git
 cd mathlib-fp
 ```
 
-Save this as `my_program.pas`:
+### 1. Multiply two matrices
+
+Save this as `multiply_matrices.pas`:
 
 ```pascal
-program hello_mathlib;
+program multiply_matrices;
 
 {$mode objfpc}{$H+}
 
@@ -88,8 +90,61 @@ Compile it with `src/` on the unit search path:
 
 ```bash
 mkdir -p lib
-fpc -Fusrc -FUlib my_program.pas
-./my_program
+fpc -Fusrc -FUlib multiply_matrices.pas
+./multiply_matrices
+```
+
+### 2. Solve a system of equations
+
+Suppose three receipts contain different quantities of coffee, sandwiches,
+and juice, but only their totals remain. Solve the three simultaneous
+equations to recover the price of each item. Save this as `solve_prices.pas`:
+
+```pascal
+program solve_prices;
+
+{$mode objfpc}{$H+}
+
+uses
+  AlgebraLib.DenseMatrices,
+  AlgebraLib.DenseSolvers;
+
+var
+  ItemsPerReceipt, ReceiptTotals, UnitPrices: IDenseDoubleMatrix;
+
+begin
+  ItemsPerReceipt := TDenseDoubleMatrix.FromArray([
+    [2.0, 1.0, 1.0],
+    [1.0, 2.0, 3.0],
+    [3.0, 2.0, 1.0]
+  ]);
+  ReceiptTotals := TDenseDoubleMatrix.FromArray([
+    [18.50],
+    [28.00],
+    [30.00]
+  ]);
+
+  UnitPrices := Solve(ItemsPerReceipt, ReceiptTotals);
+
+  Writeln('Coffee:  $', UnitPrices[0, 0]:0:2);
+  Writeln('Sandwich: $', UnitPrices[1, 0]:0:2);
+  Writeln('Juice:   $', UnitPrices[2, 0]:0:2);
+end.
+```
+
+Expected output:
+
+```text
+Coffee:  $4.00
+Sandwich: $7.50
+Juice:   $3.00
+```
+
+Compile and run it in the same way:
+
+```bash
+fpc -Fusrc -FUlib solve_prices.pas
+./solve_prices
 ```
 
 Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths → Other Unit Files**, or install the mathlib-fp package from [`packages/lazarus/mathlib_fp.lpk`](packages/lazarus/mathlib_fp.lpk).
