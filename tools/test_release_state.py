@@ -9,21 +9,21 @@ from check_docs import roadmap_release_state_errors
 
 class RoadmapReleaseStateTests(unittest.TestCase):
     def test_rejects_current_release_left_as_next(self) -> None:
-        roadmap = "## Next release: 1.9.6 — Portability and distribution\n"
+        roadmap = "## Next release: 1.9.7 — Migration rehearsal\n"
 
-        errors = roadmap_release_state_errors(roadmap, "1.9.6", "1.9.7")
+        errors = roadmap_release_state_errors(roadmap, "1.9.7", "1.9.8")
 
-        self.assertIn("Roadmap does not record 1.9.6 as the previous release", errors)
-        self.assertIn("Roadmap does not name 1.9.7 as the next release", errors)
+        self.assertIn("Roadmap does not record 1.9.7 as the previous release", errors)
+        self.assertIn("Roadmap does not name 1.9.8 as the next release", errors)
 
     def test_accepts_previous_current_and_next_release(self) -> None:
         roadmap = (
-            "## Previous release: 1.9.6 — Portability and distribution\n\n"
-            "## Next release: 1.9.7 — Migration rehearsal\n"
+            "## Previous release: 1.9.7 — Migration rehearsal\n\n"
+            "## Next release: 1.9.8 — External beta\n"
         )
 
         self.assertEqual(
-            [], roadmap_release_state_errors(roadmap, "1.9.6", "1.9.7")
+            [], roadmap_release_state_errors(roadmap, "1.9.7", "1.9.8")
         )
 
 

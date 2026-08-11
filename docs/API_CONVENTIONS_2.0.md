@@ -58,10 +58,10 @@ Compatibility is not deprecation. No warning or removal is proposed.
 | `IMatrix` | Replace in new code | Use `IDenseDoubleMatrix`; conversion is an explicit deep copy and typed algorithms use separate kernels, factors, results, and `SizeInt` shapes. |
 | `TMatrixKit` | Replace in new code | Use `TDenseDoubleMatrix`; it is a named factory, not a cast or subclass replacement. |
 | `TMatrixKitSparse` | Replace in new code | Use `TSparseDoubleMatrix`, which creates canonical CSR/CSC `ISparseDoubleMatrix` values. Conversion enumerates/copies; it is never a zero-copy reinterpretation. |
-| `EPressureError` | Prospective canonical path | Use `EFluidDynamicsError` with `TFluidDynamicsKit`. It is the identical exception class; 1.9.7 must confirm migration and packaging before deprecation is considered. |
-| `TPressureKit` | Prospective canonical path | Use `TFluidDynamicsKit`. It is the identical complete facade, not a narrower pressure implementation; 1.9.7 must confirm migration and packaging before deprecation is considered. |
-| `EVelocityError` | Prospective canonical path | Use `EFluidDynamicsError` with `TFluidDynamicsKit`. It is the identical exception class; 1.9.7 must confirm migration and packaging before deprecation is considered. |
-| `TVelocityKit` | Prospective canonical path | Use `TFluidDynamicsKit`. It is the identical complete facade, not a narrower velocity implementation; 1.9.7 must confirm migration and packaging before deprecation is considered. |
+| `EPressureError` | Retain | Exact alias of `EFluidDynamicsError`; 1.9.7 confirmed exception identity and dependency-neutral in-place packaging. The common error name is preferred only when using the common facade. |
+| `TPressureKit` | Retain | Exact alias of `TFluidDynamicsKit`; 1.9.7 confirmed identical behavior and retained the useful focused import without deprecation. |
+| `EVelocityError` | Retain | Exact alias of `EFluidDynamicsError`; 1.9.7 confirmed exception identity and dependency-neutral in-place packaging. The common error name is preferred only when using the common facade. |
+| `TVelocityKit` | Retain | Exact alias of `TFluidDynamicsKit`; 1.9.7 confirmed identical behavior and retained the useful focused import without deprecation. |
 | `FinanceLib.Bonds` | Retain | Its four public names are exact focused aliases of `TFinanceKit`, `EFinanceError`, and amortization types. |
 | `FinanceLib.NPV` | Retain | Its three public names are exact focused aliases of `TFinanceKit`, `EFinanceError`, and `TDoubleArray`. |
 

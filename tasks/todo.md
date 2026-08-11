@@ -1,116 +1,113 @@
-# 1.9.6 task list
+# 1.9.7 task list
 
-## Task 1: Portability evidence contract
+## Task 1: Migration-rehearsal contract
 
-**Description:** Define target tiers, exact gate profiles, ABI expectations,
-cross-target invariants, audit categories, and generated result semantics.
+**Description:** Define required domains, semantic concerns, consumer projects,
+external mappings, duplicate-alias decisions, package paths, and result data.
 
 **Acceptance criteria:**
 
-- [x] Every claimed target names compiler, OS, CPU, pointer/scalar ABI, exact
-  checks, evidence date/ref, and limitations.
-- [x] Unqualified targets are structurally distinct from supported targets.
-- [x] Binary/numerical invariants and source-audit rules are machine-readable.
+- [x] Every documented domain has 1.x and candidate-2.0 coverage for
+  construction, success, failure, ownership, copying, indexing, precision,
+  defaults, and result interpretation.
+- [x] Every alias decision has a replacement, difference note, compatibility
+  period, owner, migration example, and tested package paths.
+- [x] Invalid or incomplete records are rejected by focused unit tests.
 
-**Verification:** `python tools/test_portability_evidence.py`.
+**Verification:** `python tools/test_migration_rehearsal.py`.
 
 **Dependencies:** None.
 
 **Estimated scope:** Medium.
 
-## Task 2: Native probe and offline validator
+## Task 2: Side-by-side consumer projects
 
-**Description:** Compile and run a Pascal probe, validate its observations and
-the source/package audit, and write target-specific evidence JSON.
+**Description:** Add independent supported-1.x and candidate-convention
+projects that exercise every domain and assert expected behavior changes.
 
 **Acceptance criteria:**
 
-- [x] ABI, endian, locale, binary, and numerical observations are deterministic
-  and validated against the target contract.
-- [x] Foreign runtime/network/calling-convention dependencies fail the audit.
-- [x] The validator uses only standard-library Python and works offline.
+- [x] Both projects compile with FPC 3.2.2 from the source/package layout.
+- [x] Both projects run to a deterministic success marker and assert failure
+  paths rather than documenting them only in prose.
+- [x] The candidate project uses only replacements already shipped in 1.9.7.
 
-**Verification:** Focused unit tests and
-`python tools/check_portability_evidence.py --compiler fpc`.
+**Verification:** `python tools/check_migration_rehearsal.py --compiler fpc`.
 
 **Dependencies:** Task 1.
 
 **Estimated scope:** Medium.
 
-## Task 3: Archive qualification enforcement
+## Task 3: Alias package boundary and decisions
 
-**Description:** Verify checksummed source archives, extracted clean trees,
-network isolation, and extracted checksummed offline-documentation archives in
-the release driver.
+**Description:** Test pressure/velocity facade and error aliases alongside the
+canonical fluid-dynamics paths, then finalize the decision list.
 
 **Acceptance criteria:**
 
-- [x] Clean mode rejects `.git`, compiler outputs, missing release content, or
-  archive/checksum mismatches.
-- [x] Offline HTML is extracted and revalidated after checksum creation.
-- [x] Qualification retains portability results alongside existing evidence.
+- [x] Direct-source and Lazarus-package paths expose all old and canonical
+  declarations with no hidden dependency.
+- [x] Type identity, exception identity, defaults, ownership, and numerical
+  results are asserted.
+- [x] Each candidate is explicitly retained or deprecated with evidence; no
+  removal entitlement is implied.
 
-**Verification:** `python tools/test_qualify_release.py` plus a focused clean
-archive qualification run.
+**Verification:** Focused FPC consumer builds plus Lazarus package build.
 
 **Dependencies:** Tasks 1-2.
 
 **Estimated scope:** Medium.
 
-## Task 4: CI target and schedule coverage
+## Task 4: External migration mappings
 
-**Description:** Align ordinary, secondary, weekly full, candidate, and release
-workflows with the exact target profiles and publish their evidence.
-
-**Acceptance criteria:**
-
-- [x] Windows/Linux x86-64 run primary checks on each change and complete
-  archive qualification weekly and for candidates/releases.
-- [x] Windows i386 runs only its documented secondary checks.
-- [x] Archive qualification blocks outbound networking after dependencies are
-  installed and restores it before evidence publication.
-
-**Verification:** Workflow review plus documentation/release-state checks.
-
-**Dependencies:** Task 3.
-
-**Estimated scope:** Medium.
-
-## Task 5: Support, release, and distribution documentation
-
-**Description:** Publish the evidence-backed support matrix and consistently
-advance release metadata and documentation to 1.9.6.
+**Description:** Publish conservative NumLib and LMath/DMath mapping guidance.
 
 **Acceptance criteria:**
 
-- [x] Installation instructions link qualified and unqualified targets,
-  offline paths, checksums, limitations, and exact evidence profiles.
-- [x] README, support/capability data, changelog, docs index, releasing guide,
-  release/PR/qualification notes, package, workflows, and version manifest
-  agree on 1.9.6.
-- [x] Roadmap records 1.9.6 as previous and 1.9.7 as next.
+- [x] Common numerical tasks map to exact mathlib-fp units and entry points.
+- [x] Indexing, storage, ownership, scalar precision, diagnostics, defaults,
+  and unsupported differences are explicit.
+- [x] Primary upstream references and “not drop-in compatible” language are
+  present.
 
-**Verification:** All documentation tests, site/offline build checks, API
-snapshot checks, and release-state tests.
+**Verification:** Rehearsal schema tests and documentation checks.
+
+**Dependencies:** Task 1.
+
+**Estimated scope:** Small.
+
+## Task 5: Release and qualification integration
+
+**Description:** Make migration rehearsal a release-owned gate and advance all
+relevant documentation and metadata to 1.9.7.
+
+**Acceptance criteria:**
+
+- [x] Linux/Windows CI and clean-archive qualification run the rehearsal.
+- [x] README, package, capabilities, versions, changelog, support, releasing,
+  docs index, release/PR/qualification notes, and roadmap agree on 1.9.7.
+- [x] Roadmap records 1.9.7 as previous and 1.9.8 as next.
+
+**Verification:** Documentation, release-state, build-site, and qualification
+tests.
 
 **Dependencies:** Tasks 1-4.
 
-**Estimated scope:** Large; land as focused documentation/metadata increments.
+**Estimated scope:** Large; land as focused metadata and documentation edits.
 
-## Task 6: Full qualification and review
+## Task 6: Full verification and review
 
-**Description:** Run all supported local gates and review the complete diff for
-correctness, simplicity, architecture, security, and performance.
+**Description:** Run applicable release gates and review the complete change.
 
 **Acceptance criteria:**
 
-- [x] Normal, optimized, checked/heap, examples, documentation, package,
-  benchmark, portability, and archive gates pass locally.
-- [x] No public-interface snapshot change or unsupported platform claim remains.
-- [x] All critical/required review findings are resolved.
+- [x] Test builds, examples, docs, migration rehearsal, package, portability,
+  and applicable evidence gates pass locally.
+- [x] No public-interface snapshot change or unsupported migration claim remains.
+- [x] All critical and required review findings are resolved.
 
-**Verification:** `python tools/qualify_release.py --release 1.9.6 --compiler
-fpc --lazbuild lazbuild` plus `git diff --check` and final diff review.
+**Verification:** `python tools/qualify_release.py --release 1.9.7 --compiler
+fpc --lazbuild lazbuild`, plus `git diff --check` and final diff review.
 
 **Dependencies:** Tasks 1-5.
 

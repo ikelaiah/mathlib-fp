@@ -22,16 +22,16 @@ generic specialization and the unit-interface hash.
 
 ## Exact compiler-alias review
 
-Every plain `=` type alias in the snapshot has exactly one 1.9.3
-review. The compiler-identity profile records identical behavior,
-defaults, ownership, exception identity, and numerical results; an
-alias adds only another public spelling/import path. `Canonicalize`
-is a prospective common path for 1.9.7 migration/package testing,
-not a 1.9.3 deprecation, removal, warning, or package move.
+Every plain `=` type alias in the snapshot has exactly one review.
+The compiler-identity profile records identical behavior, defaults,
+ownership, exception identity, and numerical results; an alias adds
+only another public spelling/import path. The 1.9.7 migration and
+package-boundary rehearsal retained all 21 aliases and approved no
+deprecation, removal, warning, or package move.
 
 Equivalence basis: A Free Pascal plain-equals type alias denotes the same compiler type and introduces no implementation, wrapper, storage, default, exception translation, or numerical path.
 
-| Alias | Exact target | 1.9.3 decision | Prospective canonical path | Status / follow-up | Reason |
+| Alias | Exact target | Current decision | Preferred canonical path | Status / follow-up | Reason |
 | --- | --- | --- | --- | --- | --- |
 | `AlgebraLib.Determinants.TIterSolverMethod` | `TIterativeMethod` | `retain` | `—` | `review-only` | Retain the focused determinant/decomposition entry name; it adds no implementation and existing source uses it directly. |
 | `AlgebraLib.VectorKernels.TComplexVector` | `TComplexArray` | `retain` | `—` | `review-only` | Retain the vector-domain vocabulary used consistently by TVectorKit signatures. |
@@ -42,11 +42,11 @@ Equivalence basis: A Free Pascal plain-equals type alias denotes the same compil
 | `AlgebraLib.Vectors.TRealVector` | `TDoubleArray` | `retain` | `—` | `review-only` | Retain the documented one-unit vector entry point and its contiguous real-vector vocabulary. |
 | `AlgebraLib.Vectors.TVector` | `TMatrixKit` | `retain` | `—` | `review-only` | Retain the established matrix-as-vector construction spelling documented by AlgebraLib.Vectors. |
 | `AlgebraLib.Vectors.TVectorKit` | `AlgebraLib.VectorKernels.TVectorKit` | `retain` | `—` | `review-only` | Retain the documented one-unit vector entry point; all implementation remains owned by AlgebraLib.VectorKernels. |
-| `EngineeringLib.Pressure.EPressureError` | `EngineeringLib.Common.EFluidDynamicsError` | `canonicalize` | `EngineeringLib.Common.EFluidDynamicsError` | `review-only; revisit 1.9.7` | Review migration with the pressure facade alias so one fluid-dynamics exception path can be preferred. |
-| `EngineeringLib.Pressure.TPressureKit` | `TFluidDynamicsKit` | `canonicalize` | `EngineeringLib.FluidDynamics.TFluidDynamicsKit` | `review-only; revisit 1.9.7` | The alias exposes the complete fluid-dynamics facade rather than a narrower pressure surface; test migration to the owning facade in 1.9.7. |
+| `EngineeringLib.Pressure.EPressureError` | `EngineeringLib.Common.EFluidDynamicsError` | `retain` | `—` | `review-only` | The 1.9.7 migration and package-boundary rehearsal confirmed exact exception identity and no dependency cost; retain the useful focused import without deprecation. |
+| `EngineeringLib.Pressure.TPressureKit` | `TFluidDynamicsKit` | `retain` | `—` | `review-only` | The 1.9.7 rehearsal proved identical type, defaults, ownership, exceptions, and numerical results through source and package paths; retain the focused import without deprecation. |
 | `EngineeringLib.Signal.TDoubleArray` | `MathBase.SharedTypes.TDoubleArray` | `retain` | `—` | `review-only` | Retain the familiar signal entry spelling used throughout TSignalKit signatures while sharing the project-wide container type. |
-| `EngineeringLib.Velocity.EVelocityError` | `EngineeringLib.Common.EFluidDynamicsError` | `canonicalize` | `EngineeringLib.Common.EFluidDynamicsError` | `review-only; revisit 1.9.7` | Review migration with the velocity facade alias so one fluid-dynamics exception path can be preferred. |
-| `EngineeringLib.Velocity.TVelocityKit` | `TFluidDynamicsKit` | `canonicalize` | `EngineeringLib.FluidDynamics.TFluidDynamicsKit` | `review-only; revisit 1.9.7` | The alias exposes the complete fluid-dynamics facade rather than a narrower velocity surface; test migration to the owning facade in 1.9.7. |
+| `EngineeringLib.Velocity.EVelocityError` | `EngineeringLib.Common.EFluidDynamicsError` | `retain` | `—` | `review-only` | The 1.9.7 migration and package-boundary rehearsal confirmed exact exception identity and no dependency cost; retain the useful focused import without deprecation. |
+| `EngineeringLib.Velocity.TVelocityKit` | `TFluidDynamicsKit` | `retain` | `—` | `review-only` | The 1.9.7 rehearsal proved identical type, defaults, ownership, exceptions, and numerical results through source and package paths; retain the focused import without deprecation. |
 | `FinanceLib.Bonds.EBondError` | `EFinanceError` | `retain` | `—` | `review-only` | Retain the focused bond entry unit and its finance-owned exception identity. |
 | `FinanceLib.Bonds.TBondKit` | `TFinanceKit` | `retain` | `—` | `review-only` | Retain the useful focused bond import without copying financial formulas. |
 | `FinanceLib.Bonds.TBondPayment` | `TFinanceKit.TAmortizationPayment` | `retain` | `—` | `review-only` | Retain the directly nameable focused result type with identical managed-value semantics. |
@@ -1440,8 +1440,8 @@ Interface SHA-256: `7ba319719acd1c24c9fd1ec661ddd8f495b2a713b22684740bfdcb788f50
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EPressureError` | `EPressureError=EngineeringLib.Common.EFluidDynamicsError` | `compatibility` | `replace` | `EFluidDynamicsError` | `pressure-error-alias` |
-| `(unit)` | `type` | `TPressureKit` | `TPressureKit=TFluidDynamicsKit` | `compatibility` | `replace` | `TFluidDynamicsKit` | `pressure-facade-alias` |
+| `(unit)` | `type` | `EPressureError` | `EPressureError=EngineeringLib.Common.EFluidDynamicsError` | `compatibility` | `retain` | `—` | `pressure-error-alias` |
+| `(unit)` | `type` | `TPressureKit` | `TPressureKit=TFluidDynamicsKit` | `compatibility` | `retain` | `—` | `pressure-facade-alias` |
 
 ## EngineeringLib.Signal
 
@@ -1756,8 +1756,8 @@ Interface SHA-256: `c71d42a545d7c3c47bbd80231ded89b3699be4c8b7169ad42bd2c145d849
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `(unit)` | `type` | `EVelocityError` | `EVelocityError=EngineeringLib.Common.EFluidDynamicsError` | `compatibility` | `replace` | `EFluidDynamicsError` | `velocity-error-alias` |
-| `(unit)` | `type` | `TVelocityKit` | `TVelocityKit=TFluidDynamicsKit` | `compatibility` | `replace` | `TFluidDynamicsKit` | `velocity-facade-alias` |
+| `(unit)` | `type` | `EVelocityError` | `EVelocityError=EngineeringLib.Common.EFluidDynamicsError` | `compatibility` | `retain` | `—` | `velocity-error-alias` |
+| `(unit)` | `type` | `TVelocityKit` | `TVelocityKit=TFluidDynamicsKit` | `compatibility` | `retain` | `—` | `velocity-facade-alias` |
 
 ## FinanceLib.Bonds
 

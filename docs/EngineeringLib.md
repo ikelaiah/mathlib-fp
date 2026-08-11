@@ -647,7 +647,7 @@ TPressureKit = TFluidDynamicsKit;
 These focused units intentionally contain aliases, not duplicate
 implementations. The one obvious path for new pressure, velocity, and flow code
 is `EngineeringLib.FluidDynamics.TFluidDynamicsKit`; `TVelocityKit` and
-`TPressureKit` remain exact supported aliases. Their migration and package
-boundary are reviewed in 1.9.7 before any deprecation decision. Physical unit
-conversions remain in `TUnitConversionKit.ConvertVelocity` and
-`ConvertPressure`.
+`TPressureKit` remain exact supported aliases. The 1.9.7 executable migration
+and package-boundary rehearsal retained both facade aliases and both focused
+error aliases without deprecation. Physical unit conversions remain in
+`TUnitConversionKit.ConvertVelocity` and `ConvertPressure`.

@@ -28,11 +28,12 @@ facades through explicit copying conversions. `FinanceLib.Bonds` and
 `FinanceLib.NPV` are retained because their focused aliases are semantically
 exact and useful; age or naming taste is not a removal reason.
 
-The exact-alias review identifies `TPressureKit`/`EPressureError` and
-`TVelocityKit`/`EVelocityError` as prospective canonicalization candidates.
-That changes documentation priority only: 1.9.3 retains every alias and adds no
-deprecation warning. Migration and the package boundary are deferred to the
-planned 1.9.7 confirmation gate.
+The exact-alias review originally identified `TPressureKit`/`EPressureError`
+and `TVelocityKit`/`EVelocityError` as prospective canonicalization candidates.
+The 1.9.7 migration and package-boundary rehearsal retained all four: focused
+imports remain useful, exact, and dependency-neutral. Documentation may prefer
+the common facade for cross-fluid code, but no deprecation warning, removal, or
+package move is approved.
 
 ## Separately routed capability
 

@@ -12,32 +12,32 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.9.6" src="https://img.shields.io/badge/version-1.9.6-brightgreen.svg">
+  <img alt="Version 1.9.7" src="https://img.shields.io/badge/version-1.9.7-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
 
 ## ✨ Why mathlib-fp?
 
-- **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
+- **Broad:** 13 focused domains, from matrices and probability to geometry and interchange.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
 - **Ready to explore:** searchable reference docs, runnable examples, and a
   release-qualified automated suite.
 
 > [!NOTE]
-> **1.9.6 is the current release; 1.2.0 was the first public release.** The
+> **1.9.7 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.9.6.md), the checked
-> [portability evidence](docs/PORTABILITY_EVIDENCE_1.9.6.md), and the
+> [release notes](docs/RELEASE_NOTES_1.9.7.md), the checked
+> [migration rehearsal](docs/MIGRATION_REHEARSAL_1.9.7.md), and the
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-Open the [1.9.6 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.6)
+Open the [1.9.7 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.7)
 or download the source directly as
-[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.6.tar.gz)
-or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.6.zip).
+[`tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.7.tar.gz)
+or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.7.zip).
 You can also clone the repository:
 
 ```bash
@@ -45,53 +45,130 @@ git clone https://github.com/ikelaiah/mathlib-fp.git
 cd mathlib-fp
 ```
 
-Save this as `my_program.pas`:
+### 1. Multiply two matrices
+
+Save this as `multiply_matrices.pas`:
 
 ```pascal
-program hello_mathlib;
+program multiply_matrices;
 
 {$mode objfpc}{$H+}
 
 uses
-  ProbabilityLib.Distributions;
+  AlgebraLib.DenseMatrices,
+  AlgebraLib.DenseKernels;
+
+var
+  A, B, ProductMatrix: IDenseDoubleMatrix;
 
 begin
-  Writeln('P(Z <= 1.96) = ', TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
+  A := TDenseDoubleMatrix.FromArray([
+    [1.0, 2.0],
+    [3.0, 4.0]
+  ]);
+  B := TDenseDoubleMatrix.FromArray([
+    [5.0, 6.0],
+    [7.0, 8.0]
+  ]);
+  ProductMatrix := Multiply(A, B);
+
+  Writeln('A * B =');
+  Writeln(ProductMatrix[0, 0]:0:0, ' ', ProductMatrix[0, 1]:0:0);
+  Writeln(ProductMatrix[1, 0]:0:0, ' ', ProductMatrix[1, 1]:0:0);
 end.
 ```
 
 Expected output:
 
 ```text
-P(Z <= 1.96) = 0.975002
+A * B =
+19 22
+43 50
 ```
 
 Compile it with `src/` on the unit search path:
 
 ```bash
 mkdir -p lib
-fpc -Fusrc -FUlib my_program.pas
-./my_program
+fpc -Fusrc -FUlib multiply_matrices.pas
+./multiply_matrices
+```
+
+### 2. Solve a system of equations
+
+Suppose three receipts contain different quantities of coffee, sandwiches,
+and juice, but only their totals remain. Solve the three simultaneous
+equations to recover the price of each item. Save this as `solve_prices.pas`:
+
+```pascal
+program solve_prices;
+
+{$mode objfpc}{$H+}
+
+uses
+  AlgebraLib.DenseMatrices,
+  AlgebraLib.DenseSolvers;
+
+var
+  ItemsPerReceipt, ReceiptTotals, UnitPrices: IDenseDoubleMatrix;
+
+begin
+  ItemsPerReceipt := TDenseDoubleMatrix.FromArray([
+    [2.0, 1.0, 1.0],
+    [1.0, 2.0, 3.0],
+    [3.0, 2.0, 1.0]
+  ]);
+  ReceiptTotals := TDenseDoubleMatrix.FromArray([
+    [18.50],
+    [28.00],
+    [30.00]
+  ]);
+
+  UnitPrices := Solve(ItemsPerReceipt, ReceiptTotals);
+
+  Writeln('Coffee:  $', UnitPrices[0, 0]:0:2);
+  Writeln('Sandwich: $', UnitPrices[1, 0]:0:2);
+  Writeln('Juice:   $', UnitPrices[2, 0]:0:2);
+end.
+```
+
+Expected output:
+
+```text
+Coffee:  $4.00
+Sandwich: $7.50
+Juice:   $3.00
+```
+
+Compile and run it in the same way:
+
+```bash
+fpc -Fusrc -FUlib solve_prices.pas
+./solve_prices
 ```
 
 Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths → Other Unit Files**, or install the mathlib-fp package from [`packages/lazarus/mathlib_fp.lpk`](packages/lazarus/mathlib_fp.lpk).
 
 ## 🧰 What's included
 
-| Domain (unit family) | Highlights |
-| --- | --- |
-| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange |
-| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](docs/DenseLinearAlgebra.md), and [structured/sparse/matrix-free solvers](docs/SparseLinearAlgebra.md) |
-| [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics |
-| [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap |
-| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion |
-| [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs |
-| [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions |
-| [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations |
-| [OptimizationLib](docs/OptimizationLib.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP |
-| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering |
-| [MLLib](docs/MLLib.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours |
-| [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms |
+Each domain has a short, runnable walkthrough so you can start from a concrete
+calculation and expand from there.
+
+| Domain (unit family) | Highlights | Runnable example |
+| --- | --- | --- |
+| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange | [Constants, precision, and trigonometry](examples/00_getting_started.pas) |
+| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](docs/DenseLinearAlgebra.md), and [structured/sparse/matrix-free solvers](docs/SparseLinearAlgebra.md) | [Matrix arithmetic and decompositions](examples/03_matrix_operations.pas) |
+| [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics | [NPV and IRR](examples/04_finance_npv_irr.pas) |
+| [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap | [Descriptive statistics](examples/01_stats_basics.pas) |
+| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion | [Type-safe unit conversion](examples/05_unit_conversion.pas) |
+| [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs | [Roots, integration, and ODEs](examples/13_numerical_methods.pas) |
+| [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions | [Common distributions](examples/07_probability.pas) |
+| [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations | [Counting and permutations](examples/08_combinatorics.pas) |
+| [OptimizationLib](docs/OptimizationLib.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP | [Optimisation and linear programming](examples/09_optimization.pas) |
+| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering | [Smoothing and forecasting](examples/10_timeseries.pas) |
+| [MLLib](docs/MLLib.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours | [Models, clustering, and metrics](examples/11_machinelearning.pas) |
+| [InterchangeLib](docs/Interchange.md) | Versioned persistence for selected fitted models and numerical state | [Save, load, and replay](examples/20_interchange_replay.pas) |
+| [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms | [Intersections, hulls, and transforms](examples/12_geometry.pas) |
 
 All public units live in `src/`; the domains can be used independently unless
 their documentation says otherwise. See the

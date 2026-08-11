@@ -1,21 +1,24 @@
 # Supported platform matrix
 
-Version 1.9.6 uses Free Pascal source and standard RTL/FCL units only. The
+Version 1.9.7 uses Free Pascal source and standard RTL/FCL units only. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](portability-evidence-1.9.6.json); the
-[evidence report](PORTABILITY_EVIDENCE_1.9.6.md) explains the checks and audit.
+[evidence report](PORTABILITY_EVIDENCE_1.9.6.md) explains the unchanged target
+contract and audit. The 1.9.7
+[migration rehearsal](MIGRATION_REHEARSAL_1.9.7.md) adds source/package
+consumer evidence without expanding the supported target matrix.
 
 ## Support tiers and current evidence
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2026-08-11, `v1.9.5`; fresh 1.9.6 candidate CI required | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2026-08-11, `v1.9.5`; fresh 1.9.6 candidate CI required | P-Linux |
-| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 2026-08-11, `v1.9.5`; reruns on each change | S-Win32 |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2026-08-12 local 1.9.7 rehearsal; fresh candidate CI required | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; fresh 1.9.7 candidate CI required | P-Linux |
+| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The exact 1.9.6 candidate commit must produce new Linux and Windows primary
+The exact 1.9.7 candidate commit must produce new Linux and Windows primary
 artifacts before tagging.
 
 ### Exact profiles
@@ -70,7 +73,7 @@ files to the offline machine, verify the checksum, and extract the archive.
 Adding `src/` to the FPC unit path is sufficient; no configure or generation
 step is required. The release page also provides a separately checksummed
 offline HTML ZIP generated from the same tagged documentation. Extract it and
-open `mathlib-fp-docs-1.9.6/index.html` locally.
+open `mathlib-fp-docs-1.9.7/index.html` locally.
 
 The release qualification workflows perform these same checksum, clean-
 extraction, direct-source, representative-workflow, documentation, and package

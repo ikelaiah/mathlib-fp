@@ -1461,7 +1461,7 @@ and offline-documentation extraction, weekly drift qualification, and explicit
 primary, secondary, and unqualified tiers. Exact 1.9.6 Linux and Windows
 candidate archive artifacts remain mandatory before tagging.
 
-## Next release: 1.9.7 — Migration and compatibility rehearsal
+## Previous release: 1.9.7 — Migration and compatibility rehearsal
 
 Version 1.9.7 proves migration before any 2.0 documentation default changes.
 It does not remove maintained 1.x declarations or silently reinterpret their
@@ -1500,7 +1500,13 @@ storage, defaults, or numerical behaviour.
 - If migration requires a new public replacement, it has shipped and soaked in
   a 1.x minor release before any corresponding removal is considered.
 
-## Planned 1.9.8 — Representative workflows and external beta
+The release ships two executable consumer projects covering all 13 documented
+domains, a machine-readable rehearsal contract and offline checker, responsible
+NumLib and LMath/DMath mappings, and direct-source/Lazarus-package evidence. It
+retains the four pressure/velocity facade and error aliases in place without
+deprecation because the focused imports are exact and dependency-neutral.
+
+## Next release: 1.9.8 — Representative workflows and external beta
 
 Version 1.9.8 validates that separately mature domains feel like one library in
 applications not written to mirror the internal architecture.

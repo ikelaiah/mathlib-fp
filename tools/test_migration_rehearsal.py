@@ -1,0 +1,202 @@
+#!/usr/bin/env python3
+"""Regression tests for the 1.9.7 migration-rehearsal contract."""
+
+from __future__ import annotations
+
+import copy
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from migration_rehearsal import (
+    REQUIRED_CONCERNS,
+    REQUIRED_DOMAINS,
+    MigrationContractError,
+    load_manifest,
+    validate_consumer_output,
+    validate_manifest,
+    validate_package_boundary,
+)
+
+
+def complete_manifest() -> dict[str, object]:
+    concerns = {name: f"verified {name}" for name in REQUIRED_CONCERNS}
+    domains = [
+        {
+            "id": domain,
+            "guide": "docs/example.md",
+            "one_x": copy.deepcopy(concerns),
+            "candidate_2_0": copy.deepcopy(concerns),
+            "semantic_differences": ["No silent behavior change."],
+            "assertions": [f"{domain}: success"],
+        }
+        for domain in REQUIRED_DOMAINS
+    ]
+    aliases = []
+    for alias in (
+        "EPressureError",
+        "TPressureKit",
+        "EVelocityError",
+        "TVelocityKit",
+    ):
+        aliases.append(
+            {
+                "name": alias,
+                "unit": "EngineeringLib.Pressure",
+                "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+                "decision": "retain",
+                "replacement": "TFluidDynamicsKit",
+                "semantic_difference": "Exact compiler alias; no difference.",
+                "migration_example": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+                "compatibility_period": "Supported throughout 1.x.",
+                "owner": "EngineeringLib",
+                "package_boundary": "in-place",
+                "tested_paths": ["fpc-direct", "lazarus-package"],
+            }
+        )
+    return {
+        "schema_version": 1,
+        "release": "1.9.7",
+        "candidate_release": "2.0",
+        "consumers": [
+            {
+                "id": "one-x",
+                "source": "examples/migration/one_x/consumer_1_9.lpr",
+                "success_marker": "1.x migration consumer: success",
+                "expected_warnings": [],
+                "source_edits": ["Keep supported 1.x imports."],
+            },
+            {
+                "id": "candidate-2.0",
+                "source": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+                "success_marker": "candidate 2.0 migration consumer: success",
+                "expected_warnings": [],
+                "source_edits": ["Replace focused aliases with canonical imports."],
+            },
+        ],
+        "tested_paths": [
+            {"id": "fpc-direct", "kind": "source", "compiler": "FPC 3.2.2"},
+            {
+                "id": "lazarus-package",
+                "kind": "package",
+                "compiler": "Lazarus 4.8 / FPC 3.2.2",
+            },
+        ],
+        "domains": domains,
+        "external_mappings": [
+            {
+                "source_library": "NumLib",
+                "source_api": "typ.ArbFloat",
+                "target": "MathBase.SharedTypes.TDoubleArray",
+                "equivalence": "conceptual",
+                "semantic_differences": ["Explicit zero-based dynamic array."],
+                "unsupported": ["No pointer-plus-bounds compatibility wrapper."],
+                "source": "https://www.freepascal.org/daily/packages/numlib/numlib/index.html",
+            },
+            {
+                "source_library": "LMath/DMath",
+                "source_api": "TVector",
+                "target": "MathBase.SharedTypes.TDoubleArray",
+                "equivalence": "conceptual",
+                "semantic_differences": ["No Lb/Ub slice parameters."],
+                "unsupported": ["No package-name compatibility layer."],
+                "source": "https://sourceforge.net/projects/lmath-library/files/LMath/",
+            },
+        ],
+        "alias_decisions": aliases,
+    }
+
+
+class MigrationRehearsalContractTests(unittest.TestCase):
+    def test_accepts_complete_contract(self) -> None:
+        validate_manifest(complete_manifest())
+
+    def test_rejects_missing_domain_semantic_concern(self) -> None:
+        manifest = complete_manifest()
+        del manifest["domains"][0]["candidate_2_0"]["ownership"]
+        with self.assertRaisesRegex(MigrationContractError, "ownership"):
+            validate_manifest(manifest)
+
+    def test_rejects_drop_in_external_mapping(self) -> None:
+        manifest = complete_manifest()
+        manifest["external_mappings"][0]["equivalence"] = "drop-in"
+        with self.assertRaisesRegex(MigrationContractError, "conceptual"):
+            validate_manifest(manifest)
+
+    def test_rejects_alias_decision_without_all_package_paths(self) -> None:
+        manifest = complete_manifest()
+        manifest["alias_decisions"][0]["tested_paths"] = ["fpc-direct"]
+        with self.assertRaisesRegex(MigrationContractError, "lazarus-package"):
+            validate_manifest(manifest)
+
+    def test_load_manifest_rejects_missing_consumer_source(self) -> None:
+        manifest = complete_manifest()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(MigrationContractError, "consumer source"):
+                load_manifest(path, root)
+
+    def test_load_manifest_rejects_path_outside_repository(self) -> None:
+        manifest = complete_manifest()
+        with tempfile.TemporaryDirectory() as directory:
+            parent = Path(directory)
+            root = parent / "repository"
+            root.mkdir()
+            outside = parent / "outside.lpr"
+            outside.write_text("program outside; begin end.", encoding="utf-8")
+            manifest["consumers"][0]["source"] = "../outside.lpr"
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(MigrationContractError, "outside repository"):
+                load_manifest(path, root)
+
+    def test_rejects_consumer_output_missing_a_domain_assertion(self) -> None:
+        output = "\n".join(
+            f"{domain}: success"
+            for domain in REQUIRED_DOMAINS
+            if domain != "GeometryLib"
+        )
+        with self.assertRaisesRegex(MigrationContractError, "GeometryLib"):
+            validate_consumer_output(
+                "one-x", output, "1.x migration consumer: success"
+            )
+
+    def test_accepts_in_place_alias_package_boundary(self) -> None:
+        package = """<?xml version="1.0"?>
+<CONFIG><Package><Files>
+  <Item><UnitName Value="EngineeringLib.Common"/></Item>
+  <Item><UnitName Value="EngineeringLib.FluidDynamics"/></Item>
+  <Item><UnitName Value="EngineeringLib.Pressure"/></Item>
+  <Item><UnitName Value="EngineeringLib.Velocity"/></Item>
+</Files><RequiredPkgs><Item><PackageName Value="FCL"/></Item></RequiredPkgs>
+</Package></CONFIG>"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "mathlib_fp.lpk"
+            path.write_text(package, encoding="utf-8")
+            evidence = validate_package_boundary(path)
+        self.assertEqual("in-place", evidence["choice"])
+        self.assertEqual(["FCL"], evidence["required_packages"])
+
+    def test_rejects_package_boundary_with_hidden_dependency(self) -> None:
+        package = """<?xml version="1.0"?>
+<CONFIG><Package><Files>
+  <Item><UnitName Value="EngineeringLib.Common"/></Item>
+  <Item><UnitName Value="EngineeringLib.FluidDynamics"/></Item>
+  <Item><UnitName Value="EngineeringLib.Pressure"/></Item>
+  <Item><UnitName Value="EngineeringLib.Velocity"/></Item>
+</Files><RequiredPkgs>
+  <Item><PackageName Value="FCL"/></Item>
+  <Item><PackageName Value="HiddenNumerics"/></Item>
+</RequiredPkgs></Package></CONFIG>"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "mathlib_fp.lpk"
+            path.write_text(package, encoding="utf-8")
+            with self.assertRaisesRegex(MigrationContractError, "HiddenNumerics"):
+                validate_package_boundary(path)
+
+
+if __name__ == "__main__":
+    unittest.main()
