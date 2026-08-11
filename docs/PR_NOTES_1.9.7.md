@@ -1,4 +1,4 @@
-# PR notes: 1.9.7 migration and compatibility rehearsal
+# feat(migration): complete v1.9.7 migration and compatibility rehearsal
 
 ## Purpose
 
