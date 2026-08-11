@@ -39,14 +39,14 @@ rehearsal schema/tests ──> side-by-side consumer projects
 
 ## Task list
 
-1. [ ] Define the v1.9.7 migration-rehearsal data contract and failing tests.
-2. [ ] Add 1.x and candidate-2.0 consumer projects covering every domain and
+1. [x] Define the v1.9.7 migration-rehearsal data contract and failing tests.
+2. [x] Add 1.x and candidate-2.0 consumer projects covering every domain and
    required semantic concern; compile and run both through the checker.
-3. [ ] Compile-test every 1.9.3 duplicate-alias candidate through direct-source
+3. [x] Compile-test every 1.9.3 duplicate-alias candidate through direct-source
    and Lazarus-package boundaries and finalize retain/deprecate decisions.
-4. [ ] Publish verified NumLib and LMath/DMath conceptual mappings, semantic
+4. [x] Publish verified NumLib and LMath/DMath conceptual mappings, semantic
    differences, unsupported cases, and source-edit guidance.
-5. [ ] Integrate migration evidence into CI, clean-archive qualification,
+5. [x] Integrate migration evidence into CI, clean-archive qualification,
    release metadata, changelog, indexes, roadmap, and release documentation.
 6. [ ] Run focused and full qualification, review all five quality axes, and
    resolve every critical or required finding.

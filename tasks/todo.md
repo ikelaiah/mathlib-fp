@@ -7,12 +7,12 @@ external mappings, duplicate-alias decisions, package paths, and result data.
 
 **Acceptance criteria:**
 
-- [ ] Every documented domain has 1.x and candidate-2.0 coverage for
+- [x] Every documented domain has 1.x and candidate-2.0 coverage for
   construction, success, failure, ownership, copying, indexing, precision,
   defaults, and result interpretation.
-- [ ] Every alias decision has a replacement, difference note, compatibility
+- [x] Every alias decision has a replacement, difference note, compatibility
   period, owner, migration example, and tested package paths.
-- [ ] Invalid or incomplete records are rejected by focused unit tests.
+- [x] Invalid or incomplete records are rejected by focused unit tests.
 
 **Verification:** `python tools/test_migration_rehearsal.py`.
 
@@ -27,10 +27,10 @@ projects that exercise every domain and assert expected behavior changes.
 
 **Acceptance criteria:**
 
-- [ ] Both projects compile with FPC 3.2.2 from the source/package layout.
-- [ ] Both projects run to a deterministic success marker and assert failure
+- [x] Both projects compile with FPC 3.2.2 from the source/package layout.
+- [x] Both projects run to a deterministic success marker and assert failure
   paths rather than documenting them only in prose.
-- [ ] The candidate project uses only replacements already shipped in 1.9.7.
+- [x] The candidate project uses only replacements already shipped in 1.9.7.
 
 **Verification:** `python tools/check_migration_rehearsal.py --compiler fpc`.
 
@@ -45,11 +45,11 @@ canonical fluid-dynamics paths, then finalize the decision list.
 
 **Acceptance criteria:**
 
-- [ ] Direct-source and Lazarus-package paths expose all old and canonical
+- [x] Direct-source and Lazarus-package paths expose all old and canonical
   declarations with no hidden dependency.
-- [ ] Type identity, exception identity, defaults, ownership, and numerical
+- [x] Type identity, exception identity, defaults, ownership, and numerical
   results are asserted.
-- [ ] Each candidate is explicitly retained or deprecated with evidence; no
+- [x] Each candidate is explicitly retained or deprecated with evidence; no
   removal entitlement is implied.
 
 **Verification:** Focused FPC consumer builds plus Lazarus package build.
@@ -64,10 +64,10 @@ canonical fluid-dynamics paths, then finalize the decision list.
 
 **Acceptance criteria:**
 
-- [ ] Common numerical tasks map to exact mathlib-fp units and entry points.
-- [ ] Indexing, storage, ownership, scalar precision, diagnostics, defaults,
+- [x] Common numerical tasks map to exact mathlib-fp units and entry points.
+- [x] Indexing, storage, ownership, scalar precision, diagnostics, defaults,
   and unsupported differences are explicit.
-- [ ] Primary upstream references and “not drop-in compatible” language are
+- [x] Primary upstream references and “not drop-in compatible” language are
   present.
 
 **Verification:** Rehearsal schema tests and documentation checks.
@@ -83,10 +83,10 @@ relevant documentation and metadata to 1.9.7.
 
 **Acceptance criteria:**
 
-- [ ] Linux/Windows CI and clean-archive qualification run the rehearsal.
-- [ ] README, package, capabilities, versions, changelog, support, releasing,
+- [x] Linux/Windows CI and clean-archive qualification run the rehearsal.
+- [x] README, package, capabilities, versions, changelog, support, releasing,
   docs index, release/PR/qualification notes, and roadmap agree on 1.9.7.
-- [ ] Roadmap records 1.9.7 as previous and 1.9.8 as next.
+- [x] Roadmap records 1.9.7 as previous and 1.9.8 as next.
 
 **Verification:** Documentation, release-state, build-site, and qualification
 tests.

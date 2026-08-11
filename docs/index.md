@@ -13,6 +13,14 @@ allocating path and link the advanced controls separately.
 
 ## Releases
 
+- [mathlib-fp 1.9.7 release notes](RELEASE_NOTES_1.9.7.md) — executable
+  side-by-side migration, external-library mappings, and alias decisions.
+- [1.9.7 migration rehearsal](MIGRATION_REHEARSAL_1.9.7.md) — all-domain
+  consumers, source edits, package boundary, and NumLib/LMath guidance.
+- [1.9.7 PR notes](PR_NOTES_1.9.7.md) — implementation and review boundary.
+- [1.9.7 qualification report](QUALIFICATION_1.9.7.md) — local and candidate
+  archive evidence status.
+
 - [mathlib-fp 1.9.6 release notes](RELEASE_NOTES_1.9.6.md) — evidence-backed
   platform tiers, archive qualification, and offline distribution.
 - [1.9.6 portability evidence](PORTABILITY_EVIDENCE_1.9.6.md) — native ABI/

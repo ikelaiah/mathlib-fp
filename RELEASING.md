@@ -44,6 +44,11 @@ Use this checklist for every mathlib-fp release.
   `python tools/check_portability_evidence.py --compiler fpc`; confirm the
   target/ABI matches the manifest, the source/package audit is clean, and the
   generated `portability-results.json` names exact checks and limitations.
+- [ ] For 1.9.7, run `python tools/test_migration_rehearsal.py` and
+  `python tools/check_migration_rehearsal.py --compiler fpc`; confirm both
+  consumer projects assert all 13 domains, the alias-boundary consumer passes,
+  compiler warnings match the manifest, and every alias decision records both
+  direct-source and Lazarus-package evidence.
 - [ ] Run exact Linux and Windows qualification with `--source-archive`,
   `--source-checksum`, and `--network-isolated` only after the workflow has
   blocked new outbound connections. Review the recorded digest, archive file
@@ -108,6 +113,10 @@ python tools/check_performance_evidence.py --compiler fpc \
 python tools/test_portability_evidence.py
 python tools/check_portability_evidence.py --compiler fpc \
   --work-dir build-temp/portability
+
+python tools/test_migration_rehearsal.py
+python tools/check_migration_rehearsal.py --compiler fpc \
+  --work-dir build-temp/migration-rehearsal
 
 lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 ```

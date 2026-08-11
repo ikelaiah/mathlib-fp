@@ -356,6 +356,7 @@ def documentation_gates(
         "test_numerical_mutation.py",
         "test_performance_evidence.py",
         "test_portability_evidence.py",
+        "test_migration_rehearsal.py",
         "check_docs.py",
         "check_api_decision.py",
         "check_numerical_evidence.py",
@@ -475,6 +476,21 @@ def portability_gate(
     )
 
 
+def migration_rehearsal_gate(
+    qualification: Qualification, compiler: str,
+) -> None:
+    qualification.run(
+        "migration-rehearsal",
+        [
+            sys.executable,
+            str(ROOT / "tools" / "check_migration_rehearsal.py"),
+            "--compiler", compiler,
+            "--work-dir", str(qualification.work / "migration-rehearsal"),
+            "--result", str(qualification.work / "migration-results.json"),
+        ],
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--release", required=True)
@@ -542,6 +558,7 @@ def main() -> int:
         )
         build_and_run_examples(qualification, args.compiler)
         documentation_gates(qualification, args.compiler, args.release)
+        migration_rehearsal_gate(qualification, args.compiler)
         portability_gate(qualification, args.compiler)
         if not args.skip_package:
             package_gate(qualification, args.lazbuild)

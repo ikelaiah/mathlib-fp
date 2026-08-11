@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.7] - 2026-08-12
+
+### Added
+
+- Added independent supported-1.x and candidate-2.0 consumer projects that
+  compile and assert construction, ordinary results, diagnostic failure,
+  ownership/copying, indexing, precision, defaults, and interpretation across
+  all 13 documented domains.
+- Added an offline migration-rehearsal contract and checker covering direct FPC
+  use, the Lazarus package boundary, expected warnings/source edits, and
+  generated host-specific results.
+- Published conservative NumLib and LMath/DMath conceptual mappings with
+  explicit storage, indexing, ownership, diagnostic, precision, licensing, and
+  unsupported-compatibility differences.
+
+### Compatibility
+
+- Retained `TPressureKit`, `EPressureError`, `TVelocityKit`, and
+  `EVelocityError` in their existing units after executable source/package
+  rehearsal confirmed exact identity and no hidden dependency. No deprecation,
+  warning, package move, or removal runway is introduced.
+
+### Documentation
+
+- Published the migration decision list, side-by-side source edits, package
+  evidence, release notes, PR notes, and qualification record for 1.9.7.
+
 ## [1.9.6] - 2026-08-11
 
 ### Validation

@@ -12,32 +12,32 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.9.6" src="https://img.shields.io/badge/version-1.9.6-brightgreen.svg">
+  <img alt="Version 1.9.7" src="https://img.shields.io/badge/version-1.9.7-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
 
 ## ✨ Why mathlib-fp?
 
-- **Broad:** 12 focused domains, from matrices and probability to geometry and ARIMA.
+- **Broad:** 13 focused domains, from matrices and probability to geometry and interchange.
 - **Native:** written for FPC 3.2.2+ in `objfpc` mode.
 - **Lightweight:** use only the units you need; no third-party runtime dependencies.
 - **Ready to explore:** searchable reference docs, runnable examples, and a
   release-qualified automated suite.
 
 > [!NOTE]
-> **1.9.6 is the current release; 1.2.0 was the first public release.** The
+> **1.9.7 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.9.6.md), the checked
-> [portability evidence](docs/PORTABILITY_EVIDENCE_1.9.6.md), and the
+> [release notes](docs/RELEASE_NOTES_1.9.7.md), the checked
+> [migration rehearsal](docs/MIGRATION_REHEARSAL_1.9.7.md), and the
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-Open the [1.9.6 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.6)
+Open the [1.9.7 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.7)
 or download the source directly as
-[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.6.tar.gz)
-or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.6.zip).
+[`tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.7.tar.gz)
+or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.7.zip).
 You can also clone the repository:
 
 ```bash
