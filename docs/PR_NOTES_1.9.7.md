@@ -1,4 +1,4 @@
-# feat(migration): complete v1.9.7 migration and compatibility rehearsal
+# chore(release): complete v1.9.7 migration and compatibility rehearsal
 
 ## Purpose
 
