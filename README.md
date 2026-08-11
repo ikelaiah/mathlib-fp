@@ -53,17 +53,29 @@ program hello_mathlib;
 {$mode objfpc}{$H+}
 
 uses
-  ProbabilityLib.Distributions;
+  AlgebraLib.DenseMatrices,
+  AlgebraLib.DenseKernels;
+
+var
+  A, B, ProductMatrix: IDenseDoubleMatrix;
 
 begin
-  Writeln('P(Z <= 1.96) = ', TProbabilityKit.NormalCDF(1.96, 0, 1):0:6);
+  A := TDenseDoubleMatrix.FromValues(2, 2, [1.0, 2.0, 3.0, 4.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 2, [5.0, 6.0, 7.0, 8.0]);
+  ProductMatrix := Multiply(A, B);
+
+  Writeln('A * B =');
+  Writeln(ProductMatrix[0, 0]:0:0, ' ', ProductMatrix[0, 1]:0:0);
+  Writeln(ProductMatrix[1, 0]:0:0, ' ', ProductMatrix[1, 1]:0:0);
 end.
 ```
 
 Expected output:
 
 ```text
-P(Z <= 1.96) = 0.975002
+A * B =
+19 22
+43 50
 ```
 
 Compile it with `src/` on the unit search path:
@@ -78,20 +90,24 @@ Using Lazarus? Add `src/` under **Project Options → Compiler Options → Paths
 
 ## 🧰 What's included
 
-| Domain (unit family) | Highlights |
-| --- | --- |
-| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange |
-| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](docs/DenseLinearAlgebra.md), and [structured/sparse/matrix-free solvers](docs/SparseLinearAlgebra.md) |
-| [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics |
-| [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap |
-| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion |
-| [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs |
-| [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions |
-| [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations |
-| [OptimizationLib](docs/OptimizationLib.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP |
-| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering |
-| [MLLib](docs/MLLib.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours |
-| [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms |
+Each domain has a short, runnable walkthrough so you can start from a concrete
+calculation and expand from there.
+
+| Domain (unit family) | Highlights | Runnable example |
+| --- | --- | --- |
+| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange | [Constants, precision, and trigonometry](examples/00_getting_started.pas) |
+| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](docs/DenseLinearAlgebra.md), and [structured/sparse/matrix-free solvers](docs/SparseLinearAlgebra.md) | [Matrix arithmetic and decompositions](examples/03_matrix_operations.pas) |
+| [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics | [NPV and IRR](examples/04_finance_npv_irr.pas) |
+| [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap | [Descriptive statistics](examples/01_stats_basics.pas) |
+| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion | [Type-safe unit conversion](examples/05_unit_conversion.pas) |
+| [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs | [Roots, integration, and ODEs](examples/13_numerical_methods.pas) |
+| [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions | [Common distributions](examples/07_probability.pas) |
+| [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations | [Counting and permutations](examples/08_combinatorics.pas) |
+| [OptimizationLib](docs/OptimizationLib.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP | [Optimisation and linear programming](examples/09_optimization.pas) |
+| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering | [Smoothing and forecasting](examples/10_timeseries.pas) |
+| [MLLib](docs/MLLib.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours | [Models, clustering, and metrics](examples/11_machinelearning.pas) |
+| [InterchangeLib](docs/Interchange.md) | Versioned persistence for selected fitted models and numerical state | [Save, load, and replay](examples/20_interchange_replay.pas) |
+| [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms | [Intersections, hulls, and transforms](examples/12_geometry.pas) |
 
 All public units live in `src/`; the domains can be used independently unless
 their documentation says otherwise. See the
