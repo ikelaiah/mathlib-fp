@@ -10,6 +10,7 @@ import os
 import platform
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import tarfile
@@ -125,6 +126,21 @@ def verify_archive_checksum(archive: Path, checksum: Path) -> str:
     return actual
 
 
+def verify_network_isolated() -> None:
+    """Fail when a new outbound TCP connection is possible in offline mode."""
+    connection = None
+    try:
+        connection = socket.create_connection(("1.1.1.1", 443), timeout=2.0)
+    except OSError:
+        return
+    finally:
+        if connection is not None:
+            connection.close()
+    raise RuntimeError(
+        "outbound network is reachable during network-isolated qualification"
+    )
+
+
 def _safe_archive_files(archive: Path) -> set[str]:
     if zipfile.is_zipfile(archive):
         with zipfile.ZipFile(archive) as bundle:
@@ -163,9 +179,21 @@ def verify_clean_source_archive(
         )
     if (root / ".git").exists():
         raise RuntimeError("clean source tree contains repository-local .git state")
-    forbidden_suffixes = {".o", ".ppu", ".exe", ".dll", ".so", ".dylib", ".compiled"}
+    forbidden_suffixes = {
+        ".a", ".compiled", ".dll", ".dylib", ".exe", ".o", ".obj", ".or",
+        ".pdb", ".ppu", ".pyc", ".res", ".so",
+    }
     compiler_outputs = sorted(
         name for name in archive_files if Path(name).suffix.lower() in forbidden_suffixes
+    )
+    generated_prefixes = (
+        "build-temp/", "example-bin/", "tests/lib/", "packages/lazarus/lib/",
+    )
+    compiler_outputs.extend(
+        sorted(
+            name for name in archive_files
+            if any(name.startswith(prefix) for prefix in generated_prefixes)
+        )
     )
     if compiler_outputs:
         raise RuntimeError(f"source archive contains compiler output: {compiler_outputs}")
@@ -475,11 +503,16 @@ def main() -> int:
             raise RuntimeError(
                 "--source-archive and --source-checksum must be supplied together"
             )
+        if args.network_isolated and not args.source_archive:
+            raise RuntimeError(
+                "--network-isolated requires a verified source archive"
+            )
         if args.source_archive:
             if not args.network_isolated:
                 raise RuntimeError(
                     "clean source archive qualification requires --network-isolated"
                 )
+            verify_network_isolated()
             archive_evidence = verify_clean_source_archive(
                 ROOT,
                 args.source_archive.resolve(),

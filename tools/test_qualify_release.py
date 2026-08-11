@@ -8,11 +8,13 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 from qualify_release import (
     output_tail,
     verify_clean_source_archive,
     verify_heaptrc_output,
+    verify_network_isolated,
     verify_offline_documentation_archive,
 )
 
@@ -124,6 +126,27 @@ class ArchiveValidationTests(unittest.TestCase):
             )
 
             self.assertTrue((extracted / "index.html").is_file())
+
+
+class NetworkIsolationTests(unittest.TestCase):
+    @patch("qualify_release.socket.create_connection", side_effect=OSError("blocked"))
+    def test_accepts_blocked_outbound_connection(
+        self, create_connection: MagicMock
+    ) -> None:
+        verify_network_isolated()
+        create_connection.assert_called_once()
+
+    @patch("qualify_release.socket.create_connection")
+    def test_rejects_reachable_outbound_connection(
+        self, create_connection: MagicMock
+    ) -> None:
+        connection = MagicMock()
+        create_connection.return_value = connection
+
+        with self.assertRaisesRegex(RuntimeError, "outbound network is reachable"):
+            verify_network_isolated()
+
+        connection.close.assert_called_once()
 
 
 if __name__ == "__main__":

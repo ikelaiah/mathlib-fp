@@ -146,6 +146,19 @@ class PortabilityEvidenceTests(unittest.TestCase):
         self.assertTrue(any("runtime_dependency" in item for item in findings))
         self.assertTrue(any("calling_convention" in item for item in findings))
 
+    def test_source_audit_rejects_link_and_generated_include_directives(self) -> None:
+        findings = audit_source_texts(
+            {
+                "src/Foreign.pas": (
+                    "unit Foreign; {$linklib solver} {$I generated-table.inc} "
+                    "interface implementation end."
+                )
+            }
+        )
+
+        self.assertTrue(any("link directive" in item for item in findings))
+        self.assertTrue(any("include directive" in item for item in findings))
+
     def test_source_audit_accepts_standard_portable_units(self) -> None:
         findings = audit_source_texts(
             {

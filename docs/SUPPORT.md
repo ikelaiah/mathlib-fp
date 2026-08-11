@@ -75,3 +75,5 @@ open `mathlib-fp-docs-1.9.6/index.html` locally.
 The release qualification workflows perform these same checksum, clean-
 extraction, direct-source, representative-workflow, documentation, and package
 checks after toolchain installation and with new outbound connections blocked.
+The release driver actively challenges that policy and fails if a new outbound
+connection succeeds.

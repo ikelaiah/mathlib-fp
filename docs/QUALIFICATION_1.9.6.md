@@ -14,7 +14,7 @@ checksummed clean-archive workflows pass for the exact candidate commit.
 | Assumption audit | Filesystem, locale, endian, floating-point, calling-convention, address-space, and runtime-dependency outcomes are published and mechanically checked where applicable. |
 | Clean source archive | The driver verifies SHA-256, safe members, required content, exact extraction, absence of `.git`, and absence of compiler/runtime artifacts before building. |
 | Offline documentation | The generated ZIP checksum is verified; the archive is extracted and its links, search data, and release identity are checked again. |
-| Offline execution | Linux/Windows workflows install FPC/Lazarus before applying an outbound-default-block policy during extracted-tree qualification. |
+| Offline execution | Linux/Windows workflows install FPC/Lazarus before applying an outbound-default-block policy; the driver rejects offline mode if an active outbound connection succeeds. |
 | Honest limitations | Win32 has a named secondary profile; macOS/ARM64, Linux/ARM64, other Unix variants, and other compiler versions remain visibly unqualified. |
 
 ## Required local command

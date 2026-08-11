@@ -271,6 +271,16 @@ def audit_source_texts(source_texts: Mapping[str, str]) -> list[str]:
     )
     uses_pattern = re.compile(r"\buses\b(?P<body>.*?);", re.IGNORECASE | re.DOTALL)
     for name, text in sorted(source_texts.items()):
+        if re.search(
+            r"(?:\{\$|\(\*\$)\s*(?:linklib|link|l|dynamiclib)\b",
+            text,
+            re.IGNORECASE,
+        ):
+            findings.append(f"runtime_dependency:{name}: link directive")
+        if re.search(
+            r"(?:\{\$|\(\*\$)\s*(?:i|include)\b", text, re.IGNORECASE
+        ):
+            findings.append(f"filesystem:{name}: include directive")
         code = _pascal_code_only(text)
         for match in uses_pattern.finditer(code):
             body = match.group("body")

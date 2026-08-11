@@ -61,8 +61,8 @@ benchmarks, and the native probe directly from that tree.
 The generated offline HTML ZIP and checksum are independently verified,
 extracted, and passed through the built-link/release-identity checker. Linux
 and Windows workflows install FPC/Lazarus first, then block new outbound
-connections for qualification and restore runner networking before artifact
-publication.
+connections for qualification, require an active connection attempt to fail,
+and restore runner networking before artifact publication.
 
 ## Unqualified targets
 

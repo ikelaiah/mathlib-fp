@@ -20,7 +20,8 @@ repository state and compiler output, compares the archive with its extracted
 tree, and records the digest. The documentation ZIP is separately checksummed,
 extracted, and checked for links and release identity. Exact Linux and Windows
 archive workflows install toolchains first and then block new outbound
-connections while qualification runs.
+connections while qualification runs. The driver actively verifies that a new
+outbound connection cannot be opened before accepting offline evidence.
 
 Primary checks continue on each change; complete archive qualification also
 runs weekly, manually, and for the exact release. Windows i386 has an explicit
