@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.6] - 2026-08-11
+
+### Validation
+
+- Added a native Pascal ABI, endian, locale, numerical, and exact binary-format
+  probe plus an offline validator for tiered target evidence and stable-source/
+  package dependency assumptions.
+- Release qualification now verifies source-archive SHA-256 and exact clean
+  extraction, rejects repository/compiler artifacts, extracts and rechecks the
+  offline documentation ZIP, and retains target-specific portability results.
+- Primary checks run on each change and complete Linux/Windows archive
+  qualification runs weekly and for exact candidates/releases; Windows i386
+  has a bounded secondary profile rather than inferred primary coverage.
+- Clean archive workflows block new outbound connections after toolchain
+  installation and restore runner networking before evidence publication.
+
+### Documentation
+
+- Published compiler, OS/CPU, pointer/scalar ABI, evidence dates/refs, exact
+  checks, platform-assumption audit outcomes, offline installation steps, and
+  visible unqualified-target limits in machine-readable and human-readable
+  v1.9.6 evidence.
+
 ## [1.9.5] - 2026-08-11
 
 ### Performance

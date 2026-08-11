@@ -4,12 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import platform
 import re
+import shutil
+import socket
 import subprocess
 import sys
+import tarfile
 import time
 import zipfile
 from pathlib import Path
@@ -29,6 +33,7 @@ class Qualification:
         self.logs = work / "logs"
         self.logs.mkdir(parents=True, exist_ok=True)
         self.results: list[dict[str, object]] = []
+        self.context: dict[str, object] = {}
 
     def write_results(self, release: str, compiler: str) -> None:
         self.result_path.parent.mkdir(parents=True, exist_ok=True)
@@ -40,6 +45,7 @@ class Qualification:
                     "platform": platform.platform(),
                     "python": platform.python_version(),
                     "compiler": compiler,
+                    "qualification_context": self.context,
                     "gates": self.results,
                 },
                 indent=2,
@@ -99,6 +105,143 @@ def output_tail(output: str, limit: int = 12000) -> str:
     if len(output) <= limit:
         return output
     return "[... earlier output omitted ...]\n" + output[-limit:]
+
+
+def verify_archive_checksum(archive: Path, checksum: Path) -> str:
+    try:
+        fields = checksum.read_text(encoding="ascii").strip().split()
+    except OSError as exc:
+        raise RuntimeError(f"cannot read archive checksum {checksum}: {exc}") from exc
+    if len(fields) != 2 or not re.fullmatch(r"[0-9a-fA-F]{64}", fields[0]):
+        raise RuntimeError(f"invalid SHA-256 checksum file {checksum}")
+    if Path(fields[1].lstrip("*")).name != archive.name:
+        raise RuntimeError(
+            f"checksum names {fields[1]!r}, expected archive {archive.name!r}"
+        )
+    actual = hashlib.sha256(archive.read_bytes()).hexdigest()
+    if actual.lower() != fields[0].lower():
+        raise RuntimeError(
+            f"archive checksum mismatch: expected {fields[0].lower()}, found {actual}"
+        )
+    return actual
+
+
+def verify_network_isolated() -> None:
+    """Fail when a new outbound TCP connection is possible in offline mode."""
+    connection = None
+    try:
+        connection = socket.create_connection(("1.1.1.1", 443), timeout=2.0)
+    except OSError:
+        return
+    finally:
+        if connection is not None:
+            connection.close()
+    raise RuntimeError(
+        "outbound network is reachable during network-isolated qualification"
+    )
+
+
+def _safe_archive_files(archive: Path) -> set[str]:
+    if zipfile.is_zipfile(archive):
+        with zipfile.ZipFile(archive) as bundle:
+            names = [item.filename for item in bundle.infolist() if not item.is_dir()]
+    elif tarfile.is_tarfile(archive):
+        with tarfile.open(archive, "r:*") as bundle:
+            names = [item.name for item in bundle.getmembers() if item.isfile()]
+    else:
+        raise RuntimeError(f"unsupported source archive format: {archive}")
+    normalized: set[str] = set()
+    for raw_name in names:
+        name = raw_name.replace("\\", "/")
+        parts = Path(name).parts
+        if name.startswith("/") or ".." in parts or not name:
+            raise RuntimeError(f"unsafe archive member {raw_name!r}")
+        normalized.add(name)
+    return normalized
+
+
+def verify_clean_source_archive(
+    root: Path, archive: Path, checksum: Path
+) -> dict[str, object]:
+    """Verify a source archive and its already-extracted clean tree."""
+    digest = verify_archive_checksum(archive, checksum)
+    archive_files = _safe_archive_files(archive)
+    required_files = {"README.md", "LICENSE.md", "RELEASING.md"}
+    missing_files = sorted(required_files - archive_files)
+    required_prefixes = ("src/", "docs/", "examples/", "tests/", "tools/", "packages/")
+    missing_prefixes = [
+        prefix for prefix in required_prefixes
+        if not any(name.startswith(prefix) for name in archive_files)
+    ]
+    if missing_files or missing_prefixes:
+        raise RuntimeError(
+            f"source archive is incomplete: files={missing_files}, prefixes={missing_prefixes}"
+        )
+    if (root / ".git").exists():
+        raise RuntimeError("clean source tree contains repository-local .git state")
+    forbidden_suffixes = {
+        ".a", ".compiled", ".dll", ".dylib", ".exe", ".o", ".obj", ".or",
+        ".pdb", ".ppu", ".pyc", ".res", ".so",
+    }
+    compiler_outputs = sorted(
+        name for name in archive_files if Path(name).suffix.lower() in forbidden_suffixes
+    )
+    generated_prefixes = (
+        "build-temp/", "example-bin/", "tests/lib/", "packages/lazarus/lib/",
+    )
+    compiler_outputs.extend(
+        sorted(
+            name for name in archive_files
+            if any(name.startswith(prefix) for prefix in generated_prefixes)
+        )
+    )
+    if compiler_outputs:
+        raise RuntimeError(f"source archive contains compiler output: {compiler_outputs}")
+    extracted_files = {
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file()
+    }
+    if extracted_files != archive_files:
+        missing = sorted(archive_files - extracted_files)[:10]
+        extra = sorted(extracted_files - archive_files)[:10]
+        raise RuntimeError(
+            f"extracted source tree differs from archive: missing={missing}, extra={extra}"
+        )
+    return {
+        "archive": archive.name,
+        "sha256": digest,
+        "files": len(archive_files),
+        "clean_tree": True,
+    }
+
+
+def verify_offline_documentation_archive(
+    archive: Path, checksum: Path, extraction: Path, release: str
+) -> Path:
+    """Verify and extract the generated offline HTML archive safely."""
+    verify_archive_checksum(archive, checksum)
+    prefix = f"mathlib-fp-docs-{release}/"
+    with zipfile.ZipFile(archive) as bundle:
+        files = [item.filename for item in bundle.infolist() if not item.is_dir()]
+        required = {
+            prefix + "index.html",
+            prefix + "release.json",
+            prefix + "search-index.json",
+        }
+        if not required.issubset(files):
+            raise RuntimeError(
+                f"offline documentation archive is missing {sorted(required - set(files))}"
+            )
+        for name in files:
+            normalized = name.replace("\\", "/")
+            if not normalized.startswith(prefix) or ".." in Path(normalized).parts:
+                raise RuntimeError(f"unsafe offline documentation member {name!r}")
+        if extraction.exists():
+            shutil.rmtree(extraction)
+        extraction.mkdir(parents=True)
+        bundle.extractall(extraction)
+    return extraction / prefix.rstrip("/")
 
 
 def verify_heaptrc_output(output: str) -> None:
@@ -212,6 +355,7 @@ def documentation_gates(
         "test_numerical_evidence.py",
         "test_numerical_mutation.py",
         "test_performance_evidence.py",
+        "test_portability_evidence.py",
         "check_docs.py",
         "check_api_decision.py",
         "check_numerical_evidence.py",
@@ -253,19 +397,19 @@ def documentation_gates(
             "--site", str(site), "--release", release,
         ],
     )
-    with zipfile.ZipFile(archive) as bundle:
-        names = set(bundle.namelist())
-        prefix = f"mathlib-fp-docs-{release}/"
-        required = {
-            prefix + "index.html",
-            prefix + "release.json",
-            prefix + "search-index.json",
-        }
-        if not required.issubset(names):
-            qualification.results[-1]["status"] = "failed"
-            raise RuntimeError(
-                f"offline documentation archive is missing {sorted(required - names)}"
-            )
+    extracted_site = verify_offline_documentation_archive(
+        archive,
+        archive.with_name(archive.name + ".sha256"),
+        qualification.work / "offline-docs-extracted",
+        release,
+    )
+    qualification.run(
+        "documentation-offline-archive-links",
+        [
+            sys.executable, str(ROOT / "tools" / "check_built_docs.py"),
+            "--site", str(extracted_site), "--release", release,
+        ],
+    )
 
 
 def package_gate(
@@ -316,6 +460,21 @@ def benchmark_gate(
     )
 
 
+def portability_gate(
+    qualification: Qualification, compiler: str,
+) -> None:
+    qualification.run(
+        "portability-evidence",
+        [
+            sys.executable,
+            str(ROOT / "tools" / "check_portability_evidence.py"),
+            "--compiler", compiler,
+            "--work-dir", str(qualification.work / "portability"),
+            "--result", str(qualification.work / "portability-results.json"),
+        ],
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--release", required=True)
@@ -330,6 +489,9 @@ def main() -> int:
     )
     parser.add_argument("--skip-package", action="store_true")
     parser.add_argument("--skip-benchmark", action="store_true")
+    parser.add_argument("--source-archive", type=Path)
+    parser.add_argument("--source-checksum", type=Path)
+    parser.add_argument("--network-isolated", action="store_true")
     args = parser.parse_args()
 
     work = (ROOT / args.work_dir).resolve()
@@ -337,6 +499,27 @@ def main() -> int:
     qualification = Qualification(work, result)
     compiler_version = "unknown"
     try:
+        if bool(args.source_archive) != bool(args.source_checksum):
+            raise RuntimeError(
+                "--source-archive and --source-checksum must be supplied together"
+            )
+        if args.network_isolated and not args.source_archive:
+            raise RuntimeError(
+                "--network-isolated requires a verified source archive"
+            )
+        if args.source_archive:
+            if not args.network_isolated:
+                raise RuntimeError(
+                    "clean source archive qualification requires --network-isolated"
+                )
+            verify_network_isolated()
+            archive_evidence = verify_clean_source_archive(
+                ROOT,
+                args.source_archive.resolve(),
+                args.source_checksum.resolve(),
+            )
+            qualification.context["source_archive"] = archive_evidence
+        qualification.context["network_isolated"] = args.network_isolated
         compiler_version = qualification.run(
             "compiler-version", [args.compiler, "-iV"], timeout=30
         ).strip()
@@ -359,6 +542,7 @@ def main() -> int:
         )
         build_and_run_examples(qualification, args.compiler)
         documentation_gates(qualification, args.compiler, args.release)
+        portability_gate(qualification, args.compiler)
         if not args.skip_package:
             package_gate(qualification, args.lazbuild)
         if not args.skip_benchmark:

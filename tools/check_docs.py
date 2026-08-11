@@ -12,11 +12,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.5"
-NEXT_RELEASE = "1.9.6"
+CURRENT_RELEASE = "1.9.6"
+NEXT_RELEASE = "1.9.7"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
-HISTORICAL_RELEASES = ["1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
+HISTORICAL_RELEASES = ["1.9.5", "1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -173,6 +173,10 @@ def main() -> int:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
         assert inventory["release"] == CURRENT_RELEASE
         assert inventory["schema_version"] == 1
+        assert inventory["support_matrix"] == "docs/SUPPORT.md"
+        assert inventory["portability_evidence"] == (
+            "docs/portability-evidence-1.9.6.json"
+        )
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
         errors.append(f"docs/capabilities.json: invalid inventory: {exc}")
@@ -713,7 +717,7 @@ def main() -> int:
         DOCS / f"RELEASE_NOTES_{CURRENT_RELEASE}.md",
         DOCS / f"PR_NOTES_{CURRENT_RELEASE}.md",
         DOCS / f"QUALIFICATION_{CURRENT_RELEASE}.md",
-        DOCS / f"PERFORMANCE_EVIDENCE_{CURRENT_RELEASE}.md",
+        DOCS / f"PORTABILITY_EVIDENCE_{CURRENT_RELEASE}.md",
         DOCS / "FEEDBACK.md",
     ]
     for release_file in release_files:
@@ -733,7 +737,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="5"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="6"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:

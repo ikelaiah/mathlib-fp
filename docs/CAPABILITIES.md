@@ -2,6 +2,8 @@
 
 The machine-readable source for this page is
 [`capabilities.json`](capabilities.json).
+Target qualifications and platform-specific limitations are defined by the
+[support matrix](SUPPORT.md), not inferred from capability maturity.
 
 | Family | Maturity | Scalar paths | Important limitations |
 | --- | --- | --- | --- |

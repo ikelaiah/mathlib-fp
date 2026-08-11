@@ -40,6 +40,14 @@ Use this checklist for every mathlib-fp release.
   `python tools/check_performance_evidence.py --compiler fpc`; confirm every
   published claim maps to a checked row, investigate every `review` comparison,
   and retain the generated `performance-results.json` with qualification.
+- [ ] For 1.9.6, run `python tools/test_portability_evidence.py` and
+  `python tools/check_portability_evidence.py --compiler fpc`; confirm the
+  target/ABI matches the manifest, the source/package audit is clean, and the
+  generated `portability-results.json` names exact checks and limitations.
+- [ ] Run exact Linux and Windows qualification with `--source-archive`,
+  `--source-checksum`, and `--network-isolated` only after the workflow has
+  blocked new outbound connections. Review the recorded digest, archive file
+  count, extracted offline HTML check, and target-specific artifacts.
 - [ ] Build the deterministic offline documentation ZIP, verify its SHA-256,
   extract it without network access, and compare its `release.json`, examples,
   signatures, and limitations with repository Markdown.
@@ -96,6 +104,10 @@ python tools/check_built_docs.py \
 python tools/test_performance_evidence.py
 python tools/check_performance_evidence.py --compiler fpc \
   --work-dir build-temp/performance
+
+python tools/test_portability_evidence.py
+python tools/check_portability_evidence.py --compiler fpc \
+  --work-dir build-temp/portability
 
 lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 ```

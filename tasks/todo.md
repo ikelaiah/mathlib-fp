@@ -1,135 +1,117 @@
-# 1.9.5 task list
+# 1.9.6 task list
 
-## Task 1: Performance evidence contract
+## Task 1: Portability evidence contract
 
-**Description:** Define the checked manifest and row format for reproducible
-performance, allocation, retained-memory, correctness, and setup evidence.
+**Description:** Define target tiers, exact gate profiles, ABI expectations,
+cross-target invariants, audit categories, and generated result semantics.
 
 **Acceptance criteria:**
 
-- [x] The manifest requires all seven roadmap domains and small/large scale
-  coverage where meaningful.
-- [x] Every row names scalar kind, shape, tolerance, setup, timing mode,
-  allocation/retained-state semantics, checksum, and comparison policy.
-- [x] Timing review signals are distinct from hard allocation/complexity gates.
+- [x] Every claimed target names compiler, OS, CPU, pointer/scalar ABI, exact
+  checks, evidence date/ref, and limitations.
+- [x] Unqualified targets are structurally distinct from supported targets.
+- [x] Binary/numerical invariants and source-audit rules are machine-readable.
 
-**Verification:** `python tools/test_performance_evidence.py`.
+**Verification:** `python tools/test_portability_evidence.py`.
 
 **Dependencies:** None.
 
 **Estimated scope:** Medium.
 
-## Task 2: Benchmark rows and exact tripwires
+## Task 2: Native probe and offline validator
 
-**Description:** Extend `BenchmarkRunner` to emit uniform machine-readable
-rows for dense, sparse, iterative, DSP, modelling, statistics, and analysis.
+**Description:** Compile and run a Pascal probe, validate its observations and
+the source/package audit, and write target-specific evidence JSON.
 
 **Acceptance criteria:**
 
-- [x] Rows report cold and warmed timing plus deterministic correctness values.
-- [x] Exact allocation, retained-state, and inappropriate dense-shape ceilings
-  halt the runner and fail the Python gate.
-- [x] Small-call and large-throughput workloads are both represented.
+- [x] ABI, endian, locale, binary, and numerical observations are deterministic
+  and validated against the target contract.
+- [x] Foreign runtime/network/calling-convention dependencies fail the audit.
+- [x] The validator uses only standard-library Python and works offline.
 
-**Verification:** Compile/run the benchmark at `-O3`, then validate its output.
+**Verification:** Focused unit tests and
+`python tools/check_portability_evidence.py --compiler fpc`.
 
 **Dependencies:** Task 1.
 
-**Estimated scope:** Medium, split between runner infrastructure and workloads.
+**Estimated scope:** Medium.
 
-## Task 3: Offline performance validator
+## Task 3: Archive qualification enforcement
 
-**Description:** Compile/run the benchmark, capture reproducible host/toolchain
-conditions, validate rows against the manifest, and write versioned JSON.
+**Description:** Verify checksummed source archives, extracted clean trees,
+network isolation, and extracted checksummed offline-documentation archives in
+the release driver.
 
 **Acceptance criteria:**
 
-- [x] Missing/duplicate/malformed rows and hard-ceiling failures are rejected.
-- [x] Same-run and prior-baseline ratios are calculated with advisory review
-  status for noisy timing.
-- [x] The tool uses only FPC and Python's standard library and works offline.
+- [x] Clean mode rejects `.git`, compiler outputs, missing release content, or
+  archive/checksum mismatches.
+- [x] Offline HTML is extracted and revalidated after checksum creation.
+- [x] Qualification retains portability results alongside existing evidence.
 
-**Verification:** `python tools/test_performance_evidence.py` and a real
-`python tools/check_performance_evidence.py --compiler fpc` run.
+**Verification:** `python tools/test_qualify_release.py` plus a focused clean
+archive qualification run.
 
 **Dependencies:** Tasks 1-2.
 
 **Estimated scope:** Medium.
 
-## Task 4: Profile-led optimisation decision
+## Task 4: CI target and schedule coverage
 
-**Description:** Repeat representative hot-path samples and accept an internal
-optimisation only if it gives a material reproducible benefit without changing
-portable results or public interfaces.
-
-**Acceptance criteria:**
-
-- [x] Profiling commands, repetitions, results, and decision are documented.
-- [x] Any changed algorithm has a failing regression/cross-path test first and
-  keeps all portable correctness tests green.
-- [x] If no candidate clears the evidence threshold, no speculative numerical
-  source change is made.
-
-**Verification:** Focused FPCUnit tests and repeated benchmark comparison.
-
-**Dependencies:** Tasks 2-3.
-
-**Estimated scope:** Small to medium.
-
-## Task 5: Qualification and CI integration
-
-**Description:** Make release qualification produce and validate performance
-evidence while keeping wall-clock changes advisory on hosted runners.
+**Description:** Align ordinary, secondary, weekly full, candidate, and release
+workflows with the exact target profiles and publish their evidence.
 
 **Acceptance criteria:**
 
-- [x] Local qualification and the clean-archive workflows invoke the gate.
-- [x] Performance JSON and logs are retained as qualification artifacts.
-- [x] Tool unit tests run in ordinary CI.
+- [x] Windows/Linux x86-64 run primary checks on each change and complete
+  archive qualification weekly and for candidates/releases.
+- [x] Windows i386 runs only its documented secondary checks.
+- [x] Archive qualification blocks outbound networking after dependencies are
+  installed and restores it before evidence publication.
 
-**Verification:** Python tool tests, workflow/documentation checks, and a
-qualification run with benchmarks enabled.
+**Verification:** Workflow review plus documentation/release-state checks.
 
-**Dependencies:** Tasks 1-4.
+**Dependencies:** Task 3.
 
 **Estimated scope:** Medium.
 
-## Task 6: Documentation and release identity
+## Task 5: Support, release, and distribution documentation
 
-**Description:** Publish the performance evidence guide and consistently
-advance release metadata and documentation to 1.9.5.
+**Description:** Publish the evidence-backed support matrix and consistently
+advance release metadata and documentation to 1.9.6.
 
 **Acceptance criteria:**
 
-- [x] Every performance/memory claim links to a checked row and conditions.
-- [x] README, benchmark/releasing guidance, capability inventory, changelog,
-  docs index, release/PR/qualification notes, packages, workflows, and version
-  manifest agree on 1.9.5.
-- [x] Roadmap records 1.9.5 as previous and 1.9.6 as next.
+- [x] Installation instructions link qualified and unqualified targets,
+  offline paths, checksums, limitations, and exact evidence profiles.
+- [x] README, support/capability data, changelog, docs index, releasing guide,
+  release/PR/qualification notes, package, workflows, and version manifest
+  agree on 1.9.6.
+- [x] Roadmap records 1.9.6 as previous and 1.9.7 as next.
 
 **Verification:** All documentation tests, site/offline build checks, API
 snapshot checks, and release-state tests.
 
-**Dependencies:** Tasks 1-5.
+**Dependencies:** Tasks 1-4.
 
-**Estimated scope:** Large; land as focused metadata/documentation increments.
+**Estimated scope:** Large; land as focused documentation/metadata increments.
 
-## Task 7: Full qualification and review
+## Task 6: Full qualification and review
 
 **Description:** Run all supported local gates and review the complete diff for
 correctness, simplicity, architecture, security, and performance.
 
 **Acceptance criteria:**
 
-- [x] Normal, optimized, checked/heap, examples, documentation, package, and
-  performance gates pass.
-- [x] No public-interface snapshot changes or unexplained material regressions
-  remain.
+- [x] Normal, optimized, checked/heap, examples, documentation, package,
+  benchmark, portability, and archive gates pass locally.
+- [x] No public-interface snapshot change or unsupported platform claim remains.
 - [x] All critical/required review findings are resolved.
 
-**Verification:** `python tools/qualify_release.py --release 1.9.5 --compiler
+**Verification:** `python tools/qualify_release.py --release 1.9.6 --compiler
 fpc --lazbuild lazbuild` plus `git diff --check` and final diff review.
 
-**Dependencies:** Tasks 1-6.
+**Dependencies:** Tasks 1-5.
 
 **Estimated scope:** Medium.
