@@ -48,7 +48,7 @@ rehearsal schema/tests ──> side-by-side consumer projects
    differences, unsupported cases, and source-edit guidance.
 5. [x] Integrate migration evidence into CI, clean-archive qualification,
    release metadata, changelog, indexes, roadmap, and release documentation.
-6. [ ] Run focused and full qualification, review all five quality axes, and
+6. [x] Run focused and full qualification, review all five quality axes, and
    resolve every critical or required finding.
 
 ## Checkpoints

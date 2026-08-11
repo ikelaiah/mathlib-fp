@@ -200,6 +200,25 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
         )
 
 
+def _repository_file(root: Path, raw_path: str, description: str) -> Path:
+    repository = root.resolve()
+    candidate = Path(raw_path)
+    if candidate.is_absolute():
+        raise MigrationContractError(
+            f"{description} is outside repository root: {raw_path}"
+        )
+    resolved = (repository / candidate).resolve()
+    try:
+        resolved.relative_to(repository)
+    except ValueError as exc:
+        raise MigrationContractError(
+            f"{description} is outside repository root: {raw_path}"
+        ) from exc
+    if not resolved.is_file():
+        raise MigrationContractError(f"missing {description}: {resolved}")
+    return resolved
+
+
 def load_manifest(path: Path, root: Path) -> dict[str, Any]:
     """Read a manifest, validate it, and resolve repository-owned paths."""
     try:
@@ -210,19 +229,13 @@ def load_manifest(path: Path, root: Path) -> dict[str, Any]:
         raise MigrationContractError("migration manifest root must be an object")
     validate_manifest(manifest)
     for consumer in manifest["consumers"]:
-        source = root / consumer["source"]
-        if not source.is_file():
-            raise MigrationContractError(f"missing consumer source: {source}")
+        _repository_file(root, consumer["source"], "consumer source")
     for domain in manifest["domains"]:
-        guide = root / domain["guide"]
-        if not guide.is_file():
-            raise MigrationContractError(f"missing domain guide: {guide}")
+        _repository_file(root, domain["guide"], "domain guide")
     for decision in manifest["alias_decisions"]:
-        migration_example = root / decision["migration_example"]
-        if not migration_example.is_file():
-            raise MigrationContractError(
-                f"missing alias migration example: {migration_example}"
-            )
+        _repository_file(
+            root, decision["migration_example"], "alias migration example"
+        )
     return manifest
 
 

@@ -30,9 +30,20 @@ it does not infer Linux or Win32 results from a Windows x86-64 run.
 | Runtime dependencies added | None |
 | Compiler warnings from migration consumers | None |
 
+## Full local release qualification
+
+`python tools/qualify_release.py --release 1.9.7 --compiler fpc --lazbuild
+lazbuild` passed 83 gates on 2026-08-12. The retained result is
+`build-temp/release-qualification-1.9.7/results.json`; it covers compiler
+identity, normal/optimized/checked-heap test modes, all examples and output
+contracts, documentation tests/fragments/site/offline archive, API decisions,
+numerical mutation/evidence, migration rehearsal, portability, Lazarus package,
+and benchmark/performance evidence. Build artifacts remain local/CI evidence
+and are not part of the source archive.
+
 ## Required exact-candidate evidence
 
-Before tagging, the exact commit must still pass:
+Before tagging, the exact commit must still pass in CI:
 
 - Linux x86-64 and Windows x86-64 checksummed, network-isolated clean-archive
   qualification, including migration results as retained artifacts;

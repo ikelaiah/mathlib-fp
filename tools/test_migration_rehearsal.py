@@ -139,6 +139,20 @@ class MigrationRehearsalContractTests(unittest.TestCase):
             with self.assertRaisesRegex(MigrationContractError, "consumer source"):
                 load_manifest(path, root)
 
+    def test_load_manifest_rejects_path_outside_repository(self) -> None:
+        manifest = complete_manifest()
+        with tempfile.TemporaryDirectory() as directory:
+            parent = Path(directory)
+            root = parent / "repository"
+            root.mkdir()
+            outside = parent / "outside.lpr"
+            outside.write_text("program outside; begin end.", encoding="utf-8")
+            manifest["consumers"][0]["source"] = "../outside.lpr"
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(MigrationContractError, "outside repository"):
+                load_manifest(path, root)
+
     def test_rejects_consumer_output_missing_a_domain_assertion(self) -> None:
         output = "\n".join(
             f"{domain}: success"

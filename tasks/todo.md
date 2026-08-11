@@ -101,10 +101,10 @@ tests.
 
 **Acceptance criteria:**
 
-- [ ] Test builds, examples, docs, migration rehearsal, package, portability,
+- [x] Test builds, examples, docs, migration rehearsal, package, portability,
   and applicable evidence gates pass locally.
-- [ ] No public-interface snapshot change or unsupported migration claim remains.
-- [ ] All critical and required review findings are resolved.
+- [x] No public-interface snapshot change or unsupported migration claim remains.
+- [x] All critical and required review findings are resolved.
 
 **Verification:** `python tools/qualify_release.py --release 1.9.7 --compiler
 fpc --lazbuild lazbuild`, plus `git diff --check` and final diff review.
