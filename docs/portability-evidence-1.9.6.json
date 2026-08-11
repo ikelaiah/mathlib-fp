@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "release": "1.9.6",
+  "compiler": {
+    "name": "Free Pascal",
+    "version": "3.2.2"
+  },
+  "compiler_flags": ["-O2"],
+  "required_audits": [
+    "filesystem",
+    "locale",
+    "endianness",
+    "floating_point",
+    "calling_convention",
+    "address_space",
+    "runtime_dependency"
+  ],
+  "cross_target_invariants": {
+    "endian": "little",
+    "locale_guard": "pass",
+    "numerical_checksum": "3ff0000000000000",
+    "binary_fixture_hex": "4d465042494e310001000100010000000000000001000000000000000800000000000000e913f8c7000000000000f03f"
+  },
+  "targets": [
+    {
+      "id": "win64-x86_64",
+      "tier": "primary",
+      "target_os": "win64",
+      "target_cpu": "x86_64",
+      "pointer_bits": 64,
+      "scalar_abi": {
+        "single_bytes": 4,
+        "double_bytes": 8,
+        "extended_bytes": 8
+      },
+      "exact_checks": [
+        "normal-tests",
+        "optimized-tests",
+        "runtime-checked-heap-tests",
+        "examples-and-output-contracts",
+        "documentation-and-offline-html",
+        "numerical-and-mutation-evidence",
+        "performance-evidence",
+        "portability-probe-and-audit",
+        "lazarus-package",
+        "checksummed-clean-source-archive"
+      ],
+      "evidence": {
+        "last_successful_date": "2026-08-11",
+        "ref": "v1.9.5",
+        "status": "retained"
+      },
+      "limitations": [
+        "Extended is a 64-bit Double alias on Win64.",
+        "The exact v1.9.6 candidate archive must pass before tagging."
+      ]
+    },
+    {
+      "id": "linux-x86_64",
+      "tier": "primary",
+      "target_os": "linux",
+      "target_cpu": "x86_64",
+      "pointer_bits": 64,
+      "scalar_abi": {
+        "single_bytes": 4,
+        "double_bytes": 8,
+        "extended_bytes": 10
+      },
+      "exact_checks": [
+        "normal-tests",
+        "optimized-tests",
+        "runtime-checked-heap-tests",
+        "examples-and-output-contracts",
+        "documentation-and-offline-html",
+        "numerical-and-mutation-evidence",
+        "performance-evidence",
+        "portability-probe-and-audit",
+        "checksummed-clean-source-archive"
+      ],
+      "evidence": {
+        "last_successful_date": "2026-08-11",
+        "ref": "v1.9.5",
+        "status": "retained"
+      },
+      "limitations": [
+        "Extended uses the x87 80-bit format stored in 10 bytes.",
+        "The Lazarus package is release-qualified on Windows, not this target.",
+        "The exact v1.9.6 candidate archive must pass before tagging."
+      ]
+    },
+    {
+      "id": "win32-i386",
+      "tier": "secondary",
+      "target_os": "win32",
+      "target_cpu": "i386",
+      "pointer_bits": 32,
+      "scalar_abi": {
+        "single_bytes": 4,
+        "double_bytes": 8,
+        "extended_bytes": 10
+      },
+      "exact_checks": [
+        "optimized-tests",
+        "portability-probe-and-audit",
+        "lazarus-package"
+      ],
+      "evidence": {
+        "last_successful_date": "2026-08-11",
+        "ref": "v1.9.5",
+        "status": "retained"
+      },
+      "limitations": [
+        "Address space is 32-bit and practical container sizes are lower.",
+        "Extended uses the x87 80-bit format stored in 10 bytes.",
+        "This tier does not claim the full documentation, benchmark, or heap-traced profile."
+      ]
+    },
+    {
+      "id": "darwin-aarch64",
+      "tier": "unqualified",
+      "target_os": "darwin",
+      "target_cpu": "aarch64",
+      "reason": "No maintainable macOS/ARM64 runner with repeatable numerical and archive evidence is configured."
+    },
+    {
+      "id": "linux-aarch64",
+      "tier": "unqualified",
+      "target_os": "linux",
+      "target_cpu": "aarch64",
+      "reason": "No maintained Linux/ARM64 release-qualification runner is configured."
+    }
+  ]
+}
