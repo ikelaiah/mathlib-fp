@@ -1,4 +1,4 @@
-# PR notes: v1.9.6 portability and distribution
+# feat(portability): complete v1.9.6 portability and distribution
 
 ## Review boundary
 
