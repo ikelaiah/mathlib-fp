@@ -1,95 +1,98 @@
-# Implementation plan: 1.9.5 predictable performance
+# Implementation plan: 1.9.6 portability and distribution
 
 ## Overview
 
-Build a release-owned performance evidence contract around the existing
-portable benchmark runner. The contract records reproducible conditions,
-uniform cold/warmed measurements, allocation and retained-state ceilings,
-same-run comparisons, and prior-release advisory baselines. Qualification will
-fail on missing rows, invalid results, or exact complexity/allocation
-regressions; noisy wall-clock changes will be reported for review.
+Add a release-owned portability evidence contract around the existing clean
+archive and qualification machinery. The contract will be validated by an
+offline Python tool and a native Pascal probe, then produced from ordinary CI,
+scheduled complete qualification, and exact release-candidate archives.
 
 ## Architecture decisions
 
-- Keep numerical workloads in the dependency-free Pascal benchmark runner and
-  use Python standard-library tooling only to compile, execute, validate, and
-  publish its machine-readable rows.
-- Store benchmark contracts in `docs/performance-evidence-1.9.5.json`; generated
-  host results remain qualification artifacts rather than source-controlled
-  claims that accidentally describe every machine.
-- Use exact logical allocation, retained-state, and dense-shape tripwires as
-  hard gates. Treat elapsed-time comparisons as advisory unless they are
-  same-run algorithm comparisons with a deliberately conservative bound.
-- Preserve the frozen 1.9 public API. Change internal numerical code only after
-  repeated profiling demonstrates a material benefit and existing cross-path
-  correctness tests remain green.
+- Keep target facts and required gates in
+  `docs/portability-evidence-1.9.6.json`; generated per-run observations remain
+  CI/local artifacts rather than universal source-controlled claims.
+- Use a small native Pascal probe for ABI, endianness, numerical, locale, and
+  binary-format observations. Use Python only to compile/run it, validate the
+  contract, audit source/package assumptions, and serialize evidence.
+- Reuse `tools/qualify_release.py` for full workflows. Add explicit verified
+  source-archive inputs and clean-tree/network-isolation assertions rather than
+  creating a second qualification path.
+- Preserve the frozen 1.9 public API and add no runtime dependency.
 
 ## Dependency graph
 
 ```text
-benchmark workload contract ──> parser/validator tests ──> Pascal row output
-           │                              │                         │
-           └──────────────> qualification runner <──────────────────┘
-                                          │
-                                          v
-                         performance guide, release notes, qualification
+target/evidence contract ──> validator tests ──> Pascal portability probe
+           │                        │                       │
+           └──────────────> source/package audit <─────────┘
+                                    │
+                                    v
+                       clean archive qualification
+                                    │
+                                    v
+                  CI schedule, support matrix, release docs
 ```
 
 ## Task list
 
-1. Specify the v1.9.5 benchmark-row and evidence-manifest contracts.
-2. Add failing parser/validator tests for missing domains, malformed rows,
-   allocation ceilings, complexity tripwires, and timing review signals.
-3. Extend the Pascal runner with representative small/large dense, sparse,
-   iterative, DSP, modelling, statistics, and data-analysis rows, including
-   cold/warm timing and deterministic correctness checks.
-4. Add the offline Python performance gate, host/toolchain capture, same-run
-   comparisons, and versioned result JSON.
-5. Profile repeatable candidate hot paths; make only justified internal
-   optimisations and prove portable/candidate equivalence. Record an explicit
-   no-change result when evidence does not justify a source change.
-6. Integrate performance validation into CI and release qualification.
-7. Update performance policy, capability data, README/releasing guidance,
-   changelog, release/PR/qualification notes, documentation index, package and
-   version metadata, then advance the roadmap to 1.9.6.
-8. Run focused checks, the full test suite, documentation builds, package build,
-   and the complete local 1.9.5 qualification; perform a five-axis review.
+1. Define the v1.9.6 target, ABI, invariant, audit, and evidence-result
+   contracts.
+2. Add failing tests for malformed target manifests, mismatched ABI/binary
+   observations, forbidden dependencies/calling conventions, and incomplete
+   evidence.
+3. Add the native Pascal probe and offline validator; make focused tests green
+   and validate the current Windows x86-64 host.
+4. Extend release qualification to verify source archive/checksum inputs,
+   clean-tree contents, network-isolation acknowledgement, extracted offline
+   documentation, and retained portability results.
+5. Update primary/secondary CI profiles, add weekly complete qualification,
+   enforce network isolation during archive qualification, and publish
+   target-specific evidence artifacts.
+6. Update the support matrix, portability evidence report, installation and
+   releasing guidance, capability inventory, changelog, release/PR/
+   qualification notes, package/workflow/version metadata, and roadmap.
+7. Run focused checks and complete local qualification, review all five quality
+   axes, resolve required findings, and record the final local evidence.
 
 ## Checkpoints
 
-### After tasks 1-2
+### After tasks 1-3
 
-- Contract tests fail for incomplete or unsafe evidence and pass only for a
-  complete representative fixture.
-- No production numerical source or public interface has changed.
+- Contract tests reject unqualified claims and mismatched native observations.
+- The current host produces a complete target evidence artifact offline.
+- Source and package audits cover the roadmap assumption categories without
+  changing a public declaration.
 
-### After tasks 3-5
+### After tasks 4-5
 
-- Every required domain has small/large coverage where applicable, cold/warm
-  timing, scalar/shape/tolerance/setup metadata, and deterministic checksums.
-- Exact allocation and complexity ceilings fail mechanically.
-- Any optimisation is backed by repeated same-host evidence and cross-path
-  tests; otherwise the release records that no optimisation was warranted.
+- Qualification rejects an unverified or dirty archive context when clean
+  archive mode is required.
+- Source and offline-documentation archives are both checksummed, extracted,
+  and exercised.
+- Ordinary primary CI, secondary tier checks, weekly full qualification, and
+  candidate/release qualification have explicit non-overstated scopes.
 
-### After tasks 6-8
+### After tasks 6-7
 
-- CI and local qualification produce checked performance-result JSON.
-- All published performance/memory statements resolve to a manifest row and
-  identify conditions and limitations.
-- The full release qualification and final review are clean.
+- All current-release identity and documentation checks agree on 1.9.6.
+- Local normal, optimized, checked/heap, examples, docs, package, benchmark,
+  historical evidence, portability, and archive gates pass.
+- The final diff has no unresolved correctness, architecture, security,
+  performance, or documentation finding.
 
 ## Risks and mitigations
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
-| Hosted-runner timing noise creates false failures | High | Keep prior-baseline timing advisory and use repeated samples plus review bands. |
-| Logical allocation counts overstate exact heap accounting | Medium | Name each metric precisely and use sampled heap deltas only where monitor boundaries make them meaningful. |
-| Benchmark expansion makes qualification too slow | Medium | Use bounded deterministic cases and a quick contract-fixture mode for Python tests. |
-| Optimisation changes numerical order or contracts | High | Profile first, preserve the portable path, and require cross-path numerical tests before accepting it. |
-| Release claims drift from executable evidence | High | Cross-reference every claim and domain through the checked manifest and documentation gate. |
+| A support table overstates CI coverage | High | Validate every cell against a manifest target and exact named gate profile. |
+| Hosted jobs cannot prove offline use | High | Install tools first, then apply OS outbound-network blocking around extracted-archive qualification and record the isolation policy. |
+| ABI probing accidentally treats `Extended` as uniform | High | Record `SizeOf(Extended)` per target and document target-specific precision. |
+| Static dependency audit creates noisy false positives | Medium | Limit hard failures to explicit foreign/runtime/network mechanisms and retain reviewed findings for broader assumptions. |
+| Archive checks only exercise a maintainer tree | High | Require archive/checksum paths, verify the digest and extracted-root shape, and reject `.git` or compiler artifacts in clean mode. |
 
 ## Scope decision
 
-The user requested the complete milestone and authorized implementation. No
-new public API, external dependency, platform claim, or optional foreign-library
-comparison is needed for 1.9.5.
+The milestone qualifies existing portable behavior and distribution paths. It
+does not add macOS/ARM64 claims, change numerical algorithms, or expand the
+public API.
