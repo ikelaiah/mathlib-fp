@@ -36,23 +36,23 @@ target/evidence contract ──> validator tests ──> Pascal portability prob
 
 ## Task list
 
-1. Define the v1.9.6 target, ABI, invariant, audit, and evidence-result
+1. [x] Define the v1.9.6 target, ABI, invariant, audit, and evidence-result
    contracts.
-2. Add failing tests for malformed target manifests, mismatched ABI/binary
+2. [x] Add failing tests for malformed target manifests, mismatched ABI/binary
    observations, forbidden dependencies/calling conventions, and incomplete
    evidence.
-3. Add the native Pascal probe and offline validator; make focused tests green
+3. [x] Add the native Pascal probe and offline validator; make focused tests green
    and validate the current Windows x86-64 host.
-4. Extend release qualification to verify source archive/checksum inputs,
+4. [x] Extend release qualification to verify source archive/checksum inputs,
    clean-tree contents, network-isolation acknowledgement, extracted offline
    documentation, and retained portability results.
-5. Update primary/secondary CI profiles, add weekly complete qualification,
+5. [x] Update primary/secondary CI profiles, add weekly complete qualification,
    enforce network isolation during archive qualification, and publish
    target-specific evidence artifacts.
-6. Update the support matrix, portability evidence report, installation and
+6. [x] Update the support matrix, portability evidence report, installation and
    releasing guidance, capability inventory, changelog, release/PR/
    qualification notes, package/workflow/version metadata, and roadmap.
-7. Run focused checks and complete local qualification, review all five quality
+7. [x] Run focused checks and complete local qualification, review all five quality
    axes, resolve required findings, and record the final local evidence.
 
 ## Checkpoints

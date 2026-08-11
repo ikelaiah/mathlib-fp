@@ -1,6 +1,8 @@
 {
   "schema_version": 1,
-  "release": "1.9.5",
+  "release": "1.9.6",
+  "support_matrix": "docs/SUPPORT.md",
+  "portability_evidence": "docs/portability-evidence-1.9.6.json",
   "capabilities": [
     {
       "family": "scalar_special_functions",

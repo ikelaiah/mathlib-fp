@@ -2,8 +2,8 @@
 
 ## Status
 
-In progress on `milestone/v1.9.6`. Local qualification and exact-candidate
-Linux/Windows clean-archive CI are required before tagging.
+Completed locally on `milestone/v1.9.6`: all 81 qualification gates pass.
+Exact-candidate Linux/Windows clean-archive CI remains required before tagging.
 
 ## Objective
 

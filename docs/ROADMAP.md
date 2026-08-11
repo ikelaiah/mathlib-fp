@@ -1421,9 +1421,9 @@ movements as advisory comparisons. Profiling also identified and removed a
 material applied radix-2 FFT regression while retaining tested portable code.
 See [the v1.9.5 evidence report](PERFORMANCE_EVIDENCE_1.9.5.md).
 
-## Next release: 1.9.6 — Portability and distribution
+## Previous release: 1.9.6 — Portability and distribution
 
-Version 1.9.6 proves that installation and support claims survive outside a
+Released on 2026-08-11, version 1.9.6 proves that installation and support claims survive outside a
 maintainer checkout and remain honest about targets without continuous
 qualification.
 
@@ -1455,7 +1455,13 @@ qualification.
 - Unqualified targets and platform-specific limitations are easy to find from
   the installation instructions and capability inventory.
 
-## Planned 1.9.7 — Migration and compatibility rehearsal
+The release adds a native ABI/endian/locale/binary probe, a checked target
+manifest and seven-category source/package assumption audit, verified source
+and offline-documentation extraction, weekly drift qualification, and explicit
+primary, secondary, and unqualified tiers. Exact 1.9.6 Linux and Windows
+candidate archive artifacts remain mandatory before tagging.
+
+## Next release: 1.9.7 — Migration and compatibility rehearsal
 
 Version 1.9.7 proves migration before any 2.0 documentation default changes.
 It does not remove maintained 1.x declarations or silently reinterpret their

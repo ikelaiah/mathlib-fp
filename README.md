@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 1.9.5" src="https://img.shields.io/badge/version-1.9.5-brightgreen.svg">
+  <img alt="Version 1.9.6" src="https://img.shields.io/badge/version-1.9.6-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,18 +26,18 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **1.9.5 is the current release; 1.2.0 was the first public release.** The
+> **1.9.6 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.9.5.md), the checked
-> [performance evidence](docs/PERFORMANCE_EVIDENCE_1.9.5.md), and the
+> [release notes](docs/RELEASE_NOTES_1.9.6.md), the checked
+> [portability evidence](docs/PORTABILITY_EVIDENCE_1.9.6.md), and the
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-Open the [1.9.5 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.5)
+Open the [1.9.6 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.6)
 or download the source directly as
-[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.5.tar.gz)
-or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.5.zip).
+[`.tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.6.tar.gz)
+or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.6.zip).
 You can also clone the repository:
 
 ```bash
@@ -118,6 +118,9 @@ On Windows, run the generated `.exe` instead. Start with the
 [versioned web documentation](https://ikelaiah.github.io/mathlib-fp/) or the
 [repository documentation index](docs/index.md) for offline use. The release
 page also provides the generated offline HTML archive and its SHA-256 checksum.
+See the [support matrix](docs/SUPPORT.md) for exact qualified targets, evidence
+dates, offline installation, ABI differences, and explicitly unqualified
+platforms.
 
 To compile all examples into `example-bin/` from the repository root, run
 `sh ./build-examples.sh` or `.\build-examples.ps1`. See the
