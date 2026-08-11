@@ -14,7 +14,9 @@ from migration_rehearsal import (
     REQUIRED_DOMAINS,
     MigrationContractError,
     load_manifest,
+    validate_consumer_output,
     validate_manifest,
+    validate_package_boundary,
 )
 
 
@@ -62,11 +64,15 @@ def complete_manifest() -> dict[str, object]:
                 "id": "one-x",
                 "source": "examples/migration/one_x/consumer_1_9.lpr",
                 "success_marker": "1.x migration consumer: success",
+                "expected_warnings": [],
+                "source_edits": ["Keep supported 1.x imports."],
             },
             {
                 "id": "candidate-2.0",
                 "source": "examples/migration/candidate_2_0/consumer_2_0.lpr",
                 "success_marker": "candidate 2.0 migration consumer: success",
+                "expected_warnings": [],
+                "source_edits": ["Replace focused aliases with canonical imports."],
             },
         ],
         "tested_paths": [
@@ -132,6 +138,50 @@ class MigrationRehearsalContractTests(unittest.TestCase):
             path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(MigrationContractError, "consumer source"):
                 load_manifest(path, root)
+
+    def test_rejects_consumer_output_missing_a_domain_assertion(self) -> None:
+        output = "\n".join(
+            f"{domain}: success"
+            for domain in REQUIRED_DOMAINS
+            if domain != "GeometryLib"
+        )
+        with self.assertRaisesRegex(MigrationContractError, "GeometryLib"):
+            validate_consumer_output(
+                "one-x", output, "1.x migration consumer: success"
+            )
+
+    def test_accepts_in_place_alias_package_boundary(self) -> None:
+        package = """<?xml version="1.0"?>
+<CONFIG><Package><Files>
+  <Item><UnitName Value="EngineeringLib.Common"/></Item>
+  <Item><UnitName Value="EngineeringLib.FluidDynamics"/></Item>
+  <Item><UnitName Value="EngineeringLib.Pressure"/></Item>
+  <Item><UnitName Value="EngineeringLib.Velocity"/></Item>
+</Files><RequiredPkgs><Item><PackageName Value="FCL"/></Item></RequiredPkgs>
+</Package></CONFIG>"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "mathlib_fp.lpk"
+            path.write_text(package, encoding="utf-8")
+            evidence = validate_package_boundary(path)
+        self.assertEqual("in-place", evidence["choice"])
+        self.assertEqual(["FCL"], evidence["required_packages"])
+
+    def test_rejects_package_boundary_with_hidden_dependency(self) -> None:
+        package = """<?xml version="1.0"?>
+<CONFIG><Package><Files>
+  <Item><UnitName Value="EngineeringLib.Common"/></Item>
+  <Item><UnitName Value="EngineeringLib.FluidDynamics"/></Item>
+  <Item><UnitName Value="EngineeringLib.Pressure"/></Item>
+  <Item><UnitName Value="EngineeringLib.Velocity"/></Item>
+</Files><RequiredPkgs>
+  <Item><PackageName Value="FCL"/></Item>
+  <Item><PackageName Value="HiddenNumerics"/></Item>
+</RequiredPkgs></Package></CONFIG>"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "mathlib_fp.lpk"
+            path.write_text(package, encoding="utf-8")
+            with self.assertRaisesRegex(MigrationContractError, "HiddenNumerics"):
+                validate_package_boundary(path)
 
 
 if __name__ == "__main__":

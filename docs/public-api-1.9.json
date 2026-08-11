@@ -22,10 +22,10 @@
     "legacy-sparse-matrix": "TSparseDoubleMatrix constructs canonical CSR/CSC values returned as ISparseDoubleMatrix. TMatrixKitSparse remains an IMatrix-compatible mutable representation; conversion must enumerate/copy and must not be treated as a zero-copy CSR cast.",
     "focused-bond-alias-unit": "Retain FinanceLib.Bonds as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TFinanceKit amortization types, so retaining it has no numerical or ownership difference.",
     "focused-npv-alias-unit": "Retain FinanceLib.NPV as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TDoubleArray, so retaining it has no numerical or ownership difference.",
-    "pressure-facade-alias": "Prefer EngineeringLib.FluidDynamics.TFluidDynamicsKit for new pressure code. TPressureKit is the identical class type and changes no behavior, defaults, ownership, exceptions, or numerical results; 1.9.7 must confirm migration and packaging before any deprecation decision.",
-    "pressure-error-alias": "Prefer EngineeringLib.Common.EFluidDynamicsError with TFluidDynamicsKit. EPressureError is the identical exception class; 1.9.7 must confirm migration and packaging before any deprecation decision.",
-    "velocity-facade-alias": "Prefer EngineeringLib.FluidDynamics.TFluidDynamicsKit for new velocity code. TVelocityKit is the identical class type and changes no behavior, defaults, ownership, exceptions, or numerical results; 1.9.7 must confirm migration and packaging before any deprecation decision.",
-    "velocity-error-alias": "Prefer EngineeringLib.Common.EFluidDynamicsError with TFluidDynamicsKit. EVelocityError is the identical exception class; 1.9.7 must confirm migration and packaging before any deprecation decision."
+    "pressure-facade-alias": "TPressureKit remains a supported exact alias of EngineeringLib.FluidDynamics.TFluidDynamicsKit. The 1.9.7 rehearsal confirmed identical behavior, defaults, ownership, exceptions, numerical results, and dependency-neutral in-place packaging; new cross-fluid code may prefer the common facade, but no deprecation is approved.",
+    "pressure-error-alias": "EPressureError remains a supported exact alias of EngineeringLib.Common.EFluidDynamicsError. The 1.9.7 rehearsal confirmed exception identity and dependency-neutral in-place packaging; no deprecation is approved.",
+    "velocity-facade-alias": "TVelocityKit remains a supported exact alias of EngineeringLib.FluidDynamics.TFluidDynamicsKit. The 1.9.7 rehearsal confirmed identical behavior, defaults, ownership, exceptions, numerical results, and dependency-neutral in-place packaging; new cross-fluid code may prefer the common facade, but no deprecation is approved.",
+    "velocity-error-alias": "EVelocityError remains a supported exact alias of EngineeringLib.Common.EFluidDynamicsError. The 1.9.7 rehearsal confirmed exception identity and dependency-neutral in-place packaging; no deprecation is approved."
   },
   "unresolved_decisions": [],
   "units": [
@@ -9339,9 +9339,8 @@
           "kind": "type",
           "signature": "EPressureError=EngineeringLib.Common.EFluidDynamicsError",
           "classification": "compatibility",
-          "compatibility_decision": "replace",
-          "compatibility_note": "pressure-error-alias",
-          "preferred_replacement": "EFluidDynamicsError"
+          "compatibility_decision": "retain",
+          "compatibility_note": "pressure-error-alias"
         },
         {
           "owner": null,
@@ -9349,9 +9348,8 @@
           "kind": "type",
           "signature": "TPressureKit=TFluidDynamicsKit",
           "classification": "compatibility",
-          "compatibility_decision": "replace",
-          "compatibility_note": "pressure-facade-alias",
-          "preferred_replacement": "TFluidDynamicsKit"
+          "compatibility_decision": "retain",
+          "compatibility_note": "pressure-facade-alias"
         }
       ]
     },
@@ -11389,9 +11387,8 @@
           "kind": "type",
           "signature": "EVelocityError=EngineeringLib.Common.EFluidDynamicsError",
           "classification": "compatibility",
-          "compatibility_decision": "replace",
-          "compatibility_note": "velocity-error-alias",
-          "preferred_replacement": "EFluidDynamicsError"
+          "compatibility_decision": "retain",
+          "compatibility_note": "velocity-error-alias"
         },
         {
           "owner": null,
@@ -11399,9 +11396,8 @@
           "kind": "type",
           "signature": "TVelocityKit=TFluidDynamicsKit",
           "classification": "compatibility",
-          "compatibility_decision": "replace",
-          "compatibility_note": "velocity-facade-alias",
-          "preferred_replacement": "TFluidDynamicsKit"
+          "compatibility_decision": "retain",
+          "compatibility_note": "velocity-facade-alias"
         }
       ]
     },

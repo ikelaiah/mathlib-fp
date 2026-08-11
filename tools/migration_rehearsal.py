@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
@@ -65,6 +66,15 @@ def _require_text_list(record: dict[str, Any], key: str, context: str) -> list[s
     return value
 
 
+def _require_string_list(
+    record: dict[str, Any], key: str, context: str,
+) -> list[str]:
+    value = record.get(key)
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        raise MigrationContractError(f"{context}: {key} must be a string list")
+    return value
+
+
 def validate_manifest(manifest: dict[str, Any]) -> None:
     """Validate completeness without making host-specific compiler claims."""
     if manifest.get("schema_version") != 1:
@@ -85,6 +95,8 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
         consumer_ids.add(_require_text(consumer, "id", context))
         _require_text(consumer, "source", context)
         _require_text(consumer, "success_marker", context)
+        _require_string_list(consumer, "expected_warnings", context)
+        _require_text_list(consumer, "source_edits", context)
     if consumer_ids != {"one-x", "candidate-2.0"}:
         raise MigrationContractError("consumers must be one-x and candidate-2.0")
 
@@ -212,3 +224,60 @@ def load_manifest(path: Path, root: Path) -> dict[str, Any]:
                 f"missing alias migration example: {migration_example}"
             )
     return manifest
+
+
+def validate_consumer_output(
+    consumer_id: str, output: str, success_marker: str,
+) -> None:
+    """Require each domain assertion and the consumer's final marker."""
+    missing = [
+        f"{domain}: success"
+        for domain in REQUIRED_DOMAINS
+        if f"{domain}: success" not in output
+    ]
+    if success_marker not in output:
+        missing.append(success_marker)
+    if missing:
+        raise MigrationContractError(
+            f"{consumer_id}: output is missing assertions {missing}"
+        )
+
+
+def validate_package_boundary(package_path: Path) -> dict[str, object]:
+    """Confirm aliases stay in the dependency-neutral main package."""
+    try:
+        root = ET.parse(package_path).getroot()
+    except (OSError, ET.ParseError) as exc:
+        raise MigrationContractError(
+            f"cannot read Lazarus package {package_path}: {exc}"
+        ) from exc
+    units = {
+        node.attrib.get("Value", "")
+        for node in root.findall(".//Files/Item/UnitName")
+    }
+    required_units = {
+        "EngineeringLib.Common",
+        "EngineeringLib.FluidDynamics",
+        "EngineeringLib.Pressure",
+        "EngineeringLib.Velocity",
+    }
+    missing = sorted(required_units - units)
+    if missing:
+        raise MigrationContractError(
+            f"Lazarus package omits alias-boundary units {missing}"
+        )
+    required_packages = sorted(
+        node.attrib.get("Value", "")
+        for node in root.findall(".//RequiredPkgs/Item/PackageName")
+    )
+    hidden = [name for name in required_packages if name != "FCL"]
+    if hidden:
+        raise MigrationContractError(
+            f"alias package boundary introduces hidden dependencies {hidden}"
+        )
+    return {
+        "choice": "in-place",
+        "units": sorted(required_units),
+        "required_packages": required_packages,
+        "hidden_dependencies": [],
+    }

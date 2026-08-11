@@ -74,12 +74,11 @@ entry units add no conflicting numerical, ownership, or default behavior.
 The snapshot contains 21 plain `=` compiler aliases. Every alias has one exact
 review in the generated declaration reference. The shared compiler-identity
 profile records identical behavior, defaults, ownership, exception identity,
-and numerical results. Seventeen aliases are explicitly retained.
-`TPressureKit`, `EPressureError`, `TVelocityKit`, and `EVelocityError` are
-review-only canonicalization candidates: new code prefers
-`TFluidDynamicsKit`/`EFluidDynamicsError`, while 1.9.7 must confirm migration
-and packaging before any deprecation decision. Version 1.9.3 adds no warning,
-removal, or package move.
+and numerical results. All 21 aliases are retained. The 1.9.7 executable
+migration and package-boundary rehearsal rejected deprecation of
+`TPressureKit`, `EPressureError`, `TVelocityKit`, and `EVelocityError`; the
+common `TFluidDynamicsKit`/`EFluidDynamicsError` names remain preferred for new
+cross-fluid code, but no warning, removal, or package move is approved.
 
 Every one of the 131 exact compatibility declaration rows carries its decision
 and semantic-note identifier in the generated reference.

@@ -446,26 +446,22 @@
       "reason": "Retain the documented one-unit vector entry point; all implementation remains owned by AlgebraLib.VectorKernels."
     },
     {
-      "id": "canonicalize-pressure-error-alias",
+      "id": "retain-pressure-error-alias",
       "selector": {"unit": "EngineeringLib.Pressure", "name": "EPressureError", "owner": null, "kind": "type"},
       "target": "EngineeringLib.Common.EFluidDynamicsError",
       "equivalence_profile": "compiler-type-identity",
-      "decision": "canonicalize",
-      "canonical": "EngineeringLib.Common.EFluidDynamicsError",
+      "decision": "retain",
       "status": "review-only",
-      "follow_up_release": "1.9.7",
-      "reason": "Review migration with the pressure facade alias so one fluid-dynamics exception path can be preferred."
+      "reason": "The 1.9.7 migration and package-boundary rehearsal confirmed exact exception identity and no dependency cost; retain the useful focused import without deprecation."
     },
     {
-      "id": "canonicalize-pressure-kit-alias",
+      "id": "retain-pressure-kit-alias",
       "selector": {"unit": "EngineeringLib.Pressure", "name": "TPressureKit", "owner": null, "kind": "type"},
       "target": "TFluidDynamicsKit",
       "equivalence_profile": "compiler-type-identity",
-      "decision": "canonicalize",
-      "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+      "decision": "retain",
       "status": "review-only",
-      "follow_up_release": "1.9.7",
-      "reason": "The alias exposes the complete fluid-dynamics facade rather than a narrower pressure surface; test migration to the owning facade in 1.9.7."
+      "reason": "The 1.9.7 rehearsal proved identical type, defaults, ownership, exceptions, and numerical results through source and package paths; retain the focused import without deprecation."
     },
     {
       "id": "retain-signal-double-array-alias",
@@ -477,26 +473,22 @@
       "reason": "Retain the familiar signal entry spelling used throughout TSignalKit signatures while sharing the project-wide container type."
     },
     {
-      "id": "canonicalize-velocity-error-alias",
+      "id": "retain-velocity-error-alias",
       "selector": {"unit": "EngineeringLib.Velocity", "name": "EVelocityError", "owner": null, "kind": "type"},
       "target": "EngineeringLib.Common.EFluidDynamicsError",
       "equivalence_profile": "compiler-type-identity",
-      "decision": "canonicalize",
-      "canonical": "EngineeringLib.Common.EFluidDynamicsError",
+      "decision": "retain",
       "status": "review-only",
-      "follow_up_release": "1.9.7",
-      "reason": "Review migration with the velocity facade alias so one fluid-dynamics exception path can be preferred."
+      "reason": "The 1.9.7 migration and package-boundary rehearsal confirmed exact exception identity and no dependency cost; retain the useful focused import without deprecation."
     },
     {
-      "id": "canonicalize-velocity-kit-alias",
+      "id": "retain-velocity-kit-alias",
       "selector": {"unit": "EngineeringLib.Velocity", "name": "TVelocityKit", "owner": null, "kind": "type"},
       "target": "TFluidDynamicsKit",
       "equivalence_profile": "compiler-type-identity",
-      "decision": "canonicalize",
-      "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+      "decision": "retain",
       "status": "review-only",
-      "follow_up_release": "1.9.7",
-      "reason": "The alias exposes the complete fluid-dynamics facade rather than a narrower velocity surface; test migration to the owning facade in 1.9.7."
+      "reason": "The 1.9.7 rehearsal proved identical type, defaults, ownership, exceptions, and numerical results through source and package paths; retain the focused import without deprecation."
     },
     {
       "id": "retain-bond-error-alias",
@@ -567,10 +559,10 @@
     "legacy-sparse-matrix": "TSparseDoubleMatrix constructs canonical CSR/CSC values returned as ISparseDoubleMatrix. TMatrixKitSparse remains an IMatrix-compatible mutable representation; conversion must enumerate/copy and must not be treated as a zero-copy CSR cast.",
     "focused-bond-alias-unit": "Retain FinanceLib.Bonds as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TFinanceKit amortization types, so retaining it has no numerical or ownership difference.",
     "focused-npv-alias-unit": "Retain FinanceLib.NPV as a focused entry unit. Its public names are exact aliases of TFinanceKit, EFinanceError, and TDoubleArray, so retaining it has no numerical or ownership difference.",
-    "pressure-facade-alias": "Prefer EngineeringLib.FluidDynamics.TFluidDynamicsKit for new pressure code. TPressureKit is the identical class type and changes no behavior, defaults, ownership, exceptions, or numerical results; 1.9.7 must confirm migration and packaging before any deprecation decision.",
-    "pressure-error-alias": "Prefer EngineeringLib.Common.EFluidDynamicsError with TFluidDynamicsKit. EPressureError is the identical exception class; 1.9.7 must confirm migration and packaging before any deprecation decision.",
-    "velocity-facade-alias": "Prefer EngineeringLib.FluidDynamics.TFluidDynamicsKit for new velocity code. TVelocityKit is the identical class type and changes no behavior, defaults, ownership, exceptions, or numerical results; 1.9.7 must confirm migration and packaging before any deprecation decision.",
-    "velocity-error-alias": "Prefer EngineeringLib.Common.EFluidDynamicsError with TFluidDynamicsKit. EVelocityError is the identical exception class; 1.9.7 must confirm migration and packaging before any deprecation decision."
+    "pressure-facade-alias": "TPressureKit remains a supported exact alias of EngineeringLib.FluidDynamics.TFluidDynamicsKit. The 1.9.7 rehearsal confirmed identical behavior, defaults, ownership, exceptions, numerical results, and dependency-neutral in-place packaging; new cross-fluid code may prefer the common facade, but no deprecation is approved.",
+    "pressure-error-alias": "EPressureError remains a supported exact alias of EngineeringLib.Common.EFluidDynamicsError. The 1.9.7 rehearsal confirmed exception identity and dependency-neutral in-place packaging; no deprecation is approved.",
+    "velocity-facade-alias": "TVelocityKit remains a supported exact alias of EngineeringLib.FluidDynamics.TFluidDynamicsKit. The 1.9.7 rehearsal confirmed identical behavior, defaults, ownership, exceptions, numerical results, and dependency-neutral in-place packaging; new cross-fluid code may prefer the common facade, but no deprecation is approved.",
+    "velocity-error-alias": "EVelocityError remains a supported exact alias of EngineeringLib.Common.EFluidDynamicsError. The 1.9.7 rehearsal confirmed exception identity and dependency-neutral in-place packaging; no deprecation is approved."
   },
   "compatibility_decisions": [
     {
@@ -607,31 +599,27 @@
       "note": "focused-npv-alias-unit"
     },
     {
-      "id": "replace-pressure-error-alias",
+      "id": "retain-pressure-error-alias",
       "selector": {"unit": "EngineeringLib.Pressure", "name": "EPressureError", "owner": null},
-      "decision": "replace",
-      "replacement": "EFluidDynamicsError",
+      "decision": "retain",
       "note": "pressure-error-alias"
     },
     {
-      "id": "replace-pressure-kit-alias",
+      "id": "retain-pressure-kit-alias",
       "selector": {"unit": "EngineeringLib.Pressure", "name": "TPressureKit", "owner": null},
-      "decision": "replace",
-      "replacement": "TFluidDynamicsKit",
+      "decision": "retain",
       "note": "pressure-facade-alias"
     },
     {
-      "id": "replace-velocity-error-alias",
+      "id": "retain-velocity-error-alias",
       "selector": {"unit": "EngineeringLib.Velocity", "name": "EVelocityError", "owner": null},
-      "decision": "replace",
-      "replacement": "EFluidDynamicsError",
+      "decision": "retain",
       "note": "velocity-error-alias"
     },
     {
-      "id": "replace-velocity-kit-alias",
+      "id": "retain-velocity-kit-alias",
       "selector": {"unit": "EngineeringLib.Velocity", "name": "TVelocityKit", "owner": null},
-      "decision": "replace",
-      "replacement": "TFluidDynamicsKit",
+      "decision": "retain",
       "note": "velocity-facade-alias"
     }
   ],

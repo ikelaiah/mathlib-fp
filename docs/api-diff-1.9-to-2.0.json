@@ -41,7 +41,7 @@
         },
         {
           "id": "exact-alias-review",
-          "consequence": "All 21 plain compiler aliases record five-part equivalence plus an explicit retain or prospective canonical decision; 1.9.3 adds no deprecation, removal, or package move."
+          "consequence": "All 21 plain compiler aliases record five-part equivalence and are retained; the 1.9.7 migration/package rehearsal approved no deprecation, removal, warning, or package move."
         }
       ]
     }

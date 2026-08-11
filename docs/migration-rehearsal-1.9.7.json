@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "release": "1.9.7",
+  "candidate_release": "2.0",
+  "consumers": [
+    {
+      "id": "one-x",
+      "source": "examples/migration/one_x/consumer_1_9.lpr",
+      "success_marker": "1.x migration consumer: success",
+      "expected_warnings": [],
+      "source_edits": [
+        "No edits are required; maintained 1.x declarations remain supported."
+      ]
+    },
+    {
+      "id": "candidate-2.0",
+      "source": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+      "success_marker": "candidate 2.0 migration consumer: success",
+      "expected_warnings": [],
+      "source_edits": [
+        "Prefer typed dense storage over TMatrixKit for new code.",
+        "Replace focused pressure/velocity imports with EngineeringLib.Common and EngineeringLib.FluidDynamics.",
+        "Read explicit diagnostic records and clone mutable storage when independence is required."
+      ]
+    }
+  ],
+  "tested_paths": [
+    {
+      "id": "fpc-direct",
+      "kind": "source",
+      "compiler": "FPC 3.2.2"
+    },
+    {
+      "id": "lazarus-package",
+      "kind": "package",
+      "compiler": "Lazarus 4.8 / FPC 3.2.2"
+    }
+  ],
+  "domains": [
+    {
+      "id": "MathBase",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Create TDoubleArray values explicitly.",
+        "ordinary_success": "GammaLn(5) agrees with ln(24).",
+        "diagnostic_failure": "Domain and finite-value validation remains operation-specific.",
+        "ownership": "Dynamic arrays remain caller-owned managed values.",
+        "copying": "Use Copy when independent array storage is required.",
+        "indexing": "Shared arrays are zero-based.",
+        "precision": "The exercised scalar path uses Double.",
+        "defaults": "No hidden scalar-type promotion is introduced.",
+        "result_interpretation": "Compare special functions with scale-aware tolerances."
+      },
+      "candidate_2_0": {
+        "construction": "Keep explicit scalar and array types.",
+        "ordinary_success": "The same GammaLn reference case is asserted.",
+        "diagnostic_failure": "Keep explicit domain and finite-value handling.",
+        "ownership": "Managed-value ownership is unchanged.",
+        "copying": "Copy arrays deliberately when mutation must not alias.",
+        "indexing": "Zero-based indexing remains the common path.",
+        "precision": "Prefer type-named Single/Double/complex APIs where available.",
+        "defaults": "No silent precision conversion is proposed.",
+        "result_interpretation": "Retain documented accuracy budgets."
+      },
+      "semantic_differences": ["No MathBase behavior change is proposed by the rehearsal."],
+      "assertions": ["MathBase: success"]
+    },
+    {
+      "id": "AlgebraLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "TMatrixKit.CreateFromArray remains supported.",
+        "ordinary_success": "A copied arithmetic result preserves matrix values.",
+        "diagnostic_failure": "Out-of-range and shape errors remain exceptions.",
+        "ownership": "IMatrix is reference-counted.",
+        "copying": "Copy-producing arithmetic creates independent storage.",
+        "indexing": "IMatrix uses zero-based row and column indices.",
+        "precision": "TMatrixKit stores Double.",
+        "defaults": "Legacy solver defaults remain supported.",
+        "result_interpretation": "Callers must distinguish handles from independent results."
+      },
+      "candidate_2_0": {
+        "construction": "Use TDenseDoubleMatrix.FromValues with an explicit shape.",
+        "ordinary_success": "Typed matrix values and clone independence are asserted.",
+        "diagnostic_failure": "Shape/index validation remains explicit.",
+        "ownership": "IDenseDoubleMatrix retains shared reference-counted storage.",
+        "copying": "Clone creates independent mutable storage.",
+        "indexing": "Typed matrices are zero-based.",
+        "precision": "The Double type is visible in the declaration name.",
+        "defaults": "Select solver options/statuses explicitly for advanced paths.",
+        "result_interpretation": "Read residual, rank, and convergence diagnostics."
+      },
+      "semantic_differences": ["Typed storage makes scalar type, shape, aliasing, and diagnostics more explicit."],
+      "assertions": ["AlgebraLib: success"]
+    },
+    {
+      "id": "FinanceLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Pass cash values, per-period rates, and periods explicitly.",
+        "ordinary_success": "PresentValue(100, 0.1, 1) returns 90.9091.",
+        "diagnostic_failure": "Negative periods remain invalid.",
+        "ownership": "Returned scalar values have value semantics.",
+        "copying": "Cash-flow arrays follow managed-array copy rules.",
+        "indexing": "Cash-flow arrays are zero-based chronological sequences.",
+        "precision": "Financial calculations use Double plus explicit decimal rounding.",
+        "defaults": "PresentValue defaults to four decimals.",
+        "result_interpretation": "Rates are per period, not percentages."
+      },
+      "candidate_2_0": {
+        "construction": "Keep rate, period, and cash-flow units explicit.",
+        "ordinary_success": "The same present-value result is asserted.",
+        "diagnostic_failure": "Validation remains unchanged.",
+        "ownership": "Scalar and array ownership is unchanged.",
+        "copying": "Copy mutable cash-flow arrays deliberately.",
+        "indexing": "Chronological arrays remain zero-based.",
+        "precision": "Double and decimal-rounding contracts remain visible.",
+        "defaults": "No default rounding change is proposed.",
+        "result_interpretation": "Retain per-period rate interpretation."
+      },
+      "semantic_differences": ["No FinanceLib behavior change is proposed by the rehearsal."],
+      "assertions": ["FinanceLib: success"]
+    },
+    {
+      "id": "EngineeringLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Import focused Pressure and Velocity units.",
+        "ordinary_success": "Pressure and Mach results are asserted through aliases.",
+        "diagnostic_failure": "EPressureError catches invalid pressure input.",
+        "ownership": "Static facade calls allocate no caller-visible object.",
+        "copying": "Scalar results have value semantics.",
+        "indexing": "The exercised scalar facade has no indexed storage.",
+        "precision": "Facade calculations use Double.",
+        "defaults": "Alias calls have identical defaults to the common facade.",
+        "result_interpretation": "Physical units remain method-specific and documented."
+      },
+      "candidate_2_0": {
+        "construction": "Import Common and FluidDynamics directly.",
+        "ordinary_success": "One common facade handles pressure and velocity calculations.",
+        "diagnostic_failure": "EFluidDynamicsError catches the same invalid input.",
+        "ownership": "The canonical facade is also static and reentrant.",
+        "copying": "Scalar result semantics are unchanged.",
+        "indexing": "No indexed storage is introduced.",
+        "precision": "Double calculations are unchanged.",
+        "defaults": "The aliases and canonical class are identical types.",
+        "result_interpretation": "The canonical path is broader, not numerically different."
+      },
+      "semantic_differences": ["Only import and type names change; behavior, defaults, exception identity, and numerical results do not."],
+      "assertions": ["EngineeringLib: success", "alias package boundary: success"]
+    },
+    {
+      "id": "StatsLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Create TDoubleArray samples.",
+        "ordinary_success": "Mean([1,2,3]) equals 2.",
+        "diagnostic_failure": "Empty/invalid samples follow documented exceptions.",
+        "ownership": "Input arrays remain caller-owned.",
+        "copying": "Order-changing operations document whether they copy.",
+        "indexing": "Samples are zero-based.",
+        "precision": "Statistics use Double.",
+        "defaults": "Sample/population choices remain operation-specific.",
+        "result_interpretation": "Interpret denominator, tail, and confidence level explicitly."
+      },
+      "candidate_2_0": {
+        "construction": "Keep sample arrays and streaming state explicit.",
+        "ordinary_success": "The same mean is asserted.",
+        "diagnostic_failure": "No silent missing-value policy is added.",
+        "ownership": "Caller-owned input remains unchanged.",
+        "copying": "Copy before mutation when order must be preserved.",
+        "indexing": "Zero-based arrays remain standard.",
+        "precision": "Double remains the stable scalar type.",
+        "defaults": "Statistical definitions remain documented per method.",
+        "result_interpretation": "Read inference results and diagnostics together."
+      },
+      "semantic_differences": ["No StatsLib behavior change is proposed by the rehearsal."],
+      "assertions": ["StatsLib: success"]
+    },
+    {
+      "id": "ProbabilityLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Pass distribution parameters to static methods.",
+        "ordinary_success": "Standard normal CDF at zero equals 0.5.",
+        "diagnostic_failure": "Invalid scale/shape parameters raise documented errors.",
+        "ownership": "Scalar calls keep no mutable global distribution state.",
+        "copying": "Scalar values have value semantics.",
+        "indexing": "The exercised distribution call is scalar.",
+        "precision": "Distribution calculations use Double.",
+        "defaults": "Parameters are explicit rather than globally defaulted.",
+        "result_interpretation": "CDF and survival tails are distinct."
+      },
+      "candidate_2_0": {
+        "construction": "Keep parameters explicit at each call.",
+        "ordinary_success": "The same CDF reference value is asserted.",
+        "diagnostic_failure": "Parameter validation remains explicit.",
+        "ownership": "No stateful distribution object is introduced.",
+        "copying": "Scalar semantics are unchanged.",
+        "indexing": "No indexed storage is introduced.",
+        "precision": "Double accuracy contracts remain documented.",
+        "defaults": "No hidden parameter defaults are proposed.",
+        "result_interpretation": "Tail meaning must remain explicit."
+      },
+      "semantic_differences": ["No ProbabilityLib behavior change is proposed by the rehearsal."],
+      "assertions": ["ProbabilityLib: success"]
+    },
+    {
+      "id": "CombinatoricsLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Pass non-negative integer counts.",
+        "ordinary_success": "5 factorial equals exactly 120.",
+        "diagnostic_failure": "Invalid counts and overflow paths remain explicit.",
+        "ownership": "Integer results have value semantics.",
+        "copying": "Generated arrays are independent managed values.",
+        "indexing": "Sequence arrays are zero-based.",
+        "precision": "Exact integer vs logarithmic floating results are distinct.",
+        "defaults": "No implicit approximation mode is introduced.",
+        "result_interpretation": "Check range before treating counts as exact."
+      },
+      "candidate_2_0": {
+        "construction": "Keep exact-count intent visible.",
+        "ordinary_success": "The same exact factorial is asserted.",
+        "diagnostic_failure": "Overflow and invalid-domain behavior stays documented.",
+        "ownership": "Value semantics are unchanged.",
+        "copying": "Managed-array outputs remain independent values.",
+        "indexing": "Zero-based sequences remain standard.",
+        "precision": "Do not substitute a floating approximation silently.",
+        "defaults": "No default change is proposed.",
+        "result_interpretation": "Exact and log-scale APIs remain separate."
+      },
+      "semantic_differences": ["No CombinatoricsLib behavior change is proposed by the rehearsal."],
+      "assertions": ["CombinatoricsLib: success"]
+    },
+    {
+      "id": "NumericsLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Provide callbacks and a valid bracket.",
+        "ordinary_success": "BrentResult finds sqrt(2).",
+        "diagnostic_failure": "Converged/status/residual expose failure without a silent answer.",
+        "ownership": "Callback data remains caller-owned.",
+        "copying": "Array solution records own managed results.",
+        "indexing": "Sample and state arrays are zero-based.",
+        "precision": "Tolerances are Double and scale-aware.",
+        "defaults": "BrentResult uses documented tolerance and iteration defaults.",
+        "result_interpretation": "Read root, residual, iteration count, and status together."
+      },
+      "candidate_2_0": {
+        "construction": "Prefer explicit result-returning entry points.",
+        "ordinary_success": "The same bracketed root is asserted.",
+        "diagnostic_failure": "Non-convergence remains visible in status fields.",
+        "ownership": "Caller/callback ownership is unchanged.",
+        "copying": "Managed result arrays remain explicit.",
+        "indexing": "Zero-based state arrays remain standard.",
+        "precision": "Pass problem-appropriate tolerances when defaults are insufficient.",
+        "defaults": "Defaults are stable but documented rather than assumed.",
+        "result_interpretation": "A returned number alone is not convergence evidence."
+      },
+      "semantic_differences": ["Candidate guidance prefers explicit diagnostics already shipped in 1.x."],
+      "assertions": ["NumericsLib: success"]
+    },
+    {
+      "id": "OptimizationLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Provide an objective and a valid interval.",
+        "ordinary_success": "GoldenSection recovers x=3.",
+        "diagnostic_failure": "Invalid intervals and exhausted iterations remain visible.",
+        "ownership": "Objective inputs remain caller-visible borrowed values.",
+        "copying": "Vector results use managed arrays.",
+        "indexing": "Decision vectors are zero-based.",
+        "precision": "Objectives and tolerances use Double.",
+        "defaults": "Default tolerance and MaxIter are exercised.",
+        "result_interpretation": "Check feasibility/convergence for diagnostic solvers."
+      },
+      "candidate_2_0": {
+        "construction": "Prefer explicit option and model records for advanced solvers.",
+        "ordinary_success": "The same scalar minimum is asserted.",
+        "diagnostic_failure": "Termination status must accompany candidate solutions.",
+        "ownership": "Callback and model ownership remains documented.",
+        "copying": "Clone mutable vectors when independence is required.",
+        "indexing": "Decision vectors remain zero-based.",
+        "precision": "Double tolerances remain explicit.",
+        "defaults": "Review defaults against scale instead of assuming equivalence.",
+        "result_interpretation": "Feasible and converged are separate claims."
+      },
+      "semantic_differences": ["Candidate guidance emphasizes explicit options and diagnostics; scalar behavior is unchanged."],
+      "assertions": ["OptimizationLib: success"]
+    },
+    {
+      "id": "TimeSeriesLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Create a chronological TDoubleArray.",
+        "ordinary_success": "A centered window of three has midpoint mean 3.",
+        "diagnostic_failure": "Empty series and invalid windows raise ETimeSeriesError.",
+        "ownership": "Input arrays remain caller-owned.",
+        "copying": "Smoothing returns a new managed array.",
+        "indexing": "Time order follows zero-based array positions.",
+        "precision": "Samples and results use Double.",
+        "defaults": "Edge handling uses available values as documented.",
+        "result_interpretation": "The centered output length equals the input length."
+      },
+      "candidate_2_0": {
+        "construction": "Keep ordering, period, and missing-value policy explicit.",
+        "ordinary_success": "The same centered average is asserted.",
+        "diagnostic_failure": "Invalid shape/window behavior is unchanged.",
+        "ownership": "Caller-owned inputs and new outputs remain distinct.",
+        "copying": "Returned arrays remain independent managed values.",
+        "indexing": "Zero-based chronological indexing remains standard.",
+        "precision": "Double samples remain explicit.",
+        "defaults": "No edge-policy change is proposed.",
+        "result_interpretation": "Align centered output with original timestamps."
+      },
+      "semantic_differences": ["No TimeSeriesLib behavior change is proposed by the rehearsal."],
+      "assertions": ["TimeSeriesLib: success"]
+    },
+    {
+      "id": "MLLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Build TDoubleMatrix as an array of rows.",
+        "ordinary_success": "Two-feature normalization reaches zero and one.",
+        "diagnostic_failure": "Ragged or empty feature matrices raise EMLError.",
+        "ownership": "Input feature rows remain caller-owned.",
+        "copying": "Normalise returns newly allocated rows.",
+        "indexing": "Feature access is X[row][column].",
+        "precision": "Features and predictions use Double.",
+        "defaults": "Seed and preprocessing defaults remain method-specific.",
+        "result_interpretation": "Keep preprocessing fitted only to training data."
+      },
+      "candidate_2_0": {
+        "construction": "Keep row-major shape and training boundary explicit.",
+        "ordinary_success": "The same normalized endpoints are asserted.",
+        "diagnostic_failure": "Shape validation remains explicit.",
+        "ownership": "Input/output ownership is unchanged.",
+        "copying": "Returned rows remain independent allocations.",
+        "indexing": "Row-major zero-based indexing remains standard.",
+        "precision": "Double model inputs remain explicit.",
+        "defaults": "Pass seeds/options for reproducible algorithms.",
+        "result_interpretation": "Prevent leakage and interpret model diagnostics."
+      },
+      "semantic_differences": ["No MLLib behavior change is proposed by the rehearsal."],
+      "assertions": ["MLLib: success"]
+    },
+    {
+      "id": "InterchangeLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Create a caller-owned stream and typed matrix/state.",
+        "ordinary_success": "Matrix and local RNG state round trips are asserted.",
+        "diagnostic_failure": "Malformed headers/shapes raise interchange errors.",
+        "ownership": "The caller creates and frees streams.",
+        "copying": "Loads create independent matrix/state values.",
+        "indexing": "Persisted matrix indices are zero-based after load.",
+        "precision": "Binary Double matrix encoding is explicit.",
+        "defaults": "Load limits are supplied explicitly in the consumer.",
+        "result_interpretation": "Format/version/type metadata is validated before payload use."
+      },
+      "candidate_2_0": {
+        "construction": "Persist type-named matrices and explicit local RNG state.",
+        "ordinary_success": "The same round-trip and replay are asserted.",
+        "diagnostic_failure": "Untrusted input remains bounded and validated.",
+        "ownership": "Streams remain caller-owned.",
+        "copying": "Loaded storage remains independent.",
+        "indexing": "Typed matrix indexing remains zero-based.",
+        "precision": "Scalar type is encoded and must match the load API.",
+        "defaults": "Use explicit load limits at trust boundaries.",
+        "result_interpretation": "A successful parse also validates shape/type/version."
+      },
+      "semantic_differences": ["Candidate guidance prefers explicit type/state paths already shipped in 1.x."],
+      "assertions": ["InterchangeLib: success"]
+    },
+    {
+      "id": "GeometryLib",
+      "guide": "docs/MIGRATION_REHEARSAL_1.9.7.md",
+      "one_x": {
+        "construction": "Construct TPoint2D values explicitly.",
+        "ordinary_success": "The 3-4-5 distance equals 5.",
+        "diagnostic_failure": "Degenerate and non-finite cases remain operation-specific.",
+        "ownership": "Geometry records use value semantics.",
+        "copying": "Record assignment copies values.",
+        "indexing": "The exercised point API uses named coordinates.",
+        "precision": "Coordinates use Double.",
+        "defaults": "No coordinate-system default is hidden.",
+        "result_interpretation": "Distance is in the caller's coordinate units."
+      },
+      "candidate_2_0": {
+        "construction": "Keep dimension and coordinate units explicit.",
+        "ordinary_success": "The same distance is asserted.",
+        "diagnostic_failure": "Degenerate-input contracts remain documented.",
+        "ownership": "Value semantics are unchanged.",
+        "copying": "Record assignment remains an independent value copy.",
+        "indexing": "Named coordinates remain preferred for points.",
+        "precision": "Double geometry remains explicit.",
+        "defaults": "No hidden unit or coordinate convention is added.",
+        "result_interpretation": "Caller-defined coordinate units remain authoritative."
+      },
+      "semantic_differences": ["No GeometryLib behavior change is proposed by the rehearsal."],
+      "assertions": ["GeometryLib: success"]
+    }
+  ],
+  "external_mappings": [
+    {
+      "source_library": "NumLib",
+      "source_api": "typ ArbFloat vector/matrix storage",
+      "target": "MathBase.SharedTypes.TDoubleArray and AlgebraLib typed dense/sparse matrices",
+      "equivalence": "conceptual",
+      "semantic_differences": ["mathlib-fp uses explicit zero-based managed arrays and typed shape-owning interfaces."],
+      "unsupported": ["No pointer-plus-bounds, selected lower-bound, or implicit-leading-dimension wrapper is provided."],
+      "source": "https://www.freepascal.org/daily/packages/numlib/numlib/index.html"
+    },
+    {
+      "source_library": "NumLib",
+      "source_api": "root finding, quadrature, and dense linear systems",
+      "target": "NumericsLib.Numerics and AlgebraLib.DenseSolvers",
+      "equivalence": "conceptual",
+      "semantic_differences": ["Callbacks, indexing, storage, stopping rules, and diagnostic results must be adapted."],
+      "unsupported": ["Routine-name aliases and identical convergence/failure behavior are not promised."],
+      "source": "https://www.freepascal.org/daily/packages/numlib/numlib/index.html"
+    },
+    {
+      "source_library": "LMath/DMath",
+      "source_api": "TVector/TMatrix with Lb/Ub slices",
+      "target": "TDoubleArray and typed dense/sparse matrices and views",
+      "equivalence": "conceptual",
+      "semantic_differences": ["Bounds become zero-based indices/views and mutation versus cloning must be selected explicitly."],
+      "unsupported": ["No LMath/DMath unit, package, ABI, or in-place mutation compatibility layer is provided."],
+      "source": "https://sourceforge.net/projects/lmath-library/files/LMath/"
+    },
+    {
+      "source_library": "LMath/DMath",
+      "source_api": "uMeanSD/uMathStat, uNonLinEq, uOptimum, uRegression, and uFFT/uConvolutions",
+      "target": "StatsLib, NumericsLib, OptimizationLib, MLLib/NumericsLib.Modelling, and EngineeringLib.DSP",
+      "equivalence": "conceptual",
+      "semantic_differences": ["Data shape, sample definitions, callbacks, constraints, normalization, diagnostics, random state, and output ownership require review."],
+      "unsupported": ["Plotting components, Float precision switches, identical random streams, and identical stopping or exception behavior are not mapped."],
+      "source": "https://sourceforge.net/projects/lmath-library/files/LMath/"
+    }
+  ],
+  "alias_decisions": [
+    {
+      "name": "EPressureError",
+      "unit": "EngineeringLib.Pressure",
+      "canonical": "EngineeringLib.Common.EFluidDynamicsError",
+      "decision": "retain",
+      "replacement": "EFluidDynamicsError",
+      "semantic_difference": "Exact exception alias; identity and failure behavior are unchanged.",
+      "migration_example": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+      "compatibility_period": "Supported throughout 1.x; no removal runway starts in 1.9.7.",
+      "owner": "EngineeringLib",
+      "package_boundary": "in-place",
+      "tested_paths": ["fpc-direct", "lazarus-package"]
+    },
+    {
+      "name": "TPressureKit",
+      "unit": "EngineeringLib.Pressure",
+      "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+      "decision": "retain",
+      "replacement": "TFluidDynamicsKit",
+      "semantic_difference": "Exact facade alias; behavior, defaults, ownership, exceptions, and numerical results are unchanged.",
+      "migration_example": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+      "compatibility_period": "Supported throughout 1.x; no removal runway starts in 1.9.7.",
+      "owner": "EngineeringLib",
+      "package_boundary": "in-place",
+      "tested_paths": ["fpc-direct", "lazarus-package"]
+    },
+    {
+      "name": "EVelocityError",
+      "unit": "EngineeringLib.Velocity",
+      "canonical": "EngineeringLib.Common.EFluidDynamicsError",
+      "decision": "retain",
+      "replacement": "EFluidDynamicsError",
+      "semantic_difference": "Exact exception alias; identity and failure behavior are unchanged.",
+      "migration_example": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+      "compatibility_period": "Supported throughout 1.x; no removal runway starts in 1.9.7.",
+      "owner": "EngineeringLib",
+      "package_boundary": "in-place",
+      "tested_paths": ["fpc-direct", "lazarus-package"]
+    },
+    {
+      "name": "TVelocityKit",
+      "unit": "EngineeringLib.Velocity",
+      "canonical": "EngineeringLib.FluidDynamics.TFluidDynamicsKit",
+      "decision": "retain",
+      "replacement": "TFluidDynamicsKit",
+      "semantic_difference": "Exact facade alias; behavior, defaults, ownership, exceptions, and numerical results are unchanged.",
+      "migration_example": "examples/migration/candidate_2_0/consumer_2_0.lpr",
+      "compatibility_period": "Supported throughout 1.x; no removal runway starts in 1.9.7.",
+      "owner": "EngineeringLib",
+      "package_boundary": "in-place",
+      "tested_paths": ["fpc-direct", "lazarus-package"]
+    }
+  ]
+}
