@@ -154,6 +154,15 @@ jobs:
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
             examples/23_api_migration_preview.pas
           ./example-bin/23_api_migration_preview
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/24_sensor_pipeline.pas
+          ./example-bin/24_sensor_pipeline
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/25_numerical_modelling_optimisation.pas
+          ./example-bin/25_numerical_modelling_optimisation
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/26_probability_finance.pas
+          ./example-bin/26_probability_finance
           python3 tools/check_example_output.py
 
   windows:
