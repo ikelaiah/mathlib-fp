@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.8] - 2026-08-16
+
+### Added
+
+- Added three maintained multi-domain end-to-end workflows: a sensor pipeline
+  (DSP + statistics + time-series), a numerical modelling and optimisation
+  workflow (fitting + interpolation + solve + bounded optimisation), and a
+  reproducible probability/finance analysis workflow (seeded sampling +
+  inference + NPV/IRR). Each loads or seeds local data, validates it,
+  transforms, fits or solves, runs a diagnostic path, and exports a
+  deterministic report.
+- Added an offline workflow-qualification contract and checker that validates
+  the machine-readable manifest, compiles and runs every workflow with
+  FPC 3.2.2 from an isolated work directory, verifies success markers,
+  diagnostics, numerical bounds, exported artifacts, and byte-identical
+  repeatability, and records the exact compiler/platform that ran.
+
+### Validation
+
+- Integrated the workflow checker into ordinary CI and clean-archive release
+  qualification so representative workflows are reproduced from published
+  instructions without network access, foreign runtimes, licence keys, or
+  repository-local configuration.
+
+### Documentation
+
+- Published the workflow guide, release notes, PR notes, qualification record,
+  and updated support/capability/release identity for 1.9.8.
+
 ## [1.9.7] - 2026-08-12
 
 ### Added

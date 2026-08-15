@@ -36,6 +36,9 @@ closest to your project. For a shorter task-first route, use the
 | `21_release_1_8_workflows.pas` | DSP / StatsLib / MLLib / TimeSeriesLib / InterchangeLib | Block convolution, paired distribution APIs, leakage-safe preprocessing, seeded forests, multivariate Kalman filtering, model persistence, and bounded expressions |
 | `22_sparse_end_to_end.pas` | AlgebraLib / MathBase | Assemble canonical sparse storage, round-trip Matrix Market, build IC(0), solve without densification, and interpret residual diagnostics |
 | `23_api_migration_preview.pas` | Cross-domain migration | Run and verify typed dense and sparse solves, fitting, interpolation, optimisation, DSP, and statistics while preserving explicit compatibility paths |
+| `24_sensor_pipeline.pas` | MathBase / EngineeringLib / StatsLib / TimeSeriesLib | Load and validate a bundled sensor CSV, FIR/Welch DSP, streaming statistics, trend and anomaly analysis, a non-finite diagnostic, and deterministic export |
+| `25_numerical_modelling_optimisation.pas` | MathBase / NumericsLib / OptimizationLib | Fit and interpolate local data, solve a scalar root, run unconstrained and bounded optimisation, exercise convergence-failure and invalid-input diagnostics, and export |
+| `26_probability_finance.pas` | MathBase / ProbabilityLib / StatsLib / FinanceLib | Seeded return simulation, distribution estimation, CAPM-style regression, NPV/IRR appraisal, an invalid-probability diagnostic, and a deterministic export |
 
 ## Build and run
 

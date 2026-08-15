@@ -1506,12 +1506,12 @@ NumLib and LMath/DMath mappings, and direct-source/Lazarus-package evidence. It
 retains the four pressure/velocity facade and error aliases in place without
 deprecation because the focused imports are exact and dependency-neutral.
 
-## Next release: 1.9.8 — Representative workflow qualification
+## Previous release: 1.9.8 — Representative workflow qualification
 
 Version 1.9.8 validates that separately mature domains feel like one library in
 applications not written to mirror the internal architecture. External reports
 remain welcome, but participation by particular users is not a release gate:
-completion evidence must be reproducible from repository-owned artifacts and
+completion evidence is reproducible from repository-owned artifacts and
 supported build environments.
 
 ### 1.9.8 scope
@@ -1547,7 +1547,13 @@ supported build environments.
 - Workflow findings are triaged by correctness risk and user-workflow impact,
   not by the ease of adding another isolated function.
 
-## Planned 1.9.9 — Final 1.9.x convergence handoff
+The release ships three maintained multi-domain workflow programs (sensor
+pipeline, numerical modelling/optimisation, and probability/finance analysis),
+a machine-readable workflow manifest and offline checker, and direct-source/
+clean-archive workflow evidence. It adds no public API and records the exact
+compiler and platform that ran each workflow.
+
+## Next release: 1.9.9 — Final 1.9.x convergence handoff
 
 Version 1.9.9 is the final 1.9.x convergence release. It introduces no planned
 public capability and closes the evidence, compatibility decisions, and exact

@@ -12,11 +12,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.7"
-NEXT_RELEASE = "1.9.8"
+CURRENT_RELEASE = "1.9.8"
+NEXT_RELEASE = "1.9.9"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
-HISTORICAL_RELEASES = ["1.9.6", "1.9.5", "1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
+HISTORICAL_RELEASES = ["1.9.7", "1.9.6", "1.9.5", "1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -179,6 +179,9 @@ def main() -> int:
         )
         assert inventory["migration_rehearsal"] == (
             "docs/migration-rehearsal-1.9.7.json"
+        )
+        assert inventory["workflow_qualification"] == (
+            "docs/workflow-qualification-1.9.8.json"
         )
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -720,7 +723,7 @@ def main() -> int:
         DOCS / f"RELEASE_NOTES_{CURRENT_RELEASE}.md",
         DOCS / f"PR_NOTES_{CURRENT_RELEASE}.md",
         DOCS / f"QUALIFICATION_{CURRENT_RELEASE}.md",
-        DOCS / f"MIGRATION_REHEARSAL_{CURRENT_RELEASE}.md",
+        DOCS / f"WORKFLOW_QUALIFICATION_{CURRENT_RELEASE}.md",
         DOCS / "FEEDBACK.md",
     ]
     for release_file in release_files:
@@ -740,7 +743,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="7"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="8"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:
@@ -754,7 +757,7 @@ def main() -> int:
         contract_data = json.loads(contracts_path.read_text(encoding="utf-8"))
         assert contract_data["schema_version"] == 1
         contracts = contract_data["examples"]
-        assert len(contracts) == 4
+        assert len(contracts) == 7
         for contract in contracts:
             source = ROOT / contract["path"]
             assert source.is_file()

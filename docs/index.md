@@ -13,6 +13,15 @@ allocating path and link the advanced controls separately.
 
 ## Releases
 
+- [mathlib-fp 1.9.8 release notes](RELEASE_NOTES_1.9.8.md) — representative
+  multi-domain sensor, modelling, and probability/finance workflows with
+  reproducible clean-archive evidence.
+- [1.9.8 workflow qualification](WORKFLOW_QUALIFICATION_1.9.8.md) — the three
+  qualified end-to-end workflows, their domains, limits, and evidence.
+- [1.9.8 PR notes](PR_NOTES_1.9.8.md) — implementation and review boundary.
+- [1.9.8 qualification report](QUALIFICATION_1.9.8.md) — local and candidate
+  archive evidence status.
+
 - [mathlib-fp 1.9.7 release notes](RELEASE_NOTES_1.9.7.md) — executable
   side-by-side migration, external-library mappings, and alias decisions.
 - [1.9.7 migration rehearsal](MIGRATION_REHEARSAL_1.9.7.md) — all-domain

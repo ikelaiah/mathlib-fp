@@ -41,6 +41,32 @@
         "optimization: x=2.000000, -1.000000; status=converged"
       ],
       "final_line": "migration preview: success"
+    },
+    {
+      "path": "examples/24_sensor_pipeline.pas",
+      "contains": [
+        "raw count: 48",
+        "diagnostic: rejected 1 non-finite reading",
+        "welch bins: 9"
+      ],
+      "final_line": "sensor pipeline: success"
+    },
+    {
+      "path": "examples/25_numerical_modelling_optimisation.pas",
+      "contains": [
+        "fit slope: 2.000000",
+        "root value: 1.414214",
+        "root diagnostic converged: FALSE"
+      ],
+      "final_line": "modelling workflow: success"
+    },
+    {
+      "path": "examples/26_probability_finance.pas",
+      "contains": [
+        "decision: accept",
+        "diagnostic: invalid sigma rejected by EProbabilityError"
+      ],
+      "final_line": "probability finance workflow: success"
     }
   ]
 }
