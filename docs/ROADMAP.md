@@ -154,7 +154,7 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 1.9.5 | Predictable performance | Reproducible time/allocation baselines and evidence-led internal optimisation |
 | 1.9.6 | Portability and distribution | Clean archives, offline use, and a current evidence-backed support matrix |
 | 1.9.7 | Migration and compatibility rehearsal | Complete 1.x mappings and a tested compatibility-package plan |
-| 1.9.8 | Representative workflows and external beta | Multi-domain applications and recorded use by people outside their implementation |
+| 1.9.8 | Representative workflow qualification | Multi-domain applications with reproducible clean-archive workflow evidence |
 | 1.9.9 | Final 1.9.x convergence handoff | Closed 1.10.0 capability manifest, complete evidence, and no unresolved API decisions |
 | 1.10.0 | Additive API completion and final 2.0 freeze | Approved missing conveniences, including 2-D vector rotation, followed by release-candidate qualification and soak |
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
@@ -1506,10 +1506,13 @@ NumLib and LMath/DMath mappings, and direct-source/Lazarus-package evidence. It
 retains the four pressure/velocity facade and error aliases in place without
 deprecation because the focused imports are exact and dependency-neutral.
 
-## Next release: 1.9.8 — Representative workflows and external beta
+## Next release: 1.9.8 — Representative workflow qualification
 
 Version 1.9.8 validates that separately mature domains feel like one library in
-applications not written to mirror the internal architecture.
+applications not written to mirror the internal architecture. External reports
+remain welcome, but participation by particular users is not a release gate:
+completion evidence must be reproducible from repository-owned artifacts and
+supported build environments.
 
 ### 1.9.8 scope
 
@@ -1520,26 +1523,29 @@ applications not written to mirror the internal architecture.
 - Exercise loading, validation, transformations, fitting or solving,
   diagnostics, cancellation where relevant, persistence/export, and result
   interpretation rather than chaining only happy-path scalar calls.
-- Recruit users who did not implement the exercised features, including at
-  least one person relatively new to Free Pascal, and record installation,
-  comprehension, API-friction, migration, and error-recovery observations.
-- Resolve defects and documentation gaps found by the beta. Keep desirable new
-  algorithm families in the post-2.0 backlog unless they block a documented
-  core workflow and receive their own minor-release plan.
-- Publish known limitations and workarounds found during the beta rather than
-  delaying disclosure until the final release notes.
+- Run each application through an automated clean-archive journey that follows
+  only its published installation and task instructions, checks expected and
+  diagnostic paths, and records compiler, platform, commands, results, and
+  generated artifacts without repository-local configuration.
+- Resolve defects and documentation gaps found by end-to-end workflow
+  qualification. Keep desirable new algorithm families in the post-2.0
+  backlog unless they block a documented core workflow and receive their own
+  minor-release plan.
+- Publish known limitations and tested workarounds exposed by workflow
+  qualification rather than delaying disclosure until the final release
+  notes.
 
 ### 1.9.8 completion gate
 
 - At least three representative applications build and run from the release
   archive on primary targets and have bounded, reproducible expected results.
-- At least three people outside the implementation of those workflows complete
-  recorded clean-room use; unresolved confusion is either corrected or named
-  with a tested workaround.
+- Automated clean-archive journeys reproduce installation, documented task
+  flow, migration, and error-recovery paths from the published instructions;
+  unresolved friction is either corrected or named with a tested workaround.
 - No reference application requires private conversions, undocumented symbols,
   a foreign runtime, a licence key, or network access for its numerical path.
-- Beta findings are triaged by correctness risk and user-workflow impact, not
-  by the ease of adding another isolated function.
+- Workflow findings are triaged by correctness risk and user-workflow impact,
+  not by the ease of adding another isolated function.
 
 ## Planned 1.9.9 — Final 1.9.x convergence handoff
 
@@ -1607,9 +1613,9 @@ material, qualification procedure, and distribution artifacts promoted to 2.0.
   documentation archives. After the freeze, accept only release-blocking
   correctness, safety, portability, packaging, documentation, or migration
   fixes, each with regression evidence and a reviewed API diff.
-- Allow a 30–60 day external soak after the first complete candidate; elapsed
-  time without use is not evidence, so representative workflows and beta users
-  must exercise the actual candidate artifacts.
+- Exercise the actual candidate artifacts through repeated clean-archive
+  representative workflows during both release-candidate cycles; elapsed time
+  or an untested artifact is not qualification evidence.
 
 ### 1.10.0 completion gate
 
