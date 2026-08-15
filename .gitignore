@@ -48,6 +48,7 @@ lib/
 backup/
 example-bin/
 build-temp/
+workflow-exports/
 
 # Python documentation/release tooling caches
 __pycache__/

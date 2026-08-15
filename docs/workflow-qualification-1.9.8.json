@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "release": "1.9.8",
+  "guide": "docs/WORKFLOW_QUALIFICATION_1.9.8.md",
+  "workflows": [
+    {
+      "id": "sensor-pipeline",
+      "source": "examples/24_sensor_pipeline.pas",
+      "success_marker": "sensor pipeline: success",
+      "description": "Local sensor readings -> validation -> FIR/Welch DSP -> statistics -> time-series trend and anomaly analysis -> diagnostics -> deterministic export.",
+      "domains": ["MathBase", "EngineeringLib", "StatsLib", "TimeSeriesLib"],
+      "fixtures": ["examples/data/sensor_readings.csv"],
+      "max_fixture_bytes": 65536,
+      "diagnostics": [
+        "diagnostic: rejected 1 non-finite reading"
+      ],
+      "numerical_expectations": [
+        {"name": "raw-mean", "line_prefix": "raw mean:", "minimum": 19.5, "maximum": 20.5},
+        {"name": "raw-stddev", "line_prefix": "raw sample stddev:", "minimum": 1.0, "maximum": 3.0},
+        {"name": "streaming-mean", "line_prefix": "streaming mean:", "minimum": 19.5, "maximum": 20.5},
+        {"name": "smoothed-mean", "line_prefix": "smoothed mean:", "minimum": 15.0, "maximum": 20.0},
+        {"name": "anomaly-count", "line_prefix": "anomaly count:", "minimum": 0.0, "maximum": 10.0},
+        {"name": "trend-slope", "line_prefix": "trend slope:", "minimum": -1.0, "maximum": 0.0},
+        {"name": "last-moving-average", "line_prefix": "last moving average:", "minimum": 15.0, "maximum": 22.0}
+      ],
+      "exports": ["workflow-exports/sensor_report.txt"]
+    },
+    {
+      "id": "numerical-modelling-optimisation",
+      "source": "examples/25_numerical_modelling_optimisation.pas",
+      "success_marker": "modelling workflow: success",
+      "description": "Local modelling data -> validation -> linear fit and PCHIP interpolation -> bracketed scalar solve -> unconstrained and bounded optimisation -> convergence-failure and invalid-input diagnostics -> deterministic export.",
+      "domains": ["MathBase", "NumericsLib", "OptimizationLib"],
+      "fixtures": [],
+      "max_fixture_bytes": 65536,
+      "diagnostics": [
+        "root diagnostic converged: FALSE",
+        "diagnostic: invalid fit rejected by EModellingError"
+      ],
+      "numerical_expectations": [
+        {"name": "fit-intercept", "line_prefix": "fit intercept:", "minimum": 2.9, "maximum": 3.1},
+        {"name": "fit-slope", "line_prefix": "fit slope:", "minimum": 1.9, "maximum": 2.1},
+        {"name": "fit-r2", "line_prefix": "fit R^2:", "minimum": 0.99, "maximum": 1.01},
+        {"name": "pchip", "line_prefix": "pchip(1.5):", "minimum": 1.0, "maximum": 4.0},
+        {"name": "root-value", "line_prefix": "root value:", "minimum": 1.4, "maximum": 1.43},
+        {"name": "optimizer-x0", "line_prefix": "optimizer x0:", "minimum": 1.99, "maximum": 2.01},
+        {"name": "optimizer-x1", "line_prefix": "optimizer x1:", "minimum": -1.01, "maximum": -0.99},
+        {"name": "bounded-x0", "line_prefix": "bounded optimizer x0:", "minimum": 2.9, "maximum": 3.1},
+        {"name": "bounded-x1", "line_prefix": "bounded optimizer x1:", "minimum": 1.9, "maximum": 2.1}
+      ],
+      "exports": ["workflow-exports/model_report.txt"]
+    },
+    {
+      "id": "probability-finance",
+      "source": "examples/26_probability_finance.pas",
+      "success_marker": "probability finance workflow: success",
+      "description": "Seeded return generation -> probability distribution estimation -> one-sample test and CAPM-style regression -> NPV/IRR project appraisal -> invalid-probability diagnostic -> deterministic export and interpretation.",
+      "domains": ["MathBase", "ProbabilityLib", "StatsLib", "FinanceLib"],
+      "fixtures": [],
+      "max_fixture_bytes": 65536,
+      "diagnostics": [
+        "diagnostic: invalid sigma rejected by EProbabilityError"
+      ],
+      "numerical_expectations": [
+        {"name": "estimate-mean", "line_prefix": "estimate mean:", "minimum": 0.0, "maximum": 0.01},
+        {"name": "estimate-stddev", "line_prefix": "estimate stddev:", "minimum": 0.01, "maximum": 0.05},
+        {"name": "t-statistic", "line_prefix": "t statistic:", "minimum": 0.0, "maximum": 1.0},
+        {"name": "p-value", "line_prefix": "p value:", "minimum": 0.0, "maximum": 1.0},
+        {"name": "regression-intercept", "line_prefix": "regression intercept:", "minimum": -0.01, "maximum": 0.01},
+        {"name": "regression-beta", "line_prefix": "regression beta:", "minimum": 1.0, "maximum": 1.7},
+        {"name": "regression-r2", "line_prefix": "regression R^2:", "minimum": 0.5, "maximum": 1.0},
+        {"name": "npv", "line_prefix": "net present value:", "minimum": 5000.0, "maximum": 15000.0},
+        {"name": "irr", "line_prefix": "internal rate of return:", "minimum": 0.05, "maximum": 0.25}
+      ],
+      "exports": ["workflow-exports/finance_report.txt"]
+    }
+  ]
+}

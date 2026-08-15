@@ -49,6 +49,11 @@ Use this checklist for every mathlib-fp release.
   consumer projects assert all 13 domains, the alias-boundary consumer passes,
   compiler warnings match the manifest, and every alias decision records both
   direct-source and Lazarus-package evidence.
+- [ ] For 1.9.8, run `python tools/test_workflow_qualification.py` and
+  `python tools/check_workflow_qualification.py --compiler fpc`; confirm all
+  three workflows exercise multiple domains, their success markers, diagnostic
+  paths, and numerical bounds pass, their exported artifacts are produced, and
+  their output and exports are byte-identical across two runs.
 - [ ] Run exact Linux and Windows qualification with `--source-archive`,
   `--source-checksum`, and `--network-isolated` only after the workflow has
   blocked new outbound connections. Review the recorded digest, archive file
@@ -117,6 +122,10 @@ python tools/check_portability_evidence.py --compiler fpc \
 python tools/test_migration_rehearsal.py
 python tools/check_migration_rehearsal.py --compiler fpc \
   --work-dir build-temp/migration-rehearsal
+
+python tools/test_workflow_qualification.py
+python tools/check_workflow_qualification.py --compiler fpc \
+  --work-dir build-temp/workflow-qualification
 
 lazbuild --build-all packages/lazarus/mathlib_fp.lpk
 ```
