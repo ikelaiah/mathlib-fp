@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "closed_by_release": "1.9.9",
+  "target_release": "1.10.0",
+  "status": "closed",
+  "scope_source": "docs/ROADMAP.md",
+  "decision_sources": [
+    "docs/api-decision-2.0.json",
+    "docs/api-diff-1.9-to-2.0.json",
+    "docs/migration-rehearsal-1.9.7.json"
+  ],
+  "api_baseline": "docs/public-api-1.9.json",
+  "declarations": [
+    {
+      "id": "vector2d-rotation",
+      "kind": "addition",
+      "unit": "GeometryLib.Geometry",
+      "owner": "TVector2D",
+      "name": "Rotate",
+      "signature": "function Rotate(const Angle: Double): TVector2D",
+      "status": "accepted-for-1.10.0",
+      "behavior_contract": [
+        "Angle is measured in radians.",
+        "Positive angles rotate counter-clockwise about the origin.",
+        "The source vector is not modified; the operation returns a new value.",
+        "The operation is allocation-free and O(1); it is a value operation on the fixed-size record.",
+        "Rotate(0) returns a vector equal to the source within ordinary Double comparison.",
+        "Rotate(Pi / 2) is consistent with TVector2D.Perpendicular up to a stated 1e-15 relative tolerance; negative angles rotate clockwise and Rotate(-a) is the inverse of Rotate(a) within the same tolerance.",
+        "The returned magnitude preserves the source magnitude within the stated tolerance for finite inputs.",
+        "Assigning the result back to the source variable (V := V.Rotate(a)) is an ordinary value assignment and is safe.",
+        "Rotating the zero vector returns the zero vector exactly.",
+        "Non-finite input behavior follows the existing TVector2D contract: non-finite angle or non-finite components propagate the documented non-finite convention of GeometryLib instead of inventing a new one.",
+        "The method is documented as thread-safe and reentrant because it reads its value receiver and returns a new value."
+      ],
+      "test_plan": [
+        "Compile-check the exact signature against the shipped GeometryLib.Geometry interface and the 1.9 API snapshot diff.",
+        "Orientation fixtures: Rotate(Pi / 2) of (1, 0) yields a vector equal to (0, 1) within 1e-15; Rotate(Pi) yields (-1, 0); Rotate(3*Pi/2) yields (0, -1).",
+        "Angle conventions: zero angle is identity; negative angle inverts the positive angle of the same magnitude; angle reduction beyond 2*Pi is tested for periodicity consistency.",
+        "Perpendicular agreement: Rotate(Pi / 2) is compared with TVector2D.Perpendicular on several ordinary vectors.",
+        "Magnitude preservation: relative magnitude deviation is bounded by the stated tolerance for representative vectors including very small and very large finite components.",
+        "Source immutability: the receiver record is unchanged after the call, including when the result is assigned back to the same variable.",
+        "Zero-vector behavior: Rotate of the zero vector returns the exact zero vector for ordinary angles.",
+        "Non-finite policy: NaN or Infinity angle or components follow the documented GeometryLib non-finite contract and are covered by explicit fixtures.",
+        "The regression suite runs in normal, optimized, runtime-checked, and heap-traced test builds; allocation freedom is asserted by the heap-traced run and by the fixed-size record contract.",
+        "Public-API smoke coverage and the API snapshot reference are updated in the same change."
+      ],
+      "documentation_plan": [
+        "Document the exact signature, radians unit, counter-clockwise convention, magnitude tolerance, zero-vector, and non-finite contract in the GeometryLib reference.",
+        "Extend the runnable geometry example with a compact rotation workflow whose output is checked by the example-output gate.",
+        "Add a recipe or selection note where vector rotation is a common geometry task.",
+        "Record the exact addition in the 1.10.0 release notes, API snapshot diff, and capability inventory.",
+        "Update the 2.0 candidate snapshot and migration notes to name the new method."
+      ],
+      "compatibility_impact": [
+        "Pure additive method on an existing record type; no existing declaration, behavior, default, warning, or package membership changes.",
+        "Existing 1.9 callers remain source-compatible; the 1.9.9 snapshot diff for source/behavior/warnings/packaging remains empty.",
+        "No 1.9.x release may add the declaration; it is declared only by 1.10.0."
+      ]
+    },
+    {
+      "id": "deprecation-marking",
+      "kind": "deprecation",
+      "unit": null,
+      "owner": null,
+      "name": null,
+      "signature": null,
+      "status": "accepted-for-1.10.0",
+      "decision": "no-deprecation",
+      "behavior_contract": [
+        "1.10.0 marks no alias or compatibility declaration as deprecated and adds no deprecation warning, hint, or package move.",
+        "The four 1.9.7-rehearsed names TPressureKit, EPressureError, TVelocityKit, and EVelocityError remain in their existing units with exact type/exception identity and no hidden dependency.",
+        "All 21 plain compiler aliases reviewed by the 1.9.3 decision remain retained with their exact replacement guidance; the common TFluidDynamicsKit/EFluidDynamicsError names remain preferred documentation for new cross-fluid code only.",
+        "IMatrix, TMatrixKit, and TMatrixKitSparse remain supported compatibility paths directed to the typed facades through explicit copying conversions; no removal runway starts.",
+        "Full source compatibility is retained throughout 1.10.0; a maintained 1.x API is not deprecated merely because a major version is available."
+      ],
+      "test_plan": [
+        "Re-run the 1.9.7 migration rehearsal consumer projects against the 1.10.0 candidate and require the same domain assertions and alias-boundary outcomes.",
+        "Compile the alias-boundary consumer with warnings-as-visible and assert the manifest records no expected deprecation warning for any retained alias.",
+        "Re-run the API decision checker and require the alias review statuses to remain retain/review-only.",
+        "Package-boundary evidence: direct-source and Lazarus-package paths expose all retained declarations with identical identity and behavior."
+      ],
+      "documentation_plan": [
+        "Publish the closed deprecation decision list with the canonical-preferred naming guidance for new code.",
+        "Update the migration guide to state that no deprecation runway starts in 1.10.0.",
+        "Record the decision in the 1.10.0 release notes and the 2.0 compatibility documentation."
+      ],
+      "compatibility_impact": [
+        "None at compile time or runtime: no warnings, no behavior change, no package membership change.",
+        "Documentation may continue to prefer canonical names for new cross-fluid code."
+      ]
+    }
+  ],
+  "deferrals": [
+    {
+      "id": "vector3d-rotation",
+      "proposal": "Ergonomic 3-D vector rotation (axis-angle, quaternion, or matrix semantics)",
+      "routing": "deferred-beyond-2.0",
+      "reason": "The closed 1.10.0 manifest adds only the 2-D allocation-free rotation whose design was completed. 3-D rotation still requires a decision among axis-angle, quaternion, and matrix semantics plus orientation, units, normalization, and naming; it is explicitly deferred rather than left open."
+    },
+    {
+      "id": "bessel-elliptic-expint",
+      "proposal": "Bessel, elliptic, and exponential-integral scalar families",
+      "capability_family": "bessel_elliptic_exponential_integral",
+      "routing": "deferred-beyond-2.0",
+      "reason": "No stable public implementation and no demonstrated downstream requirement during 1.9.x convergence; the capability inventory keeps the families visible as unsupported."
+    },
+    {
+      "id": "advanced-sparse-direct",
+      "proposal": "Fill-reducing symbolic ordering, multifrontal/supernodal, distributed, out-of-core, and GPU sparse direct algorithms",
+      "routing": "deferred-beyond-2.0",
+      "reason": "Requires separate storage and performance design beyond the 1.9 stable sparse boundary."
+    },
+    {
+      "id": "advanced-iterative",
+      "proposal": "Block/flexible Krylov variants, algebraic multigrid, and parallel/SIMD sparse dispatch",
+      "routing": "deferred-beyond-2.0",
+      "reason": "No demonstrated need during convergence and no stable parallelism design; portable serial solvers remain the documented path."
+    },
+    {
+      "id": "advanced-spectral",
+      "proposal": "Full nonsymmetric, generalized, polynomial, Schur, shift-invert, and interior-target eigensystems",
+      "capability_family": "remaining_advanced_spectral_linear_algebra",
+      "routing": "deferred-beyond-2.0",
+      "reason": "The 1.9 stable boundary is full symmetric/Hermitian plus largest-magnitude partial eigensolvers; the remaining families need a dedicated design."
+    },
+    {
+      "id": "advanced-dsp-design",
+      "proposal": "Equiripple and advanced IIR design families and wavelet packets",
+      "capability_family": "advanced_dsp_design_and_wavelets",
+      "routing": "deferred-beyond-2.0",
+      "reason": "Conditional capability with no qualified numerical validation during convergence; Haar and the shipped filter baselines remain the stable boundary."
+    },
+    {
+      "id": "conditional-statistics",
+      "proposal": "Survival analysis, factor analysis, robust covariance, multinomial/count GLMs, boosting, and broader forecasting",
+      "capability_family": "conditional_data_science_extensions",
+      "routing": "deferred-beyond-2.0",
+      "reason": "Not activated because prerequisite numerical validation was not available; visible as unsupported in the capability inventory."
+    },
+    {
+      "id": "general-model-persistence",
+      "proposal": "Decomposition, forest, graph, and multivariate-state persistence",
+      "routing": "deferred-beyond-2.0",
+      "reason": "Selected model adapters are stable; general persistence needs its own interchange design."
+    },
+    {
+      "id": "parallel-simd",
+      "proposal": "Stable thread-pool and SIMD numerical dispatch",
+      "capability_family": "parallel_and_simd_numerical_dispatch",
+      "routing": "deferred-beyond-2.0",
+      "reason": "No stable parallelism API design exists; portable serial oracles remain the 1.x contract."
+    },
+    {
+      "id": "new-domains",
+      "proposal": "Any additional domain or algorithm family not shipped in 1.9.x",
+      "routing": "deferred-beyond-2.0",
+      "reason": "New domains require the GOVERNANCE.md contribution gate: demonstrated user need, a design record, and independent numerical references before implementation."
+    }
+  ],
+  "release_discipline": {
+    "source_compatibility": "Full 1.x source compatibility is retained throughout 1.10.0; no maintained declaration is removed or deprecated.",
+    "scope_lock": "1.10.0 implements only the closed declarations above plus the exact documentation, snapshot-diff, migration, and release-candidate work listed in the 1.10.0 roadmap section.",
+    "release_candidates": [
+      "At least two 2.0 release-candidate cycles run from tagged source and offline-documentation archives after the 1.10.0 additions land.",
+      "After the freeze, only release-blocking correctness, safety, portability, packaging, documentation, or migration fixes are accepted, each with regression evidence and a reviewed API diff.",
+      "Each candidate is exercised through repeated clean-archive representative workflows; elapsed time or an untested artifact is not qualification evidence."
+    ],
+    "completion_gate": [
+      "The shipped 1.10.0 public API exactly matches this closed manifest and every addition has a documented contract, focused regression coverage, and a runnable example.",
+      "Two release candidates pass full archive-based qualification and the later candidate includes every accepted freeze fix.",
+      "No unresolved critical/high-impact correctness, unsafe ownership/concurrency, portability, packaging, or migration defect is hidden to meet the version target.",
+      "Representative 1.x applications complete the documented migration or remain operational through the tested compatibility surface.",
+      "The only remaining work for 2.0.0 is version/release metadata and promotion of the qualified candidate."
+    ]
+  },
+  "unresolved_api_questions": []
+}

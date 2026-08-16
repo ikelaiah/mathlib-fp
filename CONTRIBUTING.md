@@ -114,6 +114,26 @@ symmetrical. New public identifiers must describe a useful API boundary.
 5. Update the CHANGELOG.md
 6. Submit a pull request
 
+### Contribution gate for new domains
+
+A new domain (a functional area such as finance, geometry, or DSP) or a new
+algorithm family inside an existing domain is accepted only when:
+
+1. a documented, demonstrated user need exists (an issue, a completed
+   workflow that cannot finish, or a repeated support question);
+2. a design record fixes the public types, ownership, mutation, indexing,
+   shape, error, tolerance, and compatibility contracts before code lands;
+3. at least one independent mathematical reference or published algorithm is
+   named, and its licence is compatible with MIT redistribution;
+4. tests, API documentation, selection guidance, and a runnable example land
+   in the same change as the implementation; and
+5. the capability inventory and the closed capability manifest
+   (`docs/capability-manifest-1.10.0.json`) are updated in the same change.
+
+Proposals that do not meet the gate are deferred explicitly rather than left
+open. The normative policy is
+[`docs/GOVERNANCE.md`](docs/GOVERNANCE.md#contribution-gate-for-new-domains).
+
 ### Pull Request Title Format
 
 ```

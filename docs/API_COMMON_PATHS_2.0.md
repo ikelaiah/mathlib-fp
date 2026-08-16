@@ -47,8 +47,10 @@ not collapsed by name.
 ## Review outcome
 
 The short programs confirm that ordinary double-real work does not need a new
-wrapper in 1.9.x. Geometry rotation is the one common convenience routed to a
-separate 1.10.0 design: both 2-D and 3-D rotation are useful, but 3-D must first
-choose axis-angle, quaternion, or matrix semantics and define orientation,
-units, normalization, and error behavior. No public name or declaration is
-introduced by this decision release.
+wrapper in 1.9.x. Geometry rotation is the one common convenience routed to
+1.10.0: the 1.9.9 convergence gate closed 2-D `TVector2D.Rotate` as a 1.10.0
+declaration with a complete contract, and explicitly deferred 3-D rotation
+beyond 2.0 until axis-angle, quaternion, or matrix semantics and orientation,
+units, normalization, and error behavior are designed. No public name or
+declaration is introduced by this decision release; see the
+[closed manifest](CAPABILITY_MANIFEST_1.10.0.md).

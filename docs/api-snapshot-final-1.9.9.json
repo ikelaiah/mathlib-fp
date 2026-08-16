@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "release": "1.9.9",
+  "status": "final",
+  "final_candidate_release": "2.0.0",
+  "api_baseline": "docs/public-api-1.9.json",
+  "baseline_release": "1.9.0",
+  "candidate_surface": [
+    {
+      "part": "1.9.0 public API surface",
+      "source": "docs/public-api-1.9.json",
+      "change_from_baseline": "none",
+      "detail": "The frozen 2,880-row 1.9 snapshot remains byte-identical across 1.9.0 through 1.9.9; the public interface digest of every src/*.pas unit matches the baseline."
+    },
+    {
+      "part": "Closed 1.10.0 additions",
+      "source": "docs/capability-manifest-1.10.0.json",
+      "change_from_baseline": "planned-1.10.0-only",
+      "detail": "TVector2D.Rotate is declared only by 1.10.0; 1.9.x adds no declaration."
+    }
+  ],
+  "diff_categories": {
+    "compatibility_preserving_corrections": [],
+    "documentation_changes": [
+      "The 1.9.3 documentary defaults: common paths appear first, advanced stable paths remain visible, compatibility differences are explicit, and generic scaffolding is labelled implementation support.",
+      "Versioned web/offline documentation, checked example execution, migration, portability, performance, workflow, and convergence evidence accumulated across 1.9.x."
+    ],
+    "packaging_changes": [],
+    "post_1_10_0_source_changes": "docs/capability-manifest-1.10.0.json"
+  },
+  "compiled_diff_from_1_9_0": {
+    "source": [],
+    "behaviour": [],
+    "warnings": [],
+    "packaging": []
+  },
+  "open_questions": []
+}

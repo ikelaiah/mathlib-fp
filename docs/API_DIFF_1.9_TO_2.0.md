@@ -38,10 +38,21 @@ package move is approved.
 ## Separately routed capability
 
 The common-program review identified ergonomic 2-D and 3-D vector rotation as
-useful. It is routed to a focused 1.10.0 design because 3-D must choose among
-axis-angle, quaternion, and matrix semantics and both dimensions must settle
-orientation, angular units, normalization, non-finite behavior, and naming.
-This document does not propose a declaration, and 1.9.x does not implement it.
+useful. The 1.9.9 convergence gate closed the routing in the
+[1.10.0 capability manifest](CAPABILITY_MANIFEST_1.10.0.md):
+
+- 2-D `TVector2D.Rotate(const Angle: Double): TVector2D` is declared for
+  1.10.0 only, with a closed contract (radians, counter-clockwise positive,
+  allocation-free value operation, source immutability, `Perpendicular`
+  agreement at π/2, magnitude preservation tolerance, zero-vector, and
+  non-finite behavior), a test plan, a documentation plan, and an empty
+  compatibility impact.
+- 3-D rotation is explicitly deferred beyond 2.0 because it must choose among
+  axis-angle, quaternion, and matrix semantics and settle orientation, units,
+  normalization, and naming.
+
+This document still proposes no 1.9.x declaration, and 1.9.x does not
+implement the 1.10.0 addition.
 
 ## Mechanical closure
 

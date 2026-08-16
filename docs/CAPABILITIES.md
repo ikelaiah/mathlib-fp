@@ -52,6 +52,9 @@ Target qualifications and platform-specific limitations are defined by the
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
 Unsupported entries are not counted in the 1.9.4 numerical-evidence audit. The
+[closed 1.10.0 capability manifest](CAPABILITY_MANIFEST_1.10.0.md) defers
+every unsupported family explicitly beyond 2.0 and is enforced by
+`tools/check_convergence.py`; no capability question remains open. The
 [dense solver-selection guide](DenseLinearAlgebra.md#choose-a-dense-solver)
 and [sparse solver-selection guide](SparseLinearAlgebra.md#choose-an-iterative-solver)
 name the stable linear-algebra boundaries. The
