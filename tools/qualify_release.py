@@ -358,9 +358,11 @@ def documentation_gates(
         "test_portability_evidence.py",
         "test_migration_rehearsal.py",
         "test_workflow_qualification.py",
+        "test_convergence.py",
         "check_docs.py",
         "check_api_decision.py",
         "check_numerical_evidence.py",
+        "check_convergence.py",
     ):
         qualification.run(
             script.removesuffix(".py"),
@@ -507,6 +509,18 @@ def workflow_qualification_gate(
     )
 
 
+def convergence_gate(
+    qualification: Qualification,
+) -> None:
+    qualification.run(
+        "convergence",
+        [
+            sys.executable,
+            str(ROOT / "tools" / "check_convergence.py"),
+        ],
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--release", required=True)
@@ -576,6 +590,7 @@ def main() -> int:
         documentation_gates(qualification, args.compiler, args.release)
         migration_rehearsal_gate(qualification, args.compiler)
         workflow_qualification_gate(qualification, args.compiler)
+        convergence_gate(qualification)
         portability_gate(qualification, args.compiler)
         if not args.skip_package:
             package_gate(qualification, args.lazbuild)
