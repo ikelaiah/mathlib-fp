@@ -225,4 +225,17 @@ a comprehensive native Free Pascal numerical package.
 
 [MIT](LICENSE.md) © the mathlib-fp contributors.
 
+## 🙏 Acknowledgments
+
+- [Free Pascal Dev Team](https://www.freepascal.org/) for the Free Pascal compiler
+- [Lazarus IDE Team](https://www.lazarus-ide.org/) for such an amazing IDE
+- The helpful folks on various online communities:
+    - [Unofficial Free Pascal Discord server](https://discord.com/channels/570025060312547359/570091337173696513)
+    - [Free Pascal & Lazarus forum](https://forum.lazarus.freepascal.org/index.php)
+    - [Tweaking4All Delphi, Lazarus, Free Pascal forum](https://www.tweaking4all.com/forum/delphi-lazarus-free-pascal/)
+    - [Laz Planet - Blogspot](https://lazplanet.blogspot.com/) / [Laz Planet - GitLab](https://lazplanet.gitlab.io/)
+    - [Delphi Basics](https://www.delphibasics.co.uk/index.html)
+- Everyone who has helped make this project better
+
+
 <sub>Originally extracted from <a href="https://github.com/ikelaiah/tidykit-fp">tidykit-fp</a>.</sub>
