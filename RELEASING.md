@@ -54,6 +54,12 @@ Use this checklist for every mathlib-fp release.
   three workflows exercise multiple domains, their success markers, diagnostic
   paths, and numerical bounds pass, their exported artifacts are produced, and
   their output and exports are byte-identical across two runs.
+- [ ] For 1.9.9, run `python tools/test_convergence.py` and
+  `python tools/check_convergence.py`; confirm the closed 1.10.0 manifest
+  covers the roadmap scope, the final snapshot diff is empty across
+  source/behaviour/warnings/packaging, the provenance audit covers every
+  `src/` unit, the governance policies are complete, and no API design
+  question remains open.
 - [ ] Run exact Linux and Windows qualification with `--source-archive`,
   `--source-checksum`, and `--network-isolated` only after the workflow has
   blocked new outbound connections. Review the recorded digest, archive file

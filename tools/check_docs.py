@@ -12,11 +12,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.8"
-NEXT_RELEASE = "1.9.9"
+CURRENT_RELEASE = "1.9.9"
+NEXT_RELEASE = "1.10.0"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
-HISTORICAL_RELEASES = ["1.9.7", "1.9.6", "1.9.5", "1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
+HISTORICAL_RELEASES = ["1.9.8", "1.9.7", "1.9.6", "1.9.5", "1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -182,6 +182,15 @@ def main() -> int:
         )
         assert inventory["workflow_qualification"] == (
             "docs/workflow-qualification-1.9.8.json"
+        )
+        assert inventory["convergence"] == (
+            "docs/capability-manifest-1.10.0.json"
+        )
+        assert inventory["provenance_audit"] == (
+            "docs/provenance-audit-1.9.9.json"
+        )
+        assert inventory["api_snapshot_final"] == (
+            "docs/api-snapshot-final-1.9.9.json"
         )
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -743,7 +752,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="8"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="9" Release="9"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:

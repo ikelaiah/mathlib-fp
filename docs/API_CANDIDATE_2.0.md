@@ -106,9 +106,19 @@ compiles and executes them, checks their expected output, and rejects generic
 implementation declarations in those programs.
 
 The review found no wrapper that must be added inside 1.9.x. Ergonomic 2-D and
-3-D vector rotation is useful but is routed to a separate 1.10.0 design. That
-review must decide 3-D representation plus orientation, units, normalization,
-non-finite behavior, and public naming before any declaration is proposed.
+3-D vector rotation is useful. The 1.9.9 convergence gate closed that routing
+in the [1.10.0 capability manifest](CAPABILITY_MANIFEST_1.10.0.md): 2-D
+`TVector2D.Rotate` is declared for 1.10.0 with a complete behavior contract,
+test plan, documentation plan, and compatibility impact, while 3-D rotation is
+explicitly deferred beyond 2.0 until its representation and semantics are
+designed.
+
+## Final 1.9.9 snapshot status
+
+The [final snapshot and diff](API_SNAPSHOT_FINAL_1.9.9.md) confirm the
+compiled 1.9.0-to-1.9.9 diff is empty across source, behavior, warnings, and
+packaging, and the candidate 2.0 surface is exactly this frozen 1.9 snapshot
+plus the closed 1.10.0 additions.
 
 ## Freeze and compatibility rule
 
@@ -120,4 +130,6 @@ deprecation.
 
 There are no unresolved stable declarations, aliases, compiled defaults,
 ownership rules, classifications, compatibility decisions, or replacement
-mappings in this candidate.
+mappings in this candidate. The 1.9.9 convergence gate closes every remaining
+capability question in the
+[1.10.0 capability manifest](CAPABILITY_MANIFEST_1.10.0.md).

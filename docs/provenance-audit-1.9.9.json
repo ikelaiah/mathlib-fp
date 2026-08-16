@@ -1,0 +1,459 @@
+{
+  "schema_version": 1,
+  "release": "1.9.9",
+  "policy": "docs/GOVERNANCE.md",
+  "audit_scope": "Every stable src/*.pas unit: algorithm provenance, fixture provenance, and licence status",
+  "licence": "MIT",
+  "units": [
+    {
+      "unit": "AlgebraLib.DenseDecompositions",
+      "algorithms": "Householder QR, column-pivoted QR, compact one-sided Jacobi SVD, symmetric/Hermitian cyclic-Jacobi eigensystem, triangular solves",
+      "provenance": "Original portable Object Pascal implementations following Golub and Van Loan, Matrix Computations (4th ed.), and LAPACK working notes; MIT-compatible reference algorithms only",
+      "fixture_provenance": "Independent exact references and repository-authored literals per docs/numerical-evidence-1.9.4.json",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.DenseKernels",
+      "algorithms": "Level-1/2/3 dense kernels, compensated reductions, blocked multiplication",
+      "provenance": "Original implementations following Golub and Van Loan and Higham, Accuracy and Stability of Numerical Algorithms",
+      "fixture_provenance": "Oracle and aliasing fixtures authored in tests/TestDenseMatrices.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.DenseMatrices",
+      "algorithms": "Contiguous row-major storage, views, small 2x2 value arithmetic",
+      "provenance": "Original design documented in docs/design/typed-dense-1.5.md",
+      "fixture_provenance": "Shape, conversion, and ownership fixtures in tests/TestDenseMatrices.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.DenseSolvers",
+      "algorithms": "Pivoted LU, Cholesky, direct solve paths with diagnostics",
+      "provenance": "Original implementations following Golub and Van Loan decomposition conventions",
+      "fixture_provenance": "Residual and backward-error fixtures in tests/TestDenseMatrices.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.Determinants",
+      "algorithms": "Determinant/decomposition entry points and legacy solver methods",
+      "provenance": "Original implementations reusing shared factors",
+      "fixture_provenance": "Reconstruction fixtures in the dense test suites",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.IterativeSolvers",
+      "algorithms": "CG, MINRES, restarted GMRES, BiCGSTAB, LSQR with preconditioners",
+      "provenance": "Original implementations following Saad, Iterative Methods for Sparse Linear Systems, and Barrett et al., Templates for the Solution of Linear Systems",
+      "fixture_provenance": "Typed-dense oracle convergence fixtures in tests/TestIterativeSolvers.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.LinearOperators",
+      "algorithms": "Stored and matrix-free linear operators, preconditioners",
+      "provenance": "Original design documented in docs/design/sparse-iterative-1.9.md",
+      "fixture_provenance": "Ordinary/adjoint action fixtures in tests/TestIterativeSolvers.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.Matrices",
+      "algorithms": "Legacy IMatrix/TMatrixKit compatibility surface",
+      "provenance": "Original 1.x implementation retained as the compatibility path",
+      "fixture_provenance": "Compatibility fixtures in the legacy algebra suite",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.PartialEigensystems",
+      "algorithms": "Restarted Lanczos/Arnoldi partial eigensolvers",
+      "provenance": "Original implementations following Saad and Golub and Van Loan subspace conventions",
+      "fixture_provenance": "Largest-magnitude residual fixtures in tests/TestPartialEigensystems.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.SparseMatrices",
+      "algorithms": "CSR/CSC and structured sparse storage, triplet builders",
+      "provenance": "Original design documented in docs/design/sparse-iterative-1.9.md",
+      "fixture_provenance": "Dense-oracle product and canonical-validation fixtures in tests/TestSparseMatrices.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.StructuredSolvers",
+      "algorithms": "Tridiagonal, band, and sparse LU direct factors",
+      "provenance": "Original implementations following Golub and Van Loan band and sparse LU conventions",
+      "fixture_provenance": "Typed-dense residual and pivot fixtures in tests/TestStructuredSolvers.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.VectorKernels",
+      "algorithms": "Real/complex array-vector kernels, compensated norms",
+      "provenance": "Original implementations following Higham summation guidance",
+      "fixture_provenance": "Kernel property fixtures in tests/TestVectorKernels.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "AlgebraLib.Vectors",
+      "algorithms": "Compatibility-oriented vector facade",
+      "provenance": "Original re-exports of the shared kernel facade",
+      "fixture_provenance": "Covered by the vector kernel suite",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "CombinatoricsLib.Combinatorics",
+      "algorithms": "Permutations, combinations, catalogs",
+      "provenance": "Original combinatorial implementations from published counting identities",
+      "fixture_provenance": "Exact-count fixtures in tests/TestCombinatorics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.Common",
+      "algorithms": "Shared engineering result types",
+      "provenance": "Original design",
+      "fixture_provenance": "Shared contracts exercised by domain suites",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.DSP",
+      "algorithms": "FFT (radix-2/Bluestein), convolution, spectra, streaming filters, Haar",
+      "provenance": "Original implementations following Smith-style DFT conventions and the Bluestein chirp-z algorithm",
+      "fixture_provenance": "DFT-oracle and round-trip fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.FluidDynamics",
+      "algorithms": "Canonical fluid-dynamics computations",
+      "provenance": "Original implementations from published engineering formulas",
+      "fixture_provenance": "Formula fixtures in tests/TestEngineering.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.Pressure",
+      "algorithms": "Focused pressure entry names",
+      "provenance": "Exact compiler aliases into the shared fluid-dynamics surface; retained by the 1.9.7 rehearsal",
+      "fixture_provenance": "Identity and behavior asserted by the migration rehearsal consumers",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.Signal",
+      "algorithms": "Signal-generation helpers",
+      "provenance": "Original implementations",
+      "fixture_provenance": "Deterministic signal fixtures",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.Thermodynamics",
+      "algorithms": "Thermodynamic property computations",
+      "provenance": "Original implementations from published engineering formulas",
+      "fixture_provenance": "Formula fixtures in tests/TestEngineering.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.UnitConversion",
+      "algorithms": "Unit conversion and parsing",
+      "provenance": "Original implementation of published conversion factors",
+      "fixture_provenance": "Round-trip and locale fixtures in tests/TestEngineering.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "EngineeringLib.Velocity",
+      "algorithms": "Focused velocity entry names",
+      "provenance": "Exact compiler aliases into the shared fluid-dynamics surface; retained by the 1.9.7 rehearsal",
+      "fixture_provenance": "Identity and behavior asserted by the migration rehearsal consumers",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "FinanceLib.Bonds",
+      "algorithms": "Focused bond entry names",
+      "provenance": "Exact aliases into FinanceLib.Interest; retained by the 1.9.3 decision",
+      "fixture_provenance": "Identity asserted by the alias review and rehearsal",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "FinanceLib.Interest",
+      "algorithms": "Interest, NPV, IRR, bond mathematics",
+      "provenance": "Original implementations from published finance formulas",
+      "fixture_provenance": "Closed-form fixtures in tests/TestFinance.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "FinanceLib.NPV",
+      "algorithms": "Focused NPV entry names",
+      "provenance": "Exact aliases into FinanceLib.Interest; retained by the 1.9.3 decision",
+      "fixture_provenance": "Identity asserted by the alias review and rehearsal",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "GeometryLib.Geometry",
+      "algorithms": "2-D/3-D vector value types and operators",
+      "provenance": "Original design documented in the 1.4.0 release notes",
+      "fixture_provenance": "Operator and edge-case fixtures in tests/TestGeometry.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "InterchangeLib.Models",
+      "algorithms": "Selected model persistence adapters",
+      "provenance": "Original versioned little-endian adapters",
+      "fixture_provenance": "Round-trip and corruption fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MLLib.Analysis",
+      "algorithms": "PCA, clustering, standardization, LDA, forests, KD tree",
+      "provenance": "Original implementations following Hastie et al., The Elements of Statistical Learning, conventions",
+      "fixture_provenance": "Leakage-safe and deterministic fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MLLib.MachineLearning",
+      "algorithms": "Machine-learning facade types",
+      "provenance": "Original re-exports and facade definitions",
+      "fixture_provenance": "Covered by the data-analysis suite",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Complex",
+      "algorithms": "Complex scalars, scale-safe division, principal functions",
+      "provenance": "Original implementations following the ISO C99 annex-G conventions and Higham branch guidance",
+      "fixture_provenance": "Identity and branch fixtures in tests/TestMathBase.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Expressions",
+      "algorithms": "Bounded mathematical expression evaluation",
+      "provenance": "Original parser/evaluator with explicit resource limits",
+      "fixture_provenance": "Oracle and malformed-input fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Interchange",
+      "algorithms": "Invariant text, Matrix Market, binary interchange",
+      "provenance": "Original implementations following the published Matrix Market format",
+      "fixture_provenance": "Round-trip fixtures in tests/TestAppliedNumerics.pas and tests/TestSparseInterchange.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Iteration",
+      "algorithms": "Shared iteration status types",
+      "provenance": "Original design",
+      "fixture_provenance": "Status fixtures across solver suites",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.MathConstants",
+      "algorithms": "Mathematical constants",
+      "provenance": "Repository-authored high-precision literals",
+      "fixture_provenance": "Literal checks in tests/TestMathBase.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Precision",
+      "algorithms": "Gamma/beta/error functions, special-function helpers",
+      "provenance": "Original implementations following NIST DLMF and the public-domain Abramowitz and Stegun reference values",
+      "fixture_provenance": "Closed-form identity and tail fixtures in tests/TestMathBase.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Random",
+      "algorithms": "xoshiro256** and SplitMix64 seeded random state",
+      "provenance": "Public-domain xoshiro/SplitMix algorithms by Blackman and Vigna; original Pascal port with documented sequence contract",
+      "fixture_provenance": "Known-answer transition fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.SharedTypes",
+      "algorithms": "Shared arrays, ranges, option records",
+      "provenance": "Original design",
+      "fixture_provenance": "Shape and conversion fixtures across suites",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "MathBase.Trigonometry",
+      "algorithms": "Angle-safe trigonometric helpers",
+      "provenance": "Original implementations from published identities",
+      "fixture_provenance": "Period and boundary fixtures in tests/TestMathBase.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "NumericsLib.Differentiation",
+      "algorithms": "Finite differences, complex-step, forward dual-number AD",
+      "provenance": "Original implementations following published differentiation references and the dual-number literature",
+      "fixture_provenance": "Analytic/numerical/AD agreement fixtures in tests/TestNumericalModelling.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "NumericsLib.Interpolation",
+      "algorithms": "Barycentric, spline, PCHIP/Akima, grid, scattered interpolation",
+      "provenance": "Original implementations following published interpolation references; PCHIP and Akima behavior per their original papers",
+      "fixture_provenance": "Knot, monotonicity, and exact-node fixtures in tests/TestNumericalModelling.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "NumericsLib.Modelling",
+      "algorithms": "Adaptive Gauss-Kronrod and QMC integration, fits, nonlinear least squares, roots, adaptive ODE",
+      "provenance": "Original implementations following published quadrature (Kronrod), Levenberg-Marquardt, and embedded Runge-Kutta references",
+      "fixture_provenance": "Budget and convergence fixtures in tests/TestNumericalModelling.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "NumericsLib.Numerics",
+      "algorithms": "Numerical convenience facade",
+      "provenance": "Original re-exports",
+      "fixture_provenance": "Covered by the modelling suite",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "OptimizationLib.Convex",
+      "algorithms": "Dense QP and second-order cone programs",
+      "provenance": "Original implementations following convex-optimization references (Boyd and Vandenberghe conventions)",
+      "fixture_provenance": "Objective/feasibility fixtures in tests/TestNumericalModelling.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "OptimizationLib.Optimization",
+      "algorithms": "Line search, CG/L-BFGS, trust region, Nelder-Mead, LP, constrained and Pareto paths",
+      "provenance": "Original implementations following Nocedal and Wright, Numerical Optimization, conventions",
+      "fixture_provenance": "Scaled/bounded/constrained fixtures in tests/TestOptimizationLib.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "ProbabilityLib.Distributions",
+      "algorithms": "Continuous/discrete distribution densities, CDFs, sampling",
+      "provenance": "Original implementations from published distribution formulas",
+      "fixture_provenance": "Identity and seeded-sampling fixtures in tests/TestProbability.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "StatsLib.Inference",
+      "algorithms": "Distribution estimates, hypothesis tests, OLS/logistic regression",
+      "provenance": "Original implementations following published statistical references",
+      "fixture_provenance": "Analytic fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "StatsLib.Stats",
+      "algorithms": "Basic statistics facade",
+      "provenance": "Original re-exports",
+      "fixture_provenance": "Covered by the streaming/inference suites",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "StatsLib.Streaming",
+      "algorithms": "Online Welford/PeBay weighted statistics",
+      "provenance": "Welford and PeBay published algorithms with original Pascal implementation",
+      "fixture_provenance": "Batch-reference and merge-order fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "TimeSeriesLib.StateSpace",
+      "algorithms": "Scalar and multivariate Kalman filtering/forecasting",
+      "provenance": "Original implementations following published Kalman-filter references",
+      "fixture_provenance": "Closed-form innovation/covariance fixtures in tests/TestAppliedNumerics.pas",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    },
+    {
+      "unit": "TimeSeriesLib.TimeSeries",
+      "algorithms": "Time-series convenience facade",
+      "provenance": "Original re-exports",
+      "fixture_provenance": "Covered by the state-space suite",
+      "licence": "MIT",
+      "third_party_code": "none",
+      "runtime_dependency": "none"
+    }
+  ]
+}

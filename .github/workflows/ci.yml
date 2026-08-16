@@ -62,6 +62,7 @@ jobs:
           python3 tools/test_portability_evidence.py
           python3 tools/test_migration_rehearsal.py
           python3 tools/test_workflow_qualification.py
+          python3 tools/test_convergence.py
           python3 tools/check_docs.py
           python3 tools/check_api_decision.py
           python3 tools/check_numerical_evidence.py
@@ -71,11 +72,12 @@ jobs:
             --work-dir build-temp/migration-ci
           python3 tools/check_workflow_qualification.py --compiler fpc \
             --work-dir build-temp/workflow-ci
-          python3 tools/build_docs.py --release 1.9.8 \
-            --output build-temp/docs-site/1.9.8
+          python3 tools/check_convergence.py
+          python3 tools/build_docs.py --release 1.9.9 \
+            --output build-temp/docs-site/1.9.9
           python3 tools/check_built_docs.py \
-            --site build-temp/docs-site/1.9.8 --release 1.9.8
-          test -s build-temp/docs-site/1.9.8/search-index.json
+            --site build-temp/docs-site/1.9.9 --release 1.9.9
+          test -s build-temp/docs-site/1.9.9/search-index.json
 
       - name: Validate representative performance evidence
         run: |
@@ -107,11 +109,11 @@ jobs:
       - name: Test typed solve from a checksummed source archive
         run: |
           archive_dir=$(mktemp -d)
-          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.9.8.tar.gz" HEAD
-          sha256sum "$archive_dir/mathlib-fp-1.9.8.tar.gz" > "$archive_dir/mathlib-fp-1.9.8.sha256"
-          sha256sum --check "$archive_dir/mathlib-fp-1.9.8.sha256"
+          git archive --format=tar.gz --output="$archive_dir/mathlib-fp-1.9.9.tar.gz" HEAD
+          sha256sum "$archive_dir/mathlib-fp-1.9.9.tar.gz" > "$archive_dir/mathlib-fp-1.9.9.sha256"
+          sha256sum --check "$archive_dir/mathlib-fp-1.9.9.sha256"
           mkdir "$archive_dir/source"
-          tar -xzf "$archive_dir/mathlib-fp-1.9.8.tar.gz" -C "$archive_dir/source"
+          tar -xzf "$archive_dir/mathlib-fp-1.9.9.tar.gz" -C "$archive_dir/source"
           cd "$archive_dir/source"
           python3 tools/test_api_decision.py
           python3 tools/test_api_snapshot.py
@@ -127,6 +129,7 @@ jobs:
           python3 tools/test_portability_evidence.py
           python3 tools/test_migration_rehearsal.py
           python3 tools/test_workflow_qualification.py
+          python3 tools/test_convergence.py
           python3 tools/check_docs.py
           python3 tools/check_api_decision.py
           python3 tools/check_numerical_evidence.py
@@ -136,11 +139,12 @@ jobs:
             --work-dir build-temp/migration-archive
           python3 tools/check_workflow_qualification.py --compiler fpc \
             --work-dir build-temp/workflow-archive
-          python3 tools/build_docs.py --release 1.9.8 \
-            --output build-temp/docs-site/1.9.8 \
-            --offline-archive build-temp/mathlib-fp-docs-1.9.8.zip
+          python3 tools/check_convergence.py
+          python3 tools/build_docs.py --release 1.9.9 \
+            --output build-temp/docs-site/1.9.9 \
+            --offline-archive build-temp/mathlib-fp-docs-1.9.9.zip
           python3 tools/check_built_docs.py \
-            --site build-temp/docs-site/1.9.8 --release 1.9.8
+            --site build-temp/docs-site/1.9.9 --release 1.9.9
           mkdir -p example-bin/units
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
             examples/15_typed_dense_solve.pas
@@ -306,6 +310,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/test_workflow_qualification.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/test_convergence.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_docs.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_api_decision.py
@@ -322,13 +328,15 @@ jobs:
           python tools/check_workflow_qualification.py `
             --compiler $env:FPC_WIN64 --work-dir build-temp/workflow-ci
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/build_docs.py --release 1.9.8 `
-            --output build-temp/docs-site/1.9.8
+          python tools/check_convergence.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/build_docs.py --release 1.9.9 `
+            --output build-temp/docs-site/1.9.9
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/check_built_docs.py `
-            --site build-temp/docs-site/1.9.8 --release 1.9.8
+            --site build-temp/docs-site/1.9.9 --release 1.9.9
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if (-not (Test-Path build-temp/docs-site/1.9.8/search-index.json)) {
+          if (-not (Test-Path build-temp/docs-site/1.9.9/search-index.json)) {
             throw 'Documentation search index was not generated'
           }
 

@@ -8,6 +8,16 @@
 | 1.8.x | :x: |
 | 1.7.x and older | :x: |
 
+## Security Support Window
+
+Each minor release line is supported for security fixes from its release date
+until the earlier of one year or six months after the next minor release line
+is published. The 1.9.x line is additionally supported through the 2.0.0
+publication plus six months, and at minimum one year from 1.9.9, so 1.x
+adopters have a tested migration runway to 2.0. Security fixes are published
+as patch releases for every supported affected line with regression evidence,
+as defined in the [governance policies](docs/GOVERNANCE.md#security-support-window).
+
 ## Reporting a Vulnerability
 
 We take the security of mathlib-fp seriously. If you believe you have found
