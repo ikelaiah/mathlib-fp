@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.9] - 2026-08-17
+
+### Added
+
+- Published the closed 1.10.0 capability manifest: `TVector2D.Rotate` is
+  declared for 1.10.0 with a complete behavior contract, test plan,
+  documentation plan, and compatibility impact; the deprecation-marking
+  decision closes as no-deprecation; every other proposal is explicitly
+  deferred beyond 2.0 with a recorded reason.
+- Added an offline convergence checker that validates the manifest against the
+  roadmap, the 1.9.3 API decision, the 1.9.7 migration rehearsal, the frozen
+  1.9 API snapshot, and the capability inventory, and fails when any API
+  design question remains open.
+- Published the final 1.9.9 candidate API snapshot and exact diff from 1.9.0,
+  separating compatibility-preserving corrections (none), 2.0 documentation
+  changes, and packaging changes (none).
+
+### Governance
+
+- Completed the algorithm/fixture provenance and licence audit covering every
+  stable `src/` unit, the 2.x maintenance policy, support policy, deprecation
+  policy, contribution gate for new domains, and the security support window.
+
+### Validation
+
+- Integrated the convergence gate into ordinary CI, clean-archive release
+  qualification, and the release checklist.
+
+### Documentation
+
+- Published the capability manifest, final snapshot and diff, provenance
+  audit, governance policies, release notes, PR notes, and qualification
+  record for 1.9.9.
+
 ## [1.9.8] - 2026-08-16
 
 ### Added

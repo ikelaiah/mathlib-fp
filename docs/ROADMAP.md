@@ -1553,44 +1553,57 @@ a machine-readable workflow manifest and offline checker, and direct-source/
 clean-archive workflow evidence. It adds no public API and records the exact
 compiler and platform that ran each workflow.
 
-## Next release: 1.9.9 — Final 1.9.x convergence handoff
+## Previous release: 1.9.9 — Final 1.9.x convergence handoff
 
-Version 1.9.9 is the final 1.9.x convergence release. It introduces no planned
-public capability and closes the evidence, compatibility decisions, and exact
-manifest of additive public work assigned to 1.10.0. It is the handoff to the
-minor release that completes the approved API before the final 2.0 freeze.
+Released on 2026-08-17, version 1.9.9 is the final 1.9.x convergence release.
+It introduces no planned public capability and closes the evidence,
+compatibility decisions, and exact manifest of additive public work assigned
+to 1.10.0. It is the handoff to the minor release that completes the approved
+API before the final 2.0 freeze.
 
-### 1.9.9 scope
+### Completed 1.9.9 scope
 
-- Publish the final candidate public-API snapshot and an exact diff from 1.9.0,
-  separating compatibility-preserving corrections from 2.0 documentation or
-  packaging changes.
-- Complete the algorithm/fixture provenance and licence audit, 2.x maintenance
-  policy, support policy, deprecation policy, contribution gate for new domains,
-  and security support window.
-- Convert every accepted public capability gap into a closed 1.10.0 declaration,
-  behavior contract, test plan, documentation plan, and compatibility impact;
-  defer all other proposals explicitly beyond 2.0.
-- Build source and offline-documentation archives from the release tag, then run
-  the complete target, numerical, memory, performance, examples, migration,
-  package, and documentation qualification against those archives.
+- The final candidate public-API snapshot and an exact diff from 1.9.0 are
+  published, separating compatibility-preserving corrections (none), 2.0
+  documentation changes, and packaging changes (none). The compiled
+  1.9.0-to-1.9.9 source/behaviour/warning/packaging diff is empty.
+- The algorithm/fixture provenance and licence audit, 2.x maintenance policy,
+  support policy, deprecation policy, contribution gate for new domains, and
+  security support window are complete and enforced by the convergence
+  checker.
+- Every accepted public capability gap is converted into a closed 1.10.0
+  declaration with a behavior contract, test plan, documentation plan, and
+  compatibility impact: `TVector2D.Rotate` is declared for 1.10.0, and the
+  deprecation-marking decision closes as no-deprecation. Every other proposal
+  is explicitly deferred beyond 2.0 with a recorded reason.
+- Source and offline-documentation archives are built from the release tag,
+  and the complete target, numerical, memory, performance, examples,
+  migration, package, and documentation qualification runs against those
+  archives with new outbound connections blocked.
 
 ### 1.9.9 completion gate
 
 - The final snapshot, guides, examples, source comments, capability inventory,
-  support matrix, release notes, and qualification report contain no unresolved
-  contract mismatch.
-- The tagged release passes full archive-based qualification and includes every
-  accepted 1.9.x correction.
-- No unresolved critical/high-impact correctness, unsafe ownership/concurrency,
-  portability, packaging, or migration defect is hidden to meet the version
-  target.
+  support matrix, release notes, and qualification report contain no
+  unresolved contract mismatch; the convergence checker enforces this on
+  every change.
+- The tagged release passes full archive-based qualification and includes
+  every accepted 1.9.x correction.
+- No unresolved critical/high-impact correctness, unsafe
+  ownership/concurrency, portability, packaging, or migration defect is
+  hidden to meet the version target.
 - Representative 1.x applications complete the documented migration or remain
   operational through the tested compatibility surface.
 - Every public addition required before 2.0 is either present in the closed
-  1.10.0 manifest or explicitly deferred; no API design question remains open.
+  1.10.0 manifest or explicitly deferred; no API design question remains
+  open.
 
-## Planned 1.10.0 — Additive API completion and final 2.0 freeze
+The release ships the closed 1.10.0 capability manifest with its offline
+checker, the final 1.9.9 API snapshot and diff, the complete provenance and
+licence audit, and the governance policies for the 2.x line. The 1.10.0
+section below is the exact handoff scope.
+
+## Next release: 1.10.0 — Additive API completion and final 2.0 freeze
 
 Version 1.10.0 is the backward-compatible minor release for public capabilities
 approved during 1.9.x convergence. It implements only the closed 1.9.9 manifest,

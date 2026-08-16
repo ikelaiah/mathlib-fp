@@ -1,10 +1,13 @@
 {
   "schema_version": 1,
-  "release": "1.9.8",
+  "release": "1.9.9",
   "support_matrix": "docs/SUPPORT.md",
   "portability_evidence": "docs/portability-evidence-1.9.6.json",
   "migration_rehearsal": "docs/migration-rehearsal-1.9.7.json",
   "workflow_qualification": "docs/workflow-qualification-1.9.8.json",
+  "convergence": "docs/capability-manifest-1.10.0.json",
+  "provenance_audit": "docs/provenance-audit-1.9.9.json",
+  "api_snapshot_final": "docs/api-snapshot-final-1.9.9.json",
   "capabilities": [
     {
       "family": "scalar_special_functions",

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Source ref for a 1.9.8 documentation rebuild
+        description: Source ref for a 1.9.9 documentation rebuild
         required: true
         default: main
   release:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.8'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.9'
     runs-on: ubuntu-latest
     steps:
       - name: Check out current documentation source
@@ -115,9 +115,9 @@ jobs:
           python3 current/tools/build_docs.py \
             --source current/docs \
             --versions current/docs/versions.json \
-            --release 1.9.8 --output site/1.9.8 --site-root site \
-            --offline-archive artifacts/mathlib-fp-docs-1.9.8.zip
-          python3 -c 'import json; assert json.load(open("site/1.9.8/release.json"))["release"] == "1.9.8"'
+            --release 1.9.9 --output site/1.9.9 --site-root site \
+            --offline-archive artifacts/mathlib-fp-docs-1.9.9.zip
+          python3 -c 'import json; assert json.load(open("site/1.9.9/release.json"))["release"] == "1.9.9"'
           python3 -c 'import json; assert json.load(open("site/1.9.7/release.json"))["release"] == "1.9.7"'
           python3 -c 'import json; assert json.load(open("site/1.9.6/release.json"))["release"] == "1.9.6"'
           python3 -c 'import json; assert json.load(open("site/1.9.5/release.json"))["release"] == "1.9.5"'
@@ -126,7 +126,7 @@ jobs:
           python3 -c 'import json; assert json.load(open("site/1.9.2/release.json"))["release"] == "1.9.2"'
           python3 -c 'import json; assert json.load(open("site/1.9.1/release.json"))["release"] == "1.9.1"'
           python3 -c 'import json; assert json.load(open("site/1.9.0/release.json"))["release"] == "1.9.0"'
-          grep -q 'Current release: 1.9.8' site/index.html
+          grep -q 'Current release: 1.9.9' site/index.html
           grep -q '1.9.7/index.html' site/index.html
           grep -q '1.9.6/index.html' site/index.html
           grep -q '1.9.5/index.html' site/index.html
@@ -148,11 +148,11 @@ jobs:
       - name: Publish offline documentation artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: mathlib-fp-docs-1.9.8
+          name: mathlib-fp-docs-1.9.9
           if-no-files-found: error
           path: |
-            artifacts/mathlib-fp-docs-1.9.8.zip
-            artifacts/mathlib-fp-docs-1.9.8.zip.sha256
+            artifacts/mathlib-fp-docs-1.9.9.zip
+            artifacts/mathlib-fp-docs-1.9.9.zip.sha256
 
       - name: Attach offline documentation to release
         if: github.event_name == 'release'
@@ -160,12 +160,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            artifacts/mathlib-fp-docs-1.9.8.zip \
-            artifacts/mathlib-fp-docs-1.9.8.zip.sha256 --clobber \
+            artifacts/mathlib-fp-docs-1.9.9.zip \
+            artifacts/mathlib-fp-docs-1.9.9.zip.sha256 --clobber \
             --repo "$GITHUB_REPOSITORY"
 
   deploy:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.8'
+    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.9.9'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

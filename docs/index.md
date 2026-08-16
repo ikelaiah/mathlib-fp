@@ -13,6 +13,21 @@ allocating path and link the advanced controls separately.
 
 ## Releases
 
+- [mathlib-fp 1.9.9 release notes](RELEASE_NOTES_1.9.9.md) — final 1.9.x
+  convergence: closed 1.10.0 capability manifest, final snapshot and diff,
+  provenance audit, and governance policies.
+- [1.9.9 convergence manifest](CAPABILITY_MANIFEST_1.10.0.md) — the closed
+  1.10.0 declarations, the no-deprecation decision, and explicit deferrals.
+- [1.9.9 final snapshot and diff](API_SNAPSHOT_FINAL_1.9.9.md) — the final
+  candidate public API and its exact empty compiled diff from 1.9.0.
+- [1.9.9 provenance audit](PROVENANCE_AUDIT_1.9.9.md) — algorithm, fixture,
+  and licence provenance for every stable unit.
+- [1.9.9 governance](GOVERNANCE.md) — 2.x maintenance, support, deprecation,
+  new-domain gate, and security window policies.
+- [1.9.9 PR notes](PR_NOTES_1.9.9.md) — implementation and review boundary.
+- [1.9.9 qualification report](QUALIFICATION_1.9.9.md) — local and candidate
+  archive evidence status.
+
 - [mathlib-fp 1.9.8 release notes](RELEASE_NOTES_1.9.8.md) — representative
   multi-domain sensor, modelling, and probability/finance workflows with
   reproducible clean-archive evidence.
