@@ -387,3 +387,17 @@ serialized so overlapping threads cannot corrupt the shared callback state.
 - `MathBase.SharedTypes` — `TDoubleArray`
 
 No other external libraries required.
+
+## Common mistakes
+
+- **Local versus global.** `LBFGS`, `NelderMead`, and the 1-D methods find a
+  local optimum; use `SimulatedAnnealing` or `MultiStart` when the global
+  optimum matters. `SolveConstrained` is a local solver, not a proof of global
+  optimality or infeasibility.
+- **Read `Status`, not `Converged`.** `Converged` is only the legacy
+  compatibility view; inspect the detailed `Status` on `TOptResult`.
+- **LP form.** `SimplexLP` solves `min c'x` subject to `Ax <= b`, `x >= 0`;
+  express maximisation and inequality direction accordingly.
+- **Empty bounds mean unbounded.** For bounded solvers an empty bound array
+  means unbounded coordinates; pass explicit bounds when coordinates must stay
+  inside a box.

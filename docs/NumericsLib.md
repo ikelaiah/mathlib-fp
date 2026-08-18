@@ -362,3 +362,16 @@ Spline(1.5) = 2.2321
   strictly increasing/distinct interpolation knots as applicable.
 - Bracketed solvers return endpoint roots immediately and reject brackets that
   contain no sign change.
+
+## Common mistakes
+
+- **Bracketing requires a sign change.** `Bisection` and `Brent` reject
+  brackets where `f(A)` and `f(B)` share a sign with `EInvalidArgument`.
+- **Interpolation is not fitting.** Interpolators pass exactly through every
+  knot; a fitted curve does not. `LagrangeInterp` is ill-conditioned beyond
+  about ten knots (Runge phenomenon) — prefer `CubicSplineBuild`.
+- **The ODE solvers are explicit and non-stiff.** `EulerSolve` and `RK4Solve`
+  suit ordinary initial-value problems; stiff systems are a post-2.0 roadmap
+  gap and are not supported here.
+- **Fixed-evaluation quadrature.** `GaussLegendre5` uses only five function
+  evaluations; for oscillatory integrands use `SimpsonRule` with a large `N`.

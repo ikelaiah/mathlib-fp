@@ -436,3 +436,17 @@ application needs a different convention.
 - `MathBase.SharedTypes` — `TDoubleArray`, `TIntegerArray`
 
 No other external libraries required.
+
+## Common mistakes
+
+- **Fit standardisation on training data only.** `FitStandardization` must run
+  on training rows; apply the returned model to training, validation, and test
+  sets to avoid leakage.
+- **Importance is not causality.** Forest `FeatureImportances` is impurity
+  based and can favour continuous or high-cardinality inputs; it is not a
+  causal measure.
+- **OOB needs enough trees.** `OOBScore` uses only rows with an out-of-bag
+  prediction; for a small tree count not every row is guaranteed one.
+- **Dense in-memory baselines.** The typed-analysis APIs are dense, serial,
+  in-memory paths; multiclass LDA, boosting, and distributed training are
+  outside 1.8.

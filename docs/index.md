@@ -11,6 +11,44 @@ New to Free Pascal numerical code? Read the
 [beginner recipes](RECIPES.md). The recipes lead with the double-real,
 allocating path and link the advanced controls separately.
 
+The [cheatsheet](CHEATSHEET.md) is one page of canonical entry points;
+the [task index](TOP_TASKS.md) covers five common tasks per domain.
+
+See the [comparison of Pascal numerical libraries](COMPARISON.md) for how
+mathlib-fp relates to other projects. The
+[release maintenance view](HEALTH.md) summarises each domain's stable surface,
+evidence, and limitations at a glance.
+
+## Getting the source
+
+Get the source directly with git:
+
+```bash
+git clone --depth 1 --branch v1.9.9 \
+  https://github.com/ikelaiah/mathlib-fp.git
+```
+
+or as a source archive with `wget`:
+
+```bash
+wget \
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz
+```
+
+or with `curl`:
+
+```bash
+curl -L -o mathlib-fp.tar.gz \
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz
+```
+
+> No package manager or install step is required for direct source use; add
+> `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
+
+Direct source use is canonical; the
+[Lazarus package](../packages/lazarus/mathlib_fp.lpk) remains a tested,
+versioned alternative.
+
 ## Releases
 
 - [mathlib-fp 1.9.9 release notes](RELEASE_NOTES_1.9.9.md) — final 1.9.x

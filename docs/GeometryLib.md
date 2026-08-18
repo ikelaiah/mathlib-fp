@@ -406,3 +406,17 @@ undefined.
 - `MathBase.SharedTypes` — `TDoubleArray`
 
 No other external libraries required.
+
+## Common mistakes
+
+- **`Normalise` versus operators.** `Normalise` requires a finite non-zero
+  vector and raises `EGeometryError` otherwise, while arithmetic operators
+  propagate NaN and Infinity by IEEE rules — validate when a finite result is
+  required.
+- **Segment versus line distance.** `PointToSegment2D` clamps to the segment
+  (`T` in [0,1]); `PointToLine2D` treats the line as infinite. Pick the
+  distance the problem actually needs.
+- **Degenerate constructions raise.** Two identical line points, collinear
+  plane points, and polygons with fewer than 3 vertices raise
+  `EGeometryError`.
+- **`Normalise` returns a new vector.** It does not modify the source vector.

@@ -34,16 +34,38 @@
 
 ## 🚀 Quick start
 
-Open the [1.9.9 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.9)
-or download the source directly as
-[`tar.gz`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz)
-or [`.zip`](https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.zip).
-You can also clone the repository:
+See the [cheatsheet](docs/CHEATSHEET.md) for one canonical entry point per
+domain, or the [task index](docs/TOP_TASKS.md) for five common tasks per
+domain.
+
+Get the source directly with git:
 
 ```bash
-git clone https://github.com/ikelaiah/mathlib-fp.git
-cd mathlib-fp
+git clone --depth 1 --branch v1.9.9 \
+  https://github.com/ikelaiah/mathlib-fp.git
 ```
+
+or as a source archive with `wget`:
+
+```bash
+wget \
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz
+```
+
+or with `curl`:
+
+```bash
+curl -L -o mathlib-fp.tar.gz \
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz
+```
+
+> No package manager or install step is required for direct source use; add
+> `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
+
+Direct source use is canonical. The
+[1.9.9 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.9.9)
+also publishes `.zip` and `.tar.gz` archives, the offline documentation
+archive, and its SHA-256 checksum.
 
 ### 1. Multiply two matrices
 

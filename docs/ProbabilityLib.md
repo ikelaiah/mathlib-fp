@@ -439,3 +439,17 @@ reliability := TProbabilityKit.WeibullSurvival(800, 2, 1000);
 - `MathBase.Precision` — `GammaLn`, `BetaInc`, and `NormalCDF` used internally
 
 No other external libraries required.
+
+## Common mistakes
+
+- **Pick the correct tail.** `Survival` returns `P(X > x)` directly; computing
+  it as `1 − CDF` can round a small tail to zero. For chi-squared tests the
+  p-value is `ChiSquaredSurvival`, not the CDF.
+- **Out-of-domain input is not an error.** PDF/PMF return 0 and CDF clamps for
+  `X` outside the distribution domain; invalid or non-finite *parameters* raise
+  `EProbabilityError`.
+- **Parameter order.** The value `X` comes first, then the distribution
+  parameters — for example `NormalSurvival(X, Mu, Sigma)` — and any rounding
+  parameter comes last.
+- **Two-sided versus one-sided.** Use `StudentTTwoTail` for two-sided tests;
+  `MathBase.Precision.StudentT` covers only `X >= 0`.

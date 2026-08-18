@@ -358,3 +358,18 @@ r = 0.9880
 - Normality-test p-values are approximations: K-S uses the asymptotic distribution despite estimating normal parameters from the sample, and Shapiro-Wilk uses Royston's approximation.
 - Prefer the seeded bootstrap overloads for reproducible tests and analyses. Use `Randomize` once in the application only when intentionally using the global-RNG overloads.
 - `EStatsError` is raised for empty arrays, arrays too small for a given statistic, or out-of-range parameters.
+
+## Common mistakes
+
+- **Sample versus population convention.** In `TDescriptiveStats`, `Variance`
+  uses the sample denominator (n−1) while `StdDev` uses the population
+  denominator (n); the two are not the same convention.
+- **Two-sided tests by default.** The hypothesis tests report two-sided
+  p-values; express the question so a one-sided statement is not read into a
+  two-sided result.
+- **Inference diagnostics.** `FitOLS` covariance-style standard errors require
+  full rank and positive residual degrees of freedom, and distribution or
+  logistic estimates need `Status`/`Identifiable` inspection before their
+  uncertainty is used.
+- **Streaming policy.** `TOnlineStatistics` keeps constant retained state and
+  applies an explicit reject/ignore policy for non-finite observations.

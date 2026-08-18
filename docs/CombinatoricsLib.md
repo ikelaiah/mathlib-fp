@@ -242,4 +242,17 @@ For larger values use `LogFactorial` / `LogCombination` which return `Double`.
 - `MathBase.SharedTypes` — `TIntegerArray`
 - `MathBase.Precision` — `GammaLn`, used by `LogFactorial`
 
+## Common mistakes
+
+- **Fixed-width counts overflow.** `Factorial` overflows above 20,
+  `CatalanNumber` above 30, and `BellNumber` above 18; these raise
+  `ECombinatoricsError` rather than wrapping. Use `LogFactorial` or
+  `LogCombination` for larger values.
+- **Argument domains.** `Permutation` and `Combination` require `K <= N`;
+  negative `N` or `K` raises.
+- **Modular inverse needs coprime input.** `ModInverse(A, M)` raises when
+  `GCD(A, M) <> 1`.
+- **Not arbitrary precision.** The counting APIs return fixed-width integers;
+  they are not big-integer routines.
+
 No other external libraries required.

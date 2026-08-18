@@ -9,6 +9,36 @@ Run the [README quick start](../README.md#quick-start) first, then choose a
 task from the [beginner recipes](RECIPES.md). Every linked program is compiled,
 run, and checked against its claimed output in release qualification.
 
+## Getting the source
+
+Get the source directly with git:
+
+```bash
+git clone --depth 1 --branch v1.9.9 \
+  https://github.com/ikelaiah/mathlib-fp.git
+```
+
+or as a source archive with `wget`:
+
+```bash
+wget \
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz
+```
+
+or with `curl`:
+
+```bash
+curl -L -o mathlib-fp.tar.gz \
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v1.9.9.tar.gz
+```
+
+> No package manager or install step is required for direct source use; add
+> `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
+
+Then return to the [README quick start](../README.md#quick-start) or choose a
+recipe below. Direct source use is canonical; the Lazarus package remains a
+tested, versioned alternative.
+
 ## The beginner data path
 
 | Need | Begin with | Go deeper when |

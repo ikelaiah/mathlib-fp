@@ -217,3 +217,18 @@ Version 1.9 does not promise decomposition or preconditioner factors, arbitrary
 model graphs, decision forests, multivariate Kalman filters, or general filter
 objects as stable formats. Adding one requires a separate versioned schema and
 compatibility tests; raw Pascal record dumps are not accepted as persistence.
+
+## Common mistakes
+
+- **Persistence rejects malformed input.** Loaders validate magic, version,
+  checksum, shapes, limits, and finite values before returning; a corrupt
+  stream raises rather than producing a partial result.
+- **Invariant text is locale-independent.** The `...ToInvariant` and
+  `Parse...Invariant` helpers use a fixed decimal separator; locale-aware
+  presentation belongs in application code.
+- **Streams are borrowed.** Interchange functions use the caller's stream
+  synchronously and never retain it; write a temporary file and rename it for
+  transactional replacement.
+- **Only selected models persist.** `InterchangeLib.Models` covers the
+  documented spline/FIR/standardizer/scalar-Kalman adapters; decomposition
+  factors, forests, and general object graphs are not stable formats.

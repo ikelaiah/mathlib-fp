@@ -271,3 +271,16 @@ Expected output contains:
   sign-changing bracket it establishes.
 - Other invalid inputs—including negative periods, an empty cash-flow array,
   or non-convergence of an iterative method—also raise `EFinanceError`.
+
+## Common mistakes
+
+- **Rates are decimals.** Pass `0.05`, not `5`, for a 5% rate, and measure time
+  in periods or years — never `TDateTime`.
+- **IRR has assumptions.** `InternalRateOfReturn` requires a positive initial
+  investment and at least one positive future cash flow, and raises
+  `EFinanceError` when it cannot bracket or converge on a rate.
+- **Compounding conventions differ.** Most calculations use discrete period
+  compounding; Black-Scholes uses continuous compounding. Do not mix the two.
+- **Undefined ratios raise.** Metrics with a zero denominator (such as beta or
+  portfolio standard deviation) raise `EFinanceError` instead of returning a
+  fabricated zero.

@@ -359,3 +359,18 @@ documented beside each operation. In particular, precision predicates return
 a Boolean, while parsers, bounded expressions, invalid RNG state, and
 operations with an explicit finite-domain contract raise their named
 MathBase exception before returning a result.
+
+## Common mistakes
+
+- **Degrees versus radians.** The triangle, circle, and vector-angle helpers
+  take radians (for example `CircularSectorArea(Radius, Angle)`); passing
+  degrees silently changes the result.
+- **`StudentT` covers only `X >= 0`.** It returns NaN for negative X; use
+  `TProbabilityKit.StudentTCDF` for a complete signed CDF and correct t-test
+  p-values.
+- **Degenerate geometry is not rejected.** The triangle, circle, reciprocal-
+  trigonometric, and vector helpers do not validate negative dimensions,
+  invalid sides, or zero divisors; validate such inputs in the caller.
+- **Reproducibility needs explicit state.** `TLocalRandom` never touches the
+  global `RandSeed`; seed it explicitly and save/restore its state for a
+  reproducible simulation.

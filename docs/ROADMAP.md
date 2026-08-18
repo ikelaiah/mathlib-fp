@@ -44,6 +44,28 @@ optimisation. Units remain independently usable rather than requiring one
 monolithic import, but together they must feel like one coherent library.
 Compatibility and documented migration paths protect existing users.
 
+### Deliberate design boundaries
+
+These boundaries are positive, reviewable constraints on the project's own
+design choices, not criticism of other projects:
+
+- **No mandatory foreign-language numerical core.** Every stable capability
+  has a readable Object Pascal implementation in this repository; an optional
+  adapter may supplement but never replace it.
+- **No proprietary or paid algorithm tier in the stable library.** The MIT
+  licensed library contains no licence-key or paid algorithm layer.
+- **No external BLAS/LAPACK runtime as the sole implementation.** An external
+  library may be an optional acceleration path only where a complete portable
+  Pascal implementation also exists.
+- **No hidden global mutable numerical state in ordinary stable APIs.** Stable
+  numerical entry points must not depend on hidden mutable singleton state.
+- **No terse historical naming where a clearer stable Pascal API can be
+  offered.** Where a legacy name survives, it does so as an explicitly labelled
+  compatibility path with a documented replacement.
+- **Portable Pascal remains sufficient for complete functionality.** No
+  capability may require an architecture-specific kernel, service, or foreign
+  runtime to work at all.
+
 ## Product ambition
 
 mathlib-fp is intended to meet four related needs in the Pascal ecosystem.
@@ -158,6 +180,14 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 1.9.9 | Final 1.9.x convergence handoff | Closed 1.10.0 capability manifest, complete evidence, and no unresolved API decisions |
 | 1.10.0 | Additive API completion and final 2.0 freeze | Approved missing conveniences, including 2-D vector rotation, followed by release-candidate qualification and soak |
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
+| 2.1 | Special Functions II | Bessel, elliptic, exponential-integral, and a bounded hypergeometric baseline with cited budgets |
+| 2.2 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
+| 2.3 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
+| 2.4 | Sparse Direct II | Fill-reducing ordering, symbolic/numeric separation, and a documented fill/memory model |
+
+Versions 2.1 through 2.4 are the committed near-term capability gates; see the
+candidate capability lanes in the post-2.0 capability programme for longer-term
+possible directions that are not version promises.
 
 ## Implementation discipline
 
@@ -224,6 +254,10 @@ release alongside its numerical scope.
 - Publish focused migration notes for widely used Pascal numerical APIs when
   users request them and a responsible semantic mapping exists. State
   differences instead of promising drop-in compatibility.
+- Propose a future `Coming from ALGLIB-Pascal` migration note alongside the
+  existing NumLib and LMath/DMath mappings. It must explain conceptual
+  mappings, state ownership/type/default differences, and never promise
+  drop-in compatibility unless equivalence is actually proven.
 
 ### API and first-use experience
 
@@ -447,6 +481,9 @@ long-term use.
   identity across different floating-point precisions and instruction paths.
 - A solver family that has not met its correctness, diagnostics, scalability,
   and termination gates remains experimental even if code for it exists.
+- Post-2.0 capability gates exist precisely so that 2.0 does not absorb
+  unfinished future families; any future numerical family is planned and
+  qualified in its own gate rather than pulled into the 2.0 baseline.
 
 ### Documentation accuracy and release readiness
 
@@ -550,6 +587,24 @@ This order is deliberate: adding many entry points before the scalar,
 storage, and linear-algebra foundations are dependable would multiply
 numerical defects and duplicate private solvers.
 
+## 2.x surface-area discipline
+
+New stable public API is a permanent maintenance cost and must justify itself
+through shared foundations, fit with the naming and type model, a clear user
+workflow, numerical evidence, documentation, examples, testing,
+migration/compatibility consequences, and realistic maintainer comprehension.
+
+- A new algorithm is not automatically a new public type.
+- A competitor having a feature is not sufficient justification.
+- One coherent family is preferable to many thin wrappers.
+- New stable surface should grow more slowly than internal implementation
+  capability where possible.
+
+There is no numerical quota for deprecations or removals. Existing stable API
+is removed only when justified by correctness, safety, unsustainable design,
+or an established deprecation/migration process; no API needs to die merely
+because a new major version exists.
+
 ## Capability inventory and maturity
 
 The project should maintain a machine-readable capability inventory that also
@@ -575,6 +630,12 @@ The inventory should prevent three recurring failure modes: a method name being
 mistaken for a production-quality implementation, platform-specific support
 being described as universal, and an example-only feature becoming a permanent
 API accidentally.
+
+Every `Unsupported` capability family must eventually identify one of: a
+committed post-2.0 capability gate, a candidate capability lane, or
+`no current plan` with a concise reason. Readers can then distinguish
+unsupported but planned, unsupported and under consideration, and unsupported
+with no current plan. CI enforcement of this routing is future work.
 
 ## Quality contract
 
@@ -667,6 +728,13 @@ only when a caller can discover when and how to use it safely.
   repetitive narration must not obscure the invariant or formula that matters.
 - Every important numerical algorithm cites an appropriate paper, textbook, or
   openly accessible technical reference where practical.
+- Every stable algorithm family, where applicable, has a documented
+  `Background and references` section covering what mathematical problem the
+  algorithm solves, the important mathematical idea, numerical safeguards and
+  why they exist, assumptions and limitations, further reading, and open or
+  otherwise appropriate references where practical. AMath/DAMath's documented
+  implementation-note and reference approach is a model for this material;
+  mathlib-fp does not claim an identical structure or copy its text.
 - Documentation names known limitations directly; an unsupported case is not
   hidden behind a generic error or omitted from the reference page.
 - Error and convergence messages should identify the operation, violated
@@ -677,31 +745,219 @@ only when a caller can discover when and how to use it safely.
 - Public documentation and code comments are reviewed alongside implementation
   and tests, and stale examples are treated as defects.
 
-## Capability direction beyond individual releases
+## Post-2.0 capability programme
 
-The long-term target remains broad numerical coverage, including:
+Post-2.0 milestones are **capability gates, not dates**. A gate ships when its
+algorithms, contracts, tests, documentation, and maintenance review are ready;
+it is not scheduled by the calendar. Dependency order matters more than
+version-number aesthetics: each gate builds on foundations that earlier gates
+and the 2.0 baseline make dependable.
 
-- single/double real and complex scalar, vector, matrix, special-function, and
-  random-generation foundations;
-- dense, structured, sparse, and matrix-free vector/matrix arithmetic;
-- BLAS-like kernels, LU/QR/LQ/Cholesky/LDLT/SVD/eigen decompositions, condition
-  estimates, and direct/iterative solvers;
-- interpolation, approximation, linear and nonlinear fitting;
-- FFT, convolution, correlation, filtering, and spectral analysis;
-- descriptive/inferential statistics and probability distributions;
-- scalar, linear, quadratic, cone-constrained, nonlinear, derivative-free,
-  multiobjective, global, and eventually mixed-integer optimisation;
-- numerical and automatic differentiation;
-- numerical integration, root finding, ODE solvers, and special functions;
-- clustering, regression, classification, time-series, nearest-neighbour, and
-  geometry tools;
-- open data/model interchange, safe expression evaluation, inspection, and
-  developer tooling kept separate from the numerical core.
+Only the near-term gates below are committed roadmap directions. The candidate
+lanes that follow are possibilities to be activated, split, reordered, or
+rejected after a design and maintenance review; listing a lane is not a promise
+to ship it. A capability is not complete merely because an implementation
+exists — it must also meet the numerical, documentation, portability, and
+maintenance contracts this roadmap applies to every stable family.
 
-These capabilities need not map one-to-one to new domains. New units and types
-should follow useful API boundaries, and new domains should be introduced only
-when the existing foundations and naming model cannot express the capability
-cleanly.
+### 2.1 — Special Functions II
+
+Scope:
+
+- Bessel families (`J`, `Y`, `I`, `K` and related) with defined domains and
+  accuracy budgets;
+- elliptic integrals and elliptic functions;
+- exponential integrals;
+- a carefully bounded hypergeometric baseline rather than an open-ended family;
+- per-family accuracy and domain budgets with a stated behaviour for
+  out-of-domain input;
+- an independent reference corpus, algorithm provenance, and cited references.
+
+Non-goals:
+
+- arbitrary or multiprecision arithmetic;
+- attempting every specialist special function in one release.
+
+Completion gate: each shipped special-function family has a documented domain,
+accuracy budget, independent reference corpus, and cited algorithm source, and
+matches the capability inventory's declared limits. AMath/DAMath demonstrates
+the value of detailed implementation notes and cited numerical sources for such
+families; this project does not copy its code or claim equivalent coverage.
+
+The [capability inventory](CAPABILITIES.md) records which of these families are
+unsupported today.
+
+### 2.2 — Nonsymmetric and generalised spectral algebra
+
+Scope:
+
+- Hessenberg reduction;
+- a real and complex Schur foundation as appropriate to the chosen design;
+- nonsymmetric eigenvalue and eigenvector workflows;
+- generalised `A x = λ B x` problems;
+- ordering, scaling, convergence, residual, and failure contracts.
+
+Non-goals:
+
+- polynomial eigenvalue problems;
+- large-scale shift-invert infrastructure unless separately designed.
+
+Final public names are not invented from this roadmap; they are resolved in a
+focused design record before any public API is added. Completion gate: the
+chosen design is fixed and qualified against the dense and sparse references,
+with ordering, scaling, convergence, residual, and failure behaviour documented
+and tested. See the [dense solver guide](DenseLinearAlgebra.md#choose-a-dense-solver)
+and [partial eigensystems](SparseLinearAlgebra.md#partial-eigensystems) for the
+current supported boundary.
+
+### 2.3 — Stiff and implicit ODEs
+
+Scope:
+
+- a documented stiff-solver baseline such as BDF and/or Radau-family methods,
+  subject to design review;
+- a Jacobian policy covering analytic, automatic, and numerical derivatives;
+- tolerances and convergence diagnostics;
+- dense output where supported;
+- integration with the existing derivative contracts.
+
+Non-goals:
+
+- a full DAE index-reduction framework;
+- PDE solving.
+
+Listing a method here is not a promise of it; the design record must select the
+final stable method and justify the choice. Completion gate: the selected stiff
+method meets the accuracy, diagnostics, reentrancy, and dense-output contracts
+used by the existing explicit path and is covered by reference and
+stiff/non-stiff comparison tests. See the [modelling guide](NumericalModelling.md#choose-an-algorithm)
+for the current explicit ODE scope.
+
+### 2.4 — Sparse Direct II
+
+Scope:
+
+- fill-reducing ordering;
+- symbolic/numeric separation;
+- a reusable factor workflow;
+- a documented fill and memory model;
+- robust sparse direct solving for selected matrix structures.
+
+Non-goals:
+
+- distributed solvers;
+- out-of-core solvers;
+- GPU-only paths.
+
+Multifrontal or supernodal architecture is not promised unless later design
+evidence justifies it. Completion gate: the fill and memory model is measured
+and documented, factors are reusable, and results agree with the typed-dense
+oracle and residual checks on supported structures. See the
+[reusable direct factors](SparseLinearAlgebra.md#reusable-direct-factors) for
+the current baseline.
+
+### Performance acceleration track
+
+Optional parallel and SIMD work is evidence-driven and is not tied to a
+promised minor version:
+
+- the complete portable Pascal implementation remains the reference and oracle;
+- optimise only benchmarked bottlenecks;
+- optional in-tree x86/ARM-specific paths may be considered;
+- accelerated paths require cross-path correctness tests;
+- determinism differences must be explicit;
+- small workloads must not pay unnecessary dispatch or thread overhead;
+- no vendor BLAS/LAPACK library may become the only implementation;
+- GPU support remains outside the current committed roadmap.
+
+SIMD is not promised merely to compete on benchmark numbers; it earns its place
+through measured, reproducible benefit over the portable baseline.
+
+### Candidate capability lanes
+
+The following lanes are **not release promises**. Each states likely direction
+and the conditions under which it could be activated for design and maintenance
+review; lanes may be reordered or rejected.
+
+#### Signal Processing II
+
+- FIR/IIR design with practical Butterworth and Chebyshev families;
+- DCT/DST;
+- STFT and spectral-estimation workflows;
+- resampling and polyphase methods;
+- broader practical wavelet support.
+
+Activation requires clear API boundaries, reference evidence, and demonstrated
+workflow value.
+
+#### Statistics II
+
+- generalised linear models;
+- robust regression and covariance;
+- survival and reliability analysis;
+- stronger state-space/time-series diagnostics where foundations permit.
+
+Causal-inference tooling is not implied.
+
+#### Data Analysis II
+
+- NMF;
+- ICA;
+- PLS/CCA;
+- incremental or truncated PCA;
+- additional dimensionality-reduction techniques only where numerical and
+  maintenance gates are clear.
+
+Fashionable algorithms are not roadmapped merely to match another library's
+list.
+
+#### Global and discrete optimisation
+
+- a reproducible global-optimisation baseline;
+- better bound-constrained finishing and polishing;
+- stronger diagnostic and scaling infrastructure.
+
+MILP is conditional research work, not a promised public capability. Before
+MILP can enter a committed milestone it requires a dedicated design covering
+branch-and-bound, bounds, termination, tolerances, reproducibility, incumbent
+handling, test and reference strategy, and maintenance cost. MINLP remains
+outside the committed roadmap unless it later receives its own dedicated
+maturity gates.
+
+#### Persistence and interchange II
+
+- additional stable fitted-model persistence where actual workflows need it;
+- decomposition and state persistence only when ownership and versioning
+  semantics are clear;
+- compatibility and corruption-handling contracts.
+
+Arbitrary object-graph serialisation is not promised.
+
+#### Beginner convenience units
+
+After 2.0, evaluate whether optional per-domain beginner convenience units
+would materially reduce first-use friction. They are **not currently approved
+public API**. A convenience unit may enter a future minor release only if:
+
+- a complete-program usability review shows a genuine improvement;
+- it does not create another competing naming layer;
+- dependencies remain bounded;
+- the unit has a design record;
+- examples demonstrate reduced complexity.
+
+#### Console demo browser
+
+A future console application that walks through the domains from a simple
+menu and points the user toward the corresponding documentation and runnable
+examples. It must remain an educational example, not another API framework.
+
+#### Optional TAChart visualisation demo
+
+A future, separately packaged, demo-only visualisation project that shows
+selected numerical outputs graphically, for example through Lazarus TAChart.
+It must remain optional, add no dependency to the numerical core, impose no
+GUI requirement on normal mathlib-fp use, and carry no implication that
+charting becomes a numerical-library domain.
 
 ## Performance direction
 

@@ -470,3 +470,17 @@ result contains `NPow div 2 + 1` bins, including DC and Nyquist.
 - `MathBase.SharedTypes` — `TDoubleArray`, `TIntegerArray`
 
 No other external libraries required.
+
+## Common mistakes
+
+- **Forecasting undifferences.** `ARIMAForecast(Model, OriginalY, H)` needs the
+  original series so the forecast returns to the original scale; forecasting
+  from the differenced series alone mis-scales the result.
+- **Kalman is linear-Gaussian.** `TScalarKalmanFilter` and
+  `TMultivariateKalmanFilter` are time-invariant linear-Gaussian baselines;
+  missing observations, controls, smoothing, and nonlinear filters are outside
+  1.8.
+- **History requirements.** `Undifference` requires at least `D` initial
+  values, and `ACF` requires `MaxLag < N`.
+- **Mutable filter records.** A filter record is mutable and must not be
+  updated concurrently; callers own the state.

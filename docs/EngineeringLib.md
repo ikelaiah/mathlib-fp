@@ -651,3 +651,17 @@ is `EngineeringLib.FluidDynamics.TFluidDynamicsKit`; `TVelocityKit` and
 and package-boundary rehearsal retained both facade aliases and both focused
 error aliases without deprecation. Physical unit conversions remain in
 `TUnitConversionKit.ConvertVelocity` and `ConvertPressure`.
+
+## Common mistakes
+
+- **Temperature is affine.** `ConvertTemperature` uses offset-based
+  conversions; do not apply a plain scale factor.
+- **Time is duration, not calendar.** `tuMonth` and `tuYear` are fixed-duration
+  conventions (for example 2,628,000 and 31,536,000 seconds), not calendar
+  arithmetic.
+- **Block convolution has a tail.** `TOverlapAddConvolver` needs a final
+  `Flush` to return the pending tail; `TOverlapSaveConvolver` emits one output
+  block per input block.
+- **`Try...` versus raising.** The `Try...`-named unit-conversion APIs return
+  `False` for unknown input, while non-`Try` APIs raise
+  `EUnitConversionError`.

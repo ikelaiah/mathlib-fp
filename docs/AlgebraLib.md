@@ -358,3 +358,18 @@ Rank = 2
 - **Explicit convergence** — iterative solves and matrix exponential evaluation raise `EMatrixError` when they cannot converge or produce a finite representable result.
 - **Real eigensystem contract** — the API raises `EMatrixError` for complex spectra, defective matrices, and unsupported nonsymmetric matrices larger than 2×2 instead of returning misleading real approximations.
 - **Reproducible random matrices** — the seeded `CreateRandom` overload uses local state and does not change the process-wide `RandSeed`; the compatibility overload uses caller-managed global state and never calls `Randomize`.
+
+## Common mistakes
+
+- **Inverse versus solve.** For `A*X = B` prefer `Solve(A, B)` or a reusable
+  factor instead of forming `A.Inverse`; inversion is not the recommended way
+  to solve a system.
+- **Square-only LU solves.** The pivoted-LU `Solve` path handles square
+  systems; use QR least squares or SVD minimum norm for tall, wide, or
+  rank-deficient problems.
+- **Real eigensystems are limited.** The compatibility API raises
+  `EMatrixError` for complex spectra, defective matrices, and nonsymmetric
+  cases larger than 2×2 rather than returning misleading real approximations.
+- **Compatibility versus typed.** `IMatrix` remains the double-real,
+  nested-storage compatibility path; new dense code should use the typed dense
+  API.
