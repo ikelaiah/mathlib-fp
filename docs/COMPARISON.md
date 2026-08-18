@@ -6,15 +6,15 @@ upstream projects and this repository; see the comparison policy below.
 
 | Library | Status/licence | Native Pascal? | Scope | Notes |
 | ------- | -------------- | -------------- | ----- | ----- |
-| FPC NumLib | Bundled with FPC; FPC RTL licence; essentially frozen | Yes — Pascal source | Terse units for determinants, eigenvalues, integration, ODEs, roots, linear systems, special functions, and splines | Port of the 1986–2000 NUMLIB library (Eindhoven); `ArbFloat` configurable types; flat-array pointer-overlay API |
-| DMath | Jean Debord; v0.90 (Dec 2012); LGPL v2 | Yes — Delphi/FPC Pascal | Special functions, distributions, linear algebra, optimisation, integration/ODEs, FFT, RNG, regression/PCA, and expression parsing | Broad scope; unmaintained since 2012; global RNG |
+| FPC NumLib | Bundled with FPC; FPC RTL licence; essentially unchanged since 2000 | Yes — Pascal source | Units for determinants, eigenvalues, integration, ODEs, roots, linear systems, special functions, and splines | Port of the 1986–2000 NUMLIB library (Eindhoven); `ArbFloat` configurable types; flat-array pointer-overlay API |
+| DMath | Jean Debord; v0.90 (Dec 2012); LGPL v2 | Yes — Delphi/FPC Pascal | Special functions, distributions, linear algebra, optimisation, integration/ODEs, FFT, RNG, regression/PCA, and expression parsing | Broad scope; last release v0.90 (Dec 2012); continued by LMath |
 | LMath | FPC/Lazarus continuation of DMath; LGPL v3; last update 2025-10 | Yes — FPC/Lazarus Pascal | Same procedural core as DMath | SourceForge `lmath-library`; Lazarus packages and GUI demos |
 | MtxVec | Dew Research; commercial | Core Edition is full-source Pascal; Delphi/C++ Builder/.NET | Dense vector and matrix numerics | Performance paths include MKL and assembly; add-ons include Stats, DSP, and Data Miner |
-| ALGLIB for Delphi | Free edition licensed for personal/academic use; commercial use paid | Pascal wrapper around a generic C core; FPC-compatible | LP/QP/SOCP/QCQP/NLP/MINLP, global and derivative-free optimisation, 1–3D interpolation, dense/sparse EVD/SVD, FFT, statistics, and decision forests | Wrapper over a generic C core |
+| ALGLIB for Delphi | Free edition licensed for personal/academic use; commercial use paid | Pascal wrapper around a C core; FPC-compatible | LP/QP/SOCP/QCQP/NLP/MINLP, global and derivative-free optimisation, 1–3D interpolation, dense/sparse EVD/SVD, FFT, statistics, and decision forests | Broad numerical and optimisation coverage |
 | AMath/DAMath + MPArith | Wolfgang Ehrhardt; zlib licence | Yes — Delphi + FPC Pascal | Elementary and special functions (Bessel, elliptic, hypergeometric, zeta/polylog, distributions), quadrature, multiprecision | Quadpack and double-exponential quadrature; reference manual includes implementation notes and cited sources |
-| mrMath | Apache-2.0; active in 2026 | Yes — Delphi + FPC Pascal | Dense LU/QR/Cholesky/SVD, PCA/t-SNE/ICA/NNMF, wavelets | ASM/AVX/FMA kernels; multithreading; class-based API with manual `Free` |
-| numerik | MIT; stale since 2021 | Yes — FPC/Lazarus Pascal | NumPy-like `TMultiArray` with broadcasting and slicing | Requires external OpenBLAS/LAPACK libraries |
-| FastMath | BSD; Delphi-only | Yes — Delphi Pascal (SIMD assembly) | 2-D/3-D/4-D vectors and matrices for games/graphics | Single precision only |
+| mrMath | Apache-2.0; active in 2026 | Yes — Delphi + FPC Pascal | Dense LU/QR/Cholesky/SVD, PCA/t-SNE/ICA/NNMF, wavelets | ASM/AVX/FMA kernels; multithreading |
+| numerik | MIT; last updated 2021 | Yes — FPC/Lazarus Pascal | NumPy-like `TMultiArray` with broadcasting and slicing | Requires external OpenBLAS/LAPACK libraries |
+| FastMath | BSD; Delphi-only | Yes — Delphi Pascal (SIMD assembly) | 2-D/3-D/4-D vectors and matrices for games/graphics; single precision | Designed for graphics workloads |
 | mathlib-fp | MIT; native Free Pascal | Yes — complete portable Object Pascal | 13 focused domains covering algebra, probability, statistics, engineering/DSP, numerics, optimisation, time series, machine learning, finance, geometry, and interchange | No mandatory third-party numerical runtime; versioned web/offline documentation; beginner recipes; machine-readable capability inventory; qualification programme |
 
 ## Position
