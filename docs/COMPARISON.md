@@ -1,4 +1,4 @@
-# mathlib-fp and other Pascal numerical libraries
+# Choosing a Pascal numerical library
 
 This page is an informational map of Pascal numerical libraries for someone
 choosing a foundation for Free Pascal work. It uses only facts verified from

@@ -50,7 +50,7 @@ tested, versioned alternative.
 | Iterative outcome | the result record and `TIterationStatus` | Add progress, cancellation, and tighter options only when required |
 
 The names above are concrete public aliases. A beginner should not need to
-understand the generic specialization scaffolding used to implement them.
+understand the generic specialisation scaffolding used to implement them.
 
 ## Dynamic arrays and zero-based indexing
 

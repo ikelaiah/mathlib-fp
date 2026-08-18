@@ -163,7 +163,7 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | Release | Numerical outcome | User-facing outcome |
 | --- | --- | --- |
 | 1.3.0 | Complex scalars and allocation-light real/complex vector kernels | Documented native complex/vector workflows with compatible FFT paths |
-| 1.4.0 | Ergonomic and consistent 2-D/3-D geometry vector arithmetic | Natural operators, runnable examples, and explicit edge-case behavior |
+| 1.4.0 | Ergonomic and consistent 2-D/3-D geometry vector arithmetic | Natural operators, runnable examples, and explicit edge-case behaviour |
 | 1.5.0 | Typed contiguous scalar, vector, and dense matrix foundation | Five-minute install path, searchable documentation baseline, and concise solve examples |
 | 1.6.0 | Dependable typed dense decompositions and direct solvers | “Choose a dense solver” guidance, reusable factors, and inspectable diagnostics |
 | 1.7.0 | Interpolation, fitting, advanced numerics, and optimisation | End-to-end modelling recipes with convergence and diagnostic guidance |
@@ -307,7 +307,7 @@ documents rather than in this roadmap.
 | 1.2.0 | 2026-07-18 | Initial shared-type release: numeric types, real symmetric eigendecomposition, matrix powers, and seeded random/bootstrap paths | [notes](RELEASE_NOTES_1.2.0.md) |
 | 1.2.1 | 2026-07-18 | Canonical terminology guide, public API naming inventory, and aligned README/FAQ/guides | [notes](RELEASE_NOTES_1.2.1.md) |
 | 1.2.2 | 2026-07-18 | MathBase and NumericsLib walkthroughs; a runnable program and index for every documented domain | [notes](RELEASE_NOTES_1.2.2.md) |
-| 1.2.3 | 2026-07-21 | Correctness and robustness release: special-function accuracy, convergence and tail behavior, and overflow/underflow/cancellation removal | [notes](RELEASE_NOTES_1.2.3.md) |
+| 1.2.3 | 2026-07-21 | Correctness and robustness release: special-function accuracy, convergence and tail behaviour, and overflow/underflow/cancellation removal | [notes](RELEASE_NOTES_1.2.3.md) |
 | 1.3.0 | 2026-07-23 | Complex-number and vector foundation (`TComplex`, real/complex vector kernels) for later algebra and signal processing | [notes](RELEASE_NOTES_1.3.0.md) |
 | 1.4.0 | 2026-07-25 | GeometryLib fixed-size vector arithmetic through natural operators | [notes](RELEASE_NOTES_1.4.0.md) |
 | 1.5.0 | 2026-07-26 | Typed contiguous real/complex scalar, vector, and dense-matrix foundation with a direct `Solve` path | [notes](RELEASE_NOTES_1.5.0.md) |
