@@ -18,7 +18,7 @@ generic specialization and the unit-interface hash.
 | `compatibility` | 131 |
 | `experimental` | 0 |
 | `implementation` | 431 |
-| `recommended` | 536 |
+| `recommended` | 537 |
 
 ## Exact compiler-alias review
 
@@ -1857,7 +1857,7 @@ Interface SHA-256: `c6fbf1c36ed0f3448519e41d05b75df2788985053e91aee7e1dc11aaaf2d
 ## GeometryLib.Geometry
 
 Source: [`src/GeometryLib.Geometry.pas`](../src/GeometryLib.Geometry.pas)  
-Interface SHA-256: `f4bba8d9ae9084c71d6502e4e59bfa6e4fa32abaca2fdc9f60fcf6ab022347a2`
+Interface SHA-256: `a2640d1745a38b4c75a2dc803a776e5ebadf0849305f080f6fbb98074192b685`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -1974,6 +1974,7 @@ Interface SHA-256: `f4bba8d9ae9084c71d6502e4e59bfa6e4fa32abaca2fdc9f60fcf6ab0223
 | `TVector2D` | `function` | `Magnitude` | `function Magnitude:Double` | `recommended` | `—` | `—` | `—` |
 | `TVector2D` | `function` | `Normalise` | `function Normalise:TVector2D` | `recommended` | `—` | `—` | `—` |
 | `TVector2D` | `function` | `Perpendicular` | `function Perpendicular:TVector2D` | `recommended` | `—` | `—` | `—` |
+| `TVector2D` | `function` | `Rotate` | `function Rotate(const Angle:Double):TVector2D` | `recommended` | `—` | `—` | `—` |
 | `TVector2D` | `function` | `ToString` | `function ToString:String` | `recommended` | `—` | `—` | `—` |
 | `TVector2D` | `field` | `X` | `X:Double` | `recommended` | `—` | `—` | `—` |
 | `TVector2D` | `field` | `Y` | `Y:Double` | `recommended` | `—` | `—` | `—` |

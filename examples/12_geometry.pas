@@ -380,6 +380,26 @@ begin
 end;
 
 { ============================================================
+  SECTION 8b — 2-D Vector Rotation
+============================================================ }
+procedure DemoVectorRotation;
+var
+  V: TVector2D;
+begin
+  WriteLn;
+  WriteLn('=== 2-D VECTOR ROTATION ===');
+  WriteLn('Rotate turns a vector counter-clockwise by an angle in radians.');
+  Sep;
+
+  V := TVector2D.Create(3, -4);
+  WriteLn(Format('  Rotate((3,-4), 0.7) = (%.4f, %.4f)',
+    [V.Rotate(0.7).X, V.Rotate(0.7).Y]));
+  WriteLn(Format('  |(3,-4)| = %.6f,  |Rotate((3,-4), 0.7)| = %.6f',
+    [V.Magnitude, V.Rotate(0.7).Magnitude]));
+  WriteLn(Format('  source unchanged: %s', [V.ToString]));
+end;
+
+{ ============================================================
   MAIN
 ============================================================ }
 begin
@@ -395,7 +415,9 @@ begin
   DemoConvexHull;
   DemoTransformations;
   Demo3D;
+  DemoVectorRotation;
 
   WriteLn;
   WriteLn('Done.');
+  WriteLn('geometry walkthrough: success');
 end.

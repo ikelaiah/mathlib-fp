@@ -73,6 +73,7 @@ TVector2D = record
   function Dot(const V: TVector2D): Double;
   function Cross(const V: TVector2D): Double;    { 2-D scalar (z-component) }
   function Perpendicular: TVector2D;             { rotate 90° CCW }
+  function Rotate(const Angle: Double): TVector2D; { rotate CCW by radians }
   class operator +(const A, B: TVector2D): TVector2D;
   class operator -(const A, B: TVector2D): TVector2D;
   class operator -(const A: TVector2D): TVector2D;
@@ -197,6 +198,31 @@ The arithmetic operators and numeric vector methods are O(1) for these fixed
 dimensions and perform no heap allocation on successful calls. They keep no
 hidden state and are reentrant. Concurrent calls are safe provided no thread
 modifies the same record storage while another thread is reading it.
+
+### Rotation
+
+`TVector2D.Rotate(Angle)` returns a new vector equal to the receiver rotated
+counter-clockwise about the origin by `Angle` radians. It is an O(1),
+allocation-free value operation: the source record is never modified, so
+`V := V.Rotate(a)` is an ordinary value assignment.
+
+```pascal
+V := TVector2D.Create(1, 0).Rotate(Pi / 2);  // ≈ (0, 1), the same as Perpendicular
+V := TVector2D.Create(3, -4).Rotate(0.7);    // ≈ (4.8714, -1.1267)
+```
+
+The rotation preserves magnitude: for finite inputs the relative magnitude
+deviation stays below a ~1e-15 tolerance. `Rotate(0)` returns the source
+exactly, `Rotate(Pi / 2)` agrees with `Perpendicular`, and `Rotate(-a)`
+inverts `Rotate(a)` within that tolerance. Rotating the zero vector returns
+the exact zero vector. Non-finite angles or components follow the shared
+floating-point convention described in
+[Floating-point behavior](#floating-point-behavior): a NaN or infinite angle
+makes `Sin`/`Cos` produce NaN, which propagates through the result.
+
+Because `Rotate` reads its value receiver and returns a new value, it is
+thread-safe and reentrant; concurrent calls are safe provided no thread
+modifies the same record storage while another reads it.
 
 ### Magnitude and normalization
 

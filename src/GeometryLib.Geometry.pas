@@ -100,6 +100,14 @@ type
     function Dot(const V: TVector2D): Double;
     function Cross(const V: TVector2D): Double; { 2-D: scalar z-component }
     function Perpendicular: TVector2D; { rotate 90° CCW }
+    { Rotate by Angle radians about the origin; positive angles rotate
+      counter-clockwise.  Allocation-free value operation: returns a new
+      record and does not modify the receiver.  Preserves magnitude within a
+      ~1e-15 relative tolerance for finite inputs; rotating the zero vector
+      returns the exact zero vector; non-finite angles or components follow
+      the shared IEEE-754 convention above.  Reading its value receiver and
+      returning a new value makes it thread-safe and reentrant. }
+    function Rotate(const Angle: Double): TVector2D;
     { Componentwise value arithmetic.  These O(1), reentrant operators do not
       mutate either operand or allocate storage; concurrent calls are safe
       unless another thread mutates the same record.  Normal IEEE-754 results,
@@ -433,6 +441,19 @@ begin Result := X * V.Y - Y * V.X; end;
 
 function TVector2D.Perpendicular: TVector2D;
 begin Result.X := -Y; Result.Y := X; end;
+
+{ Rotation matrix:  x' =  x*cos(a) - y*sin(a),  y' =  x*sin(a) + y*cos(a).
+  Zero returns the source exactly; signed zeros follow +0*cos ± ±0*sin under
+  IEEE-754.  Non-finite angles make Sin/Cos NaN and propagate. }
+function TVector2D.Rotate(const Angle: Double): TVector2D;
+var
+  C, S: Double;
+begin
+  C := Cos(Angle);
+  S := Sin(Angle);
+  Result.X := X * C - Y * S;
+  Result.Y := X * S + Y * C;
+end;
 
 class operator TVector2D.+(const A, B: TVector2D): TVector2D;
 begin

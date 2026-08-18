@@ -49,7 +49,7 @@
   "future_minor_routes": [
     {
       "release": "1.10.0",
-      "capability": "Ergonomic 2-D and 3-D vector rotation",
+      "capability": "TVector2D.Rotate (2-D allocation-free rotation); 3-D rotation deferred beyond 2.0",
       "effect_on_this_diff": "none"
     }
   ],

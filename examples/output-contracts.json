@@ -2,6 +2,16 @@
   "schema_version": 1,
   "examples": [
     {
+      "path": "examples/12_geometry.pas",
+      "contains": [
+        "=== 2-D VECTOR ROTATION ===",
+        "Rotate((3,-4), 0.7) = (4.8714, -1.1267)",
+        "|(3,-4)| = 5.000000,  |Rotate((3,-4), 0.7)| = 5.000000",
+        "source unchanged: <3, -4>"
+      ],
+      "final_line": "geometry walkthrough: success"
+    },
+    {
       "path": "examples/15_typed_dense_solve.pas",
       "contains": [
         "Coffee:  $4.00",

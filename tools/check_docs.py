@@ -766,7 +766,7 @@ def main() -> int:
         contract_data = json.loads(contracts_path.read_text(encoding="utf-8"))
         assert contract_data["schema_version"] == 1
         contracts = contract_data["examples"]
-        assert len(contracts) == 7
+        assert len(contracts) == 8
         for contract in contracts:
             source = ROOT / contract["path"]
             assert source.is_file()

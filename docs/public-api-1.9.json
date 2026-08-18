@@ -11962,9 +11962,9 @@
         "compatibility": 0,
         "experimental": 0,
         "implementation": 0,
-        "recommended": 17
+        "recommended": 18
       },
-      "interface_sha256": "f4bba8d9ae9084c71d6502e4e59bfa6e4fa32abaca2fdc9f60fcf6ab022347a2",
+      "interface_sha256": "a2640d1745a38b4c75a2dc803a776e5ebadf0849305f080f6fbb98074192b685",
       "declarations": [
         {
           "owner": null,
@@ -12755,6 +12755,13 @@
           "name": "Perpendicular",
           "kind": "function",
           "signature": "function Perpendicular:TVector2D",
+          "classification": "recommended"
+        },
+        {
+          "owner": "TVector2D",
+          "name": "Rotate",
+          "kind": "function",
+          "signature": "function Rotate(const Angle:Double):TVector2D",
           "classification": "recommended"
         },
         {
