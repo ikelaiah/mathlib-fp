@@ -6,13 +6,18 @@ Use this checklist for every mathlib-fp release.
 
 - [ ] Freeze the public API and review exception, rounding, random-state, and
   ownership semantics in the reference docs.
-- [ ] Confirm the version matches in `packages/lazarus/mathlib_fp.lpk`, the
-  README badge, and `CHANGELOG.md`.
+- [ ] Confirm the version matches in `VERSION`, `packages/lazarus/mathlib_fp.lpk`,
+  the README badge, and `CHANGELOG.md`.
 - [ ] Confirm the release section has the publication date and **Unreleased**
   contains only changes made after that release.
 - [ ] Confirm CI passes with FPC 3.2.2 on Linux and Windows and builds with the
   minimum supported Lazarus 4.8 on Windows.
 - [ ] Confirm CI compiles and runs every example and builds the Lazarus package.
+- [ ] Run the heavyweight `Release qualification` workflow (weekly schedule or
+  manual dispatch) and review its evidence. That workflow — not ordinary PR CI —
+  owns mutation testing, full performance/portability evidence, migration and
+  workflow rehearsal, convergence/2.0 promotion checks, and clean-archive,
+  checksum, and network-isolated qualification.
 - [ ] Run normal, optimized, runtime-checked, and heap-traced test builds; verify
   the heap-traced run reports zero unfreed blocks.
 - [ ] Run `tools/check_performance_evidence.py`; require every exact
