@@ -324,6 +324,7 @@ documents rather than in this roadmap.
 | 1.9.7 | 2026-08-12 | Migration and compatibility rehearsal: complete 1.x mappings and a tested compatibility plan | [notes](RELEASE_NOTES_1.9.7.md) |
 | 1.9.8 | 2026-08-16 | Representative workflow qualification: multi-domain applications with clean-archive workflow evidence | [notes](RELEASE_NOTES_1.9.8.md) |
 | 1.9.9 | 2026-08-17 | Final 1.9.x convergence handoff: closed 1.10.0 capability manifest and complete evidence | [notes](RELEASE_NOTES_1.9.9.md) |
+| 1.10.0 | 2026-08-19 | Additive API completion and final 2.0 freeze: `TVector2D.Rotate`, no-deprecation closure, and frozen 2.0 candidate | [notes](RELEASE_NOTES_1.10.0.md) |
 
 Detailed historical evidence for each release remains in the corresponding
 `RELEASE_NOTES_<version>.md`, `PR_NOTES_<version>.md`, `QUALIFICATION_<version>.md`,
@@ -356,62 +357,42 @@ numbers with unrelated algorithm families.
   functions, tests, pages, or examples does not substitute for the stated user
   and numerical outcome.
 
-## Previous release: 1.9.9
+## Previous release: 1.10.0
 
-Version 1.9.9 is the final 1.9.x convergence handoff: it introduced no planned
-public capability and closed the evidence, compatibility decisions, and the
-exact manifest of additive public work assigned to 1.10.0. See the completed-
-releases table above and the [1.9.9 release notes](RELEASE_NOTES_1.9.9.md).
+Version 1.10.0 is the backward-compatible minor release that implemented the
+closed 1.9.9 convergence manifest and froze the code, API, documentation,
+support claims, migration material, qualification procedure, and distribution
+artifacts promoted to 2.0. It added exactly one public declaration,
+`TVector2D.Rotate(const Angle: Double): TVector2D` in `GeometryLib.Geometry`
+— an allocation-free value rotation by radians (counter-clockwise for positive
+angles) that leaves the source unmodified, returns the exact zero vector for
+the zero vector, and conserves magnitude within a stated tolerance. The
+deprecation decision closed as **no-deprecation**: 1.10.0 marked no alias or
+compatibility declaration as deprecated, removed, or moved, and retained full
+1.x source compatibility. The historical 1.9 public-API baseline
+([`public-api-1.9.json`](public-api-1.9.json)) was kept immutable, and the
+addition was captured in a new current snapshot
+([`public-api-1.10.0.json`](public-api-1.10.0.json)) with an explicit
+1.9.9-to-1.10.0 diff rather than a mutated historical baseline. Version 1.9.9,
+the final 1.9.x convergence handoff, had closed that manifest in advance. See
+the completed-releases table above and the
+[1.10.0 release notes](RELEASE_NOTES_1.10.0.md) and
+[qualification record](QUALIFICATION_1.10.0.md).
 
-## Next release: 1.10.0 — Additive API completion and final 2.0 freeze
+## Next release: 2.0.0 — Stable native numerical platform
 
-Version 1.10.0 is the backward-compatible minor release for public capabilities
-approved during 1.9.x convergence. It implements only the closed 1.9.9 manifest,
-then freezes the code, API, documentation sources, support claims, migration
-material, qualification procedure, and distribution artifacts promoted to 2.0.
+Version 2.0.0 is the next active capability gate and the current release
+target. It is a quality and API graduation, not an excuse for an arbitrary
+rewrite: it ships only when the additive 1.x foundations have been used by the
+higher-level libraries, the migration path is proven, and the 1.x convergence
+gates through 1.10.0 are complete. Because 1.10.0 froze the promoted 2.0
+candidate, the only remaining work for 2.0.0 is version and release metadata
+and promotion of the qualified candidate, not a new algorithm or public API
+design. The detailed 2.0 plan — public-API and compatibility boundary,
+capability baseline, non-goals, documentation readiness, and completion gate —
+is documented in the `2.0.0` section below.
 
-### 1.10.0 scope
-
-- Add `TVector2D.Rotate(const Angle: Double): TVector2D` as an allocation-free
-  value operation. `Angle` is in radians; positive values rotate
-  counter-clockwise about the origin; the source vector is not modified.
-- Mark aliases whose deprecation was confirmed by the 1.9.7 migration rehearsal
-  as deprecated, with their canonical replacements named, while retaining full
-  source compatibility throughout 1.10.0.
-- Document and test rotation orientation, zero and negative angles, agreement
-  with `Perpendicular` at π/2, magnitude preservation within a stated
-  tolerance, assignment back to the source variable, zero-vector behavior, and
-  the finite/non-finite input contract.
-- Implement the other public declarations in the closed 1.9.9 capability
-  manifest without pulling in unrelated algorithm families or speculative
-  convenience APIs.
-- Publish an exact API snapshot diff, migration impact, release notes, concise
-  compile-checked examples, and generated reference documentation for every
-  addition.
-- Run at least two 2.0 release-candidate cycles from tagged source and offline-
-  documentation archives. After the freeze, accept only release-blocking
-  correctness, safety, portability, packaging, documentation, or migration
-  fixes, each with regression evidence and a reviewed API diff.
-- Exercise the actual candidate artifacts through repeated clean-archive
-  representative workflows during both release-candidate cycles; elapsed time
-  or an untested artifact is not qualification evidence.
-
-### 1.10.0 completion gate
-
-- The shipped public API exactly matches the closed capability manifest and
-  every addition has a documented contract, focused regression coverage, and a
-  complete runnable example where it is part of a common workflow.
-- Two release candidates pass full archive-based qualification and the later
-  candidate includes every accepted freeze fix.
-- No unresolved critical/high-impact correctness, unsafe ownership/concurrency,
-  portability, packaging, or migration defect is hidden to meet the version
-  target.
-- Representative 1.x applications complete the documented migration or remain
-  operational through the tested compatibility surface.
-- The only remaining work for 2.0.0 is version/release metadata and promotion
-  of the qualified candidate, not a new algorithm or public API design.
-
-## Planned 2.0.0 — Stable native numerical platform
+## 2.0.0 — Stable native numerical platform
 
 Version 2.0.0 is a quality and API graduation, not an excuse for an arbitrary
 rewrite. It ships only when the additive 1.x foundations have been used by

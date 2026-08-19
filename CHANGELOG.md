@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.10.0] - 2026-08-19
 
 ### Added
 
@@ -13,10 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `GeometryLib.Geometry` as an allocation-free value operation. `Angle` is in
   radians; positive angles rotate counter-clockwise about the origin; the
   source vector is not modified. `Rotate(Pi / 2)` agrees with `Perpendicular`
-  and `Rotate(-a)` inverts `Rotate(a)` within a ~1e-15 relative tolerance;
-  magnitude is preserved for finite inputs; the zero vector rotates to the
-  exact zero vector; non-finite angles or components follow the documented
-  IEEE-754 convention.
+  and `Rotate(-a)` inverts `Rotate(a)` within a ~1e-15 relative tolerance on
+  the tested ordinary and extreme finite ranges; no universal relative bound
+  is claimed for every finite or denormal `Double`; the zero vector rotates
+  to the exact zero vector; non-finite angles or components follow the
+  documented IEEE-754 convention.
 - Implemented the closed [1.10.0 capability
   manifest](docs/CAPABILITY_MANIFEST_1.10.0.md) in full. The closed
   deprecation-marking decision is no-deprecation: no declaration is

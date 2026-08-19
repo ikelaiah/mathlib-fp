@@ -211,10 +211,12 @@ V := TVector2D.Create(1, 0).Rotate(Pi / 2);  // ≈ (0, 1), the same as Perpendi
 V := TVector2D.Create(3, -4).Rotate(0.7);    // ≈ (4.8714, -1.1267)
 ```
 
-The rotation preserves magnitude: for finite inputs the relative magnitude
-deviation stays below a ~1e-15 tolerance. `Rotate(0)` returns the source
-exactly, `Rotate(Pi / 2)` agrees with `Perpendicular`, and `Rotate(-a)`
-inverts `Rotate(a)` within that tolerance. Rotating the zero vector returns
+The rotation preserves magnitude on the tested ordinary and extreme finite
+ranges: the covered fixtures keep the relative magnitude deviation below a
+~1e-15 tolerance. No universal relative bound is claimed for every finite or
+denormal `Double`. `Rotate(0)` returns the source exactly,
+`Rotate(Pi / 2)` agrees with `Perpendicular`, and `Rotate(-a)` inverts
+`Rotate(a)` within that covered tolerance. Rotating the zero vector returns
 the exact zero vector. Non-finite angles or components follow the shared
 floating-point convention described in
 [Floating-point behavior](#floating-point-behavior): a NaN or infinite angle

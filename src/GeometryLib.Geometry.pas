@@ -103,10 +103,12 @@ type
     { Rotate by Angle radians about the origin; positive angles rotate
       counter-clockwise.  Allocation-free value operation: returns a new
       record and does not modify the receiver.  Preserves magnitude within a
-      ~1e-15 relative tolerance for finite inputs; rotating the zero vector
-      returns the exact zero vector; non-finite angles or components follow
-      the shared IEEE-754 convention above.  Reading its value receiver and
-      returning a new value makes it thread-safe and reentrant. }
+      ~1e-15 relative tolerance on the covered ordinary and extreme finite
+      ranges (per-magnitude fixtures); no universal relative bound is claimed
+      for every finite or denormal Double.  Rotating the zero vector returns
+      the exact zero vector; non-finite angles or components follow the shared
+      IEEE-754 convention above.  Reading its value receiver and returning a
+      new value makes it thread-safe and reentrant. }
     function Rotate(const Angle: Double): TVector2D;
     { Componentwise value arithmetic.  These O(1), reentrant operators do not
       mutate either operand or allocate storage; concurrent calls are safe

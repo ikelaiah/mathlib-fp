@@ -263,22 +263,25 @@ class DeferralTests(unittest.TestCase):
 
 
 class RoadmapConvergenceTests(unittest.TestCase):
-    def test_requires_1_9_9_previous_and_1_10_0_next(self) -> None:
-        roadmap = (
-            "## Previous release: 1.9.8 — Workflow qualification\n"
-            "## Next release: 1.9.9 — Convergence handoff\n"
-        )
+    def test_requires_permanent_closure_record(self) -> None:
+        roadmap = "## Next release: 2.0.0\n"
 
         errors = roadmap_convergence_errors(roadmap)
 
         self.assertTrue(any("1.9.9" in error for error in errors))
         self.assertTrue(any("1.10.0" in error for error in errors))
+        self.assertTrue(any("TVector2D.Rotate" in error for error in errors))
 
-    def test_accepts_converged_roadmap(self) -> None:
+    def test_accepts_advanced_roadmap(self) -> None:
+        # After 1.10.0 ships the roadmap moves to a 2.0.0-next posture; the
+        # historical convergence gate must still accept it as long as the
+        # permanent closure record (1.9.9 handoff, 1.10.0, TVector2D.Rotate)
+        # is kept.
         roadmap = (
-            "## Previous release: 1.9.9 — Final 1.9.x convergence handoff\n"
-            "## Next release: 1.10.0 — Additive API completion\n"
-            "Add `TVector2D.Rotate(const Angle: Double): TVector2D`.\n"
+            "## Previous release: 1.10.0 — Additive API completion and final 2.0 freeze\n"
+            "## Next release: 2.0.0 — Stable native numerical platform\n"
+            "1.9.9 closed the manifest for 1.10.0 including "
+            "`TVector2D.Rotate`.\n"
         )
 
         self.assertEqual([], roadmap_convergence_errors(roadmap))
@@ -381,7 +384,7 @@ class CapabilityInventoryTests(unittest.TestCase):
         )
 
         self.assertTrue(
-            any("1.9.9" in error for error in errors)
+            any("1.10.0" in error for error in errors)
         )
         self.assertTrue(
             any("convergence" in error for error in errors)
@@ -389,7 +392,7 @@ class CapabilityInventoryTests(unittest.TestCase):
 
     def test_accepts_complete_inventory(self) -> None:
         capabilities = {
-            "release": "1.9.9",
+            "release": "1.10.0",
             "convergence": "docs/capability-manifest-1.10.0.json",
             "provenance_audit": "docs/provenance-audit-1.9.9.json",
             "api_snapshot_final": "docs/api-snapshot-final-1.9.9.json",

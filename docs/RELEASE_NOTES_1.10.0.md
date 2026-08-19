@@ -53,18 +53,25 @@ smoke suite (`TestPublicAPI`) is extended in the same change.
 No warning, hint, or package move is added. Full 1.x source compatibility is
 retained throughout 1.10.0.
 
-## API snapshot diff
+## API snapshot and diff
 
-The [API reference](API_REFERENCE_1.9.md) and the machine-readable
-[`public-api-1.9.json`](public-api-1.9.json) are regenerated from `src/` and
-record exactly one addition over the frozen 1.9.9 final snapshot: the
-`GeometryLib.Geometry` unit-interface hash changes and one
-`TVector2D.Rotate` function row is added (classified `recommended` through
-the existing `TVector2D` common path). No existing declaration, behavior,
-default, warning, or package membership changes. The 2.0-candidate decision
-and diff ([`api-decision-2.0.json`](api-decision-2.0.json),
-[`api-diff-1.9-to-2.0.json`](api-diff-1.9-to-2.0.json)) name the decided
-2-D contract; 3-D rotation remains deferred beyond 2.0.
+The historical 1.9 public-API baseline
+([`public-api-1.9.json`](public-api-1.9.json) and
+[`API_REFERENCE_1.9.md`](API_REFERENCE_1.9.md)) is preserved byte-identically
+and is pinned by SHA-256 in `tools/check_docs.py`; the frozen 1.9.0-to-1.9.9
+diff therefore remains empty without ever mutating its baseline. The current
+release snapshot and reference
+([`public-api-1.10.0.json`](public-api-1.10.0.json) and
+[`API_REFERENCE_1.10.0.md`](API_REFERENCE_1.10.0.md)) are generated from the
+live `src/` interfaces. The exact 1.9.9-to-1.10.0 diff is one added
+`TVector2D.Rotate` function row on the `TVector2D` record (classified
+`recommended` through the existing `TVector2D` common path) plus the
+corresponding `GeometryLib.Geometry` unit-interface hash change. No existing
+declaration, behavior, default, warning, or package membership changes. The
+2.0-candidate decision and diff
+([`api-decision-2.0.json`](api-decision-2.0.json),
+[`api-diff-1.9-to-2.0.json`](api-diff-1.9-to-2.0.json)) name the decided 2-D
+contract; 3-D rotation remains deferred beyond 2.0.
 
 ## Upgrade notes
 
