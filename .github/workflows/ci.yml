@@ -147,6 +147,9 @@ jobs:
             --site build-temp/docs-site/1.9.9 --release 1.9.9
           mkdir -p example-bin/units
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
+            examples/12_geometry.pas
+          ./example-bin/12_geometry
+          fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
             examples/15_typed_dense_solve.pas
           ./example-bin/15_typed_dense_solve
           fpc -B -FcUTF8 -Fusrc -FUexample-bin/units -FEexample-bin \
