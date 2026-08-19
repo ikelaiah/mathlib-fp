@@ -214,6 +214,9 @@ begin
   V2 := -V2 / 2.0;
   AssertEquals('TVector2D operator X', -4.0, V2.X, 0.0);
   AssertEquals('TVector2D operator Y', 2.0, V2.Y, 0.0);
+  V2 := TVector2D.Create(1.0, 0.0).Rotate(Pi / 2.0);
+  AssertEquals('TVector2D.Rotate X', 0.0, V2.X, 1e-15);
+  AssertEquals('TVector2D.Rotate Y', 1.0, V2.Y, 1e-15);
 
   V3 := 2.0 * (TVector3D.Create(3.0, -4.0, 5.0) -
     TVector3D.Create(1.0, 2.0, 3.0));

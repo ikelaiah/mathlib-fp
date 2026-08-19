@@ -12,11 +12,30 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.9.9"
-NEXT_RELEASE = "1.10.0"
+CURRENT_RELEASE = "1.10.0"
+NEXT_RELEASE = "2.0.0"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
-HISTORICAL_RELEASES = ["1.9.8", "1.9.7", "1.9.6", "1.9.5", "1.9.4", "1.9.3", "1.9.2", "1.9.1", API_BASELINE_RELEASE]
+CURRENT_SNAPSHOT_PATH = DOCS / f"public-api-{CURRENT_RELEASE}.json"
+CURRENT_REFERENCE_PATH = DOCS / f"API_REFERENCE_{CURRENT_RELEASE}.md"
+# Immutable historical 1.9 baseline. These SHA-256 digests must stay constant:
+# the frozen 1.9 public-API snapshot and its human reference are never
+# regenerated or mutated, so an historical diff cannot be made to appear empty
+# by editing its baseline.
+FROZEN_1_9_SNAPSHOT_SHA256 = "bade8ef2810d0b70183436ef83792488ff308b2955e51564e08afb49596816f0"
+FROZEN_1_9_REFERENCE_SHA256 = "59b7ac1e1431b0d97c7bfc2015588ab21a0509b35787127186a96e843f76943b"
+HISTORICAL_RELEASES = [
+    "1.9.9",
+    "1.9.8",
+    "1.9.7",
+    "1.9.6",
+    "1.9.5",
+    "1.9.4",
+    "1.9.3",
+    "1.9.2",
+    "1.9.1",
+    API_BASELINE_RELEASE,
+]
 
 LEARNING_ROUTE_DOCUMENTS = {
     "MathBase.md": "#quick-start",
@@ -196,12 +215,28 @@ def main() -> int:
     except (ValueError, KeyError, AssertionError) as exc:
         errors.append(f"docs/capabilities.json: invalid inventory: {exc}")
 
-    snapshot_path = DOCS / "public-api-1.9.json"
+    # Immutable historical 1.9 baseline guard: the frozen public-API snapshot
+    # and its human reference must remain byte-identical or the historical
+    # 1.9.0-to-1.9.9 diff could be made to appear empty by mutating its basis.
+    for path, expected in (
+        (DOCS / "public-api-1.9.json", FROZEN_1_9_SNAPSHOT_SHA256),
+        (DOCS / "API_REFERENCE_1.9.md", FROZEN_1_9_REFERENCE_SHA256),
+    ):
+        digest = hashlib.sha256(
+            path.read_bytes().replace(b"\r\n", b"\n")
+        ).hexdigest()
+        if digest != expected:
+            errors.append(
+                f"{path.relative_to(ROOT)}: frozen 1.9 baseline was modified; "
+                "historical API evidence must not be regenerated or edited"
+            )
+
+    snapshot_path = CURRENT_SNAPSHOT_PATH
     snapshot_symbols: set[str] = set()
     snapshot_declarations: list[tuple[str, dict[str, object]]] = []
     try:
         snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-        assert snapshot["release"] == API_BASELINE_RELEASE
+        assert snapshot["release"] == CURRENT_RELEASE
         assert snapshot["schema_version"] == 3
         assert snapshot["decision_release"] == API_DECISION_RELEASE
         assert snapshot["identity"] == [
@@ -216,7 +251,8 @@ def main() -> int:
         expected_sources = {path.relative_to(ROOT).as_posix() for path in source_paths}
         if set(snapshot_units) != expected_sources:
             errors.append(
-                "docs/public-api-1.9.json: source-unit set differs from src/*.pas"
+                f"{snapshot_path.relative_to(ROOT)}: source-unit set differs from "
+                "src/*.pas"
             )
         for source_path in source_paths:
             relative = source_path.relative_to(ROOT).as_posix()
@@ -291,9 +327,9 @@ def main() -> int:
                     f"{declaration['owner']}.{declaration['name']} is absent"
                 )
     except (ValueError, KeyError, AssertionError) as exc:
-        errors.append(f"docs/public-api-1.9.json: invalid snapshot: {exc}")
+        errors.append(f"{snapshot_path.relative_to(ROOT)}: invalid snapshot: {exc}")
 
-    reference_path = DOCS / "API_REFERENCE_1.9.md"
+    reference_path = CURRENT_REFERENCE_PATH
     reference_text = reference_path.read_text(encoding="utf-8")
     reference_rows = set(reference_text.splitlines())
 
@@ -328,7 +364,7 @@ def main() -> int:
         )
         if expected_row not in reference_rows:
             errors.append(
-                "docs/API_REFERENCE_1.9.md: missing exact declaration row for "
+                f"{reference_path.relative_to(ROOT)}: missing exact declaration row for "
                 f"{unit_name}.{owner}.{declaration['name']}"
             )
 
@@ -360,7 +396,7 @@ def main() -> int:
             )
             if expected_row not in reference_rows:
                 errors.append(
-                    "docs/API_REFERENCE_1.9.md: missing exact alias-review row "
+                    f"{reference_path.relative_to(ROOT)}: missing exact alias-review row "
                     f"for {alias_name}"
                 )
     except (ValueError, KeyError, AssertionError) as exc:
@@ -752,7 +788,7 @@ def main() -> int:
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="9" Release="9"/>' in package,
+        "Lazarus package": '<Version Major="1" Minor="10" Release="0"/>' in package,
     }
     for description, valid in identity_checks.items():
         if not valid:
@@ -766,7 +802,7 @@ def main() -> int:
         contract_data = json.loads(contracts_path.read_text(encoding="utf-8"))
         assert contract_data["schema_version"] == 1
         contracts = contract_data["examples"]
-        assert len(contracts) == 7
+        assert len(contracts) == 8
         for contract in contracts:
             source = ROOT / contract["path"]
             assert source.is_file()

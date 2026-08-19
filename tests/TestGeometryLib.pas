@@ -7,7 +7,7 @@ unit TestGeometryLib;
  All expected values are analytically computed.
 
  Coverage
-   TPoint2D / TVector2D helpers
+   TPoint2D / TVector2D helpers (including Rotate)
    TSegment2D / TLine2D / TCircle2D helpers
    TPoint3D / TVector3D / TSegment3D / TPlane3D / TSphere3D helpers
    PointToPoint2D / PointToSegment2D / PointToLine2D / SegmentToSegment2D
@@ -59,6 +59,13 @@ type
     procedure TestVector2D_Dot;
     procedure TestVector2D_Cross;
     procedure TestVector2D_Perpendicular;
+    procedure TestVector2D_Rotate_Orientation;
+    procedure TestVector2D_Rotate_AngleConventions;
+    procedure TestVector2D_Rotate_AgreesWithPerpendicular;
+    procedure TestVector2D_Rotate_PreservesMagnitude;
+    procedure TestVector2D_Rotate_SourceImmutability;
+    procedure TestVector2D_Rotate_ZeroVector;
+    procedure TestVector2D_Rotate_NonFinite;
     procedure TestVector2D_ArithmeticOperators;
     procedure TestSegment2D_Length;
     procedure TestSegment2D_Midpoint;
@@ -366,6 +373,120 @@ begin
   AssertNear('Perp Y', 1.0, P.Y);
   { Dot with original = 0 }
   AssertNear('Perp dot = 0', 0.0, V.Dot(P));
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_Orientation;
+var V, R: TVector2D;
+begin
+  V := TVector2D.Create(1, 0);
+  R := V.Rotate(Pi / 2);
+  AssertVector2DNear('Rotate(Pi/2) of (1,0) -> (0,1)', 0.0, 1.0, R, 1e-15);
+  R := V.Rotate(Pi);
+  AssertVector2DNear('Rotate(Pi) of (1,0) -> (-1,0)', -1.0, 0.0, R, 1e-15);
+  R := V.Rotate(3 * Pi / 2);
+  AssertVector2DNear('Rotate(3*Pi/2) of (1,0) -> (0,-1)', 0.0, -1.0, R, 1e-15);
+  V := TVector2D.Create(0, -1);
+  R := V.Rotate(Pi / 2);
+  AssertVector2DNear('Rotate(Pi/2) of (0,-1) stays CCW -> (1,0)', 1.0, 0.0, R, 1e-15);
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_AngleConventions;
+var V, RPos: TVector2D;
+begin
+  V := TVector2D.Create(3, -4);
+  AssertVector2DNear('zero angle is identity', V.X, V.Y, V.Rotate(0.0), 1e-15);
+  RPos := V.Rotate(0.7);
+  { Rotate(-a) inverts Rotate(a): composing them returns the source. }
+  AssertVector2DNear('negative angle inverts positive angle',
+    V.X, V.Y, RPos.Rotate(-0.7), 1e-15);
+  { Angle reduction beyond 2*Pi is still the same rotation. }
+  AssertVector2DNear('angle reduction beyond 2*Pi is periodic',
+    RPos.X, RPos.Y, V.Rotate(0.7 + 2 * Pi), 1e-15);
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_AgreesWithPerpendicular;
+var V: TVector2D;
+begin
+  V := TVector2D.Create(1, 0);
+  AssertVector2DNear('Rotate(Pi/2) agrees with Perpendicular (1)',
+    V.Perpendicular.X, V.Perpendicular.Y, V.Rotate(Pi / 2), 1e-15);
+  V := TVector2D.Create(-2, 7);
+  AssertVector2DNear('Rotate(Pi/2) agrees with Perpendicular (2)',
+    V.Perpendicular.X, V.Perpendicular.Y, V.Rotate(Pi / 2), 1e-15);
+  V := TVector2D.Create(0.3, -1.8);
+  AssertVector2DNear('Rotate(Pi/2) agrees with Perpendicular (3)',
+    V.Perpendicular.X, V.Perpendicular.Y, V.Rotate(Pi / 2), 1e-15);
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_PreservesMagnitude;
+var
+  Samples: array of TVector2D;
+  V, R: TVector2D;
+  I: Integer;
+  RelativeDeviation: Double;
+begin
+  SetLength(Samples, 5);
+  Samples[0] := TVector2D.Create(1, 0);
+  Samples[1] := TVector2D.Create(3, -4);
+  Samples[2] := TVector2D.Create(0.123456789, 9.87654321);
+  Samples[3] := TVector2D.Create(1.0e-150, 2.0e-150);
+  Samples[4] := TVector2D.Create(1.0e150, 1.0e150);
+  for I := 0 to High(Samples) do
+  begin
+    V := Samples[I];
+    R := V.Rotate(0.6);
+    RelativeDeviation := Abs(R.Magnitude - V.Magnitude) / V.Magnitude;
+    AssertTrue('magnitude preserved within 1e-15 relative for finite input',
+      RelativeDeviation <= 1e-15);
+  end;
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_SourceImmutability;
+var V, V0, R: TVector2D;
+begin
+  V0 := TVector2D.Create(3, -4);
+  V := V0;
+  R := V.Rotate(1.1);
+  AssertVector2DNear('receiver unchanged after Rotate', V0.X, V0.Y, V, 1e-15);
+  { V := V.Rotate(a) is an ordinary value assignment and is safe. }
+  V := V0;
+  V := V.Rotate(1.1);
+  AssertVector2DNear('self assignment produces the rotated value',
+    R.X, R.Y, V, 1e-15);
+  AssertVector2DNear('original variable still unchanged', V0.X, V0.Y, V0, 1e-15);
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_ZeroVector;
+var R: TVector2D;
+begin
+  R := TVector2D.Create(0, 0).Rotate(1.3);
+  AssertTrue('zero vector stays zero (X)', R.X = 0.0);
+  AssertTrue('zero vector stays zero (Y)', R.Y = 0.0);
+  R := TVector2D.Create(0, 0).Rotate(-2.9);
+  AssertTrue('zero vector stays zero under a negative angle (X)', R.X = 0.0);
+  AssertTrue('zero vector stays zero under a negative angle (Y)', R.Y = 0.0);
+end;
+
+procedure TTestGeometryLib.TestVector2D_Rotate_NonFinite;
+var
+  SavedMask: TFPUExceptionMask;
+  R: TVector2D;
+begin
+  SavedMask := GetExceptionMask;
+  SetExceptionMask([exInvalidOp, exDenormalized, exZeroDivide, exOverflow,
+    exUnderflow, exPrecision]);
+  try
+    R := TVector2D.Create(1, 0).Rotate(NaN);
+    AssertTrue('NaN angle yields NaN X', IsNan(R.X));
+    AssertTrue('NaN angle yields NaN Y', IsNan(R.Y));
+    R := TVector2D.Create(1, 0).Rotate(Infinity);
+    AssertTrue('infinite angle yields NaN X', IsNan(R.X));
+    AssertTrue('infinite angle yields NaN Y', IsNan(R.Y));
+    R := TVector2D.Create(NaN, 1).Rotate(0.5);
+    AssertTrue('NaN component propagates', IsNan(R.X) and IsNan(R.Y));
+  finally
+    SetExceptionMask(SavedMask);
+  end;
 end;
 
 procedure TTestGeometryLib.TestVector2D_ArithmeticOperators;

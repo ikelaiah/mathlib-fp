@@ -197,15 +197,21 @@ def deferral_errors(manifest: dict, capabilities: dict) -> list[str]:
 
 
 def roadmap_convergence_errors(roadmap: str) -> list[str]:
+    """Return errors when the roadmap omits the permanent 1.10.0 closure record."""
     errors: list[str] = []
-    if "## Previous release: 1.9.9" not in roadmap:
-        errors.append("Roadmap does not record 1.9.9 as the previous release")
-    if "## Next release: 1.10.0" not in roadmap:
-        errors.append("Roadmap does not name 1.10.0 as the next release")
-    scope_start = roadmap.find("## Next release: 1.10.0")
-    scope = roadmap[scope_start:] if scope_start >= 0 else ""
-    if "TVector2D.Rotate" not in scope:
-        errors.append("Roadmap 1.10.0 section does not declare TVector2D.Rotate")
+    # The 1.9.9 convergence gate is historical. Once 1.10.0 ships the roadmap
+    # advances to a 2.0.0-next posture, so this deliberately does not depend on
+    # the live "Previous release"/"Next release" headings. It only requires the
+    # roadmap to keep permanently recording the 1.9.9 handoff and the closed
+    # 1.10.0 accepted scope.
+    if "1.9.9" not in roadmap:
+        errors.append("Roadmap does not record the 1.9.9 convergence handoff")
+    if "1.10.0" not in roadmap:
+        errors.append("Roadmap does not record 1.10.0")
+    if "TVector2D.Rotate" not in roadmap:
+        errors.append(
+            "Roadmap does not record the closed 1.10.0 TVector2D.Rotate scope"
+        )
     return errors
 
 
@@ -280,8 +286,8 @@ def provenance_errors(audit: dict, unit_names: set[str]) -> list[str]:
 
 def capability_inventory_errors(capabilities: dict) -> list[str]:
     errors: list[str] = []
-    if capabilities.get("release") != "1.9.9":
-        errors.append("capabilities.json: release must be 1.9.9")
+    if capabilities.get("release") != "1.10.0":
+        errors.append("capabilities.json: release must be 1.10.0")
     if capabilities.get("convergence") != "docs/capability-manifest-1.10.0.json":
         errors.append("capabilities.json: missing convergence manifest reference")
     if capabilities.get("provenance_audit") != "docs/provenance-audit-1.9.9.json":

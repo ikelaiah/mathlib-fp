@@ -628,9 +628,9 @@
   "future_minor_capabilities": [
     {
       "release": "1.10.0",
-      "capability": "Ergonomic 2-D and 3-D vector rotation",
-      "reason": "The common geometry review still requires manual coordinate reconstruction; 3-D also needs an explicit choice among axis-angle, quaternion, and matrix semantics.",
-      "api_status": "A focused 1.10.0 design must choose the public names, orientation conventions, units, normalization rules, and contracts; 1.9.x adds no declaration."
+      "capability": "TVector2D.Rotate (2-D allocation-free rotation); 3-D rotation deferred beyond 2.0",
+      "reason": "The closed 1.10.0 capability manifest fixes the public name and contract for the 2-D operation: `TVector2D.Rotate(Angle)` rotates counter-clockwise by radians, is allocation-free and value-semantic, and preserves magnitude within a ~1e-15 relative tolerance. 3-D rotation still needs a decision among axis-angle, quaternion, and matrix semantics and is deferred beyond 2.0.",
+      "api_status": "Decided by the closed 1.9.9 manifest and implemented by 1.10.0; the 2-D contract (radians, counter-clockwise, value semantics, 1e-15 magnitude tolerance, zero-vector and non-finite behaviour) is fixed and covered by tests and documentation."
     }
   ]
 }
