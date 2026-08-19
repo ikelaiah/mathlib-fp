@@ -258,6 +258,9 @@ a comprehensive native Free Pascal numerical package.
   - [Tweaking4All Delphi, Lazarus, Free Pascal forum](https://www.tweaking4all.com/forum/delphi-lazarus-free-pascal/)
   - [Laz Planet - Blogspot](https://lazplanet.blogspot.com/) / [Laz Planet - GitLab](https://lazplanet.gitlab.io/)
   - [Delphi Basics](https://www.delphibasics.co.uk/index.html)
+- [rchastain2](https://github.com/rchastain2) for proposing
+  `TVector2D.Rotate` and providing the original working example in
+  [issue #18](https://github.com/ikelaiah/mathlib-fp/issues/18)
 - Everyone who has helped make this project better
 
 <sub>Originally extracted from <a href="https://github.com/ikelaiah/tidykit-fp">tidykit-fp</a>.</sub>

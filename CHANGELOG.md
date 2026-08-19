@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [GeometryLib reference](docs/GeometryLib.md) and extended the runnable
   [geometry example](examples/12_geometry.pas) with a rotation workflow whose
   output is now checked by the example-output gate.
+- Credit [rchastain2](https://github.com/rchastain2) for proposing
+  `TVector2D.Rotate` and providing the original example in issue #18.
 - Regenerated the [API reference](docs/API_REFERENCE_1.9.md) and snapshot to
   record the single `TVector2D.Rotate` addition, and recorded the now-decided
   2-D rotation contract in the 2.0-candidate decision and diff.
