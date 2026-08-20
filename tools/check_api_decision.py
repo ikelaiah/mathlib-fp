@@ -20,6 +20,7 @@ from api_decision import (
     selector_matches,
 )
 from check_doc_examples import is_runnable, pascal_fragments
+from docs_layout import DocumentationLayout, load_layout
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -51,6 +52,20 @@ def load_json(path: Path, errors: list[str]) -> dict[str, object]:
     except (OSError, ValueError) as exc:
         errors.append(f"{path.relative_to(ROOT)}: invalid JSON: {exc}")
         return {}
+
+
+def canonical_example_document(
+    document: Path, layout: DocumentationLayout
+) -> Path:
+    """Resolve a historical flat documentation path for evidence checks."""
+    try:
+        relative = document.relative_to(DOCS.name)
+    except ValueError:
+        return document
+    canonical = layout.canonical_path(relative.as_posix())
+    if canonical is None:
+        return document
+    return Path(DOCS.name) / canonical.relative_to(layout.root)
 
 
 def check_alias_reviews(
@@ -337,6 +352,7 @@ def check_decision(
 
     check_alias_reviews(decision, all_declarations, symbols, errors)
 
+    layout = load_layout(DOCS / "layout.json", DOCS)
     fragments = pascal_fragments(ROOT)
     implementation_names = {
         declaration["name"]
@@ -345,7 +361,7 @@ def check_decision(
         and declaration["owner"] is None
     }
     for path in paths:
-        document = Path(path["example_document"])
+        document = canonical_example_document(Path(path["example_document"]), layout)
         candidates = [
             fragment
             for fragment in fragments
