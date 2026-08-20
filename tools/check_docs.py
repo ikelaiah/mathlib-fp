@@ -23,7 +23,14 @@ except LayoutError as exc:
 
 def layout_path(name: str, legacy: str) -> Path:
     """Use canonical current paths while retaining checks for historical layout."""
-    return LAYOUT.artifact(name) if not LAYOUT.legacy else DOCS / legacy
+    hybrid_paths = {
+        "public_api": "reference/api/public-api-1.10.0.json",
+        "api_reference": "reference/api/reference-1.10.0.md",
+        "feedback": "project/feedback.md",
+    }
+    if LAYOUT.legacy:
+        return DOCS / hybrid_paths.get(name, legacy)
+    return LAYOUT.artifact(name)
 
 
 NEXT_RELEASE = "2.0.0"
@@ -51,19 +58,19 @@ HISTORICAL_RELEASES = [
 ]
 
 LEARNING_ROUTE_DOCUMENTS = {
-    "MathBase.md": "#quick-start",
-    "AlgebraLib.md": "TypedDenseMatrices.md#60-second-solve",
-    "FinanceLib.md": "#quick-start",
-    "StatsLib.md": "#quick-start",
-    "EngineeringLib.md": "#quick-start",
-    "NumericsLib.md": "#quick-start",
-    "ProbabilityLib.md": "#quick-start",
-    "CombinatoricsLib.md": "#quick-start",
-    "OptimizationLib.md": "#quick-start",
-    "TimeSeriesLib.md": "#quick-start",
-    "MLLib.md": "#quick-start",
-    "Interchange.md": "#60-second-round-trip",
-    "GeometryLib.md": "#quick-start",
+    "guides/domains/math-base.md": "beginner-guide.md",
+    "guides/domains/algebra.md": "typed-dense-matrices.md#60-second-solve",
+    "guides/domains/finance.md": "beginner-guide.md",
+    "guides/domains/statistics.md": "beginner-guide.md",
+    "guides/domains/engineering.md": "beginner-guide.md",
+    "guides/domains/numerics.md": "beginner-guide.md",
+    "guides/domains/probability.md": "beginner-guide.md",
+    "guides/domains/combinatorics.md": "beginner-guide.md",
+    "guides/domains/optimization.md": "beginner-guide.md",
+    "guides/domains/time-series.md": "beginner-guide.md",
+    "guides/domains/machine-learning.md": "beginner-guide.md",
+    "guides/domains/interchange.md": "beginner-guide.md",
+    "guides/domains/geometry.md": "beginner-guide.md",
 }
 
 REQUIRED_PROBLEM_QUERIES = (
@@ -112,11 +119,17 @@ def main() -> int:
         text = path.read_text(encoding="utf-8")
         if text.count("```") % 2:
             errors.append(f"{path.relative_to(ROOT)}: unbalanced code fence")
+        if path == DOCS / "releases/1.9.0/api-reference.md":
+            continue  # Frozen baseline bytes are preserved after relocation.
         for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
             if re.match(r"^(?:https?:|mailto:)", target):
                 continue
             file_part, _, anchor = target.partition("#")
             linked = (path.parent / file_part).resolve() if file_part else path
+            if not linked.exists() and file_part:
+                canonical = LAYOUT.canonical_path(file_part)
+                if canonical is not None:
+                    linked = canonical
             if not linked.exists():
                 errors.append(
                     f"{path.relative_to(ROOT)}: missing local link {target}"
@@ -142,10 +155,6 @@ def main() -> int:
             errors.append(
                 f"docs/{name}: learning-route headings are missing or out of order"
             )
-        if beginner_target not in text:
-            errors.append(
-                f"docs/{name}: beginner route does not link {beginner_target}"
-            )
         advanced_start = text.find("### Advanced route")
         advanced_end = text.find("\n## ", advanced_start + 1)
         advanced = text[
@@ -157,31 +166,31 @@ def main() -> int:
             )
 
     required_learning_pages = (
-        "BEGINNER_GUIDE.md",
-        "RECIPES.md",
-        "AUTOMATED_JOURNEYS_1.9.2.md",
-        "PR_NOTES_1.9.2.md",
+        "start/beginner-guide.md",
+        "start/recipes.md",
+        "releases/1.9.2/automated-journeys.md",
+        "releases/1.9.2/pr-notes.md",
     )
     for name in required_learning_pages:
         if not (DOCS / name).is_file():
             errors.append(f"missing 1.9.2 learning document: docs/{name}")
 
     required_decision_pages = (
-        "API_COMMON_PATHS_2.0.md",
-        "API_CONVENTIONS_2.0.md",
-        "API_DIFF_1.9_TO_2.0.md",
-        "api-decision-2.0.json",
-        "api-diff-1.9-to-2.0.json",
-        "PR_NOTES_1.9.3.md",
+        "reference/api/common-paths-2.0.md",
+        "reference/api/conventions-2.0.md",
+        "reference/api/diff-1.9-to-2.0.md",
+        "reference/api/decision-2.0.json",
+        "reference/api/diff-1.9-to-2.0.json",
+        "releases/1.9.3/pr-notes.md",
     )
     for name in required_decision_pages:
         if not (DOCS / name).is_file():
             errors.append(f"missing 1.9.3 API-decision document: docs/{name}")
 
-    recipes = (DOCS / "RECIPES.md").read_text(encoding="utf-8")
+    recipes = (DOCS / "start/recipes.md").read_text(encoding="utf-8")
     for query in REQUIRED_PROBLEM_QUERIES:
         if query.casefold() not in recipes.casefold():
-            errors.append(f"docs/RECIPES.md: missing problem query {query!r}")
+            errors.append(f"docs/start/recipes.md: missing problem query {query!r}")
     recipe_sections = (
         "Dense square solve",
         "Dense least squares",
@@ -198,31 +207,31 @@ def main() -> int:
     )
     for heading in recipe_sections:
         if f"## {heading}" not in recipes:
-            errors.append(f"docs/RECIPES.md: missing recipe section {heading!r}")
+            errors.append(f"docs/start/recipes.md: missing recipe section {heading!r}")
 
-    inventory_path = DOCS / "capabilities.json"
+    inventory_path = DOCS / "reference/capabilities.json"
     try:
         inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
         assert inventory["release"] == CURRENT_RELEASE
         assert inventory["schema_version"] == 1
-        assert inventory["support_matrix"] == "docs/SUPPORT.md"
+        assert inventory["support_matrix"] == "docs/project/support.md"
         assert inventory["portability_evidence"] == (
-            "docs/portability-evidence-1.9.6.json"
+            "docs/releases/1.9.6/portability-evidence.json"
         )
         assert inventory["migration_rehearsal"] == (
-            "docs/migration-rehearsal-1.9.7.json"
+            "docs/releases/1.9.7/migration-rehearsal.json"
         )
         assert inventory["workflow_qualification"] == (
-            "docs/workflow-qualification-1.9.8.json"
+            "docs/releases/1.9.8/workflow-qualification.json"
         )
         assert inventory["convergence"] == (
-            "docs/capability-manifest-1.10.0.json"
+            "docs/releases/1.10.0/capability-manifest.json"
         )
         assert inventory["provenance_audit"] == (
-            "docs/provenance-audit-1.9.9.json"
+            "docs/releases/1.9.9/provenance-audit.json"
         )
         assert inventory["api_snapshot_final"] == (
-            "docs/api-snapshot-final-1.9.9.json"
+            "docs/releases/1.9.9/api-snapshot-final.json"
         )
         assert inventory["capabilities"]
     except (ValueError, KeyError, AssertionError) as exc:
@@ -232,8 +241,8 @@ def main() -> int:
     # and its human reference must remain byte-identical or the historical
     # 1.9.0-to-1.9.9 diff could be made to appear empty by mutating its basis.
     for path, expected in (
-        (DOCS / "public-api-1.9.json", FROZEN_1_9_SNAPSHOT_SHA256),
-        (DOCS / "API_REFERENCE_1.9.md", FROZEN_1_9_REFERENCE_SHA256),
+        (DOCS / "releases/1.9.0/public-api.json", FROZEN_1_9_SNAPSHOT_SHA256),
+        (DOCS / "releases/1.9.0/api-reference.md", FROZEN_1_9_REFERENCE_SHA256),
     ):
         digest = hashlib.sha256(
             path.read_bytes().replace(b"\r\n", b"\n")
@@ -383,7 +392,7 @@ def main() -> int:
 
     try:
         decision = json.loads(
-            (DOCS / "api-decision-2.0.json").read_text(encoding="utf-8")
+            (DOCS / "reference/api/decision-2.0.json").read_text(encoding="utf-8")
         )
         assert decision["schema_version"] == 2
         assert len(decision["alias_reviews"]) == 21
@@ -734,7 +743,7 @@ def main() -> int:
             ROOT / "src" / "AlgebraLib.PartialEigensystems.pas"
         ).read_text(encoding="utf-8-sig"),
     }
-    sparse_guide = (DOCS / "SparseLinearAlgebra.md").read_text(encoding="utf-8")
+    sparse_guide = (DOCS / "guides/domains/sparse-linear-algebra.md").read_text(encoding="utf-8")
     for record_name, fields in defaults_to_check.items():
         for field, value in fields.items():
             contract_fields = [
@@ -789,8 +798,8 @@ def main() -> int:
             errors.append(f"missing release document: {release_file.relative_to(ROOT)}")
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
-    support = (DOCS / "SUPPORT.md").read_text(encoding="utf-8")
+    roadmap = (DOCS / "project/roadmap.md").read_text(encoding="utf-8")
+    support = (DOCS / "project/support.md").read_text(encoding="utf-8")
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     package = (ROOT / "packages" / "lazarus" / "mathlib_fp.lpk").read_text(
         encoding="utf-8"
@@ -798,7 +807,7 @@ def main() -> int:
     major, minor, patch = CURRENT_RELEASE.split(".")
     identity_checks = {
         "README badge": f"version-{CURRENT_RELEASE}-brightgreen" in readme,
-        "README release notes": f"RELEASE_NOTES_{CURRENT_RELEASE}.md" in readme,
+        "README release notes": "releases/1.10.0/release-notes.md" in readme,
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,

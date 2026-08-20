@@ -28,14 +28,14 @@
 > [!NOTE]
 > **1.10.0 is the current release; 1.2.0 was the first public release.** The
 > project follows semantic versioning; read the
-> [release notes](docs/RELEASE_NOTES_1.10.0.md), the checked
-> [convergence handoff](docs/CAPABILITY_MANIFEST_1.10.0.md), and the
+> [release notes](docs/releases/1.10.0/release-notes.md), the checked
+> [convergence handoff](docs/releases/1.10.0/capability-manifest.md), and the
 > [changelog](CHANGELOG.md) when upgrading.
 
 ## 🚀 Quick start
 
-See the [cheatsheet](docs/CHEATSHEET.md) for one canonical entry point per
-domain, or the [task index](docs/TOP_TASKS.md) for five common tasks per
+See the [cheatsheet](docs/start/cheatsheet.md) for one canonical entry point per
+domain, or the [task index](docs/guides/tasks.md) for five common tasks per
 domain.
 
 Get the source directly with git:
@@ -178,31 +178,31 @@ calculation and expand from there.
 
 | Domain (unit family) | Highlights | Runnable example |
 | --- | --- | --- |
-| [MathBase](docs/MathBase.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange | [Constants, precision, and trigonometry](examples/00_getting_started.pas) |
-| [AlgebraLib](docs/AlgebraLib.md) | Compatibility matrices, [typed dense storage/solvers](docs/DenseLinearAlgebra.md), and [structured/sparse/matrix-free solvers](docs/SparseLinearAlgebra.md) | [Matrix arithmetic and decompositions](examples/03_matrix_operations.pas) |
-| [FinanceLib](docs/FinanceLib.md) | TVM, bonds, NPV/IRR, options, risk metrics | [NPV and IRR](examples/04_finance_npv_irr.pas) |
-| [StatsLib](docs/StatsLib.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap | [Descriptive statistics](examples/01_stats_basics.pas) |
-| [EngineeringLib](docs/EngineeringLib.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion | [Type-safe unit conversion](examples/05_unit_conversion.pas) |
-| [NumericsLib](docs/NumericsLib.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs | [Roots, integration, and ODEs](examples/13_numerical_methods.pas) |
-| [ProbabilityLib](docs/ProbabilityLib.md) | Continuous and discrete distributions | [Common distributions](examples/07_probability.pas) |
-| [CombinatoricsLib](docs/CombinatoricsLib.md) | Counting, sequences, number theory, permutations | [Counting and permutations](examples/08_combinatorics.pas) |
-| [OptimizationLib](docs/OptimizationLib.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP | [Optimisation and linear programming](examples/09_optimization.pas) |
-| [TimeSeriesLib](docs/TimeSeriesLib.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering | [Smoothing and forecasting](examples/10_timeseries.pas) |
-| [MLLib](docs/MLLib.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours | [Models, clustering, and metrics](examples/11_machinelearning.pas) |
-| [InterchangeLib](docs/Interchange.md) | Versioned persistence for selected fitted models and numerical state | [Save, load, and replay](examples/20_interchange_replay.pas) |
-| [GeometryLib](docs/GeometryLib.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms | [Intersections, hulls, and transforms](examples/12_geometry.pas) |
+| [MathBase](docs/guides/domains/math-base.md) | Shared types, constants, precision, local RNG state, bounded expressions, and numerical interchange | [Constants, precision, and trigonometry](examples/00_getting_started.pas) |
+| [AlgebraLib](docs/guides/domains/algebra.md) | Compatibility matrices, [typed dense storage/solvers](docs/guides/domains/dense-linear-algebra.md), and [structured/sparse/matrix-free solvers](docs/guides/domains/sparse-linear-algebra.md) | [Matrix arithmetic and decompositions](examples/03_matrix_operations.pas) |
+| [FinanceLib](docs/guides/domains/finance.md) | TVM, bonds, NPV/IRR, options, risk metrics | [NPV and IRR](examples/04_finance_npv_irr.pas) |
+| [StatsLib](docs/guides/domains/statistics.md) | Descriptive/streaming statistics, paired distributions, inference, regression diagnostics, and bootstrap | [Descriptive statistics](examples/01_stats_basics.pas) |
+| [EngineeringLib](docs/guides/domains/engineering.md) | Fluids, thermodynamics, batch/block DSP, and unit conversion | [Type-safe unit conversion](examples/05_unit_conversion.pas) |
+| [NumericsLib](docs/guides/domains/numerics.md) | Roots, interpolation, fitting, differentiation, adaptive integration and ODEs | [Roots, integration, and ODEs](examples/13_numerical_methods.pas) |
+| [ProbabilityLib](docs/guides/domains/probability.md) | Continuous and discrete distributions | [Common distributions](examples/07_probability.pas) |
+| [CombinatoricsLib](docs/guides/domains/combinatorics.md) | Counting, sequences, number theory, permutations | [Counting and permutations](examples/08_combinatorics.pas) |
+| [OptimizationLib](docs/guides/domains/optimization.md) | Diagnostic scalar/multivariate/constrained optimisation, two-phase LP, dense convex QP and SOCP | [Optimisation and linear programming](examples/09_optimization.pas) |
+| [TimeSeriesLib](docs/guides/domains/time-series.md) | Smoothing, decomposition, ARIMA, anomaly detection, and scalar/multivariate Kalman filtering | [Smoothing and forecasting](examples/10_timeseries.pas) |
+| [MLLib](docs/guides/domains/machine-learning.md) | Leakage-safe preprocessing, regression/classification, typed clustering/PCA/LDA/forests, and exact neighbours | [Models, clustering, and metrics](examples/11_machinelearning.pas) |
+| [InterchangeLib](docs/guides/domains/interchange.md) | Versioned persistence for selected fitted models and numerical state | [Save, load, and replay](examples/20_interchange_replay.pas) |
+| [GeometryLib](docs/guides/domains/geometry.md) | 2-D/3-D geometry, vector arithmetic, and scale-safe norms | [Intersections, hulls, and transforms](examples/12_geometry.pas) |
 
 All public units live in `src/`; the domains can be used independently unless
 their documentation says otherwise. See the
-[terminology and API naming inventory](docs/index.md#terminology) for the
+[API conventions and reference material](docs/reference/index.md) for the
 difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
 The [`examples/`](examples/) directory contains 27 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
-[beginner guide](docs/BEGINNER_GUIDE.md), choose a short task from the
-[beginner recipes](docs/RECIPES.md), or follow the
+[beginner guide](docs/start/beginner-guide.md), choose a short task from the
+[beginner recipes](docs/start/recipes.md), or follow the
 [example index and suggested learning path](examples/README.md). Compile one in
 seconds:
 
@@ -217,7 +217,7 @@ On Windows, run the generated `.exe` instead. Start with the
 [versioned web documentation](https://ikelaiah.github.io/mathlib-fp/) or the
 [repository documentation index](docs/index.md) for offline use. The release
 page also provides the generated offline HTML archive and its SHA-256 checksum.
-See the [support matrix](docs/SUPPORT.md) for exact qualified targets, evidence
+See the [support matrix](docs/project/support.md) for exact qualified targets, evidence
 dates, offline installation, ABI differences, and explicitly unqualified
 platforms.
 
@@ -229,7 +229,7 @@ options.
 ## 🤝 Contributing
 
 Bug reports and pull requests are welcome. For first-use friction, use the
-[focused 1.9 feedback route](docs/FEEDBACK.md). See
+[focused 1.9 feedback route](docs/project/feedback.md). See
 [CONTRIBUTING.md](CONTRIBUTING.md) to get started, or run the full test suite locally:
 
 ```bash
@@ -240,7 +240,7 @@ fpc -Fu../src -FUlib TestRunner.lpr
 ```
 
 Maintainers preparing a distribution should follow the [release checklist](RELEASING.md).
-The [project roadmap](docs/ROADMAP.md) describes the quality-first path toward
+The [project roadmap](docs/project/roadmap.md) describes the quality-first path toward
 a comprehensive native Free Pascal numerical package.
 
 ## 📄 License

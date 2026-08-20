@@ -400,9 +400,9 @@ def check_diff(diff: dict[str, object], decision: dict[str, object], errors: lis
 
 def main() -> int:
     errors: list[str] = []
-    decision = load_json(DOCS / "api-decision-2.0.json", errors)
-    snapshot = load_json(DOCS / "public-api-1.9.json", errors)
-    diff = load_json(DOCS / "api-diff-1.9-to-2.0.json", errors)
+    decision = load_json(DOCS / "reference/api/decision-2.0.json", errors)
+    snapshot = load_json(DOCS / "releases/1.9.0/public-api.json", errors)
+    diff = load_json(DOCS / "reference/api/diff-1.9-to-2.0.json", errors)
     if not errors:
         try:
             assert snapshot["schema_version"] == 3

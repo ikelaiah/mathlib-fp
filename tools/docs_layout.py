@@ -27,6 +27,7 @@ class DocumentationLayout:
     release: str
     artifacts: dict[str, Path]
     aliases: dict[str, str]
+    legacy_paths: dict[str, str] = None  # type: ignore[assignment]
     legacy: bool = False
 
     def artifact(self, name: str) -> Path:
@@ -37,6 +38,23 @@ class DocumentationLayout:
 
     def release_notes(self) -> Path:
         return self.artifact("release_notes")
+
+    def canonical_path(self, relative: str) -> Path | None:
+        """Map a former flat evidence path to its canonical source path."""
+        name = Path(relative).name
+        target = (
+            self.aliases.get(relative) or self.aliases.get(name)
+            or (self.legacy_paths or {}).get(relative)
+            or (self.legacy_paths or {}).get(name)
+        )
+        if target:
+            return self.root / target
+        match = re.fullmatch(r"(RELEASE_NOTES|PR_NOTES|QUALIFICATION|WORKFLOW_QUALIFICATION)_(\d+\.\d+\.\d+)\.md", name)
+        if match:
+            slug = {"RELEASE_NOTES": "release-notes", "PR_NOTES": "pr-notes", "QUALIFICATION": "qualification", "WORKFLOW_QUALIFICATION": "workflow-qualification"}[match.group(1)]
+            candidate = self.root / "releases" / match.group(2) / f"{slug}.md"
+            return candidate if candidate.is_file() else None
+        return None
 
 
 def legacy_layout(root: Path, release: str) -> DocumentationLayout:
@@ -49,7 +67,7 @@ def legacy_layout(root: Path, release: str) -> DocumentationLayout:
             "qualification": Path(f"QUALIFICATION_{release}.md"),
             "workflow_qualification": Path(f"WORKFLOW_QUALIFICATION_{release}.md"),
         },
-        aliases={},
+        aliases={}, legacy_paths={},
         legacy=True,
     )
 
@@ -97,4 +115,14 @@ def load_layout(path: Path, root: Path, release: str | None = None) -> Documenta
         aliases[old_path.as_posix()] = new_path.as_posix()
     if len(aliases) != len(raw_aliases):
         raise LayoutError(f"{path}: duplicate alias source")
-    return DocumentationLayout(root, declared_release, artifacts, aliases)
+    raw_legacy = data.get("legacy_paths", {})
+    if not isinstance(raw_legacy, dict):
+        raise LayoutError(f"{path}: legacy_paths must be an object")
+    legacy_paths = {}
+    for old, new in raw_legacy.items():
+        old_path = _relative(old, "legacy path source")
+        new_path = _relative(new, "legacy path target")
+        if not (root / new_path).is_file():
+            raise LayoutError(f"{path}: legacy path target does not exist: {new_path}")
+        legacy_paths[old_path.as_posix()] = new_path.as_posix()
+    return DocumentationLayout(root, declared_release, artifacts, aliases, legacy_paths)

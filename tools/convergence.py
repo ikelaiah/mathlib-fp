@@ -244,7 +244,7 @@ def policy_errors() -> list[str]:
     governance = (DOCS / "GOVERNANCE.md").read_text(encoding="utf-8")
     for section in REQUIRED_POLICY_SECTIONS:
         if section not in governance:
-            errors.append(f"docs/GOVERNANCE.md: missing section {section}")
+            errors.append(f"docs/project/governance.md: missing section {section}")
     security = (ROOT / "SECURITY.md").read_text(encoding="utf-8")
     if "## Security Support Window" not in security:
         errors.append("SECURITY.md: missing Security Support Window section")

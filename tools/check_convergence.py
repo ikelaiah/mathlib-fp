@@ -70,7 +70,7 @@ def main() -> int:
         errors.append(f"provenance audit cannot be read: {exc}")
 
     errors.extend(policy_errors())
-    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
+    roadmap = (DOCS / "project/roadmap.md").read_text(encoding="utf-8")
     errors.extend(roadmap_convergence_errors(roadmap))
 
     if errors:

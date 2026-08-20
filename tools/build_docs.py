@@ -347,6 +347,18 @@ def page_link_resolver(
             return target
         file_part, separator, anchor = target.partition("#")
         candidate = (markdown_path.parent / file_part).resolve()
+        # The 1.9 API reference is immutable evidence. Its source links retain
+        # their former flat-docs base and are resolved without rewriting bytes.
+        if (
+            markdown_path == source / "releases/1.9.0/api-reference.md"
+            and file_part.startswith("../")
+        ):
+            candidate = (source / file_part).resolve()
+        if not candidate.exists():
+            layout = load_layout(source / "layout.json", source, release)
+            canonical = layout.canonical_path(file_part)
+            if canonical is not None:
+                candidate = canonical
         try:
             relative_document = candidate.relative_to(source)
         except ValueError:

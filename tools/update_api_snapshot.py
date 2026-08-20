@@ -3,7 +3,7 @@
 
 The tool writes a versioned public-API snapshot and human reference for the
 current `src/` interfaces. The historical 1.9 baseline
-(`docs/public-api-1.9.json` + `docs/API_REFERENCE_1.9.md`) is immutable and is
+(`docs/public-api-1.9.json` + `docs/releases/1.9.0/api-reference.md`) is immutable and is
 never regenerated here; the current release (default reads `VERSION`) is
 written to its own `public-api-<release>.json` + `API_REFERENCE_<release>.md`
 files."""
