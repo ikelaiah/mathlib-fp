@@ -6,13 +6,20 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from docs_layout import load_layout
+
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
 
-MANIFEST_PATH = DOCS / "capability-manifest-1.10.0.json"
-SNAPSHOT_FINAL_PATH = DOCS / "api-snapshot-final-1.9.9.json"
-PROVENANCE_PATH = DOCS / "provenance-audit-1.9.9.json"
-DECISION_PATH = DOCS / "api-decision-2.0.json"
+MANIFEST_PATH = LAYOUT.artifact("capability_manifest_json")
+SNAPSHOT_FINAL_PATH = LAYOUT.canonical_path("api-snapshot-final-1.9.9.json")
+PROVENANCE_PATH = LAYOUT.canonical_path("provenance-audit-1.9.9.json")
+DECISION_PATH = LAYOUT.canonical_path("api-decision-2.0.json")
+assert SNAPSHOT_FINAL_PATH is not None
+assert PROVENANCE_PATH is not None
+assert DECISION_PATH is not None
+CAPABILITIES_PATH = LAYOUT.artifact("capabilities_json")
 
 EXPECTED_ROTATE_SIGNATURE = "function Rotate(const Angle: Double): TVector2D"
 
@@ -26,10 +33,10 @@ REQUIRED_POLICY_SECTIONS = (
 )
 
 REQUIRED_HUMAN_DOCUMENTS = (
-    "CAPABILITY_MANIFEST_1.10.0.md",
-    "API_SNAPSHOT_FINAL_1.9.9.md",
-    "GOVERNANCE.md",
-    "PROVENANCE_AUDIT_1.9.9.md",
+    LAYOUT.artifact("capability_manifest"),
+    SNAPSHOT_FINAL_PATH.with_suffix(".md"),
+    LAYOUT.artifact("governance"),
+    PROVENANCE_PATH.with_suffix(".md"),
 )
 
 REQUIRED_ALIAS_RETENTIONS = (
@@ -238,10 +245,13 @@ def snapshot_final_errors(snapshot: dict) -> list[str]:
 
 def policy_errors() -> list[str]:
     errors: list[str] = []
-    for name in REQUIRED_HUMAN_DOCUMENTS:
-        if not (DOCS / name).is_file():
-            errors.append(f"missing 1.9.9 convergence document: docs/{name}")
-    governance = (DOCS / "GOVERNANCE.md").read_text(encoding="utf-8")
+    for path in REQUIRED_HUMAN_DOCUMENTS:
+        if not path.is_file():
+            errors.append(
+                "missing 1.9.9 convergence document: "
+                f"{path.relative_to(ROOT).as_posix()}"
+            )
+    governance = LAYOUT.artifact("governance").read_text(encoding="utf-8")
     for section in REQUIRED_POLICY_SECTIONS:
         if section not in governance:
             errors.append(f"docs/project/governance.md: missing section {section}")
@@ -288,10 +298,10 @@ def capability_inventory_errors(capabilities: dict) -> list[str]:
     errors: list[str] = []
     if capabilities.get("release") != "1.10.0":
         errors.append("capabilities.json: release must be 1.10.0")
-    if capabilities.get("convergence") != "docs/capability-manifest-1.10.0.json":
+    if capabilities.get("convergence") != "docs/releases/1.10.0/capability-manifest.json":
         errors.append("capabilities.json: missing convergence manifest reference")
-    if capabilities.get("provenance_audit") != "docs/provenance-audit-1.9.9.json":
+    if capabilities.get("provenance_audit") != "docs/releases/1.9.9/provenance-audit.json":
         errors.append("capabilities.json: missing provenance audit reference")
-    if capabilities.get("api_snapshot_final") != "docs/api-snapshot-final-1.9.9.json":
+    if capabilities.get("api_snapshot_final") != "docs/releases/1.9.9/api-snapshot-final.json":
         errors.append("capabilities.json: missing final snapshot reference")
     return errors

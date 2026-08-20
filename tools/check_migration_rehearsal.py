@@ -18,10 +18,14 @@ from migration_rehearsal import (
     validate_consumer_output,
     validate_package_boundary,
 )
+from docs_layout import load_layout
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MANIFEST = ROOT / "docs" / "migration-rehearsal-1.9.7.json"
+DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
+DEFAULT_MANIFEST = LAYOUT.canonical_path("migration-rehearsal-1.9.7.json")
+assert DEFAULT_MANIFEST is not None
 PACKAGE = ROOT / "packages" / "lazarus" / "mathlib_fp.lpk"
 ALIAS_CONSUMER = (
     ROOT / "examples" / "migration" / "package_boundary" / "alias_boundary.lpr"

@@ -14,9 +14,14 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any, Mapping
 
+from docs_layout import load_layout
+
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MANIFEST = ROOT / "docs" / "portability-evidence-1.9.6.json"
+DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
+DEFAULT_MANIFEST = LAYOUT.canonical_path("portability-evidence-1.9.6.json")
+assert DEFAULT_MANIFEST is not None
 DEFAULT_WORK = ROOT / "build-temp" / "portability-evidence"
 INTEGER_FIELDS = {
     "pointer_bits",

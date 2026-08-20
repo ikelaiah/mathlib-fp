@@ -15,8 +15,11 @@ import json
 import sys
 from pathlib import Path
 
+from docs_layout import load_layout
+
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
 
 CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 NEXT_RELEASE = "2.0.0"
@@ -25,7 +28,7 @@ NEXT_RELEASE = "2.0.0"
 def main() -> int:
     errors: list[str] = []
 
-    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
+    roadmap = LAYOUT.artifact("roadmap").read_text(encoding="utf-8")
     if f"## Previous release: {CURRENT_RELEASE}" not in roadmap:
         errors.append(
             f"Roadmap does not record {CURRENT_RELEASE} as the previous release"
@@ -33,7 +36,7 @@ def main() -> int:
     if f"## Next release: {NEXT_RELEASE}" not in roadmap:
         errors.append(f"Roadmap does not name {NEXT_RELEASE} as the next release")
 
-    snapshot_path = DOCS / f"public-api-{CURRENT_RELEASE}.json"
+    snapshot_path = LAYOUT.artifact("public_api")
     try:
         snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
         rotate = any(

@@ -393,9 +393,9 @@ class CapabilityInventoryTests(unittest.TestCase):
     def test_accepts_complete_inventory(self) -> None:
         capabilities = {
             "release": "1.10.0",
-            "convergence": "docs/capability-manifest-1.10.0.json",
-            "provenance_audit": "docs/provenance-audit-1.9.9.json",
-            "api_snapshot_final": "docs/api-snapshot-final-1.9.9.json",
+            "convergence": "docs/releases/1.10.0/capability-manifest.json",
+            "provenance_audit": "docs/releases/1.9.9/provenance-audit.json",
+            "api_snapshot_final": "docs/releases/1.9.9/api-snapshot-final.json",
         }
 
         self.assertEqual([], capability_inventory_errors(capabilities))

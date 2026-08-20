@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release": "1.9.4",
-  "inventory": "docs/capabilities.json",
+  "inventory": "docs/reference/capabilities.json",
   "inventory_release": "1.9.4",
   "families": [
     {
@@ -48,7 +48,7 @@
           "test": "tests/TestMathBase.pas"
         }
       ],
-      "documentation": "docs/MathBase.md"
+      "documentation": "docs/guides/domains/math-base.md"
     },
     {
       "family": "small_dense_value_arithmetic",
@@ -85,7 +85,7 @@
         "batch iteration preserves value records",
         "complex real and imaginary components are checked separately"
       ],
-      "documentation": "docs/TypedDenseMatrices.md"
+      "documentation": "docs/guides/domains/typed-dense-matrices.md"
     },
     {
       "family": "typed_dense_storage",
@@ -122,7 +122,7 @@
         "empty shapes are valid where documented",
         "views retain explicit stride and alias semantics"
       ],
-      "documentation": "docs/TypedDenseMatrices.md"
+      "documentation": "docs/guides/domains/typed-dense-matrices.md"
     },
     {
       "family": "typed_dense_kernels",
@@ -158,7 +158,7 @@
         "mixed extreme finite scales remain representable in the published fixture",
         "non-finite input is outside the stable kernel contract"
       ],
-      "documentation": "docs/TypedDenseMatrices.md"
+      "documentation": "docs/guides/domains/typed-dense-matrices.md"
     },
     {
       "family": "typed_direct_solve",
@@ -211,7 +211,7 @@
           "test": "tests/TestDenseMatrices.pas"
         }
       ],
-      "documentation": "docs/DenseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
     },
     {
       "family": "typed_triangular_solve",
@@ -247,7 +247,7 @@
         "transpose and conjugate-transpose operations are explicit",
         "numerically zero non-unit diagonals are rejected"
       ],
-      "documentation": "docs/DenseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
     },
     {
       "family": "typed_qr_least_squares",
@@ -284,7 +284,7 @@
         "wide QR is rejected with SVD guidance",
         "empty and singleton factors have explicit behavior"
       ],
-      "documentation": "docs/DenseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
     },
     {
       "family": "typed_compact_svd_minimum_norm",
@@ -321,7 +321,7 @@
         "non-finite SVD input is rejected",
         "rank-deficient solving remains a documented minimum-norm operation"
       ],
-      "documentation": "docs/DenseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
     },
     {
       "family": "typed_symmetric_hermitian_eigensystem",
@@ -358,7 +358,7 @@
         "tiny finite scales retain the tested eigenvalues",
         "nonsymmetric and non-finite input is rejected"
       ],
-      "documentation": "docs/DenseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
     },
     {
       "family": "typed_sparse_linear_algebra",
@@ -395,7 +395,7 @@
         "stored-zero policy is enforced",
         "malformed construction is failure-atomic"
       ],
-      "documentation": "docs/SparseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/sparse-linear-algebra.md"
     },
     {
       "family": "typed_iterative_matrix_free_linear_algebra",
@@ -432,7 +432,7 @@
         "breakdown, iteration limits, and cancellation report statuses",
         "alias rejection leaves caller storage unchanged"
       ],
-      "documentation": "docs/SparseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/sparse-linear-algebra.md"
     },
     {
       "family": "typed_structured_and_sparse_direct_solve",
@@ -469,7 +469,7 @@
         "singular sparse construction is rejected",
         "in-place solves and multiple right-hand sides are explicit"
       ],
-      "documentation": "docs/SparseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/sparse-linear-algebra.md"
     },
     {
       "family": "typed_partial_spectral_linear_algebra",
@@ -506,7 +506,7 @@
         "non-square shapes and invalid requested counts are rejected",
         "single-complex coverage uses its wider documented budget"
       ],
-      "documentation": "docs/SparseLinearAlgebra.md"
+      "documentation": "docs/guides/domains/sparse-linear-algebra.md"
     },
     {
       "family": "interpolation_and_approximation",
@@ -535,7 +535,7 @@
         }
       ],
       "edge_cases": ["evaluation clamps outside documented knot ranges", "duplicate scattered nodes are rejected", "dense scattered methods target small data"],
-      "documentation": "docs/NumericalModelling.md"
+      "documentation": "docs/guides/domains/numerical-modelling.md"
     },
     {
       "family": "differentiation_and_derivative_checking",
@@ -564,7 +564,7 @@
         }
       ],
       "edge_cases": ["complex-step callbacks must preserve the imaginary perturbation", "forward dual mode is explicit", "bad derivative callbacks have explicit validation"],
-      "documentation": "docs/NumericalModelling.md"
+      "documentation": "docs/guides/domains/numerical-modelling.md"
     },
     {
       "family": "numerical_modelling",
@@ -593,7 +593,7 @@
         }
       ],
       "edge_cases": ["non-finite Monte Carlo callbacks raise", "subdivision limits report status", "non-stiff explicit ODE scope is retained"],
-      "documentation": "docs/NumericalModelling.md"
+      "documentation": "docs/guides/domains/numerical-modelling.md"
     },
     {
       "family": "diagnostic_nonlinear_and_linear_optimization",
@@ -622,7 +622,7 @@
         }
       ],
       "edge_cases": ["local smooth solvers do not claim global optimality", "iteration exhaustion is explicit", "infeasible and unbounded LP outcomes are distinct"],
-      "documentation": "docs/OptimizationLib.md"
+      "documentation": "docs/guides/domains/optimization.md"
     },
     {
       "family": "dense_convex_optimization",
@@ -651,7 +651,7 @@
         }
       ],
       "edge_cases": ["SOCP requires a strictly feasible start", "unbounded QP certificates are limited to documented recession directions", "general cone infeasibility certificates are unsupported"],
-      "documentation": "docs/ConvexOptimization.md"
+      "documentation": "docs/guides/domains/convex-optimization.md"
     },
     {
       "family": "shared_iteration_diagnostics",
@@ -680,7 +680,7 @@
         }
       ],
       "edge_cases": ["only statuses applicable to a mathematical method are reported", "status text is stable release evidence", "numerical breakdown is distinct from iteration limit"],
-      "documentation": "docs/NumericalModelling.md"
+      "documentation": "docs/guides/domains/numerical-modelling.md"
     },
     {
       "family": "explicit_local_random_state",
@@ -709,7 +709,7 @@
         }
       ],
       "edge_cases": ["all-zero state is invalid", "generator state is local rather than RTL-global", "the generator is not cryptographic"],
-      "documentation": "docs/AppliedNumerics.md"
+      "documentation": "docs/guides/domains/applied-numerics.md"
     },
     {
       "family": "streaming_descriptive_statistics",
@@ -738,7 +738,7 @@
         }
       ],
       "edge_cases": ["non-finite inputs may be ignored or rejected explicitly", "weight and moment overflow are failure-atomic", "moments stop at variance"],
-      "documentation": "docs/AppliedNumerics.md"
+      "documentation": "docs/guides/domains/applied-numerics.md"
     },
     {
       "family": "applied_dsp",
@@ -776,7 +776,7 @@
           "test": "tests/TestAppliedNumerics.pas"
         }
       ],
-      "documentation": "docs/AppliedNumerics.md"
+      "documentation": "docs/guides/domains/applied-numerics.md"
     },
     {
       "family": "typed_data_analysis",
@@ -805,7 +805,7 @@
         }
       ],
       "edge_cases": ["non-finite features are rejected", "dense in-memory double scope is retained", "impurity importance bias remains documented"],
-      "documentation": "docs/AppliedNumerics.md"
+      "documentation": "docs/guides/domains/applied-numerics.md"
     },
     {
       "family": "linear_gaussian_state_space",
@@ -834,7 +834,7 @@
         }
       ],
       "edge_cases": ["non-finite observations are rejected without state mutation", "forecast uncertainty does not shrink without measurements", "missing data and smoothing are unsupported"],
-      "documentation": "docs/AppliedNumerics.md"
+      "documentation": "docs/guides/domains/applied-numerics.md"
     },
     {
       "family": "numerical_interchange",
@@ -868,7 +868,7 @@
         }
       ],
       "edge_cases": ["CRC, version, kind, shape, payload length, and caps are checked before return", "binary format is documented little-endian version 1", "non-finite numeric payloads are rejected"],
-      "documentation": "docs/Interchange.md"
+      "documentation": "docs/guides/domains/interchange.md"
     },
     {
       "family": "statistical_inference_and_regression",
@@ -897,7 +897,7 @@
         }
       ],
       "edge_cases": ["approximate p-values remain documented as portable approximations", "rank deficiency yields explicit diagnostics", "separated logistic data has explicit non-identifiable status"],
-      "documentation": "docs/StatsLib.md"
+      "documentation": "docs/guides/domains/statistics.md"
     },
     {
       "family": "selected_model_persistence",
@@ -926,7 +926,7 @@
         }
       ],
       "edge_cases": ["failed loads preserve caller values", "only selected model classes are persisted", "decompositions, forests, arbitrary graphs, and multivariate Kalman remain unsupported"],
-      "documentation": "docs/Interchange.md"
+      "documentation": "docs/guides/domains/interchange.md"
     },
     {
       "family": "bounded_mathematical_expressions",
@@ -955,7 +955,7 @@
         }
       ],
       "edge_cases": ["assignment is not part of the expression language", "depth and operation limits are enforced", "non-finite results are rejected"],
-      "documentation": "docs/Interchange.md"
+      "documentation": "docs/guides/domains/interchange.md"
     }
   ]
 }

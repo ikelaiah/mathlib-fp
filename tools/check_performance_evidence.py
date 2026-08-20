@@ -14,9 +14,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from docs_layout import load_layout
+
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MANIFEST = ROOT / "docs" / "performance-evidence-1.9.5.json"
+DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
+DEFAULT_MANIFEST = LAYOUT.canonical_path("performance-evidence-1.9.5.json")
+assert DEFAULT_MANIFEST is not None
 DEFAULT_WORK = ROOT / "build-temp" / "performance-evidence"
 INTEGER_FIELDS = {
     "cold_ms",
