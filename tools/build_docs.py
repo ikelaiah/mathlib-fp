@@ -14,6 +14,8 @@ import zipfile
 from pathlib import Path
 from urllib.parse import quote
 
+from docs_layout import DocumentationLayout, load_layout
+
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_VERSIONS = ROOT / "docs" / "versions.json"
@@ -107,6 +109,21 @@ hidden></div>
 </main></div>
 <script src="{safe_root}search-index.js"></script>
 <script src="{safe_root}assets/search.js"></script></body></html>"""
+
+
+def render_redirect_page(*, target: str, release: str) -> str:
+    """Render an accessible legacy URL redirect without adding a search entry."""
+    safe_target = html.escape(target, quote=True)
+    safe_release = html.escape(release, quote=True)
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="mathlib-release" content="{safe_release}">
+<meta http-equiv="refresh" content="0; url={safe_target}">
+<link rel="canonical" href="{safe_target}"><title>Moved documentation</title>
+</head><body><main><h1>Moved documentation</h1>
+<p>This page moved to <a href="{safe_target}">its canonical location</a>.</p>
+</main><script>location.replace({json.dumps(target)} + location.hash);</script></body></html>"""
 
 
 def inline(text: str, link_resolver=None) -> str:
@@ -495,7 +512,8 @@ def main() -> int:
     known = {str(item["release"]) for item in versions["versions"]}
     if release not in known:
         raise ValueError(f"release {release} is absent from {args.versions}")
-    if not (source / f"RELEASE_NOTES_{release}.md").is_file():
+    layout: DocumentationLayout = load_layout(source / "layout.json", source, release)
+    if not layout.release_notes().is_file():
         raise ValueError(
             f"{source}: release identity {release} has no matching release notes"
         )
@@ -540,6 +558,17 @@ def main() -> int:
             }
         )
 
+    for legacy, canonical in layout.aliases.items():
+        target = output / Path(canonical).with_suffix(".html")
+        redirect = output / Path(legacy).with_suffix(".html")
+        redirect.parent.mkdir(parents=True, exist_ok=True)
+        redirect.write_text(
+            render_redirect_page(
+                target=relative_url(redirect.parent, target), release=release
+            ),
+            encoding="utf-8",
+        )
+
     assets = output / "assets"
     assets.mkdir(exist_ok=True)
     (assets / "site.css").write_text(
@@ -565,6 +594,7 @@ def main() -> int:
                 "release": release,
                 "source_ref": source_ref,
                 "page_count": len(entries),
+                "aliases": layout.aliases,
             },
             indent=2,
         ) + "\n",

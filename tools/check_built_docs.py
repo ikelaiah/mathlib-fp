@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
+from functools import lru_cache
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -45,10 +47,16 @@ class PageParser(HTMLParser):
             self.releases.append(str(values["content"]))
 
 
-def parse_page(path: Path) -> PageParser:
+@lru_cache(maxsize=None)
+def _parse_page(path: Path, modified_ns: int) -> PageParser:
     parser = PageParser()
     parser.feed(path.read_text(encoding="utf-8"))
     return parser
+
+
+def parse_page(path: Path) -> PageParser:
+    """Reuse parsed linked pages while respecting files rewritten during tests."""
+    return _parse_page(path, path.stat().st_mtime_ns)
 
 
 def validate_page(page: Path, root: Path, expected_release: str) -> list[str]:
@@ -111,6 +119,30 @@ def check_search_index(
     return errors
 
 
+def check_redirects(directory: Path, aliases: dict[str, str]) -> list[str]:
+    """Ensure legacy aliases remain local redirects and never become search hits."""
+    errors: list[str] = []
+    try:
+        entries = json.loads((directory / "search-index.json").read_text(encoding="utf-8"))
+        indexed = {entry["url"] for entry in entries}
+    except (OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
+        return [f"{directory}: cannot validate redirects without search index: {exc}"]
+    for legacy, canonical in aliases.items():
+        redirect = directory / Path(legacy).with_suffix(".html")
+        target = directory / Path(canonical).with_suffix(".html")
+        if not redirect.is_file():
+            errors.append(f"{redirect}: missing alias redirect")
+            continue
+        if not target.is_file():
+            errors.append(f"{redirect}: canonical target is missing: {canonical}")
+        href = os.path.relpath(target, redirect.parent).replace(os.sep, "/")
+        if href not in redirect.read_text(encoding="utf-8"):
+            errors.append(f"{redirect}: does not link to {canonical}")
+        if redirect.relative_to(directory).as_posix() in indexed:
+            errors.append(f"{redirect}: alias must not be indexed")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--site", type=Path, required=True)
@@ -147,6 +179,9 @@ def main() -> int:
                 identity = json.loads(release_path.read_text(encoding="utf-8"))
                 if identity["release"] != release or not identity.get("source_ref"):
                     raise ValueError("release/source_ref identity mismatch")
+                aliases = identity.get("aliases", {})
+                if not isinstance(aliases, dict):
+                    raise ValueError("invalid redirect aliases")
             except (OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
                 errors.append(f"{release_path}: invalid release identity: {exc}")
             required_queries = (
@@ -155,6 +190,7 @@ def main() -> int:
                 else ()
             )
             errors.extend(check_search_index(directory, required_queries))
+            errors.extend(check_redirects(directory, aliases))
         pages = [directory / "index.html"] if directory == site and not args.release else sorted(directory.rglob("*.html"))
         for page in pages:
             if not page.is_file():

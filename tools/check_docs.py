@@ -9,15 +9,28 @@ import re
 import sys
 from pathlib import Path
 
+from docs_layout import LayoutError, load_layout
+
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+try:
+    LAYOUT = load_layout(DOCS / "layout.json", DOCS, CURRENT_RELEASE)
+except LayoutError as exc:
+    raise SystemExit(f"docs layout: {exc}") from exc
+
+
+def layout_path(name: str, legacy: str) -> Path:
+    """Use canonical current paths while retaining checks for historical layout."""
+    return LAYOUT.artifact(name) if not LAYOUT.legacy else DOCS / legacy
+
+
 NEXT_RELEASE = "2.0.0"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
-CURRENT_SNAPSHOT_PATH = DOCS / f"public-api-{CURRENT_RELEASE}.json"
-CURRENT_REFERENCE_PATH = DOCS / f"API_REFERENCE_{CURRENT_RELEASE}.md"
+CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")
+CURRENT_REFERENCE_PATH = layout_path("api_reference", f"API_REFERENCE_{CURRENT_RELEASE}.md")
 # Immutable historical 1.9 baseline. These SHA-256 digests must stay constant:
 # the frozen 1.9 public-API snapshot and its human reference are never
 # regenerated or mutated, so an historical diff cannot be made to appear empty
@@ -765,11 +778,11 @@ def main() -> int:
         errors.append(f"docs/versions.json: invalid version manifest: {exc}")
 
     release_files = [
-        DOCS / f"RELEASE_NOTES_{CURRENT_RELEASE}.md",
-        DOCS / f"PR_NOTES_{CURRENT_RELEASE}.md",
-        DOCS / f"QUALIFICATION_{CURRENT_RELEASE}.md",
-        DOCS / f"WORKFLOW_QUALIFICATION_{CURRENT_RELEASE}.md",
-        DOCS / "FEEDBACK.md",
+        layout_path("release_notes", f"RELEASE_NOTES_{CURRENT_RELEASE}.md"),
+        layout_path("pr_notes", f"PR_NOTES_{CURRENT_RELEASE}.md"),
+        layout_path("qualification", f"QUALIFICATION_{CURRENT_RELEASE}.md"),
+        layout_path("workflow_qualification", f"WORKFLOW_QUALIFICATION_{CURRENT_RELEASE}.md"),
+        layout_path("feedback", "FEEDBACK.md"),
     ]
     for release_file in release_files:
         if not release_file.is_file():

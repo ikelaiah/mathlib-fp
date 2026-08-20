@@ -7,10 +7,26 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from check_built_docs import check_search_index, validate_page
+from check_built_docs import check_redirects, check_search_index, validate_page
 
 
 class BuiltDocumentationTests(unittest.TestCase):
+    def test_redirect_checks_target_and_search_exclusion(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "start").mkdir()
+            (root / "start" / "beginner-guide.html").write_text(
+                "canonical", encoding="utf-8"
+            )
+            (root / "BEGINNER_GUIDE.html").write_text(
+                '<a href="start/beginner-guide.html">Moved</a>', encoding="utf-8"
+            )
+            (root / "search-index.json").write_text(
+                '[{"url":"start/beginner-guide.html"}]', encoding="utf-8"
+            )
+            self.assertEqual([], check_redirects(root, {
+                "BEGINNER_GUIDE.md": "start/beginner-guide.md",
+            }))
     def test_checks_release_identity_target_and_anchor(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
