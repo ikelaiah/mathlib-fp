@@ -8,10 +8,27 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from check_numerical_evidence import validate_catalogue
+from check_numerical_evidence import catalogue_paths, validate_catalogue
+from docs_layout import load_layout
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 
 
 class NumericalEvidenceCatalogueTests(unittest.TestCase):
+    def test_catalogue_paths_follow_the_layout_manifest(self) -> None:
+        layout = load_layout(
+            REPOSITORY_ROOT / "docs/layout.json", REPOSITORY_ROOT / "docs", "1.10.0"
+        )
+        self.assertEqual(
+            REPOSITORY_ROOT / "docs/releases/1.9.4/numerical-evidence.json",
+            catalogue_paths(layout)[0],
+        )
+        self.assertEqual(
+            REPOSITORY_ROOT / "docs/reference/capabilities.json",
+            catalogue_paths(layout)[1],
+        )
+
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
@@ -92,7 +109,7 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
                 {
                     "schema_version": 1,
                     "release": "1.9.4",
-                    "inventory": "docs/capabilities.json",
+                    "inventory": "docs/reference/capabilities.json",
                     "inventory_release": "1.9.4",
                     "families": records,
                 }

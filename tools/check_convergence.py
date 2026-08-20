@@ -7,6 +7,7 @@ from __future__ import annotations
 import sys
 
 from convergence import (
+    CAPABILITIES_PATH,
     DECISION_PATH,
     DOCS,
     MANIFEST_PATH,
@@ -51,7 +52,7 @@ def main() -> int:
             errors.extend(rotation_errors(rotation))
         decision = load_json(DECISION_PATH)
         errors.extend(deprecation_errors(manifest, decision))
-        capabilities = load_json(DOCS / "capabilities.json")
+        capabilities = load_json(CAPABILITIES_PATH)
         errors.extend(deferral_errors(manifest, capabilities))
         errors.extend(capability_inventory_errors(capabilities))
     except (ValueError, KeyError, OSError) as exc:
@@ -70,7 +71,7 @@ def main() -> int:
         errors.append(f"provenance audit cannot be read: {exc}")
 
     errors.extend(policy_errors())
-    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
+    roadmap = (DOCS / "project/roadmap.md").read_text(encoding="utf-8")
     errors.extend(roadmap_convergence_errors(roadmap))
 
     if errors:

@@ -18,28 +18,28 @@ ROOT = Path(__file__).resolve().parent.parent
 REQUIRED_RUNNABLE_DOCUMENTS = {
     Path("README.md"),
     Path("docs/API_CANDIDATE_2.0.md"),
-    Path("docs/Interchange.md"),
-    Path("docs/MIGRATING_TO_2.0_PREVIEW.md"),
-    Path("docs/SparseLinearAlgebra.md"),
+    Path("docs/guides/domains/interchange.md"),
+    Path("docs/guides/migration/to-2.0-preview.md"),
+    Path("docs/guides/domains/sparse-linear-algebra.md"),
 }
 
 # One output-checked program is the mechanical beginner route for each stable
 # domain. Algebra deliberately points to the primary typed-double guide rather
 # than the compatibility landing-page example.
 BEGINNER_ROUTE_DOCUMENTS = {
-    "MathBase": Path("docs/MathBase.md"),
-    "AlgebraLib": Path("docs/TypedDenseMatrices.md"),
-    "FinanceLib": Path("docs/FinanceLib.md"),
-    "StatsLib": Path("docs/StatsLib.md"),
-    "EngineeringLib": Path("docs/EngineeringLib.md"),
-    "NumericsLib": Path("docs/NumericsLib.md"),
-    "ProbabilityLib": Path("docs/ProbabilityLib.md"),
-    "CombinatoricsLib": Path("docs/CombinatoricsLib.md"),
-    "OptimizationLib": Path("docs/OptimizationLib.md"),
-    "TimeSeriesLib": Path("docs/TimeSeriesLib.md"),
-    "MLLib": Path("docs/MLLib.md"),
-    "InterchangeLib": Path("docs/Interchange.md"),
-    "GeometryLib": Path("docs/GeometryLib.md"),
+    "MathBase": Path("docs/guides/domains/math-base.md"),
+    "AlgebraLib": Path("docs/guides/domains/typed-dense-matrices.md"),
+    "FinanceLib": Path("docs/guides/domains/finance.md"),
+    "StatsLib": Path("docs/guides/domains/statistics.md"),
+    "EngineeringLib": Path("docs/guides/domains/engineering.md"),
+    "NumericsLib": Path("docs/guides/domains/numerics.md"),
+    "ProbabilityLib": Path("docs/guides/domains/probability.md"),
+    "CombinatoricsLib": Path("docs/guides/domains/combinatorics.md"),
+    "OptimizationLib": Path("docs/guides/domains/optimization.md"),
+    "TimeSeriesLib": Path("docs/guides/domains/time-series.md"),
+    "MLLib": Path("docs/guides/domains/machine-learning.md"),
+    "InterchangeLib": Path("docs/guides/domains/interchange.md"),
+    "GeometryLib": Path("docs/guides/domains/geometry.md"),
 }
 
 

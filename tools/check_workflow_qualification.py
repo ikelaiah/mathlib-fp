@@ -26,10 +26,14 @@ from workflow_qualification import (
     load_manifest,
     validate_workflow_output,
 )
+from docs_layout import load_layout
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MANIFEST = ROOT / "docs" / "workflow-qualification-1.9.8.json"
+DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
+DEFAULT_MANIFEST = LAYOUT.canonical_path("workflow-qualification-1.9.8.json")
+assert DEFAULT_MANIFEST is not None
 
 
 def executable_path(directory: Path, stem: str) -> Path:

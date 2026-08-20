@@ -3,7 +3,7 @@
 
 The tool writes a versioned public-API snapshot and human reference for the
 current `src/` interfaces. The historical 1.9 baseline
-(`docs/public-api-1.9.json` + `docs/API_REFERENCE_1.9.md`) is immutable and is
+(`docs/public-api-1.9.json` + `docs/releases/1.9.0/api-reference.md`) is immutable and is
 never regenerated here; the current release (default reads `VERSION`) is
 written to its own `public-api-<release>.json` + `API_REFERENCE_<release>.md`
 files."""
@@ -18,19 +18,22 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from api_decision import CLASSIFICATIONS, apply_decisions, load_decision
+from docs_layout import load_layout
 
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "src"
-DECISION_INPUT = ROOT / "docs" / "api-decision-2.0.json"
+DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
+DECISION_INPUT = LAYOUT.canonical_path("api-decision-2.0.json")
+assert DECISION_INPUT is not None
 CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 
 
 def snapshot_paths(release: str) -> tuple[Path, Path]:
-    return (
-        ROOT / "docs" / f"public-api-{release}.json",
-        ROOT / "docs" / f"API_REFERENCE_{release}.md",
-    )
+    if release != CURRENT_RELEASE:
+        raise ValueError("only the current API snapshot can be regenerated")
+    return LAYOUT.artifact("public_api"), LAYOUT.artifact("api_reference")
 
 
 @dataclass(frozen=True)

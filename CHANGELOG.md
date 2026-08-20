@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- Reorganised maintained documentation into Start, Guides, Reference, Project,
+  and version-owned Releases sections, with compatibility redirects for former
+  user-guide URLs. This is a documentation discoverability milestone only; it
+  does not change the public API or numerical behaviour.
+
 ## [1.10.0] - 2026-08-19
 
 ### Added
@@ -19,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to the exact zero vector; non-finite angles or components follow the
   documented IEEE-754 convention.
 - Implemented the closed [1.10.0 capability
-  manifest](docs/CAPABILITY_MANIFEST_1.10.0.md) in full. The closed
+  manifest](docs/releases/1.10.0/capability-manifest.md) in full. The closed
   deprecation-marking decision is no-deprecation: no declaration is
   deprecated, removed, or moved, and full 1.x source compatibility is
   retained.
@@ -27,15 +34,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 - Documented the `TVector2D.Rotate` contract in the
-  [GeometryLib reference](docs/GeometryLib.md) and extended the runnable
+  [GeometryLib reference](docs/guides/domains/geometry.md) and extended the runnable
   [geometry example](examples/12_geometry.pas) with a rotation workflow whose
   output is now checked by the example-output gate.
 - Credit [rchastain2](https://github.com/rchastain2) for proposing
   `TVector2D.Rotate` and providing the original example in issue #18.
-- Regenerated the [API reference](docs/API_REFERENCE_1.9.md) and snapshot to
+- Regenerated the [API reference](docs/releases/1.9.0/api-reference.md) and snapshot to
   record the single `TVector2D.Rotate` addition, and recorded the now-decided
   2-D rotation contract in the 2.0-candidate decision and diff.
-- Published the [1.10.0 release notes](docs/RELEASE_NOTES_1.10.0.md).
+- Published the [1.10.0 release notes](docs/releases/1.10.0/release-notes.md).
 
 ## [1.9.9] - 2026-08-17
 
@@ -270,7 +277,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   checked/heap-traced, examples, documentation, Lazarus package, quick-start,
   and benchmark gates, while preserving the exact 1.9 public API snapshot.
 - Recorded the release evidence and unchanged limitations in
-  `docs/QUALIFICATION_1.9.1.md`.
+  `docs/releases/1.9.1/qualification.md`.
 
 ## [1.9.0] - 2026-08-01
 
@@ -306,7 +313,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   qualification cases with nonzero/allocation/storage/product/iteration/
   residual/timing evidence.
 - The complete platform, package, example, documentation, and archive matrix is
-  recorded in `docs/QUALIFICATION_1.9.0.md`.
+  recorded in `docs/releases/1.9.0/qualification.md`.
 
 ### Compatibility
 

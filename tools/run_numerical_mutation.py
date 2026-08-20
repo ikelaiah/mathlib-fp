@@ -13,8 +13,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from docs_layout import load_layout
 
 ROOT = Path(__file__).resolve().parent.parent
+DOCS = ROOT / "docs"
+LAYOUT = load_layout(DOCS / "layout.json", DOCS)
+DEFAULT_CATALOGUE = LAYOUT.canonical_path("numerical-evidence-1.9.4.json")
+assert DEFAULT_CATALOGUE is not None
 
 
 @dataclass(frozen=True)
@@ -189,7 +194,7 @@ def main() -> int:
     parser.add_argument(
         "--catalogue",
         type=Path,
-        default=ROOT / "docs" / "numerical-evidence-1.9.4.json",
+        default=DEFAULT_CATALOGUE,
     )
     parser.add_argument("--compiler", default="fpc")
     parser.add_argument(

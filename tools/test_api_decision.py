@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from api_decision import (
     apply_decisions,
@@ -12,9 +13,21 @@ from api_decision import (
     plain_alias_target,
     selector_matches,
 )
+from check_api_decision import canonical_example_document
+from docs_layout import load_layout
+
+
+ROOT = Path(__file__).resolve().parent.parent
 
 
 class ApiDecisionTests(unittest.TestCase):
+    def test_example_document_canonicalizes_a_legacy_flat_path(self) -> None:
+        layout = load_layout(ROOT / "docs/layout.json", ROOT / "docs", "1.10.0")
+        self.assertEqual(
+            Path("docs/guides/domains/math-base.md"),
+            canonical_example_document(Path("docs/MathBase.md"), layout),
+        )
+
     def test_surface_selector_covers_type_and_owned_members(self) -> None:
         selector = {"unit": "Example.Unit", "surface": "TFacade"}
         facade = {"owner": None, "name": "TFacade", "kind": "class", "signature": "TFacade=class"}

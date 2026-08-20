@@ -7,8 +7,8 @@ public method; the linked domain guides are the complete API reference.
 New to the library? Start with
 [`00_getting_started.pas`](00_getting_started.pas), then choose the workflow
 closest to your project. For a shorter task-first route, use the
-[beginner guide](../docs/BEGINNER_GUIDE.md) and
-[recipe index](../docs/RECIPES.md).
+[beginner guide](../docs/start/beginner-guide.md) and
+[recipe index](../docs/start/recipes.md).
 
 | Example | Domain | What it introduces |
 | --- | --- | --- |

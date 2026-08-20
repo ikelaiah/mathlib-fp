@@ -1,0 +1,135 @@
+# Complete 2.0 API decision
+
+Version 1.9.3 completes the all-domain decision over the frozen 1.9 public API.
+It is a compatibility and documentation decision, not a 2.0 implementation:
+no maintained declaration, compiled default, warning, behavior, or package
+membership changes in this patch release.
+
+Choose an ordinary workflow from the
+[`curated common-path map`](common-paths-2.0.md). Use the generated
+[`declaration reference`](../../releases/1.9.0/api-reference.md) when an exact overload,
+advanced control, compatibility entry, or specialization detail matters.
+
+## Decision artifacts
+
+| Artifact | Authority |
+| --- | --- |
+| [`public-api-1.9.json`](../../public-api-1.9.json) | Exact 2,880-row unit/owner/kind/name/signature baseline plus the classification and compatibility decision for every row |
+| [`API_REFERENCE_1.9.md`](../../releases/1.9.0/api-reference.md) | Generated human-readable rendering of every exact row |
+| [`api-decision-2.0.json`](../../api-decision-2.0.json) | Normative common selectors, all-domain conventions, exact alias reviews, compatibility decisions, and separately routed capability |
+| [`API_CONVENTIONS_2.0.md`](conventions-2.0.md) | Reviewed explanation of shared and domain-specific decisions |
+| [`api-diff-1.9-to-2.0.json`](../../api-diff-1.9-to-2.0.json) | Machine-readable source/behaviour/warning/packaging/documentary consequences |
+| [`API_DIFF_1.9_TO_2.0.md`](diff-1.9-to-2.0.md) | Human-readable exact proposed diff |
+
+`tools/update_api_snapshot.py` regenerates the snapshot and reference from
+every `src/*.pas` interface plus the reviewed decision selectors.
+`tools/check_api_decision.py` independently verifies exact coverage, convention
+closure, exact alias coverage, compatibility mappings, common examples, and
+diff categories.
+
+## Five complete classifications
+
+- **Recommended** declarations form the concise common paths. Each path has an
+  output-checked, compile/run-checked complete program.
+- **Advanced** declarations are stable application API for more scalar kinds,
+  storage formats, diagnostics, reusable state, and specialist workflows.
+- **Compatibility** declarations remain supported and carry exactly one named
+  replacement plus semantic-difference note or an explicit retain decision.
+- **Experimental** declarations are outside the stable promise. The current
+  snapshot contains none.
+- **Implementation** declarations are exposed only because Free Pascal generic
+  specialization needs them. Their named specializations/facades are the
+  application surface.
+
+The classifier is owner- and signature-aware. It distinguishes overloads such
+as double-real `Solve` from same-named scalar variants and propagates generic
+implementation status to the members of each generic public owner.
+
+## Primary conventions
+
+The complete convention matrix is in
+[`API_CONVENTIONS_2.0.md`](conventions-2.0.md). Its resolved concerns are:
+naming, indexing, shape, units, ownership, mutation, aliasing, exceptions,
+compiled defaults, tolerances, outcomes, RNG state, cancellation, progress,
+and thread safety. All 13 domains inherit the shared decisions and record their
+specific application; every snapshot unit is assigned to exactly one domain.
+
+The common teaching route remains double-real and allocating. Named
+single/complex facades, sparse and structured containers, views, destinations,
+workspaces, callbacks, and diagnostics remain stable one step deeper. No route
+hides a scalar conversion, dense conversion, retained callback, factor rebuild,
+external runtime, or global mutable registry.
+
+## Compatibility decisions
+
+`IMatrix`, `TMatrixKit`, and `TMatrixKitSparse` stay source-compatible. New code
+uses `IDenseDoubleMatrix`, `TDenseDoubleMatrix`, and `TSparseDoubleMatrix`
+respectively, with explicit copying conversions and documented semantic
+differences. This guidance is not a deprecation or removal schedule.
+
+`FinanceLib.Bonds` and `FinanceLib.NPV` are explicitly retained. Their public
+types are exact aliases into `FinanceLib.Interest`/shared arrays, so the focused
+entry units add no conflicting numerical, ownership, or default behavior.
+
+The snapshot contains 21 plain `=` compiler aliases. Every alias has one exact
+review in the generated declaration reference. The shared compiler-identity
+profile records identical behavior, defaults, ownership, exception identity,
+and numerical results. All 21 aliases are retained. The 1.9.7 executable
+migration and package-boundary rehearsal rejected deprecation of
+`TPressureKit`, `EPressureError`, `TVelocityKit`, and `EVelocityError`; the
+common `TFluidDynamicsKit`/`EFluidDynamicsError` names remain preferred for new
+cross-fluid code, but no warning, removal, or package move is approved.
+
+Every one of the 131 exact compatibility declaration rows carries its decision
+and semantic-note identifier in the generated reference.
+
+## Exact proposed diff
+
+The compiled 1.9-to-2.0 proposal is empty:
+
+- no source declaration change;
+- no behavior or compiled-default change;
+- no warning/deprecation change;
+- no packaging change.
+
+The documentary defaults change: common paths appear first, advanced stable
+paths remain visible, compatibility differences are explicit, and generic
+support is no longer presented as an application choice. See the
+[`exact diff`](diff-1.9-to-2.0.md).
+
+## Complete-program review
+
+The 13 selected programs cover MathBase, dense algebra, finance, statistics,
+engineering, numerics, probability, combinatorics, optimisation, time series,
+machine learning, interchange, and geometry. Documentation qualification
+compiles and executes them, checks their expected output, and rejects generic
+implementation declarations in those programs.
+
+The review found no wrapper that must be added inside 1.9.x. Ergonomic 2-D and
+3-D vector rotation is useful. The 1.9.9 convergence gate closed that routing
+in the [1.10.0 capability manifest](../../releases/1.10.0/capability-manifest.md): 2-D
+`TVector2D.Rotate` is declared for 1.10.0 with a complete behavior contract,
+test plan, documentation plan, and compatibility impact, while 3-D rotation is
+explicitly deferred beyond 2.0 until its representation and semantics are
+designed.
+
+## Final 1.9.9 snapshot status
+
+The [final snapshot and diff](../../releases/1.9.9/api-snapshot-final.md) confirm the
+compiled 1.9.0-to-1.9.9 diff is empty across source, behavior, warnings, and
+packaging, and the candidate 2.0 surface is exactly this frozen 1.9 snapshot
+plus the closed 1.10.0 additions.
+
+## Freeze and compatibility rule
+
+The snapshot remains the 1.9 interface freeze. A changed interface hash needs
+a regenerated snapshot and a documented compatibility or correctness reason;
+this decision does not authorize breaking changes. A maintained 1.x API is not
+removed merely because a major version is available, and compatibility is not
+deprecation.
+
+There are no unresolved stable declarations, aliases, compiled defaults,
+ownership rules, classifications, compatibility decisions, or replacement
+mappings in this candidate. The 1.9.9 convergence gate closes every remaining
+capability question in the
+[1.10.0 capability manifest](../../releases/1.10.0/capability-manifest.md).

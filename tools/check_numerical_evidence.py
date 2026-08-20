@@ -8,10 +8,13 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from docs_layout import DocumentationLayout, LayoutError, load_layout
+
 
 ROOT = Path(__file__).resolve().parent.parent
 RELEASE = "1.9.4"
 INVENTORY_RELEASE = "1.9.4"
+CAPABILITIES_REFERENCE = "docs/reference/capabilities.json"
 REFERENCE_FIELDS = (
     "method",
     "source",
@@ -30,6 +33,14 @@ BUDGET_KINDS = {
     "feasibility",
     "exact",
 }
+
+
+def catalogue_paths(layout: DocumentationLayout) -> tuple[Path, Path]:
+    """Locate retained evidence and the current inventory through the layout."""
+    catalogue = layout.canonical_path("numerical-evidence-1.9.4.json")
+    if catalogue is None:
+        raise LayoutError("layout has no numerical-evidence-1.9.4.json record")
+    return catalogue, layout.artifact("capabilities_json")
 
 
 def load_object(path: Path, errors: list[str]) -> dict[str, Any]:
@@ -200,8 +211,10 @@ def validate_catalogue(
         errors.append("catalogue.schema_version: expected 1")
     if catalogue.get("release") != RELEASE:
         errors.append(f"catalogue.release: expected {RELEASE}")
-    if catalogue.get("inventory") != "docs/capabilities.json":
-        errors.append("catalogue.inventory: expected docs/capabilities.json")
+    if catalogue.get("inventory") != CAPABILITIES_REFERENCE:
+        errors.append(
+            f"catalogue.inventory: expected {CAPABILITIES_REFERENCE}"
+        )
     if inventory.get("schema_version") != 1:
         errors.append("inventory.schema_version: expected 1")
     inventory_release = inventory.get("release")
@@ -246,8 +259,8 @@ def validate_catalogue(
 
 
 def main() -> int:
-    catalogue_path = ROOT / "docs" / "numerical-evidence-1.9.4.json"
-    inventory_path = ROOT / "docs" / "capabilities.json"
+    layout = load_layout(ROOT / "docs/layout.json", ROOT / "docs")
+    catalogue_path, inventory_path = catalogue_paths(layout)
     errors = validate_catalogue(ROOT, catalogue_path, inventory_path)
     if errors:
         print("Numerical-evidence validation failed:", file=sys.stderr)

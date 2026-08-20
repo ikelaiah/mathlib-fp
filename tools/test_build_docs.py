@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -63,6 +65,51 @@ class DocumentationBuildTests(unittest.TestCase):
         self.assertIn("Current release: 1.9.3", page)
         self.assertIn('href="1.9.0/index.html"', page)
         self.assertIn('class="release-list"', page)
+
+    def test_builds_legacy_flat_release_notes_without_layout_manifest(self) -> None:
+        source = self.root / "flat-docs"
+        source.mkdir()
+        (source / "index.md").write_text("# Home\n", encoding="utf-8")
+        (source / "RELEASE_NOTES_1.9.3.md").write_text(
+            "# Release notes\n", encoding="utf-8"
+        )
+        result = subprocess.run(
+            [sys.executable, str(Path(__file__).parent / "build_docs.py"),
+             "--source", str(source), "--versions", str(self.manifest),
+             "--release", "1.9.3", "--output", str(self.root / "flat-site")],
+            text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertTrue((self.root / "flat-site" / "RELEASE_NOTES_1.9.3.html").is_file())
+
+    def test_builds_nested_layout_and_redirects_without_indexing_aliases(self) -> None:
+        source = self.root / "nested-docs"
+        (source / "start").mkdir(parents=True)
+        (source / "releases" / "1.9.3").mkdir(parents=True)
+        (source / "index.md").write_text("# Home\n", encoding="utf-8")
+        (source / "start" / "beginner-guide.md").write_text(
+            "# Beginner\n", encoding="utf-8"
+        )
+        (source / "releases" / "1.9.3" / "release-notes.md").write_text(
+            "# Release notes\n", encoding="utf-8"
+        )
+        (source / "layout.json").write_text(json.dumps({
+            "schema_version": 1,
+            "current_release": "1.9.3",
+            "artifacts": {"release_notes": "releases/1.9.3/release-notes.md"},
+            "aliases": {"BEGINNER_GUIDE.md": "start/beginner-guide.md"},
+        }), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(Path(__file__).parent / "build_docs.py"),
+             "--source", str(source), "--versions", str(self.manifest),
+             "--release", "1.9.3", "--output", str(self.root / "nested-site")],
+            text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(0, result.returncode, result.stderr)
+        redirect = (self.root / "nested-site" / "BEGINNER_GUIDE.html").read_text(encoding="utf-8")
+        self.assertIn("start/beginner-guide.html", redirect)
+        index = json.loads((self.root / "nested-site" / "search-index.json").read_text(encoding="utf-8"))
+        self.assertNotIn("BEGINNER_GUIDE.html", {entry["url"] for entry in index})
 
     def test_offline_archive_is_deterministic_and_self_identifying(self) -> None:
         site = self.root / "site"

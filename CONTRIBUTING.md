@@ -107,7 +107,7 @@ signatures, statuses, numerical claims, and success markers as well as syntax
 errors.
 
 Use the project terminology defined in the
-[documentation index](docs/index.md#terminology):
+[documentation reference](docs/reference/index.md):
 
 - **domain** for a functional area such as finance or geometry
 - **unit family** for a prefix such as `FinanceLib`
@@ -146,7 +146,7 @@ algorithm family inside an existing domain is accepted only when:
 
 Proposals that do not meet the gate are deferred explicitly rather than left
 open. The normative policy is
-[`docs/GOVERNANCE.md`](docs/GOVERNANCE.md#contribution-gate-for-new-domains).
+[`docs/project/governance.md`](docs/project/governance.md#contribution-gate-for-new-domains).
 
 ### Pull Request Title Format
 
