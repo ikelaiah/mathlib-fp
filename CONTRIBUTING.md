@@ -62,6 +62,17 @@ fpc -B -FcUTF8 -Fu../src -FUlib TestRunner.lpr
 ./TestRunner -a --format=plain
 ```
 
+### Continuous integration
+
+The normal `CI` workflow runs on every push and pull request and covers the
+Linux and Windows unit tests, example compilation and output contracts,
+documentation and API sanity checks, compiler-backed documentation examples,
+and the Lazarus package build. Heavyweight release-oriented gates — mutation
+testing, full performance and portability evidence, migration and workflow
+rehearsal, convergence/2.0 promotion checks, and clean-archive, checksum, and
+network-isolated qualification — run only in the scheduled/manual `Release
+qualification` workflow and on release publications, not on every PR.
+
 ### Documentation
 
 - Update README.md if needed
@@ -79,10 +90,11 @@ python tools/test_built_docs.py
 python tools/check_docs.py
 python tools/check_doc_examples.py
 python tools/check_example_output.py
-python tools/build_docs.py --release 1.9.1 \
-  --output build-temp/docs-site/1.9.1
+release=$(cat VERSION)
+python tools/build_docs.py --release "$release" \
+  --output "build-temp/docs-site/$release"
 python tools/check_built_docs.py \
-  --site build-temp/docs-site/1.9.1 --release 1.9.1
+  --site "build-temp/docs-site/$release" --release "$release"
 ```
 
 Release-facing Pascal fences must be self-contained: the documentation gate
@@ -127,8 +139,8 @@ algorithm family inside an existing domain is accepted only when:
    named, and its licence is compatible with MIT redistribution;
 4. tests, API documentation, selection guidance, and a runnable example land
    in the same change as the implementation; and
-5. the capability inventory and the closed capability manifest
-   (`docs/capability-manifest-1.10.0.json`) are updated in the same change.
+5. the capability inventory and the closed capability manifest are updated in
+   the same change.
 
 Proposals that do not meet the gate are deferred explicitly rather than left
 open. The normative policy is

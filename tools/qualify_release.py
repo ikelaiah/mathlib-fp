@@ -363,6 +363,7 @@ def documentation_gates(
         "check_api_decision.py",
         "check_numerical_evidence.py",
         "check_convergence.py",
+        "check_promotion_2_0.py",
     ):
         qualification.run(
             script.removesuffix(".py"),
