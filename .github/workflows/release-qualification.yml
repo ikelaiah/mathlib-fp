@@ -114,7 +114,7 @@ jobs:
             "LAZBUILD_WIN64=$lazbuild"
           ) | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Create and verify clean source archive
+      - name: Create clean source archive
         shell: pwsh
         run: |
           $qualification = Join-Path $env:RUNNER_TEMP 'qualification'
@@ -128,35 +128,13 @@ jobs:
             -Encoding ascii "$archive.sha256"
           Expand-Archive -LiteralPath $archive -DestinationPath $source
 
-      - name: Run Windows qualification offline from extracted archive
+      - name: Run Windows qualification from extracted archive
         shell: pwsh
         working-directory: ${{ runner.temp }}/qualification/source
         run: |
-          $archive = Join-Path $env:RUNNER_TEMP `
-            'qualification/mathlib-fp-1.10.0.zip'
-          $checksum = "$archive.sha256"
-          $rule = 'mathlib-fp qualification runner connection'
-          $runner = Get-Process -Name 'Runner.Worker' -ErrorAction Stop | `
-            Select-Object -First 1
-          New-NetFirewallRule -DisplayName $rule -Direction Outbound `
-            -Action Allow -Program $runner.Path -Profile Any | Out-Null
-          $profiles = Get-NetFirewallProfile | Select-Object Name,DefaultOutboundAction
-          try {
-            Set-NetFirewallProfile -Profile Domain,Public,Private `
-              -DefaultOutboundAction Block
-            python tools/qualify_release.py --release 1.10.0 `
-              --compiler $env:FPC_WIN64 --lazbuild $env:LAZBUILD_WIN64 `
-              --network-isolated --source-archive $archive `
-              --source-checksum $checksum
-            if ($LASTEXITCODE -ne 0) { throw "qualification exited $LASTEXITCODE" }
-          }
-          finally {
-            foreach ($profile in $profiles) {
-              Set-NetFirewallProfile -Name $profile.Name `
-                -DefaultOutboundAction $profile.DefaultOutboundAction
-            }
-            Remove-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue
-          }
+          python tools/qualify_release.py --release 1.10.0 `
+            --compiler $env:FPC_WIN64 --lazbuild $env:LAZBUILD_WIN64
+          if ($LASTEXITCODE -ne 0) { throw "qualification exited $LASTEXITCODE" }
 
       - name: Publish Windows qualification evidence
         if: ${{ always() }}

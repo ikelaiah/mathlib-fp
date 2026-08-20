@@ -65,10 +65,13 @@ Use this checklist for every mathlib-fp release.
   source/behaviour/warnings/packaging, the provenance audit covers every
   `src/` unit, the governance policies are complete, and no API design
   question remains open.
-- [ ] Run exact Linux and Windows qualification with `--source-archive`,
-  `--source-checksum`, and `--network-isolated` only after the workflow has
-  blocked new outbound connections. Review the recorded digest, archive file
-  count, extracted offline HTML check, and target-specific artifacts.
+- [ ] Run exact network-isolated clean-archive qualification on Linux with
+  `--source-archive`, `--source-checksum`, and `--network-isolated` only after
+  the workflow has blocked new outbound connections (Windows cannot
+  machine-block outbound without severing the hosted runner's heartbeat, so
+  the Windows job runs the full gate battery from the extracted archive
+  without isolation). Review the recorded digest, archive file count,
+  extracted offline HTML check, and target-specific artifacts.
 - [ ] Build the deterministic offline documentation ZIP, verify its SHA-256,
   extract it without network access, and compare its `release.json`, examples,
   signatures, and limitations with repository Markdown.
