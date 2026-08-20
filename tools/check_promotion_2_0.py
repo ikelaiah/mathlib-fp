@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 
-CURRENT_RELEASE = "1.10.0"
+CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 NEXT_RELEASE = "2.0.0"
 
 
@@ -52,7 +52,9 @@ def main() -> int:
     try:
         versions = json.loads((DOCS / "versions.json").read_text(encoding="utf-8"))
         if versions.get("current") != CURRENT_RELEASE:
-            errors.append("docs/versions.json current is not 1.10.0")
+            errors.append(
+                f"docs/versions.json current is not {CURRENT_RELEASE}"
+            )
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         errors.append(f"docs/versions.json: invalid version manifest: {exc}")
 

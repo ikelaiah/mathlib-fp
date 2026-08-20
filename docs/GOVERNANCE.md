@@ -64,8 +64,9 @@ algorithm family inside an existing domain is accepted only when:
    named, and its licence is compatible with MIT redistribution;
 4. tests, API documentation, selection guidance, and a runnable example land
    in the same change as the implementation; and
-5. the capability inventory and the closed capability manifest are updated in
-   the same change.
+5. the current capability inventory and any active/open release manifest are
+   updated in the same change; closed release manifests remain immutable
+   historical evidence.
 
 Proposals that do not meet the gate are deferred explicitly — recorded in the
 capability manifest — rather than left open. See

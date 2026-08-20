@@ -4,8 +4,9 @@
 The tool writes a versioned public-API snapshot and human reference for the
 current `src/` interfaces. The historical 1.9 baseline
 (`docs/public-api-1.9.json` + `docs/API_REFERENCE_1.9.md`) is immutable and is
-never regenerated here; the current release (default `1.10.0`) is written to
-its own `public-api-<release>.json` + `API_REFERENCE_<release>.md` files."""
+never regenerated here; the current release (default reads `VERSION`) is
+written to its own `public-api-<release>.json` + `API_REFERENCE_<release>.md`
+files."""
 
 from __future__ import annotations
 
@@ -22,7 +23,7 @@ from api_decision import CLASSIFICATIONS, apply_decisions, load_decision
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "src"
 DECISION_INPUT = ROOT / "docs" / "api-decision-2.0.json"
-CURRENT_RELEASE = "1.10.0"
+CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 
 
 def snapshot_paths(release: str) -> tuple[Path, Path]:

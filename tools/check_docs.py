@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
-CURRENT_RELEASE = "1.10.0"
+CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 NEXT_RELEASE = "2.0.0"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
@@ -782,13 +782,16 @@ def main() -> int:
     package = (ROOT / "packages" / "lazarus" / "mathlib_fp.lpk").read_text(
         encoding="utf-8"
     )
+    major, minor, patch = CURRENT_RELEASE.split(".")
     identity_checks = {
         "README badge": f"version-{CURRENT_RELEASE}-brightgreen" in readme,
         "README release notes": f"RELEASE_NOTES_{CURRENT_RELEASE}.md" in readme,
         "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
         "support matrix": f"Version {CURRENT_RELEASE}" in support,
         "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": '<Version Major="1" Minor="10" Release="0"/>' in package,
+        "Lazarus package": (
+            f'<Version Major="{major}" Minor="{minor}" Release="{patch}"/>'
+        ) in package,
     }
     for description, valid in identity_checks.items():
         if not valid:

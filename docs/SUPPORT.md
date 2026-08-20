@@ -31,10 +31,12 @@ artifacts before tagging.
 - **P-Windows:** normal, `-O3`, runtime-checked/heap-traced tests; all examples
   and output contracts; documentation, generated site, extracted offline HTML,
   numerical mutation, performance, and portability gates; Lazarus package;
-  checksummed clean ZIP with new outbound connections blocked.
+  checksummed clean ZIP verified by the qualification driver from the extracted
+  archive (no machine-level outbound block: the GitHub hosted runner
+  disconnects when outbound is blocked).
 - **P-Linux:** the same full profile except the Lazarus package, which is not a
   Linux release claim; checksummed clean `tar.gz` with new outbound connections
-  blocked.
+  blocked and the driver's network-isolated challenge.
 - **S-Win32:** `-O2` full tests, the native ABI/binary portability probe and
   source/package audit, and the Lazarus package. This tier does not imply the
   primary documentation, benchmark, or heap-traced profile.
@@ -82,6 +84,9 @@ open `mathlib-fp-docs-1.10.0/index.html` locally.
 
 The release qualification workflows perform these same checksum, clean-
 extraction, direct-source, representative-workflow, documentation, and package
-checks after toolchain installation and with new outbound connections blocked.
-The release driver actively challenges that policy and fails if a new outbound
-connection succeeds.
+checks after toolchain installation. Linux runs them with new outbound
+connections blocked, and the release driver actively challenges that policy,
+failing if a new outbound connection succeeds. Windows runs the same full gate
+battery from the extracted clean ZIP and verifies its checksum, but it cannot
+machine-block outbound traffic without disconnecting the hosted runner, so it
+does not attempt that block.

@@ -522,6 +522,36 @@ def convergence_gate(
     )
 
 
+def validate_source_qualification(
+    source_archive: Path | None,
+    source_checksum: Path | None,
+    network_isolated: bool,
+) -> dict[str, object]:
+    """Validate source-archive/checksum/network-isolation CLI couplings.
+
+    Archive and checksum verification work independently of network isolation:
+    any platform can verify a checksummed clean archive from an extracted tree.
+    Network isolation remains an optional additional challenge and still
+    requires a verified source archive.
+    """
+    if bool(source_archive) != bool(source_checksum):
+        raise RuntimeError(
+            "--source-archive and --source-checksum must be supplied together"
+        )
+    if network_isolated and not source_archive:
+        raise RuntimeError("--network-isolated requires a verified source archive")
+    context: dict[str, object] = {"network_isolated": network_isolated}
+    if network_isolated:
+        verify_network_isolated()
+    if source_archive:
+        context["source_archive"] = verify_clean_source_archive(
+            ROOT,
+            source_archive.resolve(),
+            source_checksum.resolve(),
+        )
+    return context
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--release", required=True)
@@ -546,27 +576,13 @@ def main() -> int:
     qualification = Qualification(work, result)
     compiler_version = "unknown"
     try:
-        if bool(args.source_archive) != bool(args.source_checksum):
-            raise RuntimeError(
-                "--source-archive and --source-checksum must be supplied together"
+        qualification.context.update(
+            validate_source_qualification(
+                args.source_archive,
+                args.source_checksum,
+                args.network_isolated,
             )
-        if args.network_isolated and not args.source_archive:
-            raise RuntimeError(
-                "--network-isolated requires a verified source archive"
-            )
-        if args.source_archive:
-            if not args.network_isolated:
-                raise RuntimeError(
-                    "clean source archive qualification requires --network-isolated"
-                )
-            verify_network_isolated()
-            archive_evidence = verify_clean_source_archive(
-                ROOT,
-                args.source_archive.resolve(),
-                args.source_checksum.resolve(),
-            )
-            qualification.context["source_archive"] = archive_evidence
-        qualification.context["network_isolated"] = args.network_isolated
+        )
         compiler_version = qualification.run(
             "compiler-version", [args.compiler, "-iV"], timeout=30
         ).strip()
