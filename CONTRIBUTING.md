@@ -64,14 +64,15 @@ fpc -B -FcUTF8 -Fu../src -FUlib TestRunner.lpr
 
 ### Continuous integration
 
-The normal `CI` workflow runs on every push and pull request and covers the
-Linux and Windows unit tests, example compilation and output contracts,
-documentation and API sanity checks, compiler-backed documentation examples,
-and the Lazarus package build. Heavyweight release-oriented gates — mutation
-testing, full performance and portability evidence, migration and workflow
-rehearsal, convergence/2.0 promotion checks, and clean-archive, checksum, and
-network-isolated qualification — run only in the scheduled/manual `Release
-qualification` workflow and on release publications, not on every PR.
+The normal `CI` workflow runs on pushes to `main` and on pull requests
+targeting `main`, covering the Linux and Windows unit tests, example
+compilation and output contracts, documentation and API sanity checks,
+compiler-backed documentation examples, and the Lazarus package build.
+Heavyweight release-oriented gates — mutation testing, full performance and
+portability evidence, migration and workflow rehearsal, convergence/2.0
+promotion checks, and clean-archive, checksum, and network-isolated
+qualification — run only in the scheduled/manual `Release qualification`
+workflow and on release publications, not on every PR.
 
 ### Documentation
 
@@ -139,8 +140,9 @@ algorithm family inside an existing domain is accepted only when:
    named, and its licence is compatible with MIT redistribution;
 4. tests, API documentation, selection guidance, and a runnable example land
    in the same change as the implementation; and
-5. the capability inventory and the closed capability manifest are updated in
-   the same change.
+5. the current capability inventory and any active/open release manifest are
+   updated in the same change; closed release manifests remain immutable
+   historical evidence.
 
 Proposals that do not meet the gate are deferred explicitly rather than left
 open. The normative policy is

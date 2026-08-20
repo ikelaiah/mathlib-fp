@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: Source ref for a 1.10.0 documentation rebuild
+        description: Source ref for the current-release documentation rebuild
         required: true
         default: main
   release:
@@ -20,8 +20,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.version.outputs.release }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read current release version
+        id: version
+        run: echo "release=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
   build:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.10.0'
+    needs: resolve
+    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     runs-on: ubuntu-latest
     steps:
       - name: Check out current documentation source
@@ -90,6 +103,9 @@ jobs:
           ref: v1.9.9
           path: historical-1.9.9
 
+      - name: Read current release version
+        run: echo "RELEASE=$(cat current/VERSION)" >> "$GITHUB_ENV"
+
       - name: Build preserved and current versioned sites
         run: |
           python3 current/tools/build_docs.py \
@@ -135,9 +151,9 @@ jobs:
           python3 current/tools/build_docs.py \
             --source current/docs \
             --versions current/docs/versions.json \
-            --release 1.10.0 --output site/1.10.0 --site-root site \
-            --offline-archive artifacts/mathlib-fp-docs-1.10.0.zip
-          python3 -c 'import json; assert json.load(open("site/1.10.0/release.json"))["release"] == "1.10.0"'
+            --release "$RELEASE" --output "site/$RELEASE" --site-root site \
+            --offline-archive "artifacts/mathlib-fp-docs-$RELEASE.zip"
+          python3 -c 'import json, os; r = os.environ["RELEASE"]; assert json.load(open(f"site/{r}/release.json"))["release"] == r'
           python3 -c 'import json; assert json.load(open("site/1.9.9/release.json"))["release"] == "1.9.9"'
           python3 -c 'import json; assert json.load(open("site/1.9.8/release.json"))["release"] == "1.9.8"'
           python3 -c 'import json; assert json.load(open("site/1.9.7/release.json"))["release"] == "1.9.7"'
@@ -148,7 +164,7 @@ jobs:
           python3 -c 'import json; assert json.load(open("site/1.9.2/release.json"))["release"] == "1.9.2"'
           python3 -c 'import json; assert json.load(open("site/1.9.1/release.json"))["release"] == "1.9.1"'
           python3 -c 'import json; assert json.load(open("site/1.9.0/release.json"))["release"] == "1.9.0"'
-          grep -q 'Current release: 1.10.0' site/index.html
+          grep -q "Current release: $RELEASE" site/index.html
           grep -q '1.9.9/index.html' site/index.html
           grep -q '1.9.8/index.html' site/index.html
           grep -q '1.9.7/index.html' site/index.html
@@ -172,11 +188,11 @@ jobs:
       - name: Publish offline documentation artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: mathlib-fp-docs-1.10.0
+          name: mathlib-fp-docs-${{ env.RELEASE }}
           if-no-files-found: error
           path: |
-            artifacts/mathlib-fp-docs-1.10.0.zip
-            artifacts/mathlib-fp-docs-1.10.0.zip.sha256
+            artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip
+            artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip.sha256
 
       - name: Attach offline documentation to release
         if: github.event_name == 'release'
@@ -184,17 +200,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
-            artifacts/mathlib-fp-docs-1.10.0.zip \
-            artifacts/mathlib-fp-docs-1.10.0.zip.sha256 --clobber \
+            artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip \
+            artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip.sha256 --clobber \
             --repo "$GITHUB_REPOSITORY"
 
   deploy:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.10.0'
+    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [resolve, build]
 
     steps:
       - name: Deploy GitHub Pages

@@ -11,8 +11,23 @@ permissions:
   contents: read
 
 jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.version.outputs.release }}
+    steps:
+      - name: Check out release tree
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || github.sha }}
+
+      - name: Read current release version
+        id: version
+        run: echo "release=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
   linux-clean-archive:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.10.0'
+    needs: resolve
+    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     runs-on: ubuntu-latest
 
     steps:
@@ -27,16 +42,19 @@ jobs:
           sudo apt-get install -y fp-compiler fp-units-fcl
           test "$(fpc -iV)" = "3.2.2"
 
+      - name: Read current release version
+        run: echo "RELEASE=$(cat VERSION)" >> "$GITHUB_ENV"
+
       - name: Create and verify clean source archive
         run: |
           mkdir -p "$RUNNER_TEMP/qualification/source"
           git archive --format=tar.gz \
-            --output="$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz" HEAD
-          sha256sum "$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz" \
-            > "$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz.sha256"
+            --output="$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz" HEAD
+          sha256sum "$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz" \
+            > "$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz.sha256"
           sha256sum --check \
-            "$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz.sha256"
-          tar -xzf "$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz" \
+            "$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz.sha256"
+          tar -xzf "$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz" \
             -C "$RUNNER_TEMP/qualification/source"
 
       - name: Run Linux qualification offline from extracted archive
@@ -54,25 +72,26 @@ jobs:
             -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
           sudo iptables -A MATHLIB_OFFLINE -j REJECT
           sudo iptables -I OUTPUT 1 -j MATHLIB_OFFLINE
-          python3 tools/qualify_release.py --release 1.10.0 \
+          python3 tools/qualify_release.py --release "$RELEASE" \
             --compiler fpc --skip-package --network-isolated \
             --source-archive \
-              "$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz" \
+              "$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz" \
             --source-checksum \
-              "$RUNNER_TEMP/qualification/mathlib-fp-1.10.0.tar.gz.sha256"
+              "$RUNNER_TEMP/qualification/mathlib-fp-$RELEASE.tar.gz.sha256"
 
       - name: Publish Linux qualification evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: qualification-1.10.0-linux-x86-64
+          name: qualification-${{ env.RELEASE }}-linux-x86-64
           if-no-files-found: warn
           path: |
-            ${{ runner.temp }}/qualification/mathlib-fp-1.10.0.tar.gz.sha256
+            ${{ runner.temp }}/qualification/mathlib-fp-${{ env.RELEASE }}.tar.gz.sha256
             ${{ runner.temp }}/qualification/source/build-temp/release-qualification
 
   windows-clean-archive:
-    if: github.event_name != 'release' || github.event.release.tag_name == 'v1.10.0'
+    needs: resolve
+    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     runs-on: windows-latest
 
     steps:
@@ -114,17 +133,24 @@ jobs:
             "LAZBUILD_WIN64=$lazbuild"
           ) | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Read current release version
+        shell: pwsh
+        run: |
+          "RELEASE=$((Get-Content VERSION).Trim())" | `
+            Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Create clean source archive
         shell: pwsh
         run: |
+          $release = $env:RELEASE
           $qualification = Join-Path $env:RUNNER_TEMP 'qualification'
           $source = Join-Path $qualification 'source'
           New-Item -ItemType Directory -Force -Path $source | Out-Null
-          $archive = Join-Path $qualification 'mathlib-fp-1.10.0.zip'
+          $archive = Join-Path $qualification "mathlib-fp-${release}.zip"
           git archive --format=zip --output=$archive HEAD
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
-          "$hash  mathlib-fp-1.10.0.zip" | Set-Content `
+          "$hash  mathlib-fp-${release}.zip" | Set-Content `
             -Encoding ascii "$archive.sha256"
           Expand-Archive -LiteralPath $archive -DestinationPath $source
 
@@ -132,16 +158,21 @@ jobs:
         shell: pwsh
         working-directory: ${{ runner.temp }}/qualification/source
         run: |
-          python tools/qualify_release.py --release 1.10.0 `
-            --compiler $env:FPC_WIN64 --lazbuild $env:LAZBUILD_WIN64
+          $release = $env:RELEASE
+          python tools/qualify_release.py --release $release `
+            --compiler $env:FPC_WIN64 --lazbuild $env:LAZBUILD_WIN64 `
+            --source-archive `
+              $env:RUNNER_TEMP/qualification/mathlib-fp-${release}.zip `
+            --source-checksum `
+              $env:RUNNER_TEMP/qualification/mathlib-fp-${release}.zip.sha256
           if ($LASTEXITCODE -ne 0) { throw "qualification exited $LASTEXITCODE" }
 
       - name: Publish Windows qualification evidence
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: qualification-1.10.0-windows-x86-64
+          name: qualification-${{ env.RELEASE }}-windows-x86-64
           if-no-files-found: warn
           path: |
-            ${{ runner.temp }}/qualification/mathlib-fp-1.10.0.zip.sha256
+            ${{ runner.temp }}/qualification/mathlib-fp-${{ env.RELEASE }}.zip.sha256
             ${{ runner.temp }}/qualification/source/build-temp/release-qualification

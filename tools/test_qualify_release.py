@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 
 from qualify_release import (
     output_tail,
+    validate_source_qualification,
     verify_clean_source_archive,
     verify_heaptrc_output,
     verify_network_isolated,
@@ -147,6 +148,58 @@ class NetworkIsolationTests(unittest.TestCase):
             verify_network_isolated()
 
         connection.close.assert_called_once()
+
+
+class SourceQualificationArgumentTests(unittest.TestCase):
+    """CLI couplings between --source-archive/--source-checksum and --network-isolated."""
+
+    def test_archive_verification_works_without_network_isolation(self) -> None:
+        with patch("qualify_release.verify_network_isolated") as verify_network:
+            with patch(
+                "qualify_release.verify_clean_source_archive",
+                return_value={"clean_tree": True, "sha256": "a" * 64},
+            ) as verify_archive:
+                context = validate_source_qualification(
+                    Path("mathlib-fp-1.10.0.zip"),
+                    Path("mathlib-fp-1.10.0.zip.sha256"),
+                    network_isolated=False,
+                )
+            verify_archive.assert_called_once()
+            verify_network.assert_not_called()
+        self.assertFalse(context["network_isolated"])
+        self.assertTrue(context["source_archive"]["clean_tree"])
+
+    def test_network_isolation_still_runs_with_verified_archive(self) -> None:
+        with patch("qualify_release.verify_network_isolated") as verify_network:
+            with patch(
+                "qualify_release.verify_clean_source_archive",
+                return_value={"clean_tree": True, "sha256": "a" * 64},
+            ) as verify_archive:
+                context = validate_source_qualification(
+                    Path("mathlib-fp-1.10.0.tar.gz"),
+                    Path("mathlib-fp-1.10.0.tar.gz.sha256"),
+                    network_isolated=True,
+                )
+            verify_archive.assert_called_once()
+            verify_network.assert_called_once()
+        self.assertTrue(context["network_isolated"])
+        self.assertTrue(context["source_archive"]["clean_tree"])
+
+    def test_network_isolation_requires_verified_source_archive(self) -> None:
+        with self.assertRaisesRegex(
+            RuntimeError,
+            "--network-isolated requires a verified source archive",
+        ):
+            validate_source_qualification(None, None, network_isolated=True)
+
+    def test_archive_and_checksum_are_supplied_together(self) -> None:
+        with self.assertRaisesRegex(
+            RuntimeError,
+            "--source-archive and --source-checksum must be supplied together",
+        ):
+            validate_source_qualification(
+                Path("mathlib-fp-1.10.0.zip"), None, network_isolated=False
+            )
 
 
 if __name__ == "__main__":
