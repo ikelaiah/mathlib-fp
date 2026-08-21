@@ -15,26 +15,51 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release: ${{ steps.version.outputs.release }}
+      source_ref: ${{ steps.source.outputs.ref }}
+      tag_kind: ${{ steps.tag.outputs.kind }}
     steps:
+      - name: Select source ref
+        id: source
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          source_ref="$GITHUB_SHA"
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            source_ref="$RELEASE_TAG"
+          fi
+          echo "ref=$source_ref" >> "$GITHUB_OUTPUT"
+
       - name: Check out release tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name || github.sha }}
+          ref: ${{ steps.source.outputs.ref }}
 
       - name: Read current release version
         id: version
         run: echo "release=$(cat VERSION)" >> "$GITHUB_OUTPUT"
 
+      - name: Classify release tag
+        id: tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE: ${{ steps.version.outputs.release }}
+        run: |
+          kind=manual
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            kind="$(python3 tools/release_tags.py \
+              --tag "$RELEASE_TAG" --version "$RELEASE")"
+          fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+
   linux-clean-archive:
     needs: resolve
-    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out release tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name || github.sha }}
+          ref: ${{ needs.resolve.outputs.source_ref }}
 
       - name: Install Free Pascal 3.2.2
         run: |
@@ -91,14 +116,13 @@ jobs:
 
   windows-clean-archive:
     needs: resolve
-    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     runs-on: windows-latest
 
     steps:
       - name: Check out release tree
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name || github.sha }}
+          ref: ${{ needs.resolve.outputs.source_ref }}
 
       - name: Install Lazarus 4.8 and Free Pascal 3.2.2
         shell: pwsh

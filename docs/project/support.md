@@ -17,14 +17,14 @@ and 1.10.0, the current release, adds no target-matrix change.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2026-08-12 local 1.9.7 rehearsal; fresh 1.9.8 candidate CI required | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; fresh 1.9.8 candidate CI required | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 1.10.0 local qualification evidence; full 2.0 RC qualification pending | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; full 2.0 RC qualification pending | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The exact 1.10.0 candidate commit must produce new Linux and Windows primary
-artifacts before tagging.
+Each 2.0 release-candidate tag must produce new Linux and Windows primary
+artifacts before promotion.
 
 ### Exact profiles
 
@@ -41,9 +41,10 @@ artifacts before tagging.
   source/package audit, and the Lazarus package. This tier does not imply the
   primary documentation, benchmark, or heap-traced profile.
 
-Primary normal checks run on every push and pull request. The complete primary
-archive profiles run on demand, for the exact published release, and weekly to
-detect drift before a release candidate.
+Primary normal checks run on pushes to `main` and pull requests targeting
+`main`. The complete primary archive profiles run on demand, for each
+qualifying published release tag, and weekly to detect drift before a release
+candidate.
 
 ## Explicitly unqualified targets
 

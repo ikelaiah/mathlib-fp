@@ -24,23 +24,52 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release: ${{ steps.version.outputs.release }}
+      source_ref: ${{ steps.source.outputs.ref }}
+      tag_kind: ${{ steps.tag.outputs.kind }}
     steps:
-      - name: Check out repository
+      - name: Select documentation source ref
+        id: source
+        env:
+          INPUT_RELEASE_REF: ${{ inputs.release_ref }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          source_ref="$INPUT_RELEASE_REF"
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            source_ref="$RELEASE_TAG"
+          fi
+          echo "ref=$source_ref" >> "$GITHUB_OUTPUT"
+
+      - name: Check out documentation source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.source.outputs.ref }}
+          path: current
 
       - name: Read current release version
         id: version
-        run: echo "release=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+        run: echo "release=$(cat current/VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Classify release tag
+        id: tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE: ${{ steps.version.outputs.release }}
+        run: |
+          kind=manual
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            kind="$(python3 current/tools/release_tags.py \
+              --tag "$RELEASE_TAG" --version "$RELEASE")"
+          fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
 
   build:
     needs: resolve
-    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
     runs-on: ubuntu-latest
     steps:
       - name: Check out current documentation source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.release.tag_name || inputs.release_ref }}
+          ref: ${{ needs.resolve.outputs.source_ref }}
           path: current
 
       - name: Check out immutable 1.9.0 documentation source
@@ -104,7 +133,9 @@ jobs:
           path: historical-1.9.9
 
       - name: Read current release version
-        run: echo "RELEASE=$(cat current/VERSION)" >> "$GITHUB_ENV"
+        run: |
+          test "$(cat current/VERSION)" = "${{ needs.resolve.outputs.release }}"
+          echo "RELEASE=$(cat current/VERSION)" >> "$GITHUB_ENV"
 
       - name: Build preserved and current versioned sites
         run: |
@@ -178,9 +209,11 @@ jobs:
           python3 current/tools/check_built_docs.py --site site
 
       - name: Configure GitHub Pages
+        if: needs.resolve.outputs.tag_kind != 'rc'
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
 
       - name: Upload GitHub Pages artifact
+        if: needs.resolve.outputs.tag_kind != 'rc'
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: site
@@ -195,7 +228,7 @@ jobs:
             artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip.sha256
 
       - name: Attach offline documentation to release
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' && needs.resolve.outputs.tag_kind == 'stable'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -205,7 +238,7 @@ jobs:
             --repo "$GITHUB_REPOSITORY"
 
   deploy:
-    if: github.event_name != 'release' || github.event.release.tag_name == format('v{0}', needs.resolve.outputs.release)
+    if: needs.resolve.outputs.tag_kind != 'rc'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
