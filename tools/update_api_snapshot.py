@@ -535,7 +535,7 @@ def write_reference(
                 "",
                 f"## {unit_name}",
                 "",
-                f"Source: [`{source}`](../{source})  ",
+                f"Source: [`{source}`](../../../{source})  ",
                 f"Interface SHA-256: `{unit['interface_sha256']}`",
                 "",
                 "| Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |",

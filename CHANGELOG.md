@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.0.0] - Release candidate (not yet published)
+
+### Changed
+
+- Promoted the frozen 1.10.0 API and documentation evidence to the 2.0.0
+  release-candidate target. No new public API, numerical implementation,
+  default, tolerance, warning, or package-surface change is introduced.
+- Added versioned 2.0 API evidence and candidate migration/release material;
+  1.10.0 remains the latest published stable release until final publication.
+
 - Reorganised maintained documentation into Start, Guides, Reference, Project,
   and version-owned Releases sections, with compatibility redirects for former
   user-guide URLs. This is a documentation discoverability milestone only; it

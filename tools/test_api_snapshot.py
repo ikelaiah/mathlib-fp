@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import unittest
+import tempfile
+from pathlib import Path
 
-from update_api_snapshot import extract_declarations
+from update_api_snapshot import extract_declarations, write_reference
 
 
 FIXTURE = """
@@ -35,6 +37,29 @@ end.
 
 
 class SnapshotExtractorTests(unittest.TestCase):
+    def test_reference_links_sources_from_the_nested_api_directory(self) -> None:
+        snapshot = {
+            "units": [{
+                "unit": "Fixture",
+                "source": "src/Fixture.pas",
+                "interface_sha256": "fixture",
+                "declarations": [],
+            }]
+        }
+        decision = {
+            "alias_equivalence_profiles": {
+                "compiler-type-identity": {"basis": "fixture"}
+            },
+            "alias_reviews": [],
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            reference = Path(temporary) / "reference.md"
+            write_reference(snapshot, decision, reference, "2.0.0")
+            self.assertIn(
+                "[`src/Fixture.pas`](../../../src/Fixture.pas)",
+                reference.read_text(encoding="utf-8"),
+            )
+
     def test_owner_overload_visibility_and_exact_identity(self) -> None:
         declarations = extract_declarations("Fixture", FIXTURE.split("implementation")[0])
         open_declarations = [

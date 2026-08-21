@@ -400,6 +400,18 @@ class CapabilityInventoryTests(unittest.TestCase):
 
         self.assertEqual([], capability_inventory_errors(capabilities))
 
+    def test_accepts_a_promoted_candidate_inventory_without_rewriting_history(self) -> None:
+        capabilities = {
+            "release": "2.0.0",
+            "convergence": "docs/releases/1.10.0/capability-manifest.json",
+            "provenance_audit": "docs/releases/1.9.9/provenance-audit.json",
+            "api_snapshot_final": "docs/releases/1.9.9/api-snapshot-final.json",
+        }
+
+        self.assertEqual(
+            [], capability_inventory_errors(capabilities, active_release="2.0.0")
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

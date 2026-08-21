@@ -1,6 +1,7 @@
 # Supported platform matrix
 
-Version 1.10.0 uses Free Pascal source and standard RTL/FCL units only. The
+The 2.0.0 release candidate uses Free Pascal source and standard RTL/FCL units
+only; 1.10.0 remains the latest published stable release. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](../portability-evidence-1.9.6.json); the
 [evidence report](../releases/1.9.6/portability-evidence.md) explains the unchanged target
@@ -11,13 +12,13 @@ consumer evidence, and the 1.9.8
 multi-domain end-to-end workflow evidence without expanding the supported
 target matrix. The 1.9.9
 [convergence gate](../releases/1.10.0/capability-manifest.md) closed the 1.10.0 handoff,
-and 1.10.0, the current release, adds no target-matrix change.
+and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 1.10.0 local qualification evidence; full 2.0 RC qualification pending | P-Windows |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 1.10.0 retained evidence; full 2.0 RC qualification pending | P-Windows |
 | Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; full 2.0 RC qualification pending | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
@@ -81,7 +82,9 @@ files to the offline machine, verify the checksum, and extract the archive.
 Adding `src/` to the FPC unit path is sufficient; no configure or generation
 step is required. The release page also provides a separately checksummed
 offline HTML ZIP generated from the same tagged documentation. Extract it and
-open `mathlib-fp-docs-1.10.0/index.html` locally.
+open the latest published archive, `mathlib-fp-docs-1.10.0/index.html`,
+locally. A 2.0.0 RC archive may be evaluated separately but does not replace
+the published stable documentation.
 
 The release qualification workflows perform these same checksum, clean-
 extraction, direct-source, representative-workflow, documentation, and package

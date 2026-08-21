@@ -294,10 +294,12 @@ def provenance_errors(audit: dict, unit_names: set[str]) -> list[str]:
     return errors
 
 
-def capability_inventory_errors(capabilities: dict) -> list[str]:
+def capability_inventory_errors(
+    capabilities: dict, active_release: str = "1.10.0",
+) -> list[str]:
     errors: list[str] = []
-    if capabilities.get("release") != "1.10.0":
-        errors.append("capabilities.json: release must be 1.10.0")
+    if capabilities.get("release") != active_release:
+        errors.append(f"capabilities.json: release must be {active_release}")
     if capabilities.get("convergence") != "docs/releases/1.10.0/capability-manifest.json":
         errors.append("capabilities.json: missing convergence manifest reference")
     if capabilities.get("provenance_audit") != "docs/releases/1.9.9/provenance-audit.json":
