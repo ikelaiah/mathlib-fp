@@ -48,15 +48,15 @@ class PageParser(HTMLParser):
 
 
 @lru_cache(maxsize=None)
-def _parse_page(path: Path, modified_ns: int) -> PageParser:
+def _parse_page(path: Path, source: str) -> PageParser:
     parser = PageParser()
-    parser.feed(path.read_text(encoding="utf-8"))
+    parser.feed(source)
     return parser
 
 
 def parse_page(path: Path) -> PageParser:
-    """Reuse parsed linked pages while respecting files rewritten during tests."""
-    return _parse_page(path, path.stat().st_mtime_ns)
+    """Reuse parsed pages without trusting filesystem timestamp precision."""
+    return _parse_page(path, path.read_text(encoding="utf-8"))
 
 
 def validate_page(page: Path, root: Path, expected_release: str) -> list[str]:

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -43,11 +44,13 @@ class BuiltDocumentationTests(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertEqual([], validate_page(page, root, "1.9.3"))
+            original_mtime = page.stat().st_mtime_ns
             page.write_text(
                 '<meta name="mathlib-release" content="1.9.0">'
                 '<a href="missing.html">missing</a>',
                 encoding="utf-8",
             )
+            os.utime(page, ns=(page.stat().st_atime_ns, original_mtime))
             errors = validate_page(page, root, "1.9.3")
             self.assertTrue(any("release metadata" in error for error in errors))
             self.assertTrue(any("missing built link" in error for error in errors))
