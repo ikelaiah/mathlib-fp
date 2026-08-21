@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
+from docs_layout import DocumentationLayout, LayoutError, load_layout
+
 
 REQUIRED_DOMAINS = (
     "MathBase",
@@ -200,7 +202,21 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
         )
 
 
-def _repository_file(root: Path, raw_path: str, description: str) -> Path:
+def _documentation_layout(root: Path) -> DocumentationLayout | None:
+    docs = root / "docs"
+    layout_path = docs / "layout.json"
+    if not layout_path.is_file():
+        return None
+    try:
+        return load_layout(layout_path, docs)
+    except LayoutError as exc:
+        raise MigrationContractError(f"invalid documentation layout: {exc}") from exc
+
+
+def _repository_file(
+    root: Path, raw_path: str, description: str,
+    layout: DocumentationLayout | None,
+) -> Path:
     repository = root.resolve()
     candidate = Path(raw_path)
     if candidate.is_absolute():
@@ -214,6 +230,16 @@ def _repository_file(root: Path, raw_path: str, description: str) -> Path:
         raise MigrationContractError(
             f"{description} is outside repository root: {raw_path}"
         ) from exc
+    if (
+        not resolved.is_file()
+        and layout is not None
+        and candidate.parts[:1] == ("docs",)
+    ):
+        canonical = layout.canonical_path(
+            candidate.relative_to("docs").as_posix()
+        )
+        if canonical is not None:
+            resolved = canonical.resolve()
     if not resolved.is_file():
         raise MigrationContractError(f"missing {description}: {resolved}")
     return resolved
@@ -228,13 +254,14 @@ def load_manifest(path: Path, root: Path) -> dict[str, Any]:
     if not isinstance(manifest, dict):
         raise MigrationContractError("migration manifest root must be an object")
     validate_manifest(manifest)
+    layout = _documentation_layout(root)
     for consumer in manifest["consumers"]:
-        _repository_file(root, consumer["source"], "consumer source")
+        _repository_file(root, consumer["source"], "consumer source", layout)
     for domain in manifest["domains"]:
-        _repository_file(root, domain["guide"], "domain guide")
+        _repository_file(root, domain["guide"], "domain guide", layout)
     for decision in manifest["alias_decisions"]:
         _repository_file(
-            root, decision["migration_example"], "alias migration example"
+            root, decision["migration_example"], "alias migration example", layout
         )
     return manifest
 
