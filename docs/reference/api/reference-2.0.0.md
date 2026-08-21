@@ -57,7 +57,7 @@ Equivalence basis: A Free Pascal plain-equals type alias denotes the same compil
 
 ## AlgebraLib.DenseDecompositions
 
-Source: [`src/AlgebraLib.DenseDecompositions.pas`](../../../src/AlgebraLib.DenseDecompositions.pas)  
+Source: [`src/AlgebraLib.DenseDecompositions.pas`](../../../src/AlgebraLib.DenseDecompositions.pas)
 Interface SHA-256: `22c91ef478349504453ef2986593b25d3ce45c8daeac4bd10cb71f66652a2f95`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -180,7 +180,7 @@ Interface SHA-256: `22c91ef478349504453ef2986593b25d3ce45c8daeac4bd10cb71f66652a
 
 ## AlgebraLib.DenseKernels
 
-Source: [`src/AlgebraLib.DenseKernels.pas`](../../../src/AlgebraLib.DenseKernels.pas)  
+Source: [`src/AlgebraLib.DenseKernels.pas`](../../../src/AlgebraLib.DenseKernels.pas)
 Interface SHA-256: `ca15637537ad37e7208ba46c575c7b2ced1bc22a2b64b86441c0927be0e80870`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -296,7 +296,7 @@ Interface SHA-256: `ca15637537ad37e7208ba46c575c7b2ced1bc22a2b64b86441c0927be0e8
 
 ## AlgebraLib.DenseMatrices
 
-Source: [`src/AlgebraLib.DenseMatrices.pas`](../../../src/AlgebraLib.DenseMatrices.pas)  
+Source: [`src/AlgebraLib.DenseMatrices.pas`](../../../src/AlgebraLib.DenseMatrices.pas)
 Interface SHA-256: `61b095e413bd523943bd018682ac9d2f70c26954eff820786583013822eb5d23`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -393,7 +393,7 @@ Interface SHA-256: `61b095e413bd523943bd018682ac9d2f70c26954eff820786583013822eb
 
 ## AlgebraLib.DenseSolvers
 
-Source: [`src/AlgebraLib.DenseSolvers.pas`](../../../src/AlgebraLib.DenseSolvers.pas)  
+Source: [`src/AlgebraLib.DenseSolvers.pas`](../../../src/AlgebraLib.DenseSolvers.pas)
 Interface SHA-256: `482a32d391f57762787cced31b47957a20d27322cede4d4d24d432c499d53b1e`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -455,7 +455,7 @@ Interface SHA-256: `482a32d391f57762787cced31b47957a20d27322cede4d4d24d432c499d5
 
 ## AlgebraLib.Determinants
 
-Source: [`src/AlgebraLib.Determinants.pas`](../../../src/AlgebraLib.Determinants.pas)  
+Source: [`src/AlgebraLib.Determinants.pas`](../../../src/AlgebraLib.Determinants.pas)
 Interface SHA-256: `3b6da7a77613265189df699e0f9d987a1a10d43e6f0aaf0435792e15645dbe8d`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -464,7 +464,7 @@ Interface SHA-256: `3b6da7a77613265189df699e0f9d987a1a10d43e6f0aaf0435792e15645d
 
 ## AlgebraLib.IterativeSolvers
 
-Source: [`src/AlgebraLib.IterativeSolvers.pas`](../../../src/AlgebraLib.IterativeSolvers.pas)  
+Source: [`src/AlgebraLib.IterativeSolvers.pas`](../../../src/AlgebraLib.IterativeSolvers.pas)
 Interface SHA-256: `6079df3e3fc24477a6d09573fc833accce9e52e52b8cab87e7ac614fd4d15707`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -555,7 +555,7 @@ Interface SHA-256: `6079df3e3fc24477a6d09573fc833accce9e52e52b8cab87e7ac614fd4d1
 
 ## AlgebraLib.LinearOperators
 
-Source: [`src/AlgebraLib.LinearOperators.pas`](../../../src/AlgebraLib.LinearOperators.pas)  
+Source: [`src/AlgebraLib.LinearOperators.pas`](../../../src/AlgebraLib.LinearOperators.pas)
 Interface SHA-256: `abbab8d8456e9a2e07bdecfed5dee1f8f8afd88a35806aadeb95f300808e1db4`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -710,7 +710,7 @@ Interface SHA-256: `abbab8d8456e9a2e07bdecfed5dee1f8f8afd88a35806aadeb95f300808e
 
 ## AlgebraLib.Matrices
 
-Source: [`src/AlgebraLib.Matrices.pas`](../../../src/AlgebraLib.Matrices.pas)  
+Source: [`src/AlgebraLib.Matrices.pas`](../../../src/AlgebraLib.Matrices.pas)
 Interface SHA-256: `9693f80e64fe84df6ddcfa09a97e66e25891f4da323b403e2ea43c7e8824bdba`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -877,7 +877,7 @@ Interface SHA-256: `9693f80e64fe84df6ddcfa09a97e66e25891f4da323b403e2ea43c7e8824
 
 ## AlgebraLib.PartialEigensystems
 
-Source: [`src/AlgebraLib.PartialEigensystems.pas`](../../../src/AlgebraLib.PartialEigensystems.pas)  
+Source: [`src/AlgebraLib.PartialEigensystems.pas`](../../../src/AlgebraLib.PartialEigensystems.pas)
 Interface SHA-256: `c294bce8f96956d913f2a956d9e5b477d09c026826c7db2d8f75f68bb3e26f69`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -922,7 +922,7 @@ Interface SHA-256: `c294bce8f96956d913f2a956d9e5b477d09c026826c7db2d8f75f68bb3e2
 
 ## AlgebraLib.SparseMatrices
 
-Source: [`src/AlgebraLib.SparseMatrices.pas`](../../../src/AlgebraLib.SparseMatrices.pas)  
+Source: [`src/AlgebraLib.SparseMatrices.pas`](../../../src/AlgebraLib.SparseMatrices.pas)
 Interface SHA-256: `18c1b6712121b70e343782b4409e715fb6eb1c3edb32b7f0e7661000328705c0`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1068,7 +1068,7 @@ Interface SHA-256: `18c1b6712121b70e343782b4409e715fb6eb1c3edb32b7f0e76610003287
 
 ## AlgebraLib.StructuredSolvers
 
-Source: [`src/AlgebraLib.StructuredSolvers.pas`](../../../src/AlgebraLib.StructuredSolvers.pas)  
+Source: [`src/AlgebraLib.StructuredSolvers.pas`](../../../src/AlgebraLib.StructuredSolvers.pas)
 Interface SHA-256: `27e137e9cd250b58e2bc2a33d98514aa6d30c74bbefaf993e03a18cde805ad92`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1166,7 +1166,7 @@ Interface SHA-256: `27e137e9cd250b58e2bc2a33d98514aa6d30c74bbefaf993e03a18cde805
 
 ## AlgebraLib.VectorKernels
 
-Source: [`src/AlgebraLib.VectorKernels.pas`](../../../src/AlgebraLib.VectorKernels.pas)  
+Source: [`src/AlgebraLib.VectorKernels.pas`](../../../src/AlgebraLib.VectorKernels.pas)
 Interface SHA-256: `d343f85841a63a54dcb0eb12c85432db587def837375ceaf23bfc6c5c482f48e`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1211,7 +1211,7 @@ Interface SHA-256: `d343f85841a63a54dcb0eb12c85432db587def837375ceaf23bfc6c5c482
 
 ## AlgebraLib.Vectors
 
-Source: [`src/AlgebraLib.Vectors.pas`](../../../src/AlgebraLib.Vectors.pas)  
+Source: [`src/AlgebraLib.Vectors.pas`](../../../src/AlgebraLib.Vectors.pas)
 Interface SHA-256: `f2948879070ad4f48e4505f67e0a3765420e0ca31ff0ab3c6878e666d91c5dc5`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1225,7 +1225,7 @@ Interface SHA-256: `f2948879070ad4f48e4505f67e0a3765420e0ca31ff0ab3c6878e666d91c
 
 ## CombinatoricsLib.Combinatorics
 
-Source: [`src/CombinatoricsLib.Combinatorics.pas`](../../../src/CombinatoricsLib.Combinatorics.pas)  
+Source: [`src/CombinatoricsLib.Combinatorics.pas`](../../../src/CombinatoricsLib.Combinatorics.pas)
 Interface SHA-256: `4c73ea2e6c68defa6dd2c7f38d1668dcba907b26cb39214b543459652c1b4781`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1276,7 +1276,7 @@ Interface SHA-256: `4c73ea2e6c68defa6dd2c7f38d1668dcba907b26cb39214b543459652c1b
 
 ## EngineeringLib.Common
 
-Source: [`src/EngineeringLib.Common.pas`](../../../src/EngineeringLib.Common.pas)  
+Source: [`src/EngineeringLib.Common.pas`](../../../src/EngineeringLib.Common.pas)
 Interface SHA-256: `40da5189dadf272d9bf13848a282b6fdedbafec3a56dda318cb9ede720a7702b`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1289,7 +1289,7 @@ Interface SHA-256: `40da5189dadf272d9bf13848a282b6fdedbafec3a56dda318cb9ede720a7
 
 ## EngineeringLib.DSP
 
-Source: [`src/EngineeringLib.DSP.pas`](../../../src/EngineeringLib.DSP.pas)  
+Source: [`src/EngineeringLib.DSP.pas`](../../../src/EngineeringLib.DSP.pas)
 Interface SHA-256: `b9475b4c6545d2335f86040353cc9ee72c785194b67b0d50d862094d5d27d804`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1381,7 +1381,7 @@ Interface SHA-256: `b9475b4c6545d2335f86040353cc9ee72c785194b67b0d50d862094d5d27
 
 ## EngineeringLib.FluidDynamics
 
-Source: [`src/EngineeringLib.FluidDynamics.pas`](../../../src/EngineeringLib.FluidDynamics.pas)  
+Source: [`src/EngineeringLib.FluidDynamics.pas`](../../../src/EngineeringLib.FluidDynamics.pas)
 Interface SHA-256: `cee0ec867efb769522f50b593be8d0edef2aea915abb08812be928de55fa0a7e`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1435,7 +1435,7 @@ Interface SHA-256: `cee0ec867efb769522f50b593be8d0edef2aea915abb08812be928de55fa
 
 ## EngineeringLib.Pressure
 
-Source: [`src/EngineeringLib.Pressure.pas`](../../../src/EngineeringLib.Pressure.pas)  
+Source: [`src/EngineeringLib.Pressure.pas`](../../../src/EngineeringLib.Pressure.pas)
 Interface SHA-256: `7ba319719acd1c24c9fd1ec661ddd8f495b2a713b22684740bfdcb788f50aa68`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1445,7 +1445,7 @@ Interface SHA-256: `7ba319719acd1c24c9fd1ec661ddd8f495b2a713b22684740bfdcb788f50
 
 ## EngineeringLib.Signal
 
-Source: [`src/EngineeringLib.Signal.pas`](../../../src/EngineeringLib.Signal.pas)  
+Source: [`src/EngineeringLib.Signal.pas`](../../../src/EngineeringLib.Signal.pas)
 Interface SHA-256: `f72fc090374b3768dae2687625113e921622e1c30b028c7b24a79c4415f58d50`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1478,7 +1478,7 @@ Interface SHA-256: `f72fc090374b3768dae2687625113e921622e1c30b028c7b24a79c4415f5
 
 ## EngineeringLib.Thermodynamics
 
-Source: [`src/EngineeringLib.Thermodynamics.pas`](../../../src/EngineeringLib.Thermodynamics.pas)  
+Source: [`src/EngineeringLib.Thermodynamics.pas`](../../../src/EngineeringLib.Thermodynamics.pas)
 Interface SHA-256: `930001a78df5eb686e412d3fbd03f2d8d3658bbcdbb300307c0a5dd15b69fd81`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1532,7 +1532,7 @@ Interface SHA-256: `930001a78df5eb686e412d3fbd03f2d8d3658bbcdbb300307c0a5dd15b69
 
 ## EngineeringLib.UnitConversion
 
-Source: [`src/EngineeringLib.UnitConversion.pas`](../../../src/EngineeringLib.UnitConversion.pas)  
+Source: [`src/EngineeringLib.UnitConversion.pas`](../../../src/EngineeringLib.UnitConversion.pas)
 Interface SHA-256: `1463bdaa57cb84eb3f3045fb577ed85088f9c1f9c48e8759e60861203383fe4a`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1751,7 +1751,7 @@ Interface SHA-256: `1463bdaa57cb84eb3f3045fb577ed85088f9c1f9c48e8759e60861203383
 
 ## EngineeringLib.Velocity
 
-Source: [`src/EngineeringLib.Velocity.pas`](../../../src/EngineeringLib.Velocity.pas)  
+Source: [`src/EngineeringLib.Velocity.pas`](../../../src/EngineeringLib.Velocity.pas)
 Interface SHA-256: `c71d42a545d7c3c47bbd80231ded89b3699be4c8b7169ad42bd2c145d8497551`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1761,7 +1761,7 @@ Interface SHA-256: `c71d42a545d7c3c47bbd80231ded89b3699be4c8b7169ad42bd2c145d849
 
 ## FinanceLib.Bonds
 
-Source: [`src/FinanceLib.Bonds.pas`](../../../src/FinanceLib.Bonds.pas)  
+Source: [`src/FinanceLib.Bonds.pas`](../../../src/FinanceLib.Bonds.pas)
 Interface SHA-256: `ee28d157c511c65c2b2f268f35f6e57f9d84eb1e6b109ff19e6cc04d14c429c0`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1773,7 +1773,7 @@ Interface SHA-256: `ee28d157c511c65c2b2f268f35f6e57f9d84eb1e6b109ff19e6cc04d14c4
 
 ## FinanceLib.Interest
 
-Source: [`src/FinanceLib.Interest.pas`](../../../src/FinanceLib.Interest.pas)  
+Source: [`src/FinanceLib.Interest.pas`](../../../src/FinanceLib.Interest.pas)
 Interface SHA-256: `6c7265b16ed7a41d966a2582d202138f135a0110ad97c769e4a73d9a62d15cec`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1845,7 +1845,7 @@ Interface SHA-256: `6c7265b16ed7a41d966a2582d202138f135a0110ad97c769e4a73d9a62d1
 
 ## FinanceLib.NPV
 
-Source: [`src/FinanceLib.NPV.pas`](../../../src/FinanceLib.NPV.pas)  
+Source: [`src/FinanceLib.NPV.pas`](../../../src/FinanceLib.NPV.pas)
 Interface SHA-256: `c6fbf1c36ed0f3448519e41d05b75df2788985053e91aee7e1dc11aaaf2df48d`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1856,7 +1856,7 @@ Interface SHA-256: `c6fbf1c36ed0f3448519e41d05b75df2788985053e91aee7e1dc11aaaf2d
 
 ## GeometryLib.Geometry
 
-Source: [`src/GeometryLib.Geometry.pas`](../../../src/GeometryLib.Geometry.pas)  
+Source: [`src/GeometryLib.Geometry.pas`](../../../src/GeometryLib.Geometry.pas)
 Interface SHA-256: `f9153059c791b9295b46de318c7b1fe404c86d94076a5ff39b80e5d4cc8f1015`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -1997,7 +1997,7 @@ Interface SHA-256: `f9153059c791b9295b46de318c7b1fe404c86d94076a5ff39b80e5d4cc8f
 
 ## InterchangeLib.Models
 
-Source: [`src/InterchangeLib.Models.pas`](../../../src/InterchangeLib.Models.pas)  
+Source: [`src/InterchangeLib.Models.pas`](../../../src/InterchangeLib.Models.pas)
 Interface SHA-256: `bca8bc1a3add64031172bdd67a2f163f012d70699157f4d308c982a70b082dc0`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2019,7 +2019,7 @@ Interface SHA-256: `bca8bc1a3add64031172bdd67a2f163f012d70699157f4d308c982a70b08
 
 ## MathBase.Complex
 
-Source: [`src/MathBase.Complex.pas`](../../../src/MathBase.Complex.pas)  
+Source: [`src/MathBase.Complex.pas`](../../../src/MathBase.Complex.pas)
 Interface SHA-256: `58ab9d4c1e42bf1890afdc80ac4bf898783d896e94e972d9ad6ccdf5ea148239`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2093,7 +2093,7 @@ Interface SHA-256: `58ab9d4c1e42bf1890afdc80ac4bf898783d896e94e972d9ad6ccdf5ea14
 
 ## MathBase.Expressions
 
-Source: [`src/MathBase.Expressions.pas`](../../../src/MathBase.Expressions.pas)  
+Source: [`src/MathBase.Expressions.pas`](../../../src/MathBase.Expressions.pas)
 Interface SHA-256: `43870a1ff854d7e352970b98cbcd4c36a4d9f0bd50b570de91213f3052f0b76d`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2126,7 +2126,7 @@ Interface SHA-256: `43870a1ff854d7e352970b98cbcd4c36a4d9f0bd50b570de91213f3052f0
 
 ## MathBase.Interchange
 
-Source: [`src/MathBase.Interchange.pas`](../../../src/MathBase.Interchange.pas)  
+Source: [`src/MathBase.Interchange.pas`](../../../src/MathBase.Interchange.pas)
 Interface SHA-256: `023a74575eccf18849f8b148ea115a64c3996c089866ed15e2a5626a440f7883`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2192,7 +2192,7 @@ Interface SHA-256: `023a74575eccf18849f8b148ea115a64c3996c089866ed15e2a5626a440f
 
 ## MathBase.Iteration
 
-Source: [`src/MathBase.Iteration.pas`](../../../src/MathBase.Iteration.pas)  
+Source: [`src/MathBase.Iteration.pas`](../../../src/MathBase.Iteration.pas)
 Interface SHA-256: `a5a331e44c03161a6b809fae6fbf0f8589e40a65ee8a5760069d229575764453`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2211,7 +2211,7 @@ Interface SHA-256: `a5a331e44c03161a6b809fae6fbf0f8589e40a65ee8a5760069d22957576
 
 ## MathBase.MathConstants
 
-Source: [`src/MathBase.MathConstants.pas`](../../../src/MathBase.MathConstants.pas)  
+Source: [`src/MathBase.MathConstants.pas`](../../../src/MathBase.MathConstants.pas)
 Interface SHA-256: `7b665b0a608e253add891b24dc2659ae170bcbdee7c0fea44245be2d344f4e6a`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2232,7 +2232,7 @@ Interface SHA-256: `7b665b0a608e253add891b24dc2659ae170bcbdee7c0fea44245be2d344f
 
 ## MathBase.Precision
 
-Source: [`src/MathBase.Precision.pas`](../../../src/MathBase.Precision.pas)  
+Source: [`src/MathBase.Precision.pas`](../../../src/MathBase.Precision.pas)
 Interface SHA-256: `eb14f7d7c9eea0fadd0ef460a10275937ebb0d7deb7dfde4ef94443c51b08714`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2246,7 +2246,7 @@ Interface SHA-256: `eb14f7d7c9eea0fadd0ef460a10275937ebb0d7deb7dfde4ef94443c51b0
 
 ## MathBase.Random
 
-Source: [`src/MathBase.Random.pas`](../../../src/MathBase.Random.pas)  
+Source: [`src/MathBase.Random.pas`](../../../src/MathBase.Random.pas)
 Interface SHA-256: `c228dd158893139a0c37e41ac208949cf7ba39860628a165660f063698089e74`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2269,7 +2269,7 @@ Interface SHA-256: `c228dd158893139a0c37e41ac208949cf7ba39860628a165660f06369808
 
 ## MathBase.SharedTypes
 
-Source: [`src/MathBase.SharedTypes.pas`](../../../src/MathBase.SharedTypes.pas)  
+Source: [`src/MathBase.SharedTypes.pas`](../../../src/MathBase.SharedTypes.pas)
 Interface SHA-256: `a416e6f148fdf45b0a25fd7dc97b7ea887729fae7f191d22ba53483c99cf59a6`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2287,7 +2287,7 @@ Interface SHA-256: `a416e6f148fdf45b0a25fd7dc97b7ea887729fae7f191d22ba53483c99cf
 
 ## MathBase.Trigonometry
 
-Source: [`src/MathBase.Trigonometry.pas`](../../../src/MathBase.Trigonometry.pas)  
+Source: [`src/MathBase.Trigonometry.pas`](../../../src/MathBase.Trigonometry.pas)
 Interface SHA-256: `828196cd105971ed00a3370ce97ae8512c373dbfc8a80817af90b4e4a536e447`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2330,7 +2330,7 @@ Interface SHA-256: `828196cd105971ed00a3370ce97ae8512c373dbfc8a80817af90b4e4a536
 
 ## MLLib.Analysis
 
-Source: [`src/MLLib.Analysis.pas`](../../../src/MLLib.Analysis.pas)  
+Source: [`src/MLLib.Analysis.pas`](../../../src/MLLib.Analysis.pas)
 Interface SHA-256: `0b107a3183b456089fe369788d7cdacda2e402a3859a0f3468bea604e82069b3`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2417,7 +2417,7 @@ Interface SHA-256: `0b107a3183b456089fe369788d7cdacda2e402a3859a0f3468bea604e820
 
 ## MLLib.MachineLearning
 
-Source: [`src/MLLib.MachineLearning.pas`](../../../src/MLLib.MachineLearning.pas)  
+Source: [`src/MLLib.MachineLearning.pas`](../../../src/MLLib.MachineLearning.pas)
 Interface SHA-256: `a2c2e6db5103bb5362aaf157d32a8dc7ac7a222cda378e8a9834868ca56c5921`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2475,7 +2475,7 @@ Interface SHA-256: `a2c2e6db5103bb5362aaf157d32a8dc7ac7a222cda378e8a9834868ca56c
 
 ## NumericsLib.Differentiation
 
-Source: [`src/NumericsLib.Differentiation.pas`](../../../src/NumericsLib.Differentiation.pas)  
+Source: [`src/NumericsLib.Differentiation.pas`](../../../src/NumericsLib.Differentiation.pas)
 Interface SHA-256: `f8e1c2ea7bad43c15fbe8ad64d72d01d13044740be4fe1026fecd6e81d2eaeb7`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2547,7 +2547,7 @@ Interface SHA-256: `f8e1c2ea7bad43c15fbe8ad64d72d01d13044740be4fe1026fecd6e81d2e
 
 ## NumericsLib.Interpolation
 
-Source: [`src/NumericsLib.Interpolation.pas`](../../../src/NumericsLib.Interpolation.pas)  
+Source: [`src/NumericsLib.Interpolation.pas`](../../../src/NumericsLib.Interpolation.pas)
 Interface SHA-256: `d5387826d1524550260e1552538359fbc3144e90b417e833abd42d27be049f50`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2618,7 +2618,7 @@ Interface SHA-256: `d5387826d1524550260e1552538359fbc3144e90b417e833abd42d27be04
 
 ## NumericsLib.Modelling
 
-Source: [`src/NumericsLib.Modelling.pas`](../../../src/NumericsLib.Modelling.pas)  
+Source: [`src/NumericsLib.Modelling.pas`](../../../src/NumericsLib.Modelling.pas)
 Interface SHA-256: `4dcd7399b9167afced9b2fe00c280c7555072879600a6e893d7c755714f8e494`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2732,7 +2732,7 @@ Interface SHA-256: `4dcd7399b9167afced9b2fe00c280c7555072879600a6e893d7c755714f8
 
 ## NumericsLib.Numerics
 
-Source: [`src/NumericsLib.Numerics.pas`](../../../src/NumericsLib.Numerics.pas)  
+Source: [`src/NumericsLib.Numerics.pas`](../../../src/NumericsLib.Numerics.pas)
 Interface SHA-256: `5c160336ebac2511438e747e52dff1a153dc028741e08278cfab1a51b0c285a4`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2779,7 +2779,7 @@ Interface SHA-256: `5c160336ebac2511438e747e52dff1a153dc028741e08278cfab1a51b0c2
 
 ## OptimizationLib.Convex
 
-Source: [`src/OptimizationLib.Convex.pas`](../../../src/OptimizationLib.Convex.pas)  
+Source: [`src/OptimizationLib.Convex.pas`](../../../src/OptimizationLib.Convex.pas)
 Interface SHA-256: `de66e5609b4e00d01439d571ece66c919ae46aa8f13470263c2e2937dd398340`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2827,7 +2827,7 @@ Interface SHA-256: `de66e5609b4e00d01439d571ece66c919ae46aa8f13470263c2e2937dd39
 
 ## OptimizationLib.Optimization
 
-Source: [`src/OptimizationLib.Optimization.pas`](../../../src/OptimizationLib.Optimization.pas)  
+Source: [`src/OptimizationLib.Optimization.pas`](../../../src/OptimizationLib.Optimization.pas)
 Interface SHA-256: `2a0dc52718192c1e8b964e319d45145aea8f612e8686cd65861d716f037b7a0c`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -2921,7 +2921,7 @@ Interface SHA-256: `2a0dc52718192c1e8b964e319d45145aea8f612e8686cd65861d716f037b
 
 ## ProbabilityLib.Distributions
 
-Source: [`src/ProbabilityLib.Distributions.pas`](../../../src/ProbabilityLib.Distributions.pas)  
+Source: [`src/ProbabilityLib.Distributions.pas`](../../../src/ProbabilityLib.Distributions.pas)
 Interface SHA-256: `e84d2cfef03612ee25cf4d4f735d9a18c20dc667e748247acc2a731b5951e2ef`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -3005,7 +3005,7 @@ Interface SHA-256: `e84d2cfef03612ee25cf4d4f735d9a18c20dc667e748247acc2a731b5951
 
 ## StatsLib.Inference
 
-Source: [`src/StatsLib.Inference.pas`](../../../src/StatsLib.Inference.pas)  
+Source: [`src/StatsLib.Inference.pas`](../../../src/StatsLib.Inference.pas)
 Interface SHA-256: `c53d9dcac00bba7e6fb4f50b653ad7dc5e775b5146bedda6043a4f7e2217c847`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -3102,7 +3102,7 @@ Interface SHA-256: `c53d9dcac00bba7e6fb4f50b653ad7dc5e775b5146bedda6043a4f7e2217
 
 ## StatsLib.Stats
 
-Source: [`src/StatsLib.Stats.pas`](../../../src/StatsLib.Stats.pas)  
+Source: [`src/StatsLib.Stats.pas`](../../../src/StatsLib.Stats.pas)
 Interface SHA-256: `f0b020f9f127af2aca2996221b997fbcc2a23db6ff2daa456515a0cb7d80aaf5`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -3178,7 +3178,7 @@ Interface SHA-256: `f0b020f9f127af2aca2996221b997fbcc2a23db6ff2daa456515a0cb7d80
 
 ## StatsLib.Streaming
 
-Source: [`src/StatsLib.Streaming.pas`](../../../src/StatsLib.Streaming.pas)  
+Source: [`src/StatsLib.Streaming.pas`](../../../src/StatsLib.Streaming.pas)
 Interface SHA-256: `fce473cf688ebd0b0ef5054889e9026cdf5cb8bae6fba81af51607ff8f721f39`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -3206,7 +3206,7 @@ Interface SHA-256: `fce473cf688ebd0b0ef5054889e9026cdf5cb8bae6fba81af51607ff8f72
 
 ## TimeSeriesLib.StateSpace
 
-Source: [`src/TimeSeriesLib.StateSpace.pas`](../../../src/TimeSeriesLib.StateSpace.pas)  
+Source: [`src/TimeSeriesLib.StateSpace.pas`](../../../src/TimeSeriesLib.StateSpace.pas)
 Interface SHA-256: `7133e9bbfb69f95b36be6a3566699d0d506fbc0cde3fe4e9c1c2850e810ba6c9`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
@@ -3272,7 +3272,7 @@ Interface SHA-256: `7133e9bbfb69f95b36be6a3566699d0d506fbc0cde3fe4e9c1c2850e810b
 
 ## TimeSeriesLib.TimeSeries
 
-Source: [`src/TimeSeriesLib.TimeSeries.pas`](../../../src/TimeSeriesLib.TimeSeries.pas)  
+Source: [`src/TimeSeriesLib.TimeSeries.pas`](../../../src/TimeSeriesLib.TimeSeries.pas)
 Interface SHA-256: `5e8da110e07ec2589e3cba88e9552fb00718baa65953ecbcca5fdaacd66e96a2`
 
 | Owner | Kind | Name | Normalized signature | Classification | Compatibility decision | Preferred replacement | Compatibility note |
