@@ -20,6 +20,10 @@ from migration_rehearsal import (
 )
 
 
+ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_MANIFEST = ROOT / "docs" / "releases" / "1.9.7" / "migration-rehearsal.json"
+
+
 def complete_manifest() -> dict[str, object]:
     concerns = {name: f"verified {name}" for name in REQUIRED_CONCERNS}
     domains = [
@@ -109,6 +113,9 @@ def complete_manifest() -> dict[str, object]:
 
 
 class MigrationRehearsalContractTests(unittest.TestCase):
+    def test_loads_repository_manifest_with_current_guide_paths(self) -> None:
+        load_manifest(DEFAULT_MANIFEST, ROOT)
+
     def test_accepts_complete_contract(self) -> None:
         validate_manifest(complete_manifest())
 
