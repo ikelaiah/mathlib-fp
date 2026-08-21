@@ -63,7 +63,7 @@ curl -L -o mathlib-fp.tar.gz \
 > `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
 
 Direct source use is canonical. The
-The [1.10.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.10.0)
+[1.10.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v1.10.0)
 remains the source of published stable `.zip`, `.tar.gz`, offline documentation,
 and checksum artifacts until 2.0.0 publication.
 
