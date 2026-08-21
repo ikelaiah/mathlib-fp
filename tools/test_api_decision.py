@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 class ApiDecisionTests(unittest.TestCase):
     def test_example_document_canonicalizes_a_legacy_flat_path(self) -> None:
-        layout = load_layout(ROOT / "docs/layout.json", ROOT / "docs", "1.10.0")
+        layout = load_layout(ROOT / "docs/layout.json", ROOT / "docs", "2.0.0")
         self.assertEqual(
             Path("docs/guides/domains/math-base.md"),
             canonical_example_document(Path("docs/MathBase.md"), layout),

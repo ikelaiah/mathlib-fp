@@ -52,6 +52,14 @@ class DocumentationWorkflowTests(unittest.TestCase):
         )
         self.assertIn("python3 current/tools/release_tags.py", self.workflow)
 
+    def test_builds_the_published_stable_documentation_path(self) -> None:
+        self.assertIn("ref: v1.10.0", self.workflow)
+        self.assertIn("path: historical-1.10.0", self.workflow)
+        self.assertIn("--source historical-1.10.0/docs", self.workflow)
+        self.assertIn("--release 1.10.0 --output site/1.10.0", self.workflow)
+        self.assertIn('site/1.10.0/release.json', self.workflow)
+        self.assertIn("'1.10.0/index.html'", self.workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

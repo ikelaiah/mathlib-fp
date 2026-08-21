@@ -34,6 +34,7 @@ def layout_path(name: str, legacy: str) -> Path:
 
 
 NEXT_RELEASE = "2.0.0"
+PUBLISHED_STABLE = "1.10.0"
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
 CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")
@@ -780,7 +781,13 @@ def main() -> int:
         assert versions["schema_version"] == 1
         assert versions["current"] == CURRENT_RELEASE
         listed_releases = [item["release"] for item in versions["versions"]]
-        assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
+        if versions.get("release_state") == "candidate":
+            assert versions["published_stable"] == PUBLISHED_STABLE
+            assert listed_releases == [
+                CURRENT_RELEASE, PUBLISHED_STABLE, *HISTORICAL_RELEASES
+            ]
+        else:
+            assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
         assert versions["site_url"].startswith("https://")
         assert versions["repository_url"].startswith("https://")
     except (ValueError, KeyError, AssertionError) as exc:
@@ -805,22 +812,55 @@ def main() -> int:
         encoding="utf-8"
     )
     major, minor, patch = CURRENT_RELEASE.split(".")
-    identity_checks = {
-        "README badge": f"version-{CURRENT_RELEASE}-brightgreen" in readme,
-        "README release notes": "releases/1.10.0/release-notes.md" in readme,
-        "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
-        "support matrix": f"Version {CURRENT_RELEASE}" in support,
-        "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
-        "Lazarus package": (
-            f'<Version Major="{major}" Minor="{minor}" Release="{patch}"/>'
-        ) in package,
-    }
+    if versions.get("release_state") == "candidate":
+        identity_checks = {
+            "README candidate badge": (
+                f"version-{CURRENT_RELEASE}--rc-blue" in readme
+            ),
+            "README candidate notes": (
+                f"releases/{CURRENT_RELEASE}/release-notes.md" in readme
+            ),
+            "README candidate archive": (
+                f"heads/release/v{CURRENT_RELEASE}.tar.gz" in readme
+            ),
+            "README published stable": PUBLISHED_STABLE in readme,
+            "support matrix": f"{CURRENT_RELEASE} release candidate" in support,
+            "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
+            "Lazarus package": (
+                f'<Version Major="{major}" Minor="{minor}" Release="{patch}"/>'
+            ) in package,
+        }
+    else:
+        identity_checks = {
+            "README badge": f"version-{CURRENT_RELEASE}-brightgreen" in readme,
+            "README release notes": f"releases/{CURRENT_RELEASE}/release-notes.md" in readme,
+            "README direct archive": f"tags/v{CURRENT_RELEASE}.tar.gz" in readme,
+            "support matrix": f"Version {CURRENT_RELEASE}" in support,
+            "changelog": f"## [{CURRENT_RELEASE}]" in changelog,
+            "Lazarus package": (
+                f'<Version Major="{major}" Minor="{minor}" Release="{patch}"/>'
+            ) in package,
+        }
     for description, valid in identity_checks.items():
         if not valid:
             errors.append(f"release identity mismatch: {description}")
-    errors.extend(
-        roadmap_release_state_errors(roadmap, CURRENT_RELEASE, NEXT_RELEASE)
-    )
+    if versions.get("release_state") == "candidate":
+        if (
+            f"## Previous published stable release: {PUBLISHED_STABLE}"
+            not in roadmap
+        ):
+            errors.append(
+                f"Roadmap does not record {PUBLISHED_STABLE} as the previous "
+                "published stable release"
+            )
+        if f"## Release candidate target: {CURRENT_RELEASE}" not in roadmap:
+            errors.append(
+                f"Roadmap does not name {CURRENT_RELEASE} as the release candidate target"
+            )
+    else:
+        errors.extend(
+            roadmap_release_state_errors(roadmap, CURRENT_RELEASE, NEXT_RELEASE)
+        )
 
     contracts_path = ROOT / "examples" / "output-contracts.json"
     try:

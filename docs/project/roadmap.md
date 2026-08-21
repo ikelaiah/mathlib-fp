@@ -364,7 +364,7 @@ numbers with unrelated algorithm families.
   functions, tests, pages, or examples does not substitute for the stated user
   and numerical outcome.
 
-## Previous release: 1.10.0
+## Previous published stable release: 1.10.0
 
 Version 1.10.0 is the backward-compatible minor release that implemented the
 closed 1.9.9 convergence manifest and froze the code, API, documentation,
@@ -386,11 +386,12 @@ the completed-releases table above and the
 [1.10.0 release notes](../releases/1.10.0/release-notes.md) and
 [qualification record](../releases/1.10.0/qualification.md).
 
-## Next release: 2.0.0 — Stable native numerical platform
+## Release candidate target: 2.0.0 — Stable native numerical platform
 
-Version 2.0.0 is the next active capability gate and the current release
-target. It is a quality and API graduation, not an excuse for an arbitrary
-rewrite: it ships only when the additive 1.x foundations have been used by the
+Version 2.0.0 is the active release-candidate target; 1.10.0 remains the
+latest published stable release until final publication. It is a quality and
+API graduation, not an excuse for an arbitrary rewrite: it ships only when the
+additive 1.x foundations have been used by the
 higher-level libraries, the migration path is proven, and the 1.x convergence
 gates through 1.10.0 are complete. Because 1.10.0 froze the promoted 2.0
 candidate, the only remaining work for 2.0.0 is version and release metadata

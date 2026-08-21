@@ -29,6 +29,9 @@ from convergence import (
 )
 
 
+CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -54,7 +57,7 @@ def main() -> int:
         errors.extend(deprecation_errors(manifest, decision))
         capabilities = load_json(CAPABILITIES_PATH)
         errors.extend(deferral_errors(manifest, capabilities))
-        errors.extend(capability_inventory_errors(capabilities))
+        errors.extend(capability_inventory_errors(capabilities, CURRENT_RELEASE))
     except (ValueError, KeyError, OSError) as exc:
         errors.append(f"convergence artifacts cannot be read: {exc}")
 

@@ -132,6 +132,12 @@ jobs:
           ref: v1.9.9
           path: historical-1.9.9
 
+      - name: Check out immutable 1.10.0 documentation source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v1.10.0
+          path: historical-1.10.0
+
       - name: Read current release version
         run: |
           test "$(cat current/VERSION)" = "${{ needs.resolve.outputs.release }}"
@@ -180,11 +186,16 @@ jobs:
             --versions current/docs/versions.json \
             --release 1.9.9 --output site/1.9.9 --site-root site
           python3 current/tools/build_docs.py \
+            --source historical-1.10.0/docs \
+            --versions current/docs/versions.json \
+            --release 1.10.0 --output site/1.10.0 --site-root site
+          python3 current/tools/build_docs.py \
             --source current/docs \
             --versions current/docs/versions.json \
             --release "$RELEASE" --output "site/$RELEASE" --site-root site \
             --offline-archive "artifacts/mathlib-fp-docs-$RELEASE.zip"
           python3 -c 'import json, os; r = os.environ["RELEASE"]; assert json.load(open(f"site/{r}/release.json"))["release"] == r'
+          python3 -c 'import json; assert json.load(open("site/1.10.0/release.json"))["release"] == "1.10.0"'
           python3 -c 'import json; assert json.load(open("site/1.9.9/release.json"))["release"] == "1.9.9"'
           python3 -c 'import json; assert json.load(open("site/1.9.8/release.json"))["release"] == "1.9.8"'
           python3 -c 'import json; assert json.load(open("site/1.9.7/release.json"))["release"] == "1.9.7"'
@@ -196,6 +207,7 @@ jobs:
           python3 -c 'import json; assert json.load(open("site/1.9.1/release.json"))["release"] == "1.9.1"'
           python3 -c 'import json; assert json.load(open("site/1.9.0/release.json"))["release"] == "1.9.0"'
           grep -q "Current release: $RELEASE" site/index.html
+          grep -q '1.10.0/index.html' site/index.html
           grep -q '1.9.9/index.html' site/index.html
           grep -q '1.9.8/index.html' site/index.html
           grep -q '1.9.7/index.html' site/index.html

@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-Consult the [API reference](reference/api/reference-1.10.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md).
+Consult the [2.0 candidate API reference](reference/api/reference-2.0.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md). The latest published stable release remains 1.10.0 until 2.0.0 is published.
 
 ## Domains
 

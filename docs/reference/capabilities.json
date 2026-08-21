@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "1.10.0",
+  "release": "2.0.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",

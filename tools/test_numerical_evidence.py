@@ -18,7 +18,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 class NumericalEvidenceCatalogueTests(unittest.TestCase):
     def test_catalogue_paths_follow_the_layout_manifest(self) -> None:
         layout = load_layout(
-            REPOSITORY_ROOT / "docs/layout.json", REPOSITORY_ROOT / "docs", "1.10.0"
+        REPOSITORY_ROOT / "docs/layout.json", REPOSITORY_ROOT / "docs", "2.0.0"
         )
         self.assertEqual(
             REPOSITORY_ROOT / "docs/releases/1.9.4/numerical-evidence.json",
