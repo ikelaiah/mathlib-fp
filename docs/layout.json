@@ -64,6 +64,7 @@
     "portability-evidence-1.9.6.json": "releases/1.9.6/portability-evidence.json",
     "MIGRATION_REHEARSAL_1.9.7.md": "releases/1.9.7/migration-rehearsal.md",
     "migration-rehearsal-1.9.7.json": "releases/1.9.7/migration-rehearsal.json",
+    "WORKFLOW_QUALIFICATION_1.9.8.md": "releases/1.9.8/workflow-qualification.md",
     "workflow-qualification-1.9.8.json": "releases/1.9.8/workflow-qualification.json",
     "API_SNAPSHOT_FINAL_1.9.9.md": "releases/1.9.9/api-snapshot-final.md",
     "api-snapshot-final-1.9.9.json": "releases/1.9.9/api-snapshot-final.json",
