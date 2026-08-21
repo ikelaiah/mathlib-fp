@@ -14,6 +14,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from docs_layout import DocumentationLayout, LayoutError, load_layout
+
 
 REQUIRED_DOMAINS = (
     "MathBase",
@@ -170,8 +172,24 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
             )
 
 
+def _documentation_layout(root: Path) -> DocumentationLayout | None:
+    docs = root / "docs"
+    layout_path = docs / "layout.json"
+    if not layout_path.is_file():
+        return None
+    try:
+        return load_layout(layout_path, docs)
+    except LayoutError as exc:
+        raise WorkflowContractError(f"invalid documentation layout: {exc}") from exc
+
+
 def _repository_file(
-    root: Path, raw_path: str, description: str, *, must_exist: bool = True
+    root: Path,
+    raw_path: str,
+    description: str,
+    layout: DocumentationLayout | None,
+    *,
+    must_exist: bool = True,
 ) -> Path:
     repository = root.resolve()
     candidate = Path(raw_path)
@@ -186,6 +204,15 @@ def _repository_file(
         raise WorkflowContractError(
             f"{description} is outside repository root: {raw_path}"
         ) from exc
+    if (
+        must_exist
+        and not resolved.is_file()
+        and layout is not None
+        and candidate.parts[:1] == ("docs",)
+    ):
+        canonical = layout.canonical_path(candidate.relative_to("docs").as_posix())
+        if canonical is not None:
+            resolved = canonical.resolve()
     if must_exist and not resolved.is_file():
         raise WorkflowContractError(f"missing {description}: {resolved}")
     return resolved
@@ -200,11 +227,12 @@ def load_manifest(path: Path, root: Path) -> dict[str, Any]:
     if not isinstance(manifest, dict):
         raise WorkflowContractError("workflow manifest root must be an object")
     validate_manifest(manifest)
-    _repository_file(root, manifest["guide"], "workflow guide")
+    layout = _documentation_layout(root)
+    _repository_file(root, manifest["guide"], "workflow guide", layout)
     for workflow in manifest["workflows"]:
-        _repository_file(root, workflow["source"], "workflow source")
+        _repository_file(root, workflow["source"], "workflow source", layout)
         for fixture in workflow["fixtures"]:
-            resolved = _repository_file(root, fixture, "workflow fixture")
+            resolved = _repository_file(root, fixture, "workflow fixture", layout)
             if resolved.stat().st_size > workflow["max_fixture_bytes"]:
                 raise WorkflowContractError(
                     f"fixture {fixture!r} exceeds max_fixture_bytes "

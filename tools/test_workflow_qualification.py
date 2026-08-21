@@ -18,6 +18,12 @@ from workflow_qualification import (
 )
 
 
+ROOT = Path(__file__).resolve().parent.parent
+REPOSITORY_MANIFEST = (
+    ROOT / "docs" / "releases" / "1.9.8" / "workflow-qualification.json"
+)
+
+
 def complete_manifest() -> dict[str, object]:
     return {
         "schema_version": 1,
@@ -146,6 +152,9 @@ class WorkflowManifestContractTests(unittest.TestCase):
 
 
 class WorkflowManifestLoadTests(unittest.TestCase):
+    def test_loads_repository_manifest_through_documentation_layout(self) -> None:
+        load_manifest(REPOSITORY_MANIFEST, ROOT)
+
     def test_load_manifest_rejects_missing_fixture(self) -> None:
         manifest = complete_manifest()
         with tempfile.TemporaryDirectory() as directory:
