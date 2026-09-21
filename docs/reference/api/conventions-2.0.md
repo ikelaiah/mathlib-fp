@@ -1,6 +1,6 @@
 # Complete 2.0 API conventions
 
-Version 1.9.3 resolves the candidate conventions for every public domain. They
+Version 1.9.3 resolves the 2.0 conventions for every public domain. They
 are documentary decisions over the frozen 1.9 declarations: compiled defaults,
 source compatibility, numerical behavior, and package membership do not change.
 The normative machine-readable record is

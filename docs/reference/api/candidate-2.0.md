@@ -117,7 +117,7 @@ designed.
 
 The [final snapshot and diff](../../releases/1.9.9/api-snapshot-final.md) confirm the
 compiled 1.9.0-to-1.9.9 diff is empty across source, behavior, warnings, and
-packaging, and the candidate 2.0 surface is exactly this frozen 1.9 snapshot
+packaging, and the 2.0 surface is exactly this frozen 1.9 snapshot
 plus the closed 1.10.0 additions.
 
 ## Freeze and compatibility rule
@@ -130,6 +130,6 @@ deprecation.
 
 There are no unresolved stable declarations, aliases, compiled defaults,
 ownership rules, classifications, compatibility decisions, or replacement
-mappings in this candidate. The 1.9.9 convergence gate closes every remaining
+mappings in 2.0.0. The 1.9.9 convergence gate closes every remaining
 capability question in the
 [1.10.0 capability manifest](../../releases/1.10.0/capability-manifest.md).

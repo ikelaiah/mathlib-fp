@@ -1,14 +1,14 @@
 # Release history and evidence
 
-Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release. Candidate material is kept separate from published releases.
+Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.0.0 — release candidate
+## 2.0.0 — current published stable
 
-- [Release-candidate notes](2.0.0/release-notes.md)
-- [RC qualification plan](2.0.0/qualification.md) and [workflow qualification](2.0.0/workflow-qualification.md)
-- [PR review notes](2.0.0/pr-notes.md)
+- [Release notes](2.0.0/release-notes.md)
+- [Qualification](2.0.0/qualification.md) and [workflow qualification](2.0.0/workflow-qualification.md)
+- [Release review notes](2.0.0/pr-notes.md)
 
-## 1.10.0 — latest published stable
+## 1.10.0 — previous stable release
 
 - [Release notes](1.10.0/release-notes.md)
 - [Qualification](1.10.0/qualification.md) and [workflow qualification](1.10.0/workflow-qualification.md)

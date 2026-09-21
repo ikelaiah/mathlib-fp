@@ -1,7 +1,7 @@
 # Migrating to mathlib-fp 2.0
 
-This guide covers the 2.0.0 release candidate. It promotes the frozen 1.10.0
-API; it is not a rewrite and does not make 2.0.0 a published stable release.
+This guide covers the published 2.0.0 release. It promotes the frozen 1.10.0
+API; it is not a rewrite.
 
 ## No-change paths
 

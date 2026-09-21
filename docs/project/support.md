@@ -1,7 +1,6 @@
 # Supported platform matrix
 
-The 2.0.0 release candidate uses Free Pascal source and standard RTL/FCL units
-only; 1.10.0 remains the latest published stable release. The
+Version 2.0.0 uses Free Pascal source and standard RTL/FCL units only. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](../portability-evidence-1.9.6.json); the
 [evidence report](../releases/1.9.6/portability-evidence.md) explains the unchanged target
@@ -18,14 +17,14 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 1.10.0 retained evidence; full 2.0 RC qualification pending | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; full 2.0 RC qualification pending | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | `v2.0.0-rc.2` clean-archive qualification, 2026-09-21 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | `v2.0.0-rc.2` clean-archive qualification, 2026-09-21 | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-Each 2.0 release-candidate tag must produce new Linux and Windows primary
-artifacts before promotion.
+The promoted `v2.0.0-rc.2` tag produced new Linux and Windows primary
+artifacts before publication.
 
 ### Exact profiles
 
@@ -82,9 +81,8 @@ files to the offline machine, verify the checksum, and extract the archive.
 Adding `src/` to the FPC unit path is sufficient; no configure or generation
 step is required. The release page also provides a separately checksummed
 offline HTML ZIP generated from the same tagged documentation. Extract it and
-open the latest published archive, `mathlib-fp-docs-1.10.0/index.html`,
-locally. A 2.0.0 RC archive may be evaluated separately but does not replace
-the published stable documentation.
+open the latest published archive, `mathlib-fp-docs-2.0.0/index.html`,
+locally.
 
 The release qualification workflows perform these same checksum, clean-
 extraction, direct-source, representative-workflow, documentation, and package

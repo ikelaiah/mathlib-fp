@@ -332,6 +332,7 @@ documents rather than in this roadmap.
 | 1.9.8 | 2026-08-16 | Representative workflow qualification: multi-domain applications with clean-archive workflow evidence | [notes](../releases/1.9.8/release-notes.md) |
 | 1.9.9 | 2026-08-17 | Final 1.9.x convergence handoff: closed 1.10.0 capability manifest and complete evidence | [notes](../releases/1.9.9/release-notes.md) |
 | 1.10.0 | 2026-08-19 | Additive API completion and final 2.0 freeze: `TVector2D.Rotate`, no-deprecation closure, and frozen 2.0 candidate | [notes](../releases/1.10.0/release-notes.md) |
+| 2.0.0 | 2026-09-21 | Stable native numerical platform: frozen API promoted after two RC cycles, exercised soak, and Linux/Windows clean-archive qualification | [notes](../releases/2.0.0/release-notes.md) |
 
 Detailed historical evidence for each release remains in the corresponding
 `RELEASE_NOTES_<version>.md`, `PR_NOTES_<version>.md`, `QUALIFICATION_<version>.md`,
@@ -364,7 +365,7 @@ numbers with unrelated algorithm families.
   functions, tests, pages, or examples does not substitute for the stated user
   and numerical outcome.
 
-## Previous published stable release: 1.10.0
+## 1.10.0 freeze handoff
 
 Version 1.10.0 is the backward-compatible minor release that implemented the
 closed 1.9.9 convergence manifest and froze the code, API, documentation,
@@ -386,17 +387,16 @@ the completed-releases table above and the
 [1.10.0 release notes](../releases/1.10.0/release-notes.md) and
 [qualification record](../releases/1.10.0/qualification.md).
 
-## Release candidate target: 2.0.0 — Stable native numerical platform
+## Previous release: 2.0.0 — Stable native numerical platform
 
-Version 2.0.0 is the active release-candidate target; 1.10.0 remains the
-latest published stable release until final publication. It is a quality and
-API graduation, not an excuse for an arbitrary rewrite: it ships only when the
-additive 1.x foundations have been used by the
+Version 2.0.0 is the current published stable release. It is a quality and
+API graduation, not an arbitrary rewrite: it was published after the additive
+1.x foundations had been used by the
 higher-level libraries, the migration path is proven, and the 1.x convergence
-gates through 1.10.0 are complete. Because 1.10.0 froze the promoted 2.0
-candidate, the only remaining work for 2.0.0 is version and release metadata
-and promotion of the qualified candidate, not a new algorithm or public API
-design. The detailed 2.0 plan — public-API and compatibility boundary,
+gates through 1.10.0 were complete. The promoted `v2.0.0-rc.2` passed the
+Linux and Windows clean-archive qualification after the exercised soak.
+Because 1.10.0 froze the promoted 2.0 surface, publication added no algorithm
+or public API design. The detailed 2.0 record — public-API and compatibility boundary,
 capability baseline, non-goals, documentation readiness, and completion gate —
 is documented in the `2.0.0` section below.
 
@@ -749,7 +749,7 @@ to ship it. A capability is not complete merely because an implementation
 exists — it must also meet the numerical, documentation, portability, and
 maintenance contracts this roadmap applies to every stable family.
 
-### 2.1 — Special Functions II
+## Next release: 2.1 — Special Functions II
 
 Scope:
 

@@ -1,8 +1,8 @@
-# mathlib-fp 2.0.0 release candidate
+# mathlib-fp 2.0.0
 
-This branch prepares the frozen 2.0.0 release candidate. It is **not** a
-published stable release: 1.10.0 remains the latest published stable version
-until final 2.0.0 publication.
+Version 2.0.0 is the published stable release. It promotes the frozen 1.10.0
+API after two release-candidate cycles, an exercised 30-day soak, and the
+Linux/Windows clean-archive qualification of `v2.0.0-rc.2`.
 
 ## Promotion outcome
 
@@ -17,15 +17,14 @@ Existing supported 1.x code continues to compile. The recommended 2.0 paths
 are the typed/common paths already introduced and rehearsed during 1.x;
 intentional compatibility symbols remain available. There are no new breaking
 changes, deprecations, warning changes, default changes, or numerical-result
-changes in this candidate. See the [migration guide](../../guides/migration/to-2.0.md).
+changes in this release. See the [migration guide](../../guides/migration/to-2.0.md).
 
 ## Qualification scope
 
-The candidate is prepared for qualified Linux and Windows RC workflows,
-versioned/offline documentation, representative workflows, and the full
-native Pascal test suite. Final publication requires normal CI review and the
-approved RC qualification workflow; this branch does not tag, publish, or
-replace stable Pages content.
+The release is supported by qualified Linux and Windows clean-archive
+workflows, versioned/offline documentation, representative workflows, and the
+full native Pascal test suite. The final `v2.0.0` tag triggers the release and
+documentation workflows from this finalized release record.
 
 ## Known limitations and deferrals
 

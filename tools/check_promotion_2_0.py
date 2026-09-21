@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Validate the frozen 2.0.0 release-candidate promotion posture.
+"""Validate the frozen 2.0.0 stable-release promotion posture.
 
-The 1.10.0 release remains the latest published stable release until 2.0.0 is
-published. This gate validates the candidate target and its generated API
+This gate validates the published 2.0.0 release state and its generated API
 evidence without rewriting the historical 1.9 convergence checks.
 """
 
@@ -20,47 +19,44 @@ LAYOUT = load_layout(DOCS / "layout.json", DOCS)
 
 CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 TARGET_RELEASE = "2.0.0"
-PUBLISHED_STABLE = "1.10.0"
+NEXT_RELEASE = "2.1"
 
 
-def candidate_state_errors(
+def stable_state_errors(
     target_release: str, versions: object, roadmap: str,
 ) -> list[str]:
-    """Return candidate/stable-state disagreements in release metadata."""
+    """Return stable-release disagreements in active release metadata."""
     errors: list[str] = []
     if not isinstance(versions, dict):
         return ["docs/versions.json: version manifest must be an object"]
     if versions.get("current") != target_release:
         errors.append(f"docs/versions.json current is not {target_release}")
-    if versions.get("release_state") != "candidate":
-        errors.append("docs/versions.json release_state is not candidate")
-    if versions.get("published_stable") != PUBLISHED_STABLE:
+    if versions.get("release_state") != "stable":
+        errors.append("docs/versions.json release_state is not stable")
+    if versions.get("published_stable") != target_release:
         errors.append(
-            f"docs/versions.json published stable is not {PUBLISHED_STABLE}"
+            f"docs/versions.json published stable is not {target_release}"
         )
     entries = versions.get("versions")
-    candidate_entry = next(
+    stable_entry = next(
         (
             item for item in entries
             if isinstance(item, dict) and item.get("release") == target_release
         ),
         None,
     ) if isinstance(entries, list) else None
-    if candidate_entry is None:
-        errors.append(f"docs/versions.json has no {target_release} candidate entry")
-    elif candidate_entry.get("source_ref") != f"release/v{target_release}":
+    if stable_entry is None:
+        errors.append(f"docs/versions.json has no {target_release} stable entry")
+    elif stable_entry.get("source_ref") != f"v{target_release}":
         errors.append(
-            f"docs/versions.json candidate source_ref is not release/v{target_release}"
+            f"docs/versions.json stable source_ref is not v{target_release}"
         )
-    if f"## Previous published stable release: {PUBLISHED_STABLE}" not in roadmap:
+    if f"## Previous release: {target_release}" not in roadmap:
         errors.append(
-            f"Roadmap does not record {PUBLISHED_STABLE} as the previous "
-            "published stable release"
+            f"Roadmap does not record {target_release} as the previous release"
         )
-    if f"## Release candidate target: {target_release}" not in roadmap:
-        errors.append(
-            f"Roadmap does not name {target_release} as the release candidate target"
-        )
+    if f"## Next release: {NEXT_RELEASE}" not in roadmap:
+        errors.append(f"Roadmap does not name {NEXT_RELEASE} as the next release")
     return errors
 
 
@@ -72,7 +68,7 @@ def main() -> int:
     roadmap = LAYOUT.artifact("roadmap").read_text(encoding="utf-8")
     try:
         versions = json.loads((DOCS / "versions.json").read_text(encoding="utf-8"))
-        errors.extend(candidate_state_errors(CURRENT_RELEASE, versions, roadmap))
+        errors.extend(stable_state_errors(CURRENT_RELEASE, versions, roadmap))
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         errors.append(f"docs/versions.json: invalid version manifest: {exc}")
 
@@ -136,8 +132,8 @@ def main() -> int:
         print("\n".join(errors), file=sys.stderr)
         return 1
     print(
-        "2.0 candidate promotion checks passed: "
-        f"{CURRENT_RELEASE} target, {PUBLISHED_STABLE} published stable, API frozen"
+        "2.0 stable promotion checks passed: "
+        f"{CURRENT_RELEASE} published stable, next {NEXT_RELEASE}, API frozen"
     )
     return 0
 
