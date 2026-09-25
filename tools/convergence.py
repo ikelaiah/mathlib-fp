@@ -51,8 +51,10 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def source_unit_names() -> set[str]:
-    return {path.stem for path in (ROOT / "src").glob("*.pas")}
+def historical_unit_names() -> set[str]:
+    """Units in the frozen 1.9 API, the scope of the 1.9.9 provenance audit."""
+    snapshot = load_json(DOCS / "releases/1.9.0/public-api.json")
+    return {str(unit["unit"]) for unit in snapshot["units"]}
 
 
 def manifest_structure_errors(manifest: dict) -> list[str]:

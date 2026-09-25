@@ -13,6 +13,7 @@ uses
   MathBase.SharedTypes,
   MathBase.Complex,
   MathBase.Precision,
+  MathBase.SpecialFunctions,
   MathBase.Trigonometry,
   MathBase.Iteration,
   MathBase.Random,

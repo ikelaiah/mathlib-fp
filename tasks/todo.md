@@ -1,114 +1,79 @@
-# 1.9.7 task list
+# 2.1 Special Functions II task list
 
-## Task 1: Migration-rehearsal contract
+## 1. Freeze the first contract
 
-**Description:** Define required domains, semantic concerns, consumer projects,
-external mappings, duplicate-alias decisions, package paths, and result data.
+**Status:** Complete for J/Y.
 
-**Acceptance criteria:**
+**Acceptance:** Exact Bessel names/order coverage, real domains, NaN/Infinity,
+zero/pole behavior, and per-region error budgets are recorded in
+`tasks/spec-2.1.md`; algorithm sources and compatibility are reviewed.
 
-- [x] Every documented domain has 1.x and candidate-2.0 coverage for
-  construction, success, failure, ownership, copying, indexing, precision,
-  defaults, and result interpretation.
-- [x] Every alias decision has a replacement, difference note, compatibility
-  period, owner, migration example, and tested package paths.
-- [x] Invalid or incomplete records are rejected by focused unit tests.
+**Verify:** Review against `docs/project/roadmap.md`, `MathBase.Precision`, and
+the capability inventory. **Dependencies:** None. **Scope:** Small, docs only.
 
-**Verification:** `python tools/test_migration_rehearsal.py`.
+## 2. Build the independent reference corpus
 
-**Dependencies:** None.
+**Status:** Complete for J/Y.
 
-**Estimated scope:** Medium.
+**Acceptance:** Bessel fixtures cover domain boundaries, roots, transition
+regions, large inputs, and overflow/underflow; each value records its source,
+precision, and generator version; ordinary tests use committed values only.
 
-## Task 2: Side-by-side consumer projects
+**Verify:** Focused corpus validation and a deliberate bad-value rejection.
+**Dependencies:** 1. **Scope:** Medium, reference data and tests.
 
-**Description:** Add independent supported-1.x and candidate-convention
-projects that exercise every domain and assert expected behavior changes.
+## 3. Ship the first J/Y slice
 
-**Acceptance criteria:**
+**Status:** Implemented and locally verified on Windows; Linux CI pending.
 
-- [x] Both projects compile with FPC 3.2.2 from the source/package layout.
-- [x] Both projects run to a deterministic success marker and assert failure
-  paths rather than documenting them only in prose.
-- [x] The candidate project uses only replacements already shipped in 1.9.7.
+**Acceptance:** The agreed J/Y functions match the corpus within documented
+budgets, handle invalid inputs as specified, and include API docs and a
+runnable example.
 
-**Verification:** `python tools/check_migration_rehearsal.py --compiler fpc`.
+**Verify:** Focused FPC tests, full `TestRunner`, example build/output, docs
+checks, and Windows/Linux CI. **Dependencies:** 1-2. **Scope:** Medium; split
+J and Y into separate changes if either exceeds one focused review.
 
-**Dependencies:** Task 1.
+## 4. Ship the first I/K slice
 
-**Estimated scope:** Medium.
+**Status:** Open.
 
-## Task 3: Alias package boundary and decisions
+**Acceptance:** The agreed I/K functions meet separate ordinary and extreme
+scale budgets, define overflow/underflow, and include documentation and tests.
 
-**Description:** Test pressure/velocity facade and error aliases alongside the
-canonical fluid-dynamics paths, then finalize the decision list.
+**Verify:** Focused reference, identity, and edge tests; full `TestRunner`.
+**Dependencies:** 1-2. **Scope:** Medium; split I and K if necessary.
 
-**Acceptance criteria:**
+## 5. Add elliptic integral/function slices
 
-- [x] Direct-source and Lazarus-package paths expose all old and canonical
-  declarations with no hidden dependency.
-- [x] Type identity, exception identity, defaults, ownership, and numerical
-  results are asserted.
-- [x] Each candidate is explicitly retained or deprecated with evidence; no
-  removal entitlement is implied.
+**Acceptance:** Each approved slice states its parameter convention, singular
+limits, real domain, accuracy budget, and independent reference cases.
 
-**Verification:** Focused FPC consumer builds plus Lazarus package build.
+**Verify:** Focused FPC tests and full `TestRunner` per slice.
+**Dependencies:** 1. **Scope:** Multiple small/medium changes.
 
-**Dependencies:** Tasks 1-2.
+## 6. Add exponential integrals
 
-**Estimated scope:** Medium.
+**Acceptance:** Approved real `Ei`/`E1` behavior at zero, sign boundaries,
+small/large arguments, and nonfinite input is documented and tested.
 
-## Task 4: External migration mappings
+**Verify:** Independent reference and edge tests; full `TestRunner`.
+**Dependencies:** 1. **Scope:** Medium.
 
-**Description:** Publish conservative NumLib and LMath/DMath mapping guidance.
+## 7. Add bounded hypergeometric support
 
-**Acceptance criteria:**
+**Acceptance:** Parameter and argument limits are explicit; convergence or
+nonconvergence is visible; accepted inputs meet a stated numerical budget.
 
-- [x] Common numerical tasks map to exact mathlib-fp units and entry points.
-- [x] Indexing, storage, ownership, scalar precision, diagnostics, defaults,
-  and unsupported differences are explicit.
-- [x] Primary upstream references and “not drop-in compatible” language are
-  present.
+**Verify:** Reference values, identities, and failure tests; full `TestRunner`.
+**Dependencies:** 1. **Scope:** Multiple small/medium changes.
 
-**Verification:** Rehearsal schema tests and documentation checks.
+## 8. Qualify 2.1
 
-**Dependencies:** Task 1.
+**Acceptance:** Capability inventory, guides, examples, API docs, changelog,
+release records, and evidence agree with the implementation; all applicable
+release gates pass; no unresolved critical review finding remains.
 
-**Estimated scope:** Small.
-
-## Task 5: Release and qualification integration
-
-**Description:** Make migration rehearsal a release-owned gate and advance all
-relevant documentation and metadata to 1.9.7.
-
-**Acceptance criteria:**
-
-- [x] Linux/Windows CI and clean-archive qualification run the rehearsal.
-- [x] README, package, capabilities, versions, changelog, support, releasing,
-  docs index, release/PR/qualification notes, and roadmap agree on 1.9.7.
-- [x] Roadmap records 1.9.7 as previous and 1.9.8 as next.
-
-**Verification:** Documentation, release-state, build-site, and qualification
-tests.
-
-**Dependencies:** Tasks 1-4.
-
-**Estimated scope:** Large; land as focused metadata and documentation edits.
-
-## Task 6: Full verification and review
-
-**Description:** Run applicable release gates and review the complete change.
-
-**Acceptance criteria:**
-
-- [x] Test builds, examples, docs, migration rehearsal, package, portability,
-  and applicable evidence gates pass locally.
-- [x] No public-interface snapshot change or unsupported migration claim remains.
-- [x] All critical and required review findings are resolved.
-
-**Verification:** `python tools/qualify_release.py --release 1.9.7 --compiler
-fpc --lazbuild lazbuild`, plus `git diff --check` and final diff review.
-
-**Dependencies:** Tasks 1-5.
-
-**Estimated scope:** Medium.
+**Verify:** Normal CI plus applicable `tools/qualify_release.py` checks,
+`python tools/check_docs.py`, example builds, and final diff review.
+**Dependencies:** 3-7. **Scope:** Multiple reviewable documentation and gate changes.
