@@ -2,8 +2,8 @@
 
 Status: J/Y, I/K, the first elliptic integral slice, real Ei/E1, and bounded
 real Gauss 2F1 are implemented. A bounded real Jacobi sn/cn/dn slice is
-implemented and locally qualified; third-kind elliptic integrals remain to be
-resolved.
+implemented and locally qualified. The bounded real third-kind Legendre
+integral is implemented on a feature branch and under qualification.
 
 ## Objective
 
@@ -37,12 +37,9 @@ provenance are published and tested.
   `./TestRunner -a --format=plain` (use `./TestRunner.exe` on Windows).
 - Documentation from repository root: `python tools/check_docs.py`.
 - Check committed reference data with the family generator, including
-  `python tools/generate_hypergeometric_data.py --check`.
+  `python tools/generate_hypergeometric_data.py --check` and
+  `python tools/generate_elliptic_third_kind_data.py --check`.
 - Examples on Windows: `./build-examples.ps1`; on Unix: `sh ./build-examples.sh`.
-
-## Remaining contract decisions
-
-- Third-kind elliptic integral domain and parameter conventions.
 
 ## Initial J/Y contract
 
@@ -170,6 +167,37 @@ provenance are published and tested.
   the defining E1 integral for the continued-fraction range.
 - Complex-valued branches, generalized exponential integrals, and scaled
   exponential integrals are deferred.
+
+## Legendre elliptic integral of the third kind contract
+
+- Public functions: `IncompleteEllipticPi(phi, n, m)` and
+  `CompleteEllipticPi(n, m)` in `MathBase.SpecialFunctions`. The amplitude is
+  `phi`; the characteristic is `n`; the elliptic parameter is `m=k^2`, as in
+  the existing K/E/F API.
+- Accept finite `-Pi/2 <= phi <= Pi/2`, `-16 <= n <= 1`, and `0 <= m <= 1`.
+  Values outside those domains or nonfinite arguments return NaN. The bounded
+  characteristic range avoids large intermediate values while supporting
+  negative characteristics. `n <= 1` means the real defining integral has no
+  interior pole, so the Cauchy principal-value case is intentionally excluded.
+- `IncompleteEllipticPi` is odd in `phi`, returns `phi` when `n=0`, and returns
+  zero at `phi=0`. At either amplitude endpoint it returns signed infinity
+  when `n=1` or `m=1`; otherwise the endpoint result is finite. Complete Pi
+  returns positive infinity when `n=1` or `m=1`.
+- Finite results target `5e-13` absolute error or `5e-12` relative error,
+  whichever allows more. Coverage includes negative/zero/positive `n`, values
+  near `n=1` and `m=1`, endpoint amplitudes, symmetry, and invalid domains.
+- For finite nonsingular inputs, use Carlson's symmetric form
+  `Pi = s RF(c^2, c^2+(1-m)s^2, 1) + n s^3 RJ(c^2, c^2+(1-m)s^2, 1,
+  c^2+(1-n)s^2)/3`, where `s=sin(phi)` and `c=cos(phi)`. Evaluate `R_J` by
+  duplication with its `R_C` correction. Explicit endpoint handling avoids
+  evaluating singular Carlson arguments.
+- Definition: NIST DLMF [Legendre integral definition](https://dlmf.nist.gov/19.2.E7),
+  relation to symmetric integrals [§19.25, equation 19.25.14](https://dlmf.nist.gov/19.25.E14),
+  and the [duplication computation](https://dlmf.nist.gov/19.36).
+  The committed reference corpus uses independent Gauss-Legendre quadrature
+  of the defining theta integral.
+- Cauchy principal values for `n>1`, amplitudes outside the principal interval,
+  and complex arguments remain deferred.
 
 ## Bounded Gauss hypergeometric contract
 

@@ -48,19 +48,22 @@ define pole and nonfinite behavior, and include documentation and tests.
 
 ## 5. Add elliptic integral/function slices
 
-**Status:** Legendre K/E/F slice merged in PR #43; real Jacobi sn/cn/dn is implemented and locally qualified, PR pending.
+**Status:** Legendre K/E/F slice merged in PR #43; real Jacobi sn/cn/dn merged
+after PR #46; bounded real Legendre Pi is implemented and undergoing qualification.
 
 The first slice uses parameter `m=k^2` in `[0,1]`, complete K/E, and
-incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`. Third-kind integrals remain
-for a later contract decision. The Jacobi sn/cn/dn slice has its own contract
-below.
+incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`; the real third-kind Pi
+contract is recorded in `tasks/spec-2.1.md`. The Jacobi sn/cn/dn slice has its
+own contract below.
 
 **Acceptance:** Each approved slice states its parameter convention, singular
 limits, real domain, accuracy budget, and independent reference cases.
 
 The Jacobi slice uses parameter `M=k^2` in `[0,1]`, finite `|U|<=100`, and
-the real functions `sn`, `cn`, and `dn`. Other Jacobi functions and the
-third-kind integral remain deferred.
+the real functions `sn`, `cn`, and `dn`. Other Jacobi functions remain
+deferred. The third-kind slice supports `N` in `[-16,1]`, `M` in `[0,1]`,
+and principal amplitudes, with real endpoint limits and no principal-value
+case.
 
 **Verify:** Focused FPC tests and full `TestRunner` per slice.
 **Dependencies:** 1. **Scope:** Multiple small/medium changes.

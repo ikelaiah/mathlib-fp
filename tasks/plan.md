@@ -59,8 +59,10 @@ reference cases, no dependency additions, and passing focused tests.
    K/E/F integral slice is merged. Add real Jacobi sn/cn/dn for parameter
    `m=k^2` in `[0,1]` and bounded real arguments by safeguarded inversion of
    the incomplete Legendre F integral, with exact endpoint cases, independent
-   references, identities, docs, and an example. Defer third-kind integrals
-   and other Jacobi functions.
+   references, identities, docs, and an example. The third-kind slice adds
+   real complete/incomplete Pi with `n` in `[-16,1]`, Carlson RJ duplication,
+   endpoint limits, independent quadrature references, docs, and an example.
+   Defer other Jacobi functions, principal values, and complex arguments.
 6. **Exponential integrals.** Define the real `Ei`/`E1` boundary and implement
    only the approved domain/range, with sign, branch, pole, and tail tests.
 7. **Hypergeometric baseline.** Implement the bounded real Gauss 2F1 series for

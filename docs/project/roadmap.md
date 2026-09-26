@@ -755,7 +755,9 @@ Scope:
 
 - Bessel families (`J`, `Y`, `I`, `K` and related) with defined domains and
   accuracy budgets;
-- elliptic integrals and elliptic functions;
+- Legendre elliptic integrals and real Jacobi elliptic functions, with
+  third-kind Pi restricted to a bounded real characteristic range and no
+  Cauchy principal-value or complex path;
 - exponential integrals;
 - a carefully bounded hypergeometric baseline rather than an open-ended family;
 - per-family accuracy and domain budgets with a stated behaviour for

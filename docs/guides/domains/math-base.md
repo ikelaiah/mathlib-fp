@@ -293,6 +293,30 @@ Carlson algorithm. See NIST DLMF [Legendre definitions](https://dlmf.nist.gov/19
 [duplication algorithms](https://dlmf.nist.gov/19.36). Third-kind integrals and
 amplitudes outside the principal interval remain outside this slice.
 
+The real third-kind functions `IncompleteEllipticPi(Phi,N,M)` and
+`CompleteEllipticPi(N,M)` extend the same convention: `M=k^2` is the elliptic
+parameter, and `N` is the characteristic in the denominator
+`1-N*sin(theta)^2`. They accept finite `-16 <= N <= 1`, `0 <= M <= 1`, and
+`|Phi| <= Pi/2`. `N > 1` is rejected so real integrals with an interior pole
+and their Cauchy principal values are not implied. Incomplete Pi is odd in
+`Phi`; it is zero at `Phi=0` and equals incomplete F when `N=0`. Incomplete
+endpoint values are signed infinities for `N=1` or `M=1`; complete Pi is
+positive infinity when either parameter is 1. Other invalid and nonfinite
+inputs return NaN. The finite-value budget is
+`max(5e-13, 5e-12 * |reference value|)`.
+
+For nonsingular inputs the implementation uses Carlson RF/RJ duplication:
+`Pi = s RF(c^2, y, 1) + N*s^3*RJ(c^2, y, 1, p)/3`, where
+`y=c^2+(1-M)*s^2`, `p=c^2+(1-N)*s^2`, `s=sin(Phi)`, and `c=cos(Phi)`.
+`R_J` uses Carlson `R_C` corrections. The independent
+[reference corpus](../../../tests/EllipticThirdKindReference.inc) is generated
+by [2048-point Gauss-Legendre quadrature](../../../tools/generate_elliptic_third_kind_data.py)
+of DLMF [definition 19.2.7](https://dlmf.nist.gov/19.2.E7); the symmetric-form
+relation is DLMF [equation 19.25.14](https://dlmf.nist.gov/19.25.E14). See the
+[runnable example](../../../examples/33_elliptic_third_kind.pas). Cauchy
+principal values, amplitudes outside the principal interval, and complex
+arguments remain deferred.
+
 Real Jacobi elliptic functions `JacobiEllipticSN(U,M)`,
 `JacobiEllipticCN(U,M)`, and `JacobiEllipticDN(U,M)` use parameter `M=k^2`.
 They accept finite `|U| <= 100` and `M` in `[0,1]`; invalid or nonfinite
@@ -310,8 +334,8 @@ The algorithm follows NIST DLMF [Jacobi definitions](https://dlmf.nist.gov/22.2)
 [real identities](https://dlmf.nist.gov/22.6), [Legendre integral definitions](https://dlmf.nist.gov/19.2),
 and [Carlson forms](https://dlmf.nist.gov/19.25). See the
 [runnable example](../../../examples/32_jacobi_elliptic_functions.pas).
-Other Jacobi functions, public amplitude, complex arguments, and third-kind
-integrals remain deferred.
+Other Jacobi functions, public amplitude, and complex arguments remain
+deferred.
 
 The same 2.1 development unit provides the real exponential integrals
 `ExponentialIntegralEi` and `ExponentialIntegralE1`. Ei accepts finite

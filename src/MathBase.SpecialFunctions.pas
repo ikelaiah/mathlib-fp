@@ -60,6 +60,13 @@ function CompleteEllipticK(const M: Double): Double;
 function CompleteEllipticE(const M: Double): Double;
 function IncompleteEllipticF(const Phi, M: Double): Double;
 function IncompleteEllipticE(const Phi, M: Double): Double;
+{ Legendre third-kind integrals use N in [-16,1] and M=k^2 in [0,1].
+  Incomplete Phi is restricted to [-Pi/2,Pi/2]. Incomplete Pi is odd in Phi;
+  N=0 reduces to incomplete F. Singular incomplete endpoints return signed
+  infinity and singular complete cases return positive infinity. Invalid or
+  nonfinite inputs return NaN. }
+function CompleteEllipticPi(const N, M: Double): Double;
+function IncompleteEllipticPi(const Phi, N, M: Double): Double;
 
 { Real Jacobi elliptic functions using parameter M=k^2 in [0,1] and finite
   |U| <= 100. Nonfinite or out-of-domain inputs return NaN. }
@@ -813,6 +820,90 @@ begin
   Result := NaN;
 end;
 
+function CarlsonRC(XIn, YIn: Double): Double;
+var
+  RootRatio, Difference: Double;
+begin
+  if (XIn < 0.0) or (YIn <= 0.0) then
+    Exit(NaN);
+  if XIn = YIn then
+    Exit(1.0 / Sqrt(XIn));
+  if XIn < YIn then
+  begin
+    Difference := YIn - XIn;
+    if XIn = 0.0 then
+      Exit(HalfPiValue / Sqrt(Difference));
+    RootRatio := Sqrt(Difference / XIn);
+    Result := ArcTan(RootRatio) / Sqrt(Difference);
+  end
+  else
+  begin
+    Difference := XIn - YIn;
+    RootRatio := Sqrt(Difference / XIn);
+    if RootRatio < 0.5 then
+      Result := ArcTanH(RootRatio) / Sqrt(Difference)
+    else
+      Result := Ln((Sqrt(XIn) + Sqrt(Difference)) / Sqrt(YIn)) /
+        Sqrt(Difference);
+  end;
+end;
+
+function CarlsonRJ(XIn, YIn, ZIn, PIn: Double): Double;
+const
+  ErrorTolerance = 1E-5;
+var
+  X, Y, Z, P, Average, DX, DY, DZ, DP: Double;
+  SqrtX, SqrtY, SqrtZ, Lambda, Alpha, Beta, Sum, Factor: Double;
+  EA, EB, EC, ED, EE, Correction: Double;
+  Iteration: Integer;
+begin
+  if (XIn < 0.0) or (YIn < 0.0) or (ZIn <= 0.0) or (PIn <= 0.0) then
+    Exit(NaN);
+  X := XIn;
+  Y := YIn;
+  Z := ZIn;
+  P := PIn;
+  Sum := 0.0;
+  Factor := 1.0;
+  for Iteration := 1 to 64 do
+  begin
+    Average := (X + Y + Z + 2.0 * P) / 5.0;
+    DX := (Average - X) / Average;
+    DY := (Average - Y) / Average;
+    DZ := (Average - Z) / Average;
+    DP := (Average - P) / Average;
+    if Max(Max(Abs(DX), Abs(DY)), Max(Abs(DZ), Abs(DP))) <=
+      ErrorTolerance then
+    begin
+      EA := DX * (DY + DZ) + DY * DZ;
+      EB := DX * DY * DZ;
+      EC := DP * DP;
+      ED := EA - 3.0 * EC;
+      EE := EB + 2.0 * DP * (EA - EC);
+      Correction := 1.0 + ED * (-3.0 / 14.0 + 9.0 * ED / 88.0 -
+        9.0 * EE / 52.0) + EB * (1.0 / 6.0 + DP * (-3.0 / 11.0 +
+        3.0 * DP / 26.0)) + DP * EA * (1.0 / 3.0 - 3.0 * DP / 22.0) -
+        DP * EC / 3.0;
+      Result := 3.0 * Sum + Factor * Correction /
+        (Average * Sqrt(Average));
+      Exit;
+    end;
+    SqrtX := Sqrt(X);
+    SqrtY := Sqrt(Y);
+    SqrtZ := Sqrt(Z);
+    Lambda := SqrtX * (SqrtY + SqrtZ) + SqrtY * SqrtZ;
+    Alpha := Sqr(P * (SqrtX + SqrtY + SqrtZ) + SqrtX * SqrtY * SqrtZ);
+    Beta := P * Sqr(P + Lambda);
+    Sum := Sum + Factor * CarlsonRC(Alpha, Beta);
+    Factor := Factor * 0.25;
+    X := 0.25 * (X + Lambda);
+    Y := 0.25 * (Y + Lambda);
+    Z := 0.25 * (Z + Lambda);
+    P := 0.25 * (P + Lambda);
+  end;
+  Result := NaN;
+end;
+
 function CompleteEllipticK(const M: Double): Double;
 begin
   if IsNan(M) or IsInfinite(M) or (M < 0.0) or (M > 1.0) then
@@ -889,6 +980,48 @@ begin
   RFValue := CarlsonRF(C2, Y, 1.0);
   RDValue := CarlsonRD(C2, Y, 1.0);
   Result := S * RFValue - M * S * S * S * RDValue / 3.0;
+end;
+
+function IncompleteEllipticPi(const Phi, N, M: Double): Double;
+var
+  S, C, C2, Y, P, RFValue, RJValue: Double;
+begin
+  if IsNan(Phi) or IsInfinite(Phi) or IsNan(N) or IsInfinite(N) or
+    IsNan(M) or IsInfinite(M) or (N < -16.0) or (N > 1.0) or
+    (M < 0.0) or (M > 1.0) or (Abs(Phi) > HalfPiValue) then
+    Exit(NaN);
+  if Phi = 0.0 then
+    Exit(Phi);
+  if N = 0.0 then
+    Exit(IncompleteEllipticF(Phi, M));
+  if Abs(Phi) = HalfPiValue then
+  begin
+    if (N = 1.0) or (M = 1.0) then
+    begin
+      if Phi < 0.0 then
+        Exit(-Infinity)
+      else
+        Exit(Infinity);
+    end;
+  end;
+  S := Sin(Phi);
+  C := Cos(Phi);
+  C2 := C * C;
+  Y := C2 + (1.0 - M) * S * S;
+  P := C2 + (1.0 - N) * S * S;
+  RFValue := CarlsonRF(C2, Y, 1.0);
+  RJValue := CarlsonRJ(C2, Y, 1.0, P);
+  Result := S * RFValue + N * S * S * S * RJValue / 3.0;
+end;
+
+function CompleteEllipticPi(const N, M: Double): Double;
+begin
+  if IsNan(N) or IsInfinite(N) or IsNan(M) or IsInfinite(M) or
+    (N < -16.0) or (N > 1.0) or (M < 0.0) or (M > 1.0) then
+    Exit(NaN);
+  if (N = 1.0) or (M = 1.0) then
+    Exit(Infinity);
+  Result := IncompleteEllipticPi(HalfPiValue, N, M);
 end;
 
 procedure JacobiEllipticValues(const U, M: Double;
