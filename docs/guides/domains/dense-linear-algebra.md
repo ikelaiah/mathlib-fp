@@ -201,20 +201,22 @@ The deterministic cyclic Jacobi method costs O(sweeps*n³) and uses O(n²)
 factor/working storage. See Demmel, *Applied Numerical Linear Algebra*,
 section 5.3.
 
-## 2.2 development: real Hessenberg reduction
+## 2.2 development: Hessenberg reduction
 
-The unreleased 2.2 development unit adds
-`ReduceHessenberg(A: IDenseDoubleMatrix)`. Its factor exposes copied `Q` and
-`H` matrices satisfying `Q^T*A*Q = H`, where `Q` is orthogonal and `H` is
-upper Hessenberg. It accepts finite square matrices, including empty and
-singleton matrices; nil, nonsquare, and non-finite inputs raise
-`EDenseMatrixError`. The implementation uses Householder similarity
-transformations, following LAPACK's documented [`DGEHRD` contract](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html).
+The unreleased 2.2 development unit adds real and complex overloads of
+`ReduceHessenberg`. The real factor exposes copied `Q` and `H` matrices
+satisfying `Q^T*A*Q = H`, where `Q` is orthogonal; the complex factor satisfies
+`Q^H*A*Q = H`, where `Q` is unitary. Both `H` factors are upper Hessenberg.
+The routines accept finite square matrices, including empty and singleton
+matrices; nil, nonsquare, non-finite, or unrepresentable reflector norms raise
+`EDenseMatrixError`. They use Householder similarity transformations,
+following LAPACK's documented [`DGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html) and [`ZGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga4de4b424a4c7b0a78f7138a94ec54671.html) contracts.
 
-This first slice prepares a real matrix for later Schur iteration. It does not
-compute Schur form, eigenvalues, or eigenvectors. Complex and single-precision
-paths are not included. See the [2.2 design record](../../../tasks/spec-2.2.md)
-and runnable [Hessenberg example](../../../examples/34_hessenberg_reduction.pas).
+These reductions prepare real or complex matrices for later Schur iteration.
+They do not compute Schur form, eigenvalues, or eigenvectors. Single-precision
+paths are not included. See the [2.2 design record](../../../tasks/spec-2.2.md),
+the [real Hessenberg example](../../../examples/34_hessenberg_reduction.pas),
+and [complex Hessenberg example](../../../examples/35_complex_hessenberg_reduction.pas).
 
 ## Empty, non-finite, and degenerate behavior
 

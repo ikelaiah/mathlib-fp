@@ -3,9 +3,9 @@
 ## Objective
 
 Build native dense tools for nonsymmetric spectral problems in ordered,
-validated slices. The first slice reduces a real double-precision square
-matrix to upper Hessenberg form. This is the foundation for a real Schur
-solver and later real nonsymmetric eigenvalue workflows.
+validated slices. The first slice reduces real and complex double-precision
+square matrices to upper Hessenberg form. These reductions are foundations
+for later Schur solvers and nonsymmetric eigenvalue workflows.
 
 The 2.2 roadmap also identifies complex Schur methods, generalised
 `A x = λ B x` problems, and ordering, scaling, convergence, residual, and
@@ -13,7 +13,7 @@ failure contracts. They are not part of this first slice. Polynomial
 eigenvalue problems and large-scale shift-invert infrastructure remain out of
 scope unless separately designed.
 
-## First-slice public contract
+## Real-double public contract
 
 - Unit: `AlgebraLib.DenseSpectral`.
 - Entry point: `ReduceHessenberg(const A: IDenseDoubleMatrix)`.
@@ -35,6 +35,24 @@ The numerical design follows LAPACK's documented Hessenberg reduction
 contract and Householder similarity method; no LAPACK code is imported. See
 [`DGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html).
 
+## Complex-double public contract
+
+- Overload `ReduceHessenberg(const A: IDenseComplexMatrix)` in
+  `AlgebraLib.DenseSpectral`.
+- Return `IDenseComplexHessenberg`, exposing full-size complex `Q` and `H`.
+- Require a finite square input, leave it unchanged, and raise
+  `EDenseMatrixError` for nil, rectangular, non-finite, or unrepresentable
+  reflector norms.
+- The factor satisfies `Q^H * A * Q = H`; `Q` is unitary and `H` is upper
+  Hessenberg. Accessors return deep copies. Empty and 1x1 matrices preserve the
+  same identity-factor behavior as the real path.
+- Use deterministic complex Householder similarity transforms. Scale the
+  norm computation to support representable values across the double range;
+  reject non-finite factors.
+
+This follows the documented complex Hessenberg reduction contract in
+[`ZGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga4de4b424a4c7b0a78f7138a94ec54671.html).
+
 ## Architecture and style
 
 - Keep nonsymmetric spectral work in `AlgebraLib.DenseSpectral`, separate
@@ -42,8 +60,8 @@ contract and Householder similarity method; no LAPACK code is imported. See
   `AlgebraLib.DenseDecompositions`.
 - Use the existing mutable dense matrix handles as inputs and return the
   immutable-factor pattern already used by QR, SVD, and Hermitian factors.
-- Implement the double-real path first. Complex double support will be a
-  separately tested slice using unitary similarity; single precision remains
+- Implement real and complex double paths as separately tested slices using
+  orthogonal and unitary similarity respectively; single precision remains
   deferred until the double paths are qualified.
 - Add no runtime dependency. Use the existing FPCUnit `TestRunner` and dense
   matrix factories. The test suite will not require a numerical library.

@@ -32,6 +32,8 @@ type
     procedure TestHessenbergReductionAndImmutableFactor;
     procedure TestHessenbergReductionValidationAndSmallMatrices;
     procedure TestHessenbergReductionScaleRange;
+    procedure TestComplexHessenbergReductionAndImmutableFactor;
+    procedure TestComplexHessenbergValidationAndScaleRange;
   end;
 
 implementation
@@ -521,7 +523,7 @@ begin
 
   Failed := False;
   try
-    ReduceHessenberg(nil);
+    ReduceHessenberg(IDenseDoubleMatrix(nil));
   except
     on EDenseMatrixError do Failed := True;
   end;
@@ -592,6 +594,166 @@ begin
           Q[I, J], ScaledQ[I, J], 3E-13);
         AssertEquals(Format('scale-aware H [%d,%d]', [I, J]),
           H[I, J], ScaledH[I, J] / Scale, 3E-12);
+      end;
+  end;
+end;
+
+procedure TDenseDecompositionTest.TestComplexHessenbergReductionAndImmutableFactor;
+var
+  A, Original, Q, H, Reconstructed, IdentityMatrix, HSnapshot, QSnapshot:
+    IDenseComplexMatrix;
+  Factor: IDenseComplexHessenberg;
+  I, J: SizeInt;
+begin
+  A := TDenseComplexMatrix.FromValues(4, 4,
+    [TComplex.Create(4.0, 1.0), TComplex.Create(1.0, -2.0),
+     TComplex.Create(-2.0, 0.5), TComplex.Create(2.0, 1.0),
+     TComplex.Create(1.0, -1.0), TComplex.Create(2.0, 0.0),
+     TComplex.Create(0.0, 2.0), TComplex.Create(1.0, 0.0),
+     TComplex.Create(3.0, 2.0), TComplex.Create(-1.0, 1.0),
+     TComplex.Create(1.0, -1.0), TComplex.Create(0.0, 3.0),
+     TComplex.Create(-2.0, 0.0), TComplex.Create(4.0, -1.0),
+     TComplex.Create(1.0, 2.0), TComplex.Create(3.0, 0.0)]);
+  Original := A.Clone;
+  Factor := ReduceHessenberg(A);
+  Q := Factor.Q;
+  H := Factor.H;
+
+  AssertComplexMatrixClose('complex reduction leaves source unchanged',
+    Original, A, 0.0);
+  for I := 2 to H.Rows - 1 do
+    for J := 0 to I - 2 do
+      AssertEquals(Format('complex Hessenberg structure [%d,%d]', [I, J]),
+        0.0, H[I, J].Magnitude, 0.0);
+  Reconstructed := Multiply(ConjugateTranspose(Q), Multiply(A, Q));
+  AssertComplexMatrixClose('unitary similarity reconstruction', H,
+    Reconstructed, 3E-12);
+  IdentityMatrix := Multiply(ConjugateTranspose(Q), Q);
+  AssertComplexMatrixClose('unitary factor',
+    TDenseComplexMatrix.FromValues(4, 4,
+      [TComplex.One, TComplex.Zero, TComplex.Zero, TComplex.Zero,
+       TComplex.Zero, TComplex.One, TComplex.Zero, TComplex.Zero,
+       TComplex.Zero, TComplex.Zero, TComplex.One, TComplex.Zero,
+       TComplex.Zero, TComplex.Zero, TComplex.Zero, TComplex.One]),
+    IdentityMatrix, 4E-13);
+
+  HSnapshot := Factor.H;
+  QSnapshot := Factor.Q;
+  H[0, 0] := H[0, 0] + TComplex.Create(10.0, -1.0);
+  AssertComplexMatrixClose('complex factor returns defensive H copy',
+    HSnapshot, Factor.H, 0.0);
+  Q[0, 0] := Q[0, 0] + TComplex.Create(10.0, 2.0);
+  AssertComplexMatrixClose('complex factor returns defensive Q copy',
+    QSnapshot, Factor.Q, 0.0);
+  A[0, 0] := TComplex.Create(-99.0, 12.0);
+  AssertComplexMatrixClose('complex factor keeps source snapshot',
+    HSnapshot, Factor.H, 0.0);
+end;
+
+procedure TDenseDecompositionTest.TestComplexHessenbergValidationAndScaleRange;
+var
+  A, ScaledA, Q, H, ScaledQ, ScaledH: IDenseComplexMatrix;
+  Factor, ScaledFactor: IDenseComplexHessenberg;
+  Scale: Double;
+  ScaleIndex, I, J: SizeInt;
+  Failed: Boolean;
+begin
+  A := TDenseComplexMatrix.Zeros(0, 0);
+  Factor := ReduceHessenberg(A);
+  AssertEquals('empty complex Q rows', 0, Factor.Q.Rows);
+  AssertEquals('empty complex H columns', 0, Factor.H.Cols);
+
+  A := TDenseComplexMatrix.FromValues(1, 1,
+    [TComplex.Create(7.5, -2.0)]);
+  Factor := ReduceHessenberg(A);
+  AssertComplexMatrixClose('one by one complex Q',
+    TDenseComplexMatrix.FromValues(1, 1, [TComplex.One]), Factor.Q, 0.0);
+  AssertComplexMatrixClose('one by one complex H', A, Factor.H, 0.0);
+
+  A := TDenseComplexMatrix.FromValues(3, 3,
+    [TComplex.One, TComplex.Create(2.0, 1.0), TComplex.Zero,
+     TComplex.Create(4.0, -2.0), TComplex.One, TComplex.Create(3.0, 1.0),
+     TComplex.Zero, TComplex.Create(5.0, 0.5), TComplex.Create(2.0, -1.0)]);
+  Factor := ReduceHessenberg(A);
+  AssertComplexMatrixClose('already-Hessenberg complex Q',
+    TDenseComplexMatrix.FromValues(3, 3,
+      [TComplex.One, TComplex.Zero, TComplex.Zero,
+       TComplex.Zero, TComplex.One, TComplex.Zero,
+       TComplex.Zero, TComplex.Zero, TComplex.One]), Factor.Q, 0.0);
+  AssertComplexMatrixClose('already-Hessenberg complex H', A, Factor.H, 0.0);
+
+  Failed := False;
+  try
+    ReduceHessenberg(IDenseComplexMatrix(nil));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil complex input is rejected', Failed);
+
+  Failed := False;
+  try
+    ReduceHessenberg(TDenseComplexMatrix.FromValues(2, 3,
+      [TComplex.Zero, TComplex.Zero, TComplex.Zero,
+       TComplex.Zero, TComplex.Zero, TComplex.Zero]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nonsquare complex input is rejected', Failed);
+
+  Failed := False;
+  try
+    ReduceHessenberg(TDenseComplexMatrix.FromValues(2, 2,
+      [TComplex.One, TComplex.Create(NaN, 0.0),
+       TComplex.Zero, TComplex.One]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('non-finite complex input is rejected', Failed);
+
+  Failed := False;
+  try
+    ReduceHessenberg(TDenseComplexMatrix.FromValues(3, 3,
+      [TComplex.Zero, TComplex.Zero, TComplex.Zero,
+       TComplex.Create(1.7E308, 1.7E308), TComplex.Zero, TComplex.Zero,
+       TComplex.Create(1.7E308, 0.0), TComplex.Zero, TComplex.Zero]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('unrepresentable complex reflector norm is rejected', Failed);
+
+  A := TDenseComplexMatrix.FromValues(3, 3,
+    [TComplex.Create(1.0, 2.0), TComplex.Create(2.0, -1.0),
+     TComplex.Create(3.0, 0.5), TComplex.Create(4.0, 1.0),
+     TComplex.Create(5.0, -2.0), TComplex.Create(6.0, 1.0),
+     TComplex.Create(7.0, 0.5), TComplex.Create(8.0, -1.0),
+     TComplex.Create(10.0, 2.0)]);
+  Factor := ReduceHessenberg(A);
+  Q := Factor.Q;
+  H := Factor.H;
+  for ScaleIndex := 0 to 1 do
+  begin
+    if ScaleIndex = 0 then
+      Scale := 1E-200
+    else
+      Scale := 1E200;
+    ScaledA := A.Clone;
+    for I := 0 to A.Rows - 1 do
+      for J := 0 to A.Cols - 1 do
+        ScaledA[I, J] := ScaledA[I, J] * Scale;
+    ScaledFactor := ReduceHessenberg(ScaledA);
+    ScaledQ := ScaledFactor.Q;
+    ScaledH := ScaledFactor.H;
+    for I := 0 to A.Rows - 1 do
+      for J := 0 to A.Cols - 1 do
+      begin
+        AssertEquals(Format('complex scale-independent Q real [%d,%d]',
+          [I, J]), Q[I, J].Re, ScaledQ[I, J].Re, 4E-13);
+        AssertEquals(Format('complex scale-independent Q imag [%d,%d]',
+          [I, J]), Q[I, J].Im, ScaledQ[I, J].Im, 4E-13);
+        AssertEquals(Format('complex scale-aware H real [%d,%d]', [I, J]),
+          H[I, J].Re, ScaledH[I, J].Re / Scale, 4E-12);
+        AssertEquals(Format('complex scale-aware H imag [%d,%d]', [I, J]),
+          H[I, J].Im, ScaledH[I, J].Im / Scale, 4E-12);
       end;
   end;
 end;
