@@ -35,6 +35,7 @@ def layout_path(name: str, legacy: str) -> Path:
 
 NEXT_RELEASE = "2.1"
 PUBLISHED_STABLE = "2.0.0"
+UNRELEASED_SOURCE_UNITS = {"src/MathBase.SpecialFunctions.pas"}
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
 CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")
@@ -271,12 +272,16 @@ def main() -> int:
             "signature",
         ]
         snapshot_units = {unit["source"]: unit for unit in snapshot["units"]}
+        snapshot_sources = set(snapshot_units)
         source_paths = sorted((ROOT / "src").glob("*.pas"))
         expected_sources = {path.relative_to(ROOT).as_posix() for path in source_paths}
-        if set(snapshot_units) != expected_sources:
+        # The published 2.0 snapshot remains frozen while named 2.1 units are
+        # developed. Remove each allowance when the next snapshot owns it.
+        if ((expected_sources - snapshot_sources) != UNRELEASED_SOURCE_UNITS
+                or snapshot_sources - expected_sources):
             errors.append(
                 f"{snapshot_path.relative_to(ROOT)}: source-unit set differs from "
-                "src/*.pas"
+                "src/*.pas plus the declared unreleased units"
             )
         for source_path in source_paths:
             relative = source_path.relative_to(ROOT).as_posix()
@@ -868,7 +873,7 @@ def main() -> int:
         contract_data = json.loads(contracts_path.read_text(encoding="utf-8"))
         assert contract_data["schema_version"] == 1
         contracts = contract_data["examples"]
-        assert len(contracts) == 8
+        assert len(contracts) == 9
         for contract in contracts:
             source = ROOT / contract["path"]
             assert source.is_file()

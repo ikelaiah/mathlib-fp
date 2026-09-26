@@ -18,6 +18,7 @@ from convergence import (
     declaration_completeness_errors,
     deferral_errors,
     deprecation_errors,
+    historical_unit_names,
     load_json,
     manifest_structure_errors,
     policy_errors,
@@ -25,7 +26,6 @@ from convergence import (
     roadmap_convergence_errors,
     rotation_errors,
     snapshot_final_errors,
-    source_unit_names,
 )
 
 
@@ -69,7 +69,7 @@ def main() -> int:
 
     try:
         audit = load_json(PROVENANCE_PATH)
-        errors.extend(provenance_errors(audit, source_unit_names()))
+        errors.extend(provenance_errors(audit, historical_unit_names()))
     except (ValueError, KeyError, OSError) as exc:
         errors.append(f"provenance audit cannot be read: {exc}")
 
@@ -82,7 +82,7 @@ def main() -> int:
         return 1
     print(
         f"Convergence gate passed: manifest closed for 1.10.0, "
-        f"{len(source_unit_names())} provenance units, policies, final snapshot, "
+        f"{len(historical_unit_names())} provenance units, policies, final snapshot, "
         "and roadmap agree"
     )
     return 0

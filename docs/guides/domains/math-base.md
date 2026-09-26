@@ -17,6 +17,7 @@ Copy and run the [double-real quick start](#quick-start). It prints
 | --- | --- | --- |
 | Shared real samples | `TDoubleArray` | [Shared types](#mathbasesharedtypes) |
 | Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
+| Bessel J/Y of orders zero and one | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
 | Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
 | Reproducible simulation | `TLocalRandom` | [Random-state contract](applied-numerics.md#reproducible-local-random-state) |
 | Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](interchange.md#choose-a-format) |
@@ -37,6 +38,7 @@ choice documented by those guides. The examples are compiled and run in CI.
 | `MathBase.Complex` | [MathBase.Complex.pas](../../../src/MathBase.Complex.pas) |
 | `MathBase.MathConstants` | [MathBase.MathConstants.pas](../../../src/MathBase.MathConstants.pas) |
 | `MathBase.Precision` | [MathBase.Precision.pas](../../../src/MathBase.Precision.pas) |
+| `MathBase.SpecialFunctions` | [MathBase.SpecialFunctions.pas](../../../src/MathBase.SpecialFunctions.pas) |
 | `MathBase.Trigonometry` | [MathBase.Trigonometry.pas](../../../src/MathBase.Trigonometry.pas) |
 | `MathBase.Iteration` | [MathBase.Iteration.pas](../../../src/MathBase.Iteration.pas) |
 | `MathBase.Random` | [MathBase.Random.pas](../../../src/MathBase.Random.pas) |
@@ -224,6 +226,37 @@ worst-case proofs.
 and returns NaN for negative X. Use `TProbabilityKit.StudentTCDF` for a complete
 signed CDF. Its formula uses I(df/(df+x²); df/2, 1/2); the `df/2` shape is
 important for correct t-test p-values.
+
+---
+
+## MathBase.SpecialFunctions — 2.1 development
+
+The 2.1 development source adds real `Double` cylindrical Bessel functions
+`BesselJ0`, `BesselJ1`, `BesselY0`, and `BesselY1`. They are not part of the
+published 2.0.0 release. Import only `MathBase.SpecialFunctions` to use them.
+
+```pascal
+uses MathBase.SpecialFunctions;
+
+Writeln(BesselJ0(1.0):0:9);  // 0.765197687
+Writeln(BesselY0(1.0):0:9);  // 0.088256964
+```
+
+J0 and J1 accept finite `|X| <= 100`, with J0 even and J1 odd. J0(0) is 1;
+J1(0) is 0. Y0 and Y1 accept finite `0 < X <= 100` and return negative infinity
+at zero. Y1 also returns negative infinity when its pole exceeds the `Double`
+range. Negative Y arguments, nonfinite inputs, and values beyond the
+validated bound return NaN. For the committed reference corpus, the acceptance
+budget is `max(5e-13, 5e-12 * |reference value|)`. This is a tested corpus
+budget, not a universal worst-case guarantee between samples.
+
+The implementation uses series for small arguments, a generated Chebyshev
+approximation for `8 < X < 16`, and a large-argument expansion above that.
+The [independent decimal corpus](../../../tests/BesselReference.inc) and
+[generator](../../../tools/generate_bessel_data.py) record the formulas and
+precision. The [runnable example](../../../examples/27_bessel_functions.pas)
+also checks the J/Y Wronskian. Broader orders, modified Bessel I/K, elliptic
+functions, and exponential integrals remain later 2.1 work.
 
 ---
 

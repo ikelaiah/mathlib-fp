@@ -77,6 +77,17 @@
         "diagnostic: invalid sigma rejected by EProbabilityError"
       ],
       "final_line": "probability finance workflow: success"
+    },
+    {
+      "path": "examples/27_bessel_functions.pas",
+      "contains": [
+        "J0(1) = 0.765197687",
+        "J1(1) = 0.440050586",
+        "Y0(1) = 0.088256964",
+        "Y1(1) = -0.781212821",
+        "Wronskian residual = 0.000000000000"
+      ],
+      "final_line": "bessel functions: success"
     }
   ]
 }

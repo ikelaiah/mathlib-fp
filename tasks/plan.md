@@ -1,92 +1,93 @@
-# Implementation plan: 1.9.7 migration and compatibility rehearsal
+# Implementation plan: 2.1 Special Functions II
 
 ## Overview
 
-Prove the proposed 2.0 migration path without changing the frozen 1.9 public
-surface. Add a machine-readable rehearsal contract, runnable side-by-side
-consumer projects for every documented domain, explicit package-boundary tests,
-responsible NumLib and LMath/DMath mappings, and release-owned evidence and
-documentation. Migration claims must be executable from a clean source archive.
+Add a bounded, documented real `Double` special-function surface in small,
+reviewable changes. Start with cylindrical Bessel functions, then elliptic
+integrals/functions, exponential integrals, and a limited hypergeometric
+baseline. Each family ships with explicit domains, numerical budgets, an
+independent offline reference corpus, cited algorithms, and user guidance.
+The proposed contract is in [spec-2.1.md](spec-2.1.md); the roadmap remains the
+release-scope authority.
 
-## Architecture decisions
+## Architecture decisions to review
 
-- Keep `EngineeringLib.Pressure` and `EngineeringLib.Velocity` in the main
-  package. Rehearse canonical imports beside their exact 1.x aliases and retain
-  all four aliases unless the evidence proves a safe deprecation runway.
-- Record migration coverage and decisions in
-  `docs/migration-rehearsal-1.9.7.json`; generate run-specific compiler and
-  result evidence rather than checking host-specific observations into source.
-- Use two independent consumer projects: one intentionally follows supported
-  1.x paths and one follows candidate-2.0 conventions available in 1.9.7.
-- Treat NumLib and LMath/DMath as conceptual source-migration guides, never as
-  drop-in compatibility promises. Every mapping names indexing, ownership,
-  precision, diagnostics, and unsupported differences.
-- Add no dependency and no new runtime API. Integrate the rehearsal checker
-  into ordinary CI and the existing clean-archive qualification driver.
+- Put new scalar functions in a dedicated `MathBase.SpecialFunctions` unit so
+  `MathBase.Precision` stays focused on its existing stable contracts. Confirm
+  public names and exact order coverage in the first task before coding.
+- Begin with real `Double`. Add no mandatory runtime or test dependency beyond
+  FPC and its standard units. High-precision tools may produce committed
+  reference values offline, with generator, version, precision, and citations
+  recorded beside the corpus.
+- Implement one complete family slice at a time: public contract, reference
+  values, source, tests, documentation, and one runnable example where useful.
+- Preserve 2.0 compatibility. No existing declaration changes or removals are
+  part of this milestone.
 
-## Dependency graph
+## Dependency order
 
 ```text
-rehearsal schema/tests ──> side-by-side consumer projects
-          │                          │
-          ├──> alias boundary tests ─┤
-          │                          v
-          └──> external mappings --> executable rehearsal evidence
-                                             │
-                                             v
-                             CI, qualification, release docs
+scope and API contract -> offline reference corpus -> Bessel J/Y -> Bessel I/K
+                              |                         |
+                              +-> elliptic methods -----+
+                              +-> exponential integrals
+                              +-> bounded hypergeometric baseline
+all family slices -> capability inventory, examples, full qualification
 ```
 
-## Task list
+## Tasks and checkpoints
 
-1. [x] Define the v1.9.7 migration-rehearsal data contract and failing tests.
-2. [x] Add 1.x and candidate-2.0 consumer projects covering every domain and
-   required semantic concern; compile and run both through the checker.
-3. [x] Compile-test every 1.9.3 duplicate-alias candidate through direct-source
-   and Lazarus-package boundaries and finalize retain/deprecate decisions.
-4. [x] Publish verified NumLib and LMath/DMath conceptual mappings, semantic
-   differences, unsupported cases, and source-edit guidance.
-5. [x] Integrate migration evidence into CI, clean-archive qualification,
-   release metadata, changelog, indexes, roadmap, and release documentation.
-6. [x] Run focused and full qualification, review all five quality axes, and
-   resolve every critical or required finding.
+1. **Contract and evidence design.** Resolve exact public names, order/range
+   coverage, domains, exceptional-value behavior, and measurable accuracy
+   budgets. Record algorithm and reference provenance. Verify the design
+   against the roadmap and existing `MathBase.Precision` conventions.
+2. **Independent Bessel corpus.** Commit reference values across small,
+   ordinary, large, near-zero, near-root, and invalid inputs, with generation
+   metadata and a test loader. Verify that incorrect sample values fail the
+   checker and that the normal test suite needs no generator dependency.
+3. **Bessel J and Y.** Add the agreed initial order coverage with piecewise
+   numerics, edge contracts, focused tests, documentation, and a runnable
+   example. Check against the corpus on Windows and Linux CI.
+4. **Modified Bessel I and K.** Add the agreed initial order coverage with
+   overflow/underflow behavior and scaled variants only if required by the
+   approved contract. Verify extreme-scale cases and identities independently.
 
-## Checkpoints
+**Checkpoint:** J/Y/I/K have documented domains and budgets, independent
+reference cases, no dependency additions, and passing focused tests.
 
-### After tasks 1-3
+5. **Elliptic integrals and functions.** Choose a bounded real parameter
+   convention. Implement the agreed complete/incomplete integrals and
+   function baseline in separate reviewable slices, with singular-endpoint
+   behavior and reference evidence.
+6. **Exponential integrals.** Define the real `Ei`/`E1` boundary and implement
+   only the approved domain/range, with sign, branch, pole, and tail tests.
+7. **Hypergeometric baseline.** Select a narrow real parameter/argument domain
+   with a clear user workflow. Reject or defer regions that cannot meet the
+   documented budget; add independent values and convergence diagnostics.
 
-- Invalid, incomplete, or unowned migration records fail validation.
-- Both consumer projects compile and assert their documented behavior.
-- All four duplicate aliases and their canonical paths compile with identical
-  type, exception, default, ownership, and numerical behavior.
+**Checkpoint:** Each shipped family matches its own contract and evidence;
+unsupported regions remain explicit in the docs and capability inventory.
 
-### After tasks 4-5
-
-- Every domain has side-by-side source and semantic-difference guidance.
-- NumLib and LMath/DMath mappings state non-equivalence and unsupported cases.
-- CI, qualification, package metadata, docs, and release identity agree on
-  1.9.7, with 1.9.8 named as next.
-
-### After task 6
-
-- Focused tests, normal/optimized/checked test builds, examples, docs,
-  migration rehearsal, package build, and applicable release gates pass.
-- The frozen public-interface snapshot is unchanged.
-- The final diff has no unresolved correctness, readability, architecture,
-  security, performance, or documentation finding.
+8. **Release integration and review.** Update capability inventory, API
+   reference, guides, examples, changelog, and 2.1 release records. Run normal
+   tests, checked and optimized builds, examples, docs, package checks, and
+   applicable numerical/release qualification. Review the public surface and
+   numerical evidence before marking 2.1 complete.
 
 ## Risks and mitigations
 
-| Risk | Impact | Mitigation |
-| --- | --- | --- |
-| A documentation-only example drifts from compilable Pascal | High | Compile and run both complete consumer projects in CI and qualification. |
-| “Mapping” is read as drop-in compatibility | High | Require semantic differences and unsupported cases for every external-library row. |
-| Moving aliases creates hidden transitive dependencies | High | Keep aliases in place and compile every old/canonical import combination through source and package paths. |
-| Candidate examples accidentally require an unshipped 2.0 API | High | Use only declarations shipped in 1.9.7 and label the examples as conventions, not a separate binary API. |
-| Release evidence overstates unsupported targets | High | Reuse the 1.9.6 target tiers and distinguish local results from CI-required cross-target evidence. |
+| Risk | Mitigation |
+| --- | --- |
+| Good accuracy at ordinary inputs hides failures near roots, poles, or extreme scales | Corpus spans those regions; use absolute error near zeros and relative error away from them. |
+| Published formulas are unstable when translated directly | Choose algorithms by subdomain and validate transitions against independent values. |
+| An open-ended API outgrows the evidence | Freeze bounded domains and order coverage before each slice; label unsupported cases. |
+| A reference generator becomes a hidden dependency | Commit plain reference data and metadata; normal build and tests use only FPC. |
+| Feature breadth delays 2.1 indefinitely | Land complete vertical slices, review scope at checkpoints, and do not claim a family stable until its gate passes. |
 
-## Scope decision
+## First reviewable change — locally verified
 
-The milestone rehearses migration and package boundaries. It does not remove or
-deprecate maintained 1.x declarations, add a compatibility package without
-evidence, import third-party numerical code, or introduce a new algorithm.
+Complete tasks 1 and 2, then implement the initial J/Y slice. This provides a
+usable feature and validates the evidence workflow before the other families.
+The J/Y slice passes the independent corpus, normal/checked/optimized FPC
+tests, example output contract, documentation build, and Lazarus package build.
+Linux CI remains the platform gate before merge.
