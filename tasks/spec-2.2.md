@@ -178,3 +178,116 @@ residual diagnostics, and exception-on-failure semantics. See
 Implementation tasks and tests are tracked in `plan-2.2.md` and
 `todo-2.2.md`. Generalized eigenproblems, left eigenvectors, complex input, and
 Schur reordering remain out of scope for this slice.
+
+## Approved generalized real and complex eigenproblem slice
+
+This slice adds dense generalized Schur reduction and right eigenpairs for
+regular real-double and complex-double matrix pencils `A - λ B`. It preserves
+generalized eigenvalues in homogeneous form so singular `B` and eigenvalues at
+infinity do not require forming an unsafe quotient. It does not add left
+eigenvectors, Schur reordering, condition estimates, or polynomial pencils.
+
+### Public API and input contract
+
+- Unit: `AlgebraLib.DenseSpectral`.
+- Real entry points:
+  `FactorRealGeneralizedSchur(const A, B: IDenseDoubleMatrix; const
+  MaxIterations: SizeInt = 0)` and
+  `FactorRealGeneralizedEigen(const A, B: IDenseDoubleMatrix; const
+  MaxIterations: SizeInt = 0)`.
+- Complex entry points:
+  `FactorComplexGeneralizedSchur(const A, B: IDenseComplexMatrix; const
+  MaxIterations: SizeInt = 0)` and
+  `FactorComplexGeneralizedEigen(const A, B: IDenseComplexMatrix; const
+  MaxIterations: SizeInt = 0)`.
+- Both matrices must be non-nil, finite, square, and have matching dimensions.
+  Inputs are not modified. Empty and 1x1 pairs are supported. Invalid inputs,
+  non-finite/unrepresentable results, arithmetic breakdown, indeterminate
+  generalized eigenvalues, or exhausted iteration budgets raise
+  `EDenseMatrixError`; no partial result is returned.
+- A nonzero `MaxIterations` is a positive limit on the Schur QR iterations of
+  the transformed matrix; a negative value is invalid. Zero selects
+  `100 * max(1,n)` iterations. `Iterations` reports iterations performed by
+  the Schur stage. Deflation is scale-relative and dimension-aware.
+- The supported mathematical input is a regular pencil: `det(A - λ B)` is not
+  identically zero. The implementation does not promise an upfront numerical
+  regularity test. If QZ yields a `(alpha,beta)=(0,0)` indeterminate value, it
+  raises rather than labeling it as finite or infinite.
+
+### Generalized Schur results
+
+- `IDenseDoubleGeneralizedSchur` exposes `Size`, `Q`, `S`, `Z`, `T`,
+  `Alpha`, `Beta`, and `Iterations`. `IDenseComplexGeneralizedSchur` exposes
+  the same properties with complex matrices. Matrix and array accessors return
+  defensive copies.
+- Real factors satisfy `A = Q*S*Z^T` and `B = Q*T*Z^T`, with orthogonal `Q`
+  and `Z`. `S` is upper quasi-triangular with isolated 1x1 and 2x2 diagonal
+  blocks; `T` is upper triangular with nonnegative diagonal. Each 1x1 block
+  represents one real generalized eigenvalue. Each 2x2 block pair represents
+  an adjacent complex-conjugate pair.
+- Complex factors satisfy `A = Q*S*Z^H` and `B = Q*T*Z^H`, with unitary `Q`
+  and `Z`; `S` and `T` are upper triangular and the diagonal of `T` is real
+  and nonnegative.
+- Both real and complex results expose homogeneous eigenvalue pairs `(alpha,
+  beta)`, where `A*v*beta = B*v*alpha`. The pair is scaled so
+  `max(|alpha|, |beta|)=1`; `beta` is real and nonnegative. For real input,
+  real eigenvalues have real `alpha`, conjugate values appear adjacently with
+  positive imaginary part first, and paired `beta` values match. `beta=0`
+  denotes an eigenvalue at infinity; finite `lambda` may be computed as
+  `alpha/beta` when representable. Values remain in generalized Schur order;
+  no sorting is performed.
+- Empty pairs return empty eigenvalue arrays, identity `Q`/`Z`, and `S=A`,
+  `T=B`. A 1x1 result follows the same factor relation and homogeneous-pair
+  normalization.
+
+### Generalized eigenpair results
+
+- `IDenseDoubleGeneralizedEigen` and `IDenseComplexGeneralizedEigen` expose
+  `Size`, `Alpha`, `Beta`, `RightEigenvectors`, `Residuals`, `Iterations`, and
+  `Converged`. Eigenvectors are columns paired by index with `(alpha,beta)`;
+  accessors return defensive copies. The real-input result uses complex
+  eigenvectors for real and conjugate eigenvalues. The complex-input result
+  uses complex eigenvectors.
+- Each vector is normalized to unit 2-norm and satisfies the homogeneous
+  equation `beta*A*v = alpha*B*v`. Its reported normalized backward residual
+  is `||beta*A*v-alpha*B*v||_2 / ((|beta|*||A||_F + |alpha|*||B||_F)*||v||_2)`,
+  evaluated with scaled arithmetic. If the denominator is zero, the residual
+  is zero only when the numerator is zero; otherwise the operation fails.
+- A successful result has `Converged=True`. Schur or vector-recovery failure
+  raises `EDenseMatrixError`. Eigenvectors are not promised to be orthogonal
+  or well-conditioned for defective or clustered spectra.
+
+### Algorithm and validation
+
+- Use a deterministic projective shift `γ` for which `C=A+γB` is numerically
+  nonsingular, then solve `C*M=B` without forming an inverse. A regular
+  `n x n` pencil has at most `n` singular shifts, so test the distinct real
+  candidates `0..n`; raise `EDenseMatrixError` if finite precision makes every
+  candidate unusable. Do not form `B^-1*A`; `B` may be singular.
+- Reduce `M` with the existing real Schur factorization or an internal bounded
+  complex shifted-QR Schur iteration. Write `M=Z*R_s*Z^H` and factor
+  `C*Z=Q*R_c`; construct `S=R_c*(I-γR_s)` and `T=R_c*R_s`, rescaled by the
+  common input scale. For real input, triangularize each 2x2 block of `T`
+  with a right plane rotation; for complex input, use column phases to make
+  the diagonal of `T` nonnegative real. This preserves both pencil
+  reconstructions and the homogeneous eigenvalue pairs.
+- Recover real-input right eigenvectors from the real Schur factor of `M`;
+  recover complex-input vectors by scaled triangular back substitution in the
+  complex Schur form. Keep real and complex implementations separately tested
+  and keep single precision deferred.
+- Validate reconstruction of both input matrices, orthogonality/unitarity of
+  both vector factors, Schur structure, homogeneous eigenvalue/eigenvector
+  equations, residuals, scale extremes, source/factor immutability, edge
+  dimensions, invalid inputs, and iteration exhaustion. Include finite
+  eigenvalues, zero eigenvalues, infinite eigenvalues from singular `B`, real
+  conjugate pairs, complex matrices, and a deliberately indeterminate/singular
+  pencil case.
+- Run focused and full FPCUnit suites, normal/optimized/checked builds, docs
+  and example checks, release qualification, and Linux/Windows CI before
+  merge. No third-party runtime is added.
+
+The generalized Schur forms and homogeneous `(alpha,beta)` representation
+follow LAPACK [`DGGES`](https://www.netlib.org/lapack/explore-html/d7/d25/group__gges_ga556be4f39b39e5008c8eb36814aa7e20.html),
+[`ZGGES`](https://www.netlib.org/lapack/explore-html/d7/d25/group__gges_ga4943e11fd632761e645ce1e5161f9f51.html),
+and [`DGGEV`](https://www.netlib.org/lapack/explore-html/d9/d52/dggev_8f_source.html)
+contracts. No LAPACK code or runtime is imported.

@@ -56,8 +56,10 @@ rank deficiency is part of the problem.
 
 Sparse, iterative, matrix-free, nonsymmetric/generalized/partial eigen,
 LDLT, update/downdate, public workspace, parallel/SIMD, GPU, and external
-BLAS/LAPACK paths are unsupported in the typed 1.6 API. The compatibility
-`IMatrix` methods do not make those typed families stable.
+BLAS/LAPACK paths are unsupported in the stable typed 1.6 API. The later 2.2
+development section describes the unreleased nonsymmetric and generalized
+spectral additions. The compatibility `IMatrix` methods do not make those
+typed families stable.
 
 ## Common contracts
 
@@ -242,6 +244,35 @@ be orthogonal or well-conditioned. Invalid input, arithmetic failure, or
 iteration exhaustion raises `EDenseMatrixError` without returning a partial
 result. The real eigenpair and conjugate-pair conventions follow LAPACK's
 [`DGEEV`](https://www.netlib.org/lapack/explore-html/d4/d68/group__geev_ga7d8afe93d23c5862e238626905ee145e.html) contract. See the [runnable real nonsymmetric eigensystem example](../../../examples/37_real_nonsymmetric_eigen.pas).
+
+`FactorRealGeneralizedSchur(A, B)` and
+`FactorComplexGeneralizedSchur(A, B)` reduce a regular matrix pencil
+`A - λ B`. Their copied factors satisfy `A = Q*S*Z^T` and `B = Q*T*Z^T`
+for real input, or use conjugate transpose for complex input. The real `T` is
+upper triangular and `S` is upper quasi-triangular; complex `S` and `T` are
+upper triangular. The corresponding `Alpha` and `Beta` arrays keep each value
+in homogeneous form: `λ = alpha/beta` when `beta` is nonzero. A zero `beta`
+represents an eigenvalue at infinity, which can occur when `B` is singular.
+Avoid forming the quotient when its magnitude is not representable.
+
+`FactorRealGeneralizedEigen(A, B)` and
+`FactorComplexGeneralizedEigen(A, B)` also return normalized right
+eigenvectors and normalized backward residuals for
+`beta*A*v = alpha*B*v`. Real input returns complex vectors for conjugate
+pairs. Accessors return defensive copies; invalid or non-finite input,
+indeterminate values, arithmetic failure, or iteration exhaustion raise
+`EDenseMatrixError` without a partial factor.
+
+The implementation selects a shift `gamma` so `A+gamma*B` can be solved
+against `B`, then applies real or complex Schur reduction to the transformed
+matrix. It never forms `B^-1*A`, and keeps the projective eigenvalues as
+`(alpha,beta)` pairs. Shift selection and Schur convergence are bounded;
+ill-conditioned shifted solves can fail. `Iterations` counts the Schur stage
+iterations, and `MaxIterations=0` selects `100*max(1,n)`. The factor forms and
+homogeneous value convention follow LAPACK's [`DGGES`](https://www.netlib.org/lapack/explore-html/d7/d25/group__gges_ga556be4f39b39e5008c8eb36814aa7e20.html),
+[`ZGGES`](https://www.netlib.org/lapack/explore-html/d7/d25/group__gges_ga4943e11fd632761e645ce1e5161f9f51.html),
+and [`DGGEV`](https://www.netlib.org/lapack/explore-html/d9/d52/dggev_8f_source.html)
+conventions. See the [generalized eigenproblem example](../../../examples/38_generalized_eigenproblem.pas).
 
 ## Empty, non-finite, and degenerate behavior
 
