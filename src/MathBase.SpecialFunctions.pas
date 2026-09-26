@@ -894,8 +894,10 @@ end;
 procedure JacobiEllipticValues(const U, M: Double;
   out SNValue, CNValue, DNValue: Double);
 const
-  MaxIterations = 64;
+  MaxIterations = 32;
+  MaxBisectionIterations = 96;
   FunctionTolerance = 1E-14;
+  AmplitudeTolerance = 2E-14;
 var
   PhiValue, FunctionValue, Difference, LowPhi, HighPhi, CandidatePhi,
     InverseDerivative, ExponentialArgument, QuarterPeriod, ReducedU,
@@ -971,10 +973,36 @@ begin
       1.0 - M * Sqr(Sin(PhiValue))));
     CandidatePhi := PhiValue - Difference * InverseDerivative;
     if (CandidatePhi <= LowPhi) or (CandidatePhi >= HighPhi) or
+      (CandidatePhi < LowPhi + 0.1 * (HighPhi - LowPhi)) or
+      (CandidatePhi > HighPhi - 0.1 * (HighPhi - LowPhi)) or
       IsNan(CandidatePhi) or IsInfinite(CandidatePhi) then
       CandidatePhi := (LowPhi + HighPhi) * 0.5;
     PhiValue := CandidatePhi;
   end;
+  if not Converged then
+    for I := 1 to MaxBisectionIterations do
+    begin
+      PhiValue := (LowPhi + HighPhi) * 0.5;
+      FunctionValue := IncompleteEllipticF(PhiValue, M);
+      Difference := FunctionValue - ReducedU;
+      if IsNan(Difference) or IsInfinite(Difference) then
+        Break;
+      if Abs(Difference) <= FunctionTolerance then
+      begin
+        Converged := True;
+        Break;
+      end;
+      if Difference < 0.0 then
+        LowPhi := PhiValue
+      else
+        HighPhi := PhiValue;
+      if HighPhi - LowPhi <= AmplitudeTolerance then
+      begin
+        PhiValue := (LowPhi + HighPhi) * 0.5;
+        Converged := True;
+        Break;
+      end;
+    end;
   if not Converged then
   begin
     SNValue := NaN;
