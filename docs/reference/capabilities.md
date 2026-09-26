@@ -53,11 +53,11 @@ Target qualifications and platform-specific limitations are defined by the
 
 This table describes the published 2.0.0 release. The [MathBase guide](../guides/domains/math-base.md#mathbasespecialfunctions-21-development)
 documents unreleased 2.1 development slices for Bessel J/Y and modified I/K,
-each at orders zero and one, Legendre elliptic integrals K/E/F, real
+each at orders zero and one, Legendre elliptic integrals K/E/F/Pi, real
 exponential integrals Ei/E1, bounded real Gauss 2F1, and real Jacobi sn/cn/dn.
-They do not change the 2.0.0 capability classification; other elliptic forms,
-analytic continuation, and complex hypergeometric or exponential-integral
-branches remain unimplemented.
+They do not change the 2.0.0 capability classification; elliptic principal
+values, amplitudes outside the principal interval, analytic continuation, and
+complex hypergeometric or exponential-integral branches remain unimplemented.
 
 Unsupported entries are not counted in the 1.9.4 numerical-evidence audit. The
 [closed 1.10.0 capability manifest](../releases/1.10.0/capability-manifest.md) defers

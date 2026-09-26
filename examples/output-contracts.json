@@ -137,6 +137,15 @@
         "sn^2 + cn^2 residual = 0.000000000000"
       ],
       "final_line": "Jacobi elliptic example: success"
+    },
+    {
+      "path": "examples/33_elliptic_third_kind.pas",
+      "contains": [
+        "Pi(0.7, 0.4, 0.6) = 0.7858786398",
+        "Pi(0.4, 0.6) = 2.5909211566",
+        "Pi(0.7, 0, 0.6) = 0.7353391599"
+      ],
+      "final_line": "Elliptic third-kind example: success"
     }
   ]
 }
