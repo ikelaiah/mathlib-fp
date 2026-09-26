@@ -36,7 +36,7 @@ J and Y into separate changes if either exceeds one focused review.
 
 ## 4. Ship the first I/K slice
 
-**Status:** Implemented and locally verified; awaiting platform CI.
+**Status:** Implemented and merged in PR #42.
 
 **Acceptance:** `ModifiedBesselI0`, `ModifiedBesselI1`, `ModifiedBesselK0`,
 and `ModifiedBesselK1` meet the range and error budget in `tasks/spec-2.1.md`,
@@ -48,7 +48,7 @@ define pole and nonfinite behavior, and include documentation and tests.
 
 ## 5. Add elliptic integral/function slices
 
-**Status:** First Legendre K/E/F slice implemented and locally qualified; PR #43 targets main.
+**Status:** First Legendre K/E/F slice implemented and merged in PR #43.
 
 The first slice uses parameter `m=k^2` in `[0,1]`, complete K/E, and
 incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`. Third-kind and Jacobi
@@ -62,7 +62,7 @@ limits, real domain, accuracy budget, and independent reference cases.
 
 ## 6. Add exponential integrals
 
-**Status:** Real Ei/E1 first slice implemented and locally qualified; PR pending.
+**Status:** Real Ei/E1 first slice implemented and locally qualified; merged in PR #44.
 
 The contract supports Ei on `[-100,100]` and E1 on `[0,100]`, with explicit
 real zero-pole and invalid-domain behavior. Complex branches are deferred.
@@ -74,6 +74,12 @@ small/large arguments, and nonfinite input is documented and tested.
 **Dependencies:** 1. **Scope:** Medium.
 
 ## 7. Add bounded hypergeometric support
+
+**Status:** Real Gauss 2F1 slice implemented and locally qualified; PR pending.
+
+The first slice uses the Gauss series for finite parameters `A,B` in `[-16,16]`,
+`C` in `[0.5,32]`, and real `X` in `[-0.75,0.75]`. Invalid or nonconvergent
+inputs return NaN; continuation and complex branches are deferred.
 
 **Acceptance:** Parameter and argument limits are explicit; convergence or
 nonconvergence is visible; accepted inputs meet a stated numerical budget.

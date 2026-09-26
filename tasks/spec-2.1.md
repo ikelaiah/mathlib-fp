@@ -1,8 +1,8 @@
 # Spec: 2.1 Special Functions II
 
-Status: J/Y, I/K, the first elliptic integral slice, and real Ei/E1 are
-implemented. Broader elliptic coverage and hypergeometric contracts remain to
-be resolved.
+Status: J/Y, I/K, the first elliptic integral slice, real Ei/E1, and bounded
+real Gauss 2F1 are implemented. Broader elliptic coverage remains to be
+resolved.
 
 ## Objective
 
@@ -35,20 +35,13 @@ provenance are published and tested.
   `fpc -B -FcUTF8 '-Fu..\src' '-FUlib' TestRunner.lpr` on Windows, then
   `./TestRunner -a --format=plain` (use `./TestRunner.exe` on Windows).
 - Documentation from repository root: `python tools/check_docs.py`.
-- Check committed Bessel data: `python tools/generate_bessel_data.py --check`.
+- Check committed reference data with the family generator, including
+  `python tools/generate_hypergeometric_data.py --check`.
 - Examples on Windows: `./build-examples.ps1`; on Unix: `sh ./build-examples.sh`.
 
-## Contracts to resolve before code
+## Remaining contract decisions
 
-- Exact names and order coverage for I/K, including whether scaled forms
-  are needed to provide useful extreme-range results.
-- Real input domains, endpoints, poles, branch conventions, NaN/Infinity,
-  overflow, underflow, and signed-zero behavior for each function.
-- Per-region absolute/relative error budgets, including neighborhoods of
-  zeros and transitions between numerical methods.
-- Elliptic parameter convention and complete/incomplete/function subset.
-- Exponential-integral branch/sign convention and real supported range.
-- Hypergeometric parameter/argument bounds and visible nonconvergence result.
+- Broader elliptic coverage beyond the first Legendre K/E/F slice.
 
 ## Initial J/Y contract
 
@@ -151,6 +144,30 @@ provenance are published and tested.
   the defining E1 integral for the continued-fraction range.
 - Complex-valued branches, generalized exponential integrals, and scaled
   exponential integrals are deferred.
+
+## Bounded Gauss hypergeometric contract
+
+- Public function: `GaussHypergeometric2F1(A, B, C, X)` in
+  `MathBase.SpecialFunctions`, returning real `Double`.
+- Accept finite `-16 <= A,B <= 16`, `0.5 <= C <= 32`, and
+  `-0.75 <= X <= 0.75`. These limits keep the denominator parameter away from
+  its poles and the Gauss series inside its disk of convergence.
+- The convergent Gauss series returns the value, including terminating cases
+  when A or B is a nonpositive integer and `X=0` where the value is 1. Invalid,
+  nonfinite, or out-of-range arguments return NaN. If the series does not meet
+  its convergence test within 10,000 terms, return NaN.
+- Finite results target `5e-13` absolute error or `5e-12` relative error,
+  whichever allows more. Use compensated summation and a tail-aware stopping
+  test. Reference coverage includes positive and negative X, near-zero and
+  boundary arguments, terminating polynomials, a near-zero function value,
+  and parameter boundaries.
+- Evaluate the Gauss series from NIST DLMF [§15.2](https://dlmf.nist.gov/15.2)
+  using the Maclaurin-method guidance in [§15.19(i)](https://dlmf.nist.gov/15.19.i).
+  The restriction `|X| <= 0.75` deliberately defers continuation and branch
+  handling at or beyond the unit circle.
+- Complex parameters/arguments, analytic continuation, regularized forms,
+  confluent functions, and other generalized hypergeometric functions remain
+  outside this slice.
 
 ## Testing and evidence
 
