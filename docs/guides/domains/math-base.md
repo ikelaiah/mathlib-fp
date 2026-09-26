@@ -312,6 +312,22 @@ the fixtures and covered transitions. The formulas follow NIST DLMF
 [continued fraction](https://dlmf.nist.gov/6.9). Complex branches and other
 orders remain outside this slice.
 
+The same 2.1 development unit provides real `GaussHypergeometric2F1(A, B, C,
+X)`, the Gauss hypergeometric function `2F1`. It accepts finite `A` and `B`
+in `[-16,16]`, `C` in `[0.5,32]`, and `X` in `[-0.75,0.75]`. The result uses
+the Gauss series on this compact part of its convergence disk; complex values,
+analytic continuation, and arguments at or beyond the unit circle are not
+supported. Invalid or nonfinite inputs and a series that fails to meet its
+convergence test return NaN. The tested corpus budget is
+`max(5e-13, 5e-12 * |reference value|)`.
+
+The [reference corpus](../../../tests/HypergeometricReference.inc) and
+[generator](../../../tools/generate_hypergeometric_data.py) use 160-digit
+Decimal arithmetic. See NIST DLMF [Gauss series](https://dlmf.nist.gov/15.2)
+and [Maclaurin computation guidance](https://dlmf.nist.gov/15.19.i). The
+[runnable example](../../../examples/31_gauss_hypergeometric.pas) demonstrates
+the real bounded API and a terminating polynomial.
+
 ---
 
 ## MathBase.Trigonometry — `TTrigKit`

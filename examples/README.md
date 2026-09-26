@@ -43,6 +43,7 @@ closest to your project. For a shorter task-first route, use the
 | `28_modified_bessel_functions.pas` | MathBase | Real order-zero/one modified Bessel I/K values and a Wronskian check on the bounded 2.1 development surface |
 | `29_elliptic_integrals.pas` | MathBase | Complete and incomplete Legendre elliptic integrals with parameter and endpoint conventions |
 | `30_exponential_integrals.pas` | MathBase | Real Ei/E1 values, their negative-argument identity, and explicit pole/domain conventions |
+| `31_gauss_hypergeometric.pas` | MathBase | Real bounded Gauss 2F1 series, a terminating polynomial, and the supported argument interval |
 
 ## Build and run
 

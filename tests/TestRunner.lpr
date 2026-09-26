@@ -11,6 +11,7 @@ uses
   , TestModifiedBessel
   , TestEllipticIntegrals
   , TestExponentialIntegrals
+  , TestGaussHypergeometric
   , TestComplexLib
   , TestAlgebraLib
   , TestDenseMatrices

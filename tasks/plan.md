@@ -61,9 +61,11 @@ reference cases, no dependency additions, and passing focused tests.
    behavior and reference evidence.
 6. **Exponential integrals.** Define the real `Ei`/`E1` boundary and implement
    only the approved domain/range, with sign, branch, pole, and tail tests.
-7. **Hypergeometric baseline.** Select a narrow real parameter/argument domain
-   with a clear user workflow. Reject or defer regions that cannot meet the
-   documented budget; add independent values and convergence diagnostics.
+7. **Hypergeometric baseline.** Implement the bounded real Gauss 2F1 series for
+   `A,B` in `[-16,16]`, `C` in `[0.5,32]`, and `X` in `[-0.75,0.75]`. Return
+   NaN for invalid input or failure to converge within the fixed iteration
+   budget. Add independent references, termination and symmetry checks, API
+   docs, and a runnable example. Defer continuation and complex branches.
 
 **Checkpoint:** Each shipped family matches its own contract and evidence;
 unsupported regions remain explicit in the docs and capability inventory.

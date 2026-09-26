@@ -18,6 +18,8 @@ unit MathBase.SpecialFunctions;
     https://dlmf.nist.gov/6.6 (exponential-integral power series)
     https://dlmf.nist.gov/6.9 (E1 continued fraction)
     https://dlmf.nist.gov/6.12 (large-argument expansions)
+    https://dlmf.nist.gov/15.2 (Gauss hypergeometric series)
+    https://dlmf.nist.gov/15.19.i (Maclaurin computation guidance)
   The small-argument series loses accuracy through cancellation as X grows;
   the large-argument expansion becomes accurate only once X is sufficiently
   large. Middle-range Chebyshev coefficients bridge that gap and were generated
@@ -60,6 +62,10 @@ function IncompleteEllipticE(const Phi, M: Double): Double;
   at zero. Nonfinite and out-of-domain arguments return NaN. }
 function ExponentialIntegralEi(const X: Double): Double;
 function ExponentialIntegralE1(const X: Double): Double;
+
+{ Real Gauss 2F1 for A,B in [-16,16], C in [0.5,32], and |X| <= 0.75.
+  Nonfinite, out-of-range, and nonconvergent inputs return NaN. }
+function GaussHypergeometric2F1(const A, B, C, X: Double): Double;
 
 implementation
 
@@ -385,6 +391,10 @@ const
   TwoOverPi = 0.63661977236758134308;
   MaxBesselArgument = 100.0;
   MaxExponentialIntegralArgument = 100.0;
+  MaxHypergeometricParameter = 16.0;
+  MaxHypergeometricDenominator = 32.0;
+  MinHypergeometricDenominator = 0.5;
+  MaxGaussHypergeometricArgument = 0.75;
   HalfPiValue: Double = 1.57079632679489661923;
 
 function ChebyshevValue(const X, Center, HalfWidth: Double;
@@ -968,6 +978,63 @@ begin
       Break;
   end;
   Result := EulerGamma + Ln(AX) + SeriesSum;
+end;
+
+function GaussHypergeometric2F1(const A, B, C, X: Double): Double;
+const
+  MaxIterations = 10000;
+  MinimumStoppingIteration = 128;
+  RelativeTermTolerance = 2E-16;
+var
+  N: Integer;
+  Term, SumValue, Compensation, AdjustedTerm, UpdatedSum: Double;
+  NumeratorA, NumeratorB: Double;
+begin
+  if IsNan(A) or IsInfinite(A) or (Abs(A) > MaxHypergeometricParameter) or
+    IsNan(B) or IsInfinite(B) or (Abs(B) > MaxHypergeometricParameter) or
+    IsNan(C) or IsInfinite(C) or
+    (C < MinHypergeometricDenominator) or
+    (C > MaxHypergeometricDenominator) or
+    IsNan(X) or IsInfinite(X) or
+    (Abs(X) > MaxGaussHypergeometricArgument) then
+    Exit(NaN);
+  if X = 0.0 then
+    Exit(1.0);
+
+  { DLMF 15.2.1 Gauss series. Kahan compensation limits loss when the
+    alternating terms nearly cancel; the compact argument disk gives a
+    convergent series without analytic continuation or branch handling. }
+  Term := 1.0;
+  SumValue := 1.0;
+  Compensation := 0.0;
+  for N := 1 to MaxIterations do
+  begin
+    NumeratorA := A + N - 1;
+    NumeratorB := B + N - 1;
+    if (NumeratorA = 0.0) or (NumeratorB = 0.0) then
+      Exit(SumValue);
+    Term := Term * NumeratorA * NumeratorB * X /
+      ((C + N - 1) * N);
+    if IsNan(Term) or IsInfinite(Term) then
+      Exit(NaN);
+    if Term = 0.0 then
+      Exit(SumValue);
+
+    AdjustedTerm := Term - Compensation;
+    UpdatedSum := SumValue + AdjustedTerm;
+    Compensation := (UpdatedSum - SumValue) - AdjustedTerm;
+    SumValue := UpdatedSum;
+    if IsNan(SumValue) or IsInfinite(SumValue) then
+      Exit(NaN);
+
+    { For N >= 128, the largest possible next-term ratio is below 0.94
+      under the public parameter bounds, so the omitted tail is below 17 terms
+      of the current magnitude. }
+    if (N >= MinimumStoppingIteration) and
+      (Abs(Term) <= RelativeTermTolerance * Max(1.0, Abs(SumValue))) then
+      Exit(SumValue);
+  end;
+  Result := NaN;
 end;
 
 end.
