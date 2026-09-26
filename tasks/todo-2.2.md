@@ -15,8 +15,7 @@ and validation cases; full `TestRunner`; guide, example, and docs checks.
 
 ## 2. Complex double Hessenberg reduction
 
-**Status:** Implemented locally on Windows with FPC 3.2.2. Focused dense
-decomposition tests pass; full qualification and PR CI are pending.
+**Status:** Implemented and merged as PR #50; CI passed.
 
 **Acceptance:** `ReduceHessenberg` returns defensive-copy complex `Q` and `H`
 factors with `Q^H A Q = H`; `Q` is unitary and `H` is upper Hessenberg.
@@ -28,8 +27,8 @@ validation cases; full `TestRunner`; guide, example, and docs checks.
 
 ## 3. Real double Schur factorization
 
-**Status:** Implemented locally; focused dense decomposition tests pass.
-Windows release qualification passed 112 gates; PR CI is pending.
+**Status:** Implemented and merged as PR #51; focused tests, Windows release
+qualification (112 gates), and PR CI passed.
 
 **Acceptance:** `FactorRealSchur` returns copied `Q` and `T` factors satisfying
 `A = Q T Q^T`, with orthogonal `Q` and standardized real Schur blocks in `T`.
@@ -42,6 +41,14 @@ example and documentation checks, release qualification, and CI.
 
 ## Later slices
 
-- [ ] Nonsymmetric eigenvalues and eigenvectors, ordering, residuals, and
-  convergence/failure diagnostics.
+- [x] Nonsymmetric eigenvalues and eigenvectors, ordering, residuals, and
+  convergence/failure diagnostics. Contract approved and implemented on
+  `feat/2.2-real-nonsymmetric-eigen`; release qualification and PR CI are
+  complete locally; PR CI is pending.
+  - **Acceptance:** real-double input returns complex values and normalized
+    right eigenvectors with stable order options, paired normalized backward
+    residuals, and bounded Schur convergence diagnostics.
+  - **Verify:** 977 FPCUnit tests, all 38 examples, 19 output contracts,
+    documentation/API checks, and 114 Windows release-qualification gates
+    passed. Linux/Windows PR CI is pending.
 - [ ] Generalized real/complex `A x = λ B x` reduction and solve contract.

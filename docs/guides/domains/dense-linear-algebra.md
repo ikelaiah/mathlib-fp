@@ -230,6 +230,19 @@ the [real Hessenberg example](../../../examples/34_hessenberg_reduction.pas),
 the [complex Hessenberg example](../../../examples/35_complex_hessenberg_reduction.pas),
 and [real Schur example](../../../examples/36_real_schur_factorization.pas).
 
+`FactorRealEigen(A, Ordering, MaxIterations)` builds on the real Schur factor
+and returns every eigenvalue as a `TComplex` plus its normalized right
+eigenvector as a column of `RightEigenvectors`. A real matrix can have complex
+conjugate pairs; those values are adjacent with the positive-imaginary member
+first. The default `reoSchurOrder` follows the Schur blocks. `reoRealPart` and
+`reoMagnitude` sort ascending, with ties retaining Schur order. `Residuals`
+contains the normalized backward residual for each pair, and `Iterations`
+reports the Schur steps. Eigenvectors are unit length but are not promised to
+be orthogonal or well-conditioned. Invalid input, arithmetic failure, or
+iteration exhaustion raises `EDenseMatrixError` without returning a partial
+result. The real eigenpair and conjugate-pair conventions follow LAPACK's
+[`DGEEV`](https://www.netlib.org/lapack/explore-html/d4/d68/group__geev_ga7d8afe93d23c5862e238626905ee145e.html) contract. See the [runnable real nonsymmetric eigensystem example](../../../examples/37_real_nonsymmetric_eigen.pas).
+
 ## Empty, non-finite, and degenerate behavior
 
 - `0 x 0` square, QR, SVD, and eigensystem factors are valid.

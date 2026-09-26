@@ -49,6 +49,7 @@ closest to your project. For a shorter task-first route, use the
 | `34_hessenberg_reduction.pas` | AlgebraLib | Reduce a real dense matrix to upper Hessenberg form |
 | `35_complex_hessenberg_reduction.pas` | AlgebraLib | Reduce a complex dense matrix with a unitary Hessenberg similarity |
 | `36_real_schur_factorization.pas` | AlgebraLib | Compute a real Schur factorization with orthogonal Schur vectors |
+| `37_real_nonsymmetric_eigen.pas` | AlgebraLib | Compute and order real nonsymmetric eigenpairs with residual diagnostics |
 
 ## Build and run
 

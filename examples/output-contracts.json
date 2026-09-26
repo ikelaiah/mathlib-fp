@@ -170,6 +170,16 @@
         "Schur form = upper quasi-triangular"
       ],
       "final_line": "Real Schur factorization: success"
+    },
+    {
+      "path": "examples/37_real_nonsymmetric_eigen.pas",
+      "contains": [
+        "lambda[0] = 0.000000 + 1.000000i",
+        "lambda[1] = 0.000000 + -1.000000i",
+        "lambda[2] = 1.000000 + 0.000000i",
+        "lambda[3] = 2.000000 + 0.000000i"
+      ],
+      "final_line": "Real nonsymmetric eigensystem: success"
     }
   ]
 }

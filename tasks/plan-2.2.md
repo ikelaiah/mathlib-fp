@@ -71,6 +71,21 @@ complex double-precision Hessenberg reductions defined in
 - [x] Run focused tests, all qualification gates, and the final diff review.
 - [ ] Linux and Windows CI pass before merge.
 
+### Phase 6: Real nonsymmetric eigenpairs (contract approved)
+
+- [x] Add tests for real and conjugate eigenpairs, stable ordering, normalized
+  residuals, defensive copies, empty/singleton matrices, invalid inputs, and
+  Schur iteration-limit failure.
+- [x] Expose the complex eigenvalue/right-eigenvector result interface and
+  ordering enum from `AlgebraLib.DenseSpectral`.
+- [x] Recover eigenvectors from the real Schur form and accumulate through
+  Schur vectors, with scaled arithmetic and finite-result validation.
+- [x] Add a runnable example and update the dense linear algebra guide,
+  capability summary, changelog, and 2.2 task status; keep the published 2.0
+  API snapshot frozen.
+- [x] Run focused and full qualification checks; review the final diff.
+- [ ] Linux and Windows CI pass before merge.
+
 ## Risks and mitigations
 
 | Risk | Mitigation |
@@ -79,6 +94,7 @@ complex double-precision Hessenberg reductions defined in
 | Complex Householder conventions differ from the real path | State the conjugate-transpose relation explicitly and test reconstruction and unitarity. |
 | Dense transformations violate the similarity relation through indexing errors | Test both reconstruction and orthogonality on independent nonsymmetric inputs. |
 | Schur iteration stalls on clustered or badly scaled spectra | Use scale-relative deflation, a bounded iteration count, and raise a clear domain error when the budget is exhausted. |
+| Repeated or clustered eigenvalues make back substitution ill-conditioned | Scale each solve step, regularize near-zero pivots relative to Schur scale, and report per-vector backward residuals; do not promise an orthogonal or well-conditioned eigenbasis. |
 
 ## Dependencies
 

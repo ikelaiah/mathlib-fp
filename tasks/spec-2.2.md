@@ -130,3 +130,51 @@ runnable example; it passes the focused and full supported test matrix.
 
 - Complex Schur and generalized QZ reductions need explicit ordering, scaling,
   and failure semantics before implementation.
+
+## Approved real nonsymmetric eigensystem slice
+
+This proposal scopes the next feature to a real-double input matrix and
+complex-double right eigenvectors. It builds on `FactorRealSchur`; it does not
+add complex Schur or left eigenvectors.
+
+- Unit: `AlgebraLib.DenseSpectral`.
+- Entry point: `FactorRealEigen(const A: IDenseDoubleMatrix; const
+  Ordering: TRealEigenvalueOrdering = reoSchurOrder; const MaxIterations:
+  SizeInt = 0)`.
+- Return `IDenseDoubleRealEigen`, exposing `Size`, `Eigenvalues:
+  TComplexArray`, `RightEigenvectors: IDenseComplexMatrix`, `Residuals:
+  TDoubleArray`, `Iterations`, and `Converged`. Matrices and arrays returned
+  from accessors are defensive copies. Eigenvectors are normalized columns
+  paired by index with eigenvalues.
+- Require finite square input; leave it unchanged. Empty and 1x1 inputs are
+  supported. Nil, nonsquare, non-finite input, non-finite computed output, and
+  exhausted Schur iteration budget raise `EDenseMatrixError`; no partial
+  eigensystem is returned. `MaxIterations` follows `FactorRealSchur` semantics.
+- Every real eigenvalue is represented with zero imaginary part. A conjugate
+  pair is returned in adjacent columns with the positive-imaginary member
+  first. `reoSchurOrder` preserves the real Schur block order. `reoRealPart`
+  orders by increasing real part; `reoMagnitude` orders by increasing complex
+  magnitude. Equal keys retain Schur order, and all corresponding vectors are
+  permuted with their values.
+- Right eigenvectors satisfy `A*v = lambda*v`. `Residuals[i]` reports the
+  normalized backward residual
+  `||A*v-lambda*v||_2 / ((||A||_F + |lambda|) * ||v||_2)` using scaled norm
+  evaluation; define it as zero when the denominator is zero (then the exact
+  residual is also zero). Each eigenvector is normalized to unit 2-norm. No
+  orthogonality or well-conditioned eigenbasis is promised.
+- `Iterations` reports the Francis double-shift steps performed by the Schur
+  stage. A successful result has `Converged=True`; non-convergence is an
+  exception, consistent with the Schur API. Arithmetic breakdown while
+  recovering an eigenvector also raises `EDenseMatrixError`.
+- Derive eigenvalues from the standardized 1x1/2x2 real Schur blocks, recover
+  right eigenvectors by backward substitution in Schur form, and transform
+  them by `Q`. Complexity target is `O(n^3)` arithmetic and `O(n^2)` storage.
+
+The real eigenvalue/eigenvector conventions and conjugate-pair representation
+follow LAPACK's `DGEEV` contract. The library adds stable ordering options,
+residual diagnostics, and exception-on-failure semantics. See
+[`DGEEV`](https://www.netlib.org/lapack/explore-html/d4/d68/group__geev_ga7d8afe93d23c5862e238626905ee145e.html).
+
+Implementation tasks and tests are tracked in `plan-2.2.md` and
+`todo-2.2.md`. Generalized eigenproblems, left eigenvectors, complex input, and
+Schur reordering remain out of scope for this slice.

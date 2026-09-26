@@ -60,11 +60,11 @@ values, amplitudes outside the principal interval, analytic continuation, and
 complex hypergeometric or exponential-integral branches remain unimplemented.
 
 The unreleased 2.2 development source contains real-double orthogonal and
-complex-double unitary Hessenberg reductions (`ReduceHessenberg`), plus a
-real-double Schur factorization (`FactorRealSchur`). It does not yet provide
-the nonsymmetric eigenvalue and eigenvector APIs, Schur block ordering, complex
-Schur factorization, or a generalized eigenproblem; those remain unsupported
-in the published 2.0.0 inventory.
+complex-double unitary Hessenberg reductions (`ReduceHessenberg`), a real-double
+Schur factorization (`FactorRealSchur`), and real-input nonsymmetric eigenpairs
+(`FactorRealEigen`) with complex right eigenvectors and ordering. Complex
+Schur factorization and generalized eigenproblems remain deferred; this
+development work does not change the published 2.0.0 capability inventory.
 
 Unsupported entries are not counted in the 1.9.4 numerical-evidence audit. The
 [closed 1.10.0 capability manifest](../releases/1.10.0/capability-manifest.md) defers
