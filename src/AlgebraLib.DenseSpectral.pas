@@ -69,6 +69,80 @@ type
     property Converged: Boolean read GetConverged;
   end;
 
+  IDenseDoubleGeneralizedSchur = interface
+    function GetSize: SizeInt;
+    function GetQ: IDenseDoubleMatrix;
+    function GetS: IDenseDoubleMatrix;
+    function GetZ: IDenseDoubleMatrix;
+    function GetT: IDenseDoubleMatrix;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetIterations: SizeInt;
+    property Size: SizeInt read GetSize;
+    property Q: IDenseDoubleMatrix read GetQ;
+    property S: IDenseDoubleMatrix read GetS;
+    property Z: IDenseDoubleMatrix read GetZ;
+    property T: IDenseDoubleMatrix read GetT;
+    { Homogeneous generalized eigenvalue numerators, paired by index. }
+    property Alpha: TComplexArray read GetAlpha;
+    { Denominators; zero denotes an eigenvalue at infinity. }
+    property Beta: TComplexArray read GetBeta;
+    property Iterations: SizeInt read GetIterations;
+  end;
+
+  IDenseDoubleGeneralizedEigen = interface
+    function GetSize: SizeInt;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetRightEigenvectors: IDenseComplexMatrix;
+    function GetResiduals: TDoubleArray;
+    function GetIterations: SizeInt;
+    function GetConverged: Boolean;
+    property Size: SizeInt read GetSize;
+    property Alpha: TComplexArray read GetAlpha;
+    property Beta: TComplexArray read GetBeta;
+    property RightEigenvectors: IDenseComplexMatrix read GetRightEigenvectors;
+    property Residuals: TDoubleArray read GetResiduals;
+    property Iterations: SizeInt read GetIterations;
+    property Converged: Boolean read GetConverged;
+  end;
+
+  IDenseComplexGeneralizedSchur = interface
+    function GetSize: SizeInt;
+    function GetQ: IDenseComplexMatrix;
+    function GetS: IDenseComplexMatrix;
+    function GetZ: IDenseComplexMatrix;
+    function GetT: IDenseComplexMatrix;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetIterations: SizeInt;
+    property Size: SizeInt read GetSize;
+    property Q: IDenseComplexMatrix read GetQ;
+    property S: IDenseComplexMatrix read GetS;
+    property Z: IDenseComplexMatrix read GetZ;
+    property T: IDenseComplexMatrix read GetT;
+    property Alpha: TComplexArray read GetAlpha;
+    property Beta: TComplexArray read GetBeta;
+    property Iterations: SizeInt read GetIterations;
+  end;
+
+  IDenseComplexGeneralizedEigen = interface
+    function GetSize: SizeInt;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetRightEigenvectors: IDenseComplexMatrix;
+    function GetResiduals: TDoubleArray;
+    function GetIterations: SizeInt;
+    function GetConverged: Boolean;
+    property Size: SizeInt read GetSize;
+    property Alpha: TComplexArray read GetAlpha;
+    property Beta: TComplexArray read GetBeta;
+    property RightEigenvectors: IDenseComplexMatrix read GetRightEigenvectors;
+    property Residuals: TDoubleArray read GetResiduals;
+    property Iterations: SizeInt read GetIterations;
+    property Converged: Boolean read GetConverged;
+  end;
+
 function ReduceHessenberg(const A: IDenseDoubleMatrix):
   IDenseDoubleHessenberg; overload;
 function ReduceHessenberg(const A: IDenseComplexMatrix):
@@ -78,11 +152,21 @@ function FactorRealSchur(const A: IDenseDoubleMatrix;
 function FactorRealEigen(const A: IDenseDoubleMatrix;
   const Ordering: TRealEigenvalueOrdering = reoSchurOrder;
   const MaxIterations: SizeInt = 0): IDenseDoubleRealEigen;
+function FactorRealGeneralizedSchur(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt = 0): IDenseDoubleGeneralizedSchur;
+function FactorRealGeneralizedEigen(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt = 0): IDenseDoubleGeneralizedEigen;
+{ Complex-input generalized Schur reduction and right-eigenpair solve. }
+function FactorComplexGeneralizedSchur(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt = 0): IDenseComplexGeneralizedSchur;
+function FactorComplexGeneralizedEigen(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt = 0): IDenseComplexGeneralizedEigen;
 
 implementation
 
 uses
-  Math, SysUtils;
+  Math, SysUtils, AlgebraLib.DenseDecompositions,
+  AlgebraLib.DenseSolvers, AlgebraLib.DenseKernels;
 
 type
   TDenseDoubleHessenberg = class(TInterfacedObject,
@@ -145,6 +229,189 @@ type
     function GetIterations: SizeInt;
     function GetConverged: Boolean;
   end;
+
+  TDenseDoubleGeneralizedSchur = class(TInterfacedObject,
+    IDenseDoubleGeneralizedSchur)
+  private
+    FSize, FIterations: SizeInt;
+    FQ, FS, FZ, FT: IDenseDoubleMatrix;
+    FAlpha, FBeta: TComplexArray;
+    FTransformEigenvectors: IDenseComplexMatrix;
+    procedure Factor(const A, B: IDenseDoubleMatrix;
+      const MaxIterations: SizeInt);
+  public
+    constructor Create(const A, B: IDenseDoubleMatrix;
+      const MaxIterations: SizeInt);
+    function GetSize: SizeInt;
+    function GetQ: IDenseDoubleMatrix;
+    function GetS: IDenseDoubleMatrix;
+    function GetZ: IDenseDoubleMatrix;
+    function GetT: IDenseDoubleMatrix;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetIterations: SizeInt;
+  end;
+
+  TDenseDoubleGeneralizedEigen = class(TInterfacedObject,
+    IDenseDoubleGeneralizedEigen)
+  private
+    FSchur: IDenseDoubleGeneralizedSchur;
+    FVectors: IDenseComplexMatrix;
+    FResiduals: TDoubleArray;
+    procedure Factor(const A, B: IDenseDoubleMatrix;
+      const MaxIterations: SizeInt);
+  public
+    constructor Create(const A, B: IDenseDoubleMatrix;
+      const MaxIterations: SizeInt);
+    function GetSize: SizeInt;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetRightEigenvectors: IDenseComplexMatrix;
+    function GetResiduals: TDoubleArray;
+    function GetIterations: SizeInt;
+    function GetConverged: Boolean;
+  end;
+
+  TDenseComplexGeneralizedSchur = class(TInterfacedObject,
+    IDenseComplexGeneralizedSchur)
+  private
+    FSize, FIterations: SizeInt;
+    FQ, FS, FZ, FT, FTransformEigenvectors: IDenseComplexMatrix;
+    FAlpha, FBeta: TComplexArray;
+    procedure Factor(const A, B: IDenseComplexMatrix;
+      const MaxIterations: SizeInt);
+  public
+    constructor Create(const A, B: IDenseComplexMatrix;
+      const MaxIterations: SizeInt);
+    function GetSize: SizeInt;
+    function GetQ: IDenseComplexMatrix;
+    function GetS: IDenseComplexMatrix;
+    function GetZ: IDenseComplexMatrix;
+    function GetT: IDenseComplexMatrix;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetIterations: SizeInt;
+  end;
+
+  TDenseComplexGeneralizedEigen = class(TInterfacedObject,
+    IDenseComplexGeneralizedEigen)
+  private
+    FSchur: IDenseComplexGeneralizedSchur;
+    FVectors: IDenseComplexMatrix;
+    FResiduals: TDoubleArray;
+    procedure Factor(const A, B: IDenseComplexMatrix;
+      const MaxIterations: SizeInt);
+  public
+    constructor Create(const A, B: IDenseComplexMatrix;
+      const MaxIterations: SizeInt);
+    function GetSize: SizeInt;
+    function GetAlpha: TComplexArray;
+    function GetBeta: TComplexArray;
+    function GetRightEigenvectors: IDenseComplexMatrix;
+    function GetResiduals: TDoubleArray;
+    function GetIterations: SizeInt;
+    function GetConverged: Boolean;
+  end;
+
+procedure FactorComplexSchurInternal(const A: IDenseComplexMatrix;
+  const MaxIterations: SizeInt; out Q, T: IDenseComplexMatrix;
+  out Iterations: SizeInt);
+var
+  N, Active, I, J, Limit, SinceDeflation: SizeInt;
+  H, U, Shifted, StepQ, ScaledA: IDenseComplexMatrix;
+  Hessenberg: IDenseComplexHessenberg;
+  QR: IDenseComplexQR;
+  Shift: TComplex;
+  LocalScale, Threshold, Epsilon, GlobalScale: Double;
+begin
+  if A = nil then
+    raise EDenseMatrixError.Create('Complex Schur: matrix must not be nil.');
+  if A.Rows <> A.Cols then
+    raise EDenseMatrixError.Create('Complex Schur: matrix must be square.');
+  N := A.Rows;
+  if MaxIterations < 0 then
+    raise EDenseMatrixError.Create('Complex Schur: iteration limit is negative.');
+  Limit := MaxIterations;
+  if Limit = 0 then Limit := 100 * Max(1, N);
+  GlobalScale := 0.0;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+      GlobalScale := Max(GlobalScale, A[I, J].Magnitude);
+  if GlobalScale = 0.0 then
+    ScaledA := A.Clone
+  else
+  begin
+    ScaledA := TDenseComplexMatrix.Zeros(N, N);
+    for I := 0 to N - 1 do
+      for J := 0 to N - 1 do
+        ScaledA[I, J] := A[I, J] / GlobalScale;
+  end;
+  Hessenberg := ReduceHessenberg(ScaledA);
+  H := Hessenberg.H;
+  Q := Hessenberg.Q;
+  Iterations := 0;
+  Active := N - 1;
+  SinceDeflation := 0;
+  Epsilon := 2.2204460492503131E-16;
+  while Active > 0 do
+  begin
+    LocalScale := Max(H[Active, Active].Magnitude,
+      H[Active - 1, Active - 1].Magnitude);
+    Threshold := Epsilon * Max(1, N) * LocalScale;
+    if H[Active, Active - 1].Magnitude <= Threshold then
+    begin
+      H[Active, Active - 1] := TComplex.Zero;
+      Dec(Active);
+      SinceDeflation := 0;
+      Continue;
+    end;
+    if Iterations >= Limit then
+      raise EDenseMatrixError.CreateFmt(
+        'Complex Schur: iteration limit (%d) reached before convergence.',
+        [Limit]);
+
+    Shift := H[Active, Active];
+    if (SinceDeflation > 0) and (SinceDeflation mod 16 = 0) then
+      Shift := Shift + TComplex.Create(0.75, 0.25) *
+        H[Active, Active - 1].Magnitude;
+    Shifted := TDenseComplexMatrix.Zeros(Active + 1, Active + 1);
+    for I := 0 to Active do
+      for J := 0 to Active do
+      begin
+        Shifted[I, J] := H[I, J];
+        if I = J then Shifted[I, J] := Shifted[I, J] - Shift;
+      end;
+    QR := FactorQR(Shifted);
+    StepQ := QR.Q;
+    U := TDenseComplexMatrix.Zeros(N, N);
+    for I := 0 to N - 1 do U[I, I] := TComplex.One;
+    for I := 0 to Active do
+      for J := 0 to Active do U[I, J] := StepQ[I, J];
+    H := Multiply(Multiply(ConjugateTranspose(U), H), U);
+    Q := Multiply(Q, U);
+    Inc(Iterations);
+    Inc(SinceDeflation);
+    if (H[Active, Active - 1].Magnitude <= Threshold) then
+    begin
+      H[Active, Active - 1] := TComplex.Zero;
+      Dec(Active);
+      SinceDeflation := 0;
+    end;
+  end;
+  if GlobalScale = 0.0 then
+    T := H
+  else
+  begin
+    T := TDenseComplexMatrix.Zeros(N, N);
+    for I := 0 to N - 1 do
+      for J := 0 to N - 1 do T[I, J] := H[I, J] * GlobalScale;
+  end;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+      if not T[I, J].IsFinite then
+        raise EDenseMatrixError.Create(
+          'Complex Schur: computed factor is non-finite.');
+end;
 
 procedure ValidateFiniteMatrix(const A: IDenseDoubleMatrix);
 var
@@ -1209,11 +1476,842 @@ function TDenseDoubleRealEigen.GetConverged: Boolean;
 begin
   Result := True;
 end;
+
+procedure TDenseDoubleGeneralizedSchur.Factor(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt);
+var
+  I, J, Candidate: SizeInt;
+  Scale, Gamma, NormBeta: Double;
+  IsIdentityB: Boolean;
+  C, BScaled, M, CZ, R, ShiftedT, Identity:
+    IDenseDoubleMatrix;
+  LU: IDenseDoubleLU;
+  QR: IDenseDoubleQR;
+  Schur: IDenseDoubleRealSchur;
+  Eigen: IDenseDoubleRealEigen;
+  Mu, AlphaValue, BetaValue: TComplex;
+  TempComplex: TComplex;
+  FoundShift: Boolean;
+begin
+  if (A = nil) or (B = nil) then
+    raise EDenseMatrixError.Create(
+      'FactorRealGeneralizedSchur: matrices must not be nil.');
+  if (A.Rows <> A.Cols) or (B.Rows <> B.Cols) or (A.Rows <> B.Rows) then
+    raise EDenseMatrixError.Create(
+      'FactorRealGeneralizedSchur: matrices must be square and have matching sizes.');
+  if MaxIterations < 0 then
+    raise EDenseMatrixError.Create(
+      'FactorRealGeneralizedSchur: iteration limit must be non-negative.');
+  FSize := A.Rows;
+  IsIdentityB := True;
+  Scale := 0.0;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+    begin
+      if IsNan(A[I, J]) or IsInfinite(A[I, J]) or
+         IsNan(B[I, J]) or IsInfinite(B[I, J]) then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorRealGeneralizedSchur: non-finite input at [%d,%d].', [I, J]);
+      if B[I, J] <> Ord(I = J) then IsIdentityB := False;
+      Scale := Max(Scale, Max(Abs(A[I, J]), Abs(B[I, J])));
+    end;
+
+  if IsIdentityB then
+  begin
+    Schur := FactorRealSchur(A, MaxIterations);
+    Eigen := FactorRealEigen(A, reoSchurOrder, MaxIterations);
+    FQ := Schur.Q;
+    FZ := Schur.Q;
+    FS := Schur.T;
+    FT := TDenseDoubleMatrix.Zeros(FSize, FSize);
+    for I := 0 to FSize - 1 do FT[I, I] := 1.0;
+    FAlpha := Eigen.Eigenvalues;
+    FBeta := nil;
+    SetLength(FBeta, FSize);
+    for I := 0 to FSize - 1 do
+    begin
+      Scale := Max(1.0, FAlpha[I].Magnitude);
+      FAlpha[I] := FAlpha[I] / Scale;
+      FBeta[I] := TComplex.Create(1.0 / Scale, 0.0);
+    end;
+    FTransformEigenvectors := Eigen.RightEigenvectors;
+    FIterations := Schur.Iterations;
+    Exit;
+  end;
+
+  if FSize = 0 then
+  begin
+    FQ := TDenseDoubleMatrix.Zeros(0, 0);
+    FZ := TDenseDoubleMatrix.Zeros(0, 0);
+    FS := A.Clone;
+    FT := B.Clone;
+    FAlpha := nil;
+    FBeta := nil;
+    FTransformEigenvectors := TDenseComplexMatrix.Zeros(0, 0);
+    FIterations := 0;
+    Exit;
+  end;
+  if Scale = 0.0 then
+    raise EDenseMatrixError.Create(
+      'FactorRealGeneralizedSchur: zero pencil is indeterminate.');
+
+  { A nonsingular shift C=A+gamma*B maps finite and infinite eigenvalues to
+    the ordinary spectrum of C^-1*B. A regular n-by-n pencil has at most n
+    singular shifts, so testing n+1 distinct values finds a usable C. }
+  BScaled := TDenseDoubleMatrix.Zeros(FSize, FSize);
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+    begin
+      if ((A[I, J] <> 0.0) and (A[I, J] / Scale = 0.0)) or
+         ((B[I, J] <> 0.0) and (B[I, J] / Scale = 0.0)) then
+        raise EDenseMatrixError.Create(
+          'FactorRealGeneralizedSchur: input dynamic range is not representable after scaling.');
+      BScaled[I, J] := B[I, J] / Scale;
+    end;
+  FoundShift := False;
+  for Candidate := 0 to FSize do
+  begin
+    Gamma := Candidate;
+    C := TDenseDoubleMatrix.Zeros(FSize, FSize);
+    for I := 0 to FSize - 1 do
+      for J := 0 to FSize - 1 do
+        C[I, J] := A[I, J] / Scale + Gamma * BScaled[I, J];
+    try
+      LU := FactorLU(C);
+      M := LU.Solve(BScaled);
+      FoundShift := True;
+      Break;
+    except
+      on EDenseMatrixError do ;
+    end;
+  end;
+  if not FoundShift then
+    raise EDenseMatrixError.Create(
+      'FactorRealGeneralizedSchur: no numerically nonsingular pencil shift was found.');
+
+  Schur := FactorRealSchur(M, MaxIterations);
+  Eigen := FactorRealEigen(M, reoSchurOrder, MaxIterations);
+  FTransformEigenvectors := Eigen.RightEigenvectors;
+  FZ := Schur.Q;
+  CZ := Multiply(C, FZ);
+  QR := FactorQR(CZ);
+  if QR.NumericalRank <> FSize then
+    raise EDenseMatrixError.Create(
+      'FactorRealGeneralizedSchur: shifted right-vector factor is rank deficient.');
+  FQ := QR.Q;
+  R := QR.R;
+  Identity := TDenseDoubleMatrix.Zeros(FSize, FSize);
+  for I := 0 to FSize - 1 do Identity[I, I] := 1.0;
+  ShiftedT := Multiply(R, Schur.T);
+  FS := Multiply(R, Identity);
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      FS[I, J] := (FS[I, J] - Gamma * ShiftedT[I, J]) * Scale;
+  FT := ShiftedT;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      FT[I, J] := FT[I, J] * Scale;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      if IsNan(FS[I, J]) or IsInfinite(FS[I, J]) or
+         IsNan(FT[I, J]) or IsInfinite(FT[I, J]) then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorRealGeneralizedSchur: non-finite factor at [%d,%d].', [I, J]);
+
+  { Triangularize each 2x2 diagonal block of T with a right plane rotation.
+    The same rotation is accumulated into Z and applied to S. }
+  I := 0;
+  while I < FSize do
+  begin
+    if (I + 1 < FSize) and (Abs(FT[I + 1, I]) > 0.0) then
+    begin
+      Scale := Max(Abs(FT[I + 1, I]), Abs(FT[I + 1, I + 1]));
+      if Scale = 0.0 then
+        raise EDenseMatrixError.Create(
+          'FactorRealGeneralizedSchur: invalid zero QZ block.');
+      NormBeta := Scale * Sqrt(Sqr(FT[I + 1, I] / Scale) +
+        Sqr(FT[I + 1, I + 1] / Scale));
+      if (NormBeta = 0.0) or IsInfinite(NormBeta) then
+        raise EDenseMatrixError.Create(
+          'FactorRealGeneralizedSchur: QZ block scaling failed.');
+      AlphaValue := TComplex.Create(FT[I + 1, I + 1] / NormBeta,
+        -FT[I + 1, I] / NormBeta);
+      BetaValue := TComplex.Create(FT[I + 1, I] / NormBeta,
+        FT[I + 1, I + 1] / NormBeta);
+      for J := 0 to FSize - 1 do
+      begin
+        Mu := TComplex.Create(FZ[J, I], 0.0);
+        FZ[J, I] := FZ[J, I] * (FT[I + 1, I + 1] / NormBeta) +
+          FZ[J, I + 1] * (-FT[I + 1, I] / NormBeta);
+        FZ[J, I + 1] := Mu.Re * (FT[I + 1, I] / NormBeta) +
+          FZ[J, I + 1] * (FT[I + 1, I + 1] / NormBeta);
+      end;
+      for J := 0 to FSize - 1 do
+      begin
+        NormBeta := FT[J, I];
+        FT[J, I] := NormBeta * AlphaValue.Re +
+          FT[J, I + 1] * AlphaValue.Im;
+        FT[J, I + 1] := NormBeta * BetaValue.Re +
+          FT[J, I + 1] * BetaValue.Im;
+        NormBeta := FS[J, I];
+        FS[J, I] := NormBeta * AlphaValue.Re +
+          FS[J, I + 1] * AlphaValue.Im;
+        FS[J, I + 1] := NormBeta * BetaValue.Re +
+          FS[J, I + 1] * BetaValue.Im;
+      end;
+      FT[I + 1, I] := 0.0;
+      Inc(I, 2);
+    end
+    else
+      Inc(I);
+  end;
+  for J := 0 to FSize - 1 do
+    if FT[J, J] < 0.0 then
+    begin
+      for I := 0 to FSize - 1 do
+      begin
+        FS[I, J] := -FS[I, J];
+        FT[I, J] := -FT[I, J];
+        FZ[I, J] := -FZ[I, J];
+      end;
+    end;
+
+  SetLength(FAlpha, FSize);
+  SetLength(FBeta, FSize);
+  for I := 0 to FSize - 1 do
+  begin
+    Mu := Eigen.Eigenvalues[I];
+    AlphaValue := TComplex.One - Mu * Gamma;
+    BetaValue := Mu;
+    NormBeta := BetaValue.Magnitude;
+    if NormBeta <> 0.0 then
+    begin
+      BetaValue := BetaValue * (BetaValue.Conjugate / NormBeta);
+      AlphaValue := AlphaValue * (Mu.Conjugate / NormBeta);
+    end
+    else
+      AlphaValue := TComplex.One;
+    Scale := Max(AlphaValue.Magnitude, BetaValue.Magnitude);
+    if (Scale = 0.0) or IsNan(Scale) or IsInfinite(Scale) then
+      raise EDenseMatrixError.Create(
+        'FactorRealGeneralizedSchur: indeterminate or non-finite generalized eigenvalue.');
+    FAlpha[I] := AlphaValue / Scale;
+    FBeta[I] := BetaValue / Scale;
+  end;
+  I := 0;
+  while I < FSize do
+  begin
+    if (Eigen.Eigenvalues[I].Im > 0.0) and (I + 1 < FSize) then
+    begin
+      if FAlpha[I].Im < 0.0 then
+      begin
+        TempComplex := FAlpha[I];
+        FAlpha[I] := FAlpha[I + 1];
+        FAlpha[I + 1] := TempComplex;
+        TempComplex := FBeta[I];
+        FBeta[I] := FBeta[I + 1];
+        FBeta[I + 1] := TempComplex;
+        for J := 0 to FSize - 1 do
+        begin
+          TempComplex := FTransformEigenvectors[J, I];
+          FTransformEigenvectors[J, I] := FTransformEigenvectors[J, I + 1];
+          FTransformEigenvectors[J, I + 1] := TempComplex;
+        end;
+      end;
+      Inc(I, 2);
+    end
+    else
+      Inc(I);
+  end;
+  FIterations := Schur.Iterations;
+end;
+
+constructor TDenseDoubleGeneralizedSchur.Create(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt);
+begin
+  inherited Create;
+  Factor(A, B, MaxIterations);
+end;
+
+function TDenseDoubleGeneralizedSchur.GetSize: SizeInt;
+begin
+  Result := FSize;
+end;
+
+function TDenseDoubleGeneralizedSchur.GetQ: IDenseDoubleMatrix;
+begin
+  Result := FQ.Clone;
+end;
+
+function TDenseDoubleGeneralizedSchur.GetS: IDenseDoubleMatrix;
+begin
+  Result := FS.Clone;
+end;
+
+function TDenseDoubleGeneralizedSchur.GetZ: IDenseDoubleMatrix;
+begin
+  Result := FZ.Clone;
+end;
+
+function TDenseDoubleGeneralizedSchur.GetT: IDenseDoubleMatrix;
+begin
+  Result := FT.Clone;
+end;
+
+function TDenseDoubleGeneralizedSchur.GetAlpha: TComplexArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FAlpha));
+  for I := 0 to High(FAlpha) do Result[I] := FAlpha[I];
+end;
+
+function TDenseDoubleGeneralizedSchur.GetBeta: TComplexArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FBeta));
+  for I := 0 to High(FBeta) do Result[I] := FBeta[I];
+end;
+
+function TDenseDoubleGeneralizedSchur.GetIterations: SizeInt;
+begin
+  Result := FIterations;
+end;
+
+procedure TDenseDoubleGeneralizedEigen.Factor(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt);
+var
+  I, J, K, N: SizeInt;
+  IsIdentityB: Boolean;
+  Eigen: IDenseDoubleRealEigen;
+  SchurImpl: TDenseDoubleGeneralizedSchur;
+  Scale, NormA, NormB, VectorNorm, ResidualNorm, Denominator: Double;
+  AV, BV, Residual: TComplex;
+  Components: array of Double;
+begin
+  SchurImpl := TDenseDoubleGeneralizedSchur.Create(A, B, MaxIterations);
+  FSchur := SchurImpl;
+  IsIdentityB := True;
+  for I := 0 to A.Rows - 1 do
+    for J := 0 to A.Rows - 1 do
+      if B[I, J] <> Ord(I = J) then IsIdentityB := False;
+  if IsIdentityB then
+  begin
+    Eigen := FactorRealEigen(A, reoSchurOrder, MaxIterations);
+    FVectors := Eigen.RightEigenvectors;
+    FResiduals := Eigen.Residuals;
+    Exit;
+  end;
+  FVectors := SchurImpl.FTransformEigenvectors.Clone;
+  N := FSchur.Size;
+  Scale := 0.0;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+      Scale := Max(Scale, Max(Abs(A[I, J]), Abs(B[I, J])));
+  NormA := 0.0;
+  NormB := 0.0;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+    begin
+      NormA := NormA + Sqr(A[I, J] / Scale);
+      NormB := NormB + Sqr(B[I, J] / Scale);
+    end;
+  NormA := Sqrt(NormA);
+  NormB := Sqrt(NormB);
+  SetLength(FResiduals, N);
+  SetLength(Components, 2 * N);
+  for K := 0 to N - 1 do
+  begin
+    VectorNorm := 0.0;
+    for J := 0 to N - 1 do
+      VectorNorm := VectorNorm + FVectors[J, K].SqrMagnitude;
+    VectorNorm := Sqrt(VectorNorm);
+    for I := 0 to N - 1 do
+    begin
+      AV := TComplex.Zero;
+      BV := TComplex.Zero;
+      for J := 0 to N - 1 do
+      begin
+        AV := AV + FVectors[J, K] * (A[I, J] / Scale);
+        BV := BV + FVectors[J, K] * (B[I, J] / Scale);
+      end;
+      Residual := FSchur.Beta[K] * AV - FSchur.Alpha[K] * BV;
+      Components[2 * I] := Residual.Re;
+      Components[2 * I + 1] := Residual.Im;
+    end;
+    ResidualNorm := ScaledNorm(Components);
+    Denominator := (FSchur.Beta[K].Magnitude * NormA +
+      FSchur.Alpha[K].Magnitude * NormB) * VectorNorm;
+    if Denominator = 0.0 then
+    begin
+      if ResidualNorm <> 0.0 then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorRealGeneralizedEigen: zero residual denominator at eigenpair %d.',
+          [K]);
+      FResiduals[K] := 0.0;
+    end
+    else
+      FResiduals[K] := ResidualNorm / Denominator;
+  end;
+end;
+
+constructor TDenseDoubleGeneralizedEigen.Create(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt);
+begin
+  inherited Create;
+  Factor(A, B, MaxIterations);
+end;
+
+function TDenseDoubleGeneralizedEigen.GetSize: SizeInt;
+begin
+  Result := FSchur.Size;
+end;
+
+function TDenseDoubleGeneralizedEigen.GetAlpha: TComplexArray;
+begin
+  Result := FSchur.Alpha;
+end;
+
+function TDenseDoubleGeneralizedEigen.GetBeta: TComplexArray;
+begin
+  Result := FSchur.Beta;
+end;
+
+function TDenseDoubleGeneralizedEigen.GetRightEigenvectors: IDenseComplexMatrix;
+begin
+  Result := FVectors.Clone;
+end;
+
+function TDenseDoubleGeneralizedEigen.GetResiduals: TDoubleArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FResiduals));
+  for I := 0 to High(FResiduals) do Result[I] := FResiduals[I];
+end;
+
+function TDenseDoubleGeneralizedEigen.GetIterations: SizeInt;
+begin
+  Result := FSchur.Iterations;
+end;
+
+function TDenseDoubleGeneralizedEigen.GetConverged: Boolean;
+begin
+  Result := True;
+end;
+
 function FactorRealEigen(const A: IDenseDoubleMatrix;
   const Ordering: TRealEigenvalueOrdering;
   const MaxIterations: SizeInt): IDenseDoubleRealEigen;
 begin
   Result := TDenseDoubleRealEigen.Create(A, Ordering, MaxIterations);
+end;
+
+function FactorRealGeneralizedSchur(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt): IDenseDoubleGeneralizedSchur;
+begin
+  Result := TDenseDoubleGeneralizedSchur.Create(A, B, MaxIterations);
+end;
+
+function FactorRealGeneralizedEigen(const A, B: IDenseDoubleMatrix;
+  const MaxIterations: SizeInt): IDenseDoubleGeneralizedEigen;
+begin
+  Result := TDenseDoubleGeneralizedEigen.Create(A, B, MaxIterations);
+end;
+
+procedure TDenseComplexGeneralizedSchur.Factor(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt);
+var
+  I, J, Candidate: SizeInt;
+  Scale, Gamma, Magnitude, PairScale, VectorNorm, SchurScale,
+    ColumnScale, SumScale: Double;
+  C, BScaled, M, SchurQ, SchurT, CZ, R, Product: IDenseComplexMatrix;
+  LU: IDenseComplexLU;
+  QR: IDenseComplexQR;
+  Mu, AlphaValue, BetaValue, Phase, Temp: TComplex;
+  FoundShift: Boolean;
+begin
+  if (A = nil) or (B = nil) then
+    raise EDenseMatrixError.Create(
+      'FactorComplexGeneralizedSchur: matrices must not be nil.');
+  if (A.Rows <> A.Cols) or (B.Rows <> B.Cols) or (A.Rows <> B.Rows) then
+    raise EDenseMatrixError.Create(
+      'FactorComplexGeneralizedSchur: matrices must be square and have matching sizes.');
+  if MaxIterations < 0 then
+    raise EDenseMatrixError.Create(
+      'FactorComplexGeneralizedSchur: iteration limit must be non-negative.');
+  FSize := A.Rows;
+  Scale := 0.0;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+    begin
+      if not A[I, J].IsFinite or not B[I, J].IsFinite then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorComplexGeneralizedSchur: non-finite input at [%d,%d].',
+          [I, J]);
+      Scale := Max(Scale, Max(A[I, J].Magnitude, B[I, J].Magnitude));
+    end;
+  if FSize = 0 then
+  begin
+    FQ := TDenseComplexMatrix.Zeros(0, 0);
+    FZ := TDenseComplexMatrix.Zeros(0, 0);
+    FS := A.Clone;
+    FT := B.Clone;
+    FAlpha := nil;
+    FBeta := nil;
+    FTransformEigenvectors := TDenseComplexMatrix.Zeros(0, 0);
+    FIterations := 0;
+    Exit;
+  end;
+  if Scale = 0.0 then
+    raise EDenseMatrixError.Create(
+      'FactorComplexGeneralizedSchur: zero pencil is indeterminate.');
+
+  BScaled := TDenseComplexMatrix.Zeros(FSize, FSize);
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+    begin
+      if ((A[I, J] <> TComplex.Zero) and
+          ((A[I, J] / Scale) = TComplex.Zero)) or
+         ((B[I, J] <> TComplex.Zero) and
+          ((B[I, J] / Scale) = TComplex.Zero)) then
+        raise EDenseMatrixError.Create(
+          'FactorComplexGeneralizedSchur: input dynamic range is not representable after scaling.');
+      BScaled[I, J] := B[I, J] / Scale;
+    end;
+  FoundShift := False;
+  for Candidate := 0 to FSize do
+  begin
+    Gamma := Candidate;
+    C := TDenseComplexMatrix.Zeros(FSize, FSize);
+    for I := 0 to FSize - 1 do
+      for J := 0 to FSize - 1 do
+        C[I, J] := A[I, J] / Scale + Gamma * BScaled[I, J];
+    try
+      LU := FactorLU(C);
+      M := LU.Solve(BScaled);
+      FoundShift := True;
+      Break;
+    except
+      on EDenseMatrixError do ;
+    end;
+  end;
+  if not FoundShift then
+    raise EDenseMatrixError.Create(
+      'FactorComplexGeneralizedSchur: no numerically nonsingular pencil shift was found.');
+
+  FactorComplexSchurInternal(M, MaxIterations, SchurQ, SchurT, FIterations);
+  FTransformEigenvectors := TDenseComplexMatrix.Zeros(FSize, FSize);
+  SchurScale := 0.0;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      SchurScale := Max(SchurScale, SchurT[I, J].Magnitude);
+  if SchurScale = 0.0 then
+    for I := 0 to FSize - 1 do FTransformEigenvectors[I, I] := TComplex.One
+  else
+  for I := 0 to FSize - 1 do
+  begin
+    FTransformEigenvectors[I, I] := TComplex.One;
+    for J := I - 1 downto 0 do
+    begin
+      Temp := TComplex.Zero;
+      for Candidate := J + 1 to I do
+        Temp := Temp + (SchurT[J, Candidate] / SchurScale) *
+          FTransformEigenvectors[Candidate, I];
+      Mu := SchurT[I, I] / SchurScale;
+      Magnitude := (SchurT[J, J] / SchurScale - Mu).Magnitude;
+      SumScale := 2.2204460492503131E-16 * Max(1, FSize);
+      if Magnitude <= SumScale then
+      begin
+        if Temp.Magnitude > SumScale * Max(1, I - J) then
+          raise EDenseMatrixError.CreateFmt(
+            'FactorComplexGeneralizedSchur: eigenvector recovery failed at %d.',
+            [I]);
+        FTransformEigenvectors[J, I] := TComplex.Zero;
+      end
+      else
+        FTransformEigenvectors[J, I] := -Temp /
+          (SchurT[J, J] / SchurScale - Mu);
+      ColumnScale := 0.0;
+      for Candidate := 0 to I do
+        ColumnScale := Max(ColumnScale,
+          FTransformEigenvectors[Candidate, I].Magnitude);
+      if ColumnScale > 1E100 then
+        for Candidate := 0 to I do
+          FTransformEigenvectors[Candidate, I] :=
+            FTransformEigenvectors[Candidate, I] / ColumnScale;
+    end;
+  end;
+  FTransformEigenvectors := Multiply(SchurQ, FTransformEigenvectors);
+  for J := 0 to FSize - 1 do
+  begin
+    ColumnScale := 0.0;
+    for I := 0 to FSize - 1 do
+      ColumnScale := Max(ColumnScale,
+        FTransformEigenvectors[I, J].Magnitude);
+    if (ColumnScale = 0.0) or IsNan(ColumnScale) or IsInfinite(ColumnScale) then
+      raise EDenseMatrixError.CreateFmt(
+        'FactorComplexGeneralizedSchur: could not normalize eigenvector %d.',
+        [J]);
+    VectorNorm := 0.0;
+    for I := 0 to FSize - 1 do
+      VectorNorm := VectorNorm +
+        (FTransformEigenvectors[I, J] / ColumnScale).SqrMagnitude;
+    VectorNorm := Sqrt(VectorNorm);
+    if (VectorNorm = 0.0) or IsNan(VectorNorm) or IsInfinite(VectorNorm) then
+      raise EDenseMatrixError.CreateFmt(
+        'FactorComplexGeneralizedSchur: could not normalize eigenvector %d.',
+        [J]);
+    for I := 0 to FSize - 1 do
+      FTransformEigenvectors[I, J] :=
+        (FTransformEigenvectors[I, J] / ColumnScale) / VectorNorm;
+  end;
+  FZ := SchurQ;
+  CZ := Multiply(C, FZ);
+  QR := FactorQR(CZ);
+  if QR.NumericalRank <> FSize then
+    raise EDenseMatrixError.Create(
+      'FactorComplexGeneralizedSchur: shifted right-vector factor is rank deficient.');
+  FQ := QR.Q;
+  R := QR.R;
+  Product := Multiply(R, SchurT);
+  FS := TDenseComplexMatrix.Zeros(FSize, FSize);
+  FT := TDenseComplexMatrix.Zeros(FSize, FSize);
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+    begin
+      FS[I, J] := (R[I, J] - Gamma * Product[I, J]) * Scale;
+      FT[I, J] := Product[I, J] * Scale;
+    end;
+
+  { Make each diagonal of T nonnegative real by a unit-modulus column phase. }
+  for J := 0 to FSize - 1 do
+  begin
+    Magnitude := FT[J, J].Magnitude;
+    if Magnitude > 0.0 then
+    begin
+      Phase := FT[J, J].Conjugate / Magnitude;
+      for I := 0 to FSize - 1 do
+      begin
+        FS[I, J] := FS[I, J] * Phase;
+        FT[I, J] := FT[I, J] * Phase;
+        FZ[I, J] := FZ[I, J] * Phase;
+      end;
+      FT[J, J] := TComplex.Create(Magnitude, 0.0);
+    end;
+  end;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      if not FS[I, J].IsFinite or not FT[I, J].IsFinite or
+         not FQ[I, J].IsFinite or not FZ[I, J].IsFinite then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorComplexGeneralizedSchur: non-finite factor at [%d,%d].',
+          [I, J]);
+
+  SetLength(FAlpha, FSize);
+  SetLength(FBeta, FSize);
+  for I := 0 to FSize - 1 do
+  begin
+    Mu := SchurT[I, I];
+    AlphaValue := TComplex.One - Gamma * Mu;
+    BetaValue := Mu;
+    Magnitude := BetaValue.Magnitude;
+    if Magnitude > 0.0 then
+    begin
+      Phase := BetaValue.Conjugate / Magnitude;
+      AlphaValue := AlphaValue * Phase;
+      BetaValue := BetaValue * Phase;
+    end
+    else
+      AlphaValue := TComplex.One;
+    PairScale := Max(AlphaValue.Magnitude, BetaValue.Magnitude);
+    if (PairScale = 0.0) or IsNan(PairScale) or IsInfinite(PairScale) then
+      raise EDenseMatrixError.Create(
+        'FactorComplexGeneralizedSchur: indeterminate or non-finite generalized eigenvalue.');
+    FAlpha[I] := AlphaValue / PairScale;
+    FBeta[I] := BetaValue / PairScale;
+  end;
+end;
+
+constructor TDenseComplexGeneralizedSchur.Create(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt);
+begin
+  inherited Create;
+  Factor(A, B, MaxIterations);
+end;
+
+function TDenseComplexGeneralizedSchur.GetSize: SizeInt;
+begin
+  Result := FSize;
+end;
+
+function TDenseComplexGeneralizedSchur.GetQ: IDenseComplexMatrix;
+begin
+  Result := FQ.Clone;
+end;
+
+function TDenseComplexGeneralizedSchur.GetS: IDenseComplexMatrix;
+begin
+  Result := FS.Clone;
+end;
+
+function TDenseComplexGeneralizedSchur.GetZ: IDenseComplexMatrix;
+begin
+  Result := FZ.Clone;
+end;
+
+function TDenseComplexGeneralizedSchur.GetT: IDenseComplexMatrix;
+begin
+  Result := FT.Clone;
+end;
+
+function TDenseComplexGeneralizedSchur.GetAlpha: TComplexArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FAlpha));
+  for I := 0 to High(FAlpha) do Result[I] := FAlpha[I];
+end;
+
+function TDenseComplexGeneralizedSchur.GetBeta: TComplexArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FBeta));
+  for I := 0 to High(FBeta) do Result[I] := FBeta[I];
+end;
+
+function TDenseComplexGeneralizedSchur.GetIterations: SizeInt;
+begin
+  Result := FIterations;
+end;
+
+procedure TDenseComplexGeneralizedEigen.Factor(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt);
+var
+  SchurImpl: TDenseComplexGeneralizedSchur;
+  N, I, J, K: SizeInt;
+  Scale, NormA, NormB, VectorNorm, ResidualNorm, Denominator: Double;
+  AV, BV, Residual: TComplex;
+  Components: array of Double;
+begin
+  SchurImpl := TDenseComplexGeneralizedSchur.Create(A, B, MaxIterations);
+  FSchur := SchurImpl;
+  FVectors := SchurImpl.FTransformEigenvectors.Clone;
+  N := FSchur.Size;
+  Scale := 0.0;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+      Scale := Max(Scale, Max(A[I, J].Magnitude, B[I, J].Magnitude));
+  NormA := 0.0;
+  NormB := 0.0;
+  for I := 0 to N - 1 do
+    for J := 0 to N - 1 do
+    begin
+      NormA := NormA + Sqr(A[I, J].Magnitude / Scale);
+      NormB := NormB + Sqr(B[I, J].Magnitude / Scale);
+    end;
+  NormA := Sqrt(NormA);
+  NormB := Sqrt(NormB);
+  SetLength(FResiduals, N);
+  SetLength(Components, 2 * N);
+  for K := 0 to N - 1 do
+  begin
+    VectorNorm := 0.0;
+    for J := 0 to N - 1 do
+      VectorNorm := VectorNorm + FVectors[J, K].SqrMagnitude;
+    VectorNorm := Sqrt(VectorNorm);
+    for I := 0 to N - 1 do
+    begin
+      AV := TComplex.Zero;
+      BV := TComplex.Zero;
+      for J := 0 to N - 1 do
+      begin
+        AV := AV + A[I, J] / Scale * FVectors[J, K];
+        BV := BV + B[I, J] / Scale * FVectors[J, K];
+      end;
+      Residual := FSchur.Beta[K] * AV - FSchur.Alpha[K] * BV;
+      Components[2 * I] := Residual.Re;
+      Components[2 * I + 1] := Residual.Im;
+    end;
+    ResidualNorm := ScaledNorm(Components);
+    Denominator := (FSchur.Beta[K].Magnitude * NormA +
+      FSchur.Alpha[K].Magnitude * NormB) * VectorNorm;
+    if Denominator = 0.0 then
+    begin
+      if ResidualNorm <> 0.0 then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorComplexGeneralizedEigen: zero residual denominator at %d.',
+          [K]);
+      FResiduals[K] := 0.0;
+    end
+    else
+      FResiduals[K] := ResidualNorm / Denominator;
+  end;
+end;
+
+constructor TDenseComplexGeneralizedEigen.Create(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt);
+begin
+  inherited Create;
+  Factor(A, B, MaxIterations);
+end;
+
+function TDenseComplexGeneralizedEigen.GetSize: SizeInt;
+begin
+  Result := FSchur.Size;
+end;
+
+function TDenseComplexGeneralizedEigen.GetAlpha: TComplexArray;
+begin
+  Result := FSchur.Alpha;
+end;
+
+function TDenseComplexGeneralizedEigen.GetBeta: TComplexArray;
+begin
+  Result := FSchur.Beta;
+end;
+
+function TDenseComplexGeneralizedEigen.GetRightEigenvectors: IDenseComplexMatrix;
+begin
+  Result := FVectors.Clone;
+end;
+
+function TDenseComplexGeneralizedEigen.GetResiduals: TDoubleArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FResiduals));
+  for I := 0 to High(FResiduals) do Result[I] := FResiduals[I];
+end;
+
+function TDenseComplexGeneralizedEigen.GetIterations: SizeInt;
+begin
+  Result := FSchur.Iterations;
+end;
+
+function TDenseComplexGeneralizedEigen.GetConverged: Boolean;
+begin
+  Result := True;
+end;
+
+function FactorComplexGeneralizedSchur(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt): IDenseComplexGeneralizedSchur;
+begin
+  Result := TDenseComplexGeneralizedSchur.Create(A, B, MaxIterations);
+end;
+
+function FactorComplexGeneralizedEigen(const A, B: IDenseComplexMatrix;
+  const MaxIterations: SizeInt): IDenseComplexGeneralizedEigen;
+begin
+  Result := TDenseComplexGeneralizedEigen.Create(A, B, MaxIterations);
 end;
 
 end.

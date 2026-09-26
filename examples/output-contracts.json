@@ -180,6 +180,16 @@
         "lambda[3] = 2.000000 + 0.000000i"
       ],
       "final_line": "Real nonsymmetric eigensystem: success"
+    },
+    {
+      "path": "examples/38_generalized_eigenproblem.pas",
+      "contains": [
+        "real lambda[0] = 2.000000",
+        "real lambda[1] = infinity",
+        "complex lambda[0] = 2.000000",
+        "complex lambda[1] = infinity"
+      ],
+      "final_line": "Generalized eigenproblem: success"
     }
   ]
 }

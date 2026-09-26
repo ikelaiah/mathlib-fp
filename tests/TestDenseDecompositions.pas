@@ -41,6 +41,12 @@ type
     procedure TestRealNonsymmetricEigenValidationAndImmutability;
     procedure TestRealNonsymmetricEigenEmptySingletonAndIterationLimit;
     procedure TestRealNonsymmetricEigenScalesAndRepeatedValues;
+    procedure TestRealGeneralizedSchurAndFiniteInfiniteEigenvalues;
+    procedure TestRealGeneralizedEigenValidation;
+    procedure TestComplexGeneralizedSchurAndEigenpairs;
+    procedure TestComplexGeneralizedValidationAndEdges;
+    procedure TestRealGeneralizedThreeByThreePencil;
+    procedure TestComplexGeneralizedThreeByThreePencil;
   end;
 
 implementation
@@ -1267,6 +1273,398 @@ begin
     Factor.Eigenvalues[1].Re, 1E-14);
   AssertTrue('regularized repeated eigenpair residuals remain small',
     (Factor.Residuals[0] < 1E-12) and (Factor.Residuals[1] < 1E-12));
+end;
+
+procedure TDenseDecompositionTest.TestRealGeneralizedSchurAndFiniteInfiniteEigenvalues;
+var
+  A, B, Q, Z, S, T, Reconstructed: IDenseDoubleMatrix;
+  Schur: IDenseDoubleGeneralizedSchur;
+  Eigen: IDenseDoubleGeneralizedEigen;
+  AV, BV: TComplex;
+  I, J: SizeInt;
+  OriginalS: Double;
+begin
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [6.0, 0.0,
+     0.0, 4.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 2,
+    [3.0, 0.0,
+     0.0, 0.0]);
+
+  Schur := FactorRealGeneralizedSchur(A, B);
+  Q := Schur.Q;
+  Z := Schur.Z;
+  S := Schur.S;
+  T := Schur.T;
+  Reconstructed := Multiply(Multiply(Q, S), Transpose(Z));
+  AssertMatrixClose('real generalized Schur reconstructs A', A,
+    Reconstructed, 1E-13);
+  Reconstructed := Multiply(Multiply(Q, T), Transpose(Z));
+  AssertMatrixClose('real generalized Schur reconstructs B', B,
+    Reconstructed, 1E-13);
+  AssertEquals('finite generalized alpha', 1.0, Schur.Alpha[0].Re, 1E-13);
+  AssertEquals('finite generalized beta', 0.5, Schur.Beta[0].Re, 1E-13);
+  AssertEquals('finite generalized quotient', 2.0,
+    Schur.Alpha[0].Re / Schur.Beta[0].Re, 1E-13);
+  AssertEquals('infinite generalized alpha', 1.0, Schur.Alpha[1].Re, 1E-13);
+  AssertEquals('infinite generalized beta', 0.0, Schur.Beta[1].Re, 1E-13);
+
+  Eigen := FactorRealGeneralizedEigen(A, B);
+  AssertEquals('generalized right vectors have one column per value', 2,
+    Eigen.RightEigenvectors.Cols);
+  AssertTrue('finite generalized eigenpair residual is small',
+    Eigen.Residuals[0] < 1E-13);
+  AssertTrue('infinite generalized eigenpair residual is small',
+    Eigen.Residuals[1] < 1E-13);
+  AssertTrue('generalized eigen factor reports convergence', Eigen.Converged);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [0.0, -1.0,
+     1.0, 0.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 2,
+    [1.0, 0.0,
+     0.0, 1.0]);
+  Schur := FactorRealGeneralizedSchur(A, B);
+  AssertMatrixClose('B=I generalized Schur reconstructs A', A,
+    Multiply(Multiply(Schur.Q, Schur.S), Transpose(Schur.Z)), 1E-13);
+  AssertMatrixClose('B=I generalized Schur reconstructs B', B,
+    Multiply(Multiply(Schur.Q, Schur.T), Transpose(Schur.Z)), 1E-13);
+  AssertEquals('B=I conjugate alpha real part', 0.0,
+    Schur.Alpha[0].Re, 1E-13);
+  AssertEquals('B=I conjugate alpha imaginary part', 1.0,
+    Schur.Alpha[0].Im, 1E-13);
+  AssertEquals('B=I beta is positive', 1.0, Schur.Beta[0].Re, 1E-13);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [4.0, 1.0,
+     1.0, 3.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 2,
+    [2.0, 0.0,
+     0.0, 1.0]);
+  Schur := FactorRealGeneralizedSchur(A, B);
+  AssertMatrixClose('general real pencil reconstructs A', A,
+    Multiply(Multiply(Schur.Q, Schur.S), Transpose(Schur.Z)), 1E-11);
+  AssertMatrixClose('general real pencil reconstructs B', B,
+    Multiply(Multiply(Schur.Q, Schur.T), Transpose(Schur.Z)), 1E-11);
+  Eigen := FactorRealGeneralizedEigen(A, B);
+  AssertTrue('first general generalized eigenpair residual is small',
+    Eigen.Residuals[0] < 1E-11);
+  AssertTrue('second general generalized eigenpair residual is small',
+    Eigen.Residuals[1] < 1E-11);
+  for I := 0 to 1 do
+  begin
+    AV := TComplex.Zero;
+    BV := TComplex.Zero;
+    for J := 0 to 1 do
+    begin
+      AV := AV + Eigen.RightEigenvectors[J, 0] * A[I, J];
+      BV := BV + Eigen.RightEigenvectors[J, 0] * B[I, J];
+    end;
+    AssertTrue('generalized eigenvector satisfies the homogeneous equation',
+      (Eigen.Beta[0] * AV - Eigen.Alpha[0] * BV).Magnitude < 1E-10);
+  end;
+  OriginalS := Schur.S[0, 0];
+  S := Schur.S;
+  S[0, 0] := S[0, 0] + 10.0;
+  A[0, 0] := A[0, 0] + 20.0;
+  AssertEquals('generalized Schur factors are immutable snapshots', OriginalS,
+    Schur.S[0, 0], 1E-13);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [0.0, -1.0,
+     1.0, 0.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 2,
+    [2.0, 0.0,
+     0.0, 1.0]);
+  Schur := FactorRealGeneralizedSchur(A, B);
+  AssertMatrixClose('general conjugate pencil reconstructs A', A,
+    Multiply(Multiply(Schur.Q, Schur.S), Transpose(Schur.Z)), 1E-11);
+  AssertMatrixClose('general conjugate pencil reconstructs B', B,
+    Multiply(Multiply(Schur.Q, Schur.T), Transpose(Schur.Z)), 1E-11);
+  AssertEquals('real generalized T has triangular conjugate block', 0.0,
+    Schur.T[1, 0], 1E-11);
+  Eigen := FactorRealGeneralizedEigen(A, B);
+  AssertTrue('general real pencil returns positive imaginary member first',
+    Eigen.Alpha[0].Im > 0.0);
+  AssertEquals('conjugate pair shares beta', Eigen.Beta[0].Re,
+    Eigen.Beta[1].Re, 1E-13);
+  AssertTrue('first generalized conjugate eigenpair residual is small',
+    Eigen.Residuals[0] < 1E-11);
+  AssertTrue('second generalized conjugate eigenpair residual is small',
+    Eigen.Residuals[1] < 1E-11);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [1.0, 0.0,
+     0.0, 1.0]);
+  B := TDenseDoubleMatrix.FromValues(2, 2,
+    [1.0, 1.0,
+     1.0, 1.0]);
+  Eigen := FactorRealGeneralizedEigen(A, B);
+  AssertEquals('non-diagonal singular B yields an infinite eigenvalue', 0.0,
+    Eigen.Beta[1].Magnitude, 1E-12);
+  AssertTrue('finite/infinite eigenvectors satisfy the pencil equation',
+    (Eigen.Residuals[0] < 1E-11) and (Eigen.Residuals[1] < 1E-11));
+end;
+
+procedure TDenseDecompositionTest.TestRealGeneralizedEigenValidation;
+var
+  A, B: IDenseDoubleMatrix;
+  Failed: Boolean;
+begin
+  Failed := False;
+  try
+    FactorRealGeneralizedSchur(IDenseDoubleMatrix(nil),
+      TDenseDoubleMatrix.Zeros(0, 0));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil generalized matrix is rejected', Failed);
+
+  A := TDenseDoubleMatrix.Zeros(2, 2);
+  B := TDenseDoubleMatrix.Zeros(3, 3);
+  Failed := False;
+  try
+    FactorRealGeneralizedEigen(A, B);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('mismatched generalized matrix sizes are rejected', Failed);
+
+  B := TDenseDoubleMatrix.Zeros(2, 2);
+  Failed := False;
+  try
+    FactorRealGeneralizedSchur(A, B, -1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('negative QZ iteration limit is rejected', Failed);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [1.0, 0.0,
+     0.0, 0.0]);
+  B := TDenseDoubleMatrix.Zeros(2, 2);
+  Failed := False;
+  try
+    FactorRealGeneralizedSchur(A, B);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('irregular real pencil with no usable shift is rejected', Failed);
+end;
+
+procedure TDenseDecompositionTest.TestComplexGeneralizedSchurAndEigenpairs;
+var
+  A, B, Q, Z, S: IDenseComplexMatrix;
+  Schur: IDenseComplexGeneralizedSchur;
+  Eigen: IDenseComplexGeneralizedEigen;
+  I, J: SizeInt;
+  AV, BV: TComplex;
+  OriginalS: TComplex;
+begin
+  A := TDenseComplexMatrix.FromValues(2, 2,
+    [TComplex.Create(6.0, 2.0), TComplex.Zero,
+     TComplex.Zero, TComplex.Create(4.0, 0.0)]);
+  B := TDenseComplexMatrix.FromValues(2, 2,
+    [TComplex.Create(3.0, 1.0), TComplex.Zero,
+     TComplex.Zero, TComplex.Zero]);
+  Schur := FactorComplexGeneralizedSchur(A, B);
+  Q := Schur.Q;
+  Z := Schur.Z;
+  AssertComplexMatrixClose('complex generalized Schur reconstructs A', A,
+    Multiply(Multiply(Q, Schur.S), ConjugateTranspose(Z)), 1E-11);
+  AssertComplexMatrixClose('complex generalized Schur reconstructs B', B,
+    Multiply(Multiply(Q, Schur.T), ConjugateTranspose(Z)), 1E-11);
+  AssertEquals('complex finite generalized eigenvalue', 2.0,
+    (Schur.Alpha[0] / Schur.Beta[0]).Re, 1E-11);
+  AssertEquals('complex beta uses nonnegative real convention', 0.0,
+    Schur.Beta[0].Im, 1E-13);
+  AssertEquals('complex infinite eigenvalue has zero beta', 0.0,
+    Schur.Beta[1].Magnitude, 1E-13);
+
+  Eigen := FactorComplexGeneralizedEigen(A, B);
+  for J := 0 to 1 do
+  begin
+    AssertTrue('complex generalized eigenpair residual is small',
+      Eigen.Residuals[J] < 1E-11);
+    AssertEquals('complex generalized eigenvector unit norm', 1.0,
+      Sqrt(Eigen.RightEigenvectors[0, J].SqrMagnitude +
+        Eigen.RightEigenvectors[1, J].SqrMagnitude), 1E-12);
+    for I := 0 to 1 do
+    begin
+      AV := TComplex.Zero;
+      BV := TComplex.Zero;
+      AV := A[I, 0] * Eigen.RightEigenvectors[0, J] +
+        A[I, 1] * Eigen.RightEigenvectors[1, J];
+      BV := B[I, 0] * Eigen.RightEigenvectors[0, J] +
+        B[I, 1] * Eigen.RightEigenvectors[1, J];
+      AssertTrue('complex eigenvector satisfies the homogeneous equation',
+        (Eigen.Beta[J] * AV - Eigen.Alpha[J] * BV).Magnitude < 1E-10);
+    end;
+  end;
+  OriginalS := Schur.S[0, 0];
+  S := Schur.S;
+  S[0, 0] := S[0, 0] + TComplex.One;
+  A[0, 0] := A[0, 0] + TComplex.One;
+  AssertTrue('complex generalized factors are immutable snapshots',
+    (Schur.S[0, 0] - OriginalS).Magnitude < 1E-13);
+
+  A := TDenseComplexMatrix.FromValues(2, 2,
+    [TComplex.Zero, TComplex.Create(-1.0, 0.0),
+     TComplex.One, TComplex.Zero]);
+  B := TDenseComplexMatrix.FromValues(2, 2,
+    [TComplex.Create(2.0, 0.0), TComplex.Zero,
+     TComplex.Zero, TComplex.One]);
+  Schur := FactorComplexGeneralizedSchur(A, B);
+  AssertComplexMatrixClose('complex conjugate pencil reconstructs A', A,
+    Multiply(Multiply(Schur.Q, Schur.S), ConjugateTranspose(Schur.Z)), 1E-9);
+  AssertComplexMatrixClose('complex conjugate pencil reconstructs B', B,
+    Multiply(Multiply(Schur.Q, Schur.T), ConjugateTranspose(Schur.Z)), 1E-9);
+  AssertTrue('complex Schur T is triangular',
+    Schur.T[1, 0].Magnitude < 1E-10);
+  Eigen := FactorComplexGeneralizedEigen(A, B);
+  AssertTrue('complex conjugate generalized eigenpair residual is small',
+    Eigen.Residuals[0] < 1E-9);
+  AssertTrue('complex conjugate generalized eigenpair residual is small',
+    Eigen.Residuals[1] < 1E-9);
+end;
+
+procedure TDenseDecompositionTest.TestComplexGeneralizedValidationAndEdges;
+var
+  A, B: IDenseComplexMatrix;
+  Schur: IDenseComplexGeneralizedSchur;
+  Failed: Boolean;
+begin
+  Failed := False;
+  try
+    FactorComplexGeneralizedSchur(IDenseComplexMatrix(nil),
+      TDenseComplexMatrix.Zeros(0, 0));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil complex generalized matrix is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorComplexGeneralizedEigen(
+      TDenseComplexMatrix.FromValues(2, 2,
+        [TComplex.One, TComplex.Zero, TComplex.Zero, TComplex.One]),
+      TDenseComplexMatrix.Zeros(1, 1));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('mismatched complex generalized dimensions are rejected', Failed);
+
+  A := TDenseComplexMatrix.FromValues(1, 1,
+    [TComplex.Create(1.0, 0.0)]);
+  B := TDenseComplexMatrix.FromValues(1, 1,
+    [TComplex.Create(1.0, 0.0)]);
+  Failed := False;
+  try
+    FactorComplexGeneralizedSchur(A, B, -1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('negative complex QZ iteration limit is rejected', Failed);
+
+  A := TDenseComplexMatrix.FromValues(2, 2,
+    [TComplex.One, TComplex.Zero,
+     TComplex.Zero, TComplex.Zero]);
+  B := TDenseComplexMatrix.Zeros(2, 2);
+  Failed := False;
+  try
+    FactorComplexGeneralizedSchur(A, B);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('irregular complex pencil with no usable shift is rejected', Failed);
+
+  A := TDenseComplexMatrix.FromValues(1, 1,
+    [TComplex.Create(Infinity, 0.0)]);
+  Failed := False;
+  try
+    FactorComplexGeneralizedSchur(A, B);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('non-finite complex generalized input is rejected', Failed);
+
+  A := TDenseComplexMatrix.Zeros(0, 0);
+  B := TDenseComplexMatrix.Zeros(0, 0);
+  Schur := FactorComplexGeneralizedSchur(A, B);
+  AssertEquals('empty complex generalized pencil size', 0, Schur.Size);
+  AssertEquals('empty complex generalized alpha length', 0,
+    Length(Schur.Alpha));
+
+  A := TDenseComplexMatrix.Zeros(2, 2);
+  B := TDenseComplexMatrix.FromValues(2, 2,
+    [TComplex.One, TComplex.Zero,
+     TComplex.Zero, TComplex.One]);
+  Schur := FactorComplexGeneralizedSchur(A, B);
+  AssertEquals('complex zero eigenvalue alpha', 0.0,
+    Schur.Alpha[0].Magnitude, 1E-13);
+  AssertEquals('complex zero eigenvalue beta', 1.0,
+    Schur.Beta[0].Re, 1E-13);
+end;
+
+procedure TDenseDecompositionTest.TestRealGeneralizedThreeByThreePencil;
+var
+  A, B: IDenseDoubleMatrix;
+  Schur: IDenseDoubleGeneralizedSchur;
+  Eigen: IDenseDoubleGeneralizedEigen;
+begin
+  A := TDenseDoubleMatrix.FromValues(3, 3,
+    [4.0, 1.0, -1.0,
+     2.0, 3.0, 0.0,
+     0.0, 1.0, 2.0]);
+  B := TDenseDoubleMatrix.FromValues(3, 3,
+    [2.0, 0.0, 1.0,
+     1.0, 1.0, 0.0,
+     0.0, 1.0, 1.0]);
+  Schur := FactorRealGeneralizedSchur(A, B);
+  AssertMatrixClose('3x3 generalized Schur reconstructs A', A,
+    Multiply(Multiply(Schur.Q, Schur.S), Transpose(Schur.Z)), 1E-9);
+  AssertMatrixClose('3x3 generalized Schur reconstructs B', B,
+    Multiply(Multiply(Schur.Q, Schur.T), Transpose(Schur.Z)), 1E-9);
+  Eigen := FactorRealGeneralizedEigen(A, B);
+  AssertTrue('3x3 generalized eigenvectors report small residuals',
+    (Eigen.Residuals[0] < 1E-8) and (Eigen.Residuals[1] < 1E-8) and
+    (Eigen.Residuals[2] < 1E-8));
+end;
+
+procedure TDenseDecompositionTest.TestComplexGeneralizedThreeByThreePencil;
+var
+  A, B: IDenseComplexMatrix;
+  Schur: IDenseComplexGeneralizedSchur;
+  Eigen: IDenseComplexGeneralizedEigen;
+  I, J: SizeInt;
+begin
+  A := TDenseComplexMatrix.FromValues(3, 3,
+    [TComplex.Create(3.0, 1.0), TComplex.Create(1.0, -2.0),
+       TComplex.Create(0.5, 0.0),
+     TComplex.Create(2.0, 1.0), TComplex.Create(-1.0, 0.5),
+       TComplex.One,
+     TComplex.Create(0.0, 0.25), TComplex.Create(2.0, 0.0),
+       TComplex.Create(2.0, -1.0)]);
+  B := TDenseComplexMatrix.FromValues(3, 3,
+    [TComplex.Create(2.0, 0.0), TComplex.Create(0.0, 0.5),
+       TComplex.One,
+     TComplex.Create(1.0, -1.0), TComplex.Create(3.0, 0.0),
+       TComplex.Zero,
+     TComplex.Create(0.5, 0.0), TComplex.One,
+       TComplex.Create(1.0, 1.0)]);
+  Schur := FactorComplexGeneralizedSchur(A, B);
+  AssertComplexMatrixClose('3x3 complex generalized Schur reconstructs A', A,
+    Multiply(Multiply(Schur.Q, Schur.S), ConjugateTranspose(Schur.Z)), 1E-8);
+  AssertComplexMatrixClose('3x3 complex generalized Schur reconstructs B', B,
+    Multiply(Multiply(Schur.Q, Schur.T), ConjugateTranspose(Schur.Z)), 1E-8);
+  for I := 1 to 2 do
+    for J := 0 to I - 1 do
+      AssertTrue('3x3 complex generalized T is upper triangular',
+        Schur.T[I, J].Magnitude < 1E-9);
+  Eigen := FactorComplexGeneralizedEigen(A, B);
+  for I := 0 to 2 do
+    AssertTrue('3x3 complex generalized eigenpair residual is small',
+      Eigen.Residuals[I] < 1E-7);
 end;
 
 initialization

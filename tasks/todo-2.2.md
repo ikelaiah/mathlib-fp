@@ -44,11 +44,15 @@ example and documentation checks, release qualification, and CI.
 - [x] Nonsymmetric eigenvalues and eigenvectors, ordering, residuals, and
   convergence/failure diagnostics. Contract approved and implemented on
   `feat/2.2-real-nonsymmetric-eigen`; release qualification and PR CI are
-  complete locally; PR CI is pending.
+  complete; PR #52 is merged and its Linux/Windows CI run passed.
   - **Acceptance:** real-double input returns complex values and normalized
     right eigenvectors with stable order options, paired normalized backward
     residuals, and bounded Schur convergence diagnostics.
   - **Verify:** 977 FPCUnit tests, all 38 examples, 19 output contracts,
-    documentation/API checks, and 114 Windows release-qualification gates
-    passed. Linux/Windows PR CI is pending.
-- [ ] Generalized real/complex `A x = λ B x` reduction and solve contract.
+    documentation/API checks, 114 Windows release-qualification gates, and
+    Linux/Windows PR CI passed.
+- [x] Generalized real/complex `A x = λ B x` reduction and solve.
+  Contract approved and implemented on `feat/2.2-generalized-eigen`; full
+  Windows qualification passed 116 gates, including 983 FPCUnit tests, all 39
+  examples, and 20 output contracts. Linux and Windows PR CI remain before
+  merge.

@@ -86,6 +86,23 @@ complex double-precision Hessenberg reductions defined in
 - [x] Run focused and full qualification checks; review the final diff.
 - [ ] Linux and Windows CI pass before merge.
 
+### Phase 7: Generalized real and complex eigenproblems (contract approved)
+
+- [x] Approve the generalized Schur and eigenpair contract in `spec-2.2.md`.
+- [x] Add tests for real and complex generalized Schur reconstruction,
+  orthogonality/unitarity, Schur structure, homogeneous `(alpha,beta)` values,
+  finite/zero/infinite eigenvalues, conjugate pairs, and singular-pencil
+  behavior.
+- [x] Implement a bounded projective-shift/Schur reduction for real and
+  complex double precision, accumulating both vector factors without forming
+  `B^-1*A`.
+- [x] Recover normalized right generalized eigenvectors and scaled residuals;
+  verify finite, infinite, and conjugate-pair cases.
+- [x] Add examples and guide/capability/changelog updates without changing the
+  frozen 2.0 API snapshot.
+- [x] Run focused/full qualification and review the final diff.
+- [ ] Pass Linux and Windows CI before merge.
+
 ## Risks and mitigations
 
 | Risk | Mitigation |
@@ -95,9 +112,12 @@ complex double-precision Hessenberg reductions defined in
 | Dense transformations violate the similarity relation through indexing errors | Test both reconstruction and orthogonality on independent nonsymmetric inputs. |
 | Schur iteration stalls on clustered or badly scaled spectra | Use scale-relative deflation, a bounded iteration count, and raise a clear domain error when the budget is exhausted. |
 | Repeated or clustered eigenvalues make back substitution ill-conditioned | Scale each solve step, regularize near-zero pivots relative to Schur scale, and report per-vector backward residuals; do not promise an orthogonal or well-conditioned eigenbasis. |
+| Singular `B` makes direct `B^-1*A` reduction invalid and eigenvalue quotients overflow | Use a projective shift `A+γB` and expose normalized homogeneous `(alpha,beta)` pairs, including `beta=0` infinite eigenvalues. |
+| A shifted coefficient matrix is ill-conditioned | Try deterministic shifts, rely on pivoted LU checks, and raise `EDenseMatrixError` if no candidate is numerically usable. |
+| Irregular pencils produce indeterminate eigenvalues | State regular-pencil input semantics and raise if QZ returns an indeterminate `(0,0)` pair; do not silently emit a quotient. |
 
 ## Dependencies
 
 Both reductions depend only on typed dense matrices and standard FPC math.
 Schur iteration depends on these results; generalized reductions need a
-separate contract.
+separate approved contract, now drafted in `spec-2.2.md`.

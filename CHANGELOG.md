@@ -29,6 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the 2.2 real-double nonsymmetric eigenvalue and right-eigenvector
   factorization with stable real-part/magnitude ordering, normalized residuals,
   and bounded Schur convergence diagnostics.
+- Added real and complex generalized matrix-pencil Schur factors, homogeneous
+  `(alpha,beta)` eigenvalues, right eigenvectors, and residual diagnostics,
+  including infinite eigenvalues when `B` is singular.
 
 ## [2.0.0] - 2026-09-21
 

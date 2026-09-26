@@ -50,6 +50,7 @@ closest to your project. For a shorter task-first route, use the
 | `35_complex_hessenberg_reduction.pas` | AlgebraLib | Reduce a complex dense matrix with a unitary Hessenberg similarity |
 | `36_real_schur_factorization.pas` | AlgebraLib | Compute a real Schur factorization with orthogonal Schur vectors |
 | `37_real_nonsymmetric_eigen.pas` | AlgebraLib | Compute and order real nonsymmetric eigenpairs with residual diagnostics |
+| `38_generalized_eigenproblem.pas` | AlgebraLib | Solve real and complex matrix pencils, including eigenvalues at infinity |
 
 ## Build and run
 
