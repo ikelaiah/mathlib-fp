@@ -3,8 +3,8 @@
 ## Overview
 
 Build dense nonsymmetric spectral capabilities from reusable reductions toward
-Schur and eigenvalue workflows. This branch implements only the first real
-double-precision Hessenberg reduction slice defined in
+Schur and eigenvalue workflows. The current increment implements the real and
+complex double-precision Hessenberg reductions defined in
 [spec-2.2.md](spec-2.2.md).
 
 ## Architecture decisions
@@ -12,9 +12,8 @@ double-precision Hessenberg reduction slice defined in
 - Put the API in `AlgebraLib.DenseSpectral`; symmetric/Hermitian methods stay
   in `AlgebraLib.DenseDecompositions`.
 - Return a factor interface with defensive-copy accessors for `Q` and `H`.
-- Use unblocked Householder reflectors and explicit real-double operations for
-  this first slice. Add complex precision in a later independently validated
-  increment.
+- Use unblocked Householder reflectors for real-double orthogonal and
+  complex-double unitary similarity transforms.
 - Reject invalid/non-finite input and computed non-finite output with
   `EDenseMatrixError`.
 
@@ -50,16 +49,26 @@ double-precision Hessenberg reduction slice defined in
 - [x] Final diff review finds no API-contract mismatch.
 - [ ] Linux and Windows CI pass before merge.
 
+### Phase 4: Complex-double increment
+
+- [x] Specify `Q^H A Q = H` and complex input/error behavior.
+- [x] Add red FPCUnit tests for structure, reconstruction, unitarity,
+  immutability, scale, dimensions, and invalid input.
+- [x] Implement scaled-norm complex Householder transformations.
+- [x] Add the complex example and update the guide and capability inventory.
+- [ ] Run full qualification and review the final diff before PR.
+- [ ] Linux and Windows CI pass before merge.
+
 ## Risks and mitigations
 
 | Risk | Mitigation |
 | --- | --- |
 | Unstable reflector norms at very large or tiny scales | Use a scaled sum-of-squares norm; test difficult scales and finite-output behavior. |
-| Complex Householder conventions differ from the real path | Keep complex implementation out of this increment and specify it separately. |
+| Complex Householder conventions differ from the real path | State the conjugate-transpose relation explicitly and test reconstruction and unitarity. |
 | Dense transformations violate the similarity relation through indexing errors | Test both reconstruction and orthogonality on independent nonsymmetric inputs. |
 
 ## Dependencies
 
-The real reduction depends only on typed dense matrices and standard FPC math.
-Real Schur iteration depends on this result; later complex and generalized
-reductions depend on a separate contract.
+Both reductions depend only on typed dense matrices and standard FPC math.
+Schur iteration depends on these results; generalized reductions need a
+separate contract.
