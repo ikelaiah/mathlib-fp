@@ -52,6 +52,20 @@ type
     property Iterations: SizeInt read GetIterations;
   end;
 
+  IDenseComplexSchur = interface
+    function GetSize: SizeInt;
+    function GetQ: IDenseComplexMatrix;
+    function GetT: IDenseComplexMatrix;
+    function GetIterations: SizeInt;
+    property Size: SizeInt read GetSize;
+    { A = Q*T*Q^H; Q is unitary and T is upper triangular. }
+    property Q: IDenseComplexMatrix read GetQ;
+    { Defensive copy of the upper triangular complex Schur form. }
+    property T: IDenseComplexMatrix read GetT;
+    { Number of shifted QR iterations. }
+    property Iterations: SizeInt read GetIterations;
+  end;
+
   IDenseDoubleRealEigen = interface
     function GetSize: SizeInt;
     function GetEigenvalues: TComplexArray;
@@ -149,6 +163,8 @@ function ReduceHessenberg(const A: IDenseComplexMatrix):
   IDenseComplexHessenberg; overload;
 function FactorRealSchur(const A: IDenseDoubleMatrix;
   const MaxIterations: SizeInt = 0): IDenseDoubleRealSchur;
+function FactorComplexSchur(const A: IDenseComplexMatrix;
+  const MaxIterations: SizeInt = 0): IDenseComplexSchur;
 function FactorRealEigen(const A: IDenseDoubleMatrix;
   const Ordering: TRealEigenvalueOrdering = reoSchurOrder;
   const MaxIterations: SizeInt = 0): IDenseDoubleRealEigen;
@@ -313,6 +329,21 @@ type
     function GetConverged: Boolean;
   end;
 
+  TDenseComplexSchur = class(TInterfacedObject, IDenseComplexSchur)
+  private
+    FSize, FIterations: SizeInt;
+    FQ, FT: IDenseComplexMatrix;
+    procedure Factor(const A: IDenseComplexMatrix;
+      const MaxIterations: SizeInt);
+  public
+    constructor Create(const A: IDenseComplexMatrix;
+      const MaxIterations: SizeInt);
+    function GetSize: SizeInt;
+    function GetQ: IDenseComplexMatrix;
+    function GetT: IDenseComplexMatrix;
+    function GetIterations: SizeInt;
+  end;
+
 procedure FactorComplexSchurInternal(const A: IDenseComplexMatrix;
   const MaxIterations: SizeInt; out Q, T: IDenseComplexMatrix;
   out Iterations: SizeInt);
@@ -411,6 +442,53 @@ begin
       if not T[I, J].IsFinite then
         raise EDenseMatrixError.Create(
           'Complex Schur: computed factor is non-finite.');
+end;
+
+procedure ValidateFiniteComplexMatrix(const A: IDenseComplexMatrix); forward;
+
+constructor TDenseComplexSchur.Create(const A: IDenseComplexMatrix;
+  const MaxIterations: SizeInt);
+begin
+  inherited Create;
+  Factor(A, MaxIterations);
+end;
+
+procedure TDenseComplexSchur.Factor(const A: IDenseComplexMatrix;
+  const MaxIterations: SizeInt);
+var
+  I, J: SizeInt;
+begin
+  ValidateFiniteComplexMatrix(A);
+  FactorComplexSchurInternal(A, MaxIterations, FQ, FT, FIterations);
+  FSize := A.Rows;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      if not FQ[I, J].IsFinite or not FT[I, J].IsFinite then
+        raise EDenseMatrixError.CreateFmt(
+          'FactorComplexSchur: non-finite factor at [%d,%d].', [I, J]);
+  for I := 1 to FSize - 1 do
+    for J := 0 to I - 1 do
+      FT[I, J] := TComplex.Zero;
+end;
+
+function TDenseComplexSchur.GetSize: SizeInt;
+begin
+  Result := FSize;
+end;
+
+function TDenseComplexSchur.GetQ: IDenseComplexMatrix;
+begin
+  Result := FQ.Clone;
+end;
+
+function TDenseComplexSchur.GetT: IDenseComplexMatrix;
+begin
+  Result := FT.Clone;
+end;
+
+function TDenseComplexSchur.GetIterations: SizeInt;
+begin
+  Result := FIterations;
 end;
 
 procedure ValidateFiniteMatrix(const A: IDenseDoubleMatrix);
@@ -1915,6 +1993,12 @@ function FactorRealGeneralizedSchur(const A, B: IDenseDoubleMatrix;
   const MaxIterations: SizeInt): IDenseDoubleGeneralizedSchur;
 begin
   Result := TDenseDoubleGeneralizedSchur.Create(A, B, MaxIterations);
+end;
+
+function FactorComplexSchur(const A: IDenseComplexMatrix;
+  const MaxIterations: SizeInt): IDenseComplexSchur;
+begin
+  Result := TDenseComplexSchur.Create(A, MaxIterations);
 end;
 
 function FactorRealGeneralizedEigen(const A, B: IDenseDoubleMatrix;

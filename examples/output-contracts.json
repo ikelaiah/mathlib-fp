@@ -190,6 +190,15 @@
         "complex lambda[1] = infinity"
       ],
       "final_line": "Generalized eigenproblem: success"
+    },
+    {
+      "path": "examples/39_complex_schur_factorization.pas",
+      "contains": [
+        "matrix size = 3",
+        "Schur form = upper triangular",
+        "maximum reconstruction residual ="
+      ],
+      "final_line": "Complex Schur factorization: success"
     }
   ]
 }

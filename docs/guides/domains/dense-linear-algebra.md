@@ -226,11 +226,21 @@ factor. This API provides the Schur factorization; it does not return an
 ordered eigenvalue list or eigenvectors.
 
 The matrix relation, real Schur block structure, and accumulated Schur vectors
-follow LAPACK's documented [`DHSEQR` contract](https://www.netlib.org/lapack/explore-html/d9/dc6/group__hseqr_ga62c3f96d2f67f96d6dc10334e118e451.html). Single-precision and
-complex Schur paths are not included. See the [2.2 design record](../../../tasks/spec-2.2.md),
+follow LAPACK's documented [`DHSEQR` contract](https://www.netlib.org/lapack/explore-html/d9/dc6/group__hseqr_ga62c3f96d2f67f96d6dc10334e118e451.html). Single-precision
+Schur remains deferred. See the [2.2 design record](../../../tasks/spec-2.2.md),
 the [real Hessenberg example](../../../examples/34_hessenberg_reduction.pas),
 the [complex Hessenberg example](../../../examples/35_complex_hessenberg_reduction.pas),
 and [real Schur example](../../../examples/36_real_schur_factorization.pas).
+
+`FactorComplexSchur(A: IDenseComplexMatrix)` returns unitary `Q` and upper
+triangular `T` satisfying `A = Q*T*Q^H`. `Iterations` reports the shifted-QR
+steps. A zero `MaxIterations` selects `100*max(1,n)`; a negative limit,
+invalid input, non-finite factor, or exhausted budget raises
+`EDenseMatrixError`. Because each explicit QR step costs up to `O(n^3)` and
+the iteration budget is `O(n)`, worst-case work is `O(n^4)`; this
+implementation targets moderate dense matrices. The relation and triangular
+form follow LAPACK's [`ZHSEQR`](https://www.netlib.org/lapack/explore-html/d9/dc6/group__hseqr_ga3facb8b36e14f2dae01755fa9400f1c6.html)
+contract; no LAPACK runtime is required. See the [complex Schur example](../../../examples/39_complex_schur_factorization.pas).
 
 `FactorRealEigen(A, Ordering, MaxIterations)` builds on the real Schur factor
 and returns every eigenvalue as a `TComplex` plus its normalized right
