@@ -199,7 +199,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 27 commented walkthroughs with
+The [`examples/`](examples/) directory contains 30 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [beginner guide](docs/start/beginner-guide.md), choose a short task from the
 [beginner recipes](docs/start/recipes.md), or follow the

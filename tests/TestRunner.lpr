@@ -9,6 +9,7 @@ uses
   , TestMathBase
   , TestSpecialFunctions
   , TestModifiedBessel
+  , TestEllipticIntegrals
   , TestComplexLib
   , TestAlgebraLib
   , TestDenseMatrices

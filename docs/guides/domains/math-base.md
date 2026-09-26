@@ -17,7 +17,7 @@ Copy and run the [double-real quick start](#quick-start). It prints
 | --- | --- | --- |
 | Shared real samples | `TDoubleArray` | [Shared types](#mathbasesharedtypes) |
 | Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
-| Bessel J/Y and modified I/K of orders zero and one | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
+| Bessel J/Y, modified I/K, and Legendre elliptic integrals | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
 | Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
 | Reproducible simulation | `TLocalRandom` | [Random-state contract](applied-numerics.md#reproducible-local-random-state) |
 | Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](interchange.md#choose-a-format) |
@@ -255,8 +255,8 @@ approximation for `8 < X < 16`, and a large-argument expansion above that.
 The [independent decimal corpus](../../../tests/BesselReference.inc) and
 [generator](../../../tools/generate_bessel_data.py) record the formulas and
 precision. The [runnable example](../../../examples/27_bessel_functions.pas)
-also checks the J/Y Wronskian. Broader orders, elliptic functions, and
-exponential integrals remain later 2.1 work.
+also checks the J/Y Wronskian. Broader orders and exponential integrals remain
+later 2.1 work.
 
 The same development unit now includes `ModifiedBesselI0`, `ModifiedBesselI1`,
 `ModifiedBesselK0`, and `ModifiedBesselK1`. I0/I1 accept finite `|X| <= 100`,
@@ -274,6 +274,25 @@ example](../../../examples/28_modified_bessel_functions.pas). The implementation
 follows the NIST DLMF [modified I definition](https://dlmf.nist.gov/10.25.E2),
 [integer-order K series](https://dlmf.nist.gov/10.31.E1), [K0 series](https://dlmf.nist.gov/10.31.E2),
 and [large-argument expansions](https://dlmf.nist.gov/10.40.E1).
+
+The same development unit provides `CompleteEllipticK`, `CompleteEllipticE`,
+`IncompleteEllipticF`, and `IncompleteEllipticE` for real parameter `M=k^2`
+in `[0,1]`. The incomplete functions accept amplitudes `Phi` in
+`[-Pi/2, Pi/2]`; values outside these domains and nonfinite inputs return NaN.
+At `M=1`, complete K is positive infinity and incomplete F diverges at both
+endpoints with the sign of `Phi`; E remains finite. The tested reference budget
+is `max(5e-13, 5e-12 * |reference value|)`.
+
+The implementation uses Carlson RF/RD duplication for incomplete F/E and
+complete K/E, with explicit formulas at `M=0` and `M=1`. Its complementary
+argument is arranged to avoid subtracting nearly equal values near `M=1`.
+The [quadrature reference corpus](../../../tests/EllipticReference.inc) and
+[generator](../../../tools/generate_elliptic_data.py) are independent of the
+Carlson algorithm. See NIST DLMF [Legendre definitions](https://dlmf.nist.gov/19.2),
+[relations to Carlson forms](https://dlmf.nist.gov/19.25), and
+[duplication algorithms](https://dlmf.nist.gov/19.36). Third-kind integrals,
+amplitudes outside the principal interval, and Jacobi elliptic functions remain
+outside this slice.
 
 ---
 
