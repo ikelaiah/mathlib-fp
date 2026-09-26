@@ -201,6 +201,21 @@ The deterministic cyclic Jacobi method costs O(sweeps*n³) and uses O(n²)
 factor/working storage. See Demmel, *Applied Numerical Linear Algebra*,
 section 5.3.
 
+## 2.2 development: real Hessenberg reduction
+
+The unreleased 2.2 development unit adds
+`ReduceHessenberg(A: IDenseDoubleMatrix)`. Its factor exposes copied `Q` and
+`H` matrices satisfying `Q^T*A*Q = H`, where `Q` is orthogonal and `H` is
+upper Hessenberg. It accepts finite square matrices, including empty and
+singleton matrices; nil, nonsquare, and non-finite inputs raise
+`EDenseMatrixError`. The implementation uses Householder similarity
+transformations, following LAPACK's documented [`DGEHRD` contract](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html).
+
+This first slice prepares a real matrix for later Schur iteration. It does not
+compute Schur form, eigenvalues, or eigenvectors. Complex and single-precision
+paths are not included. See the [2.2 design record](../../../tasks/spec-2.2.md)
+and runnable [Hessenberg example](../../../examples/34_hessenberg_reduction.pas).
+
 ## Empty, non-finite, and degenerate behavior
 
 - `0 x 0` square, QR, SVD, and eigensystem factors are valid.

@@ -93,6 +93,10 @@ THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRES
         <UnitName Value="AlgebraLib.DenseDecompositions"/>
       </Item>
       <Item>
+        <Filename Value="..\..\src\AlgebraLib.DenseSpectral.pas"/>
+        <UnitName Value="AlgebraLib.DenseSpectral"/>
+      </Item>
+      <Item>
         <Filename Value="..\..\src\AlgebraLib.SparseMatrices.pas"/>
         <UnitName Value="AlgebraLib.SparseMatrices"/>
       </Item>

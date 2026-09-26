@@ -146,6 +146,14 @@
         "Pi(0.7, 0, 0.6) = 0.7353391599"
       ],
       "final_line": "Elliptic third-kind example: success"
+    },
+    {
+      "path": "examples/34_hessenberg_reduction.pas",
+      "contains": [
+        "matrix size = 4",
+        "H[3,0] = 0.000000"
+      ],
+      "final_line": "Hessenberg reduction: success"
     }
   ]
 }

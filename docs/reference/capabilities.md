@@ -59,6 +59,12 @@ They do not change the 2.0.0 capability classification; elliptic principal
 values, amplitudes outside the principal interval, analytic continuation, and
 complex hypergeometric or exponential-integral branches remain unimplemented.
 
+The unreleased 2.2 development source also contains real-double Hessenberg
+reduction (`ReduceHessenberg`) as a foundation for later Schur work. This does
+not yet provide nonsymmetric eigenvalues, eigenvectors, Schur form, or a
+generalized eigenproblem; those remain unsupported in the published 2.0.0
+inventory.
+
 Unsupported entries are not counted in the 1.9.4 numerical-evidence audit. The
 [closed 1.10.0 capability manifest](../releases/1.10.0/capability-manifest.md) defers
 every unsupported family explicitly beyond 2.0 and is enforced by
