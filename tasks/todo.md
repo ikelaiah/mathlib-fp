@@ -62,6 +62,11 @@ limits, real domain, accuracy budget, and independent reference cases.
 
 ## 6. Add exponential integrals
 
+**Status:** Real Ei/E1 first slice implemented and locally qualified; PR pending.
+
+The contract supports Ei on `[-100,100]` and E1 on `[0,100]`, with explicit
+real zero-pole and invalid-domain behavior. Complex branches are deferred.
+
 **Acceptance:** Approved real `Ei`/`E1` behavior at zero, sign boundaries,
 small/large arguments, and nonfinite input is documented and tested.
 

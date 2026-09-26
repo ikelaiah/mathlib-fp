@@ -10,6 +10,7 @@ uses
   , TestSpecialFunctions
   , TestModifiedBessel
   , TestEllipticIntegrals
+  , TestExponentialIntegrals
   , TestComplexLib
   , TestAlgebraLib
   , TestDenseMatrices
