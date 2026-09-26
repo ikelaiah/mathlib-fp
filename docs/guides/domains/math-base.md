@@ -17,7 +17,7 @@ Copy and run the [double-real quick start](#quick-start). It prints
 | --- | --- | --- |
 | Shared real samples | `TDoubleArray` | [Shared types](#mathbasesharedtypes) |
 | Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
-| Bessel J/Y of orders zero and one | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
+| Bessel J/Y and modified I/K of orders zero and one | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
 | Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
 | Reproducible simulation | `TLocalRandom` | [Random-state contract](applied-numerics.md#reproducible-local-random-state) |
 | Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](interchange.md#choose-a-format) |
@@ -255,8 +255,25 @@ approximation for `8 < X < 16`, and a large-argument expansion above that.
 The [independent decimal corpus](../../../tests/BesselReference.inc) and
 [generator](../../../tools/generate_bessel_data.py) record the formulas and
 precision. The [runnable example](../../../examples/27_bessel_functions.pas)
-also checks the J/Y Wronskian. Broader orders, modified Bessel I/K, elliptic
-functions, and exponential integrals remain later 2.1 work.
+also checks the J/Y Wronskian. Broader orders, elliptic functions, and
+exponential integrals remain later 2.1 work.
+
+The same development unit now includes `ModifiedBesselI0`, `ModifiedBesselI1`,
+`ModifiedBesselK0`, and `ModifiedBesselK1`. I0/I1 accept finite `|X| <= 100`,
+with I0 even, I1 odd, I0(0)=1, and I1(0)=0. K0/K1 accept finite `0 < X <= 100`
+and return positive infinity at zero; K1 also returns positive infinity when
+its pole exceeds the `Double` range. Negative K inputs, nonfinite inputs, and
+finite inputs beyond 100 return NaN. Their tested corpus budget is
+`max(5e-13, 5e-12 * |reference value|)`.
+
+I uses its positive power series. K uses the logarithmic series near zero, a
+generated Chebyshev approximation on `[2, 16]`, and the large-argument
+expansion above that. See the [modified Bessel reference corpus](../../../tests/ModifiedBesselReference.inc),
+[generator](../../../tools/generate_modified_bessel_data.py), and [runnable
+example](../../../examples/28_modified_bessel_functions.pas). The implementation
+follows the NIST DLMF [modified I definition](https://dlmf.nist.gov/10.25.E2),
+[integer-order K series](https://dlmf.nist.gov/10.31.E1), [K0 series](https://dlmf.nist.gov/10.31.E2),
+and [large-argument expansions](https://dlmf.nist.gov/10.40.E1).
 
 ---
 

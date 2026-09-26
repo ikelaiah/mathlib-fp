@@ -40,6 +40,7 @@ closest to your project. For a shorter task-first route, use the
 | `25_numerical_modelling_optimisation.pas` | MathBase / NumericsLib / OptimizationLib | Fit and interpolate local data, solve a scalar root, run unconstrained and bounded optimisation, exercise convergence-failure and invalid-input diagnostics, and export |
 | `26_probability_finance.pas` | MathBase / ProbabilityLib / StatsLib / FinanceLib | Seeded return simulation, distribution estimation, CAPM-style regression, NPV/IRR appraisal, an invalid-probability diagnostic, and a deterministic export |
 | `27_bessel_functions.pas` | MathBase | Real order-zero/one Bessel J/Y values and a Wronskian check on the bounded 2.1 development surface |
+| `28_modified_bessel_functions.pas` | MathBase | Real order-zero/one modified Bessel I/K values and a Wronskian check on the bounded 2.1 development surface |
 
 ## Build and run
 
