@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Began the 2.1 special-functions line with bounded real `Double` Bessel
   J0/J1/Y0/Y1 functions, an independent decimal reference corpus, tests,
   documentation, a Lazarus package path, and a runnable example.
+- Added bounded real `Double` modified Bessel I0/I1/K0/K1 functions with
+  independent decimal references, tests, documentation, and a runnable example.
 
 ## [2.0.0] - 2026-09-21
 

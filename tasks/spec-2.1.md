@@ -67,6 +67,31 @@ provenance are published and tested.
   reference values are calculated independently with 120-digit decimal power
   series arithmetic through the full validated range.
 
+## Modified Bessel I/K contract
+
+- Public functions: `ModifiedBesselI0`, `ModifiedBesselI1`,
+  `ModifiedBesselK0`, and `ModifiedBesselK1`, each taking and returning
+  `Double` from `MathBase.SpecialFunctions`.
+- I0/I1 accept finite `|X| <= 100`; I0 is even, I1 is odd, `I0(0)=1`, and
+  `I1(0)=0`. K0/K1 accept finite `0 < X <= 100`; both return positive
+  infinity at zero, and K1 returns positive infinity when its pole exceeds
+  the `Double` range. Negative K inputs, nonfinite inputs, and finite inputs
+  beyond the validated bound return NaN.
+- Across the accepted range, the error target is at most `5e-13` absolute or
+  `5e-12` relative, whichever allows more error. Small-positive K1 values
+  whose result is infinite are covered as pole behavior rather than by the
+  finite-value error budget.
+- No scaled variants are included: over the bounded range, I0/I1 remain
+  finite and K0/K1 remain representable for ordinary positive inputs. The
+  implementation uses the positive power series for I0/I1, the logarithmic
+  series for K0/K1 near zero, a generated Chebyshev approximation for K in
+  the middle interval, and the large-argument asymptotic expansions for K.
+  The independent reference corpus uses 120-digit Decimal series arithmetic.
+- Formula sources: NIST DLMF [I definition](https://dlmf.nist.gov/10.25.E2),
+  [K integer-order series](https://dlmf.nist.gov/10.31.E1),
+  [K0 series](https://dlmf.nist.gov/10.31.E2), and [large-argument
+  expansions](https://dlmf.nist.gov/10.40.E1).
+
 ## Testing and evidence
 
 - Commit an independent reference corpus with generator/version/precision,

@@ -88,6 +88,17 @@
         "Wronskian residual = 0.000000000000"
       ],
       "final_line": "bessel functions: success"
+    },
+    {
+      "path": "examples/28_modified_bessel_functions.pas",
+      "contains": [
+        "I0(1) = 1.266065878",
+        "I1(1) = 0.565159104",
+        "K0(1) = 0.421024438",
+        "K1(1) = 0.601907230",
+        "Wronskian residual = 0.000000000000"
+      ],
+      "final_line": "modified bessel functions: success"
     }
   ]
 }

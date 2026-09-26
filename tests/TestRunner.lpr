@@ -8,6 +8,7 @@ uses
   , consoletestrunner
   , TestMathBase
   , TestSpecialFunctions
+  , TestModifiedBessel
   , TestComplexLib
   , TestAlgebraLib
   , TestDenseMatrices

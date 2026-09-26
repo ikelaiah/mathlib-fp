@@ -24,7 +24,7 @@ precision, and generator version; ordinary tests use committed values only.
 
 ## 3. Ship the first J/Y slice
 
-**Status:** Implemented and locally verified on Windows; Linux CI pending.
+**Status:** Complete; merged as PR #41 after Linux and Windows CI passed.
 
 **Acceptance:** The agreed J/Y functions match the corpus within documented
 budgets, handle invalid inputs as specified, and include API docs and a
@@ -36,12 +36,14 @@ J and Y into separate changes if either exceeds one focused review.
 
 ## 4. Ship the first I/K slice
 
-**Status:** Open.
+**Status:** Implemented and locally verified; awaiting platform CI.
 
-**Acceptance:** The agreed I/K functions meet separate ordinary and extreme
-scale budgets, define overflow/underflow, and include documentation and tests.
+**Acceptance:** `ModifiedBesselI0`, `ModifiedBesselI1`, `ModifiedBesselK0`,
+and `ModifiedBesselK1` meet the range and error budget in `tasks/spec-2.1.md`,
+define pole and nonfinite behavior, and include documentation and tests.
 
-**Verify:** Focused reference, identity, and edge tests; full `TestRunner`.
+**Verify:** Focused independent reference, Wronskian, and edge tests; full
+`TestRunner`.
 **Dependencies:** 1-2. **Scope:** Medium; split I and K if necessary.
 
 ## 5. Add elliptic integral/function slices

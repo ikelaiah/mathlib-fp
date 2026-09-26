@@ -48,9 +48,9 @@ all family slices -> capability inventory, examples, full qualification
 3. **Bessel J and Y.** Add the agreed initial order coverage with piecewise
    numerics, edge contracts, focused tests, documentation, and a runnable
    example. Check against the corpus on Windows and Linux CI.
-4. **Modified Bessel I and K.** Add the agreed initial order coverage with
-   overflow/underflow behavior and scaled variants only if required by the
-   approved contract. Verify extreme-scale cases and identities independently.
+4. **Modified Bessel I and K.** Add bounded real I0/I1/K0/K1 functions with
+   explicit pole and range behavior. The accepted range does not require scaled
+   variants. Verify small/large-scale cases and the I/K Wronskian independently.
 
 **Checkpoint:** J/Y/I/K have documented domains and budgets, independent
 reference cases, no dependency additions, and passing focused tests.
@@ -84,10 +84,10 @@ unsupported regions remain explicit in the docs and capability inventory.
 | A reference generator becomes a hidden dependency | Commit plain reference data and metadata; normal build and tests use only FPC. |
 | Feature breadth delays 2.1 indefinitely | Land complete vertical slices, review scope at checkpoints, and do not claim a family stable until its gate passes. |
 
-## First reviewable change — locally verified
+## First reviewable change — merged
 
 Complete tasks 1 and 2, then implement the initial J/Y slice. This provides a
 usable feature and validates the evidence workflow before the other families.
-The J/Y slice passes the independent corpus, normal/checked/optimized FPC
-tests, example output contract, documentation build, and Lazarus package build.
-Linux CI remains the platform gate before merge.
+The J/Y slice passed the independent corpus, normal/checked/optimized FPC
+tests, example output contract, documentation build, Lazarus package build, and
+Linux/Windows CI before merge as PR #41.
