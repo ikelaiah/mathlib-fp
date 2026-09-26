@@ -1,7 +1,8 @@
 # Spec: 2.1 Special Functions II
 
 Status: J/Y, I/K, the first elliptic integral slice, real Ei/E1, and bounded
-real Gauss 2F1 are implemented. Broader elliptic coverage remains to be
+real Gauss 2F1 are implemented. A bounded real Jacobi sn/cn/dn slice is
+implemented and locally qualified; third-kind elliptic integrals remain to be
 resolved.
 
 ## Objective
@@ -41,7 +42,7 @@ provenance are published and tested.
 
 ## Remaining contract decisions
 
-- Broader elliptic coverage beyond the first Legendre K/E/F slice.
+- Third-kind elliptic integral domain and parameter conventions.
 
 ## Initial J/Y contract
 
@@ -115,6 +116,31 @@ provenance are published and tested.
   the defining integrals, separate from the Carlson implementation.
 - The first slice defers third-kind integrals, amplitudes outside the principal
   interval, complex arguments, and Jacobi elliptic functions.
+
+## Real Jacobi elliptic function contract
+
+- Public functions: `JacobiEllipticSN(U, M)`, `JacobiEllipticCN(U, M)`, and
+  `JacobiEllipticDN(U, M)` in `MathBase.SpecialFunctions`. `M` is the
+  parameter `m=k^2`, matching the Legendre elliptic API, not the modulus `k`.
+- Accept finite `|U| <= 100` and finite `0 <= M <= 1`. Nonfinite values or
+  inputs outside these bounds return NaN. The real functions are finite across
+  the accepted domain.
+- At `M=0`, return `sin(U)`, `cos(U)`, and `1`. At `M=1`, return `tanh(U)`,
+  `sech(U)`, and `sech(U)`. SN is odd; CN and DN are even.
+- Finite results target `5e-13` absolute error or `5e-12` relative error,
+  whichever allows more. The reference corpus covers small and large U,
+  negative arguments, modulus parameters near both endpoints, quarter-period
+  neighborhoods, and the `M=0`/`M=1` limits. Identities are additional checks.
+- For `0<M<1`, reduce U by the half-period `2K(M)` and solve
+  `F(phi|M)=U` on `[-Pi/2,Pi/2]` with safeguarded Newton/bisection. The
+  incomplete integral uses the already-qualified Carlson RF implementation;
+  see DLMF [Legendre definitions](https://dlmf.nist.gov/19.2) and
+  [Carlson forms](https://dlmf.nist.gov/19.25). Compute DN from
+  `sqrt(1-M*SN^2)` using the real identity in [§22.6(i)](https://dlmf.nist.gov/22.6).
+- The reference corpus uses 100-digit Decimal AGM and inverse-sine arithmetic,
+  independent of the Carlson inversion used by the functions.
+- Other Jacobi functions, the amplitude as a public API, complex arguments,
+  and parameter values outside `[0,1]` remain deferred.
 
 ## Real exponential integral contract
 

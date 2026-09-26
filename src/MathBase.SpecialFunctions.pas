@@ -2,7 +2,7 @@ unit MathBase.SpecialFunctions;
 
 { Real Double special functions. The 2.1 development slices cover cylindrical
   Bessel J/Y and modified Bessel I/K of orders zero and one, plus bounded real
-  Legendre elliptic integrals.
+  Legendre elliptic integrals and Jacobi elliptic sn/cn/dn functions.
 
   Formula sources:
     https://dlmf.nist.gov/10.2  (J series)
@@ -20,6 +20,10 @@ unit MathBase.SpecialFunctions;
     https://dlmf.nist.gov/6.12 (large-argument expansions)
     https://dlmf.nist.gov/15.2 (Gauss hypergeometric series)
     https://dlmf.nist.gov/15.19.i (Maclaurin computation guidance)
+    https://dlmf.nist.gov/19.2 (Legendre integral definitions)
+    https://dlmf.nist.gov/19.25 (relations to Carlson forms)
+    https://dlmf.nist.gov/22.2 (Jacobi elliptic function definitions)
+    https://dlmf.nist.gov/22.6 (Jacobi elliptic identities)
   The small-argument series loses accuracy through cancellation as X grows;
   the large-argument expansion becomes accurate only once X is sufficiently
   large. Middle-range Chebyshev coefficients bridge that gap and were generated
@@ -56,6 +60,12 @@ function CompleteEllipticK(const M: Double): Double;
 function CompleteEllipticE(const M: Double): Double;
 function IncompleteEllipticF(const Phi, M: Double): Double;
 function IncompleteEllipticE(const Phi, M: Double): Double;
+
+{ Real Jacobi elliptic functions using parameter M=k^2 in [0,1] and finite
+  |U| <= 100. Nonfinite or out-of-domain inputs return NaN. }
+function JacobiEllipticSN(const U, M: Double): Double;
+function JacobiEllipticCN(const U, M: Double): Double;
+function JacobiEllipticDN(const U, M: Double): Double;
 
 { Real exponential integrals. Ei accepts finite |X| <= 100 and returns
   -Infinity at zero. E1 accepts finite 0 <= X <= 100 and returns +Infinity
@@ -391,6 +401,7 @@ const
   TwoOverPi = 0.63661977236758134308;
   MaxBesselArgument = 100.0;
   MaxExponentialIntegralArgument = 100.0;
+  MaxJacobiEllipticArgument = 100.0;
   MaxHypergeometricParameter = 16.0;
   MaxHypergeometricDenominator = 32.0;
   MinHypergeometricDenominator = 0.5;
@@ -878,6 +889,125 @@ begin
   RFValue := CarlsonRF(C2, Y, 1.0);
   RDValue := CarlsonRD(C2, Y, 1.0);
   Result := S * RFValue - M * S * S * S * RDValue / 3.0;
+end;
+
+procedure JacobiEllipticValues(const U, M: Double;
+  out SNValue, CNValue, DNValue: Double);
+const
+  MaxIterations = 64;
+  FunctionTolerance = 1E-14;
+var
+  PhiValue, FunctionValue, Difference, LowPhi, HighPhi, CandidatePhi,
+    InverseDerivative, ExponentialArgument, QuarterPeriod, ReducedU,
+    SignValue: Double;
+  I: Integer;
+  PeriodCount: Int64;
+  Converged: Boolean;
+begin
+  if IsNan(U) or IsInfinite(U) or
+    (Abs(U) > MaxJacobiEllipticArgument) or IsNan(M) or IsInfinite(M) or
+    (M < 0.0) or (M > 1.0) then
+  begin
+    SNValue := NaN;
+    CNValue := NaN;
+    DNValue := NaN;
+    Exit;
+  end;
+
+  if M = 0.0 then
+  begin
+    SNValue := Sin(U);
+    CNValue := Cos(U);
+    DNValue := 1.0;
+    Exit;
+  end;
+  if M = 1.0 then
+  begin
+    SNValue := Tanh(U);
+    ExponentialArgument := Exp(-Abs(U));
+    CNValue := 2.0 * ExponentialArgument /
+      (1.0 + ExponentialArgument * ExponentialArgument);
+    DNValue := CNValue;
+    Exit;
+  end;
+
+  { Invert F(phi|M)=U on the principal interval. The inverse derivative is
+    sqrt(1-M*sin(phi)^2); safeguarding Newton with bisection keeps convergence
+    reliable near the quarter period. Reduce by 2K first, where K is evaluated
+    by the qualified Carlson RF implementation. }
+  QuarterPeriod := CompleteEllipticK(M);
+  PeriodCount := Round(U / (2.0 * QuarterPeriod));
+  ReducedU := U - PeriodCount * (2.0 * QuarterPeriod);
+  if ReducedU > QuarterPeriod then
+    ReducedU := QuarterPeriod
+  else if ReducedU < -QuarterPeriod then
+    ReducedU := -QuarterPeriod;
+  if Abs(PeriodCount mod 2) = 1 then
+    SignValue := -1.0
+  else
+    SignValue := 1.0;
+  LowPhi := -Pi / 2.0;
+  HighPhi := Pi / 2.0;
+  PhiValue := ReducedU * (Pi / (2.0 * QuarterPeriod));
+  if PhiValue > HighPhi then
+    PhiValue := HighPhi
+  else if PhiValue < LowPhi then
+    PhiValue := LowPhi;
+  Converged := False;
+  for I := 1 to MaxIterations do
+  begin
+    FunctionValue := IncompleteEllipticF(PhiValue, M);
+    Difference := FunctionValue - ReducedU;
+    if Abs(Difference) <= FunctionTolerance then
+    begin
+      Converged := True;
+      Break;
+    end;
+    if Difference < 0.0 then
+      LowPhi := PhiValue
+    else
+      HighPhi := PhiValue;
+    InverseDerivative := Sqrt(Max(0.0,
+      1.0 - M * Sqr(Sin(PhiValue))));
+    CandidatePhi := PhiValue - Difference * InverseDerivative;
+    if (CandidatePhi <= LowPhi) or (CandidatePhi >= HighPhi) or
+      IsNan(CandidatePhi) or IsInfinite(CandidatePhi) then
+      CandidatePhi := (LowPhi + HighPhi) * 0.5;
+    PhiValue := CandidatePhi;
+  end;
+  if not Converged then
+  begin
+    SNValue := NaN;
+    CNValue := NaN;
+    DNValue := NaN;
+    Exit;
+  end;
+  SNValue := SignValue * Sin(PhiValue);
+  CNValue := SignValue * Cos(PhiValue);
+  { For real U and M, dn is positive. This identity remains stable near
+    quarter-period values. }
+  DNValue := Sqrt(Max(0.0, 1.0 - M * SNValue * SNValue));
+end;
+
+function JacobiEllipticSN(const U, M: Double): Double;
+var
+  CNValue, DNValue: Double;
+begin
+  JacobiEllipticValues(U, M, Result, CNValue, DNValue);
+end;
+
+function JacobiEllipticCN(const U, M: Double): Double;
+var
+  SNValue, DNValue: Double;
+begin
+  JacobiEllipticValues(U, M, SNValue, Result, DNValue);
+end;
+
+function JacobiEllipticDN(const U, M: Double): Double;
+var
+  SNValue, CNValue: Double;
+begin
+  JacobiEllipticValues(U, M, SNValue, CNValue, Result);
 end;
 
 function ExponentialIntegralE1Series(const X: Double): Double;
