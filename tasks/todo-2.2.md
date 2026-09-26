@@ -59,4 +59,5 @@ example and documentation checks, release qualification, and CI.
 - [x] Public complex Schur factorization. Contract approved and implemented on
   `feat/2.2-complex-schur`, reusing the existing bounded shifted-QR routine;
   Windows qualification passed 118 gates, including 985 FPCUnit tests, all 40
-  examples, and 21 output contracts. Linux and Windows PR CI remain.
+  examples, and 21 output contracts. Linux and Windows PR CI passed; PR #54 is
+  open for review.

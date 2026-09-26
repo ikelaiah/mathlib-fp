@@ -115,7 +115,7 @@ complex double-precision Hessenberg reductions defined in
   status without changing the stable API snapshot.
 - [x] Add a runnable complex Schur example, README entry, and output contract.
 - [x] Run focused/full qualification and review the final diff.
-- [ ] Pass Linux and Windows CI before merge.
+- [x] Pass Linux and Windows CI before merge.
 
 **Dependencies:** Contract approval precedes tests and implementation; docs and
 example can follow the stable API; full qualification follows all changes.
