@@ -41,6 +41,7 @@ closest to your project. For a shorter task-first route, use the
 | `26_probability_finance.pas` | MathBase / ProbabilityLib / StatsLib / FinanceLib | Seeded return simulation, distribution estimation, CAPM-style regression, NPV/IRR appraisal, an invalid-probability diagnostic, and a deterministic export |
 | `27_bessel_functions.pas` | MathBase | Real order-zero/one Bessel J/Y values and a Wronskian check on the bounded 2.1 development surface |
 | `28_modified_bessel_functions.pas` | MathBase | Real order-zero/one modified Bessel I/K values and a Wronskian check on the bounded 2.1 development surface |
+| `29_elliptic_integrals.pas` | MathBase | Complete and incomplete Legendre elliptic integrals with parameter and endpoint conventions |
 
 ## Build and run
 

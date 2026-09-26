@@ -1,8 +1,8 @@
 unit MathBase.SpecialFunctions;
 
-{ Real Double special functions. The first 2.1 slices cover cylindrical
-  Bessel J/Y and modified Bessel I/K of orders zero and one on bounded,
-  validated argument ranges.
+{ Real Double special functions. The 2.1 development slices cover cylindrical
+  Bessel J/Y and modified Bessel I/K of orders zero and one, plus bounded real
+  Legendre elliptic integrals.
 
   Formula sources:
     https://dlmf.nist.gov/10.2  (J series)
@@ -11,6 +11,9 @@ unit MathBase.SpecialFunctions;
     https://dlmf.nist.gov/10.25.2 (modified I series)
     https://dlmf.nist.gov/10.31 (modified K series)
     https://dlmf.nist.gov/10.40 (modified large-argument expansions)
+    https://dlmf.nist.gov/19.2 (Legendre integral definitions)
+    https://dlmf.nist.gov/19.25 (relations to Carlson forms)
+    https://dlmf.nist.gov/19.36 (Carlson duplication algorithms)
   The small-argument series loses accuracy through cancellation as X grows;
   the large-argument expansion becomes accurate only once X is sufficiently
   large. Middle-range Chebyshev coefficients bridge that gap and were generated
@@ -39,6 +42,14 @@ function ModifiedBesselI1(const X: Double): Double;
   negative, nonfinite, or out-of-range inputs return NaN. }
 function ModifiedBesselK0(const X: Double): Double;
 function ModifiedBesselK1(const X: Double): Double;
+
+{ Legendre elliptic integrals use parameter M = k^2 in [0,1]. The
+  incomplete forms accept Phi in [-Pi/2, Pi/2]. Invalid or nonfinite inputs
+  return NaN; K(1) and F(+-Pi/2, 1) are signed positive/negative infinities. }
+function CompleteEllipticK(const M: Double): Double;
+function CompleteEllipticE(const M: Double): Double;
+function IncompleteEllipticF(const Phi, M: Double): Double;
+function IncompleteEllipticE(const Phi, M: Double): Double;
 
 implementation
 
@@ -363,6 +374,7 @@ const
   EulerGamma = 0.57721566490153286061;
   TwoOverPi = 0.63661977236758134308;
   MaxBesselArgument = 100.0;
+  HalfPiValue: Double = 1.57079632679489661923;
 
 function ChebyshevValue(const X, Center, HalfWidth: Double;
   const Coefficients: array of Double): Double;
@@ -683,6 +695,168 @@ begin
     Result := ChebyshevValue(X, 9.0, 7.0, K1MiddleChebyshev)
   else
     Result := ModifiedBesselKAsymptotic(X, 1);
+end;
+
+function CarlsonRF(XIn, YIn, ZIn: Double): Double;
+const
+  ErrorTolerance = 0.0015;
+var
+  X, Y, Z, Average, DX, DY, DZ: Double;
+  SqrtX, SqrtY, SqrtZ, Lambda, E2, E3: Double;
+  Iteration: Integer;
+begin
+  X := XIn;
+  Y := YIn;
+  Z := ZIn;
+  for Iteration := 1 to 64 do
+  begin
+    Average := (X + Y + Z) / 3.0;
+    DX := (Average - X) / Average;
+    DY := (Average - Y) / Average;
+    DZ := (Average - Z) / Average;
+    if Max(Abs(DX), Max(Abs(DY), Abs(DZ))) <= ErrorTolerance then
+    begin
+      E2 := DX * DY - DZ * DZ;
+      E3 := DX * DY * DZ;
+      Result := (1.0 + (E2 / 24.0 - 0.1 - 3.0 * E3 / 44.0) * E2 +
+        E3 / 14.0) / Sqrt(Average);
+      Exit;
+    end;
+    SqrtX := Sqrt(X);
+    SqrtY := Sqrt(Y);
+    SqrtZ := Sqrt(Z);
+    Lambda := SqrtX * (SqrtY + SqrtZ) + SqrtY * SqrtZ;
+    X := 0.25 * (X + Lambda);
+    Y := 0.25 * (Y + Lambda);
+    Z := 0.25 * (Z + Lambda);
+  end;
+  Result := NaN;
+end;
+
+function CarlsonRD(XIn, YIn, ZIn: Double): Double;
+const
+  ErrorTolerance = 0.0012;
+var
+  X, Y, Z, Average, DX, DY, DZ: Double;
+  SqrtX, SqrtY, SqrtZ, Lambda, Sum, Factor: Double;
+  EA, EB, EC, ED, EE, Correction: Double;
+  Iteration: Integer;
+begin
+  X := XIn;
+  Y := YIn;
+  Z := ZIn;
+  Sum := 0.0;
+  Factor := 1.0;
+  for Iteration := 1 to 64 do
+  begin
+    SqrtX := Sqrt(X);
+    SqrtY := Sqrt(Y);
+    SqrtZ := Sqrt(Z);
+    Lambda := SqrtX * (SqrtY + SqrtZ) + SqrtY * SqrtZ;
+    Sum := Sum + Factor / (SqrtZ * (Z + Lambda));
+    Factor := Factor * 0.25;
+    X := 0.25 * (X + Lambda);
+    Y := 0.25 * (Y + Lambda);
+    Z := 0.25 * (Z + Lambda);
+
+    Average := (X + Y + 3.0 * Z) / 5.0;
+    DX := (Average - X) / Average;
+    DY := (Average - Y) / Average;
+    DZ := (Average - Z) / Average;
+    if Max(Abs(DX), Max(Abs(DY), Abs(DZ))) <= ErrorTolerance then
+    begin
+      EA := DX * DY;
+      EB := DZ * DZ;
+      EC := EA - EB;
+      ED := EA - 6.0 * EB;
+      EE := ED + 2.0 * EC;
+      Correction := 1.0 + ED * (-3.0 / 14.0 + 9.0 * ED / 88.0 -
+        9.0 * DZ * EE / 52.0) + DZ * (EE / 6.0 + DZ *
+        (-9.0 * EC / 22.0 + 3.0 * DZ * EA / 26.0));
+      Result := 3.0 * Sum + Factor * Correction /
+        (Average * Sqrt(Average));
+      Exit;
+    end;
+  end;
+  Result := NaN;
+end;
+
+function CompleteEllipticK(const M: Double): Double;
+begin
+  if IsNan(M) or IsInfinite(M) or (M < 0.0) or (M > 1.0) then
+    Exit(NaN);
+  if M = 1.0 then
+    Exit(Infinity);
+  if M = 0.0 then
+    Exit(Pi / 2.0);
+  Result := CarlsonRF(0.0, 1.0 - M, 1.0);
+end;
+
+function CompleteEllipticE(const M: Double): Double;
+var
+  RFValue, RDValue: Double;
+begin
+  if IsNan(M) or IsInfinite(M) or (M < 0.0) or (M > 1.0) then
+    Exit(NaN);
+  if M = 1.0 then
+    Exit(1.0);
+  if M = 0.0 then
+    Exit(Pi / 2.0);
+  RFValue := CarlsonRF(0.0, 1.0 - M, 1.0);
+  RDValue := CarlsonRD(0.0, 1.0 - M, 1.0);
+  Result := RFValue - M * RDValue / 3.0;
+end;
+
+function IncompleteEllipticF(const Phi, M: Double): Double;
+var
+  S, C, C2, Y: Double;
+begin
+  if IsNan(Phi) or IsInfinite(Phi) or IsNan(M) or IsInfinite(M) or
+    (M < 0.0) or (M > 1.0) or (Abs(Phi) > HalfPiValue) then
+    Exit(NaN);
+  if Phi = 0.0 then
+    Exit(Phi);
+  if M = 0.0 then
+    Exit(Phi);
+  if M = 1.0 then
+  begin
+    if Abs(Phi) = HalfPiValue then
+    begin
+      if Phi < 0.0 then
+        Exit(-Infinity)
+      else
+        Exit(Infinity);
+    end;
+    S := Sin(Phi);
+    C := Cos(Phi);
+    Result := Sign(S) * Ln((1.0 + Abs(S)) / Abs(C));
+    Exit;
+  end;
+  S := Sin(Phi);
+  C := Cos(Phi);
+  C2 := C * C;
+  Y := C2 + (1.0 - M) * S * S;
+  Result := S * CarlsonRF(C2, Y, 1.0);
+end;
+
+function IncompleteEllipticE(const Phi, M: Double): Double;
+var
+  S, C, C2, Y, RFValue, RDValue: Double;
+begin
+  if IsNan(Phi) or IsInfinite(Phi) or IsNan(M) or IsInfinite(M) or
+    (M < 0.0) or (M > 1.0) or (Abs(Phi) > HalfPiValue) then
+    Exit(NaN);
+  S := Sin(Phi);
+  if M = 0.0 then
+    Exit(Phi);
+  if (M = 1.0) or (Phi = 0.0) then
+    Exit(S);
+  C := Cos(Phi);
+  C2 := C * C;
+  Y := C2 + (1.0 - M) * S * S;
+  RFValue := CarlsonRF(C2, Y, 1.0);
+  RDValue := CarlsonRD(C2, Y, 1.0);
+  Result := S * RFValue - M * S * S * S * RDValue / 3.0;
 end;
 
 end.

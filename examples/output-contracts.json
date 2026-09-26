@@ -99,6 +99,16 @@
         "Wronskian residual = 0.000000000000"
       ],
       "final_line": "modified bessel functions: success"
+    },
+    {
+      "path": "examples/29_elliptic_integrals.pas",
+      "contains": [
+        "K(0.5) = 1.854074677",
+        "E(0.5) = 1.350643881",
+        "F(1, 0.5) = 1.083216773",
+        "E(1, 0.5) = 0.927329884"
+      ],
+      "final_line": "elliptic integrals: success"
     }
   ]
 }
