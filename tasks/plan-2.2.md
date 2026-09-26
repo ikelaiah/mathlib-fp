@@ -59,6 +59,18 @@ complex double-precision Hessenberg reductions defined in
 - [ ] Run full qualification and review the final diff before PR.
 - [ ] Linux and Windows CI pass before merge.
 
+### Phase 5: Real Schur factorization (contract approved)
+
+- [x] Confirm the `A = Q*T*Q^T` factor API, real Schur block form, and block
+  ordering behavior in `spec-2.2.md`.
+- [x] Add focused tests for reconstruction, orthogonality, 1x1/2x2 block
+  structure, edge inputs, immutability, scaling, and iteration-limit failure.
+- [x] Implement Hessenberg-based implicit Francis double-shift iteration,
+  deflation, and accumulated Schur vectors.
+- [x] Document the block semantics and add a runnable real Schur example.
+- [x] Run focused tests, all qualification gates, and the final diff review.
+- [ ] Linux and Windows CI pass before merge.
+
 ## Risks and mitigations
 
 | Risk | Mitigation |
@@ -66,6 +78,7 @@ complex double-precision Hessenberg reductions defined in
 | Unstable reflector norms at very large or tiny scales | Use a scaled sum-of-squares norm; test difficult scales and finite-output behavior. |
 | Complex Householder conventions differ from the real path | State the conjugate-transpose relation explicitly and test reconstruction and unitarity. |
 | Dense transformations violate the similarity relation through indexing errors | Test both reconstruction and orthogonality on independent nonsymmetric inputs. |
+| Schur iteration stalls on clustered or badly scaled spectra | Use scale-relative deflation, a bounded iteration count, and raise a clear domain error when the budget is exhausted. |
 
 ## Dependencies
 

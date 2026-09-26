@@ -201,7 +201,7 @@ The deterministic cyclic Jacobi method costs O(sweeps*n³) and uses O(n²)
 factor/working storage. See Demmel, *Applied Numerical Linear Algebra*,
 section 5.3.
 
-## 2.2 development: Hessenberg reduction
+## 2.2 development: Hessenberg and Schur factorization
 
 The unreleased 2.2 development unit adds real and complex overloads of
 `ReduceHessenberg`. The real factor exposes copied `Q` and `H` matrices
@@ -212,11 +212,23 @@ matrices; nil, nonsquare, non-finite, or unrepresentable reflector norms raise
 `EDenseMatrixError`. They use Householder similarity transformations,
 following LAPACK's documented [`DGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html) and [`ZGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga4de4b424a4c7b0a78f7138a94ec54671.html) contracts.
 
-These reductions prepare real or complex matrices for later Schur iteration.
-They do not compute Schur form, eigenvalues, or eigenvectors. Single-precision
-paths are not included. See the [2.2 design record](../../../tasks/spec-2.2.md),
+`FactorRealSchur(A: IDenseDoubleMatrix)` applies real shifted QR iteration and
+returns copied `Q` and `T` factors satisfying `A = Q*T*Q^T`. `Q` is
+orthogonal; `T` is upper quasi-triangular with isolated 1x1 real blocks and
+standardized 2x2 complex-conjugate blocks. The blocks are not ordered.
+`Iterations` reports the number of Francis double-shift steps. The optional
+`MaxIterations` argument sets the iteration limit; zero selects
+`100*max(1,n)`. A negative limit, invalid matrix, arithmetic overflow, or
+failure to converge raises `EDenseMatrixError` without returning a partial
+factor. This API provides the Schur factorization; it does not return an
+ordered eigenvalue list or eigenvectors.
+
+The matrix relation, real Schur block structure, and accumulated Schur vectors
+follow LAPACK's documented [`DHSEQR` contract](https://www.netlib.org/lapack/explore-html/d9/dc6/group__hseqr_ga62c3f96d2f67f96d6dc10334e118e451.html). Single-precision and
+complex Schur paths are not included. See the [2.2 design record](../../../tasks/spec-2.2.md),
 the [real Hessenberg example](../../../examples/34_hessenberg_reduction.pas),
-and [complex Hessenberg example](../../../examples/35_complex_hessenberg_reduction.pas).
+the [complex Hessenberg example](../../../examples/35_complex_hessenberg_reduction.pas),
+and [real Schur example](../../../examples/36_real_schur_factorization.pas).
 
 ## Empty, non-finite, and degenerate behavior
 
