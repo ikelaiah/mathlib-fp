@@ -101,7 +101,7 @@ complex double-precision Hessenberg reductions defined in
 - [x] Add examples and guide/capability/changelog updates without changing the
   frozen 2.0 API snapshot.
 - [x] Run focused/full qualification and review the final diff.
-- [ ] Pass Linux and Windows CI before merge.
+- [x] Pass Linux and Windows CI before merge.
 
 ## Risks and mitigations
 

@@ -54,5 +54,5 @@ example and documentation checks, release qualification, and CI.
 - [x] Generalized real/complex `A x = λ B x` reduction and solve.
   Contract approved and implemented on `feat/2.2-generalized-eigen`; full
   Windows qualification passed 116 gates, including 983 FPCUnit tests, all 39
-  examples, and 20 output contracts. Linux and Windows PR CI remain before
-  merge.
+  examples, and 20 output contracts. Linux and Windows PR CI passed; PR #53 is
+  open for review.
