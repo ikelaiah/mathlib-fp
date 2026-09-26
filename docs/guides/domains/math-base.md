@@ -294,6 +294,24 @@ Carlson algorithm. See NIST DLMF [Legendre definitions](https://dlmf.nist.gov/19
 amplitudes outside the principal interval, and Jacobi elliptic functions remain
 outside this slice.
 
+The same 2.1 development unit provides the real exponential integrals
+`ExponentialIntegralEi` and `ExponentialIntegralE1`. Ei accepts finite
+`|X| <= 100`, with a negative-infinity pole at either signed zero; E1 accepts
+`0 <= X <= 100` and returns positive infinity at zero. E1 is undefined on the
+negative real axis in this real API. Nonfinite and out-of-range inputs return
+NaN. The tested corpus budget is `max(5e-13, 5e-12 * |reference value|)`.
+
+Ei uses its power series for positive arguments and `Ei(-x) = -E1(x)` for
+negative arguments. E1 uses its logarithmic power series through 2 and a
+continued fraction above 2. The [reference corpus](../../../tests/ExponentialIntegralReference.inc),
+[generator](../../../tools/generate_exponential_integral_data.py), and
+[runnable example](../../../examples/30_exponential_integrals.pas) document
+the fixtures and covered transitions. The formulas follow NIST DLMF
+[definitions and the Ei/E1 relation](https://dlmf.nist.gov/6.2),
+[power series](https://dlmf.nist.gov/6.6), and
+[continued fraction](https://dlmf.nist.gov/6.9). Complex branches and other
+orders remain outside this slice.
+
 ---
 
 ## MathBase.Trigonometry — `TTrigKit`

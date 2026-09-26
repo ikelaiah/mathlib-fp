@@ -14,6 +14,10 @@ unit MathBase.SpecialFunctions;
     https://dlmf.nist.gov/19.2 (Legendre integral definitions)
     https://dlmf.nist.gov/19.25 (relations to Carlson forms)
     https://dlmf.nist.gov/19.36 (Carlson duplication algorithms)
+    https://dlmf.nist.gov/6.2 (exponential-integral definitions)
+    https://dlmf.nist.gov/6.6 (exponential-integral power series)
+    https://dlmf.nist.gov/6.9 (E1 continued fraction)
+    https://dlmf.nist.gov/6.12 (large-argument expansions)
   The small-argument series loses accuracy through cancellation as X grows;
   the large-argument expansion becomes accurate only once X is sufficiently
   large. Middle-range Chebyshev coefficients bridge that gap and were generated
@@ -50,6 +54,12 @@ function CompleteEllipticK(const M: Double): Double;
 function CompleteEllipticE(const M: Double): Double;
 function IncompleteEllipticF(const Phi, M: Double): Double;
 function IncompleteEllipticE(const Phi, M: Double): Double;
+
+{ Real exponential integrals. Ei accepts finite |X| <= 100 and returns
+  -Infinity at zero. E1 accepts finite 0 <= X <= 100 and returns +Infinity
+  at zero. Nonfinite and out-of-domain arguments return NaN. }
+function ExponentialIntegralEi(const X: Double): Double;
+function ExponentialIntegralE1(const X: Double): Double;
 
 implementation
 
@@ -374,6 +384,7 @@ const
   EulerGamma = 0.57721566490153286061;
   TwoOverPi = 0.63661977236758134308;
   MaxBesselArgument = 100.0;
+  MaxExponentialIntegralArgument = 100.0;
   HalfPiValue: Double = 1.57079632679489661923;
 
 function ChebyshevValue(const X, Center, HalfWidth: Double;
@@ -857,6 +868,106 @@ begin
   RFValue := CarlsonRF(C2, Y, 1.0);
   RDValue := CarlsonRD(C2, Y, 1.0);
   Result := S * RFValue - M * S * S * S * RDValue / 3.0;
+end;
+
+function ExponentialIntegralE1Series(const X: Double): Double;
+var
+  K: Integer;
+  Term, Addend, SeriesSum: Double;
+begin
+  Term := 1.0;
+  SeriesSum := 0.0;
+  for K := 1 to 256 do
+  begin
+    Term := -Term * X / K;
+    Addend := Term / K;
+    SeriesSum := SeriesSum - Addend;
+    if Abs(Addend) <= Abs(SeriesSum) * 1E-17 then
+      Break;
+  end;
+  Result := -EulerGamma - Ln(X) + SeriesSum;
+end;
+
+function ExponentialIntegralE1ContinuedFraction(const X: Double): Double;
+const
+  Tiny = 1E-300;
+  RelativeTolerance = 2E-16;
+var
+  F, C, D, A, B, Delta: Double;
+  N, Numerator: Integer;
+begin
+  { DLMF 6.9.1 in modified Lentz form. The even/odd denominators alternate
+    between X and 1; convergence is rapid once X is bounded away from zero. }
+  F := X;
+  C := F;
+  D := 0.0;
+  for N := 1 to 512 do
+  begin
+    Numerator := (N + 1) div 2;
+    A := Numerator;
+    if Odd(N) then
+      B := 1.0
+    else
+      B := X;
+
+    D := B + A * D;
+    if Abs(D) < Tiny then
+      D := Tiny;
+    D := 1.0 / D;
+    C := B + A / C;
+    if Abs(C) < Tiny then
+      C := Tiny;
+    Delta := C * D;
+    F := F * Delta;
+    if Abs(Delta - 1.0) <= RelativeTolerance then
+    begin
+      Result := Exp(-X) / F;
+      Exit;
+    end;
+  end;
+  Result := NaN;
+end;
+
+function ExponentialIntegralE1(const X: Double): Double;
+begin
+  if IsNan(X) or IsInfinite(X) or (X < 0.0) or
+    (X > MaxExponentialIntegralArgument) then
+    Exit(NaN);
+  if X = 0.0 then
+    Exit(Infinity);
+  if X <= 2.0 then
+    Result := ExponentialIntegralE1Series(X)
+  else
+    Result := ExponentialIntegralE1ContinuedFraction(X);
+end;
+
+function ExponentialIntegralEi(const X: Double): Double;
+var
+  K: Integer;
+  Term, Addend, SeriesSum, AX: Double;
+begin
+  if IsNan(X) or IsInfinite(X) or
+    (Abs(X) > MaxExponentialIntegralArgument) then
+    Exit(NaN);
+  if X = 0.0 then
+    Exit(-Infinity);
+  if X < 0.0 then
+    Exit(-ExponentialIntegralE1(-X));
+
+  { The positive-axis DLMF series has no cancellation in this bounded range. }
+  AX := X;
+  Term := AX;
+  SeriesSum := 0.0;
+  for K := 1 to 512 do
+  begin
+    if K > 1 then
+      Term := Term * AX / K;
+    Addend := Term / K;
+    SeriesSum := SeriesSum + Addend;
+    if Abs(Addend) <= Abs(SeriesSum) * 1E-17 then
+      Break;
+  end;
+  Result := EulerGamma + Ln(AX) + SeriesSum;
 end;
 
 end.

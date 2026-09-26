@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added bounded real Legendre complete and incomplete elliptic integrals of
   the first and second kinds, Carlson RF/RD evaluation, quadrature references,
   tests, documentation, and a runnable example.
+- Added bounded real exponential integrals Ei and E1 with explicit real-axis
+  domains and pole behavior, independent references, tests, documentation, and
+  a runnable example.
 
 ## [2.0.0] - 2026-09-21
 

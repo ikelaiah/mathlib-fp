@@ -1,8 +1,8 @@
 # Spec: 2.1 Special Functions II
 
-Status: J/Y and I/K baselines implemented; the first elliptic integral slice
-is implemented. Broader elliptic coverage, exponential-integral, and
-hypergeometric contracts remain to be resolved.
+Status: J/Y, I/K, the first elliptic integral slice, and real Ei/E1 are
+implemented. Broader elliptic coverage and hypergeometric contracts remain to
+be resolved.
 
 ## Objective
 
@@ -122,6 +122,35 @@ provenance are published and tested.
   the defining integrals, separate from the Carlson implementation.
 - The first slice defers third-kind integrals, amplitudes outside the principal
   interval, complex arguments, and Jacobi elliptic functions.
+
+## Real exponential integral contract
+
+- Public functions: `ExponentialIntegralEi(X)` and
+  `ExponentialIntegralE1(X)` in `MathBase.SpecialFunctions`.
+- `ExponentialIntegralEi` accepts finite `|X| <= 100`. It returns negative
+  infinity at either signed zero, following the real principal-value limit;
+  nonfinite inputs and finite values outside the validated range return NaN.
+- `ExponentialIntegralE1` accepts finite `0 <= X <= 100`. It returns positive
+  infinity at zero; negative, nonfinite, and out-of-range values return NaN.
+  The real negative-axis branch of complex E1 is deliberately unsupported.
+- Finite results target `5e-13` absolute error or `5e-12` relative error,
+  whichever allows more. Coverage includes both sides of zero, the zero poles,
+  the series/continued-fraction transition, large positive and negative tails,
+  denormal-scale positive inputs, and the range boundary.
+- Ei for positive X uses the convergent DLMF power series. For negative X,
+  compute `Ei(X)=-E1(-X)`. E1 uses its logarithmic power series through X=2
+  and the DLMF continued fraction for X>2. This avoids cancellation in the
+  alternating series on the large positive tail. The validated input bound
+  keeps Ei(100) representable and avoids an overflow contract.
+- Definitions and identities: NIST DLMF [§6.2](https://dlmf.nist.gov/6.2);
+  power series [§6.6](https://dlmf.nist.gov/6.6); continued fraction
+  [§6.9](https://dlmf.nist.gov/6.9); large-argument behavior
+  [§6.12](https://dlmf.nist.gov/6.12); computation guidance
+  [§6.18](https://dlmf.nist.gov/6.18). Reference fixtures combine 120-digit
+  Decimal power-series values with independent Gauss-Legendre quadrature of
+  the defining E1 integral for the continued-fraction range.
+- Complex-valued branches, generalized exponential integrals, and scaled
+  exponential integrals are deferred.
 
 ## Testing and evidence
 
