@@ -34,6 +34,9 @@ type
     procedure TestHessenbergReductionScaleRange;
     procedure TestComplexHessenbergReductionAndImmutableFactor;
     procedure TestComplexHessenbergValidationAndScaleRange;
+    procedure TestRealSchurFactorizationAndBlockStructure;
+    procedure TestRealSchurValidationAndIterationLimit;
+    procedure TestRealSchurReconstructsNonsymmetricExample;
   end;
 
 implementation
@@ -756,6 +759,256 @@ begin
           H[I, J].Im, ScaledH[I, J].Im / Scale, 4E-12);
       end;
   end;
+end;
+
+procedure TDenseDecompositionTest.TestRealSchurFactorizationAndBlockStructure;
+var
+  A, Original, Q, T, Reconstructed, IdentityMatrix, TSnapshot, QSnapshot,
+    Basis, Canonical, ScaledA, ScaledQ, ScaledT, ScaledReconstructed,
+    ScaledIdentity: IDenseDoubleMatrix;
+  Factor, ScaledFactor: IDenseDoubleRealSchur;
+  I, J, N, ScaleIndex: SizeInt;
+  V: array[0..3] of Double;
+  NormSquared, Scale: Double;
+  HasTwoByTwoBlock: Boolean;
+begin
+  V[0] := 1.0;
+  V[1] := 2.0;
+  V[2] := 3.0;
+  V[3] := 4.0;
+  NormSquared := 0.0;
+  for I := 0 to 3 do
+    NormSquared := NormSquared + V[I] * V[I];
+  Basis := TDenseDoubleMatrix.Zeros(4, 4);
+  for I := 0 to 3 do
+    for J := 0 to 3 do
+    begin
+      if I = J then
+        Basis[I, J] := 1.0
+      else
+        Basis[I, J] := 0.0;
+      Basis[I, J] := Basis[I, J] - 2.0 * V[I] * V[J] / NormSquared;
+    end;
+  Canonical := TDenseDoubleMatrix.FromValues(4, 4,
+    [0.0, -1.0, 0.0, 0.0,
+     1.0, 0.0, 0.0, 0.0,
+     0.0, 0.0, 2.0, 0.0,
+     0.0, 0.0, 0.0, 3.0]);
+  A := Multiply(Basis, Multiply(Canonical, Transpose(Basis)));
+  Original := A.Clone;
+  Factor := FactorRealSchur(A);
+  Q := Factor.Q;
+  T := Factor.T;
+
+  AssertMatrixClose('Schur factorization leaves source unchanged',
+    Original, A, 0.0);
+  AssertTrue('nontrivial Schur iteration count is positive',
+    Factor.Iterations > 0);
+  HasTwoByTwoBlock := False;
+  for I := 1 to T.Rows - 1 do
+    if T[I, I - 1] <> 0.0 then
+    begin
+      HasTwoByTwoBlock := True;
+      AssertTrue('2x2 blocks are isolated',
+        (I = 1) or (T[I - 1, I - 2] = 0.0));
+      AssertEquals('standard complex-pair block has equal diagonals',
+        T[I - 1, I - 1], T[I, I], 2E-12);
+      AssertTrue('standard complex-pair block has negative off-diagonal product',
+        T[I, I - 1] * T[I - 1, I] < 0.0);
+    end;
+  AssertTrue('dense test matrix retains a complex-pair Schur block',
+    HasTwoByTwoBlock);
+  for I := 2 to T.Rows - 1 do
+    for J := 0 to I - 2 do
+      AssertEquals(Format('Schur structure [%d,%d]', [I, J]),
+        0.0, T[I, J], 0.0);
+
+  Reconstructed := Multiply(Q, Multiply(T, Transpose(Q)));
+  AssertMatrixClose('orthogonal Schur reconstruction', A,
+    Reconstructed, 5E-11);
+  IdentityMatrix := Multiply(Transpose(Q), Q);
+  AssertMatrixClose('Schur vectors are orthogonal',
+    TDenseDoubleMatrix.FromValues(4, 4,
+      [1.0, 0.0, 0.0, 0.0,
+       0.0, 1.0, 0.0, 0.0,
+       0.0, 0.0, 1.0, 0.0,
+       0.0, 0.0, 0.0, 1.0]), IdentityMatrix, 2E-12);
+
+  TSnapshot := Factor.T;
+  QSnapshot := Factor.Q;
+  T[0, 0] := T[0, 0] + 10.0;
+  AssertMatrixClose('Schur factor returns defensive T copy', TSnapshot,
+    Factor.T, 0.0);
+  Q[0, 0] := Q[0, 0] + 10.0;
+  AssertMatrixClose('Schur factor returns defensive Q copy', QSnapshot,
+    Factor.Q, 0.0);
+
+  for ScaleIndex := 0 to 1 do
+  begin
+    if ScaleIndex = 0 then
+      Scale := 1E-150
+    else
+      Scale := 1E150;
+    ScaledA := Original.Clone;
+    for I := 0 to ScaledA.Rows - 1 do
+      for J := 0 to ScaledA.Cols - 1 do
+        ScaledA[I, J] := Scale * ScaledA[I, J];
+    ScaledFactor := FactorRealSchur(ScaledA);
+    ScaledQ := ScaledFactor.Q;
+    ScaledT := ScaledFactor.T;
+    ScaledReconstructed := Multiply(ScaledQ,
+      Multiply(ScaledT, Transpose(ScaledQ)));
+    AssertMatrixClose('scaled Schur reconstruction', ScaledA,
+      ScaledReconstructed, Scale * 5E-11);
+    ScaledIdentity := Multiply(Transpose(ScaledQ), ScaledQ);
+    AssertMatrixClose('scaled Schur vectors remain orthogonal',
+      TDenseDoubleMatrix.FromValues(4, 4,
+        [1.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 1.0]), ScaledIdentity, 3E-12);
+    for I := 2 to ScaledT.Rows - 1 do
+      for J := 0 to I - 2 do
+        AssertEquals(Format('scaled Schur structure [%d,%d]', [I, J]),
+          0.0, ScaledT[I, J], 0.0);
+  end;
+
+  for N := 3 to 8 do
+  begin
+    ScaledA := TDenseDoubleMatrix.Zeros(N, N);
+    for I := 0 to N - 1 do
+      for J := 0 to N - 1 do
+        ScaledA[I, J] :=
+          (Double(((I + 2) * (J + 5) * 7 + I * 11 - J * 3) mod 29) -
+          14.0) / 3.0;
+    ScaledFactor := FactorRealSchur(ScaledA);
+    ScaledQ := ScaledFactor.Q;
+    ScaledT := ScaledFactor.T;
+    ScaledReconstructed := Multiply(ScaledQ,
+      Multiply(ScaledT, Transpose(ScaledQ)));
+    AssertMatrixClose(Format('varied-size Schur reconstruction n=%d', [N]),
+      ScaledA, ScaledReconstructed, 2E-10);
+    for I := 2 to N - 1 do
+      for J := 0 to I - 2 do
+        AssertEquals(Format('varied-size Schur structure n=%d [%d,%d]',
+          [N, I, J]), 0.0, ScaledT[I, J], 0.0);
+  end;
+end;
+
+procedure TDenseDecompositionTest.TestRealSchurValidationAndIterationLimit;
+var
+  A: IDenseDoubleMatrix;
+  Factor: IDenseDoubleRealSchur;
+  Failed: Boolean;
+begin
+  A := TDenseDoubleMatrix.Zeros(0, 0);
+  Factor := FactorRealSchur(A);
+  AssertEquals('empty Schur Q rows', 0, Factor.Q.Rows);
+  AssertEquals('empty Schur T columns', 0, Factor.T.Cols);
+  AssertEquals('empty factor performs no iterations', 0, Factor.Iterations);
+
+  A := TDenseDoubleMatrix.FromValues(1, 1, [7.5]);
+  Factor := FactorRealSchur(A);
+  AssertMatrixClose('singleton Schur Q',
+    TDenseDoubleMatrix.FromValues(1, 1, [1.0]), Factor.Q, 0.0);
+  AssertMatrixClose('singleton Schur T', A, Factor.T, 0.0);
+  AssertEquals('singleton factor performs no iterations', 0,
+    Factor.Iterations);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [0.0, -1.0, 1.0, 0.0]);
+  Factor := FactorRealSchur(A);
+  AssertEquals('complex pair is represented by a 2x2 block', 1.0,
+    Abs(Factor.T[1, 0]), 1E-14);
+  AssertEquals('complex pair has equal diagonal entries', Factor.T[0, 0],
+    Factor.T[1, 1], 0.0);
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [1.0, 2.0, 3.0, 4.0]);
+  Factor := FactorRealSchur(A);
+  AssertEquals('real eigenvalues split into 1x1 blocks', 0.0,
+    Factor.T[1, 0], 0.0);
+
+  Failed := False;
+  try
+    FactorRealSchur(IDenseDoubleMatrix(nil));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil Schur input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealSchur(TDenseDoubleMatrix.FromValues(2, 3,
+      [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nonsquare Schur input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealSchur(TDenseDoubleMatrix.FromValues(2, 2,
+      [1.0, NaN, 3.0, 4.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('non-finite Schur input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealSchur(TDenseDoubleMatrix.FromValues(3, 3,
+      [0.0, 0.0, 0.0,
+       1.7E308, 0.0, 0.0,
+       1.7E308, 0.0, 0.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('unrepresentable Schur reduction is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealSchur(TDenseDoubleMatrix.FromValues(3, 3,
+      [1.0, 2.0, 3.0,
+       4.0, 5.0, 6.0,
+       7.0, 8.0, 9.0]), -1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('negative iteration limit is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealSchur(TDenseDoubleMatrix.FromValues(5, 5,
+      [1.0, 2.0, 3.0, 4.0, 5.0,
+       6.0, 7.0, 8.0, 9.0, 10.0,
+       11.0, 12.0, 14.0, 15.0, 16.0,
+       17.0, 18.0, 19.0, 21.0, 22.0,
+       23.0, 24.0, 25.0, 26.0, 28.0]), 1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('iteration limit fails without returning a partial factor',
+    Failed);
+end;
+
+procedure TDenseDecompositionTest.TestRealSchurReconstructsNonsymmetricExample;
+var
+  A, Q, T, Reconstructed: IDenseDoubleMatrix;
+  Factor: IDenseDoubleRealSchur;
+  I, J: SizeInt;
+begin
+  A := TDenseDoubleMatrix.FromValues(4, 4,
+    [4.0, 1.0, -2.0, 2.0,
+     1.0, 2.0, 0.0, 1.0,
+     3.0, -1.0, 1.0, 0.0,
+     -2.0, 4.0, 1.0, 3.0]);
+  Factor := FactorRealSchur(A);
+  Q := Factor.Q;
+  T := Factor.T;
+  Reconstructed := Multiply(Q, Multiply(T, Transpose(Q)));
+  AssertMatrixClose('documented dense Schur reconstruction', A,
+    Reconstructed, 1E-10);
 end;
 
 initialization

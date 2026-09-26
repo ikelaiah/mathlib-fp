@@ -162,6 +162,14 @@
         "H[2,0] magnitude = 0.000000"
       ],
       "final_line": "Complex Hessenberg reduction: success"
+    },
+    {
+      "path": "examples/36_real_schur_factorization.pas",
+      "contains": [
+        "matrix size = 4",
+        "Schur form = upper quasi-triangular"
+      ],
+      "final_line": "Real Schur factorization: success"
     }
   ]
 }

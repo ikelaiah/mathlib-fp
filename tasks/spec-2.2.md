@@ -5,7 +5,7 @@
 Build native dense tools for nonsymmetric spectral problems in ordered,
 validated slices. The first slice reduces real and complex double-precision
 square matrices to upper Hessenberg form. These reductions are foundations
-for later Schur solvers and nonsymmetric eigenvalue workflows.
+for real Schur factorization and later nonsymmetric eigenvalue workflows.
 
 The 2.2 roadmap also identifies complex Schur methods, generalised
 `A x = λ B x` problems, and ordering, scaling, convergence, residual, and
@@ -53,6 +53,39 @@ contract and Householder similarity method; no LAPACK code is imported. See
 This follows the documented complex Hessenberg reduction contract in
 [`ZGEHRD`](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga4de4b424a4c7b0a78f7138a94ec54671.html).
 
+## Real Schur factorization contract
+
+- Unit: `AlgebraLib.DenseSpectral`.
+- Entry point: `FactorRealSchur(const A: IDenseDoubleMatrix; const
+  MaxIterations: SizeInt = 0)`; `MaxIterations=0` selects the documented
+  default of `100 * max(1, A.Rows)` Francis double-shift steps. A negative
+  limit is invalid.
+- Result interface: `IDenseDoubleRealSchur`, exposing `Size`, `Q`, `T`, and
+  `Iterations`. `Q` and `T` accessors return defensive copies.
+- Require finite square input, leave it unchanged, and raise
+  `EDenseMatrixError` for invalid input, arithmetic outside the finite range,
+  or failure to converge within the iteration limit. Do not return a partial
+  Schur factor after failure.
+- The factor satisfies `A = Q * T * Q^T`; `Q` is orthogonal. `T` is upper
+  quasi-triangular: entries below the first subdiagonal are zero, and every
+  nonzero subdiagonal entry belongs to an isolated 2x2 diagonal block.
+- A 1x1 diagonal block represents a real eigenvalue. A 2x2 diagonal block
+  represents a complex-conjugate pair and is standardized with equal diagonal
+  entries and opposite-sign off-diagonal entries. Blocks are not sorted.
+- Empty and 1x1 inputs return identity `Q` and `T=A`, with zero iterations.
+  The implementation first calls real Hessenberg reduction, then applies
+  deterministic implicit Francis double-shift QR steps while accumulating
+  Schur vectors.
+- Deflation uses a documented scale-relative floating-point threshold.
+  `Iterations` counts performed double-shift steps. Every successful result is
+  converged; exhausting the limit raises rather than exposing a partial factor.
+- Complexity target is `O(n^3)` arithmetic and `O(n^2)` storage.
+
+The matrix relation, real 1x1/2x2 block structure, standard form for complex
+pairs, and accumulated Schur vectors follow LAPACK's `DHSEQR` contract. This
+API uses a bounded iteration budget and exception-on-failure behavior for the
+native library. [`DHSEQR`](https://www.netlib.org/lapack/explore-html/d9/dc6/group__hseqr_ga62c3f96d2f67f96d6dc10334e118e451.html).
+
 ## Architecture and style
 
 - Keep nonsymmetric spectral work in `AlgebraLib.DenseSpectral`, separate
@@ -83,9 +116,8 @@ This follows the documented complex Hessenberg reduction contract in
 
 - Always retain current dense solver APIs and avoid mandatory third-party
   runtimes.
-- Public names and matrix relation for later real/complex Schur and generalized
-  eigenproblem slices require their own focused design update before APIs are
-  added.
+- Complex Schur and generalized eigenproblem slices still require their own
+  focused design update before APIs are added.
 - Do not claim this first slice solves eigenvalues or reduces a matrix pair.
 
 ## Success criteria
@@ -96,7 +128,5 @@ runnable example; it passes the focused and full supported test matrix.
 
 ## Open design points for later slices
 
-- Real Schur form uses 1x1 and 2x2 diagonal blocks; its eigenvalue ordering and
-  convergence reporting need a separate contract.
 - Complex Schur and generalized QZ reductions need explicit ordering, scaling,
   and failure semantics before implementation.

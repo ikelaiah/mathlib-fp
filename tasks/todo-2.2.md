@@ -26,9 +26,22 @@ inputs or unrepresentable reflector norms raise `EDenseMatrixError`.
 **Verify:** FPCUnit structure, similarity, unitarity, scale, immutability, and
 validation cases; full `TestRunner`; guide, example, and docs checks.
 
+## 3. Real double Schur factorization
+
+**Status:** Implemented locally; focused dense decomposition tests pass.
+Windows release qualification passed 112 gates; PR CI is pending.
+
+**Acceptance:** `FactorRealSchur` returns copied `Q` and `T` factors satisfying
+`A = Q T Q^T`, with orthogonal `Q` and standardized real Schur blocks in `T`.
+Blocks are not sorted. The bounded Francis iteration reports its step count and
+raises `EDenseMatrixError` on invalid input, overflow, or non-convergence.
+
+**Verify:** FPCUnit similarity, orthogonality, block form, scaling,
+immutability, edge cases, and iteration-limit behavior; full test runner,
+example and documentation checks, release qualification, and CI.
+
 ## Later slices
 
-- [ ] Real Schur iteration and 1x1/2x2 block contract.
 - [ ] Nonsymmetric eigenvalues and eigenvectors, ordering, residuals, and
   convergence/failure diagnostics.
 - [ ] Generalized real/complex `A x = λ B x` reduction and solve contract.
