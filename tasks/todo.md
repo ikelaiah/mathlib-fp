@@ -48,7 +48,7 @@ define pole and nonfinite behavior, and include documentation and tests.
 
 ## 5. Add elliptic integral/function slices
 
-**Status:** First Legendre K/E/F slice implemented and locally qualified.
+**Status:** First Legendre K/E/F slice implemented and locally qualified; PR #43 targets main.
 
 The first slice uses parameter `m=k^2` in `[0,1]`, complete K/E, and
 incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`. Third-kind and Jacobi
