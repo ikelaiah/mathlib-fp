@@ -11,9 +11,11 @@ unit AlgebraLib.DenseSpectral;
 interface
 
 uses
-  MathBase.Complex, AlgebraLib.DenseMatrices;
+  MathBase.SharedTypes, MathBase.Complex, AlgebraLib.DenseMatrices;
 
 type
+  TRealEigenvalueOrdering = (reoSchurOrder, reoRealPart, reoMagnitude);
+
   IDenseDoubleHessenberg = interface
     function GetSize: SizeInt;
     function GetQ: IDenseDoubleMatrix;
@@ -50,12 +52,32 @@ type
     property Iterations: SizeInt read GetIterations;
   end;
 
+  IDenseDoubleRealEigen = interface
+    function GetSize: SizeInt;
+    function GetEigenvalues: TComplexArray;
+    function GetRightEigenvectors: IDenseComplexMatrix;
+    function GetResiduals: TDoubleArray;
+    function GetIterations: SizeInt;
+    function GetConverged: Boolean;
+    property Size: SizeInt read GetSize;
+    property Eigenvalues: TComplexArray read GetEigenvalues;
+    { Normalized right eigenvectors are returned as columns. }
+    property RightEigenvectors: IDenseComplexMatrix read GetRightEigenvectors;
+    { Normalized backward residual corresponding to each eigenpair. }
+    property Residuals: TDoubleArray read GetResiduals;
+    property Iterations: SizeInt read GetIterations;
+    property Converged: Boolean read GetConverged;
+  end;
+
 function ReduceHessenberg(const A: IDenseDoubleMatrix):
   IDenseDoubleHessenberg; overload;
 function ReduceHessenberg(const A: IDenseComplexMatrix):
   IDenseComplexHessenberg; overload;
 function FactorRealSchur(const A: IDenseDoubleMatrix;
   const MaxIterations: SizeInt = 0): IDenseDoubleRealSchur;
+function FactorRealEigen(const A: IDenseDoubleMatrix;
+  const Ordering: TRealEigenvalueOrdering = reoSchurOrder;
+  const MaxIterations: SizeInt = 0): IDenseDoubleRealEigen;
 
 implementation
 
@@ -102,6 +124,26 @@ type
     function GetQ: IDenseDoubleMatrix;
     function GetT: IDenseDoubleMatrix;
     function GetIterations: SizeInt;
+  end;
+
+  TDenseDoubleRealEigen = class(TInterfacedObject, IDenseDoubleRealEigen)
+  private
+    FSize, FIterations: SizeInt;
+    FValues: TComplexArray;
+    FVectors: IDenseComplexMatrix;
+    FResiduals: TDoubleArray;
+    procedure Factor(const A: IDenseDoubleMatrix;
+      const Ordering: TRealEigenvalueOrdering;
+      const MaxIterations: SizeInt);
+  public
+    constructor Create(const A: IDenseDoubleMatrix;
+      const Ordering: TRealEigenvalueOrdering; const MaxIterations: SizeInt);
+    function GetSize: SizeInt;
+    function GetEigenvalues: TComplexArray;
+    function GetRightEigenvectors: IDenseComplexMatrix;
+    function GetResiduals: TDoubleArray;
+    function GetIterations: SizeInt;
+    function GetConverged: Boolean;
   end;
 
 procedure ValidateFiniteMatrix(const A: IDenseDoubleMatrix);
@@ -795,6 +837,383 @@ function FactorRealSchur(const A: IDenseDoubleMatrix;
   const MaxIterations: SizeInt): IDenseDoubleRealSchur;
 begin
   Result := TDenseDoubleRealSchur.Create(A, MaxIterations);
+end;
+
+function EigenOrderingKey(const Value: TComplex;
+  const Ordering: TRealEigenvalueOrdering): Double;
+var
+  Scale, Ratio: Double;
+begin
+  if Ordering = reoRealPart then
+    Exit(Value.Re);
+  if Ordering = reoMagnitude then
+  begin
+    Scale := Max(Abs(Value.Re), Abs(Value.Im));
+    if Scale = 0.0 then
+      Exit(0.0);
+    Ratio := Min(Abs(Value.Re), Abs(Value.Im)) / Scale;
+    { Log-hypot remains ordered when the true magnitude exceeds MaxDouble. }
+    Exit(Ln(Scale) + 0.5 * Ln(1.0 + Sqr(Ratio)));
+  end;
+  Result := 0.0;
+end;
+
+procedure RescaleEigenvectorTail(var Vector: TComplexArray;
+  const LastIndex: SizeInt);
+var
+  I: SizeInt;
+  Largest: Double;
+begin
+  Largest := 0.0;
+  for I := 0 to LastIndex do
+    Largest := Max(Largest, Max(Abs(Vector[I].Re), Abs(Vector[I].Im)));
+  if Largest > 1.0E100 then
+    for I := 0 to LastIndex do
+      Vector[I] := Vector[I] / Largest
+  else if (Largest > 0.0) and (Largest < 1.0E-100) then
+    for I := 0 to LastIndex do
+      Vector[I] := Vector[I] / Largest;
+end;
+
+function SolveSchurBlock(const T: IDenseDoubleMatrix;
+  const BlockStart, BlockSize, EigenBlockEnd: SizeInt;
+  const Eigenvalue: TComplex; const SchurScale: Double;
+  var Vector: TComplexArray): Boolean;
+const
+  DOUBLE_EPSILON = 2.2204460492503131E-16;
+var
+  J: SizeInt;
+  A11, A12, A21, A22, Determinant, Delta: Double;
+  RHS1, RHS2, Denominator, X1, X2: TComplex;
+begin
+  RHS1 := TComplex.Zero;
+  RHS2 := TComplex.Zero;
+  for J := BlockStart + BlockSize to EigenBlockEnd do
+  begin
+    RHS1 := RHS1 - (T[BlockStart, J] / SchurScale) * Vector[J];
+    if BlockSize = 2 then
+      RHS2 := RHS2 - (T[BlockStart + 1, J] / SchurScale) * Vector[J];
+  end;
+  Delta := 32.0 * DOUBLE_EPSILON *
+    Max(1.0, Max(Abs(Eigenvalue.Re), Abs(Eigenvalue.Im)));
+  A11 := T[BlockStart, BlockStart] / SchurScale;
+  Denominator := TComplex.Create(A11 - Eigenvalue.Re, -Eigenvalue.Im);
+  if BlockSize = 1 then
+  begin
+    if Denominator.Magnitude < Delta then
+      Denominator := Denominator + Delta;
+    Vector[BlockStart] := RHS1 / Denominator;
+    Exit(Vector[BlockStart].IsFinite);
+  end;
+
+  A12 := T[BlockStart, BlockStart + 1] / SchurScale;
+  A21 := T[BlockStart + 1, BlockStart] / SchurScale;
+  A22 := T[BlockStart + 1, BlockStart + 1] / SchurScale;
+  A11 := A11 - Eigenvalue.Re;
+  A22 := A22 - Eigenvalue.Re;
+  A11 := A11 + Delta;
+  A22 := A22 + Delta;
+  X1 := TComplex.Create(A11, -Eigenvalue.Im);
+  X2 := TComplex.Create(A22, -Eigenvalue.Im);
+  Determinant := (X1 * X2 - A12 * A21).Magnitude;
+  if Determinant < Delta * Delta then
+  begin
+    A11 := A11 + Delta;
+    A22 := A22 + Delta;
+    X1 := TComplex.Create(A11, -Eigenvalue.Im);
+    X2 := TComplex.Create(A22, -Eigenvalue.Im);
+  end;
+  Denominator := X1 * X2 - A12 * A21;
+  if Denominator.Magnitude = 0.0 then
+    Exit(False);
+  X1 := (RHS1 * X2 - A12 * RHS2) / Denominator;
+  { Cramer's rule for the second component. }
+  X2 := (TComplex.Create(A11, -Eigenvalue.Im) * RHS2 -
+    A21 * RHS1) / Denominator;
+  Vector[BlockStart] := X1;
+  Vector[BlockStart + 1] := X2;
+  Result := X1.IsFinite and X2.IsFinite;
+end;
+
+function BuildSchurEigenvector(const T, Q: IDenseDoubleMatrix;
+  const BlockStart, BlockSize: SizeInt; const Eigenvalue: TComplex;
+  const SchurScale: Double): TComplexArray;
+var
+  I, J, Row, BlockSizeHere, EigenBlockEnd: SizeInt;
+  BlockScale, ImaginaryPart, VectorNorm: Double;
+  SchurVector: TComplexArray;
+begin
+  SetLength(SchurVector, T.Rows);
+  EigenBlockEnd := BlockStart + BlockSize - 1;
+  if BlockSize = 1 then
+    SchurVector[BlockStart] := TComplex.One
+  else
+  begin
+    BlockScale := Max(Abs(T[BlockStart, BlockStart + 1]),
+      Abs(T[BlockStart + 1, BlockStart]));
+    if BlockScale = 0.0 then
+      raise EDenseMatrixError.Create(
+        'FactorRealEigen: invalid zero off-diagonal in a complex Schur block.');
+    ImaginaryPart := BlockScale * Sqrt(
+      (Abs(T[BlockStart, BlockStart + 1]) / BlockScale) *
+      (Abs(T[BlockStart + 1, BlockStart]) / BlockScale));
+    if IsNan(ImaginaryPart) or IsInfinite(ImaginaryPart) then
+      raise EDenseMatrixError.Create(
+        'FactorRealEigen: complex eigenvalue exceeds the finite range.');
+    SchurVector[BlockStart] := TComplex.Create(
+      T[BlockStart, BlockStart + 1] / BlockScale, 0.0);
+    SchurVector[BlockStart + 1] := TComplex.Create(0.0,
+      ImaginaryPart / BlockScale);
+  end;
+
+  Row := BlockStart - 1;
+  while Row >= 0 do
+  begin
+    if (Row > 0) and (T[Row, Row - 1] <> 0.0) then
+    begin
+      BlockSizeHere := 2;
+      Dec(Row);
+    end
+    else
+      BlockSizeHere := 1;
+    if not SolveSchurBlock(T, Row, BlockSizeHere, EigenBlockEnd,
+      TComplex.Create(Eigenvalue.Re / SchurScale,
+        Eigenvalue.Im / SchurScale), SchurScale, SchurVector) then
+      raise EDenseMatrixError.Create(
+        'FactorRealEigen: failed during Schur back substitution.');
+    RescaleEigenvectorTail(SchurVector, EigenBlockEnd);
+    Dec(Row);
+  end;
+
+  Result := nil;
+  SetLength(Result, T.Rows);
+  for I := 0 to T.Rows - 1 do
+  begin
+    Result[I] := TComplex.Zero;
+    for J := 0 to T.Rows - 1 do
+      Result[I] := Result[I] + Q[I, J] * SchurVector[J];
+  end;
+  VectorNorm := ScaledComplexNorm(Result);
+  if (VectorNorm = 0.0) or IsNan(VectorNorm) or IsInfinite(VectorNorm) then
+    raise EDenseMatrixError.Create(
+      'FactorRealEigen: could not normalize a computed eigenvector.');
+  for I := 0 to High(Result) do
+  begin
+    Result[I] := Result[I] / VectorNorm;
+    if not Result[I].IsFinite then
+      raise EDenseMatrixError.Create(
+        'FactorRealEigen: eigenvector contains a non-finite value.');
+  end;
+end;
+
+function ComputeEigenResidual(const A: IDenseDoubleMatrix;
+  const Eigenvalue: TComplex; const Vector: IDenseComplexMatrix;
+  const Column: SizeInt; const MatrixScale, MatrixNorm: Double): Double;
+var
+  I, J: SizeInt;
+  ProductValue, ResidualValue, ScaledLambda: TComplex;
+  Values: TComplexArray;
+  Denominator: Double;
+begin
+  if MatrixScale = 0.0 then
+    Exit(0.0);
+  ScaledLambda := TComplex.Create(Eigenvalue.Re / MatrixScale,
+    Eigenvalue.Im / MatrixScale);
+  SetLength(Values, A.Rows);
+  for I := 0 to A.Rows - 1 do
+  begin
+    ProductValue := TComplex.Zero;
+    for J := 0 to A.Cols - 1 do
+      ProductValue := ProductValue + (A[I, J] / MatrixScale) * Vector[J, Column];
+    ResidualValue := ProductValue - ScaledLambda * Vector[I, Column];
+    Values[I] := ResidualValue;
+  end;
+  Denominator := MatrixNorm + ScaledLambda.Magnitude;
+  if Denominator = 0.0 then
+    Exit(0.0);
+  Result := ScaledComplexNorm(Values) / Denominator;
+  if IsNan(Result) or IsInfinite(Result) then
+    raise EDenseMatrixError.Create(
+      'FactorRealEigen: eigenpair residual is non-finite.');
+end;
+
+constructor TDenseDoubleRealEigen.Create(const A: IDenseDoubleMatrix;
+  const Ordering: TRealEigenvalueOrdering; const MaxIterations: SizeInt);
+begin
+  inherited Create;
+  Factor(A, Ordering, MaxIterations);
+end;
+
+procedure TDenseDoubleRealEigen.Factor(const A: IDenseDoubleMatrix;
+  const Ordering: TRealEigenvalueOrdering; const MaxIterations: SizeInt);
+var
+  Schur: IDenseDoubleRealSchur;
+  T, Q: IDenseDoubleMatrix;
+  I, J, K, BlockStart, BlockSize, Column: SizeInt;
+  MatrixScale, SchurScale, MatrixNorm, BlockScale, ImaginaryPart: Double;
+  TempValue: TComplex;
+  TempResidual: Double;
+  TempColumn: array of TComplex;
+  ResidualValues: TComplexArray;
+  Eigenvector: TComplexArray;
+begin
+  ValidateFiniteMatrix(A);
+  if not (Ordering in [reoSchurOrder, reoRealPart, reoMagnitude]) then
+    raise EDenseMatrixError.Create(
+      'FactorRealEigen: unsupported eigenvalue ordering.');
+  Schur := FactorRealSchur(A, MaxIterations);
+  FSize := Schur.Size;
+  FIterations := Schur.Iterations;
+  T := Schur.T;
+  Q := Schur.Q;
+  SchurScale := 0.0;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      SchurScale := Max(SchurScale, Abs(T[I, J]));
+  if SchurScale = 0.0 then
+    SchurScale := 1.0;
+  SetLength(FValues, FSize);
+  SetLength(FResiduals, FSize);
+  FVectors := TDenseComplexMatrix.Zeros(FSize, FSize);
+
+  BlockStart := 0;
+  Column := 0;
+  while BlockStart < FSize do
+  begin
+    if (BlockStart + 1 < FSize) and (T[BlockStart + 1, BlockStart] <> 0.0) then
+      BlockSize := 2
+    else
+      BlockSize := 1;
+    if BlockSize = 1 then
+      FValues[Column] := TComplex.Create(T[BlockStart, BlockStart], 0.0)
+    else
+    begin
+      BlockScale := Max(Max(Abs(T[BlockStart, BlockStart]),
+        Abs(T[BlockStart, BlockStart + 1])),
+        Max(Abs(T[BlockStart + 1, BlockStart]),
+          Abs(T[BlockStart + 1, BlockStart + 1])));
+      if BlockScale = 0.0 then
+        raise EDenseMatrixError.Create(
+          'FactorRealEigen: invalid zero complex Schur block.');
+      ImaginaryPart := BlockScale * Sqrt(
+        (Abs(T[BlockStart, BlockStart + 1]) / BlockScale) *
+        (Abs(T[BlockStart + 1, BlockStart]) / BlockScale));
+      if IsNan(ImaginaryPart) or IsInfinite(ImaginaryPart) then
+        raise EDenseMatrixError.Create(
+          'FactorRealEigen: eigenvalue exceeds the finite range.');
+      FValues[Column] := TComplex.Create(T[BlockStart, BlockStart],
+        ImaginaryPart);
+      FValues[Column + 1] := FValues[Column].Conjugate;
+    end;
+    Eigenvector := BuildSchurEigenvector(T, Q, BlockStart, BlockSize,
+      FValues[Column], SchurScale);
+    for I := 0 to FSize - 1 do
+    begin
+      FVectors[I, Column] := Eigenvector[I];
+      if BlockSize = 2 then
+        FVectors[I, Column + 1] := Eigenvector[I].Conjugate;
+    end;
+    Inc(Column, BlockSize);
+    Inc(BlockStart, BlockSize);
+  end;
+
+  MatrixScale := 0.0;
+  for I := 0 to FSize - 1 do
+    for J := 0 to FSize - 1 do
+      MatrixScale := Max(MatrixScale, Abs(A[I, J]));
+  MatrixNorm := 0.0;
+  if MatrixScale > 0.0 then
+  begin
+    SetLength(ResidualValues, FSize * FSize);
+    K := 0;
+    for I := 0 to FSize - 1 do
+      for J := 0 to FSize - 1 do
+      begin
+        ResidualValues[K] := TComplex.Create(A[I, J] / MatrixScale, 0.0);
+        Inc(K);
+      end;
+    MatrixNorm := ScaledComplexNorm(ResidualValues);
+  end;
+  for J := 0 to FSize - 1 do
+    FResiduals[J] := ComputeEigenResidual(A, FValues[J], FVectors, J,
+      MatrixScale, MatrixNorm);
+
+  if Ordering <> reoSchurOrder then
+    for I := 1 to FSize - 1 do
+    begin
+      TempValue := FValues[I];
+      TempResidual := FResiduals[I];
+      SetLength(TempColumn, FSize);
+      for K := 0 to FSize - 1 do
+        TempColumn[K] := FVectors[K, I];
+      J := I;
+      while (J > 0) and
+        (EigenOrderingKey(TempValue, Ordering) <
+        EigenOrderingKey(FValues[J - 1], Ordering)) do
+      begin
+        FValues[J] := FValues[J - 1];
+        FResiduals[J] := FResiduals[J - 1];
+        for K := 0 to FSize - 1 do
+          FVectors[K, J] := FVectors[K, J - 1];
+        Dec(J);
+      end;
+      FValues[J] := TempValue;
+      FResiduals[J] := TempResidual;
+      for K := 0 to FSize - 1 do
+        FVectors[K, J] := TempColumn[K];
+    end;
+
+  for I := 0 to FSize - 1 do
+    if not FValues[I].IsFinite or IsNan(FResiduals[I]) or
+      IsInfinite(FResiduals[I]) then
+      raise EDenseMatrixError.CreateFmt(
+        'FactorRealEigen: non-finite result at eigenpair %d.', [I]);
+end;
+
+function TDenseDoubleRealEigen.GetSize: SizeInt;
+begin
+  Result := FSize;
+end;
+
+function TDenseDoubleRealEigen.GetEigenvalues: TComplexArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FValues));
+  for I := 0 to High(FValues) do
+    Result[I] := FValues[I];
+end;
+
+function TDenseDoubleRealEigen.GetRightEigenvectors: IDenseComplexMatrix;
+begin
+  Result := FVectors.Clone;
+end;
+
+function TDenseDoubleRealEigen.GetResiduals: TDoubleArray;
+var
+  I: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, Length(FResiduals));
+  for I := 0 to High(FResiduals) do
+    Result[I] := FResiduals[I];
+end;
+
+function TDenseDoubleRealEigen.GetIterations: SizeInt;
+begin
+  Result := FIterations;
+end;
+
+function TDenseDoubleRealEigen.GetConverged: Boolean;
+begin
+  Result := True;
+end;
+function FactorRealEigen(const A: IDenseDoubleMatrix;
+  const Ordering: TRealEigenvalueOrdering;
+  const MaxIterations: SizeInt): IDenseDoubleRealEigen;
+begin
+  Result := TDenseDoubleRealEigen.Create(A, Ordering, MaxIterations);
 end;
 
 end.

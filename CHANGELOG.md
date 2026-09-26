@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added bounded real Jacobi elliptic sn/cn/dn functions with parameter and
   endpoint conventions, Carlson-integral inversion, independent references,
   tests, documentation, and a runnable example.
+- Added the 2.2 real-double nonsymmetric eigenvalue and right-eigenvector
+  factorization with stable real-part/magnitude ordering, normalized residuals,
+  and bounded Schur convergence diagnostics.
 
 ## [2.0.0] - 2026-09-21
 

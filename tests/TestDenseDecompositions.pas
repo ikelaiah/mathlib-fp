@@ -37,6 +37,10 @@ type
     procedure TestRealSchurFactorizationAndBlockStructure;
     procedure TestRealSchurValidationAndIterationLimit;
     procedure TestRealSchurReconstructsNonsymmetricExample;
+    procedure TestRealNonsymmetricEigenPairsAndOrdering;
+    procedure TestRealNonsymmetricEigenValidationAndImmutability;
+    procedure TestRealNonsymmetricEigenEmptySingletonAndIterationLimit;
+    procedure TestRealNonsymmetricEigenScalesAndRepeatedValues;
   end;
 
 implementation
@@ -996,7 +1000,6 @@ procedure TDenseDecompositionTest.TestRealSchurReconstructsNonsymmetricExample;
 var
   A, Q, T, Reconstructed: IDenseDoubleMatrix;
   Factor: IDenseDoubleRealSchur;
-  I, J: SizeInt;
 begin
   A := TDenseDoubleMatrix.FromValues(4, 4,
     [4.0, 1.0, -2.0, 2.0,
@@ -1009,6 +1012,261 @@ begin
   Reconstructed := Multiply(Q, Multiply(T, Transpose(Q)));
   AssertMatrixClose('documented dense Schur reconstruction', A,
     Reconstructed, 1E-10);
+end;
+
+procedure TDenseDecompositionTest.TestRealNonsymmetricEigenPairsAndOrdering;
+var
+  A, Basis, Canonical: IDenseDoubleMatrix;
+  Factor: IDenseDoubleRealEigen;
+  Values: TComplexArray;
+  Vectors: IDenseComplexMatrix;
+  I, J, K: SizeInt;
+  NormSquared, ResidualNorm, MatrixNorm: Double;
+  ProductValue, ResidualValue: TComplex;
+begin
+  A := TDenseDoubleMatrix.FromValues(4, 4,
+    [1.0, 1.0, 0.0, 0.0,
+     0.0, 2.0, 0.0, 0.0,
+     0.0, 0.0, 0.0, -1.0,
+     0.0, 0.0, 1.0, 0.0]);
+
+  Factor := FactorRealEigen(A, reoRealPart);
+  AssertEquals('all eigenvalues returned', 4, Length(Factor.Eigenvalues));
+  AssertTrue('successful eigensystem reports convergence', Factor.Converged);
+  Values := Factor.Eigenvalues;
+  AssertEquals('real-part order starts with positive imaginary pair', 0.0,
+    Values[0].Re, 1E-12);
+  AssertTrue('positive imaginary member comes first', Values[0].Im > 0.0);
+  AssertEquals('conjugate pair remains adjacent', -Values[0].Im,
+    Values[1].Im, 1E-12);
+  AssertEquals('real eigenvalues follow by increasing real part', 1.0,
+    Values[2].Re, 1E-12);
+  AssertEquals('largest real eigenvalue last', 2.0, Values[3].Re, 1E-12);
+
+  Vectors := Factor.RightEigenvectors;
+  AssertEquals('eigenvector rows match matrix size', 4, Vectors.Rows);
+  AssertEquals('one eigenvector per eigenvalue', 4, Vectors.Cols);
+  MatrixNorm := Sqrt(8.0);
+  for J := 0 to 3 do
+  begin
+    NormSquared := 0.0;
+    for I := 0 to 3 do
+      NormSquared := NormSquared + Vectors[I, J].SqrMagnitude;
+    AssertEquals('right eigenvector has unit 2-norm', 1.0,
+      Sqrt(NormSquared), 2E-12);
+    ResidualNorm := 0.0;
+    for I := 0 to 3 do
+    begin
+      ProductValue := TComplex.Zero;
+      for K := 0 to 3 do
+        ProductValue := ProductValue + A[I, K] * Vectors[K, J];
+      ResidualValue := ProductValue - Values[J] * Vectors[I, J];
+      ResidualNorm := ResidualNorm + ResidualValue.SqrMagnitude;
+    end;
+    ResidualNorm := Sqrt(ResidualNorm) /
+      (MatrixNorm + Values[J].Magnitude);
+    AssertTrue('normalized backward residual is small',
+      Factor.Residuals[J] < 1E-12);
+    AssertEquals('reported residual matches eigenpair equation', ResidualNorm,
+      Factor.Residuals[J], 2E-15);
+  end;
+
+  Basis := TDenseDoubleMatrix.Zeros(4, 4);
+  for I := 0 to 3 do
+    for J := 0 to 3 do
+    begin
+      if I = J then
+        Basis[I, J] := 1.0;
+      Basis[I, J] := Basis[I, J] -
+        2.0 * (I + 1) * (J + 1) / 30.0;
+    end;
+  Canonical := TDenseDoubleMatrix.FromValues(4, 4,
+    [0.0, -1.0, 0.0, 0.0,
+     1.0, 0.0, 0.0, 0.0,
+     0.0, 0.0, 2.0, 0.0,
+     0.0, 0.0, 0.0, 3.0]);
+  A := Multiply(Basis, Multiply(Canonical, Transpose(Basis)));
+  Factor := FactorRealEigen(A, reoMagnitude);
+  for J := 0 to 3 do
+    AssertTrue('back-transformed nonsymmetric eigenvector residual is small',
+      Factor.Residuals[J] < 2E-10);
+
+  A := TDenseDoubleMatrix.FromValues(4, 4,
+    [2.0, 0.0, 0.0, 0.0,
+     0.0, 1.0, 0.0, 0.0,
+     0.0, 0.0, 1.0, 0.0,
+     0.0, 0.0, 0.0, 3.0]);
+  Factor := FactorRealEigen(A, reoRealPart);
+  Vectors := Factor.RightEigenvectors;
+  AssertEquals('stable order preserves first repeated eigenvector', 1.0,
+    Vectors[1, 0].Re, 1E-14);
+  AssertEquals('stable order preserves second repeated eigenvector', 1.0,
+    Vectors[2, 1].Re, 1E-14);
+
+  Factor := FactorRealEigen(A, reoMagnitude);
+  Values := Factor.Eigenvalues;
+  AssertEquals('magnitude order starts with unit eigenvalue', 1.0,
+    Values[0].Magnitude, 1E-12);
+  AssertEquals('repeated unit eigenvalue remains stable', 1.0,
+    Values[1].Magnitude, 1E-12);
+  AssertEquals('next eigenvalue follows', 2.0, Values[2].Magnitude, 1E-12);
+  AssertEquals('largest magnitude is last', 3.0, Values[3].Magnitude, 1E-12);
+
+  A := TDenseDoubleMatrix.FromValues(4, 4,
+    [1.0, 1.0, 0.0, 0.0,
+     0.0, 2.0, 0.0, 0.0,
+     0.0, 0.0, 0.0, -1.0,
+     0.0, 0.0, 1.0, 0.0]);
+  Factor := FactorRealEigen(A, reoMagnitude);
+  Values := Factor.Eigenvalues;
+  AssertEquals('magnitude ordering includes the unit real root', 1.0,
+    Values[0].Magnitude, 1E-12);
+  AssertEquals('conjugate pair follows at unit magnitude', 1.0,
+    Values[1].Magnitude, 1E-12);
+  AssertEquals('conjugate pair stays adjacent in magnitude order',
+    -Values[1].Im, Values[2].Im, 1E-12);
+  AssertEquals('largest magnitude is last', 2.0, Values[3].Magnitude, 1E-12);
+end;
+
+procedure TDenseDecompositionTest.TestRealNonsymmetricEigenValidationAndImmutability;
+var
+  A, Original: IDenseDoubleMatrix;
+  Factor: IDenseDoubleRealEigen;
+  Values, SavedValues: TComplexArray;
+  Residuals, SavedResiduals: TDoubleArray;
+  Vectors, SavedVectors: IDenseComplexMatrix;
+  Failed: Boolean;
+begin
+  A := TDenseDoubleMatrix.FromValues(3, 3,
+    [3.0, 1.0, 2.0,
+     0.0, 4.0, 1.0,
+     0.0, 0.0, -2.0]);
+  Original := A.Clone;
+  Factor := FactorRealEigen(A);
+  AssertMatrixClose('eigen factor leaves source unchanged', Original, A, 0.0);
+
+  Values := Factor.Eigenvalues;
+  SavedValues := Factor.Eigenvalues;
+  Values[0] := TComplex.Create(999.0, 999.0);
+  AssertEquals('eigenvalue array accessor returns defensive copy',
+    SavedValues[0].Re, Factor.Eigenvalues[0].Re, 0.0);
+  Vectors := Factor.RightEigenvectors;
+  SavedVectors := Factor.RightEigenvectors;
+  Vectors[0, 0] := TComplex.Create(999.0, 999.0);
+  AssertComplexMatrixClose('eigenvector accessor returns defensive copy',
+    SavedVectors, Factor.RightEigenvectors, 0.0);
+  Residuals := Factor.Residuals;
+  SavedResiduals := Factor.Residuals;
+  Residuals[0] := 999.0;
+  AssertEquals('residual accessor returns defensive copy', SavedResiduals[0],
+    Factor.Residuals[0], 0.0);
+
+  Failed := False;
+  try
+    FactorRealEigen(IDenseDoubleMatrix(nil));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil eigen input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealEigen(TDenseDoubleMatrix.FromValues(2, 3,
+      [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nonsquare eigen input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorRealEigen(TDenseDoubleMatrix.FromValues(2, 2,
+      [1.0, NaN, 3.0, 4.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('non-finite eigen input is rejected', Failed);
+end;
+
+procedure TDenseDecompositionTest.TestRealNonsymmetricEigenEmptySingletonAndIterationLimit;
+var
+  A: IDenseDoubleMatrix;
+  Factor: IDenseDoubleRealEigen;
+  Failed: Boolean;
+begin
+  Factor := FactorRealEigen(TDenseDoubleMatrix.Zeros(0, 0));
+  AssertEquals('empty eigensystem size', 0, Factor.Size);
+  AssertEquals('empty eigenvalue list', 0, Length(Factor.Eigenvalues));
+  AssertEquals('empty eigenvector matrix rows', 0,
+    Factor.RightEigenvectors.Rows);
+  AssertTrue('empty eigensystem is converged', Factor.Converged);
+
+  A := TDenseDoubleMatrix.FromValues(1, 1, [-2.5]);
+  Factor := FactorRealEigen(A);
+  AssertEquals('singleton eigenvalue', -2.5, Factor.Eigenvalues[0].Re, 0.0);
+  AssertEquals('singleton eigenvalue is real', 0.0,
+    Factor.Eigenvalues[0].Im, 0.0);
+  AssertEquals('singleton normalized eigenvector', 1.0,
+    Factor.RightEigenvectors[0, 0].Re, 0.0);
+  AssertEquals('singleton residual', 0.0, Factor.Residuals[0], 0.0);
+  AssertEquals('singleton needs no Schur steps', 0, Factor.Iterations);
+
+  A := TDenseDoubleMatrix.FromValues(5, 5,
+    [1.0, 2.0, 3.0, 4.0, 5.0,
+     6.0, 7.0, 8.0, 9.0, 10.0,
+     11.0, 12.0, 14.0, 15.0, 16.0,
+     17.0, 18.0, 19.0, 21.0, 22.0,
+     23.0, 24.0, 25.0, 26.0, 28.0]);
+  Failed := False;
+  try
+    FactorRealEigen(A, reoSchurOrder, 1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('Schur iteration limit rejects partial eigensystem', Failed);
+end;
+
+procedure TDenseDecompositionTest.TestRealNonsymmetricEigenScalesAndRepeatedValues;
+var
+  A, ScaledA: IDenseDoubleMatrix;
+  Factor: IDenseDoubleRealEigen;
+  Scale: Double;
+  ScaleIndex, I, J: SizeInt;
+begin
+  A := TDenseDoubleMatrix.FromValues(4, 4,
+    [1.0, 1.0, 0.0, 0.0,
+     0.0, 2.0, 0.0, 0.0,
+     0.0, 0.0, 0.0, -1.0,
+     0.0, 0.0, 1.0, 0.0]);
+  for ScaleIndex := 0 to 1 do
+  begin
+    if ScaleIndex = 0 then
+      Scale := 1E-150
+    else
+      Scale := 1E150;
+    ScaledA := A.Clone;
+    for I := 0 to ScaledA.Rows - 1 do
+      for J := 0 to ScaledA.Cols - 1 do
+        ScaledA[I, J] := Scale * ScaledA[I, J];
+    Factor := FactorRealEigen(ScaledA, reoRealPart);
+    AssertEquals('scaled complex eigenvalue real part', 0.0,
+      Factor.Eigenvalues[0].Re, Scale * 1E-12);
+    AssertEquals('scaled complex eigenvalue imaginary part', Scale,
+      Factor.Eigenvalues[0].Im, Scale * 1E-12);
+    AssertTrue('scaled eigenpair residual remains small',
+      Factor.Residuals[0] < 1E-12);
+  end;
+
+  A := TDenseDoubleMatrix.FromValues(2, 2,
+    [1.0, 1.0,
+     0.0, 1.0]);
+  Factor := FactorRealEigen(A);
+  AssertEquals('repeated Jordan eigenvalue one', 1.0,
+    Factor.Eigenvalues[0].Re, 1E-14);
+  AssertEquals('repeated Jordan eigenvalue two', 1.0,
+    Factor.Eigenvalues[1].Re, 1E-14);
+  AssertTrue('regularized repeated eigenpair residuals remain small',
+    (Factor.Residuals[0] < 1E-12) and (Factor.Residuals[1] < 1E-12));
 end;
 
 initialization
