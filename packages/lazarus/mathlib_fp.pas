@@ -25,6 +25,7 @@ uses
   AlgebraLib.DenseKernels,
   AlgebraLib.DenseSolvers,
   AlgebraLib.DenseDecompositions,
+  AlgebraLib.DenseSpectral,
   AlgebraLib.SparseMatrices,
   AlgebraLib.LinearOperators,
   AlgebraLib.IterativeSolvers,

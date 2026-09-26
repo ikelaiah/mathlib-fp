@@ -35,7 +35,10 @@ def layout_path(name: str, legacy: str) -> Path:
 
 NEXT_RELEASE = "2.1"
 PUBLISHED_STABLE = "2.0.0"
-UNRELEASED_SOURCE_UNITS = {"src/MathBase.SpecialFunctions.pas"}
+UNRELEASED_SOURCE_UNITS = {
+    "src/AlgebraLib.DenseSpectral.pas",
+    "src/MathBase.SpecialFunctions.pas",
+}
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
 CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")

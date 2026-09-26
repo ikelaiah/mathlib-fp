@@ -8,7 +8,8 @@ uses
   Classes, SysUtils, Math, fpcunit, testregistry,
   MathBase.SharedTypes, MathBase.Complex,
   AlgebraLib.DenseMatrices, AlgebraLib.DenseKernels,
-  AlgebraLib.DenseDecompositions, AlgebraLib.DenseSolvers;
+  AlgebraLib.DenseDecompositions, AlgebraLib.DenseSolvers,
+  AlgebraLib.DenseSpectral;
 
 type
   TDenseDecompositionTest = class(TTestCase)
@@ -28,6 +29,9 @@ type
     procedure TestSinglePrecisionParity;
     procedure TestSquareAndPositiveDefiniteDiagnostics;
     procedure TestValidationAndImmutableFactors;
+    procedure TestHessenbergReductionAndImmutableFactor;
+    procedure TestHessenbergReductionValidationAndSmallMatrices;
+    procedure TestHessenbergReductionScaleRange;
   end;
 
 implementation
@@ -439,6 +443,157 @@ begin
     on EDenseMatrixError do Failed := True;
   end;
   AssertTrue('non-finite SVD input is rejected', Failed);
+end;
+
+procedure TDenseDecompositionTest.TestHessenbergReductionAndImmutableFactor;
+var
+  A, Original, Q, H, Reconstructed, IdentityMatrix, HSnapshot, QSnapshot:
+    IDenseDoubleMatrix;
+  Factor: IDenseDoubleHessenberg;
+  I, J: SizeInt;
+begin
+  A := TDenseDoubleMatrix.FromValues(4, 4,
+    [4.0, 1.0, -2.0, 2.0,
+     1.0, 2.0, 0.0, 1.0,
+     3.0, -1.0, 1.0, 0.0,
+     -2.0, 4.0, 1.0, 3.0]);
+  Original := A.Clone;
+  Factor := ReduceHessenberg(A);
+  Q := Factor.Q;
+  H := Factor.H;
+
+  AssertMatrixClose('reduction leaves its source unchanged', Original, A, 0.0);
+  for I := 2 to H.Rows - 1 do
+    for J := 0 to I - 2 do
+      AssertEquals(Format('Hessenberg structure [%d,%d]', [I, J]),
+        0.0, H[I, J], 0.0);
+  Reconstructed := Multiply(Transpose(Q), Multiply(A, Q));
+  AssertMatrixClose('orthogonal similarity reconstruction', H,
+    Reconstructed, 2E-12);
+  IdentityMatrix := Multiply(Transpose(Q), Q);
+  AssertMatrixClose('orthogonal factor',
+    TDenseDoubleMatrix.FromValues(4, 4,
+      [1.0, 0.0, 0.0, 0.0,
+       0.0, 1.0, 0.0, 0.0,
+       0.0, 0.0, 1.0, 0.0,
+       0.0, 0.0, 0.0, 1.0]), IdentityMatrix, 2E-13);
+
+  HSnapshot := Factor.H;
+  QSnapshot := Factor.Q;
+  H[0, 0] := H[0, 0] + 10.0;
+  AssertMatrixClose('factor returns a defensive H copy', HSnapshot,
+    Factor.H, 0.0);
+  Q[0, 0] := Q[0, 0] + 10.0;
+  AssertMatrixClose('factor returns a defensive Q copy', QSnapshot,
+    Factor.Q, 0.0);
+  A[0, 0] := -99.0;
+  AssertMatrixClose('factor keeps a source snapshot', HSnapshot,
+    Factor.H, 0.0);
+end;
+
+procedure TDenseDecompositionTest.TestHessenbergReductionValidationAndSmallMatrices;
+var
+  A: IDenseDoubleMatrix;
+  Factor: IDenseDoubleHessenberg;
+  Failed: Boolean;
+begin
+  A := TDenseDoubleMatrix.Zeros(0, 0);
+  Factor := ReduceHessenberg(A);
+  AssertEquals('empty Q rows', 0, Factor.Q.Rows);
+  AssertEquals('empty H columns', 0, Factor.H.Cols);
+
+  A := TDenseDoubleMatrix.FromValues(1, 1, [7.5]);
+  Factor := ReduceHessenberg(A);
+  AssertMatrixClose('one by one Q',
+    TDenseDoubleMatrix.FromValues(1, 1, [1.0]), Factor.Q, 0.0);
+  AssertMatrixClose('one by one H', A, Factor.H, 0.0);
+
+  A := TDenseDoubleMatrix.FromValues(3, 3,
+    [1.0, 2.0, 3.0,
+     4.0, 5.0, 6.0,
+     0.0, 7.0, 8.0]);
+  Factor := ReduceHessenberg(A);
+  AssertMatrixClose('already-Hessenberg Q',
+    TDenseDoubleMatrix.FromValues(3, 3,
+      [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]),
+    Factor.Q, 0.0);
+  AssertMatrixClose('already-Hessenberg H', A, Factor.H, 0.0);
+
+  Failed := False;
+  try
+    ReduceHessenberg(nil);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil input is rejected', Failed);
+
+  Failed := False;
+  try
+    ReduceHessenberg(TDenseDoubleMatrix.FromValues(2, 3,
+      [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nonsquare input is rejected', Failed);
+
+  Failed := False;
+  try
+    ReduceHessenberg(TDenseDoubleMatrix.FromValues(2, 2,
+      [1.0, NaN, 3.0, 4.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('non-finite input is rejected', Failed);
+
+  Failed := False;
+  try
+    ReduceHessenberg(TDenseDoubleMatrix.FromValues(3, 3,
+      [0.0, 0.0, 0.0,
+       1.7E308, 0.0, 0.0,
+       1.7E308, 0.0, 0.0]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('unrepresentable reflector norm is rejected', Failed);
+end;
+
+procedure TDenseDecompositionTest.TestHessenbergReductionScaleRange;
+var
+  A, ScaledA, Q, H, ScaledQ, ScaledH: IDenseDoubleMatrix;
+  Factor, ScaledFactor: IDenseDoubleHessenberg;
+  Scale: Double;
+  ScaleIndex, I, J: SizeInt;
+begin
+  A := TDenseDoubleMatrix.FromValues(3, 3,
+    [1.0, 2.0, 3.0,
+     4.0, 5.0, 6.0,
+     7.0, 8.0, 10.0]);
+  Factor := ReduceHessenberg(A);
+  Q := Factor.Q;
+  H := Factor.H;
+
+  for ScaleIndex := 0 to 1 do
+  begin
+    if ScaleIndex = 0 then
+      Scale := 1E-200
+    else
+      Scale := 1E200;
+    ScaledA := A.Clone;
+    for I := 0 to A.Rows - 1 do
+      for J := 0 to A.Cols - 1 do
+        ScaledA[I, J] := Scale * ScaledA[I, J];
+    ScaledFactor := ReduceHessenberg(ScaledA);
+    ScaledQ := ScaledFactor.Q;
+    ScaledH := ScaledFactor.H;
+    for I := 0 to A.Rows - 1 do
+      for J := 0 to A.Cols - 1 do
+      begin
+        AssertEquals(Format('scale-independent Q [%d,%d]', [I, J]),
+          Q[I, J], ScaledQ[I, J], 3E-13);
+        AssertEquals(Format('scale-aware H [%d,%d]', [I, J]),
+          H[I, J], ScaledH[I, J] / Scale, 3E-12);
+      end;
+  end;
 end;
 
 initialization

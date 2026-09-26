@@ -46,6 +46,7 @@ closest to your project. For a shorter task-first route, use the
 | `31_gauss_hypergeometric.pas` | MathBase | Real bounded Gauss 2F1 series, a terminating polynomial, and the supported argument interval |
 | `32_jacobi_elliptic_functions.pas` | MathBase | Real Jacobi sn/cn/dn with parameter and endpoint conventions, plus the defining identities |
 | `33_elliptic_third_kind.pas` | MathBase | Bounded real complete and incomplete Legendre third-kind integrals |
+| `34_hessenberg_reduction.pas` | AlgebraLib | Reduce a real dense matrix to upper Hessenberg form |
 
 ## Build and run
 
