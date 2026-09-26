@@ -374,6 +374,7 @@ const
   EulerGamma = 0.57721566490153286061;
   TwoOverPi = 0.63661977236758134308;
   MaxBesselArgument = 100.0;
+  HalfPiValue: Double = 1.57079632679489661923;
 
 function ChebyshevValue(const X, Center, HalfWidth: Double;
   const Coefficients: array of Double): Double;
@@ -811,7 +812,7 @@ var
   S, C, C2, Y: Double;
 begin
   if IsNan(Phi) or IsInfinite(Phi) or IsNan(M) or IsInfinite(M) or
-    (M < 0.0) or (M > 1.0) or (Abs(Phi) > Pi / 2.0) then
+    (M < 0.0) or (M > 1.0) or (Abs(Phi) > HalfPiValue) then
     Exit(NaN);
   if Phi = 0.0 then
     Exit(Phi);
@@ -819,7 +820,7 @@ begin
     Exit(Phi);
   if M = 1.0 then
   begin
-    if Abs(Phi) = Pi / 2.0 then
+    if Abs(Phi) = HalfPiValue then
     begin
       if Phi < 0.0 then
         Exit(-Infinity)
@@ -843,7 +844,7 @@ var
   S, C, C2, Y, RFValue, RDValue: Double;
 begin
   if IsNan(Phi) or IsInfinite(Phi) or IsNan(M) or IsInfinite(M) or
-    (M < 0.0) or (M > 1.0) or (Abs(Phi) > Pi / 2.0) then
+    (M < 0.0) or (M > 1.0) or (Abs(Phi) > HalfPiValue) then
     Exit(NaN);
   S := Sin(Phi);
   if M = 0.0 then
