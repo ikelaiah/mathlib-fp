@@ -1,9 +1,11 @@
 # Spec: 2.1 Special Functions II
 
-Status: J/Y, I/K, the first elliptic integral slice, real Ei/E1, and bounded
-real Gauss 2F1 are implemented. A bounded real Jacobi sn/cn/dn slice is
-implemented and locally qualified. The bounded real third-kind Legendre
-integral is implemented on a feature branch and under qualification.
+Status: All planned 2.1 slices are implemented and merged in PRs #41–47:
+Bessel J/Y and I/K, Legendre K/E/F/Pi, real Jacobi sn/cn/dn, real Ei/E1, and
+bounded real Gauss 2F1. A Windows preflight with FPC 3.2.2 passed 105 local
+gates, with package and benchmark gates skipped. Full 2.1 release qualification
+remains pending versioned candidate staging and clean-archive Linux/Windows
+qualification.
 
 ## Objective
 

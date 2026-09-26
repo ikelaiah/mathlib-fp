@@ -48,8 +48,9 @@ define pole and nonfinite behavior, and include documentation and tests.
 
 ## 5. Add elliptic integral/function slices
 
-**Status:** Legendre K/E/F slice merged in PR #43; real Jacobi sn/cn/dn merged
-after PR #46; bounded real Legendre Pi is implemented and undergoing qualification.
+**Status:** Legendre K/E/F merged in PR #43; real Jacobi sn/cn/dn merged in
+PR #46; bounded real Legendre Pi merged in PR #47. All planned 2.1 feature
+slices are merged; release qualification is tracked in task 8.
 
 The first slice uses parameter `m=k^2` in `[0,1]`, complete K/E, and
 incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`; the real third-kind Pi
@@ -96,6 +97,14 @@ nonconvergence is visible; accepted inputs meet a stated numerical budget.
 **Dependencies:** 1. **Scope:** Multiple small/medium changes.
 
 ## 8. Qualify 2.1
+
+**Status:** All 2.1 feature slices are merged (PRs #41–47). A Windows preflight
+with FPC 3.2.2 passed 105 local gates, including normal, optimized, and checked
+heap tests, examples, and documentation checks. Package and benchmark gates
+were skipped. The run used `--release 2.0.0`, matching the current versioned
+documentation; it is preflight evidence, not 2.1 release qualification. A
+versioned 2.1 candidate and clean-archive Linux/Windows qualification remain
+pending.
 
 **Acceptance:** Capability inventory, guides, examples, API docs, changelog,
 release records, and evidence agree with the implementation; all applicable
