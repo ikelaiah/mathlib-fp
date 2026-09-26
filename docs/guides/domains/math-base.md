@@ -17,7 +17,7 @@ Copy and run the [double-real quick start](#quick-start). It prints
 | --- | --- | --- |
 | Shared real samples | `TDoubleArray` | [Shared types](#mathbasesharedtypes) |
 | Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
-| Bessel J/Y, modified I/K, and Legendre elliptic integrals | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
+| Bessel J/Y, modified I/K, Legendre elliptic integrals, Jacobi elliptic functions, Ei/E1, and real 2F1 | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
 | Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
 | Reproducible simulation | `TLocalRandom` | [Random-state contract](applied-numerics.md#reproducible-local-random-state) |
 | Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](interchange.md#choose-a-format) |
@@ -290,9 +290,28 @@ The [quadrature reference corpus](../../../tests/EllipticReference.inc) and
 [generator](../../../tools/generate_elliptic_data.py) are independent of the
 Carlson algorithm. See NIST DLMF [Legendre definitions](https://dlmf.nist.gov/19.2),
 [relations to Carlson forms](https://dlmf.nist.gov/19.25), and
-[duplication algorithms](https://dlmf.nist.gov/19.36). Third-kind integrals,
-amplitudes outside the principal interval, and Jacobi elliptic functions remain
-outside this slice.
+[duplication algorithms](https://dlmf.nist.gov/19.36). Third-kind integrals and
+amplitudes outside the principal interval remain outside this slice.
+
+Real Jacobi elliptic functions `JacobiEllipticSN(U,M)`,
+`JacobiEllipticCN(U,M)`, and `JacobiEllipticDN(U,M)` use parameter `M=k^2`.
+They accept finite `|U| <= 100` and `M` in `[0,1]`; invalid or nonfinite
+inputs return NaN. At `M=0` they reduce to `sin(U)`, `cos(U)`, and `1`; at
+`M=1` they reduce to `tanh(U)`, `sech(U)`, and `sech(U)`. SN is odd and CN/DN
+are even. For intermediate M, a safeguarded Newton/bisection solve inverts the
+incomplete Legendre F integral using Carlson RF; DN uses the real identity
+`sqrt(1-M*sn(U,M)^2)`. The tested reference budget is
+`max(5e-13, 5e-12 * |reference value|)`.
+
+The [reference corpus](../../../tests/JacobiEllipticReference.inc) and
+[generator](../../../tools/generate_jacobi_elliptic_data.py) use 100-digit
+Decimal AGM and inverse-sine arithmetic, independent of the Carlson inversion.
+The algorithm follows NIST DLMF [Jacobi definitions](https://dlmf.nist.gov/22.2),
+[real identities](https://dlmf.nist.gov/22.6), [Legendre integral definitions](https://dlmf.nist.gov/19.2),
+and [Carlson forms](https://dlmf.nist.gov/19.25). See the
+[runnable example](../../../examples/32_jacobi_elliptic_functions.pas).
+Other Jacobi functions, public amplitude, complex arguments, and third-kind
+integrals remain deferred.
 
 The same 2.1 development unit provides the real exponential integrals
 `ExponentialIntegralEi` and `ExponentialIntegralE1`. Ei accepts finite

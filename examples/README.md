@@ -44,6 +44,7 @@ closest to your project. For a shorter task-first route, use the
 | `29_elliptic_integrals.pas` | MathBase | Complete and incomplete Legendre elliptic integrals with parameter and endpoint conventions |
 | `30_exponential_integrals.pas` | MathBase | Real Ei/E1 values, their negative-argument identity, and explicit pole/domain conventions |
 | `31_gauss_hypergeometric.pas` | MathBase | Real bounded Gauss 2F1 series, a terminating polynomial, and the supported argument interval |
+| `32_jacobi_elliptic_functions.pas` | MathBase | Real Jacobi sn/cn/dn with parameter and endpoint conventions, plus the defining identities |
 
 ## Build and run
 

@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added bounded real Gauss hypergeometric 2F1 with a convergent-series domain,
   explicit convergence failure behavior, independent references, tests,
   documentation, and a runnable example.
+- Added bounded real Jacobi elliptic sn/cn/dn functions with parameter and
+  endpoint conventions, Carlson-integral inversion, independent references,
+  tests, documentation, and a runnable example.
 
 ## [2.0.0] - 2026-09-21
 

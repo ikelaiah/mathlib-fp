@@ -12,6 +12,7 @@ uses
   , TestEllipticIntegrals
   , TestExponentialIntegrals
   , TestGaussHypergeometric
+  , TestJacobiElliptic
   , TestComplexLib
   , TestAlgebraLib
   , TestDenseMatrices

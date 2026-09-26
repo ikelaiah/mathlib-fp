@@ -55,10 +55,12 @@ all family slices -> capability inventory, examples, full qualification
 **Checkpoint:** J/Y/I/K have documented domains and budgets, independent
 reference cases, no dependency additions, and passing focused tests.
 
-5. **Elliptic integrals and functions.** Choose a bounded real parameter
-   convention. Implement the agreed complete/incomplete integrals and
-   function baseline in separate reviewable slices, with singular-endpoint
-   behavior and reference evidence.
+5. **Elliptic integrals and functions.** The complete/incomplete Legendre
+   K/E/F integral slice is merged. Add real Jacobi sn/cn/dn for parameter
+   `m=k^2` in `[0,1]` and bounded real arguments by safeguarded inversion of
+   the incomplete Legendre F integral, with exact endpoint cases, independent
+   references, identities, docs, and an example. Defer third-kind integrals
+   and other Jacobi functions.
 6. **Exponential integrals.** Define the real `Ei`/`E1` boundary and implement
    only the approved domain/range, with sign, branch, pole, and tail tests.
 7. **Hypergeometric baseline.** Implement the bounded real Gauss 2F1 series for

@@ -48,14 +48,19 @@ define pole and nonfinite behavior, and include documentation and tests.
 
 ## 5. Add elliptic integral/function slices
 
-**Status:** First Legendre K/E/F slice implemented and merged in PR #43.
+**Status:** Legendre K/E/F slice merged in PR #43; real Jacobi sn/cn/dn is implemented and locally qualified, PR pending.
 
 The first slice uses parameter `m=k^2` in `[0,1]`, complete K/E, and
-incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`. Third-kind and Jacobi
-functions remain for a later contract decision.
+incomplete F/E for amplitudes in `[-Pi/2, Pi/2]`. Third-kind integrals remain
+for a later contract decision. The Jacobi sn/cn/dn slice has its own contract
+below.
 
 **Acceptance:** Each approved slice states its parameter convention, singular
 limits, real domain, accuracy budget, and independent reference cases.
+
+The Jacobi slice uses parameter `M=k^2` in `[0,1]`, finite `|U|<=100`, and
+the real functions `sn`, `cn`, and `dn`. Other Jacobi functions and the
+third-kind integral remain deferred.
 
 **Verify:** Focused FPC tests and full `TestRunner` per slice.
 **Dependencies:** 1. **Scope:** Multiple small/medium changes.
@@ -75,7 +80,7 @@ small/large arguments, and nonfinite input is documented and tested.
 
 ## 7. Add bounded hypergeometric support
 
-**Status:** Real Gauss 2F1 slice implemented and locally qualified; PR pending.
+**Status:** Real Gauss 2F1 slice implemented and merged in PR #45.
 
 The first slice uses the Gauss series for finite parameters `A,B` in `[-16,16]`,
 `C` in `[0.5,32]`, and real `X` in `[-0.75,0.75]`. Invalid or nonconvergent

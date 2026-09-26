@@ -127,6 +127,16 @@
         "2F1(1, 1; 2; -0.75) = 0.746154384"
       ],
       "final_line": "Gauss hypergeometric example: success"
+    },
+    {
+      "path": "examples/32_jacobi_elliptic_functions.pas",
+      "contains": [
+        "sn(0.8, 0.4225) = 0.6950642165",
+        "cn(0.8, 0.4225) = 0.7189476580",
+        "dn(0.8, 0.4225) = 0.8921234349",
+        "sn^2 + cn^2 residual = 0.000000000000"
+      ],
+      "final_line": "Jacobi elliptic example: success"
     }
   ]
 }
