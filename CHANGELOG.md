@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added real and complex generalized matrix-pencil Schur factors, homogeneous
   `(alpha,beta)` eigenvalues, right eigenvectors, and residual diagnostics,
   including infinite eigenvalues when `B` is singular.
+- Added a complex Schur factorization with unitary Schur vectors and a bounded
+  shifted-QR iteration.
 
 ## [2.0.0] - 2026-09-21
 

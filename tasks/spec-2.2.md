@@ -116,8 +116,8 @@ native library. [`DHSEQR`](https://www.netlib.org/lapack/explore-html/d9/dc6/gro
 
 - Always retain current dense solver APIs and avoid mandatory third-party
   runtimes.
-- Complex Schur and generalized eigenproblem slices still require their own
-  focused design update before APIs are added.
+- Later spectral slices require their own focused contracts before APIs are
+  added; approved follow-on contracts are recorded below.
 - Do not claim this first slice solves eigenvalues or reduces a matrix pair.
 
 ## Success criteria
@@ -126,10 +126,12 @@ The first slice provides the specified real-double API, stable Householder
 reduction, structural and residual tests, documented limitations, and a
 runnable example; it passes the focused and full supported test matrix.
 
-## Open design points for later slices
+## Deferred design points
 
-- Complex Schur and generalized QZ reductions need explicit ordering, scaling,
-  and failure semantics before implementation.
+- Single-precision Schur/eigen paths, left eigenvectors, and Schur reordering
+  remain deferred. A future native generalized QZ implementation would need a
+  separate contract; the approved generalized slice below uses a bounded
+  projective-shift/Schur algorithm instead.
 
 ## Approved real nonsymmetric eigensystem slice
 
@@ -291,3 +293,50 @@ follow LAPACK [`DGGES`](https://www.netlib.org/lapack/explore-html/d7/d25/group_
 [`ZGGES`](https://www.netlib.org/lapack/explore-html/d7/d25/group__gges_ga4943e11fd632761e645ce1e5161f9f51.html),
 and [`DGGEV`](https://www.netlib.org/lapack/explore-html/d9/d52/dggev_8f_source.html)
 contracts. No LAPACK code or runtime is imported.
+
+## Approved complex Schur factorization slice
+
+Expose the complex shifted-QR Schur reduction already used internally by the
+generalized complex solver as a public decomposition. This completes complex
+Schur-factor parity with the existing real API without adding eigenvalue
+ordering, eigenvectors, or Schur reordering.
+
+### Public API and input contract
+
+- Unit: `AlgebraLib.DenseSpectral`.
+- Entry point: `FactorComplexSchur(const A: IDenseComplexMatrix; const
+  MaxIterations: SizeInt = 0)`.
+- Return `IDenseComplexSchur` with `Size`, `Q`, `T`, and `Iterations`.
+  Matrix accessors return defensive copies.
+- Require finite square input and leave it unchanged. Empty and 1x1 matrices
+  are supported. Nil, nonsquare, non-finite input, non-finite computed
+  factors, and iteration exhaustion raise `EDenseMatrixError`; no partial
+  factor is returned.
+- `A = Q*T*Q^H`, `Q` is unitary, and `T` is upper triangular. Empty input
+  returns empty identity `Q` and empty `T`; a 1x1 input returns identity `Q`
+  and `T=A`.
+- A negative `MaxIterations` is invalid. Zero selects `100*max(1,n)` QR
+  iterations. `Iterations` reports the performed shifted-QR iterations.
+  Deflation is scale-relative and dimension-aware.
+
+### Algorithm and limits
+
+- Scale the input by its largest entry magnitude, reduce to complex
+  Hessenberg form, and apply deterministic shifted QR similarities while
+  accumulating `Q`. Periodic exceptional shifts prevent indefinite stalls.
+  Rescale `T` after convergence and validate all outputs.
+- The current QR step factors the active dense block explicitly. Under the
+  default `O(n)` iteration budget, its worst-case work is `O(n^4)`, so this API
+  targets moderate dense matrices; an implicit Hessenberg QR optimization is
+  outside this slice.
+- Verify reconstruction, unitarity, exact triangular structure, scale
+  behavior, source/factor immutability, empty/singleton/already-triangular
+  cases, invalid input, and bounded iteration failure.
+- Run focused and full FPCUnit suites in normal, optimized, and checked modes;
+  build/run examples, validate docs/API snapshots, qualify locally, and pass
+  Linux and Windows PR CI before merge. Keep the published 2.0 API snapshot
+  unchanged and add no runtime dependency.
+
+The complex Schur relation and triangular form follow LAPACK's `ZHSEQR`
+contract; this API retains the project's bounded iteration and
+exception-on-failure semantics. No LAPACK code or runtime is imported.

@@ -37,6 +37,8 @@ type
     procedure TestRealSchurFactorizationAndBlockStructure;
     procedure TestRealSchurValidationAndIterationLimit;
     procedure TestRealSchurReconstructsNonsymmetricExample;
+    procedure TestComplexSchurReconstructionUnitarityAndCopies;
+    procedure TestComplexSchurValidationEdgesAndIterationLimit;
     procedure TestRealNonsymmetricEigenPairsAndOrdering;
     procedure TestRealNonsymmetricEigenValidationAndImmutability;
     procedure TestRealNonsymmetricEigenEmptySingletonAndIterationLimit;
@@ -1018,6 +1020,154 @@ begin
   Reconstructed := Multiply(Q, Multiply(T, Transpose(Q)));
   AssertMatrixClose('documented dense Schur reconstruction', A,
     Reconstructed, 1E-10);
+end;
+
+procedure TDenseDecompositionTest.TestComplexSchurReconstructionUnitarityAndCopies;
+var
+  A, Original, Q, T, Reconstructed, IdentityMatrix, QSnapshot,
+    TSnapshot, ScaledA, ScaledQ, ScaledT, ScaledReconstructed:
+    IDenseComplexMatrix;
+  Factor: IDenseComplexSchur;
+  I, J, ScaleIndex: SizeInt;
+  Scale: Double;
+begin
+  A := TDenseComplexMatrix.FromValues(3, 3,
+    [TComplex.Create(2.0, 1.0), TComplex.Create(1.0, -2.0),
+      TComplex.Create(-1.0, 0.5),
+     TComplex.Create(3.0, 0.25), TComplex.Create(-1.0, 2.0),
+      TComplex.Create(4.0, -1.0),
+     TComplex.Create(0.5, -3.0), TComplex.Create(2.0, 1.0),
+      TComplex.Create(0.5, 0.0)]);
+  Original := A.Clone;
+  Factor := FactorComplexSchur(A);
+  Q := Factor.Q;
+  T := Factor.T;
+
+  AssertComplexMatrixClose('complex Schur preserves the input', Original,
+    A, 0.0);
+  AssertTrue('nontrivial complex Schur iteration count is positive',
+    Factor.Iterations > 0);
+  Reconstructed := Multiply(Q, Multiply(T, ConjugateTranspose(Q)));
+  AssertComplexMatrixClose('unitary complex Schur reconstruction', A,
+    Reconstructed, 2E-10);
+  IdentityMatrix := TDenseComplexMatrix.Zeros(3, 3);
+  for I := 0 to 2 do IdentityMatrix[I, I] := TComplex.One;
+  AssertComplexMatrixClose('complex Schur vectors are unitary',
+    IdentityMatrix, Multiply(ConjugateTranspose(Q), Q), 2E-12);
+  for I := 1 to 2 do
+    for J := 0 to I - 1 do
+      AssertEquals(Format('complex Schur triangular structure [%d,%d]',
+        [I, J]), 0.0, T[I, J].Magnitude, 0.0);
+
+  QSnapshot := Factor.Q;
+  TSnapshot := Factor.T;
+  Q[0, 0] := Q[0, 0] + TComplex.One;
+  T[0, 0] := T[0, 0] + TComplex.One;
+  AssertComplexMatrixClose('complex Schur returns defensive Q copies',
+    QSnapshot, Factor.Q, 0.0);
+  AssertComplexMatrixClose('complex Schur returns defensive T copies',
+    TSnapshot, Factor.T, 0.0);
+
+  for ScaleIndex := 0 to 1 do
+  begin
+    if ScaleIndex = 0 then Scale := 1E-150 else Scale := 1E150;
+    ScaledA := Original.Clone;
+    for I := 0 to 2 do
+      for J := 0 to 2 do
+        ScaledA[I, J] := ScaledA[I, J] * Scale;
+    Factor := FactorComplexSchur(ScaledA);
+    ScaledQ := Factor.Q;
+    ScaledT := Factor.T;
+    ScaledReconstructed := Multiply(ScaledQ,
+      Multiply(ScaledT, ConjugateTranspose(ScaledQ)));
+    AssertComplexMatrixClose('scaled complex Schur reconstruction', ScaledA,
+      ScaledReconstructed, Scale * 2E-10);
+    for I := 1 to 2 do
+      for J := 0 to I - 1 do
+        AssertEquals('scaled complex Schur form remains triangular', 0.0,
+          ScaledT[I, J].Magnitude, 0.0);
+  end;
+end;
+
+procedure TDenseDecompositionTest.TestComplexSchurValidationEdgesAndIterationLimit;
+var
+  A, IdentityMatrix: IDenseComplexMatrix;
+  Factor: IDenseComplexSchur;
+  Failed: Boolean;
+begin
+  A := TDenseComplexMatrix.Zeros(0, 0);
+  Factor := FactorComplexSchur(A);
+  AssertEquals('empty complex Schur Q rows', 0, Factor.Q.Rows);
+  AssertEquals('empty complex Schur T columns', 0, Factor.T.Cols);
+  AssertEquals('empty complex Schur performs no iterations', 0,
+    Factor.Iterations);
+
+  A := TDenseComplexMatrix.FromValues(1, 1,
+    [TComplex.Create(7.5, -2.0)]);
+  Factor := FactorComplexSchur(A);
+  IdentityMatrix := TDenseComplexMatrix.Zeros(1, 1);
+  IdentityMatrix[0, 0] := TComplex.One;
+  AssertComplexMatrixClose('singleton complex Schur Q', IdentityMatrix,
+    Factor.Q, 0.0);
+  AssertComplexMatrixClose('singleton complex Schur T', A, Factor.T, 0.0);
+  AssertEquals('singleton complex Schur performs no iterations', 0,
+    Factor.Iterations);
+
+  A := TDenseComplexMatrix.FromValues(3, 3,
+    [TComplex.One, TComplex.Create(2.0, -1.0), TComplex.Create(3.0, 0.5),
+     TComplex.Zero, TComplex.Create(4.0, 1.0), TComplex.Create(-1.0, 2.0),
+     TComplex.Zero, TComplex.Zero, TComplex.Create(2.0, -3.0)]);
+  Factor := FactorComplexSchur(A);
+  AssertEquals('already triangular matrix performs no QR steps', 0,
+    Factor.Iterations);
+  AssertComplexMatrixClose('already triangular Schur form', A, Factor.T,
+    1E-14);
+
+  Failed := False;
+  try
+    FactorComplexSchur(IDenseComplexMatrix(nil));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nil complex Schur input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorComplexSchur(TDenseComplexMatrix.FromValues(2, 3,
+      [TComplex.One, TComplex.Zero, TComplex.Zero, TComplex.One,
+       TComplex.Zero, TComplex.Zero]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('nonsquare complex Schur input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorComplexSchur(TDenseComplexMatrix.FromValues(2, 2,
+      [TComplex.One, TComplex.Create(NaN, 0.0), TComplex.Zero, TComplex.One]));
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('non-finite complex Schur input is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorComplexSchur(TDenseComplexMatrix.FromValues(2, 2,
+      [TComplex.One, TComplex.Zero, TComplex.Zero, TComplex.One]), -1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('negative complex Schur iteration limit is rejected', Failed);
+
+  Failed := False;
+  try
+    FactorComplexSchur(TDenseComplexMatrix.FromValues(2, 2,
+      [TComplex.Zero, TComplex.Create(-1.0, 0.0),
+       TComplex.One, TComplex.Zero]), 1);
+  except
+    on EDenseMatrixError do Failed := True;
+  end;
+  AssertTrue('complex Schur iteration limit is enforced', Failed);
 end;
 
 procedure TDenseDecompositionTest.TestRealNonsymmetricEigenPairsAndOrdering;

@@ -103,6 +103,27 @@ complex double-precision Hessenberg reductions defined in
 - [x] Run focused/full qualification and review the final diff.
 - [x] Pass Linux and Windows CI before merge.
 
+### Phase 8: Public complex Schur factorization (contract approved)
+
+- [x] Review and approve the complex Schur contract in `spec-2.2.md`.
+- [x] Add tests for reconstruction, unitarity, exact triangular structure,
+  scaling, immutability, edge dimensions, invalid input, and iteration failure.
+- [x] Expose `IDenseComplexSchur` and `FactorComplexSchur`, reusing the bounded
+  complex shifted-QR routine already used by generalized complex reduction.
+- [x] Document the moderate-matrix scope and explicit-QR worst-case cost in the
+  dense guide and capability inventory; update health, changelog, and task
+  status without changing the stable API snapshot.
+- [x] Add a runnable complex Schur example, README entry, and output contract.
+- [x] Run focused/full qualification and review the final diff.
+- [x] Pass Linux and Windows CI before merge.
+
+**Dependencies:** Contract approval precedes tests and implementation; docs and
+example can follow the stable API; full qualification follows all changes.
+**Files likely touched:** `src/AlgebraLib.DenseSpectral.pas`,
+`tests/TestDenseDecompositions.pas`, the dense linear algebra guide, capability
+and health docs, `CHANGELOG.md`, one example, `examples/README.md`,
+`examples/output-contracts.json`, and the 2.2 task/spec files.
+
 ## Risks and mitigations
 
 | Risk | Mitigation |

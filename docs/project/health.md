@@ -30,7 +30,7 @@ not a scorecard. Every count is reproducible from the cited files:
 
 | Domain | Stable capability families | Units | Public API rows | Runnable examples | Qualification status | Known limitations |
 | ------ | -------------------------- | ----: | --------------: | ----------------: | -------------------- | ----------------- |
-| AlgebraLib | 12 | 13 | 1064 | 6 | Provenance-audited (13 units) | Dense row-major, no broadcasting; LU `Solve` is square-only; generalized eigensystems are unreleased 2.2 development APIs; polynomial eigensystems remain deferred; sparse products may create fill; partial eigensystems are largest-magnitude only |
+| AlgebraLib | 12 | 13 | 1064 | 6 | Provenance-audited (13 units) | Dense row-major, no broadcasting; LU `Solve` is square-only; nonsymmetric and generalized eigensystems are unreleased 2.2 development APIs; complex Schur uses an explicit QR step with worst-case `O(n^4)` work; polynomial eigensystems remain deferred; sparse products may create fill; partial eigensystems are largest-magnitude only |
 | CombinatoricsLib | not measured | 1 | 43 | 1 | Provenance-audited (1 unit) | Fixed-width integers overflow at documented maxima (`Factorial` > 20, `CatalanNumber` > 30, `BellNumber` > 18); `K <= N` required; not arbitrary precision |
 | EngineeringLib | 1 | 8 | 421 | 6 | Provenance-audited (8 units) | Temperature conversions are affine; time units are fixed-duration conventions; Haar is power-of-two; equiripple/Chebyshev/elliptic IIR design and wavelets beyond Haar are outside 1.8 |
 | FinanceLib | not measured | 3 | 71 | 2 | Provenance-audited (3 units) | Rates are decimals; discrete period compounding except Black-Scholes (continuous); IRR needs a positive initial investment and one positive future flow |
