@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.0.0",
+  "release": "2.2.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -368,9 +368,16 @@
     },
     {
       "family": "bessel_elliptic_exponential_integral",
-      "maturity": "unsupported",
-      "scalars": [],
-      "limitations": ["no stable public implementation in the 1.9 line"]
+      "unit": "MathBase.SpecialFunctions",
+      "entry_points": ["BesselJ0", "BesselJ1", "BesselY0", "BesselY1", "ModifiedBesselI0", "ModifiedBesselI1", "ModifiedBesselK0", "ModifiedBesselK1", "CompleteEllipticK", "CompleteEllipticE", "IncompleteEllipticF", "IncompleteEllipticE", "CompleteEllipticPi", "IncompleteEllipticPi", "JacobiEllipticSN", "JacobiEllipticCN", "JacobiEllipticDN", "ExponentialIntegralEi", "ExponentialIntegralE1", "GaussHypergeometric2F1"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["scalar"],
+      "complexity": "bounded scalar approximation, series, continued fraction, and Carlson duplication paths",
+      "accuracy": "independent decimal/quadrature references and documented per-family error bounds",
+      "docs": "docs/guides/domains/math-base.md",
+      "tests": "tests/TestSpecialFunctions.pas",
+      "limitations": ["real double paths only", "hypergeometric evaluation is restricted to the documented convergent domain", "no analytic continuation or complex special-function branches", "elliptic Pi excludes principal-value poles and unsupported characteristics"]
     },
     {
       "family": "typed_sparse_linear_algebra",
@@ -426,13 +433,20 @@
       "accuracy": "deterministic largest-magnitude eigenvalue/eigenvector residual fixtures across real/complex and single/double paths, including single-complex execution",
       "docs": "docs/guides/domains/sparse-linear-algebra.md",
       "tests": "tests/TestPartialEigensystems.pas",
-      "limitations": ["largest magnitude only", "no shift-invert, interior, generalized, Schur, or polynomial eigensystems", "real Arnoldi restart projects complex Ritz vectors to their real part"]
+      "limitations": ["largest magnitude only", "no shift-invert, interior, or polynomial eigensystems", "real Arnoldi restart projects complex Ritz vectors to their real part"]
     },
     {
       "family": "remaining_advanced_spectral_linear_algebra",
-      "maturity": "unsupported",
-      "scalars": [],
-      "limitations": ["full nonsymmetric, generalized, polynomial, Schur, interior-target, and shift-invert eigensystems remain deferred"]
+      "unit": "AlgebraLib.DenseSpectral",
+      "entry_points": ["ReduceHessenberg", "FactorRealSchur", "FactorComplexSchur", "FactorRealEigen", "FactorRealGeneralizedSchur", "FactorRealGeneralizedEigen", "FactorComplexGeneralizedSchur", "FactorComplexGeneralizedEigen"],
+      "maturity": "stable",
+      "scalars": ["double", "double_complex"],
+      "shapes": ["square_dense", "real_or_complex_matrix_pencil"],
+      "complexity": "dense cubic factorization with bounded iteration",
+      "accuracy": "similarity/factorization, orthogonality/unitarity, and normalized eigenpair residual checks",
+      "docs": "docs/guides/domains/dense-linear-algebra.md",
+      "tests": "tests/TestDenseDecompositions.pas",
+      "limitations": ["real-input nonsymmetric eigenvalues only; no real nonsymmetric complex-input API", "dense matrices only", "no polynomial eigenvalue, shift-invert, or interior-target workflow"]
     }
   ]
 }

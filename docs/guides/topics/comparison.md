@@ -33,13 +33,13 @@ The [capability inventory](../../reference/capabilities.md) is the authority for
 mathlib-fp does not yet support. The main gaps and their roadmap destinations
 are:
 
-- **Special-function families** — Bessel, elliptic, and exponential-integral
-  families are unsupported; the destination is the
-  [2.1 Special Functions II gate](../../project/roadmap.md#next-release-21-special-functions-ii).
-- **Advanced spectral families** — nonsymmetric, generalised, polynomial,
-  Schur, shift-invert, and interior-target eigensystems are deferred; the
-  destination is the
-  [2.2 spectral algebra gate](../../project/roadmap.md#22-nonsymmetric-and-generalised-spectral-algebra).
+- **Special-function families** — documented real-double Bessel, elliptic,
+  Jacobi elliptic, exponential-integral, and Gauss hypergeometric functions
+  are stable in 2.2.0; complex branches and analytic continuation remain
+  unsupported.
+- **Advanced spectral families** — real and complex Schur, Hessenberg,
+  nonsymmetric real eigen, and generalized eigen paths are stable in 2.2.0;
+  polynomial, shift-invert, and interior-target eigensystems remain deferred.
 - **Stiff and implicit ODEs** — the current ODE path is explicit and non-stiff;
   the destination is the
   [2.3 stiff and implicit ODEs gate](../../project/roadmap.md#23-stiff-and-implicit-odes).

@@ -33,12 +33,10 @@ def layout_path(name: str, legacy: str) -> Path:
     return LAYOUT.artifact(name)
 
 
-NEXT_RELEASE = "2.1"
+NEXT_RELEASE = "2.3"
 PUBLISHED_STABLE = "2.0.0"
-UNRELEASED_SOURCE_UNITS = {
-    "src/AlgebraLib.DenseSpectral.pas",
-    "src/MathBase.SpecialFunctions.pas",
-}
+# The 2.2.0 candidate snapshot owns every source unit present in this tree.
+UNRELEASED_SOURCE_UNITS: set[str] = set()
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
 CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")
@@ -50,6 +48,7 @@ CURRENT_REFERENCE_PATH = layout_path("api_reference", f"API_REFERENCE_{CURRENT_R
 FROZEN_1_9_SNAPSHOT_SHA256 = "bade8ef2810d0b70183436ef83792488ff308b2955e51564e08afb49596816f0"
 FROZEN_1_9_REFERENCE_SHA256 = "59b7ac1e1431b0d97c7bfc2015588ab21a0509b35787127186a96e843f76943b"
 HISTORICAL_RELEASES = [
+    "2.0.0",
     "1.10.0",
     "1.9.9",
     "1.9.8",
@@ -278,8 +277,8 @@ def main() -> int:
         snapshot_sources = set(snapshot_units)
         source_paths = sorted((ROOT / "src").glob("*.pas"))
         expected_sources = {path.relative_to(ROOT).as_posix() for path in source_paths}
-        # The published 2.0 snapshot remains frozen while named 2.1 units are
-        # developed. Remove each allowance when the next snapshot owns it.
+        # Historical snapshots remain frozen; the current candidate snapshot
+        # owns every source unit present in this tree.
         if ((expected_sources - snapshot_sources) != UNRELEASED_SOURCE_UNITS
                 or snapshot_sources - expected_sources):
             errors.append(
@@ -792,9 +791,7 @@ def main() -> int:
         listed_releases = [item["release"] for item in versions["versions"]]
         if versions.get("release_state") == "candidate":
             assert versions["published_stable"] == PUBLISHED_STABLE
-            assert listed_releases == [
-                CURRENT_RELEASE, PUBLISHED_STABLE, *HISTORICAL_RELEASES
-            ]
+            assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
         else:
             assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
         assert versions["site_url"].startswith("https://")

@@ -201,7 +201,10 @@ def validate_record(root: Path, record: object, errors: list[str]) -> str | None
 
 
 def validate_catalogue(
-    root: Path, catalogue_path: Path, inventory_path: Path
+    root: Path,
+    catalogue_path: Path,
+    inventory_path: Path,
+    supplemental_catalogue_paths: tuple[Path, ...] | list[Path] = (),
 ) -> list[str]:
     """Return every evidence-contract violation without modifying the checkout."""
     errors: list[str] = []
@@ -243,8 +246,30 @@ def validate_catalogue(
     if not isinstance(records, list):
         errors.append("catalogue.families: expected a list")
         records = []
+    all_records = list(records)
+    for supplemental_path in supplemental_catalogue_paths:
+        supplemental = load_object(supplemental_path, errors)
+        prefix = supplemental_path.name
+        if supplemental.get("schema_version") != 1:
+            errors.append(f"{prefix}.schema_version: expected 1")
+        if supplemental.get("release") != inventory_release:
+            errors.append(
+                f"{prefix}.release: expected current inventory release {inventory_release}"
+            )
+        if supplemental.get("inventory") != CAPABILITIES_REFERENCE:
+            errors.append(f"{prefix}.inventory: expected {CAPABILITIES_REFERENCE}")
+        if supplemental.get("inventory_release") != inventory_release:
+            errors.append(
+                f"{prefix}.inventory_release: expected the inventory release "
+                f"{inventory_release}"
+            )
+        supplemental_records = supplemental.get("families")
+        if not isinstance(supplemental_records, list):
+            errors.append(f"{prefix}.families: expected a list")
+            continue
+        all_records.extend(supplemental_records)
     seen: set[str] = set()
-    for record in records:
+    for record in all_records:
         family = validate_record(root, record, errors)
         if family is None:
             continue
@@ -261,7 +286,13 @@ def validate_catalogue(
 def main() -> int:
     layout = load_layout(ROOT / "docs/layout.json", ROOT / "docs")
     catalogue_path, inventory_path = catalogue_paths(layout)
-    errors = validate_catalogue(ROOT, catalogue_path, inventory_path)
+    version_path = ROOT / "VERSION"
+    current_release = version_path.read_text(encoding="utf-8").strip()
+    supplemental = ROOT / "docs" / "releases" / current_release / "numerical-evidence.json"
+    supplemental_paths = (supplemental,) if supplemental != catalogue_path else ()
+    errors = validate_catalogue(
+        ROOT, catalogue_path, inventory_path, supplemental_paths
+    )
     if errors:
         print("Numerical-evidence validation failed:", file=sys.stderr)
         print("\n".join(f"- {error}" for error in errors), file=sys.stderr)

@@ -2,7 +2,13 @@
 
 Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.0.0 — current published stable
+## 2.2.0 — current published stable
+
+- [Release notes](2.2.0/release-notes.md)
+- [Qualification](2.2.0/qualification.md) and [workflow qualification](2.2.0/workflow-qualification.md)
+- [Release review notes](2.2.0/pr-notes.md)
+
+## 2.0.0 — previous stable release
 
 - [Release notes](2.0.0/release-notes.md)
 - [Qualification](2.0.0/qualification.md) and [workflow qualification](2.0.0/workflow-qualification.md)

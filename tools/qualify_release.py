@@ -363,11 +363,15 @@ def documentation_gates(
         "check_api_decision.py",
         "check_numerical_evidence.py",
         "check_convergence.py",
-        "check_promotion_2_0.py",
     ):
         qualification.run(
             script.removesuffix(".py"),
             [sys.executable, str(ROOT / "tools" / script)],
+        )
+    if release == "2.0.0":
+        qualification.run(
+            "promotion-2.0",
+            [sys.executable, str(ROOT / "tools" / "check_promotion_2_0.py")],
         )
     qualification.run(
         "documentation-execution",

@@ -78,9 +78,9 @@ capability manifest — rather than left open. See
   date until the earlier of: one year, or six months after the next minor
   release line is published. `SECURITY.md` names the exact currently
   supported line.
-- The 1.9.x line is supported through the 2.0.0 publication plus six months,
-  and at minimum one year from 1.9.9, so 1.x adopters have a tested
-  migration runway to 2.0.
+- The 1.10.x and 1.9.x security support windows ended on 2026-03-21, six
+  months after 2.0.0 was published. The 1.x lines provided a tested migration
+  runway to 2.0.
 - Security fixes are published as patch releases for every supported line
   that is affected, with the regression evidence required by the maintenance
   policy.
