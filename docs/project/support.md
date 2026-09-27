@@ -27,8 +27,8 @@ on 2026-09-27 for both primary targets from checksummed clean archives. The
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The `release/2.2.0` commit produced new Linux and Windows primary artifacts
-before stable metadata finalization.
+The finalized `release/2.2.0` commit produced new Linux and Windows primary
+artifacts. See the linked qualification record for run and artifact details.
 
 ### Exact profiles
 
