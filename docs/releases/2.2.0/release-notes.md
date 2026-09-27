@@ -1,9 +1,7 @@
-# mathlib-fp 2.2.0 release candidate
+# mathlib-fp 2.2.0
 
-This candidate combines the 2.1 special-functions work and the 2.2
-nonsymmetric spectral-algebra work. It is not a published stable release;
-2.0.0 remains the latest published stable version until qualification and
-stable publication are complete.
+Version 2.2.0 is the current published stable release. It combines the 2.1
+special-functions scope with the 2.2 nonsymmetric spectral-algebra scope.
 
 ## Included capabilities
 
@@ -17,13 +15,13 @@ stable publication are complete.
   eigenvalues, including infinite eigenvalues when the B matrix is singular.
 
 Each family retains its documented domain, accuracy, convergence, and failure
-limits. See the [candidate API reference](../../reference/api/reference-2.2.0.md),
+limits. See the [2.2 API reference](../../reference/api/reference-2.2.0.md),
 [dense linear algebra guide](../../guides/domains/dense-linear-algebra.md),
 [MathBase guide](../../guides/domains/math-base.md), and [changelog](../../../CHANGELOG.md).
 
 ## Qualification status
 
-The candidate is awaiting the required clean-archive release qualification on
-Linux and Windows, including its performance, portability, documentation,
-package, and artifact checks. No new platform support claim is made until that
-qualification completes.
+The release passed checksummed clean-archive qualification on Linux and
+Windows, including performance, portability, documentation, Lazarus package,
+and artifact checks. The [qualification record](qualification.md) links the
+workflow and its uploaded evidence.

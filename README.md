@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.2.0 release candidate" src="https://img.shields.io/badge/version-2.2.0--rc-blue.svg">
+  <img alt="Version 2.2.0" src="https://img.shields.io/badge/version-2.2.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,13 +26,11 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.2.0 is a release candidate; 2.0.0 remains the current published stable release.**
-> The candidate includes the 2.1 special-function additions and 2.2 spectral
-> algebra. Review the [candidate release notes](docs/releases/2.2.0/release-notes.md)
-> and [changelog](CHANGELOG.md). The 2.0.0 release remains available from the
-> [published release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.0.0).
-
-Candidate source: [release/v2.2.0 archive](https://github.com/ikelaiah/mathlib-fp/archive/refs/heads/release/v2.2.0.tar.gz).
+> **2.2.0 is the current published stable release.** It adds bounded real
+> special functions and dense nonsymmetric and generalized spectral algebra.
+> Read the [release notes](docs/releases/2.2.0/release-notes.md), the
+> [capability inventory](docs/reference/capabilities.md), and the
+> [changelog](CHANGELOG.md) when evaluating an upgrade.
 
 ## 🚀 Quick start
 
@@ -43,7 +41,7 @@ domain.
 Get the source directly with git:
 
 ```bash
-git clone --depth 1 --branch v2.0.0 \
+git clone --depth 1 --branch v2.2.0 \
   https://github.com/ikelaiah/mathlib-fp.git
 ```
 
@@ -51,21 +49,21 @@ or as a source archive with `wget`:
 
 ```bash
 wget \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.0.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.2.0.tar.gz
 ```
 
 or with `curl`:
 
 ```bash
 curl -L -o mathlib-fp.tar.gz \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.0.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.2.0.tar.gz
 ```
 
 > No package manager or install step is required for direct source use; add
 > `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
 
 Direct source use is canonical. The
-[2.0.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.0.0)
+[2.2.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.2.0)
 is the source of published stable `.zip`, `.tar.gz`, offline documentation,
 and checksum artifacts.
 

@@ -117,6 +117,22 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
             encoding="utf-8",
         )
 
+    def write_supplemental_catalogue(
+        self, path: Path, release: str, records: list[dict[str, object]]
+    ) -> None:
+        path.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "release": release,
+                    "inventory": "docs/reference/capabilities.json",
+                    "inventory_release": release,
+                    "families": records,
+                }
+            ),
+            encoding="utf-8",
+        )
+
     def test_missing_stable_family_is_rejected(self) -> None:
         self.write_inventory(
             [
@@ -217,6 +233,32 @@ class NumericalEvidenceCatalogueTests(unittest.TestCase):
 
         self.assertEqual(
             [], validate_catalogue(self.root, self.catalogue_path, self.inventory_path)
+        )
+
+    def test_current_release_supplement_completes_frozen_catalogue(self) -> None:
+        self.write_inventory(
+            [
+                {"family": "scalar", "maturity": "stable"},
+                {"family": "dense", "maturity": "stable"},
+            ]
+        )
+        inventory = json.loads(self.inventory_path.read_text(encoding="utf-8"))
+        inventory["release"] = "2.2.0"
+        self.inventory_path.write_text(json.dumps(inventory), encoding="utf-8")
+        self.write_catalogue([self.evidence("scalar")])
+        supplemental_path = self.root / "docs" / "numerical-evidence-2.2.0.json"
+        self.write_supplemental_catalogue(
+            supplemental_path, "2.2.0", [self.evidence("dense")]
+        )
+
+        self.assertEqual(
+            [],
+            validate_catalogue(
+                self.root,
+                self.catalogue_path,
+                self.inventory_path,
+                [supplemental_path],
+            ),
         )
 
 

@@ -18,12 +18,12 @@ Target qualifications and platform-specific limitations are defined by the
 | Householder QR least squares | Stable | Single/double real/complex | Tall/square, full-rank solve |
 | Column-pivoted QR and rank-revealing solve | Stable | Single/double real/complex | Basic rank-deficient solution is not minimum norm |
 | Compact SVD and minimum-norm solve | Stable | Single/double real/complex | Full compact deterministic Jacobi path; no truncated/randomized SVD |
-| Full symmetric/Hermitian eigensystem | Stable | Single/double real/complex as applicable | No nonsymmetric, generalized, or partial eigensystems |
+| Symmetric/Hermitian and partial eigensystems | Stable | Single/double real/complex as applicable | Partial methods target largest magnitude only; no polynomial or interior-target eigensystems |
 | Typed CSR/CSC and compact structured storage | Stable | Single/double real/complex | Immutable canonical storage; products may create mathematical fill; no hidden densification |
 | Typed stored/matrix-free operators and preconditioners | Stable | Single/double real/complex | Four-scalar ordinary/adjoint and identity/diagonal/IC(0)/ILU(0) execution; caller supplies mathematical symmetry/definiteness |
 | CG, MINRES, restarted GMRES, BiCGSTAB, and LSQR | Stable | Single/double real/complex | Every method executes for every scalar; square methods stop on true residual and LSQR on normal residual; LSQR is unpreconditioned in 1.9 |
 | Reusable tridiagonal/band/sparse LU factors | Stable | Single/double real/complex | General band has no pivoting; sparse baseline is natural order and fill dependent |
-| Restarted partial Lanczos/Arnoldi | Stable | Single/double real/complex | Largest magnitude only; no shift-invert/interior/generalized/Schur path |
+| Restarted partial Lanczos/Arnoldi | Stable | Single/double real/complex | Largest magnitude only; no shift-invert/interior or polynomial path |
 | Interpolation and approximation | Stable | Double real | Includes natural/clamped/not-a-knot cubic splines; dense scattered methods target small data sets |
 | Numerical/automatic differentiation | Stable | Double real/complex callback and forward dual | Forward mode only; complex-step requires an analytic callback |
 | Adaptive integration, fitting, vector equations, polynomial roots, and ODEs | Stable | Double real plus complex root result | ODE path is explicit non-stiff; sampling error values are estimates |
@@ -42,33 +42,28 @@ Target qualifications and platform-specific limitations are defined by the
 | Serial blocked dense multiplication | Stable | Single/double real/complex | Portable kernel is the oracle; deterministic serial dispatch only |
 | Legacy `IMatrix` API | Stable compatibility | Double real | Nested storage and `Integer` dimensions |
 | Error/gamma/beta functions | Stable | Double real | Domains and budgets are documented in MathBase |
-| Bessel, elliptic, exponential-integral families | Unsupported | — | Visible roadmap gap; no stable public implementation |
+| Bessel, elliptic, exponential-integral families | Stable | Double real | Bessel orders zero and one; bounded real elliptic, exponential-integral, hypergeometric, and Jacobi paths |
 | Advanced sparse direct algorithms | Unsupported | — | No fill-reducing symbolic ordering, multifrontal/supernodal, distributed, out-of-core, or GPU path |
 | Advanced iterative variants | Unsupported | — | No block/flexible Krylov, algebraic multigrid, or parallel/SIMD sparse dispatch |
-| Remaining advanced spectral families | Unsupported | — | Full nonsymmetric, generalized, polynomial, Schur, shift-invert, and interior-target families remain deferred |
+| Nonsymmetric, generalized, Hessenberg, and Schur spectral algebra | Stable | Double real and complex | Dense matrices; nonsymmetric eigenpairs use real input; no polynomial, shift-invert, or interior-target path |
 | Advanced DSP design and wavelets | Unsupported | — | Haar is stable; equiripple, advanced IIR families, broader wavelets, and packets remain conditional |
 | Conditional statistics and data science | Unsupported | — | Survival/factor analysis, robust covariance, multinomial/count GLMs, boosting, and broader forecasting were not activated |
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This table describes the published 2.0.0 release. The [MathBase guide](../guides/domains/math-base.md#mathbasespecialfunctions-21-development)
-documents the 2.1 special-function families included in the 2.2.0 release
-candidate: Bessel J/Y and modified I/K,
-each at orders zero and one, Legendre elliptic integrals K/E/F/Pi, real
-exponential integrals Ei/E1, bounded real Gauss 2F1, and real Jacobi sn/cn/dn.
-They remain candidate capabilities and do not change the published 2.0.0
-classification; elliptic principal
-values, amplitudes outside the principal interval, analytic continuation, and
-complex hypergeometric or exponential-integral branches remain unimplemented.
+This is the published 2.2.0 capability inventory. The [MathBase guide](../guides/domains/math-base.md)
+documents Bessel J/Y and modified I/K at orders zero and one, Legendre
+elliptic integrals K/E/F/Pi, real exponential integrals Ei/E1, bounded real
+Gauss 2F1, and real Jacobi sn/cn/dn. These paths use real double precision
+with documented domains and convergence limits; elliptic principal values,
+amplitudes outside the principal interval, analytic continuation, and complex
+special-function branches remain unsupported.
 
-The 2.2.0 release candidate contains real-double orthogonal and
-complex-double unitary Hessenberg reductions (`ReduceHessenberg`), a real-double
-Schur factorization (`FactorRealSchur`), a complex-double Schur factorization
-(`FactorComplexSchur`), real-input nonsymmetric eigenpairs (`FactorRealEigen`)
-with complex right eigenvectors and ordering, and generalized real/complex
-matrix-pencil factors and eigenpairs. These remain candidate APIs
-and do not change the published 2.0.0 capability inventory until the 2.2.0
-candidate is qualified and published.
+The [dense linear algebra guide](../guides/domains/dense-linear-algebra.md)
+documents real and complex Hessenberg reductions and Schur factorizations,
+real-input nonsymmetric eigenpairs with complex right eigenvectors, and real
+and complex generalized matrix-pencil factors and eigenpairs. These are dense
+double-precision paths with bounded convergence diagnostics.
 
 Unsupported entries are not counted in the 1.9.4 numerical-evidence audit. The
 [closed 1.10.0 capability manifest](../releases/1.10.0/capability-manifest.md) defers

@@ -187,14 +187,15 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 1.9.9 | Final 1.9.x convergence handoff | Closed 1.10.0 capability manifest, complete evidence, and no unresolved API decisions |
 | 1.10.0 | Additive API completion and final 2.0 freeze | Approved missing conveniences, including 2-D vector rotation, followed by release-candidate qualification and soak |
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
-| 2.1 | Special Functions II | Bessel, elliptic, exponential-integral, and a bounded hypergeometric baseline with cited budgets |
-| 2.2 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
+| 2.1 scope (included in 2.2.0) | Special Functions II | Bessel, elliptic, exponential-integral, and a bounded hypergeometric baseline with cited budgets |
+| 2.2.0 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
 | 2.3 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
 | 2.4 | Sparse Direct II | Fill-reducing ordering, symbolic/numeric separation, and a documented fill/memory model |
 
-Versions 2.1 through 2.4 are the committed near-term capability gates; see the
-candidate capability lanes in the post-2.0 capability programme for longer-term
-possible directions that are not version promises.
+The 2.1 and 2.2 scopes shipped in 2.2.0; 2.3 and 2.4 are the next committed
+near-term capability gates. See the candidate capability lanes in the
+post-2.0 capability programme for longer-term directions that are not version
+promises.
 
 ## Implementation discipline
 
@@ -333,6 +334,7 @@ documents rather than in this roadmap.
 | 1.9.9 | 2026-08-17 | Final 1.9.x convergence handoff: closed 1.10.0 capability manifest and complete evidence | [notes](../releases/1.9.9/release-notes.md) |
 | 1.10.0 | 2026-08-19 | Additive API completion and final 2.0 freeze: `TVector2D.Rotate`, no-deprecation closure, and frozen 2.0 candidate | [notes](../releases/1.10.0/release-notes.md) |
 | 2.0.0 | 2026-09-21 | Stable native numerical platform: frozen API promoted after two RC cycles, exercised soak, and Linux/Windows clean-archive qualification | [notes](../releases/2.0.0/release-notes.md) |
+| 2.2.0 | 2026-09-27 | Bounded real special functions and dense nonsymmetric/generalized spectral algebra, qualified from checksummed Linux and Windows archives | [notes](../releases/2.2.0/release-notes.md) |
 
 Detailed historical evidence for each release remains in the corresponding
 `RELEASE_NOTES_<version>.md`, `PR_NOTES_<version>.md`, `QUALIFICATION_<version>.md`,
@@ -387,9 +389,17 @@ the completed-releases table above and the
 [1.10.0 release notes](../releases/1.10.0/release-notes.md) and
 [qualification record](../releases/1.10.0/qualification.md).
 
-## Previous published stable release: 2.0.0 — Stable native numerical platform
+## Previous release: 2.2.0 — Special functions and spectral algebra
 
-Version 2.0.0 is the current published stable release. It is a quality and
+Version 2.2.0 is the current published stable release. It delivers the
+completed 2.1 special-functions and 2.2 spectral-algebra scopes, with bounded
+real domains, accuracy and convergence contracts, and Linux/Windows
+clean-archive qualification. See the [release notes](../releases/2.2.0/release-notes.md)
+and [qualification record](../releases/2.2.0/qualification.md).
+
+## Previous release: 2.0.0 — Stable native numerical platform
+
+Version 2.0.0 was the first published 2.x stable release. It is a quality and
 API graduation, not an arbitrary rewrite: it was published after the additive
 1.x foundations had been used by the
 higher-level libraries, the migration path is proven, and the 1.x convergence
@@ -748,14 +758,6 @@ rejected after a design and maintenance review; listing a lane is not a promise
 to ship it. A capability is not complete merely because an implementation
 exists — it must also meet the numerical, documentation, portability, and
 maintenance contracts this roadmap applies to every stable family.
-
-## Release candidate target: 2.2.0 — Special functions and spectral algebra
-
-The candidate combines the completed 2.1 special-functions scope with the
-completed 2.2 nonsymmetric and generalised spectral-algebra scope. The active
-implementation plans are complete; publication now depends on the release
-qualification gates. The 2.0.0 release remains the current published stable
-version until those gates pass and stable metadata is finalized.
 
 ## Next release: 2.3 — Stiff and implicit ODEs
 

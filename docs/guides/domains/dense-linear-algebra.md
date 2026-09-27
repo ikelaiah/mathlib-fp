@@ -54,12 +54,11 @@ predictable default for a full-rank tall least-squares problem. Choose CPQR
 when rank must be diagnosed, and SVD when the solution must be minimum norm or
 rank deficiency is part of the problem.
 
-Sparse, iterative, matrix-free, nonsymmetric/generalized/partial eigen,
-LDLT, update/downdate, public workspace, parallel/SIMD, GPU, and external
-BLAS/LAPACK paths are unsupported in the stable typed 1.6 API. The later 2.2
-development section describes the unreleased nonsymmetric and generalized
-spectral additions. The compatibility `IMatrix` methods do not make those
-typed families stable.
+Sparse, iterative, and matrix-free paths are stable in 2.2.0, as are partial
+eigensystems and the Hessenberg, Schur, real nonsymmetric, and generalized
+spectral APIs described below. LDLT, update/downdate, public workspace,
+parallel/SIMD, GPU, and external BLAS/LAPACK paths remain unsupported. The
+compatibility `IMatrix` methods do not change the typed API contracts.
 
 ## Common contracts
 

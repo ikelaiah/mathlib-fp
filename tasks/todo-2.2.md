@@ -64,7 +64,7 @@ example and documentation checks, release qualification, and CI.
 
 ## Release readiness
 
-All implementation slices in the 2.2 plan are complete. The official 2.2.0
-release candidate combines the completed 2.1 special-functions and 2.2
-spectral-algebra scopes. Remaining work is candidate qualification and stable
-release publication; no further implementation slice is planned for 2.2.0.
+All implementation slices in the 2.2 plan are complete. The 2.2.0 release
+qualification passed on Linux and Windows from checksummed clean archives.
+Only stable publication remains; no further implementation slice is planned
+for 2.2.0.
