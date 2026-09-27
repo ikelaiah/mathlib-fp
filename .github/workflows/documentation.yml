@@ -53,12 +53,16 @@ jobs:
         id: tag
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_RELEASE_REF: ${{ inputs.release_ref }}
           RELEASE: ${{ steps.version.outputs.release }}
         run: |
           kind=manual
           if [ "$GITHUB_EVENT_NAME" = "release" ]; then
             kind="$(python3 current/tools/release_tags.py \
               --tag "$RELEASE_TAG" --version "$RELEASE")"
+          elif [[ "$INPUT_RELEASE_REF" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            kind="$(python3 current/tools/release_tags.py \
+              --tag "$INPUT_RELEASE_REF" --version "$RELEASE")"
           fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
 
@@ -138,6 +142,12 @@ jobs:
           ref: v1.10.0
           path: historical-1.10.0
 
+      - name: Check out immutable 2.0.0 documentation source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v2.0.0
+          path: historical-2.0.0
+
       - name: Read current release version
         run: |
           test "$(cat current/VERSION)" = "${{ needs.resolve.outputs.release }}"
@@ -190,11 +200,16 @@ jobs:
             --versions current/docs/versions.json \
             --release 1.10.0 --output site/1.10.0 --site-root site
           python3 current/tools/build_docs.py \
+            --source historical-2.0.0/docs \
+            --versions current/docs/versions.json \
+            --release 2.0.0 --output site/2.0.0 --site-root site
+          python3 current/tools/build_docs.py \
             --source current/docs \
             --versions current/docs/versions.json \
             --release "$RELEASE" --output "site/$RELEASE" --site-root site \
             --offline-archive "artifacts/mathlib-fp-docs-$RELEASE.zip"
           python3 -c 'import json, os; r = os.environ["RELEASE"]; assert json.load(open(f"site/{r}/release.json"))["release"] == r'
+          python3 -c 'import json; assert json.load(open("site/2.0.0/release.json"))["release"] == "2.0.0"'
           python3 -c 'import json; assert json.load(open("site/1.10.0/release.json"))["release"] == "1.10.0"'
           python3 -c 'import json; assert json.load(open("site/1.9.9/release.json"))["release"] == "1.9.9"'
           python3 -c 'import json; assert json.load(open("site/1.9.8/release.json"))["release"] == "1.9.8"'
@@ -207,6 +222,7 @@ jobs:
           python3 -c 'import json; assert json.load(open("site/1.9.1/release.json"))["release"] == "1.9.1"'
           python3 -c 'import json; assert json.load(open("site/1.9.0/release.json"))["release"] == "1.9.0"'
           grep -q "Current release: $RELEASE" site/index.html
+          grep -q '2.0.0/index.html' site/index.html
           grep -q '1.10.0/index.html' site/index.html
           grep -q '1.9.9/index.html' site/index.html
           grep -q '1.9.8/index.html' site/index.html
@@ -240,11 +256,11 @@ jobs:
             artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip.sha256
 
       - name: Attach offline documentation to release
-        if: github.event_name == 'release' && needs.resolve.outputs.tag_kind == 'stable'
+        if: needs.resolve.outputs.tag_kind == 'stable'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
+          gh release upload "v${{ needs.resolve.outputs.release }}" \
             artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip \
             artifacts/mathlib-fp-docs-${{ env.RELEASE }}.zip.sha256 --clobber \
             --repo "$GITHUB_REPOSITORY"
