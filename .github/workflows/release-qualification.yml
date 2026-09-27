@@ -2,6 +2,8 @@ name: Release qualification
 
 on:
   workflow_dispatch:
+  push:
+    branches: ['release/*']
   schedule:
     - cron: '17 3 * * 1'
   release:

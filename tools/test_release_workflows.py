@@ -29,6 +29,10 @@ class ReleaseQualificationWorkflowTests(unittest.TestCase):
         self.assertIn("--source-archive", windows)
         self.assertNotIn("--network-isolated", windows)
 
+    def test_qualifies_release_branches_on_push(self) -> None:
+        self.assertIn("branches: ['release/*']", self.workflow)
+        self.assertIn("--source-archive", self.workflow)
+
 
 class DocumentationWorkflowTests(unittest.TestCase):
     def setUp(self) -> None:
