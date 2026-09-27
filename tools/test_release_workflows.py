@@ -57,12 +57,26 @@ class DocumentationWorkflowTests(unittest.TestCase):
         self.assertIn("python3 current/tools/release_tags.py", self.workflow)
 
     def test_builds_the_published_stable_documentation_path(self) -> None:
+        self.assertIn("ref: v2.0.0", self.workflow)
+        self.assertIn("path: historical-2.0.0", self.workflow)
+        self.assertIn("--source historical-2.0.0/docs", self.workflow)
+        self.assertIn("--release 2.0.0 --output site/2.0.0", self.workflow)
+        self.assertIn('site/2.0.0/release.json', self.workflow)
+        self.assertIn("'2.0.0/index.html'", self.workflow)
         self.assertIn("ref: v1.10.0", self.workflow)
         self.assertIn("path: historical-1.10.0", self.workflow)
         self.assertIn("--source historical-1.10.0/docs", self.workflow)
         self.assertIn("--release 1.10.0 --output site/1.10.0", self.workflow)
         self.assertIn('site/1.10.0/release.json', self.workflow)
         self.assertIn("'1.10.0/index.html'", self.workflow)
+
+    def test_manual_tag_rebuild_attaches_stable_offline_docs(self) -> None:
+        self.assertIn('elif [[ "$INPUT_RELEASE_REF" =~ ^v', self.workflow)
+        self.assertIn('--tag "$INPUT_RELEASE_REF"', self.workflow)
+        self.assertIn(
+            "if: needs.resolve.outputs.tag_kind == 'stable'", self.workflow
+        )
+        self.assertIn('gh release upload "v${{ needs.resolve.outputs.release }}"', self.workflow)
 
 
 if __name__ == "__main__":
