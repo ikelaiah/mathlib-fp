@@ -1,6 +1,6 @@
 # Supported platform matrix
 
-Version 2.0.0 uses Free Pascal source and standard RTL/FCL units only. The
+The 2.2.0 release candidate uses Free Pascal source and standard RTL/FCL units only. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](../portability-evidence-1.9.6.json); the
 [evidence report](../releases/1.9.6/portability-evidence.md) explains the unchanged target
@@ -13,7 +13,11 @@ target matrix. The 1.9.9
 [convergence gate](../releases/1.10.0/capability-manifest.md) closed the 1.10.0 handoff,
 and the frozen 1.10.0 baseline adds no target-matrix change.
 
-## Support tiers and current evidence
+## Support tiers and retained evidence
+
+The 2.2.0 candidate is awaiting new primary-target clean-archive qualification.
+Until those runs pass, the matrix below retains the last published 2.0.0
+evidence and does not claim new candidate qualification.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |

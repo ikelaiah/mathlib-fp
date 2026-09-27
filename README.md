@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.0.0" src="https://img.shields.io/badge/version-2.0.0-brightgreen.svg">
+  <img alt="Version 2.2.0 release candidate" src="https://img.shields.io/badge/version-2.2.0--rc-blue.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,11 +26,13 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.0.0 is the current published stable release.** It promotes the frozen
-> 1.10.0 API without a new numerical redesign. Read the
-> [release notes](docs/releases/2.0.0/release-notes.md), the checked
-> [freeze handoff](docs/releases/1.10.0/capability-manifest.md), and the
-> [changelog](CHANGELOG.md) when evaluating an upgrade.
+> **2.2.0 is a release candidate; 2.0.0 remains the current published stable release.**
+> The candidate includes the 2.1 special-function additions and 2.2 spectral
+> algebra. Review the [candidate release notes](docs/releases/2.2.0/release-notes.md)
+> and [changelog](CHANGELOG.md). The 2.0.0 release remains available from the
+> [published release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.0.0).
+
+Candidate source: [release/v2.2.0 archive](https://github.com/ikelaiah/mathlib-fp/archive/refs/heads/release/v2.2.0.tar.gz).
 
 ## 🚀 Quick start
 

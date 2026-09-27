@@ -60,4 +60,11 @@ example and documentation checks, release qualification, and CI.
   `feat/2.2-complex-schur`, reusing the existing bounded shifted-QR routine;
   Windows qualification passed 118 gates, including 985 FPCUnit tests, all 40
   examples, and 21 output contracts. Linux and Windows PR CI passed; PR #54 is
-  open for review.
+  merged.
+
+## Release readiness
+
+All implementation slices in the 2.2 plan are complete. The official 2.2.0
+release candidate combines the completed 2.1 special-functions and 2.2
+spectral-algebra scopes. Remaining work is candidate qualification and stable
+release publication; no further implementation slice is planned for 2.2.0.

@@ -35,7 +35,7 @@ are:
 
 - **Special-function families** — Bessel, elliptic, and exponential-integral
   families are unsupported; the destination is the
-  [2.1 Special Functions II gate](../../project/roadmap.md#next-release-21-special-functions-ii).
+  [2.1 Special Functions II scope](../../project/roadmap.md#release-candidate-target-220-special-functions-and-spectral-algebra).
 - **Advanced spectral families** — nonsymmetric, generalised, polynomial,
   Schur, shift-invert, and interior-target eigensystems are deferred; the
   destination is the

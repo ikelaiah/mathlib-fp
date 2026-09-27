@@ -387,7 +387,7 @@ the completed-releases table above and the
 [1.10.0 release notes](../releases/1.10.0/release-notes.md) and
 [qualification record](../releases/1.10.0/qualification.md).
 
-## Previous release: 2.0.0 — Stable native numerical platform
+## Previous published stable release: 2.0.0 — Stable native numerical platform
 
 Version 2.0.0 is the current published stable release. It is a quality and
 API graduation, not an arbitrary rewrite: it was published after the additive
@@ -749,7 +749,15 @@ to ship it. A capability is not complete merely because an implementation
 exists — it must also meet the numerical, documentation, portability, and
 maintenance contracts this roadmap applies to every stable family.
 
-## Next release: 2.1 — Special Functions II
+## Release candidate target: 2.2.0 — Special functions and spectral algebra
+
+The candidate combines the completed 2.1 special-functions scope with the
+completed 2.2 nonsymmetric and generalised spectral-algebra scope. The active
+implementation plans are complete; publication now depends on the release
+qualification gates. The 2.0.0 release remains the current published stable
+version until those gates pass and stable metadata is finalized.
+
+## Next release: 2.3 — Stiff and implicit ODEs
 
 Scope:
 

@@ -52,20 +52,23 @@ Target qualifications and platform-specific limitations are defined by the
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
 This table describes the published 2.0.0 release. The [MathBase guide](../guides/domains/math-base.md#mathbasespecialfunctions-21-development)
-documents unreleased 2.1 development slices for Bessel J/Y and modified I/K,
+documents the 2.1 special-function families included in the 2.2.0 release
+candidate: Bessel J/Y and modified I/K,
 each at orders zero and one, Legendre elliptic integrals K/E/F/Pi, real
 exponential integrals Ei/E1, bounded real Gauss 2F1, and real Jacobi sn/cn/dn.
-They do not change the 2.0.0 capability classification; elliptic principal
+They remain candidate capabilities and do not change the published 2.0.0
+classification; elliptic principal
 values, amplitudes outside the principal interval, analytic continuation, and
 complex hypergeometric or exponential-integral branches remain unimplemented.
 
-The unreleased 2.2 development source contains real-double orthogonal and
+The 2.2.0 release candidate contains real-double orthogonal and
 complex-double unitary Hessenberg reductions (`ReduceHessenberg`), a real-double
 Schur factorization (`FactorRealSchur`), a complex-double Schur factorization
 (`FactorComplexSchur`), real-input nonsymmetric eigenpairs (`FactorRealEigen`)
 with complex right eigenvectors and ordering, and generalized real/complex
-matrix-pencil factors and eigenpairs. These are unreleased 2.2 development APIs
-and do not change the published 2.0.0 capability inventory.
+matrix-pencil factors and eigenpairs. These remain candidate APIs
+and do not change the published 2.0.0 capability inventory until the 2.2.0
+candidate is qualified and published.
 
 Unsupported entries are not counted in the 1.9.4 numerical-evidence audit. The
 [closed 1.10.0 capability manifest](../releases/1.10.0/capability-manifest.md) defers
