@@ -1,6 +1,7 @@
 # Supported platform matrix
 
-Version 2.2.0 uses Free Pascal source and standard RTL/FCL units only. The
+Version 2.3.0 uses Free Pascal source and standard RTL/FCL units only and adds
+the dense real-double SDIRK2 stiff ODE path. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](../portability-evidence-1.9.6.json); the
 [evidence report](../releases/1.9.6/portability-evidence.md) explains the unchanged target
@@ -15,8 +16,9 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The [2.2.0 release qualification](../releases/2.2.0/qualification.md) passed
-on 2026-09-27 for both primary targets from checksummed clean archives. The
+The 2.3.0 qualification is pending; the latest retained primary-target
+evidence remains the [2.2.0 release qualification](../releases/2.2.0/qualification.md),
+which passed on 2026-09-27 from checksummed clean archives. The
 2.0.0 qualification remains historical.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
@@ -28,7 +30,8 @@ on 2026-09-27 for both primary targets from checksummed clean archives. The
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
 The finalized `release/2.2.0` commit produced new Linux and Windows primary
-artifacts. See the linked qualification record for run and artifact details.
+artifacts. The 2.3.0 release qualification will refresh both primary profiles.
+See the linked qualification record for run and artifact details.
 
 ### Exact profiles
 

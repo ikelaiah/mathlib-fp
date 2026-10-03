@@ -52,8 +52,8 @@ The complete runnable workflow is
 | Nonlinear least squares | `FitNonlinear` | Use `FitNonlinearAuto` for a dual-number residual/Jacobian |
 | Small nonlinear equation system | `SolveSystem` | Use `SolveSystemAuto` for dual-number equations |
 | Polynomial roots | `SolvePolynomial` | Returns every real/complex root and residual; not a symbolic factorization |
-| Non-stiff vector initial-value ODE | `SolveODE` | Stiff dynamics: use the v2.3 development `SolveStiffODE`; mass-matrix systems remain outside the API |
-| Stiff vector initial-value ODE | `SolveStiffODE` (v2.3 development) | Sparse/large systems or mass matrices: use a solver designed for that structure |
+| Non-stiff vector initial-value ODE | `SolveODE` | Stiff dynamics: use `SolveStiffODE`; mass-matrix systems remain outside the API |
+| Stiff vector initial-value ODE | `SolveStiffODE` (v2.3.0) | Sparse/large systems or mass matrices: use a solver designed for that structure |
 
 Interpolation is exact at supplied points; fitting estimates a model from
 possibly noisy observations. Do not use an interpolation API when residual,
@@ -184,10 +184,10 @@ zero-crossings and localises an event against dense output.
 `AbsoluteTolerances` may provide one positive absolute tolerance per state
 component; leave it empty to use scalar `AbsoluteTolerance`.
 
-The v2.3 development entry point `SolveStiffODE` uses Alexander's two-stage,
+The stable `SolveStiffODE` entry point (introduced in v2.3.0) uses Alexander's two-stage,
 second-order SDIRK method for dense real-double systems of explicit-form ODEs.
-It solves each implicit stage with bounded modified Newton iteration and a
-dense pivoted LU factorization.
+It solves each implicit stage with bounded, residual-decreasing Newton
+iteration, Jacobian refresh, and a dense pivoted LU factorization.
 The embedded first-order value drives a maximum component-scaled error test.
 Use `TStiffODEOptions.JacobianMode` to choose a supplied analytic Jacobian,
 forward-mode automatic differentiation through `AutoDerivative`, or scaled
@@ -224,8 +224,8 @@ callback state is not concurrently mutated.
 nil callbacks, dimensions, indexes, bounds, controls, or non-finite values.
 Validation failure does not mutate inputs.
 
-The v2.2.0 stable ODE surface includes explicit Dormand-Prince integration for
-real `Double` state. The v2.3 development gate adds dense SDIRK2 integration;
+The v2.3.0 stable ODE surface includes explicit Dormand-Prince integration and
+dense SDIRK2 integration for real `Double` state;
 mass-matrix systems, DAEs, PDEs, and sparse/large-scale stiff solvers remain
 outside scope. Other boundaries include sparse/large scattered interpolation,
 reverse-mode AD, and high-dimensional deterministic cubature.

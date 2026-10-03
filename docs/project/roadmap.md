@@ -189,11 +189,12 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 2.0.0 | Unified stable API, complete migration, and documented capability baseline | A proven free, native, dependency-free default for core Free Pascal numerical work |
 | 2.1 scope (included in 2.2.0) | Special Functions II | Bessel, elliptic, exponential-integral, and a bounded hypergeometric baseline with cited budgets |
 | 2.2.0 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
-| 2.3 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
+| 2.3.0 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
 | 2.4 | Sparse Direct II | Fill-reducing ordering, symbolic/numeric separation, and a documented fill/memory model |
 
-The 2.1 and 2.2 scopes shipped in 2.2.0; 2.3 and 2.4 are the next committed
-near-term capability gates. See the candidate capability lanes in the
+The 2.1 and 2.2 scopes shipped in 2.2.0, and stiff integration shipped in
+2.3.0. Sparse Direct II is the next committed near-term capability gate. See
+the candidate capability lanes in the
 post-2.0 capability programme for longer-term directions that are not version
 promises.
 
@@ -389,9 +390,9 @@ the completed-releases table above and the
 [1.10.0 release notes](../releases/1.10.0/release-notes.md) and
 [qualification record](../releases/1.10.0/qualification.md).
 
-## Previous release: 2.2.0 — Special functions and spectral algebra
+## Earlier release: 2.2.0 — Special functions and spectral algebra
 
-Version 2.2.0 is the current published stable release. It delivers the
+Version 2.2.0 was the previous published stable release. It delivered the
 completed 2.1 special-functions and 2.2 spectral-algebra scopes, with bounded
 real domains, accuracy and convergence contracts, and Linux/Windows
 clean-archive qualification. See the [release notes](../releases/2.2.0/release-notes.md)
@@ -789,40 +790,21 @@ and tested. See the [dense solver guide](../guides/domains/dense-linear-algebra.
 and [partial eigensystems](../guides/domains/sparse-linear-algebra.md#partial-eigensystems) for the
 current supported boundary.
 
-## Next release: 2.3
+## Previous release: 2.3.0 — Stiff and implicit ODEs
 
 ### 2.3 — Stiff and implicit ODEs
 
-This is the next planned release after v2.2.0.
+The release adds the specified Alexander two-stage SDIRK2 solver through the
+additive `SolveStiffODE` API. It supports analytic, automatic, and
+finite-difference Jacobians, component-scaled error control, damped Newton
+iterations, work diagnostics, cubic-Hermite dense output, and directional
+events. The scope is dense real-double explicit-form ODE systems; mass-matrix
+problems, DAEs, PDEs, and sparse/large-scale stiff solves remain outside the
+supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
+[qualification record](../releases/2.3.0/qualification.md), and
+[modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
-The initial design, implementation plan, and checklist are in
-[`spec-2.3.md`](../../tasks/spec-2.3.md),
-[`plan-2.3.md`](../../tasks/plan-2.3.md), and
-[`todo-2.3.md`](../../tasks/todo-2.3.md). The method and API contract are
-specified; implementation and release qualification are in progress.
-
-Scope:
-
-- a documented stiff-solver baseline using the selected two-stage SDIRK
-  method;
-- a Jacobian policy covering analytic, automatic, and numerical derivatives;
-- tolerances and convergence diagnostics;
-- dense output where supported;
-- integration with the existing derivative contracts.
-
-Non-goals:
-
-- a full DAE index-reduction framework;
-- PDE solving.
-
-The selected method is Alexander's two-stage SDIRK2 method, documented in the
-design record with its primary source. Completion gate: the stiff method meets
-the accuracy, diagnostics, reentrancy, and dense-output contracts used by the
-existing explicit path and is covered by independent reference and
-stiff/non-stiff comparison tests. See the [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm)
-for method selection and the supported ODE scope.
-
-## 2.4 — Sparse Direct II
+## Next release: 2.4 — Sparse Direct II
 
 Scope:
 
