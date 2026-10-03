@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   capability references.
 - Preserved the v2.3.0 versioned documentation build as it moves into the
   historical release set.
+- Carried forward the unchanged 2.3.0 numerical-evidence catalogue with its
+  provenance recorded.
 
 ## [2.3.0] - 2026-10-03
 

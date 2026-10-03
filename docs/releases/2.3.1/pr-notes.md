@@ -9,4 +9,5 @@ The supported target matrix and runtime qualification carry forward from
 2.3.0. Documentation, package metadata, repository CI, and the release branch's
 clean-archive qualification are checked as part of this release. The
 documentation workflow now rebuilds v2.3.0 alongside the other archived site
-versions.
+versions. The release-specific numerical-evidence catalogue carries forward
+from 2.3.0 and records that source release.

@@ -5,6 +5,7 @@ Release notes, qualification records, audits, manifests, and machine-readable ev
 ## 2.3.1 — current published stable
 
 - [Release notes](2.3.1/release-notes.md)
+- Numerical-evidence catalogue carried forward from 2.3.0: [numerical evidence](2.3.1/numerical-evidence.json)
 - Runtime qualification carried forward from the unchanged 2.3.0 implementation: [qualification](2.3.0/qualification.md) and [workflow qualification](2.3.0/workflow-qualification.md)
 - [Release review notes](2.3.1/pr-notes.md)
 

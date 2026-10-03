@@ -14,6 +14,8 @@ guide for Pascal mathematics and numerical libraries, and carries forward the
   details in the capability inventory.
 - Kept the v2.3.0 documentation in the versioned-site build as it moves into
   the historical release set.
+- Carried forward the unchanged numerical-evidence catalogue from 2.3.0 and
+  recorded that provenance in the release-specific catalogue.
 
 The 2.3.0 platform qualification continues to describe the unchanged runtime
 and supported target matrix; see the [qualification record](../2.3.0/qualification.md)
