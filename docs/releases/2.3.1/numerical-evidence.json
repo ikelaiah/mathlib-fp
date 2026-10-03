@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "release": "2.3.1",
+  "inventory": "docs/reference/capabilities.json",
+  "inventory_release": "2.3.1",
+  "families": [
+    {
+      "family": "bessel_elliptic_exponential_integral",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real double inputs within each function's documented validated domain, including stated endpoint limits and exclusions.",
+      "budget": {
+        "kind": "relative_error",
+        "metric": "Absolute difference from independent reference values, with the test's 5e-13 absolute floor and 5e-12 relative allowance",
+        "limit": 5e-12,
+        "unit": "function output units"
+      },
+      "reference": {
+        "method": "120-digit decimal reference corpora, independent quadrature for E1 values, and documented mathematical identities",
+        "source": "Repository-generated reference include files cite NIST DLMF; reference generators use decimal arithmetic and Gauss-Legendre quadrature",
+        "precision": "At least 120 decimal digits during reference generation, rounded to IEEE-754 binary64 literals",
+        "parameters": "Bessel small and large arguments; modified Bessel domain and scale cases; incomplete and complete elliptic integrals including Pi; Jacobi quarter periods; Ei/E1 tails; convergent 2F1 parameter and argument fixtures",
+        "license": "Repository-authored generators and fixtures under MIT; mathematical reference material is cited from NIST DLMF",
+        "regeneration": "Run the generate_*_data.py tools referenced by each include header, then run the cited special-function test units"
+      },
+      "tests": [
+        {
+          "path": "tests/TestSpecialFunctions.pas",
+          "assertions": [
+            "procedure TTestBessel.TestJReferenceCorpus;",
+            "procedure TTestBessel.TestYReferenceCorpus;",
+            "Y0 negative domain"
+          ],
+          "kind": "independent decimal references, identities, and domain edges"
+        },
+        {
+          "path": "tests/TestModifiedBessel.pas",
+          "assertions": [
+            "procedure TTestModifiedBessel.TestReferenceCorpus;",
+            "I/K Wronskian",
+            "K0 negative domain"
+          ],
+          "kind": "independent decimal references, identities, and domain edges"
+        },
+        {
+          "path": "tests/TestEllipticIntegrals.pas",
+          "assertions": [
+            "procedure TTestEllipticIntegrals.TestIncompleteReferenceCorpus;",
+            "procedure TTestEllipticIntegrals.TestThirdKindReferenceValues;",
+            "F(phi, 0)"
+          ],
+          "kind": "decimal/quadrature references and endpoint/domain checks"
+        },
+        {
+          "path": "tests/TestJacobiElliptic.pas",
+          "assertions": [
+            "procedure TTestJacobiElliptic.TestIndependentReferences;",
+            "sn(K,m)=1",
+            "infinite parameter"
+          ],
+          "kind": "independent decimal references, quarter-period identities, and domain edges"
+        },
+        {
+          "path": "tests/TestExponentialIntegrals.pas",
+          "assertions": [
+            "procedure TTestExponentialIntegrals.TestEiReferenceCorpus;",
+            "procedure TTestExponentialIntegrals.TestE1ReferenceCorpus;",
+            "Ei below validated range"
+          ],
+          "kind": "independent decimal/quadrature references and pole/domain checks"
+        },
+        {
+          "path": "tests/TestGaussHypergeometric.pas",
+          "assertions": [
+            "procedure TTestGaussHypergeometric.TestReferenceCorpus;",
+            "F(1,1;2;0.5) identity",
+            "X above range"
+          ],
+          "kind": "independent decimal references, identities, and convergence-domain checks"
+        }
+      ],
+      "edge_cases": [
+        "Function-specific poles and finite endpoint limits are checked explicitly.",
+        "NaN, infinity, and out-of-domain values follow the documented rejection behavior.",
+        "Elliptic Pi principal-value poles, unsupported characteristics, and hypergeometric analytic continuation are excluded."
+      ],
+      "documentation": "docs/guides/domains/math-base.md"
+    },
+    {
+      "family": "remaining_advanced_spectral_linear_algebra",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real or complex double dense matrices and regular real or complex matrix pencils in documented supported dimensions.",
+      "budget": {
+        "kind": "residual",
+        "metric": "Normalized reconstruction, orthogonality/unitarity, and generalized eigenpair residuals; maximum explicit generalized residual fixture threshold",
+        "limit": 1e-07,
+        "unit": "dimensionless normalized residual"
+      },
+      "reference": {
+        "method": "Independently reconstructed Schur factorizations, known eigenvalue fixtures, orthogonality/unitarity checks, and normalized homogeneous generalized-eigenpair residuals",
+        "source": "Repository-authored fixtures and independently computed residuals in TestDenseDecompositions",
+        "precision": "IEEE-754 binary64 real and complex arithmetic",
+        "parameters": "Real/complex Hessenberg and Schur factors, nonsymmetric real eigenpairs, finite and infinite generalized eigenvalues, and real/complex 3x3 pencils",
+        "license": "Repository-authored tests under MIT; no third-party reference data",
+        "regeneration": "Run TestDenseDecompositions; recompute the stated factor reconstructions and normalized homogeneous eigenpair residuals from the fixtures"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "real generalized Schur reconstructs A",
+            "finite generalized eigenpair residual is small",
+            "3x3 generalized eigenvectors report small residuals"
+          ],
+          "kind": "factor reconstruction and normalized eigenpair residual"
+        },
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "complex generalized Schur reconstructs A",
+            "complex generalized eigenpair residual is small",
+            "3x3 complex generalized eigenpair residual is small"
+          ],
+          "kind": "complex factor reconstruction and normalized eigenpair residual"
+        }
+      ],
+      "edge_cases": [
+        "Singular B produces projective infinite generalized eigenvalues where supported.",
+        "Empty inputs, invalid dimensions, non-finite entries, and bounded-iteration failures have explicit tests.",
+        "Repeated or clustered eigenvalues may rotate their eigenvector basis; polynomial and interior-target workflows are outside this family."
+      ],
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
+    },
+    {
+      "family": "stiff_ode_integration",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real-double explicit-form initial-value systems with smooth right-hand sides over the integration interval, dense state Jacobians, and tolerances for which the bounded step and Newton iteration converges.",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "Fixture-specific endpoint, interpolation, and event bounds; the Robertson endpoint uses 20*(rtol*abs(reference)+10*atol) per component (maximum allowed state deviation 2.2e-3).",
+        "limit": 0.0022,
+        "unit": "state units; event-time bounds are separately asserted"
+      },
+      "reference": {
+        "method": "Closed-form forced-stiff scalar solution and published Robertson kinetics endpoint values",
+        "source": "The repository spec cites the SUNDIALS cvRoberts_dns.c example: https://github.com/LLNL/sundials/blob/main/examples/cvode/serial/cvRoberts_dns.c",
+        "precision": "IEEE-754 binary64; published Robertson decimal values are represented as binary64 literals",
+        "parameters": "Forced equation y'=-1000*(y-cos(t))-sin(t), y(0)=0; Robertson system at t=4e10 with y0=[1,0,0], rtol=1e-4 and atols=[1e-8,1e-14,1e-6]",
+        "license": "Repository-authored test fixture under the project license; upstream SUNDIALS source is cited and no third-party implementation code is copied",
+        "regeneration": "Run TestNumericalModelling. Review the cited SUNDIALS endpoint fixture and evaluate the forced-problem identity y(t)=cos(t)-exp(-1000*t); no network access is needed at test time."
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": [
+            "procedure TTestNumericalModelling.TestStiffODEJacobianModesAndEvents;",
+            "tighter tolerances reduce endpoint error",
+            "stiff event found",
+            "analytic Jacobian endpoint",
+            "automatic Jacobian endpoint",
+            "backward integration endpoint",
+            "non-stiff result agrees with explicit solver"
+          ],
+          "kind": "closed-form stiff endpoint and dense-output accuracy, tolerance refinement, event location, analytic/automatic/finite-difference Jacobians, backward integration, and non-stiff comparison"
+        },
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": [
+            "procedure TTestNumericalModelling.TestStiffODERobertsonReference;",
+            "Robertson stiff status",
+            "Robertson integration accepted steps",
+            "Robertson component %d reference: expected %.16g, got %.16g"
+          ],
+          "kind": "published Robertson reference endpoint with per-component absolute/relative tolerance weighting"
+        },
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": [
+            "procedure TTestNumericalModelling.TestStiffODEValidation;",
+            "missing analytic Jacobian is rejected",
+            "wrong Jacobian dimensions are rejected",
+            "step limit is reported",
+            "Newton failure is reported as breakdown",
+            "non-finite derivative output is rejected",
+            "nested stiff integration is reentrant"
+          ],
+          "kind": "invalid-input, iteration-limit, Newton-breakdown, non-finite-output, and reentrancy checks"
+        }
+      ],
+      "edge_cases": [
+        "Forward and backward integration, scalar and component tolerances, interpolation, and directional event localization are covered.",
+        "Finite-difference, analytic, and automatic Jacobian modes are tested against the same forced-stiff reference.",
+        "Missing or malformed Jacobians, zero combined tolerance, non-finite or wrong-dimension derivatives, step exhaustion, and Newton failure have explicit outcomes.",
+        "The Robertson kinetics system exercises a three-component stiff trajectory at t=4e10; sparse Jacobians, mass matrices, DAEs, and large-scale solves are outside the supported domain."
+      ],
+      "documentation": "docs/guides/domains/numerical-modelling.md"
+    }
+  ],
+  "carried_forward_from": "2.3.0",
+  "carry_forward_reason": "The 2.3.1 patch changes documentation and release metadata only; Pascal source, numerical tests, and stable capability scope are unchanged."
+}

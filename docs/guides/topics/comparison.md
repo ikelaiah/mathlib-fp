@@ -1,21 +1,52 @@
 # Choosing a Pascal numerical library
 
-This page is an informational map of Pascal numerical libraries for someone
-choosing a foundation for Free Pascal work. It uses only facts verified from
-upstream projects and this repository; see the comparison policy below.
+Reviewed 3 October 2026. This is a representative shortlist of Pascal math
+libraries and Pascal-facing numerical packages, not a benchmark or a claim of
+complete compatibility across every compiler and platform. The GitHub-hosted
+projects are listed first; established projects distributed through other
+upstream channels follow. Check each upstream project for its current release,
+compiler support, and license when evaluating it for a project.
 
-| Library | Status/licence | Native Pascal? | Scope | Notes |
-| ------- | -------------- | -------------- | ----- | ----- |
-| FPC NumLib | Bundled with FPC; FPC RTL licence; essentially unchanged since 2000 | Yes — Pascal source | Units for determinants, eigenvalues, integration, ODEs, roots, linear systems, special functions, and splines | Port of the 1986–2000 NUMLIB library (Eindhoven); `ArbFloat` configurable types; flat-array pointer-overlay API |
-| DMath | Jean Debord; v0.90 (Dec 2012); LGPL v2 | Yes — Delphi/FPC Pascal | Special functions, distributions, linear algebra, optimisation, integration/ODEs, FFT, RNG, regression/PCA, and expression parsing | Broad scope; last release v0.90 (Dec 2012); continued by LMath |
-| LMath | FPC/Lazarus continuation of DMath; LGPL v3; last update 2025-10 | Yes — FPC/Lazarus Pascal | Same procedural core as DMath | SourceForge `lmath-library`; Lazarus packages and GUI demos |
-| MtxVec | Dew Research; commercial | Core Edition is full-source Pascal; Delphi/C++ Builder/.NET | Dense vector and matrix numerics | Performance paths include MKL and assembly; add-ons include Stats, DSP, and Data Miner |
-| ALGLIB for Delphi | Free edition licensed for personal/academic use; commercial use paid | Pascal wrapper around a C core; FPC-compatible | LP/QP/SOCP/QCQP/NLP/MINLP, global and derivative-free optimisation, 1–3D interpolation, dense/sparse EVD/SVD, FFT, statistics, and decision forests | Broad numerical and optimisation coverage |
-| AMath/DAMath + MPArith | Wolfgang Ehrhardt; zlib licence | Yes — Delphi + FPC Pascal | Elementary and special functions (Bessel, elliptic, hypergeometric, zeta/polylog, distributions), quadrature, multiprecision | Quadpack and double-exponential quadrature; reference manual includes implementation notes and cited sources |
-| mrMath | Apache-2.0; active in 2026 | Yes — Delphi + FPC Pascal | Dense LU/QR/Cholesky/SVD, PCA/t-SNE/ICA/NNMF, wavelets | ASM/AVX/FMA kernels; multithreading |
-| numerik | MIT; last updated 2021 | Yes — FPC/Lazarus Pascal | NumPy-like `TMultiArray` with broadcasting and slicing | Requires external OpenBLAS/LAPACK libraries |
-| FastMath | BSD; Delphi-only | Yes — Delphi Pascal (SIMD assembly) | 2-D/3-D/4-D vectors and matrices for games/graphics; single precision | Designed for graphics workloads |
-| mathlib-fp | MIT; native Free Pascal | Yes — complete portable Object Pascal | 13 focused domains covering algebra, probability, statistics, engineering/DSP, numerics, optimisation, time series, machine learning, finance, geometry, and interchange | No mandatory third-party numerical runtime; versioned web/offline documentation; beginner recipes; machine-readable capability inventory; qualification programme |
+## GitHub-hosted projects
+
+| Project | License and compiler | Areas of strength | Notes |
+| ------- | ------------------- | ---------- | ----------------- |
+| [mrMath](https://github.com/mikerabat/mrmath) | Apache-2.0; Delphi and Free Pascal source | Dense linear algebra (LU, QR, Cholesky, SVD), statistics, dimensionality reduction, wavelets, and threaded matrix operations | A broad matrix and machine-learning toolkit, with hand-optimized assembly, AVX, and FMA paths. Its documentation describes target-specific builds and setup. |
+| [numerik](https://github.com/ariaghora/numerik) | MIT; Object Pascal with a Lazarus package | NumPy-like `TMultiArray`, broadcasting, slicing, array operations, matrix multiplication, and SVD | Brings multidimensional-array semantics to Object Pascal; can use OpenBLAS/LAPACK for BLAS acceleration. |
+| [pas-core-math](https://github.com/joaopauloschuler/pas-core-math) | MIT; Free Pascal 3.2.2+ | CORE-MATH scalar functions for binary32 and binary64, with correctly-rounded results as the design goal | A specialist project for high-quality scalar math, with an x86-64 Linux focus. |
+| [FastMath](https://github.com/neslib/FastMath) | Simplified BSD; Delphi | Single-precision scalar operations, 2D/3D/4D vectors, small matrices, and quaternions | Designed for graphics and SIMD workloads. Its `Fast*` routines make speed-oriented approximations available as a distinct choice. |
+| [CAI Neural API](https://github.com/joaopauloschuler/neural-api) | LGPL-2.1 with a custom linking exception; current master targets Free Pascal/Lazarus, and Delphi users are directed to tag v2.0.0 | Neural-network training and inference, with AVX/AVX2/AVX512 CPU paths and optional OpenCL | A dedicated machine-learning API with CPU and GPU acceleration paths; the project provides a Delphi-compatible release tag alongside its current FPC branch. |
+| [MPArith](https://github.com/JulStrat/MPArith) | Free Pascal and Delphi source; terms are in [`copying_we.txt`](https://github.com/JulStrat/MPArith/blob/master/copying_we.txt) | Arbitrary-precision integer, rational, real, and complex arithmetic | A multiprecision collection with test programs, demos, and calculator examples alongside its numeric units. |
+| [mathlib-fp 2.3.1](https://github.com/ikelaiah/mathlib-fp) | MIT; native Free Pascal source (FPC 3.2.2+) | 13 focused domains spanning algebra, probability, statistics, engineering/DSP, numerics, optimisation, time series, machine learning, finance, geometry, and interchange | A broad, FPC-first toolkit with no mandatory third-party numerical runtime, versioned web/offline docs, runnable learning examples, a capability inventory, and release qualification. It uses FPC's `objfpc` dialect and does not claim Delphi compatibility. |
+
+## Specialized GitHub projects
+
+These projects focus on precision-specific arithmetic needs.
+
+| Project | License and compiler | Areas of strength | Notes |
+| ------- | ------------------- | ---------- | ----------------- |
+| [TIntX](https://github.com/Xor-el/IntXLib4Pascal) | MIT; Free Pascal 3.0+ and Delphi 2010+ | Arbitrary-precision integers, including fast multiplication, division, and base conversion | A focused big-integer library with transform-based fast algorithms and support for both major Pascal compiler families. |
+| [BigDecimalMath](https://github.com/benibela/bigdecimalmath) | LCL-style LGPL with an explicit linking exception in the source; Free Pascal `objfpc` mode | Arbitrary-precision BCD floating point, arithmetic, rounding, square root, and power | Provides decimal multiprecision operations in an Object Pascal unit. |
+| [DelphiBigNumbers](https://github.com/rvelthuis/DelphiBigNumbers) | BSD-2-Clause; Delphi-first | Arbitrary-precision integer, decimal, and rational types | Combines assembly optimizations with pure-Pascal equivalents. The author's notes also describe an FPC build using `PUREPASCAL` and small unit-name adjustments. |
+
+The [DFF Library](https://www.delphiforfun.org/Programs/Library/Default.htm)
+is another community-catalogued resource, with material on big floating-point
+values, big integers, and astronomical calculations. Its
+[community listing](https://github.com/juliomar/awesome-delphi#math) links to
+the upstream collection.
+
+## Related projects distributed elsewhere
+
+| Project | License and compiler | Areas of strength | Notes |
+| ------- | ------------------- | ---------- | ----------------- |
+| [FPC NumLib](https://www.freepascal.org/daily/packages/numlib/numlib/index.html) | Included in the FPC distribution; package notices use the FPC modified-LGPL linking exception | Classic routines for determinants, eigenvalues, integration, ODEs, roots, linear systems, special functions, and splines | A long-standing part of the FPC ecosystem, derived from Eindhoven NUMLIB work. Its configurable `ArbFloat` and flat-array/pointer-overlay interfaces offer low-level control. The upstream source is on GitLab. |
+| [DMath](https://www.unilim.fr/pages_perso/jean.debord/tpmath/tpmath.htm) | LGPL-2.0; Delphi, FPC, and Lazarus builds are listed by the project | Scientific routines including special functions, distributions, linear algebra, optimisation, integration/ODEs, FFT, random numbers, and regression | A broad scientific collection with an established history; LMath extends its procedural core for Free Pascal and Lazarus. |
+| [JEDI Math](https://sourceforge.net/projects/jedimath/) | MPL-1.1; project lists Delphi, Kylix, FPC, and Lazarus | Matrices/vectors, regression, geometry, physics, equation rendering, and ray tracing | A community project spanning mathematical and graphical areas, including tools for physics and visualization. |
+| [LMath](https://sourceforge.net/projects/lmath-library/) | Mostly LGPL-3.0; the `lmDSP` package is identified as GPL; Free Pascal/Lazarus | Numerical analysis, probabilities, matrices, optimisation, equations, integration, FFT, regression, statistics, graphics, and components | Source-only Pascal with Lazarus packages and no external library requirement. SourceForge lists version 0.6.1 and an update in October 2025; package-specific license notices identify the terms for each component. |
+| [OptiVec](https://www.optivec.com/) | Commercial; compiler-specific Delphi products and a Lazarus/Free Pascal product for 64-bit Windows; 90-day trial | Vendor describes 4,000+ vector, matrix, and complex functions, plus statistics, FFT, fitting, interpolation, and matrix decompositions | A vendor-supported, performance-oriented engineering and scientific toolkit with hand-optimized routines. The vendor lists version 8.4.3. |
+| [AMath and DAMath](https://www.wolfgang-ehrhardt.de/misc_en.html#amath) | Permissive terms stated in the source distribution; Delphi and FPC source | Elementary and special functions, distributions, quadrature, root finding, and complex functions | A specialist collection with function-level reference material and implementation notes. |
+| [MtxVec Core Edition](https://www.dewresearch.com/products/mtxvec/core/) | Commercial; full-source Delphi edition, with separate C++/.NET products | Dense vector/matrix numerics, statistics, and signal processing | A supported commercial Delphi option; Core Edition can be built without external DLLs. |
+| [ALGLIB for Delphi](https://www.alglib.net/download.php) | Free Delphi/FPC edition is for personal and academic use; commercial edition is available | Broad optimization, interpolation, linear algebra, FFT, statistics, and data-analysis algorithms | A wide algorithm catalog with Pascal interfaces to a C core; the free Delphi edition includes precompiled binaries. |
 
 ## Position
 
@@ -23,47 +54,10 @@ mathlib-fp is intended as a general-purpose numerical library for Free Pascal
 with four deliberate characteristics: an MIT licence with no paid tier, a
 complete implementation in Object Pascal source within this repository, no
 mandatory third-party numerical runtime, and documentation and qualification
-material organised as a learning path. These characteristics are described for
-mathlib-fp itself; this page makes no claim that they are unique or that any
-other library lacks them.
-
-## Known current gaps
-
-The [capability inventory](../../reference/capabilities.md) is the authority for what
-mathlib-fp does not yet support. The main gaps and their roadmap destinations
-are:
-
-- **Special-function families** — documented real-double Bessel, elliptic,
-  Jacobi elliptic, exponential-integral, and Gauss hypergeometric functions
-  are stable in 2.2.0; complex branches and analytic continuation remain
-  unsupported.
-- **Advanced spectral families** — real and complex Schur, Hessenberg,
-  nonsymmetric real eigen, and generalized eigen paths are stable in 2.2.0;
-  polynomial, shift-invert, and interior-target eigensystems remain deferred.
-- **Stiff and implicit ODEs** — v2.3.0 adds a dense SDIRK2 solver alongside
-  the explicit, non-stiff path, as described in the
-  [stiff and implicit ODE gate](../../project/roadmap.md#23-stiff-and-implicit-odes).
-- **Advanced sparse direct algorithms** — no fill-reducing symbolic ordering,
-  multifrontal/supernodal, distributed, out-of-core, or GPU path exists; the
-  destination is the [2.4 Sparse Direct II gate](../../project/roadmap.md#next-release-24-sparse-direct-ii).
-- **Parallel/SIMD dispatch and advanced iterative variants** — no stable
-  thread-pool or vector-intrinsic API and no block/flexible Krylov or
-  multigrid; the destination is the
-  [performance acceleration track](../../project/roadmap.md#performance-acceleration-track).
-- **Advanced DSP design and wavelets** — equiripple, advanced IIR families,
-  and broader wavelets are conditional; the destination is the
-  [Signal Processing II lane](../../project/roadmap.md#signal-processing-ii).
-- **Conditional statistics and data science** — survival/factor analysis,
-  robust covariance, GLMs, boosting, and broader forecasting are not
-  activated; the destination is the
-  [Statistics II](../../project/roadmap.md#statistics-ii) and
-  [Data Analysis II](../../project/roadmap.md#data-analysis-ii) lanes.
-- **General model/decomposition persistence** — only selected model adapters
-  are stable; the destination is the
-  [Persistence and interchange II lane](../../project/roadmap.md#persistence-and-interchange-ii).
-- **Global and discrete optimisation** — no reproducible global-optimisation
-  baseline and no committed MILP/MINLP capability; the destination is the
-  [Global and discrete optimisation lane](../../project/roadmap.md#global-and-discrete-optimisation).
+material organised as a learning path. It is designed as an FPC-first,
+Lazarus-focused project. These describe mathlib-fp's approach; other projects
+bring strengths in areas such as SIMD performance, multi-precision arithmetic,
+array semantics, and Delphi support.
 
 ## Engineering differentiators
 
@@ -86,22 +80,19 @@ assert that no other compared library does similar things.
 ## Comparison policy
 
 This page is informational, not advertising. It is reviewed at least once per
-major release. Claims are linked to evidence where practical, unknown facts
-are distinguished from unsupported capabilities, and no library is declared
-superior on the basis of raw function counts.
+major release and dated. Claims are based on upstream project pages, source
+repositories, release archives, and license notices; they summarize what each
+project documents and are not independent compiler tests or performance
+benchmarks. A missing compatibility claim means it was not verified here, not
+that the project cannot work on that compiler. Package-specific license
+differences are called out where the upstream project documents them. No
+library is declared superior on the basis of raw function counts.
 
 ## Sources
 
-- FPC NumLib — [FPC NumLib unit reference](https://www.freepascal.org/daily/packages/numlib/numlib/index.html).
-- DMath — [DMath/TPMath page](https://www.unilim.fr/pages_perso/jean.debord/tpmath/tpmath.htm).
-- LMath — [SourceForge LMath project](https://sourceforge.net/projects/lmath-library/files/LMath/).
-- MtxVec — Dew Research.
-- ALGLIB for Delphi — ALGLIB Project.
-- AMath/DAMath + MPArith — Wolfgang Ehrhardt.
-- mrMath — [github.com/mikerabat/mrmath](https://github.com/mikerabat/mrmath).
-- numerik — [github.com/ariaghora/numerik](https://github.com/ariaghora/numerik).
-- FastMath — [github.com/neslib/FastMath](https://github.com/neslib/FastMath).
-- mathlib-fp — [github.com/ikelaiah/mathlib-fp](https://github.com/ikelaiah/mathlib-fp).
-
-URLs that are not already present in this repository's documentation or the
-verified fact set are deliberately omitted rather than invented.
+- FPC NumLib — [unit reference](https://www.freepascal.org/daily/packages/numlib/numlib/index.html) and [official FPC source tree](https://gitlab.com/freepascal.org/fpc/source/-/tree/main/packages/numlib).
+- DMath and LMath — [DMath/TPMath project page](https://www.unilim.fr/pages_perso/jean.debord/tpmath/tpmath.htm), [DMath SourceForge metadata](https://sourceforge.net/projects/dmath/), and [LMath releases and README](https://sourceforge.net/projects/lmath-library/files/LMath/).
+- GitHub projects — upstream repositories for [mrMath](https://github.com/mikerabat/mrmath), [numerik](https://github.com/ariaghora/numerik), [pas-core-math](https://github.com/joaopauloschuler/pas-core-math), [FastMath](https://github.com/neslib/FastMath), [CAI Neural API](https://github.com/joaopauloschuler/neural-api), [MPArith](https://github.com/JulStrat/MPArith), [TIntX](https://github.com/Xor-el/IntXLib4Pascal), [BigDecimalMath](https://github.com/benibela/bigdecimalmath), and [DelphiBigNumbers](https://github.com/rvelthuis/DelphiBigNumbers).
+- Other upstream sources — [JEDI Math](https://sourceforge.net/projects/jedimath/), [OptiVec](https://www.optivec.com/), [AMath/DAMath](https://www.wolfgang-ehrhardt.de/misc_en.html#amath), [MtxVec Core Edition](https://www.dewresearch.com/products/mtxvec/core/), and [ALGLIB Free Edition](https://www.alglib.net/download.php).
+- DFF Library — [community listing](https://github.com/juliomar/awesome-delphi#math) and [upstream collection](https://www.delphiforfun.org/Programs/Library/Default.htm).
+- mathlib-fp — [repository](https://github.com/ikelaiah/mathlib-fp), [v2.3.1 release](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.3.1), and the in-repository [capability inventory](../../reference/capabilities.md).
