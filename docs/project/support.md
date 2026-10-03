@@ -16,22 +16,22 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The 2.3.0 qualification is pending; the latest retained primary-target
-evidence remains the [2.2.0 release qualification](../releases/2.2.0/qualification.md),
-which passed on 2026-09-27 from checksummed clean archives. The
-2.0.0 qualification remains historical.
+The 2.3.0 release candidate passed the
+[Linux and Windows release qualification](../releases/2.3.0/qualification.md)
+on 2026-10-03 from checksummed clean archives. The 2.0.0 qualification remains
+historical.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.2.0 clean-archive qualification, 2026-09-27 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.2.0 clean-archive qualification, 2026-09-27 | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.3.0 clean-archive qualification, 2026-10-03 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.3.0 clean-archive qualification, 2026-10-03 | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The finalized `release/2.2.0` commit produced new Linux and Windows primary
-artifacts. The 2.3.0 release qualification will refresh both primary profiles.
-See the linked qualification record for run and artifact details.
+The qualified `release/2.3.0` candidate produced new Linux and Windows primary
+artifacts. See the linked qualification record for the run, qualified commit,
+and artifact digests.
 
 ### Exact profiles
 

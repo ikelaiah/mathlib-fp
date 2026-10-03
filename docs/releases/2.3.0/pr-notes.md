@@ -11,6 +11,9 @@ problem. The stage solve now refreshes its Jacobian and backtracks until the
 scaled implicit residual decreases. Linux and Windows CI both pass on the
 merged feature commit.
 
-The remaining release gate is the 2.3.0 checksummed clean-archive qualification
-on `release/2.3.0`. This note will link the run and artifacts after that gate
-passes.
+PR [#59](https://github.com/ikelaiah/mathlib-fp/pull/59) passed Linux and
+Windows CI on its release commit. The full checksummed clean-archive
+qualification also passed on both platforms; Linux ran with outbound
+connections blocked, and Windows built the Lazarus package for Win32 and
+Win64. Run and artifact details are in the
+[qualification record](qualification.md).
