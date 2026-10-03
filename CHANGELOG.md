@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.3.2] - 2026-10-03
+
+### Documentation
+
+- Added a concise, release-specific account of mathlib-fp's current scope
+  boundaries to the Pascal numerical-library comparison, with a link to the
+  capability inventory and respectful context for other projects.
+- Carried forward the unchanged numerical-evidence catalogue from 2.3.1 and
+  recorded its provenance.
+- Preserved the v2.3.1 versioned documentation site as it moves into the
+  historical release set.
+
 ## [2.3.1] - 2026-10-03
 
 ### Documentation

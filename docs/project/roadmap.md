@@ -804,12 +804,12 @@ supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
-## Previous release: 2.3.1 — Documentation refresh
+## Previous release: 2.3.2 — Comparison scope boundaries
 
-Version 2.3.1 refreshes the Pascal numerical-library comparison and release
-documentation. It contains no Pascal source or public API changes, so its
-runtime qualification and target evidence carry forward from 2.3.0. See the
-[2.3.1 release notes](../releases/2.3.1/release-notes.md).
+Version 2.3.2 makes the comparison guide's account of mathlib-fp's current
+scope boundaries explicit. It contains no Pascal source or public API changes,
+so its runtime qualification and target evidence carry forward from 2.3.1. See
+the [2.3.2 release notes](../releases/2.3.2/release-notes.md).
 
 ## Next release: 2.4 — Sparse Direct II
 

@@ -52,7 +52,7 @@ Target qualifications and platform-specific limitations are defined by the
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.3.1 capability inventory; its numerical scope carries forward
+This is the 2.3.2 capability inventory; its numerical scope carries forward
 unchanged from 2.3.0. The [MathBase guide](../guides/domains/math-base.md)
 documents Bessel J/Y and modified I/K at orders zero and one, Legendre
 elliptic integrals K/E/F/Pi, real exponential integrals Ei/E1, bounded real
