@@ -52,6 +52,7 @@ closest to your project. For a shorter task-first route, use the
 | `37_real_nonsymmetric_eigen.pas` | AlgebraLib | Compute and order real nonsymmetric eigenpairs with residual diagnostics |
 | `38_generalized_eigenproblem.pas` | AlgebraLib | Solve real and complex matrix pencils, including eigenvalues at infinity |
 | `39_complex_schur_factorization.pas` | AlgebraLib | Compute a complex Schur factorization with unitary Schur vectors |
+| `40_stiff_ode_sdirk.pas` | NumericsLib | Integrate a stiff forced ODE with SDIRK, analytic Jacobian, dense output, and a directional event |
 
 ## Build and run
 

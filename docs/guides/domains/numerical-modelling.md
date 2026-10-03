@@ -52,7 +52,8 @@ The complete runnable workflow is
 | Nonlinear least squares | `FitNonlinear` | Use `FitNonlinearAuto` for a dual-number residual/Jacobian |
 | Small nonlinear equation system | `SolveSystem` | Use `SolveSystemAuto` for dual-number equations |
 | Polynomial roots | `SolvePolynomial` | Returns every real/complex root and residual; not a symbolic factorization |
-| Non-stiff vector initial-value ODE | `SolveODE` | Stiff or mass-matrix problems are not supported by the stable API |
+| Non-stiff vector initial-value ODE | `SolveODE` | Stiff dynamics: use the v2.3 development `SolveStiffODE`; mass-matrix systems remain outside the API |
+| Stiff vector initial-value ODE | `SolveStiffODE` (v2.3 development) | Sparse/large systems or mass matrices: use a solver designed for that structure |
 
 Interpolation is exact at supplied points; fitting estimates a model from
 possibly noisy observations. Do not use an interpolation API when residual,
@@ -183,6 +184,35 @@ zero-crossings and localises an event against dense output.
 `AbsoluteTolerances` may provide one positive absolute tolerance per state
 component; leave it empty to use scalar `AbsoluteTolerance`.
 
+The v2.3 development entry point `SolveStiffODE` uses Alexander's two-stage,
+second-order SDIRK method for dense real-double systems of explicit-form ODEs.
+It solves each implicit stage with bounded modified Newton iteration and a
+dense pivoted LU factorization.
+The embedded first-order value drives a maximum component-scaled error test.
+Use `TStiffODEOptions.JacobianMode` to choose a supplied analytic Jacobian,
+forward-mode automatic differentiation through `AutoDerivative`, or scaled
+finite differences (the default). The callbacks must describe the same
+derivative; a failed selected mode is reported rather than silently replaced.
+The result reports accepted/rejected steps, derivative and Jacobian
+evaluations, Newton correction solves, and status. Its `Evaluate` method uses
+cubic-Hermite interpolation, which also supports directional event location.
+
+```pascal
+Options := TStiffODEOptions.Defaults;
+Options.JacobianMode := sjmAnalytic;
+Options.Jacobian := @StateJacobian;
+Solution := TModellingKit.SolveStiffODE(@Derivative, T0, InitialState, T1,
+  Options);
+```
+
+For smooth non-stiff problems, `SolveODE` remains the more efficient choice.
+`SolveStiffODE` supports dense state Jacobians and does not implement mass
+matrices, DAEs, PDEs, or sparse/large-scale systems. The selected method and
+error estimator are documented in the
+[v2.3 design record](../../../tasks/spec-2.3.md); its formula follows
+Alexander's 1977 SDIRK paper
+([DOI 10.1137/0714068](https://doi.org/10.1137/0714068)).
+
 Callbacks are synchronous and reentrant. There is no unit-global callback,
 workspace, or random state. Inputs are never mutated. Dense output and fit
 arrays own independent storage. These APIs are thread-safe when caller-owned
@@ -194,8 +224,9 @@ callback state is not concurrently mutated.
 nil callbacks, dimensions, indexes, bounds, controls, or non-finite values.
 Validation failure does not mutate inputs.
 
-The stable 1.8 boundary does not claim stiff/implicit ODE integration, mass
-matrices, sparse/large scattered interpolation, reverse-mode AD, or
-high-dimensional deterministic cubature. Those conditional roadmap families
-remain explicit rather than being silently routed to an unsuitable algorithm.
+The v2.2.0 stable ODE surface includes explicit Dormand-Prince integration for
+real `Double` state. The v2.3 development gate adds dense SDIRK2 integration;
+mass-matrix systems, DAEs, PDEs, and sparse/large-scale stiff solvers remain
+outside scope. Other boundaries include sparse/large scattered interpolation,
+reverse-mode AD, and high-dimensional deterministic cubature.
 

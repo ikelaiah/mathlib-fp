@@ -199,6 +199,16 @@
         "maximum reconstruction residual ="
       ],
       "final_line": "Complex Schur factorization: success"
+    },
+    {
+      "path": "examples/40_stiff_ode_sdirk.pas",
+      "contains": [
+        "method = Alexander two-stage SDIRK",
+        "endpoint y(1.2) = 0.36235778",
+        "dense output y(0.4) = 0.92106110",
+        "falling event state = 0.49999997"
+      ],
+      "final_line": "stiff ODE example: success"
     }
   ]
 }

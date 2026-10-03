@@ -22,6 +22,9 @@ type
     procedure TestVectorRoot;
     procedure TestPolynomialRoots;
     procedure TestAdaptiveVectorODEAndEvent;
+    procedure TestStiffODEJacobianModesAndEvents;
+    procedure TestStiffODERobertsonReference;
+    procedure TestStiffODEValidation;
     procedure TestQuadraticProgram;
     procedure TestQuadraticProgramOutcomes;
     procedure TestSecondOrderConeProgram;
@@ -120,10 +123,61 @@ function TwoScaleODE(T:Double;const Y:TDoubleArray):TDoubleArray;
 begin Result:=TDoubleArray.Create(Y[0],-2*Y[1]); end;
 function EventAtTwo(T:Double;const Y:TDoubleArray):Double;
 begin Result:=Y[0]-2; end;
+function ForcedStiffODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+begin Result:=TDoubleArray.Create(-1000*(Y[0]-Cos(T))-Sin(T)); end;
+function ForcedStiffJacobian(T:Double;const Y:TDoubleArray):TModelMatrix;
+begin Result:=nil; SetLength(Result,1);
+  Result[0]:=TDoubleArray.Create(-1000); end;
+function ForcedStiffDual(T:Double;const Y:TDualArray):TDualArray;
+begin Result:=TDualArray.Create(-1000*(Y[0]-Cos(T))-Sin(T)); end;
+function ForcedStiffEvent(T:Double;const Y:TDoubleArray):Double;
+begin Result:=Y[0]-0.5; end;
+function ConstantODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+begin Result:=TDoubleArray.Create(1); end;
+function RobertsonODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+var D1,D3:Double;
+begin
+  D1:=-0.04*Y[0]+1E4*Y[1]*Y[2];
+  D3:=3E7*Y[1]*Y[1];
+  Result:=TDoubleArray.Create(D1,-D1-D3,D3);
+end;
+function RobertsonJacobian(T:Double;const Y:TDoubleArray):TModelMatrix;
+begin
+  SetLength(Result,3);
+  Result[0]:=TDoubleArray.Create(-0.04,1E4*Y[2],1E4*Y[1]);
+  Result[1]:=TDoubleArray.Create(0.04,-1E4*Y[2]-6E7*Y[1],-1E4*Y[1]);
+  Result[2]:=TDoubleArray.Create(0,6E7*Y[1],0);
+end;
+function BadODEJacobian(T:Double;const Y:TDoubleArray):TModelMatrix;
+begin Result:=nil; end;
+function NonFiniteStiffODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+begin Result:=TDoubleArray.Create(Infinity); end;
+function WrongDimensionStiffODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+begin Result:=TDoubleArray.Create(Y[0],Y[0]); end;
+function QuadraticStiffODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+begin Result:=TDoubleArray.Create(Sqr(Y[0])); end;
+function QuadraticStiffJacobian(T:Double;const Y:TDoubleArray):TModelMatrix;
+begin Result:=nil; SetLength(Result,1);
+  Result[0]:=TDoubleArray.Create(2*Y[0]); end;
 
 threadvar
   ReentryDepth:Integer;
   IntegrationReentryDepth:Integer;
+  StiffReentryTriggered:Boolean;
+
+function ReentrantStiffODE(T:Double;const Y:TDoubleArray):TDoubleArray;
+var O:TStiffODEOptions; Inner:TStiffODESolution;
+begin
+  if not StiffReentryTriggered then begin
+    StiffReentryTriggered:=True;
+    O:=TStiffODEOptions.Defaults;
+    Inner:=TModellingKit.SolveStiffODE(@ConstantODE,0,
+      TDoubleArray.Create(1),0.1,O);
+    if Inner.Status<>isConverged then
+      raise Exception.Create('nested stiff solve did not converge');
+  end;
+  Result:=TDoubleArray.Create(Y[0]);
+end;
 
 function InnerMaximum(const X:TDoubleArray):Double;
 begin Result:=-Sqr(X[0]-2); end;
@@ -365,6 +419,178 @@ begin
   AssertNear(Self,Ln(2),S.EventTime,2E-5,'event time');
   Y:=S.Evaluate(0.5);
   AssertNear(Self,Exp(0.5),Y[0],2E-6,'dense ODE output');
+end;
+
+procedure TTestNumericalModelling.TestStiffODEJacobianModesAndEvents;
+var O:TStiffODEOptions; ExplicitOptions:TAdaptiveODEOptions;
+    S:TStiffODESolution; ExplicitSolution:TAdaptiveODESolution;
+    Y:TDoubleArray; Expected,BaseError,TightError:Double;
+begin
+  O:=TStiffODEOptions.Defaults;
+  O.AbsoluteTolerance:=1E-7; O.RelativeTolerance:=1E-6;
+  O.MaximumStep:=0.05;
+  S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+    TDoubleArray.Create(0),1.2,O);
+  AssertEquals('finite-difference stiff status',Ord(isConverged),Ord(S.Status));
+  AssertTrue('stiff solver accepted steps',S.AcceptedSteps>0);
+  AssertTrue('stiff solver recorded Newton work',S.NewtonIterations>0);
+  AssertTrue('finite-difference Jacobians recorded',S.JacobianEvaluations>0);
+  AssertNear(Self,Cos(1.2),S.Y[High(S.Y)][0],2E-5,
+    'forced stiff endpoint');
+  Expected:=Cos(1.2)-Exp(-1200);
+  BaseError:=Abs(S.Y[High(S.Y)][0]-Expected);
+  Y:=S.Evaluate(0.4);
+  AssertNear(Self,Cos(0.4),Y[0],2E-5,'stiff dense output');
+
+  O.AbsoluteTolerance:=1E-9; O.RelativeTolerance:=1E-8;
+  S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+    TDoubleArray.Create(0),1.2,O);
+  TightError:=Abs(S.Y[High(S.Y)][0]-Expected);
+  AssertTrue('tighter tolerances reduce endpoint error',TightError<BaseError);
+
+  O.AbsoluteTolerance:=1E-7; O.RelativeTolerance:=1E-6;
+  O.Event:=@ForcedStiffEvent; O.EventDirection:=-1;
+  S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+    TDoubleArray.Create(0),1.2,O);
+  AssertTrue('stiff event found',S.EventFound);
+  AssertNear(Self,Pi/3,S.EventTime,2E-4,'stiff event time');
+  AssertNear(Self,0.5,S.EventState[0],2E-5,'stiff event state');
+
+  O.Event:=nil; O.JacobianMode:=sjmAnalytic;
+  O.Jacobian:=@ForcedStiffJacobian;
+  S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+    TDoubleArray.Create(0),1.2,O);
+  AssertEquals('analytic stiff status',Ord(isConverged),Ord(S.Status));
+  AssertTrue('analytic Jacobian work recorded',S.JacobianEvaluations>0);
+  AssertTrue('analytic derivative work recorded',S.Evaluations>0);
+  AssertNear(Self,Cos(1.2),S.Y[High(S.Y)][0],2E-5,
+    'analytic Jacobian endpoint');
+
+  O.Jacobian:=nil; O.JacobianMode:=sjmAutomatic;
+  O.AutoDerivative:=@ForcedStiffDual;
+  S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+    TDoubleArray.Create(0),1.2,O);
+  AssertEquals('automatic stiff status',Ord(isConverged),Ord(S.Status));
+  AssertTrue('automatic Jacobian work recorded',S.JacobianEvaluations>0);
+  AssertTrue('automatic derivative work recorded',S.Evaluations>0);
+  AssertNear(Self,Cos(1.2),S.Y[High(S.Y)][0],2E-5,
+    'automatic Jacobian endpoint');
+
+  O:=TStiffODEOptions.Defaults;
+  S:=TModellingKit.SolveStiffODE(@ConstantODE,1,
+    TDoubleArray.Create(1),0,O);
+  AssertEquals('backward stiff status',Ord(isConverged),Ord(S.Status));
+  AssertNear(Self,0,S.Y[High(S.Y)][0],1E-12,
+    'backward integration endpoint');
+  Y:=S.Evaluate(0.5);
+  AssertNear(Self,0.5,Y[0],1E-10,'backward dense output');
+
+  O:=TStiffODEOptions.Defaults;
+  S:=TModellingKit.SolveStiffODE(@ExpODE,0,TDoubleArray.Create(1),1,O);
+  ExplicitOptions:=TAdaptiveODEOptions.Defaults;
+  ExplicitSolution:=TModellingKit.SolveODE(@ExpODE,0,
+    TDoubleArray.Create(1),1,ExplicitOptions);
+  AssertNear(Self,ExplicitSolution.Y[High(ExplicitSolution.Y)][0],
+    S.Y[High(S.Y)][0],2E-6,'non-stiff result agrees with explicit solver');
+end;
+
+procedure TTestNumericalModelling.TestStiffODERobertsonReference;
+var O:TStiffODEOptions; S:TStiffODESolution; Y:TDoubleArray;
+    Ref,Atol:TDoubleArray; I:Integer; Bound:Double;
+begin
+  O:=TStiffODEOptions.Defaults;
+  O.AbsoluteTolerance:=0; O.AbsoluteTolerances:=TDoubleArray.Create(1E-8,
+    1E-14,1E-6); O.RelativeTolerance:=1E-4;
+  O.JacobianMode:=sjmAnalytic; O.Jacobian:=@RobertsonJacobian;
+  O.MaximumStep:=1E10; O.MaxSteps:=100000;
+  S:=TModellingKit.SolveStiffODE(@RobertsonODE,0,
+    TDoubleArray.Create(1,0,0),4E10,O);
+  AssertEquals('Robertson stiff status',Ord(isConverged),Ord(S.Status));
+  AssertTrue('Robertson integration accepted steps',S.AcceptedSteps>0);
+  Y:=S.Y[High(S.Y)];
+  Ref:=TDoubleArray.Create(5.2083495894337328E-8,
+    2.0833399429795671E-13,9.9999994791629776E-1);
+  Atol:=O.AbsoluteTolerances;
+  for I:=0 to 2 do begin
+    Bound:=20*(O.RelativeTolerance*Abs(Ref[I])+10*Atol[I]);
+    AssertTrue(Format('Robertson component %d reference: expected %.16g, got %.16g',
+      [I,Ref[I],Y[I]]),Abs(Y[I]-Ref[I])<=Bound);
+  end;
+end;
+
+procedure TTestNumericalModelling.TestStiffODEValidation;
+var O:TStiffODEOptions; S,Saved,Next:TStiffODESolution;
+    Initial:TDoubleArray; Rejected:Boolean;
+begin
+  O:=TStiffODEOptions.Defaults; O.JacobianMode:=sjmAnalytic;
+  Rejected:=False;
+  try
+    S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+      TDoubleArray.Create(0),1,O);
+  except on E:EModellingError do Rejected:=True; end;
+  AssertTrue('missing analytic Jacobian is rejected',Rejected);
+
+  O.Jacobian:=@BadODEJacobian; Rejected:=False;
+  try
+    S:=TModellingKit.SolveStiffODE(@ForcedStiffODE,0,
+      TDoubleArray.Create(0),1,O);
+  except on E:EModellingError do Rejected:=True; end;
+  AssertTrue('wrong Jacobian dimensions are rejected',Rejected);
+
+  O:=TStiffODEOptions.Defaults; Rejected:=False;
+  O.AbsoluteTolerance:=0; O.RelativeTolerance:=0;
+  try
+    S:=TModellingKit.SolveStiffODE(@ConstantODE,0,
+      TDoubleArray.Create(1),1,O);
+  except on E:EModellingError do Rejected:=True; end;
+  AssertTrue('zero combined tolerance is rejected',Rejected);
+
+  O:=TStiffODEOptions.Defaults; O.MaxSteps:=1;
+  S:=TModellingKit.SolveStiffODE(@ConstantODE,0,
+    TDoubleArray.Create(1),1,O);
+  AssertEquals('step limit is reported',Ord(isIterationLimit),Ord(S.Status));
+  AssertEquals('one accepted step before limit',1,S.AcceptedSteps);
+
+  O:=TStiffODEOptions.Defaults; O.InitialStep:=0.01;
+  O.MinimumStep:=0.005; O.MaxNewtonIterations:=1;
+  O.JacobianMode:=sjmAnalytic; O.Jacobian:=@QuadraticStiffJacobian;
+  S:=TModellingKit.SolveStiffODE(@QuadraticStiffODE,0,
+    TDoubleArray.Create(1),1,O);
+  AssertEquals('Newton failure is reported as breakdown',
+    Ord(isNumericalBreakdown),Ord(S.Status));
+
+  O:=TStiffODEOptions.Defaults; Rejected:=False;
+  try
+    S:=TModellingKit.SolveStiffODE(@NonFiniteStiffODE,0,
+      TDoubleArray.Create(1),1,O);
+  except on E:EModellingError do Rejected:=True; end;
+  AssertTrue('non-finite derivative output is rejected',Rejected);
+
+  O:=TStiffODEOptions.Defaults; Rejected:=False;
+  try
+    S:=TModellingKit.SolveStiffODE(@WrongDimensionStiffODE,0,
+      TDoubleArray.Create(1),1,O);
+  except on E:EModellingError do Rejected:=True; end;
+  AssertTrue('wrong derivative dimension is rejected',Rejected);
+
+  O:=TStiffODEOptions.Defaults; Initial:=TDoubleArray.Create(1);
+  Saved:=TModellingKit.SolveStiffODE(@ConstantODE,0,Initial,1,O);
+  Initial[0]:=42;
+  AssertNear(Self,1,Saved.Y[0][0],0,'result owns initial state');
+  Next:=TModellingKit.SolveStiffODE(@ExpODE,0,
+    TDoubleArray.Create(1),1,O);
+  AssertNear(Self,2,Saved.Y[High(Saved.Y)][0],1E-10,
+    'later solve leaves earlier result intact');
+  AssertNear(Self,Exp(1),Next.Y[High(Next.Y)][0],2E-6,
+    'follow-up solve completes');
+
+  StiffReentryTriggered:=False; O:=TStiffODEOptions.Defaults;
+  S:=TModellingKit.SolveStiffODE(@ReentrantStiffODE,0,
+    TDoubleArray.Create(1),0.05,O);
+  AssertEquals('nested stiff integration is reentrant',Ord(isConverged),
+    Ord(S.Status));
+  AssertTrue('nested derivative callback was exercised',StiffReentryTriggered);
+  StiffReentryTriggered:=False;
 end;
 
 procedure TTestNumericalModelling.TestQuadraticProgram;

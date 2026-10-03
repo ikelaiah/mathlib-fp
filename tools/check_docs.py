@@ -37,6 +37,14 @@ NEXT_RELEASE = "2.3"
 PUBLISHED_STABLE = "2.0.0"
 # The 2.2.0 candidate snapshot owns every source unit present in this tree.
 UNRELEASED_SOURCE_UNITS: set[str] = set()
+# v2.2.0 is published and its snapshot stays frozen. This exact interface hash
+# is the documented v2.3 development addition until the 2.3 API snapshot exists.
+UNRELEASED_INTERFACE_CHANGES = {
+    "src/NumericsLib.Modelling.pas": {
+        "sha256": "b358ee335f2ebd7801bdc51bb8ff5dd9f146365a02ea462e10ef6ea9ad589099",
+        "spec": "tasks/spec-2.3.md",
+    },
+}
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
 CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")
@@ -293,11 +301,22 @@ def main() -> int:
             ).hexdigest()
             unit = snapshot_units.get(relative)
             if unit is not None and unit["interface_sha256"] != digest:
-                errors.append(
-                    f"{relative}: public interface differs from 1.9 snapshot; "
-                    "document the reason and regenerate with "
-                    "tools/update_api_snapshot.py"
+                planned_change = UNRELEASED_INTERFACE_CHANGES.get(relative)
+                spec_path = (
+                    ROOT / planned_change["spec"] if planned_change else None
                 )
+                if (
+                    planned_change is None
+                    or planned_change["sha256"] != digest
+                    or spec_path is None
+                    or not spec_path.is_file()
+                ):
+                    errors.append(
+                        f"{relative}: public interface differs from the current "
+                        "release snapshot without an exact documented next-release "
+                        "allowance; update the v2.3 allowance or regenerate the "
+                        "current API snapshot"
+                    )
             if unit is not None:
                 identities: set[tuple[object, ...]] = set()
                 owner_classes = {

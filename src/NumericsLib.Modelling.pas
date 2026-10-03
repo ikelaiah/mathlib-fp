@@ -99,6 +99,11 @@ type
     const Y: TDoubleArray): TDoubleArray;
   TODEEventFunction = function(T: Double;
     const Y: TDoubleArray): Double;
+  TODEJacobianFunction = function(T: Double;
+    const Y: TDoubleArray): TModelMatrix;
+  TODEAutoVectorFunction = function(T: Double;
+    const Y: TDualArray): TDualArray;
+  TStiffODEJacobianMode = (sjmFiniteDifference, sjmAnalytic, sjmAutomatic);
 
   TAdaptiveODEOptions = record
     AbsoluteTolerance: Double;
@@ -121,6 +126,41 @@ type
     AcceptedSteps: Integer;
     RejectedSteps: Integer;
     Evaluations: Integer;
+    EventFound: Boolean;
+    EventTime: Double;
+    EventState: TDoubleArray;
+    Status: TIterationStatus;
+    function Evaluate(Time: Double): TDoubleArray;
+  end;
+
+  TStiffODEOptions = record
+    AbsoluteTolerance: Double;
+    AbsoluteTolerances: TDoubleArray;
+    RelativeTolerance: Double;
+    InitialStep: Double;
+    MinimumStep: Double;
+    MaximumStep: Double;
+    MaxSteps: Integer;
+    MaxNewtonIterations: Integer;
+    NewtonTolerance: Double;
+    JacobianMode: TStiffODEJacobianMode;
+    Jacobian: TODEJacobianFunction;
+    AutoDerivative: TODEAutoVectorFunction;
+    Event: TODEEventFunction;
+    EventDirection: Integer;
+    Progress: TProgressFunction;
+    class function Defaults: TStiffODEOptions; static;
+  end;
+
+  TStiffODESolution = record
+    T: TDoubleArray;
+    Y: TVectorSeries;
+    Derivatives: TVectorSeries;
+    AcceptedSteps: Integer;
+    RejectedSteps: Integer;
+    Evaluations: Integer;
+    JacobianEvaluations: Integer;
+    NewtonIterations: Integer;
     EventFound: Boolean;
     EventTime: Double;
     EventState: TDoubleArray;
@@ -183,12 +223,16 @@ type
     class function SolveODE(F: TODEVectorFunction; T0: Double;
       const Y0: TDoubleArray; T1: Double;
       const Options: TAdaptiveODEOptions): TAdaptiveODESolution; static;
+    class function SolveStiffODE(F: TODEVectorFunction; T0: Double;
+      const Y0: TDoubleArray; T1: Double;
+      const Options: TStiffODEOptions): TStiffODESolution; static;
   end;
 
 implementation
 
 const
   DoubleEpsilon = 2.2204460492503131E-16;
+  StiffSDIRKGamma=1-0.707106781186547524400844362104849039;
 
 type
   TGKInterval = record
@@ -1500,6 +1544,195 @@ begin
   Result.MaximumStep:=Infinity; Result.MaxSteps:=100000;
 end;
 
+class function TStiffODEOptions.Defaults: TStiffODEOptions;
+begin
+  Result:=Default(TStiffODEOptions);
+  Result.AbsoluteTolerance:=1E-9; Result.RelativeTolerance:=1E-7;
+  Result.InitialStep:=0; Result.MinimumStep:=1E-12;
+  Result.MaximumStep:=Infinity; Result.MaxSteps:=100000;
+  Result.MaxNewtonIterations:=8; Result.NewtonTolerance:=0.1;
+  Result.JacobianMode:=sjmFiniteDifference;
+end;
+
+procedure ValidateStiffODEOptions(const Options:TStiffODEOptions; N:Integer);
+var I:Integer;
+begin
+  if not IsFiniteValue(Options.AbsoluteTolerance) or
+     not IsFiniteValue(Options.RelativeTolerance) or
+     (Options.AbsoluteTolerance<0) or (Options.RelativeTolerance<0) or
+     (Options.MaxSteps<=0) or (Options.MaxNewtonIterations<=0) or
+     not IsFiniteValue(Options.NewtonTolerance) or
+     (Options.NewtonTolerance<=0) or (Options.NewtonTolerance>1) or
+     not IsFiniteValue(Options.InitialStep) or (Options.InitialStep<0) or
+     not IsFiniteValue(Options.MinimumStep) or (Options.MinimumStep<=0) or
+     IsNan(Options.MaximumStep) or (Options.MaximumStep<=0) or
+     (Options.MinimumStep>Options.MaximumStep) or
+     (Options.EventDirection < -1) or (Options.EventDirection > 1) then
+    raise EModellingError.Create('SolveStiffODE: invalid options.');
+  if (Length(Options.AbsoluteTolerances)=0) and
+     (Options.AbsoluteTolerance+Options.RelativeTolerance<=0) then
+    raise EModellingError.Create('SolveStiffODE: tolerances must be positive.');
+  if (Length(Options.AbsoluteTolerances)>0) and
+     (Length(Options.AbsoluteTolerances)<>N) then
+    raise EModellingError.Create(
+      'SolveStiffODE: per-component absolute tolerance length mismatch.');
+  for I:=0 to High(Options.AbsoluteTolerances) do
+    if not IsFiniteValue(Options.AbsoluteTolerances[I]) or
+       (Options.AbsoluteTolerances[I]<0) or
+       (Options.AbsoluteTolerances[I]+Options.RelativeTolerance<=0) then
+      raise EModellingError.CreateFmt(
+        'SolveStiffODE: invalid absolute tolerance at component %d.',[I]);
+  case Options.JacobianMode of
+    sjmFiniteDifference:
+      if Assigned(Options.Jacobian) or Assigned(Options.AutoDerivative) then
+        raise EModellingError.Create(
+          'SolveStiffODE: finite-difference mode does not accept Jacobian callbacks.');
+    sjmAnalytic:
+      if not Assigned(Options.Jacobian) or Assigned(Options.AutoDerivative) then
+        raise EModellingError.Create(
+          'SolveStiffODE: analytic mode requires only a Jacobian callback.');
+    sjmAutomatic:
+      if not Assigned(Options.AutoDerivative) or Assigned(Options.Jacobian) then
+        raise EModellingError.Create(
+          'SolveStiffODE: automatic mode requires only a dual derivative callback.');
+  end;
+end;
+
+function StiffODEScale(const Options:TStiffODEOptions; Index:Integer;
+  const Y0,Y1:TDoubleArray):Double;
+var A:Double;
+begin
+  if Length(Options.AbsoluteTolerances)>0 then
+    A:=Options.AbsoluteTolerances[Index]
+  else
+    A:=Options.AbsoluteTolerance;
+  Result:=A+Options.RelativeTolerance*Max(Abs(Y0[Index]),Abs(Y1[Index]));
+end;
+
+function EvalStiffODE(F:TODEVectorFunction; T:Double;
+  const Y:TDoubleArray; N:Integer; var Evaluations:Integer):TDoubleArray;
+begin
+  Result:=F(T,Y); Inc(Evaluations);
+  if Length(Result)<>N then raise EModellingError.CreateFmt(
+    'SolveStiffODE: derivative length %d; expected %d.',[Length(Result),N]);
+  ValidateVector(Result,'SolveStiffODE derivative');
+end;
+
+function StiffODEErrorNorm(const Options:TStiffODEOptions;
+  const Y0,Y1,Error:TDoubleArray):Double;
+var I:Integer; Scale,Ratio:Double;
+begin
+  Result:=0;
+  for I:=0 to High(Y0) do begin
+    Scale:=StiffODEScale(Options,I,Y0,Y1);
+    Ratio:=Abs(Error[I])/Scale;
+    if Ratio>Result then Result:=Ratio;
+  end;
+end;
+
+function BuildStiffODEJacobian(F:TODEVectorFunction; T:Double;
+  const Y,FY:TDoubleArray; const Options:TStiffODEOptions; N:Integer;
+  var Evaluations,JacobianEvaluations:Integer):TModelMatrix;
+var I,J:Integer; Delta,Scale:Double;
+    Perturbed,FPlus:TDoubleArray; DualY,DualF:TDualArray;
+begin
+  Inc(JacobianEvaluations);
+  case Options.JacobianMode of
+    sjmAnalytic:
+    begin
+      Result:=Options.Jacobian(T,Y);
+      ValidateMatrix(Result,N,N,'SolveStiffODE Jacobian');
+    end;
+    sjmAutomatic:
+    begin
+      SetLength(Result,N); SetLength(DualY,N);
+      for I:=0 to N-1 do SetLength(Result[I],N);
+      for J:=0 to N-1 do begin
+        for I:=0 to N-1 do DualY[I]:=TDual.Create(Y[I],Ord(I=J));
+        DualF:=Options.AutoDerivative(T,DualY); Inc(Evaluations);
+        if Length(DualF)<>N then raise EModellingError.Create(
+          'SolveStiffODE: automatic derivative dimension mismatch.');
+        for I:=0 to N-1 do begin
+          if not IsFiniteValue(DualF[I].Value) or
+             not IsFiniteValue(DualF[I].Derivative) then
+            raise EModellingError.CreateFmt(
+              'SolveStiffODE: non-finite automatic derivative at row %d, column %d.',
+              [I,J]);
+          Scale:=Max(1,Max(Abs(DualF[I].Value),Abs(FY[I])));
+          if Abs(DualF[I].Value-FY[I])>64*DoubleEpsilon*Scale then
+            raise EModellingError.Create(
+              'SolveStiffODE: ordinary and dual callbacks disagree.');
+          Result[I][J]:=DualF[I].Derivative;
+        end;
+      end;
+      ValidateMatrix(Result,N,N,'SolveStiffODE automatic Jacobian');
+    end;
+    else
+    begin
+      SetLength(Result,N); SetLength(Perturbed,N);
+      for I:=0 to N-1 do begin SetLength(Result[I],N); Perturbed[I]:=Y[I]; end;
+      for J:=0 to N-1 do begin
+        Delta:=Sqrt(DoubleEpsilon)*Max(1,Abs(Y[J]));
+        Perturbed[J]:=Y[J]+Delta;
+        if Perturbed[J]=Y[J] then
+          Perturbed[J]:=Y[J]+2*DoubleEpsilon*Max(1,Abs(Y[J]));
+        Delta:=Perturbed[J]-Y[J];
+        FPlus:=EvalStiffODE(F,T,Perturbed,N,Evaluations);
+        for I:=0 to N-1 do
+          Result[I][J]:=(FPlus[I]-FY[I])/Delta;
+        Perturbed[J]:=Y[J];
+      end;
+      ValidateMatrix(Result,N,N,'SolveStiffODE finite-difference Jacobian');
+    end;
+  end;
+end;
+
+function SolveStiffODEStage(F:TODEVectorFunction; TStage,H:Double;
+  const StageBase,InitialGuess,StepStart:TDoubleArray;
+  const Options:TStiffODEOptions; var Evaluations,JacobianEvaluations,
+  NewtonIterations:Integer; out StageValue,StageDerivative:TDoubleArray):Boolean;
+var N,I,J,K:Integer; State,FState,Residual,Delta:TDoubleArray;
+    Jacobian:TModelMatrix; A,B,S:IDenseDoubleMatrix; Factor:IDenseDoubleLU;
+    CorrectionNorm,Scale,Value:Double;
+begin
+  Result:=False; N:=Length(StageBase); State:=Copy(InitialGuess);
+  FState:=EvalStiffODE(F,TStage,State,N,Evaluations);
+  Jacobian:=BuildStiffODEJacobian(F,TStage,State,FState,Options,N,
+    Evaluations,JacobianEvaluations);
+  A:=TDenseDoubleMatrix.Zeros(N,N);
+  for I:=0 to N-1 do for J:=0 to N-1 do begin
+    Value:=-StiffSDIRKGamma*H*Jacobian[I][J];
+    if I=J then Value:=Value+1;
+    if not IsFiniteValue(Value) then Exit;
+    A[I,J]:=Value;
+  end;
+  try Factor:=FactorLU(A);
+  except on E:EDenseMatrixError do Exit; end;
+  for K:=1 to Options.MaxNewtonIterations do begin
+    SetLength(Residual,N);
+    for I:=0 to N-1 do
+      Residual[I]:=-(State[I]-StageBase[I]-
+        StiffSDIRKGamma*H*FState[I]);
+    try
+      B:=DenseFromVector(Residual); S:=Factor.Solve(B);
+      Delta:=VectorFromDense(S);
+    except on E:EDenseMatrixError do Exit; end;
+    Inc(NewtonIterations); CorrectionNorm:=0;
+    for I:=0 to N-1 do begin
+      if not IsFiniteValue(Delta[I]) then Exit;
+      State[I]:=State[I]+Delta[I];
+      if not IsFiniteValue(State[I]) then Exit;
+      Scale:=StiffODEScale(Options,I,StepStart,State);
+      Value:=Abs(Delta[I])/Scale;
+      if Value>CorrectionNorm then CorrectionNorm:=Value;
+    end;
+    FState:=EvalStiffODE(F,TStage,State,N,Evaluations);
+    if CorrectionNorm<=Options.NewtonTolerance then begin
+      StageValue:=State; StageDerivative:=FState; Exit(True);
+    end;
+  end;
+end;
+
 function EvalODE(F:TODEVectorFunction; T:Double; const Y:TDoubleArray;
   N:Integer; var Evaluations:Integer):TDoubleArray;
 begin Result:=F(T,Y); Inc(Evaluations);
@@ -1640,6 +1873,160 @@ begin
   if (Result.Status=isUnknown) and (Direction*(T1-T)<=0) then Result.Status:=isConverged;
 end;
 
+procedure AppendStiffODESolution(var Solution:TStiffODESolution; T:Double;
+  const Y,Derivative:TDoubleArray);
+var I:Integer;
+begin
+  I:=Length(Solution.T); SetLength(Solution.T,I+1);
+  SetLength(Solution.Y,I+1); SetLength(Solution.Derivatives,I+1);
+  Solution.T[I]:=T; Solution.Y[I]:=Copy(Y);
+  Solution.Derivatives[I]:=Copy(Derivative);
+end;
+
+function LocateStiffODEEvent(var Solution:TStiffODESolution;
+  Event:TODEEventFunction; Direction:Integer; EventAtStart,EventAtEnd:Double;
+  RelativeTolerance:Double; var Evaluations:Integer):Boolean;
+var LeftT,RightT,MidT,LeftValue,MidValue,Tolerance:Double;
+    State:TDoubleArray; I:Integer;
+begin
+  Result:=False;
+  if not EventCrossed(EventAtStart,EventAtEnd,Direction) then Exit;
+  LeftT:=Solution.T[High(Solution.T)-1];
+  RightT:=Solution.T[High(Solution.T)]; LeftValue:=EventAtStart;
+  for I:=1 to 60 do begin
+    MidT:=LeftT+(RightT-LeftT)/2;
+    State:=Solution.Evaluate(MidT);
+    MidValue:=Event(MidT,State); Inc(Evaluations);
+    if not IsFiniteValue(MidValue) then raise EModellingError.Create(
+      'SolveStiffODE: event callback returned non-finite value.');
+    if ((LeftValue<=0) and (MidValue>=0)) or
+       ((LeftValue>=0) and (MidValue<=0)) then
+      RightT:=MidT
+    else begin LeftT:=MidT; LeftValue:=MidValue; end;
+    Tolerance:=Max(1E-12,RelativeTolerance*Max(1,Abs(MidT)));
+    if Abs(RightT-LeftT)<=Tolerance then Break;
+  end;
+  Solution.EventFound:=True;
+  Solution.EventTime:=LeftT+(RightT-LeftT)/2;
+  Solution.EventState:=Solution.Evaluate(Solution.EventTime);
+  Solution.Status:=isConverged; Result:=True;
+end;
+
+class function TModellingKit.SolveStiffODE(F:TODEVectorFunction; T0:Double;
+  const Y0:TDoubleArray; T1:Double;
+  const Options:TStiffODEOptions):TStiffODESolution;
+var Y,FStart,StageBase,Guess,Stage2,K1,K2,YHat,ErrorVector:
+      TDoubleArray;
+    T,H,Direction,Err,Factor,EventPrev,EventNow,Remaining,NewAbsH:Double;
+    I,N,Attempts,RejectStreak:Integer; Accept,StageOK:Boolean;
+begin
+  Result:=Default(TStiffODESolution);
+  if not Assigned(F) then raise EModellingError.Create(
+    'SolveStiffODE: derivative callback must be assigned.');
+  ValidateVector(Y0,'SolveStiffODE initial state'); N:=Length(Y0);
+  if not IsFiniteValue(T0) or not IsFiniteValue(T1) or (T0=T1) then
+    raise EModellingError.Create('SolveStiffODE: require finite T0 <> T1.');
+  ValidateStiffODEOptions(Options,N);
+  Direction:=1; if T1<T0 then Direction:=-1;
+  H:=Options.InitialStep;
+  if H=0 then H:=Direction*Min(Abs(T1-T0)/100,0.01)
+  else H:=Direction*Abs(H);
+  if H=0 then H:=T1-T0;
+  H:=Direction*Min(Abs(H),Options.MaximumStep);
+  T:=T0; Y:=Copy(Y0);
+  FStart:=EvalStiffODE(F,T,Y,N,Result.Evaluations);
+  AppendStiffODESolution(Result,T,Y,FStart);
+  EventPrev:=0;
+  if Assigned(Options.Event) then begin
+    EventPrev:=Options.Event(T,Y); Inc(Result.Evaluations);
+    if not IsFiniteValue(EventPrev) then raise EModellingError.Create(
+      'SolveStiffODE: event callback returned non-finite value.');
+  end;
+  Attempts:=0; RejectStreak:=0;
+  while Direction*(T1-T)>0 do begin
+    Inc(Attempts);
+    if Attempts>Options.MaxSteps then begin
+      Result.Status:=isIterationLimit; Break;
+    end;
+    Remaining:=T1-T;
+    if Abs(H)>Abs(Remaining) then H:=Remaining;
+    SetLength(Guess,N);
+    for I:=0 to N-1 do Guess[I]:=Y[I]+StiffSDIRKGamma*H*FStart[I];
+    StageOK:=SolveStiffODEStage(F,T+StiffSDIRKGamma*H,H,Y,Guess,Y,
+      Options,Result.Evaluations,Result.JacobianEvaluations,
+      Result.NewtonIterations,Stage2,K1);
+    if not StageOK then begin
+      Inc(Result.RejectedSteps); Inc(RejectStreak);
+      if (Abs(H)<=Options.MinimumStep) or (RejectStreak>=20) then begin
+        Result.Status:=isNumericalBreakdown; Break;
+      end;
+      H:=Direction*Max(Options.MinimumStep,Abs(H)*0.5);
+      if Abs(T1-T)<=Options.MinimumStep then H:=T1-T;
+      Continue;
+    end;
+    SetLength(StageBase,N); SetLength(Guess,N);
+    for I:=0 to N-1 do begin
+      StageBase[I]:=Y[I]+H*(1-StiffSDIRKGamma)*K1[I];
+      Guess[I]:=Y[I]+H*K1[I];
+    end;
+    StageOK:=SolveStiffODEStage(F,T+H,H,StageBase,Guess,Y,Options,
+      Result.Evaluations,Result.JacobianEvaluations,
+      Result.NewtonIterations,Stage2,K2);
+    if not StageOK then begin
+      Inc(Result.RejectedSteps); Inc(RejectStreak);
+      if (Abs(H)<=Options.MinimumStep) or (RejectStreak>=20) then begin
+        Result.Status:=isNumericalBreakdown; Break;
+      end;
+      H:=Direction*Max(Options.MinimumStep,Abs(H)*0.5);
+      if Abs(T1-T)<=Options.MinimumStep then H:=T1-T;
+      Continue;
+    end;
+    SetLength(YHat,N); SetLength(ErrorVector,N);
+    for I:=0 to N-1 do begin
+      YHat[I]:=Y[I]+H*K1[I];
+      ErrorVector[I]:=Stage2[I]-YHat[I];
+    end;
+    Err:=StiffODEErrorNorm(Options,Y,Stage2,ErrorVector);
+    Accept:=Err<=1;
+    if Accept then begin
+      T:=T+H;
+      if Abs(T1-T)<=DoubleEpsilon*Max(1,Abs(T1)) then T:=T1;
+      Y:=Copy(Stage2); FStart:=Copy(K2);
+      Inc(Result.AcceptedSteps); RejectStreak:=0;
+      AppendStiffODESolution(Result,T,Y,FStart);
+      if Assigned(Options.Event) then begin
+        EventNow:=Options.Event(T,Y); Inc(Result.Evaluations);
+        if not IsFiniteValue(EventNow) then raise EModellingError.Create(
+          'SolveStiffODE: event callback returned non-finite value.');
+        if LocateStiffODEEvent(Result,Options.Event,Options.EventDirection,
+          EventPrev,EventNow,Options.RelativeTolerance,Result.Evaluations) then
+          Break;
+        EventPrev:=EventNow;
+      end;
+      if Assigned(Options.Progress) and
+         not Options.Progress(Result.AcceptedSteps,Result.Evaluations,T) then begin
+        Result.Status:=isCancelled; Break;
+      end;
+    end else begin
+      Inc(Result.RejectedSteps); Inc(RejectStreak);
+      if (Abs(H)<=Options.MinimumStep) or (RejectStreak>=20) then begin
+        Result.Status:=isStagnation; Break;
+      end;
+    end;
+    if Err=0 then Factor:=4 else Factor:=0.9/Sqrt(Err);
+    Factor:=Min(4,Max(0.1,Factor));
+    if not Accept then Factor:=Min(Factor,0.5);
+    NewAbsH:=Min(Options.MaximumStep,Abs(H)*Factor);
+    if (NewAbsH<Options.MinimumStep) and
+       (Abs(T1-T)>Options.MinimumStep) then
+      NewAbsH:=Options.MinimumStep;
+    if Abs(T1-T)<=Options.MinimumStep then NewAbsH:=Abs(T1-T);
+    H:=Direction*NewAbsH;
+  end;
+  if (Result.Status=isUnknown) and (Direction*(T1-T)<=0) then
+    Result.Status:=isConverged;
+end;
+
 function TAdaptiveODESolution.Evaluate(Time: Double): TDoubleArray;
 var
   Lo,Hi,Mid,I:Integer; H,S,H00,H10,H01,H11:Double;
@@ -1658,6 +2045,36 @@ begin
   SetLength(Result,Length(Y[Lo]));
   for I:=0 to High(Result) do Result[I]:=H00*Y[Lo][I]+H10*H*Derivatives[Lo][I]+
     H01*Y[Lo+1][I]+H11*H*Derivatives[Lo+1][I];
+end;
+
+function TStiffODESolution.Evaluate(Time:Double):TDoubleArray;
+var Lo,Hi,Mid,I:Integer; H,S,H00,H10,H01,H11:Double; Forward:Boolean;
+begin
+  if Length(T)=0 then raise EModellingError.Create(
+    'StiffODESolution.Evaluate: solution is empty.');
+  if not IsFiniteValue(Time) then raise EModellingError.Create(
+    'StiffODESolution.Evaluate: time must be finite.');
+  Forward:=T[High(T)]>=T[0];
+  if Forward then begin
+    if Time<=T[0] then Exit(Copy(Y[0]));
+    if Time>=T[High(T)] then Exit(Copy(Y[High(Y)]));
+  end else begin
+    if Time>=T[0] then Exit(Copy(Y[0]));
+    if Time<=T[High(T)] then Exit(Copy(Y[High(Y)]));
+  end;
+  Lo:=0; Hi:=High(T);
+  while Hi-Lo>1 do begin
+    Mid:=Lo+(Hi-Lo) div 2;
+    if (Forward and (T[Mid]<=Time)) or
+       ((not Forward) and (T[Mid]>=Time)) then Lo:=Mid else Hi:=Mid;
+  end;
+  H:=T[Lo+1]-T[Lo]; S:=(Time-T[Lo])/H;
+  H00:=2*S*S*S-3*S*S+1; H10:=S*S*S-2*S*S+S;
+  H01:=-2*S*S*S+3*S*S; H11:=S*S*S-S*S;
+  SetLength(Result,Length(Y[Lo]));
+  for I:=0 to High(Result) do
+    Result[I]:=H00*Y[Lo][I]+H10*H*Derivatives[Lo][I]+
+      H01*Y[Lo+1][I]+H11*H*Derivatives[Lo+1][I];
 end;
 
 end.
