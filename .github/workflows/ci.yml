@@ -33,7 +33,7 @@ jobs:
         run: |
           cd tests
           mkdir -p lib/ci
-          fpc -B -FcUTF8 -Fu../src -FUlib/ci TestRunner.lpr
+          fpc -B -gl -FcUTF8 -Fu../src -FUlib/ci TestRunner.lpr
           if ! ./TestRunner -a --format=plain > test-output.txt; then
             cat test-output.txt
             exit 1
@@ -175,7 +175,7 @@ jobs:
         run: |
           Set-Location tests
           New-Item -ItemType Directory -Force -Path lib/ci | Out-Null
-          & $env:FPC_WIN64 '-B' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
+          & $env:FPC_WIN64 '-B' '-gl' '-FcUTF8' '-Fu../src' '-FUlib/ci' `
             'TestRunner.lpr'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & ./TestRunner.exe '-a' '--format=plain'
@@ -242,7 +242,7 @@ jobs:
 
           New-Item -ItemType Directory -Force `
             -Path tests/lib/ci-i386 | Out-Null
-          & $env:FPC_WIN32 '-B' '-O2' '-FcUTF8' '-Fusrc' `
+          & $env:FPC_WIN32 '-B' '-O2' '-gl' '-FcUTF8' '-Fusrc' `
             '-FUtests/lib/ci-i386' '-FEtests/lib/ci-i386' `
             'tests/TestRunner.lpr'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

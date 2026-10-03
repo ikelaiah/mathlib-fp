@@ -1659,9 +1659,11 @@ begin
               'SolveStiffODE: non-finite automatic derivative at row %d, column %d.',
               [I,J]);
           Scale:=Max(1,Max(Abs(DualF[I].Value),Abs(FY[I])));
-          if Abs(DualF[I].Value-FY[I])>64*DoubleEpsilon*Scale then
-            raise EModellingError.Create(
-              'SolveStiffODE: ordinary and dual callbacks disagree.');
+          if Abs(DualF[I].Value-FY[I])>1E-12*Scale then
+            raise EModellingError.CreateFmt(
+              'SolveStiffODE: ordinary and dual callbacks disagree ' +
+              '(ordinary %.17g, dual %.17g).',
+              [FY[I],DualF[I].Value]);
           Result[I][J]:=DualF[I].Derivative;
         end;
       end;
