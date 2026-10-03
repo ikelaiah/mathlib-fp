@@ -790,7 +790,7 @@ and tested. See the [dense solver guide](../guides/domains/dense-linear-algebra.
 and [partial eigensystems](../guides/domains/sparse-linear-algebra.md#partial-eigensystems) for the
 current supported boundary.
 
-## Previous release: 2.3.0 — Stiff and implicit ODEs
+## 2.3.0 — Stiff and implicit ODEs
 
 ### 2.3 — Stiff and implicit ODEs
 
@@ -803,6 +803,13 @@ problems, DAEs, PDEs, and sparse/large-scale stiff solves remain outside the
 supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
+
+## Previous release: 2.3.1 — Documentation refresh
+
+Version 2.3.1 refreshes the Pascal numerical-library comparison and release
+documentation. It contains no Pascal source or public API changes, so its
+runtime qualification and target evidence carry forward from 2.3.0. See the
+[2.3.1 release notes](../releases/2.3.1/release-notes.md).
 
 ## Next release: 2.4 — Sparse Direct II
 

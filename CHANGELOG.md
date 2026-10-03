@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.3.1] - 2026-10-03
+
+### Documentation
+
+- Expanded and refreshed the Pascal numerical-library comparison, adding
+  machine-learning and arbitrary-precision projects and describing each
+  library's strengths, compiler support, and licensing in neutral terms.
+- Replaced the comparison's gap-and-roadmap list with release-specific
+  capability references.
+- Preserved the v2.3.0 versioned documentation build as it moves into the
+  historical release set.
+
 ## [2.3.0] - 2026-10-03
 
 ### Added
