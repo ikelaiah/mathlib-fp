@@ -1,6 +1,6 @@
 # Supported platform matrix
 
-Version 2.3.1 is a documentation-only patch. It carries forward the Free Pascal
+Version 2.3.2 is a documentation-only patch. It carries forward the Free Pascal
 source, standard RTL/FCL runtime, and dense real-double SDIRK2 stiff ODE path
 from 2.3.0 without changing numerical behavior or public APIs. The
 machine-readable source for this matrix is
@@ -19,7 +19,7 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 The 2.3.0 release candidate passed the
 [Linux and Windows release qualification](../releases/2.3.0/qualification.md)
-on 2026-10-03 from checksummed clean archives. Since 2.3.1 does not change the
+on 2026-10-03 from checksummed clean archives. Since 2.3.2 does not change the
 runtime or supported targets, this remains the retained platform evidence for
 the 2.3 line. The 2.0.0 qualification remains historical.
 
