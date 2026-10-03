@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.2.0",
+  "release": "2.3.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -167,7 +167,7 @@
     {
       "family": "numerical_modelling",
       "unit": "NumericsLib.Modelling",
-      "entry_points": ["IntegrateAdaptive", "IntegrateImproper", "IntegrateCubature", "IntegrateQuasiMonteCarlo", "IntegrateMonteCarlo", "FitLinearBasis", "FitPolynomial", "FitNonlinear", "FitNonlinearAuto", "SolveSystem", "SolveSystemAuto", "SolvePolynomial", "SolveODE"],
+      "entry_points": ["IntegrateAdaptive", "IntegrateImproper", "IntegrateCubature", "IntegrateQuasiMonteCarlo", "IntegrateMonteCarlo", "FitLinearBasis", "FitPolynomial", "FitNonlinear", "FitNonlinearAuto", "SolveSystem", "SolveSystemAuto", "SolvePolynomial", "SolveODE", "SolveStiffODE"],
       "maturity": "stable",
       "scalars": ["double"],
       "shapes": ["scalar_integral", "dense_fit", "vector_system", "vector_initial_value_ode"],
@@ -176,13 +176,13 @@
       "docs": "docs/guides/domains/numerical-modelling.md",
       "example": "examples/40_stiff_ode_sdirk.pas",
       "tests": "tests/TestNumericalModelling.pas",
-      "limitations": ["v2.2.0 ODE path is non-stiff and explicit; the dense stiff solver is in v2.3 development", "tensor cubature is capped and intended for low dimensions", "Monte Carlo and Halton error values are estimates, not proofs"]
+      "limitations": ["SolveODE remains an explicit Dormand-Prince path; stiff initial-value problems use the dense SDIRK2 solver", "tensor cubature is capped and intended for low dimensions", "Monte Carlo and Halton error values are estimates, not proofs"]
     },
     {
       "family": "stiff_ode_integration",
       "unit": "NumericsLib.Modelling",
       "entry_points": ["SolveStiffODE", "TStiffODEOptions", "TStiffODESolution", "TStiffODEJacobianMode"],
-      "maturity": "development",
+      "maturity": "stable",
       "scalars": ["double"],
       "shapes": ["dense_stiff_initial_value_ode"],
       "complexity": "adaptive, tolerance, state dimension, and dense Jacobian factorization dependent; O(n^3) per stage factorization",
