@@ -40,9 +40,9 @@ are:
 - **Advanced spectral families** — real and complex Schur, Hessenberg,
   nonsymmetric real eigen, and generalized eigen paths are stable in 2.2.0;
   polynomial, shift-invert, and interior-target eigensystems remain deferred.
-- **Stiff and implicit ODEs** — the current ODE path is explicit and non-stiff;
-  the destination is the
-  [2.3 stiff and implicit ODEs gate](../../project/roadmap.md#23-stiff-and-implicit-odes).
+- **Stiff and implicit ODEs** — v2.2.0 provides the explicit, non-stiff path;
+  v2.3 development adds a dense SDIRK2 solver, as described in the
+  [stiff and implicit ODE gate](../../project/roadmap.md#23-stiff-and-implicit-odes).
 - **Advanced sparse direct algorithms** — no fill-reducing symbolic ordering,
   multifrontal/supernodal, distributed, out-of-core, or GPU path exists; the
   destination is the [2.4 Sparse Direct II gate](../../project/roadmap.md#24-sparse-direct-ii).

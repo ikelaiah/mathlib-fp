@@ -759,34 +759,12 @@ to ship it. A capability is not complete merely because an implementation
 exists — it must also meet the numerical, documentation, portability, and
 maintenance contracts this roadmap applies to every stable family.
 
-## Next release: 2.3 — Stiff and implicit ODEs
+## Delivered in v2.2.0
 
-Scope:
-
-- Bessel families (`J`, `Y`, `I`, `K` and related) with defined domains and
-  accuracy budgets;
-- Legendre elliptic integrals and real Jacobi elliptic functions, with
-  third-kind Pi restricted to a bounded real characteristic range and no
-  Cauchy principal-value or complex path;
-- exponential integrals;
-- a carefully bounded hypergeometric baseline rather than an open-ended family;
-- per-family accuracy and domain budgets with a stated behaviour for
-  out-of-domain input;
-- an independent reference corpus, algorithm provenance, and cited references.
-
-Non-goals:
-
-- arbitrary or multiprecision arithmetic;
-- attempting every specialist special function in one release.
-
-Completion gate: each shipped special-function family has a documented domain,
-accuracy budget, independent reference corpus, and cited algorithm source, and
-matches the capability inventory's declared limits. AMath/DAMath demonstrates
-the value of detailed implementation notes and cited numerical sources for such
-families; this project does not copy its code or claim equivalent coverage.
-
-The [capability inventory](../reference/capabilities.md) records which of these families are
-unsupported today.
+The 2.1 Special Functions II scope and the 2.2 nonsymmetric and generalised
+spectral algebra scope shipped in v2.2.0. See the
+[v2.2.0 release notes](../releases/2.2.0/release-notes.md) for the delivered
+surface and qualification evidence.
 
 ### 2.2 — Nonsymmetric and generalised spectral algebra
 
@@ -811,12 +789,22 @@ and tested. See the [dense solver guide](../guides/domains/dense-linear-algebra.
 and [partial eigensystems](../guides/domains/sparse-linear-algebra.md#partial-eigensystems) for the
 current supported boundary.
 
+## Next release: 2.3
+
 ### 2.3 — Stiff and implicit ODEs
+
+This is the next planned release after v2.2.0.
+
+The initial design, implementation plan, and checklist are in
+[`spec-2.3.md`](../../tasks/spec-2.3.md),
+[`plan-2.3.md`](../../tasks/plan-2.3.md), and
+[`todo-2.3.md`](../../tasks/todo-2.3.md). The method and API contract are
+specified; implementation and release qualification are in progress.
 
 Scope:
 
-- a documented stiff-solver baseline such as BDF and/or Radau-family methods,
-  subject to design review;
+- a documented stiff-solver baseline using the selected two-stage SDIRK
+  method;
 - a Jacobian policy covering analytic, automatic, and numerical derivatives;
 - tolerances and convergence diagnostics;
 - dense output where supported;
@@ -827,14 +815,14 @@ Non-goals:
 - a full DAE index-reduction framework;
 - PDE solving.
 
-Listing a method here is not a promise of it; the design record must select the
-final stable method and justify the choice. Completion gate: the selected stiff
-method meets the accuracy, diagnostics, reentrancy, and dense-output contracts
-used by the existing explicit path and is covered by reference and
+The selected method is Alexander's two-stage SDIRK2 method, documented in the
+design record with its primary source. Completion gate: the stiff method meets
+the accuracy, diagnostics, reentrancy, and dense-output contracts used by the
+existing explicit path and is covered by independent reference and
 stiff/non-stiff comparison tests. See the [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm)
-for the current explicit ODE scope.
+for method selection and the supported ODE scope.
 
-### 2.4 — Sparse Direct II
+## 2.4 — Sparse Direct II
 
 Scope:
 

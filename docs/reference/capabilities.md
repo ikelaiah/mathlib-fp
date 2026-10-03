@@ -26,7 +26,8 @@ Target qualifications and platform-specific limitations are defined by the
 | Restarted partial Lanczos/Arnoldi | Stable | Single/double real/complex | Largest magnitude only; no shift-invert/interior or polynomial path |
 | Interpolation and approximation | Stable | Double real | Includes natural/clamped/not-a-knot cubic splines; dense scattered methods target small data sets |
 | Numerical/automatic differentiation | Stable | Double real/complex callback and forward dual | Forward mode only; complex-step requires an analytic callback |
-| Adaptive integration, fitting, vector equations, polynomial roots, and ODEs | Stable | Double real plus complex root result | ODE path is explicit non-stiff; sampling error values are estimates |
+| Adaptive integration, fitting, vector equations, polynomial roots, and ODEs | Stable | Double real plus complex root result | v2.2.0 ODE path is explicit Dormand-Prince; sampling error values are estimates |
+| Stiff initial-value ODE integration | Development (v2.3) | Dense real-double explicit-form systems | Alexander SDIRK2; analytic, automatic, or finite-difference Jacobians; no mass matrices, DAEs, PDEs, or sparse stiff solves |
 | Diagnostic nonlinear and linear optimisation | Stable | Double real | Detailed bounds/status/best iterate, warm starts, constrained/Pareto baselines, and two-phase dense LP |
 | Dense convex QP and SOCP | Stable | Double real | Dense continuous models; SOCP needs a strictly feasible start; general certificates are not claimed |
 | Shared iteration diagnostics | Stable | Result metadata | Algorithms expose only statuses applicable to their model |

@@ -174,9 +174,23 @@
       "complexity": "algorithm and tolerance dependent; dense fit/system steps up to O(n^3)",
       "accuracy": "published quadrature, fit, root, ODE dense-output, and event budgets",
       "docs": "docs/guides/domains/numerical-modelling.md",
-      "example": "examples/17_numerical_modelling.pas",
+      "example": "examples/40_stiff_ode_sdirk.pas",
       "tests": "tests/TestNumericalModelling.pas",
-      "limitations": ["non-stiff explicit ODE only; no mass matrices", "tensor cubature is capped and intended for low dimensions", "Monte Carlo and Halton error values are estimates, not proofs"]
+      "limitations": ["v2.2.0 ODE path is non-stiff and explicit; the dense stiff solver is in v2.3 development", "tensor cubature is capped and intended for low dimensions", "Monte Carlo and Halton error values are estimates, not proofs"]
+    },
+    {
+      "family": "stiff_ode_integration",
+      "unit": "NumericsLib.Modelling",
+      "entry_points": ["SolveStiffODE", "TStiffODEOptions", "TStiffODESolution", "TStiffODEJacobianMode"],
+      "maturity": "development",
+      "scalars": ["double"],
+      "shapes": ["dense_stiff_initial_value_ode"],
+      "complexity": "adaptive, tolerance, state dimension, and dense Jacobian factorization dependent; O(n^3) per stage factorization",
+      "accuracy": "closed-form forced stiff ODE and sourced Robertson endpoint, dense-output, and event-time budgets",
+      "docs": "docs/guides/domains/numerical-modelling.md",
+      "example": "examples/40_stiff_ode_sdirk.pas",
+      "tests": "tests/TestNumericalModelling.pas",
+      "limitations": ["Alexander two-stage SDIRK2 only", "explicit-form real-double ODEs with dense Jacobians; no mass matrices, DAEs, PDEs, or sparse/large-scale systems"]
     },
     {
       "family": "diagnostic_nonlinear_and_linear_optimization",

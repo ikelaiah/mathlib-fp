@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Added adaptive stiff initial-value integration with Alexander's two-stage
+  SDIRK method, analytic/automatic/finite-difference Jacobians, Newton and
+  work diagnostics, cubic-Hermite dense output, and directional events.
+
 ## [2.2.0] - 2026-09-27
 
 ### Added
