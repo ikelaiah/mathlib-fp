@@ -1693,43 +1693,90 @@ function SolveStiffODEStage(F:TODEVectorFunction; TStage,H:Double;
   const StageBase,InitialGuess,StepStart:TDoubleArray;
   const Options:TStiffODEOptions; var Evaluations,JacobianEvaluations,
   NewtonIterations:Integer; out StageValue,StageDerivative:TDoubleArray):Boolean;
-var N,I,J,K:Integer; State,FState,Residual,Delta:TDoubleArray;
+var N,I,J,K,Backtrack:Integer;
+    State,FState,Residual,Delta,TrialState,TrialF,TrialResidual:TDoubleArray;
     Jacobian:TModelMatrix; A,B,S:IDenseDoubleMatrix; Factor:IDenseDoubleLU;
-    CorrectionNorm,Scale,Value:Double;
+    CorrectionNorm,Scale,Value,ResidualNorm,TrialNorm,Lambda,Ratio:Double;
+    AcceptedTrial:Boolean;
 begin
   Result:=False; N:=Length(StageBase); State:=Copy(InitialGuess);
   FState:=EvalStiffODE(F,TStage,State,N,Evaluations);
-  Jacobian:=BuildStiffODEJacobian(F,TStage,State,FState,Options,N,
-    Evaluations,JacobianEvaluations);
-  A:=TDenseDoubleMatrix.Zeros(N,N);
-  for I:=0 to N-1 do for J:=0 to N-1 do begin
-    Value:=-StiffSDIRKGamma*H*Jacobian[I][J];
-    if I=J then Value:=Value+1;
-    if not IsFiniteValue(Value) then Exit;
-    A[I,J]:=Value;
-  end;
-  try Factor:=FactorLU(A);
-  except on E:EDenseMatrixError do Exit; end;
   for K:=1 to Options.MaxNewtonIterations do begin
     SetLength(Residual,N);
-    for I:=0 to N-1 do
-      Residual[I]:=-(State[I]-StageBase[I]-
-        StiffSDIRKGamma*H*FState[I]);
+    ResidualNorm:=0;
+    for I:=0 to N-1 do begin
+      Residual[I]:=State[I]-StageBase[I]-
+        StiffSDIRKGamma*H*FState[I];
+      if not IsFiniteValue(Residual[I]) then Exit;
+      Scale:=StiffODEScale(Options,I,StepStart,StepStart);
+      Ratio:=Abs(Residual[I])/Scale;
+      if Ratio>ResidualNorm then ResidualNorm:=Ratio;
+    end;
+    if ResidualNorm<=Options.NewtonTolerance then begin
+      StageValue:=State; StageDerivative:=FState; Exit(True);
+    end;
+    for I:=0 to N-1 do Residual[I]:=-Residual[I];
+    Jacobian:=BuildStiffODEJacobian(F,TStage,State,FState,Options,N,
+      Evaluations,JacobianEvaluations);
+    A:=TDenseDoubleMatrix.Zeros(N,N);
+    for I:=0 to N-1 do for J:=0 to N-1 do begin
+      Value:=-StiffSDIRKGamma*H*Jacobian[I][J];
+      if I=J then Value:=Value+1;
+      if not IsFiniteValue(Value) then Exit;
+      A[I,J]:=Value;
+    end;
+    try Factor:=FactorLU(A);
+    except on E:EDenseMatrixError do Exit; end;
     try
       B:=DenseFromVector(Residual); S:=Factor.Solve(B);
       Delta:=VectorFromDense(S);
     except on E:EDenseMatrixError do Exit; end;
-    Inc(NewtonIterations); CorrectionNorm:=0;
+    Inc(NewtonIterations);
+    Lambda:=1; AcceptedTrial:=False;
+    SetLength(TrialState,N); SetLength(TrialResidual,N);
+    for Backtrack:=0 to 12 do begin
+      AcceptedTrial:=True;
+      for I:=0 to N-1 do begin
+        if not IsFiniteValue(Delta[I]) then begin
+          AcceptedTrial:=False; Break;
+        end;
+        TrialState[I]:=State[I]+Lambda*Delta[I];
+        if not IsFiniteValue(TrialState[I]) then begin
+          AcceptedTrial:=False; Break;
+        end;
+      end;
+      if AcceptedTrial then begin
+        try TrialF:=EvalStiffODE(F,TStage,TrialState,N,Evaluations);
+        except on E:EMathError do AcceptedTrial:=False; end;
+      end;
+      if AcceptedTrial then begin
+        TrialNorm:=0;
+        for I:=0 to N-1 do begin
+          TrialResidual[I]:=TrialState[I]-StageBase[I]-
+            StiffSDIRKGamma*H*TrialF[I];
+          if not IsFiniteValue(TrialResidual[I]) then begin
+            AcceptedTrial:=False; Break;
+          end;
+          Scale:=StiffODEScale(Options,I,StepStart,StepStart);
+          Ratio:=Abs(TrialResidual[I])/Scale;
+          if Ratio>TrialNorm then TrialNorm:=Ratio;
+        end;
+        if AcceptedTrial and ((TrialNorm<ResidualNorm) or
+           (TrialNorm<=Options.NewtonTolerance)) then Break;
+        AcceptedTrial:=False;
+      end;
+      Lambda:=Lambda*0.5;
+    end;
+    if not AcceptedTrial then Exit;
+    CorrectionNorm:=0;
     for I:=0 to N-1 do begin
-      if not IsFiniteValue(Delta[I]) then Exit;
-      State[I]:=State[I]+Delta[I];
-      if not IsFiniteValue(State[I]) then Exit;
-      Scale:=StiffODEScale(Options,I,StepStart,State);
-      Value:=Abs(Delta[I])/Scale;
+      Scale:=StiffODEScale(Options,I,StepStart,StepStart);
+      Value:=Abs(Lambda*Delta[I])/Scale;
       if Value>CorrectionNorm then CorrectionNorm:=Value;
     end;
-    FState:=EvalStiffODE(F,TStage,State,N,Evaluations);
-    if CorrectionNorm<=Options.NewtonTolerance then begin
+    State:=TrialState; FState:=TrialF;
+    if (CorrectionNorm<=Options.NewtonTolerance) and
+       (TrialNorm<=Options.NewtonTolerance) then begin
       StageValue:=State; StageDerivative:=FState; Exit(True);
     end;
   end;

@@ -135,12 +135,8 @@ begin Result:=Y[0]-0.5; end;
 function ConstantODE(T:Double;const Y:TDoubleArray):TDoubleArray;
 begin Result:=TDoubleArray.Create(1); end;
 function RobertsonODE(T:Double;const Y:TDoubleArray):TDoubleArray;
-var D1,D3:Double; I:Integer;
+var D1,D3:Double;
 begin
-  for I:=0 to High(Y) do
-    if Abs(Y[I])>1E100 then raise EModellingError.CreateFmt(
-      'Robertson test state out of range at t %.17g: [%.17g, %.17g, %.17g].',
-      [T,Y[0],Y[1],Y[2]]);
   D1:=-0.04*Y[0]+1E4*Y[1]*Y[2];
   D3:=3E7*Y[1]*Y[1];
   Result:=TDoubleArray.Create(D1,-D1-D3,D3);
