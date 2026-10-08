@@ -46,6 +46,7 @@ type
     procedure TestSingleAndSingleComplexCoverage;
     procedure TestFactorLifecycleContracts;
     procedure TestFourScalarDirectFamilies;
+    procedure TestSparseLUAnalysisReuseAndOrdering;
   end;
 
 implementation
@@ -59,6 +60,78 @@ begin
   FFactor := AFactor;
   FRightHandSide := ARightHandSide;
   FDestination := ADestination;
+end;
+
+procedure TStructuredSolverTest.TestSparseLUAnalysisReuseAndOrdering;
+var
+  A, A2, Changed, Overflow: ISparseDoubleMatrix;
+  Natural, MinimumDegree: ISparseDoubleLUAnalysis;
+  NaturalFactor, MinimumFactor, ReusedFactor: ISparseDoubleLUFactor;
+  B, X: IDenseDoubleMatrix;
+  OverflowAnalysis: ISparseDoubleLUAnalysis;
+  Failed: Boolean;
+begin
+  A := TSparseDoubleMatrix.FromCSR(5, 5,
+    [0, 2, 5, 7, 10, 13],
+    [0, 3, 1, 3, 4, 2, 4, 0, 1, 3, 1, 2, 4],
+    [4.0, -1.0, 4.0, -1.0, -1.0, 4.0, -1.0,
+     -1.0, -1.0, 4.0, -1.0, -1.0, 4.0]);
+  Natural := TDoubleStructuredSolver.AnalyzeSparseLU(A, soNatural);
+  MinimumDegree := TDoubleStructuredSolver.AnalyzeSparseLU(A, soMinimumDegree);
+  AssertEquals('natural analysis ordering', Ord(soNatural),
+    Ord(Natural.Ordering));
+  AssertEquals('minimum-degree analysis ordering', Ord(soMinimumDegree),
+    Ord(MinimumDegree.Ordering));
+  NaturalFactor := Natural.Factorize(A);
+  MinimumFactor := MinimumDegree.Factorize(A);
+  AssertTrue('minimum-degree ordering does not add fill',
+    MinimumFactor.FillNonZeroCount <= NaturalFactor.FillNonZeroCount);
+  AssertTrue('minimum-degree fill fixture is discriminating',
+    MinimumFactor.FillNonZeroCount < NaturalFactor.FillNonZeroCount);
+
+  A2 := TSparseDoubleMatrix.FromCSC(5, 5,
+    [0, 2, 5, 7, 10, 13],
+    [0, 3, 1, 3, 4, 2, 4, 0, 1, 3, 1, 2, 4],
+    [5.0, -1.0, 5.0, -1.0, -1.0, 5.0, -1.0,
+     -1.0, -1.0, 5.0, -1.0, -1.0, 5.0]);
+  AssertEquals('same structural pattern is reusable', True,
+    MinimumDegree.Matches(A2));
+  ReusedFactor := MinimumDegree.Factorize(A2);
+  B := TDenseDoubleMatrix.FromValues(5, 1, [4.0, 3.0, 4.0, 3.0, 3.0]);
+  X := TDenseDoubleMatrix.Zeros(5, 1);
+  ReusedFactor.SolveInto(B, X);
+  AssertEquals('reused factor solution x0', 1.0, X[0, 0], 1e-12);
+  AssertEquals('reused factor solution x1', 1.0, X[1, 0], 1e-12);
+  AssertEquals('reused factor solution x2', 1.0, X[2, 0], 1e-12);
+  AssertEquals('reused factor solution x3', 1.0, X[3, 0], 1e-12);
+  AssertEquals('reused factor solution x4', 1.0, X[4, 0], 1e-12);
+
+  Changed := TSparseDoubleMatrix.FromCSR(5, 5,
+    [0, 2, 5, 6, 9, 11],
+    [0, 3, 1, 3, 4, 2, 0, 1, 3, 1, 4],
+    [5.0, -1.0, 5.0, -1.0, -1.0, 5.0, -1.0,
+     -1.0, 5.0, -1.0, 4.0]);
+  AssertEquals('different pattern rejected', False,
+    MinimumDegree.Matches(Changed));
+  try
+    ReusedFactor := MinimumDegree.Factorize(Changed);
+    Fail('factorization must reject a structural mismatch');
+  except
+    on ESparseDirectSolveError do ;
+  end;
+
+  Overflow := TSparseDoubleMatrix.FromCSR(2, 2,
+    [0, 2, 4], [0, 1, 0, 1],
+    [1.0e154, -1.0e154, -1.0e154, -1.0e154]);
+  OverflowAnalysis := TDoubleStructuredSolver.AnalyzeSparseLU(
+    Overflow, soNatural);
+  Failed := False;
+  try
+    ReusedFactor := OverflowAnalysis.Factorize(Overflow);
+  except
+    on ESparseDirectSolveError do Failed := True;
+  end;
+  AssertTrue('non-finite elimination update rejected', Failed);
 end;
 
 procedure TFactorSolveThread.Execute;
@@ -174,6 +247,7 @@ end;
 procedure TStructuredSolverTest.TestSparseLUFillPivotAndComplexSolve;
 var
   A: ISparseComplexMatrix;
+  Analysis: ISparseComplexLUAnalysis;
   Factor: ISparseComplexLUFactor;
   B, X: IDenseComplexMatrix;
 begin
@@ -181,8 +255,9 @@ begin
     [1, 0, 1],
     [TComplex.Create(1, 1), TComplex.Create(2, 0),
      TComplex.Create(3, 0)]);
-  Factor := TComplexStructuredSolver.FactorSparseLU(A);
-  AssertEquals('natural ordering visible', Ord(soNatural),
+  Analysis := TComplexStructuredSolver.AnalyzeSparseLU(A, soMinimumDegree);
+  Factor := Analysis.Factorize(A);
+  AssertEquals('minimum-degree ordering visible', Ord(soMinimumDegree),
     Ord(Factor.Ordering));
   AssertTrue('sparse LU pivoted', Factor.InterchangeCount > 0);
   AssertTrue('factor count retained',
@@ -378,11 +453,13 @@ var
   SingleBand: IStructuredSingleMatrix;
   SingleBandFactor: IStructuredSingleDirectFactor;
   SingleSparse: ISparseSingleMatrix;
+  SingleSparseAnalysis: ISparseSingleLUAnalysis;
   SingleSparseFactor: ISparseSingleLUFactor;
   SingleB, SingleX: IDenseSingleMatrix;
   SingleComplexBand: IStructuredSingleComplexMatrix;
   SingleComplexBandFactor: IStructuredSingleComplexDirectFactor;
   SingleComplexSparse: ISparseSingleComplexMatrix;
+  SingleComplexSparseAnalysis: ISparseSingleComplexLUAnalysis;
   SingleComplexSparseFactor: ISparseSingleComplexLUFactor;
   SingleComplexB, SingleComplexX: IDenseSingleComplexMatrix;
   ComplexTridiagonal, ComplexBand: IStructuredComplexMatrix;
@@ -399,8 +476,9 @@ begin
 
   SingleSparse := TSparseSingleMatrix.FromCSR(
     2, 2, [0, 1, 2], [0, 1], [2.0, 3.0]);
-  SingleSparseFactor :=
-    TSingleStructuredSolver.FactorSparseLU(SingleSparse);
+  SingleSparseAnalysis :=
+    TSingleStructuredSolver.AnalyzeSparseLU(SingleSparse, soMinimumDegree);
+  SingleSparseFactor := SingleSparseAnalysis.Factorize(SingleSparse);
   SingleX[0, 0] := 0.0;
   SingleX[1, 0] := 0.0;
   SingleSparseFactor.SolveInto(SingleB, SingleX);
@@ -427,8 +505,10 @@ begin
     2, 2, [0, 1, 2], [0, 1],
     [TSingleComplex.Create(2.0, 0.0),
      TSingleComplex.Create(3.0, 0.0)]);
+  SingleComplexSparseAnalysis := TSingleComplexStructuredSolver.AnalyzeSparseLU(
+    SingleComplexSparse, soMinimumDegree);
   SingleComplexSparseFactor :=
-    TSingleComplexStructuredSolver.FactorSparseLU(SingleComplexSparse);
+    SingleComplexSparseAnalysis.Factorize(SingleComplexSparse);
   SingleComplexX[0, 0] := TSingleComplex.Zero;
   SingleComplexX[1, 0] := TSingleComplex.Zero;
   SingleComplexSparseFactor.SolveInto(SingleComplexB, SingleComplexX);

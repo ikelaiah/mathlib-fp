@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "release": "1.9.8",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.5",
+  "compiler": "C:\\lazarus\\fpc\\3.2.2\\bin\\x86_64-win64\\fpc.exe",
+  "compiler_version": "3.2.2",
+  "workflows": [
+    {
+      "id": "sensor-pipeline",
+      "source": "examples/24_sensor_pipeline.pas",
+      "domains": [
+        "MathBase",
+        "EngineeringLib",
+        "StatsLib",
+        "TimeSeriesLib"
+      ],
+      "success_marker": "sensor pipeline: success",
+      "output_sha256": "b155b1249215bef81c8d067c01cfeaee71bbdc6b8489049c20096bd9881a05fb",
+      "exported_artifacts": {
+        "workflow-exports/sensor_report.txt": {
+          "bytes": 162,
+          "sha256": "be15bd02f93c998d947d7ebb7204db3abf3185e5b8d190c70141c98753f1e044"
+        }
+      }
+    },
+    {
+      "id": "numerical-modelling-optimisation",
+      "source": "examples/25_numerical_modelling_optimisation.pas",
+      "domains": [
+        "MathBase",
+        "NumericsLib",
+        "OptimizationLib"
+      ],
+      "success_marker": "modelling workflow: success",
+      "output_sha256": "a6446976247d5395f189ce9bbfe1ef1634329276e6dd697b7b28542f39b958f4",
+      "exported_artifacts": {
+        "workflow-exports/model_report.txt": {
+          "bytes": 172,
+          "sha256": "90b42826166f6f3fabe97f8a750116990ac1ebb08c3998a4b9c95196c7a2ddb2"
+        }
+      }
+    },
+    {
+      "id": "probability-finance",
+      "source": "examples/26_probability_finance.pas",
+      "domains": [
+        "MathBase",
+        "ProbabilityLib",
+        "StatsLib",
+        "FinanceLib"
+      ],
+      "success_marker": "probability finance workflow: success",
+      "output_sha256": "480233f03b150242bfdb2e870645750e712efa9f3aea13f4445748117ee8c290",
+      "exported_artifacts": {
+        "workflow-exports/finance_report.txt": {
+          "bytes": 299,
+          "sha256": "5c1dd5f1925e6f898458ce9bba7f8a84896d2a83cc982ac9936f7944f85cfc61"
+        }
+      }
+    }
+  ]
+}

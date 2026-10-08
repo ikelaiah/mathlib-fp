@@ -53,6 +53,7 @@ closest to your project. For a shorter task-first route, use the
 | `38_generalized_eigenproblem.pas` | AlgebraLib | Solve real and complex matrix pencils, including eigenvalues at infinity |
 | `39_complex_schur_factorization.pas` | AlgebraLib | Compute a complex Schur factorization with unitary Schur vectors |
 | `40_stiff_ode_sdirk.pas` | NumericsLib | Integrate a stiff forced ODE with SDIRK, analytic Jacobian, dense output, and a directional event |
+| `41_sparse_direct_ordering.pas` | AlgebraLib | Analyze a sparse pattern, factor with minimum-degree ordering, and solve in the original coordinate order |
 
 ## Build and run
 
