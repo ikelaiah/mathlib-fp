@@ -5,8 +5,8 @@
   "artifacts": {
     "release_notes": "releases/2.4.0/release-notes.md",
     "pr_notes": "releases/2.4.0/pr-notes.md",
-    "qualification": "releases/2.3.0/qualification.md",
-    "workflow_qualification": "releases/2.3.0/workflow-qualification.md",
+    "qualification": "releases/2.4.0/qualification.md",
+    "workflow_qualification": "releases/2.4.0/workflow-qualification.md",
     "capability_manifest": "releases/1.10.0/capability-manifest.md",
     "capability_manifest_json": "releases/1.10.0/capability-manifest.json",
     "public_api": "reference/api/public-api-2.4.0.json",

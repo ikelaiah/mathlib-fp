@@ -1,7 +1,8 @@
 # 2.4.0 qualification
 
-**Status:** Local Windows qualification passed; clean-archive Linux and
-Windows CI qualification is pending.
+**Status:** The stable 2.4.0 metadata passes all local qualification gates.
+Candidate source code passed clean-archive qualification on Linux and Windows;
+release branch updates and the final tag run the same qualification workflow.
 
 ## Local results
 
@@ -14,7 +15,7 @@ consumer; and the benchmark evidence validator.
 
 The machine-readable local release qualification result is retained in
 [`qualification-win64.json`](qualification-win64.json) and has SHA-256
-`bb29dcff6c0cce8f3992641e80c8186a2f4732c3bf251e57ebdc39ad75c9e02f`.
+`b9d0d2e4ad8dc114e3337add999047945dadc286f6878057a43c94139d13a2d6`.
 The 2.4.0 workflow qualification ran all three representative workflows and
 matched their output and exported-artifact digests. Its machine-readable
 results are in
@@ -22,6 +23,17 @@ results are in
 
 ## Release CI
 
-The release workflow still needs to pass from clean source archives on Linux
-x86-64 and Windows x86-64. The GitHub run and its source archive checksums will
-be recorded here before publication.
+Release qualification run
+[37772756273](https://github.com/ikelaiah/mathlib-fp/actions/runs/37772756273)
+passed on commit `a2b4970e196faa7e9eafb38935faec1014d1cc02`.
+
+- Linux x86-64, FPC 3.2.2: all 124 gates passed offline from a clean source
+  archive. SHA-256: `7bca5abf8337d647bbe71fd649eda57ddf33b9b363d782ff12b65de01b1e80dd`.
+  See [`qualification-linux.json`](qualification-linux.json).
+- Windows x86-64, FPC 3.2.2: all 125 gates passed from a clean source archive,
+  including the Lazarus package consumer. SHA-256:
+  `428eeab60848f2a2b28327da7fef397245e514e7e2247c00aada800cef8c1d31`.
+  See [`qualification-windows.json`](qualification-windows.json).
+
+Each release branch update and the final `v2.4.0` release event runs the same
+qualification workflow against its exact source commit.

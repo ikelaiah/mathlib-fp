@@ -803,13 +803,20 @@ supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
-## Previous published stable release: 2.3.2 — Comparison scope boundaries
+## Previous release: 2.4.0 — Sparse Direct II
+
+Version 2.4.0 adds reusable sparse LU symbolic analysis, deterministic
+minimum-degree ordering, and pattern reuse while keeping the existing natural
+ordering API source-compatible. See the [release notes](../releases/2.4.0/release-notes.md)
+and [qualification record](../releases/2.4.0/qualification.md).
+
+## 2.3.2 — Comparison scope boundaries
 
 Version 2.3.2 made the comparison guide's account of mathlib-fp's current
 scope boundaries explicit. It contained no Pascal source or public API changes.
 See the [2.3.2 release notes](../releases/2.3.2/release-notes.md).
 
-## Release candidate target: 2.4.0 — Sparse Direct II
+## 2.4.0 roadmap scope
 
 Scope:
 
