@@ -5,8 +5,9 @@ unit AlgebraLib.StructuredSolvers;
 
  Reusable direct factors for tridiagonal, band, and explicitly requested sparse
  systems. Tridiagonal factors use adjacent partial pivoting. General band
- factors use no pivoting and report that limitation. Sparse LU uses natural
- ordering with row partial pivoting and retains only actual factor fill.
+ factors use no pivoting and report that limitation. Sparse LU supports natural
+ and minimum-degree ordering, reusable symbolic analysis, row partial pivoting,
+ and sparse factor storage.
 -----------------------------------------------------------------------------}
 
 {$mode objfpc}{$H+}{$J-}
@@ -24,7 +25,7 @@ type
   EStructuredSolveError = class(Exception);
   ESparseDirectSolveError = class(Exception);
 
-  TSparseOrdering = (soNatural);
+  TSparseOrdering = (soNatural, soMinimumDegree);
 
   generic IStructuredDirectFactor<T> = interface
     function GetSize: SizeInt;
@@ -75,11 +76,29 @@ type
     property MinimumPivotMagnitude: Double read GetMinimumPivotMagnitude;
   end;
 
+  generic ISparseLUAnalysis<T> = interface
+    function GetSize: SizeInt;
+    function GetOrdering: TSparseOrdering;
+    function GetPatternNonZeroCount: SizeInt;
+    function Matches(const Matrix: specialize ISparseMatrix<T>): Boolean;
+    function Factorize(const Matrix: specialize ISparseMatrix<T>;
+      const PivotTolerance: Double = 1.0e-14):
+      specialize ISparseLUFactor<T>;
+    property Size: SizeInt read GetSize;
+    property Ordering: TSparseOrdering read GetOrdering;
+    property PatternNonZeroCount: SizeInt read GetPatternNonZeroCount;
+  end;
+
   ISparseSingleLUFactor = specialize ISparseLUFactor<Single>;
   ISparseDoubleLUFactor = specialize ISparseLUFactor<Double>;
   ISparseSingleComplexLUFactor =
     specialize ISparseLUFactor<TSingleComplex>;
   ISparseComplexLUFactor = specialize ISparseLUFactor<TComplex>;
+  ISparseSingleLUAnalysis = specialize ISparseLUAnalysis<Single>;
+  ISparseDoubleLUAnalysis = specialize ISparseLUAnalysis<Double>;
+  ISparseSingleComplexLUAnalysis =
+    specialize ISparseLUAnalysis<TSingleComplex>;
+  ISparseComplexLUAnalysis = specialize ISparseLUAnalysis<TComplex>;
 
   generic TSparseFactorRow<T> = record
     Columns: TSparseSizeIntArray;
@@ -88,6 +107,25 @@ type
   end;
 
   generic TSparseFactorRows<T> = array of specialize TSparseFactorRow<T>;
+
+  generic TSparseLUAnalysis<T> = class(TInterfacedObject,
+    specialize ISparseLUAnalysis<T>)
+  private
+    type TMatrix = specialize ISparseMatrix<T>;
+  private
+    FSize, FPatternNonZeros: SizeInt;
+    FOrdering: TSparseOrdering;
+    FRowPointers, FColumnIndices: TSparseSizeIntArray;
+    FPermutation: TSparseSizeIntArray;
+  public
+    constructor Create(const Matrix: TMatrix; const Ordering: TSparseOrdering);
+    function GetSize: SizeInt;
+    function GetOrdering: TSparseOrdering;
+    function GetPatternNonZeroCount: SizeInt;
+    function Matches(const Matrix: TMatrix): Boolean;
+    function Factorize(const Matrix: TMatrix; const PivotTolerance: Double = 1.0e-14):
+      specialize ISparseLUFactor<T>;
+  end;
 
   generic TTridiagonalFactor<T> = class(TInterfacedObject,
     specialize IStructuredDirectFactor<T>)
@@ -149,16 +187,26 @@ type
       TFactorRows = specialize TSparseFactorRows<T>;
   private
     FSize, FOriginalNonZeros, FFactorNonZeros, FInterchanges: SizeInt;
+    FOrdering: TSparseOrdering;
     FRows: TFactorRows;
     FPermutation: TSparseSizeIntArray;
+    FColumnPermutation: TSparseSizeIntArray;
     FMinimumPivot: Double;
     function FindPosition(const Row, Col: SizeInt;
       out InsertPosition: SizeInt): SizeInt;
     function GetValue(const Row, Col: SizeInt): T;
     procedure SetValue(const Row, Col: SizeInt; const Value: T);
+    procedure Initialize(const Matrix: specialize ISparseMatrix<T>;
+      const PivotTolerance: Double;
+      const ColumnPermutation: TSparseSizeIntArray;
+      const Ordering: TSparseOrdering);
   public
     constructor Create(const Matrix: specialize ISparseMatrix<T>;
-      const PivotTolerance: Double);
+      const PivotTolerance: Double); overload;
+    constructor Create(const Matrix: specialize ISparseMatrix<T>;
+      const PivotTolerance: Double;
+      const ColumnPermutation: TSparseSizeIntArray;
+      const Ordering: TSparseOrdering); overload;
     function GetSize: SizeInt;
     function GetScalarKind: TSparseScalarKind;
     function GetOrdering: TSparseOrdering;
@@ -183,6 +231,9 @@ type
     class function FactorSparseLU(const Matrix: specialize ISparseMatrix<T>;
       const PivotTolerance: Double = 1.0e-14):
       specialize ISparseLUFactor<T>; static;
+    class function AnalyzeSparseLU(const Matrix: specialize ISparseMatrix<T>;
+      const Ordering: TSparseOrdering = soMinimumDegree):
+      specialize ISparseLUAnalysis<T>; static;
   end;
 
   TSingleStructuredSolver = specialize TStructuredSolverFactory<Single>;
@@ -193,6 +244,155 @@ type
     specialize TStructuredSolverFactory<TComplex>;
 
 implementation
+
+constructor TSparseLUAnalysis.Create(const Matrix: TMatrix;
+  const Ordering: TSparseOrdering);
+type
+  TGraph = array of TSparseSizeIntArray;
+var
+  CSR: TMatrix;
+  Graph: TGraph;
+  Active: array of Boolean;
+  I, J, P, K, U, V, Candidate, Best, BestDegree, Degree: SizeInt;
+
+  procedure AddNeighbor(const Row, Col: SizeInt);
+  var
+    Q: SizeInt;
+  begin
+    for Q := 0 to Length(Graph[Row]) - 1 do
+      if Graph[Row][Q] = Col then Exit;
+    SetLength(Graph[Row], Length(Graph[Row]) + 1);
+    Graph[Row][High(Graph[Row])] := Col;
+  end;
+
+begin
+  inherited Create;
+  if Matrix = nil then
+    raise ESparseDirectSolveError.Create(
+      'Sparse LU analysis: matrix must not be nil.');
+  if Matrix.Rows <> Matrix.Cols then
+    raise ESparseDirectSolveError.Create(
+      'Sparse LU analysis: matrix must be square.');
+  if not (Ordering in [soNatural, soMinimumDegree]) then
+    raise ESparseDirectSolveError.Create(
+      'Sparse LU analysis: unsupported ordering.');
+  if Matrix.Format = sfCSR then CSR := Matrix
+  else CSR := specialize TSparseMatrixFactory<T>.Convert(Matrix, sfCSR);
+  FSize := CSR.Rows;
+  FPatternNonZeros := CSR.NonZeroCount;
+  SetLength(FRowPointers, FSize + 1);
+  SetLength(FColumnIndices, FPatternNonZeros);
+  for I := 0 to FSize do FRowPointers[I] := CSR.GetOuterPointer(I);
+  for P := 0 to FPatternNonZeros - 1 do
+    FColumnIndices[P] := CSR.GetInnerIndex(P);
+  SetLength(FPermutation, FSize);
+  if Ordering = soNatural then
+    for I := 0 to FSize - 1 do FPermutation[I] := I
+  else
+  begin
+    FOrdering := Ordering;
+    SetLength(Graph, FSize);
+    SetLength(Active, FSize);
+    for I := 0 to FSize - 1 do Active[I] := True;
+    for I := 0 to FSize - 1 do
+      for P := CSR.GetOuterPointer(I) to CSR.GetOuterPointer(I + 1) - 1 do
+      begin
+        J := CSR.GetInnerIndex(P);
+        if I <> J then
+        begin
+          AddNeighbor(I, J);
+          AddNeighbor(J, I);
+        end;
+      end;
+    for K := 0 to FSize - 1 do
+    begin
+      Best := -1;
+      BestDegree := High(SizeInt);
+      for Candidate := 0 to FSize - 1 do
+        if Active[Candidate] then
+        begin
+          Degree := 0;
+          for P := 0 to Length(Graph[Candidate]) - 1 do
+            if Active[Graph[Candidate][P]] then Inc(Degree);
+          if (Degree < BestDegree) or
+             ((Degree = BestDegree) and (Candidate < Best)) then
+          begin
+            Best := Candidate;
+            BestDegree := Degree;
+          end;
+        end;
+      FPermutation[K] := Best;
+      Active[Best] := False;
+      for I := 0 to Length(Graph[Best]) - 1 do
+      begin
+        U := Graph[Best][I];
+        if not Active[U] then Continue;
+        for J := I + 1 to Length(Graph[Best]) - 1 do
+        begin
+          V := Graph[Best][J];
+          if Active[V] then
+          begin
+            AddNeighbor(U, V);
+            AddNeighbor(V, U);
+          end;
+        end;
+      end;
+    end;
+  end;
+  FOrdering := Ordering;
+end;
+
+function TSparseLUAnalysis.GetSize: SizeInt;
+begin
+  Result := FSize;
+end;
+
+function TSparseLUAnalysis.GetOrdering: TSparseOrdering;
+begin
+  Result := FOrdering;
+end;
+
+function TSparseLUAnalysis.GetPatternNonZeroCount: SizeInt;
+begin
+  Result := FPatternNonZeros;
+end;
+
+function TSparseLUAnalysis.Matches(const Matrix: TMatrix): Boolean;
+var
+  CSR: TMatrix;
+  I: SizeInt;
+begin
+  Result := False;
+  if (Matrix = nil) or (Matrix.Rows <> FSize) or (Matrix.Cols <> FSize) then
+    Exit;
+  if Matrix.Format = sfCSR then CSR := Matrix
+  else CSR := specialize TSparseMatrixFactory<T>.Convert(Matrix, sfCSR);
+  if CSR.NonZeroCount <> FPatternNonZeros then Exit;
+  for I := 0 to FSize do
+    if CSR.GetOuterPointer(I) <> FRowPointers[I] then Exit;
+  for I := 0 to FPatternNonZeros - 1 do
+    if CSR.GetInnerIndex(I) <> FColumnIndices[I] then Exit;
+  Result := True;
+end;
+
+function TSparseLUAnalysis.Factorize(const Matrix: TMatrix;
+  const PivotTolerance: Double): specialize ISparseLUFactor<T>;
+begin
+  if not Matches(Matrix) then
+    raise ESparseDirectSolveError.Create(
+      'Sparse LU factorization: matrix pattern differs from the analysis.');
+  try
+    Result := specialize TSparseLUFactor<T>.Create(
+      Matrix, PivotTolerance, FPermutation, FOrdering);
+  except
+    on E: EOverflow do
+      raise ESparseDirectSolveError.Create(
+        'Sparse LU factorization: non-finite arithmetic.');
+    on E: EInvalidOp do
+      raise ESparseDirectSolveError.Create(
+        'Sparse LU factorization: non-finite arithmetic.');
+  end;
+end;
 
 constructor TTridiagonalFactor.Create(
   const Matrix: specialize IStructuredMatrix<T>;
@@ -589,15 +789,35 @@ end;
 constructor TSparseLUFactor.Create(
   const Matrix: specialize ISparseMatrix<T>;
   const PivotTolerance: Double);
+begin
+  inherited Create;
+  Initialize(Matrix, PivotTolerance, nil, soNatural);
+end;
+
+constructor TSparseLUFactor.Create(
+  const Matrix: specialize ISparseMatrix<T>;
+  const PivotTolerance: Double;
+  const ColumnPermutation: TSparseSizeIntArray;
+  const Ordering: TSparseOrdering);
+begin
+  inherited Create;
+  Initialize(Matrix, PivotTolerance, ColumnPermutation, Ordering);
+end;
+
+procedure TSparseLUFactor.Initialize(
+  const Matrix: specialize ISparseMatrix<T>;
+  const PivotTolerance: Double;
+  const ColumnPermutation: TSparseSizeIntArray;
+  const Ordering: TSparseOrdering);
 var
   CSR: TMatrix;
-  I, J, K, P, PivotRow, Position: SizeInt;
+  I, J, K, P, PivotRow: SizeInt;
   PivotMagnitude, CandidateMagnitude: Double;
   Pivot, Multiplier, NewValue: T;
   TempRow: TFactorRow;
   TempPermutation: SizeInt;
+  InversePermutation: TSparseSizeIntArray;
 begin
-  inherited Create;
   if Matrix = nil then
     raise ESparseDirectSolveError.Create(
       'Sparse LU: matrix must not be nil.');
@@ -612,21 +832,27 @@ begin
   else CSR := specialize TSparseMatrixFactory<T>.Convert(Matrix, sfCSR);
   FSize := CSR.Rows;
   FOriginalNonZeros := CSR.NonZeroCount;
+  FOrdering := Ordering;
   SetLength(FRows, FSize);
   SetLength(FPermutation, FSize);
+  SetLength(FColumnPermutation, FSize);
+  SetLength(InversePermutation, FSize);
   for I := 0 to FSize - 1 do
   begin
     FPermutation[I] := I;
-    FRows[I].Count := CSR.GetOuterPointer(I + 1) -
-      CSR.GetOuterPointer(I);
-    SetLength(FRows[I].Columns, FRows[I].Count);
-    SetLength(FRows[I].Values, FRows[I].Count);
-    Position := 0;
-    for P := CSR.GetOuterPointer(I) to CSR.GetOuterPointer(I + 1) - 1 do
+    if Length(ColumnPermutation) = FSize then
+      FColumnPermutation[I] := ColumnPermutation[I]
+    else
+      FColumnPermutation[I] := I;
+    InversePermutation[FColumnPermutation[I]] := I;
+  end;
+  for I := 0 to FSize - 1 do
+  begin
+    for P := CSR.GetOuterPointer(FColumnPermutation[I]) to
+      CSR.GetOuterPointer(FColumnPermutation[I] + 1) - 1 do
     begin
-      FRows[I].Columns[Position] := CSR.GetInnerIndex(P);
-      FRows[I].Values[Position] := CSR.GetStoredValue(P);
-      Inc(Position);
+      J := InversePermutation[CSR.GetInnerIndex(P)];
+      SetValue(I, J, CSR.GetStoredValue(P));
     end;
   end;
   FMinimumPivot := Infinity;
@@ -647,6 +873,9 @@ begin
     if PivotMagnitude <= PivotTolerance then
       raise ESparseDirectSolveError.CreateFmt(
         'Sparse LU: singular pivot column %d.', [K]);
+    if IsNan(PivotMagnitude) or IsInfinite(PivotMagnitude) then
+      raise ESparseDirectSolveError.CreateFmt(
+        'Sparse LU: non-finite pivot in column %d.', [K]);
     if PivotRow <> K then
     begin
       TempRow := FRows[K];
@@ -666,6 +895,10 @@ begin
       if specialize TLinearScalar<T>.Magnitude(Multiplier) = 0.0 then
         Continue;
       Multiplier := Multiplier / Pivot;
+      CandidateMagnitude := specialize TLinearScalar<T>.Magnitude(Multiplier);
+      if IsNan(CandidateMagnitude) or IsInfinite(CandidateMagnitude) then
+        raise ESparseDirectSolveError.CreateFmt(
+          'Sparse LU: non-finite multiplier in row %d.', [I]);
       SetValue(I, K, Multiplier);
       for P := 0 to FRows[K].Count - 1 do
       begin
@@ -673,6 +906,10 @@ begin
         if J <= K then Continue;
         NewValue := GetValue(I, J) -
           Multiplier * FRows[K].Values[P];
+        CandidateMagnitude := specialize TLinearScalar<T>.Magnitude(NewValue);
+        if IsNan(CandidateMagnitude) or IsInfinite(CandidateMagnitude) then
+          raise ESparseDirectSolveError.CreateFmt(
+            'Sparse LU: non-finite update in row %d, column %d.', [I, J]);
         SetValue(I, J, NewValue);
       end;
     end;
@@ -693,7 +930,7 @@ end;
 
 function TSparseLUFactor.GetOrdering: TSparseOrdering;
 begin
-  Result := soNatural;
+  Result := FOrdering;
 end;
 
 function TSparseLUFactor.GetOriginalNonZeroCount: SizeInt;
@@ -744,7 +981,7 @@ begin
   for J := 0 to RightHandSide.Cols - 1 do
   begin
     for I := 0 to FSize - 1 do
-      Work[I] := RightHandSide[FPermutation[I], J];
+      Work[I] := RightHandSide[FColumnPermutation[FPermutation[I]], J];
     for I := 0 to FSize - 1 do
       for P := 0 to FRows[I].Count - 1 do
       begin
@@ -762,7 +999,8 @@ begin
       end;
       Work[I] := Work[I] / GetValue(I, I);
     end;
-    for I := 0 to FSize - 1 do Destination[I, J] := Work[I];
+    for I := 0 to FSize - 1 do
+      Destination[FColumnPermutation[I], J] := Work[I];
   end;
 end;
 
@@ -784,8 +1022,22 @@ end;
 class function TStructuredSolverFactory.FactorSparseLU(
   const Matrix: specialize ISparseMatrix<T>;
   const PivotTolerance: Double): specialize ISparseLUFactor<T>;
+var
+  Symbolic: specialize TSparseLUAnalysis<T>;
 begin
-  Result := specialize TSparseLUFactor<T>.Create(Matrix, PivotTolerance);
+  Symbolic := specialize TSparseLUAnalysis<T>.Create(Matrix, soNatural);
+  try
+    Result := Symbolic.Factorize(Matrix, PivotTolerance);
+  finally
+    Symbolic.Free;
+  end;
+end;
+
+class function TStructuredSolverFactory.AnalyzeSparseLU(
+  const Matrix: specialize ISparseMatrix<T>;
+  const Ordering: TSparseOrdering): specialize ISparseLUAnalysis<T>;
+begin
+  Result := specialize TSparseLUAnalysis<T>.Create(Matrix, Ordering);
 end;
 
 end.

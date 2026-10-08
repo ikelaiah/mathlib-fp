@@ -190,11 +190,10 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 2.1 scope (included in 2.2.0) | Special Functions II | Bessel, elliptic, exponential-integral, and a bounded hypergeometric baseline with cited budgets |
 | 2.2.0 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
 | 2.3.0 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
-| 2.4 | Sparse Direct II | Fill-reducing ordering, symbolic/numeric separation, and a documented fill/memory model |
+| 2.4.0 | Sparse Direct II | Fill-reducing ordering, reusable symbolic analysis, and sparse numeric factors |
 
-The 2.1 and 2.2 scopes shipped in 2.2.0, and stiff integration shipped in
-2.3.0. Sparse Direct II is the next committed near-term capability gate. See
-the candidate capability lanes in the
+The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
+and Sparse Direct II shipped in 2.4.0. See the candidate capability lanes in the
 post-2.0 capability programme for longer-term directions that are not version
 promises.
 
@@ -804,14 +803,20 @@ supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
-## Previous release: 2.3.2 — Comparison scope boundaries
+## Previous release: 2.4.0 — Sparse Direct II
 
-Version 2.3.2 makes the comparison guide's account of mathlib-fp's current
-scope boundaries explicit. It contains no Pascal source or public API changes,
-so its runtime qualification and target evidence carry forward from 2.3.1. See
-the [2.3.2 release notes](../releases/2.3.2/release-notes.md).
+Version 2.4.0 adds reusable sparse LU symbolic analysis, deterministic
+minimum-degree ordering, and pattern reuse while keeping the existing natural
+ordering API source-compatible. See the [release notes](../releases/2.4.0/release-notes.md)
+and [qualification record](../releases/2.4.0/qualification.md).
 
-## Next release: 2.4 — Sparse Direct II
+## 2.3.2 — Comparison scope boundaries
+
+Version 2.3.2 made the comparison guide's account of mathlib-fp's current
+scope boundaries explicit. It contained no Pascal source or public API changes.
+See the [2.3.2 release notes](../releases/2.3.2/release-notes.md).
+
+## 2.4.0 roadmap scope
 
 Scope:
 
@@ -828,9 +833,10 @@ Non-goals:
 - GPU-only paths.
 
 Multifrontal or supernodal architecture is not promised unless later design
-evidence justifies it. Completion gate: the fill and memory model is measured
-and documented, factors are reusable, and results agree with the typed-dense
-oracle and residual checks on supported structures. See the
+evidence justifies it. The v2.4.0 implementation adds minimum-degree symbolic
+analysis with reusable pattern state, sparse numeric LU, and typed-dense oracle
+and residual checks. See the [v2.4.0 release notes](../releases/2.4.0/release-notes.md)
+and
 [reusable direct factors](../guides/domains/sparse-linear-algebra.md#reusable-direct-factors) for
 the current baseline.
 

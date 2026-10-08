@@ -209,6 +209,14 @@
         "falling event state = 0.49999997"
       ],
       "final_line": "stiff ODE example: success"
+    },
+    {
+      "path": "examples/41_sparse_direct_ordering.pas",
+      "contains": [
+        "ordering: 1",
+        "fill entries: 0"
+      ],
+      "final_line": "sparse direct: success"
     }
   ]
 }

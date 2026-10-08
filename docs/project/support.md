@@ -1,8 +1,9 @@
 # Supported platform matrix
 
-Version 2.3.2 is a documentation-only patch. It carries forward the Free Pascal
-source, standard RTL/FCL runtime, and dense real-double SDIRK2 stiff ODE path
-from 2.3.0 without changing numerical behavior or public APIs. The
+Version 2.4.0 adds reusable sparse-direct symbolic analysis and
+minimum-degree ordering while retaining the Free Pascal source
+and standard RTL/FCL runtime.
+The dense real-double SDIRK2 stiff ODE path is unchanged. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](../portability-evidence-1.9.6.json); the
 [evidence report](../releases/1.9.6/portability-evidence.md) explains the unchanged target
@@ -17,23 +18,21 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The 2.3.0 release candidate passed the
-[Linux and Windows release qualification](../releases/2.3.0/qualification.md)
-on 2026-10-03 from checksummed clean archives. Since 2.3.2 does not change the
-runtime or supported targets, this remains the retained platform evidence for
-the 2.3 line. The 2.0.0 qualification remains historical.
+The 2.4.0 release qualification passed on 2026-10-08 from checksummed clean
+Linux and Windows archives. See the current
+[qualification record](../releases/2.4.0/qualification.md). The 2.0.0
+qualification remains historical.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.3.0 clean-archive qualification, 2026-10-03 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.3.0 clean-archive qualification, 2026-10-03 | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.4.0 clean-archive qualification, 2026-10-08 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.4.0 clean-archive qualification, 2026-10-08 | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The qualified `release/2.3.0` candidate produced new Linux and Windows primary
-artifacts. See the linked qualification record for the run, qualified commit,
-and artifact digests.
+The qualified `v2.4.0` release has Linux and Windows primary evidence. See the
+linked qualification record for the run, qualified commit, and archive digests.
 
 ### Exact profiles
 

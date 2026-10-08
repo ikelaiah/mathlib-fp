@@ -350,8 +350,35 @@ begin
 end;
 
 class function TLinearScalar.Magnitude(const Value: T): Double;
+var
+  S: Single;
+  D: Double;
+  CS: TSingleComplex;
+  CD: TComplex;
 begin
-  Result := Sqrt(AbsSquared(Value));
+  case Kind of
+    sskSingle:
+      begin
+        Move(Value, S, SizeOf(S));
+        Result := Abs(Double(S));
+      end;
+    sskDouble:
+      begin
+        Move(Value, D, SizeOf(D));
+        Result := Abs(D);
+      end;
+    sskSingleComplex:
+      begin
+        Move(Value, CS, SizeOf(CS));
+        CD := TComplex.Create(CS.Re, CS.Im);
+        Result := CD.Magnitude;
+      end;
+  else
+    begin
+      Move(Value, CD, SizeOf(CD));
+      Result := CD.Magnitude;
+    end;
+  end;
 end;
 
 class function TLinearScalar.IsFinite(const Value: T): Boolean;

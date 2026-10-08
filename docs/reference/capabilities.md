@@ -22,7 +22,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Typed CSR/CSC and compact structured storage | Stable | Single/double real/complex | Immutable canonical storage; products may create mathematical fill; no hidden densification |
 | Typed stored/matrix-free operators and preconditioners | Stable | Single/double real/complex | Four-scalar ordinary/adjoint and identity/diagonal/IC(0)/ILU(0) execution; caller supplies mathematical symmetry/definiteness |
 | CG, MINRES, restarted GMRES, BiCGSTAB, and LSQR | Stable | Single/double real/complex | Every method executes for every scalar; square methods stop on true residual and LSQR on normal residual; LSQR is unpreconditioned in 1.9 |
-| Reusable tridiagonal/band/sparse LU factors | Stable | Single/double real/complex | General band has no pivoting; sparse baseline is natural order and fill dependent |
+| Reusable tridiagonal/band/sparse LU factors | Stable | Single/double real/complex | General band has no pivoting; sparse minimum-degree ordering is heuristic and fill dependent |
 | Restarted partial Lanczos/Arnoldi | Stable | Single/double real/complex | Largest magnitude only; no shift-invert/interior or polynomial path |
 | Interpolation and approximation | Stable | Double real | Includes natural/clamped/not-a-knot cubic splines; dense scattered methods target small data sets |
 | Numerical/automatic differentiation | Stable | Double real/complex callback and forward dual | Forward mode only; complex-step requires an analytic callback |
@@ -44,7 +44,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Legacy `IMatrix` API | Stable compatibility | Double real | Nested storage and `Integer` dimensions |
 | Error/gamma/beta functions | Stable | Double real | Domains and budgets are documented in MathBase |
 | Bessel, elliptic, exponential-integral families | Stable | Double real | Bessel orders zero and one; bounded real elliptic, exponential-integral, hypergeometric, and Jacobi paths |
-| Advanced sparse direct algorithms | Unsupported | — | No fill-reducing symbolic ordering, multifrontal/supernodal, distributed, out-of-core, or GPU path |
+| Advanced sparse direct architectures | Unsupported | — | No multifrontal/supernodal, distributed, out-of-core, or GPU path |
 | Advanced iterative variants | Unsupported | — | No block/flexible Krylov, algebraic multigrid, or parallel/SIMD sparse dispatch |
 | Nonsymmetric, generalized, Hessenberg, and Schur spectral algebra | Stable | Double real and complex | Dense matrices; nonsymmetric eigenpairs use real input; no polynomial, shift-invert, or interior-target path |
 | Advanced DSP design and wavelets | Unsupported | — | Haar is stable; equiripple, advanced IIR families, broader wavelets, and packets remain conditional |
@@ -52,8 +52,9 @@ Target qualifications and platform-specific limitations are defined by the
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.3.2 capability inventory; its numerical scope carries forward
-unchanged from 2.3.0. The [MathBase guide](../guides/domains/math-base.md)
+This is the 2.4.0 capability inventory. Sparse direct solving now includes a
+reusable minimum-degree symbolic analysis and sparse numeric LU. The
+[MathBase guide](../guides/domains/math-base.md)
 documents Bessel J/Y and modified I/K at orders zero and one, Legendre
 elliptic integrals K/E/F/Pi, real exponential integrals Ei/E1, bounded real
 Gauss 2F1, and real Jacobi sn/cn/dn. These paths use real double precision

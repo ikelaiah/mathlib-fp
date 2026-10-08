@@ -1,0 +1,768 @@
+{
+  "schema_version": 1,
+  "release": "2.4.0",
+  "platform": "Windows-2025Server-10.0.26100-SP0",
+  "python": "3.12.10",
+  "compiler": "3.2.2",
+  "qualification_context": {
+    "network_isolated": false,
+    "source_archive": {
+      "archive": "mathlib-fp-2.4.0.zip",
+      "sha256": "428eeab60848f2a2b28327da7fef397245e514e7e2247c00aada800cef8c1d31",
+      "files": 422,
+      "clean_tree": true
+    }
+  },
+  "gates": [
+    {
+      "name": "compiler-version",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/compiler-version.log"
+    },
+    {
+      "name": "test-qualify-release",
+      "status": "passed",
+      "seconds": 0.859,
+      "log": "logs/test-qualify-release.log"
+    },
+    {
+      "name": "tests-normal-compile",
+      "status": "passed",
+      "seconds": 4.922,
+      "log": "logs/tests-normal-compile.log"
+    },
+    {
+      "name": "tests-normal-run",
+      "status": "passed",
+      "seconds": 0.359,
+      "log": "logs/tests-normal-run.log"
+    },
+    {
+      "name": "tests-optimized-compile",
+      "status": "passed",
+      "seconds": 6.75,
+      "log": "logs/tests-optimized-compile.log"
+    },
+    {
+      "name": "tests-optimized-run",
+      "status": "passed",
+      "seconds": 0.328,
+      "log": "logs/tests-optimized-run.log"
+    },
+    {
+      "name": "tests-checked-heap-compile",
+      "status": "passed",
+      "seconds": 7.703,
+      "log": "logs/tests-checked-heap-compile.log"
+    },
+    {
+      "name": "tests-checked-heap-run",
+      "status": "passed",
+      "seconds": 6.016,
+      "log": "logs/tests-checked-heap-run.log"
+    },
+    {
+      "name": "example-00_getting_started-compile",
+      "status": "passed",
+      "seconds": 0.203,
+      "log": "logs/example-00_getting_started-compile.log"
+    },
+    {
+      "name": "example-00_getting_started-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-00_getting_started-run.log"
+    },
+    {
+      "name": "example-01_stats_basics-compile",
+      "status": "passed",
+      "seconds": 0.844,
+      "log": "logs/example-01_stats_basics-compile.log"
+    },
+    {
+      "name": "example-01_stats_basics-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-01_stats_basics-run.log"
+    },
+    {
+      "name": "example-02_hypothesis_test-compile",
+      "status": "passed",
+      "seconds": 0.859,
+      "log": "logs/example-02_hypothesis_test-compile.log"
+    },
+    {
+      "name": "example-02_hypothesis_test-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-02_hypothesis_test-run.log"
+    },
+    {
+      "name": "example-03_matrix_operations-compile",
+      "status": "passed",
+      "seconds": 0.281,
+      "log": "logs/example-03_matrix_operations-compile.log"
+    },
+    {
+      "name": "example-03_matrix_operations-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-03_matrix_operations-run.log"
+    },
+    {
+      "name": "example-04_finance_npv_irr-compile",
+      "status": "passed",
+      "seconds": 0.235,
+      "log": "logs/example-04_finance_npv_irr-compile.log"
+    },
+    {
+      "name": "example-04_finance_npv_irr-run",
+      "status": "passed",
+      "seconds": 0.031,
+      "log": "logs/example-04_finance_npv_irr-run.log"
+    },
+    {
+      "name": "example-05_unit_conversion-compile",
+      "status": "passed",
+      "seconds": 0.234,
+      "log": "logs/example-05_unit_conversion-compile.log"
+    },
+    {
+      "name": "example-05_unit_conversion-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-05_unit_conversion-run.log"
+    },
+    {
+      "name": "example-06_fluid_dynamics-compile",
+      "status": "passed",
+      "seconds": 0.25,
+      "log": "logs/example-06_fluid_dynamics-compile.log"
+    },
+    {
+      "name": "example-06_fluid_dynamics-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-06_fluid_dynamics-run.log"
+    },
+    {
+      "name": "example-07_probability-compile",
+      "status": "passed",
+      "seconds": 0.25,
+      "log": "logs/example-07_probability-compile.log"
+    },
+    {
+      "name": "example-07_probability-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-07_probability-run.log"
+    },
+    {
+      "name": "example-08_combinatorics-compile",
+      "status": "passed",
+      "seconds": 0.235,
+      "log": "logs/example-08_combinatorics-compile.log"
+    },
+    {
+      "name": "example-08_combinatorics-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-08_combinatorics-run.log"
+    },
+    {
+      "name": "example-09_optimization-compile",
+      "status": "passed",
+      "seconds": 0.36,
+      "log": "logs/example-09_optimization-compile.log"
+    },
+    {
+      "name": "example-09_optimization-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-09_optimization-run.log"
+    },
+    {
+      "name": "example-10_timeseries-compile",
+      "status": "passed",
+      "seconds": 0.235,
+      "log": "logs/example-10_timeseries-compile.log"
+    },
+    {
+      "name": "example-10_timeseries-run",
+      "status": "passed",
+      "seconds": 0.031,
+      "log": "logs/example-10_timeseries-run.log"
+    },
+    {
+      "name": "example-11_machinelearning-compile",
+      "status": "passed",
+      "seconds": 0.25,
+      "log": "logs/example-11_machinelearning-compile.log"
+    },
+    {
+      "name": "example-11_machinelearning-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-11_machinelearning-run.log"
+    },
+    {
+      "name": "example-12_geometry-compile",
+      "status": "passed",
+      "seconds": 0.25,
+      "log": "logs/example-12_geometry-compile.log"
+    },
+    {
+      "name": "example-12_geometry-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-12_geometry-run.log"
+    },
+    {
+      "name": "example-13_numerical_methods-compile",
+      "status": "passed",
+      "seconds": 0.219,
+      "log": "logs/example-13_numerical_methods-compile.log"
+    },
+    {
+      "name": "example-13_numerical_methods-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-13_numerical_methods-run.log"
+    },
+    {
+      "name": "example-14_complex_vectors-compile",
+      "status": "passed",
+      "seconds": 0.343,
+      "log": "logs/example-14_complex_vectors-compile.log"
+    },
+    {
+      "name": "example-14_complex_vectors-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-14_complex_vectors-run.log"
+    },
+    {
+      "name": "example-15_typed_dense_solve-compile",
+      "status": "passed",
+      "seconds": 0.797,
+      "log": "logs/example-15_typed_dense_solve-compile.log"
+    },
+    {
+      "name": "example-15_typed_dense_solve-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-15_typed_dense_solve-run.log"
+    },
+    {
+      "name": "example-16_dense_solver_selection-compile",
+      "status": "passed",
+      "seconds": 0.61,
+      "log": "logs/example-16_dense_solver_selection-compile.log"
+    },
+    {
+      "name": "example-16_dense_solver_selection-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-16_dense_solver_selection-run.log"
+    },
+    {
+      "name": "example-17_numerical_modelling-compile",
+      "status": "passed",
+      "seconds": 0.86,
+      "log": "logs/example-17_numerical_modelling-compile.log"
+    },
+    {
+      "name": "example-17_numerical_modelling-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-17_numerical_modelling-run.log"
+    },
+    {
+      "name": "example-18_convex_optimization-compile",
+      "status": "passed",
+      "seconds": 0.704,
+      "log": "logs/example-18_convex_optimization-compile.log"
+    },
+    {
+      "name": "example-18_convex_optimization-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-18_convex_optimization-run.log"
+    },
+    {
+      "name": "example-19_applied_data_pipeline-compile",
+      "status": "passed",
+      "seconds": 0.922,
+      "log": "logs/example-19_applied_data_pipeline-compile.log"
+    },
+    {
+      "name": "example-19_applied_data_pipeline-run",
+      "status": "passed",
+      "seconds": 0.031,
+      "log": "logs/example-19_applied_data_pipeline-run.log"
+    },
+    {
+      "name": "example-20_interchange_replay-compile",
+      "status": "passed",
+      "seconds": 0.672,
+      "log": "logs/example-20_interchange_replay-compile.log"
+    },
+    {
+      "name": "example-20_interchange_replay-run",
+      "status": "passed",
+      "seconds": 0.031,
+      "log": "logs/example-20_interchange_replay-run.log"
+    },
+    {
+      "name": "example-21_release_1_8_workflows-compile",
+      "status": "passed",
+      "seconds": 0.969,
+      "log": "logs/example-21_release_1_8_workflows-compile.log"
+    },
+    {
+      "name": "example-21_release_1_8_workflows-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-21_release_1_8_workflows-run.log"
+    },
+    {
+      "name": "example-22_sparse_end_to_end-compile",
+      "status": "passed",
+      "seconds": 1.187,
+      "log": "logs/example-22_sparse_end_to_end-compile.log"
+    },
+    {
+      "name": "example-22_sparse_end_to_end-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-22_sparse_end_to_end-run.log"
+    },
+    {
+      "name": "example-23_api_migration_preview-compile",
+      "status": "passed",
+      "seconds": 1.734,
+      "log": "logs/example-23_api_migration_preview-compile.log"
+    },
+    {
+      "name": "example-23_api_migration_preview-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-23_api_migration_preview-run.log"
+    },
+    {
+      "name": "example-24_sensor_pipeline-compile",
+      "status": "passed",
+      "seconds": 1.516,
+      "log": "logs/example-24_sensor_pipeline-compile.log"
+    },
+    {
+      "name": "example-24_sensor_pipeline-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-24_sensor_pipeline-run.log"
+    },
+    {
+      "name": "example-25_numerical_modelling_optimisation-compile",
+      "status": "passed",
+      "seconds": 1.328,
+      "log": "logs/example-25_numerical_modelling_optimisation-compile.log"
+    },
+    {
+      "name": "example-25_numerical_modelling_optimisation-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-25_numerical_modelling_optimisation-run.log"
+    },
+    {
+      "name": "example-26_probability_finance-compile",
+      "status": "passed",
+      "seconds": 1.062,
+      "log": "logs/example-26_probability_finance-compile.log"
+    },
+    {
+      "name": "example-26_probability_finance-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-26_probability_finance-run.log"
+    },
+    {
+      "name": "example-27_bessel_functions-compile",
+      "status": "passed",
+      "seconds": 0.188,
+      "log": "logs/example-27_bessel_functions-compile.log"
+    },
+    {
+      "name": "example-27_bessel_functions-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-27_bessel_functions-run.log"
+    },
+    {
+      "name": "example-28_modified_bessel_functions-compile",
+      "status": "passed",
+      "seconds": 0.172,
+      "log": "logs/example-28_modified_bessel_functions-compile.log"
+    },
+    {
+      "name": "example-28_modified_bessel_functions-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-28_modified_bessel_functions-run.log"
+    },
+    {
+      "name": "example-29_elliptic_integrals-compile",
+      "status": "passed",
+      "seconds": 0.172,
+      "log": "logs/example-29_elliptic_integrals-compile.log"
+    },
+    {
+      "name": "example-29_elliptic_integrals-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-29_elliptic_integrals-run.log"
+    },
+    {
+      "name": "example-30_exponential_integrals-compile",
+      "status": "passed",
+      "seconds": 0.172,
+      "log": "logs/example-30_exponential_integrals-compile.log"
+    },
+    {
+      "name": "example-30_exponential_integrals-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-30_exponential_integrals-run.log"
+    },
+    {
+      "name": "example-31_gauss_hypergeometric-compile",
+      "status": "passed",
+      "seconds": 0.172,
+      "log": "logs/example-31_gauss_hypergeometric-compile.log"
+    },
+    {
+      "name": "example-31_gauss_hypergeometric-run",
+      "status": "passed",
+      "seconds": 0.031,
+      "log": "logs/example-31_gauss_hypergeometric-run.log"
+    },
+    {
+      "name": "example-32_jacobi_elliptic_functions-compile",
+      "status": "passed",
+      "seconds": 0.172,
+      "log": "logs/example-32_jacobi_elliptic_functions-compile.log"
+    },
+    {
+      "name": "example-32_jacobi_elliptic_functions-run",
+      "status": "passed",
+      "seconds": 0.015,
+      "log": "logs/example-32_jacobi_elliptic_functions-run.log"
+    },
+    {
+      "name": "example-33_elliptic_third_kind-compile",
+      "status": "passed",
+      "seconds": 0.172,
+      "log": "logs/example-33_elliptic_third_kind-compile.log"
+    },
+    {
+      "name": "example-33_elliptic_third_kind-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-33_elliptic_third_kind-run.log"
+    },
+    {
+      "name": "example-34_hessenberg_reduction-compile",
+      "status": "passed",
+      "seconds": 0.953,
+      "log": "logs/example-34_hessenberg_reduction-compile.log"
+    },
+    {
+      "name": "example-34_hessenberg_reduction-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-34_hessenberg_reduction-run.log"
+    },
+    {
+      "name": "example-35_complex_hessenberg_reduction-compile",
+      "status": "passed",
+      "seconds": 0.875,
+      "log": "logs/example-35_complex_hessenberg_reduction-compile.log"
+    },
+    {
+      "name": "example-35_complex_hessenberg_reduction-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-35_complex_hessenberg_reduction-run.log"
+    },
+    {
+      "name": "example-36_real_schur_factorization-compile",
+      "status": "passed",
+      "seconds": 0.906,
+      "log": "logs/example-36_real_schur_factorization-compile.log"
+    },
+    {
+      "name": "example-36_real_schur_factorization-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-36_real_schur_factorization-run.log"
+    },
+    {
+      "name": "example-37_real_nonsymmetric_eigen-compile",
+      "status": "passed",
+      "seconds": 0.906,
+      "log": "logs/example-37_real_nonsymmetric_eigen-compile.log"
+    },
+    {
+      "name": "example-37_real_nonsymmetric_eigen-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-37_real_nonsymmetric_eigen-run.log"
+    },
+    {
+      "name": "example-38_generalized_eigenproblem-compile",
+      "status": "passed",
+      "seconds": 0.921,
+      "log": "logs/example-38_generalized_eigenproblem-compile.log"
+    },
+    {
+      "name": "example-38_generalized_eigenproblem-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-38_generalized_eigenproblem-run.log"
+    },
+    {
+      "name": "example-39_complex_schur_factorization-compile",
+      "status": "passed",
+      "seconds": 0.922,
+      "log": "logs/example-39_complex_schur_factorization-compile.log"
+    },
+    {
+      "name": "example-39_complex_schur_factorization-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-39_complex_schur_factorization-run.log"
+    },
+    {
+      "name": "example-40_stiff_ode_sdirk-compile",
+      "status": "passed",
+      "seconds": 0.828,
+      "log": "logs/example-40_stiff_ode_sdirk-compile.log"
+    },
+    {
+      "name": "example-40_stiff_ode_sdirk-run",
+      "status": "passed",
+      "seconds": 0.047,
+      "log": "logs/example-40_stiff_ode_sdirk-run.log"
+    },
+    {
+      "name": "example-41_sparse_direct_ordering-compile",
+      "status": "passed",
+      "seconds": 1.14,
+      "log": "logs/example-41_sparse_direct_ordering-compile.log"
+    },
+    {
+      "name": "example-41_sparse_direct_ordering-run",
+      "status": "passed",
+      "seconds": 0.016,
+      "log": "logs/example-41_sparse_direct_ordering-run.log"
+    },
+    {
+      "name": "example-output-contracts",
+      "status": "passed",
+      "seconds": 0.344,
+      "log": "logs/example-output-contracts.log"
+    },
+    {
+      "name": "test_api_decision",
+      "status": "passed",
+      "seconds": 0.125,
+      "log": "logs/test_api_decision.log"
+    },
+    {
+      "name": "test_api_snapshot",
+      "status": "passed",
+      "seconds": 0.109,
+      "log": "logs/test_api_snapshot.log"
+    },
+    {
+      "name": "test_doc_examples",
+      "status": "passed",
+      "seconds": 0.094,
+      "log": "logs/test_doc_examples.log"
+    },
+    {
+      "name": "test_example_output",
+      "status": "passed",
+      "seconds": 0.078,
+      "log": "logs/test_example_output.log"
+    },
+    {
+      "name": "test_build_docs",
+      "status": "passed",
+      "seconds": 0.375,
+      "log": "logs/test_build_docs.log"
+    },
+    {
+      "name": "test_documentation_workflow",
+      "status": "passed",
+      "seconds": 0.094,
+      "log": "logs/test_documentation_workflow.log"
+    },
+    {
+      "name": "test_built_docs",
+      "status": "passed",
+      "seconds": 0.109,
+      "log": "logs/test_built_docs.log"
+    },
+    {
+      "name": "test_release_state",
+      "status": "passed",
+      "seconds": 0.109,
+      "log": "logs/test_release_state.log"
+    },
+    {
+      "name": "test_numerical_evidence",
+      "status": "passed",
+      "seconds": 0.157,
+      "log": "logs/test_numerical_evidence.log"
+    },
+    {
+      "name": "test_numerical_mutation",
+      "status": "passed",
+      "seconds": 0.125,
+      "log": "logs/test_numerical_mutation.log"
+    },
+    {
+      "name": "test_performance_evidence",
+      "status": "passed",
+      "seconds": 0.109,
+      "log": "logs/test_performance_evidence.log"
+    },
+    {
+      "name": "test_portability_evidence",
+      "status": "passed",
+      "seconds": 0.187,
+      "log": "logs/test_portability_evidence.log"
+    },
+    {
+      "name": "test_migration_rehearsal",
+      "status": "passed",
+      "seconds": 0.125,
+      "log": "logs/test_migration_rehearsal.log"
+    },
+    {
+      "name": "test_workflow_qualification",
+      "status": "passed",
+      "seconds": 0.125,
+      "log": "logs/test_workflow_qualification.log"
+    },
+    {
+      "name": "test_convergence",
+      "status": "passed",
+      "seconds": 0.141,
+      "log": "logs/test_convergence.log"
+    },
+    {
+      "name": "check_docs",
+      "status": "passed",
+      "seconds": 0.516,
+      "log": "logs/check_docs.log"
+    },
+    {
+      "name": "check_api_decision",
+      "status": "passed",
+      "seconds": 0.25,
+      "log": "logs/check_api_decision.log"
+    },
+    {
+      "name": "check_numerical_evidence",
+      "status": "passed",
+      "seconds": 0.125,
+      "log": "logs/check_numerical_evidence.log"
+    },
+    {
+      "name": "check_convergence",
+      "status": "passed",
+      "seconds": 0.093,
+      "log": "logs/check_convergence.log"
+    },
+    {
+      "name": "documentation-execution",
+      "status": "passed",
+      "seconds": 8.297,
+      "log": "logs/documentation-execution.log"
+    },
+    {
+      "name": "numerical-mutation",
+      "status": "passed",
+      "seconds": 16.625,
+      "log": "logs/numerical-mutation.log"
+    },
+    {
+      "name": "documentation-build",
+      "status": "passed",
+      "seconds": 2.781,
+      "log": "logs/documentation-build.log"
+    },
+    {
+      "name": "documentation-built-links",
+      "status": "passed",
+      "seconds": 8.813,
+      "log": "logs/documentation-built-links.log"
+    },
+    {
+      "name": "documentation-offline-archive-links",
+      "status": "passed",
+      "seconds": 8.906,
+      "log": "logs/documentation-offline-archive-links.log"
+    },
+    {
+      "name": "migration-rehearsal",
+      "status": "passed",
+      "seconds": 3.985,
+      "log": "logs/migration-rehearsal.log"
+    },
+    {
+      "name": "workflow-qualification",
+      "status": "passed",
+      "seconds": 3.984,
+      "log": "logs/workflow-qualification.log"
+    },
+    {
+      "name": "convergence",
+      "status": "passed",
+      "seconds": 0.094,
+      "log": "logs/convergence.log"
+    },
+    {
+      "name": "portability-evidence",
+      "status": "passed",
+      "seconds": 1.578,
+      "log": "logs/portability-evidence.log"
+    },
+    {
+      "name": "lazarus-package",
+      "status": "passed",
+      "seconds": 5.156,
+      "log": "logs/lazarus-package.log"
+    },
+    {
+      "name": "benchmark-compile",
+      "status": "passed",
+      "seconds": 3.032,
+      "log": "logs/benchmark-compile.log"
+    },
+    {
+      "name": "benchmark-run",
+      "status": "passed",
+      "seconds": 5.875,
+      "log": "logs/benchmark-run.log"
+    },
+    {
+      "name": "benchmark-validate",
+      "status": "passed",
+      "seconds": 0.218,
+      "log": "logs/benchmark-validate.log"
+    }
+  ]
+}

@@ -320,9 +320,29 @@ The factor interfaces are `IStructuredSingleDirectFactor`,
 
 The sparse factor reports original, factor, and fill nonzero counts, ordering,
 row-interchange count, and minimum pivot magnitude. Fill is retained sparsely
-but may be much larger than the input. There is no hidden dense fallback,
-symbolic ordering phase, fill-reducing ordering, or automatic iterative/direct
-switch. Choosing `FactorSparseLU` is the caller's explicit request.
+but may be much larger than the input. There is no hidden dense fallback or
+automatic iterative/direct switch. Choosing `FactorSparseLU` is the caller's
+explicit request.
+
+`AnalyzeSparseLU` separates the symbolic ordering from numeric factorization.
+`soNatural` preserves input ordering. `soMinimumDegree` computes a deterministic
+minimum-degree ordering from the symmetrized sparsity graph, with original row
+number as the tie breaker. Symbolic analysis stores a sparse pattern and
+permutation; it does not allocate a dense matrix. Its `Matches` operation and
+`Factorize` method accept CSR or CSC matrices with the same coordinates, even
+when their values differ. A pattern mismatch raises
+`ESparseDirectSolveError`. The older `FactorSparseLU` overload remains
+source-compatible and uses natural ordering.
+
+See the runnable [minimum-degree sparse LU example](../../../examples/41_sparse_direct_ordering.pas)
+for a complete program.
+
+Reuse the analysis when only values change while matrix coordinates stay fixed.
+Reuse the completed factor when only the right-hand sides change. Both objects
+are immutable and safe for concurrent solves; each solve may use its own dense
+destination. Numeric factorization applies row partial pivoting after the
+symmetric row/column ordering and maps the final solution back to the original
+column order.
 
 Factor constructors deep-copy/factor their input and either return a complete
 immutable reentrant factor or raise `EStructuredSolveError` /
@@ -400,4 +420,5 @@ Large non-densifying cases and measured conditions are published in the
 
 Distributed, out-of-core, GPU, vendor-library, parallel sparse/SIMD,
 fill-reducing sparse ordering, advanced sparse factorizations, and the partial
-spectral targets listed above are not stable 1.9 capabilities.
+spectral targets listed above are not stable 1.9 capabilities. In 2.4,
+minimum-degree sparse LU ordering is the committed sparse direct addition.

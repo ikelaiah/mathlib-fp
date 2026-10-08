@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.4.0] - 2026-10-08
+
+### Added
+
+- Added reusable symbolic analysis and deterministic minimum-degree ordering
+  for sparse LU. Numeric factors can be reused across right-hand sides, and
+  analyses can be reused for changed values on the same sparse pattern.
+
 ## [2.3.2] - 2026-10-03
 
 ### Documentation

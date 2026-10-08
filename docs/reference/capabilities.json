@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.3.2",
+  "release": "2.4.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -426,15 +426,15 @@
     {
       "family": "typed_structured_and_sparse_direct_solve",
       "unit": "AlgebraLib.StructuredSolvers",
-      "entry_points": ["TSingleStructuredSolver", "TDoubleStructuredSolver", "TSingleComplexStructuredSolver", "TComplexStructuredSolver", "IStructuredSingleDirectFactor", "IStructuredDoubleDirectFactor", "IStructuredSingleComplexDirectFactor", "IStructuredComplexDirectFactor", "ISparseSingleLUFactor", "ISparseDoubleLUFactor", "ISparseSingleComplexLUFactor", "ISparseComplexLUFactor"],
+      "entry_points": ["TSingleStructuredSolver", "TDoubleStructuredSolver", "TSingleComplexStructuredSolver", "TComplexStructuredSolver", "IStructuredSingleDirectFactor", "IStructuredDoubleDirectFactor", "IStructuredSingleComplexDirectFactor", "IStructuredComplexDirectFactor", "ISparseSingleLUFactor", "ISparseDoubleLUFactor", "ISparseSingleComplexLUFactor", "ISparseComplexLUFactor", "ISparseSingleLUAnalysis", "ISparseDoubleLUAnalysis", "ISparseSingleComplexLUAnalysis", "ISparseComplexLUAnalysis", "AnalyzeSparseLU"],
       "maturity": "stable",
       "scalars": ["single", "double", "single_complex", "double_complex"],
-      "shapes": ["square_tridiagonal", "square_band", "square_csr", "one_or_many_rhs"],
-      "complexity": "tridiagonal O(n); band factor O(n*bandwidth^2); sparse natural-order work and storage depend on actual fill",
-      "accuracy": "all tridiagonal/band/sparse-LU families execute for all four scalars with typed-dense residual, pivot/singularity, multiple-RHS, snapshot/reuse/alias/concurrency/failure, and fill-diagnostic fixtures",
+      "shapes": ["square_tridiagonal", "square_band", "square_csr", "square_csc", "one_or_many_rhs"],
+      "complexity": "tridiagonal O(n); band factor O(n*bandwidth^2); sparse minimum-degree analysis uses sparse adjacency and elimination fill; numeric work/storage depend on actual fill",
+      "accuracy": "all tridiagonal/band/sparse-LU families execute for all four scalars with typed-dense residual, pivot/singularity, multiple-RHS, snapshot/reuse/alias/concurrency/failure, pattern-reuse, ordering, and fill-diagnostic fixtures",
       "docs": "docs/guides/domains/sparse-linear-algebra.md",
       "tests": "tests/TestStructuredSolvers.pas",
-      "limitations": ["general band factor uses no pivoting", "sparse LU uses natural ordering with row pivoting and no fill-reducing symbolic analysis"]
+      "limitations": ["general band factor uses no pivoting", "minimum-degree ordering is a heuristic and does not guarantee lower fill for every matrix", "numeric sparse LU applies row pivoting after the symmetric ordering"]
     },
     {
       "family": "typed_partial_spectral_linear_algebra",
