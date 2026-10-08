@@ -388,6 +388,9 @@ begin
     on E: EOverflow do
       raise ESparseDirectSolveError.Create(
         'Sparse LU factorization: non-finite arithmetic.');
+    on E: EInvalidOp do
+      raise ESparseDirectSolveError.Create(
+        'Sparse LU factorization: non-finite arithmetic.');
   end;
 end;
 
