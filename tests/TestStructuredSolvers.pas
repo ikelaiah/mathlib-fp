@@ -122,7 +122,7 @@ begin
 
   Overflow := TSparseDoubleMatrix.FromCSR(2, 2,
     [0, 2, 4], [0, 1, 0, 1],
-    [1.0e154, -1.0e154, -1.0e154, -1.0e154]);
+    [1.0e308, 1.5e308, -1.0e308, 1.0e308]);
   OverflowAnalysis := TDoubleStructuredSolver.AnalyzeSparseLU(
     Overflow, soNatural);
   Failed := False;

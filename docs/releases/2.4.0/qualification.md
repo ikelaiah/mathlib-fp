@@ -14,9 +14,9 @@ consumer; and the benchmark evidence validator.
 
 The machine-readable local release qualification result is retained in
 [`qualification-win64.json`](qualification-win64.json) and has SHA-256
-`a8811c9a27da4283c86ff0fbc5c83f4a2627605a874bdd502dc147f3d5509bc3`.
+`82a0ed5fe253469b9231aed321eac15732641f03810c1fe6b2c422d8698481e8`.
 The generated searchable documentation archive has SHA-256
-`0310c0cd05cbda5df7787446680857c1f6e08b65921a0064dd82b95c24368e74`.
+`790616b0d16bb427a9ee83bddf634b37ed44edabf9106315e91523a7e6a2e7b5`.
 The 2.4.0 workflow qualification ran all three representative workflows and
 matched their output and exported-artifact digests. Its machine-readable
 results are in
