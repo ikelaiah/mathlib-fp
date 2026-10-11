@@ -9,6 +9,7 @@ from pathlib import Path
 
 from run_numerical_mutation import (
     Mutation,
+    load_mutation_catalogue,
     materialize_mutation,
     mutations_from_catalogue,
     source_overlay_path,
@@ -102,6 +103,29 @@ class NumericalMutationTests(unittest.TestCase):
         self.assertEqual(1, len(mutations))
         self.assertEqual("high", mutations[0].family)
         self.assertEqual(1, mutations[0].occurrence)
+
+    def test_loads_high_risk_mutations_from_current_release_supplement(self) -> None:
+        base_catalogue = self.root / "base-evidence.json"
+        base_catalogue.write_text(
+            '{"families": [{"family": "historical", "risk": "standard"}]}',
+            encoding="utf-8",
+        )
+        (self.root / "VERSION").write_text("2.5.0\n", encoding="utf-8")
+        release_directory = self.root / "docs" / "releases" / "2.5.0"
+        release_directory.mkdir(parents=True)
+        (release_directory / "numerical-evidence.json").write_text(
+            """{"families": [{"family": "reusable_spectral_plans",
+              "risk": "high", "fault_injections": [{
+                "source": "src/Example.pas", "needle": "good",
+                "replacement": "bad", "test": "tests/TestExample.pas"}]}]}""",
+            encoding="utf-8",
+        )
+
+        catalogue = load_mutation_catalogue(self.root, base_catalogue)
+        mutations = mutations_from_catalogue(catalogue)
+
+        self.assertEqual(1, len(mutations))
+        self.assertEqual("reusable_spectral_plans", mutations[0].family)
 
 
 if __name__ == "__main__":
