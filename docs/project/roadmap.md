@@ -191,11 +191,12 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 2.2.0 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
 | 2.3.0 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
 | 2.4.0 | Sparse Direct II | Fill-reducing ordering, reusable symbolic analysis, and sparse numeric factors |
+| 2.5.0 (next) | Reusable spectral processing | Prepared FFT/STFT execution and inverse STFT with bounded workspace and performance evidence |
 
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
-and Sparse Direct II shipped in 2.4.0. See the candidate capability lanes in the
-post-2.0 capability programme for longer-term directions that are not version
-promises.
+and Sparse Direct II shipped in 2.4.0. The next gate is 2.5.0 reusable spectral
+processing, defined below. Other candidate lanes remain directions that are
+not version promises.
 
 ## Implementation discipline
 
@@ -752,7 +753,7 @@ it is not scheduled by the calendar. Dependency order matters more than
 version-number aesthetics: each gate builds on foundations that earlier gates
 and the 2.0 baseline make dependable.
 
-Only the near-term gates below are committed roadmap directions. The candidate
+Only the named release gates below are committed roadmap directions. The candidate
 lanes that follow are possibilities to be activated, split, reordered, or
 rejected after a design and maintenance review; listing a lane is not a promise
 to ship it. A capability is not complete merely because an implementation
@@ -809,6 +810,27 @@ Version 2.4.0 adds reusable sparse LU symbolic analysis, deterministic
 minimum-degree ordering, and pattern reuse while keeping the existing natural
 ordering API source-compatible. See the [release notes](../releases/2.4.0/release-notes.md)
 and [qualification record](../releases/2.4.0/qualification.md).
+
+## Next release: 2.5.0 — Reusable spectral processing
+
+The selected scope adds reusable double-complex FFT plans and real-double
+STFT analysis/synthesis plans in `EngineeringLib.DSP`. Existing STFT,
+periodogram, Welch and other spectral estimators remain the baseline.
+The new workflow prepares storage once, repeatedly analyzes a finite signal,
+and reconstructs its complete original sample range after symmetric spectrum
+edits. Explicit padding, window-coverage, normalization, ownership and failure
+contracts are fixed in the [2.5 specification](../../tasks/spec-2.5.md).
+
+Completion requires independent numerical references, a runnable reconstruction
+example, exact warm allocation/storage gates, reviewed matching-condition
+timings, current API/capability documentation, and release qualification.
+Implementation follows the [plan](../../tasks/plan-2.5.md) and
+[checklist](../../tasks/todo-2.5.md). No speedup is claimed before measurements.
+
+SIMD/threaded backends, broader filters/wavelets/resampling, new PSD estimators
+and unrelated dense/sparse optimization are outside this gate. Performance
+remains an evidence-led track across releases; 2.5.0 has no promised publication
+date and is not yet a supported or qualified release.
 
 ## 2.3.2 — Comparison scope boundaries
 
@@ -867,7 +889,8 @@ review; lanes may be reordered or rejected.
 
 - FIR/IIR design with practical Butterworth and Chebyshev families;
 - DCT/DST;
-- STFT and spectral-estimation workflows;
+- additional spectral workflows beyond the existing STFT/PSD APIs and the
+  committed 2.5 reusable analysis/reconstruction scope;
 - resampling and polyphase methods;
 - broader practical wavelet support.
 

@@ -1,0 +1,118 @@
+# v2.5.0 reusable spectral processing checklist
+
+**Status:** Scope finalized; implementation pending.
+Contract: [spec](spec-2.5.md). Sequence: [plan](plan-2.5.md).
+
+## 1. Independent fixtures and baseline
+
+- [ ] Commit FFT/STFT fixtures, generator and provenance, focused tests/runner.
+- [ ] Include normalization, windows, overlap coverage and reconstructed signals.
+- [ ] Capture unmodified v2.4 FFT/STFT timings, commit, host, flags and setup.
+
+**Acceptance:** Independent expected values; exact workload and baseline
+conditions. **Verify:** Reproducible fixture generation, corrupt-value rejection
+and focused failures before implementation. **Dependencies:** Spec.
+**Files:** focused unit/runner, fixture include, reference generator.
+
+## 2. Radix-2 FFT plan
+
+- [ ] Implement fixed-length lifetime, cached tables/scratch, Execute/ExecuteInto.
+- [ ] Support four normalizations, exact in-place arrays and input preservation.
+- [ ] Add invalid-call/busy-plan recovery tests and public workflow docs.
+
+**Acceptance:** Reference budgets pass; pre-sized warm execution allocates
+nothing; invalid dimensions/values/arithmetic preserve destination.
+**Verify:** Focused normal/checked runs and allocation instrumentation.
+**Dependencies:** 1. **Files:** DSP unit, focused tests, applied guide.
+
+## 3. Arbitrary-length FFT preparation
+
+- [ ] Cache Bluestein chirps, transformed kernel and convolution scratch.
+- [ ] Guard element/byte overflow; report exact numeric workspace/retained bytes.
+- [ ] Qualify odd/composite/prime lengths and independent plan ownership.
+
+**Acceptance:** Same API, error and normalization rules with zero warm
+allocations. **Verify:** References, round trips, conjugation/scaling, existing
+transform comparisons, checked/heap runs. **Dependencies:** 2.
+**Files:** DSP unit, focused tests, fixtures, guide.
+
+## 4. Reusable STFT analysis
+
+- [ ] Fix geometry/window at construction and prepare complete scratch storage.
+- [ ] Implement Analyze/AnalyzeInto with full bins and specified zero padding.
+- [ ] Document the existing STFT's complete-frame convention and new plan policy.
+
+**Acceptance:** Independent frame DFTs, exact shape/padding/tail coverage,
+input immutability and strided matrix destinations meet the contract.
+**Verify:** Focused numerical/dimension/finiteness/coverage tests.
+**Dependencies:** 3. **Files:** DSP unit, focused tests, applied guide.
+
+## 5. Synthesis and failure handling
+
+- [ ] Implement Synthesize/SynthesizeInto with weighted overlap-add and trimming.
+- [ ] Check coverage, finite spectra, Hermitian symmetry, DC and Nyquist.
+- [ ] Qualify destination atomicity, busy guards, recovery, leaks and independence.
+
+**Acceptance:** Every sample round-trips within budget; symmetric spectral
+edits match independent reconstruction; invalid calls preserve destinations.
+**Verify:** Focused runner, full normal/optimized/checked/heap suite.
+**Dependencies:** 4. **Files:** DSP unit, focused tests, applied guide.
+
+## 6. Complete runnable workflow
+
+- [ ] Add a deterministic signal, repeated analysis, conjugate-bin editing,
+  synthesis, residual reporting and final success marker.
+- [ ] Register the example, check output bounds and repeat-run identity.
+- [ ] Link the user task and describe interpretation/limits.
+
+**Acceptance:** Public-API-only program demonstrates reconstruction and reuse.
+**Verify:** Example build and output contract commands in the spec.
+**Dependencies:** 5. **Files:** example, example index, checker, task guide.
+
+## 7. Performance evidence
+
+- [ ] Add cold/prepared FFT and STFT/synthesis cases at the spec's sizes.
+- [ ] Count allocation/reallocation calls and exact retained workspace.
+- [ ] Separate construction/output-allocation/execution time; retain numerical
+  gates; review matching-host comparisons and all material regressions.
+
+**Acceptance:** Zero valid warm allocations and bounded storage are exact
+gates; timing claims identify repeatable matching conditions.
+**Verify:** Performance validator tests/checker; meaningful fault injection.
+**Dependencies:** 5. **Files:** runner, manifest, validator, validator tests,
+performance guide.
+
+## 8. API, capability and release documentation
+
+- [ ] Register focused tests in TestRunner and generate current API evidence;
+  require a clean second generation.
+- [ ] Update implemented capability inventory, selection and limits.
+- [ ] Create 2.5 release notes, numerical/performance evidence, review notes and
+  qualification records identifying actual targets/results.
+
+**Acceptance:** All artifacts agree on the additive surface and scope.
+**Verify:** API generation, docs/link/example checks in the spec.
+**Dependencies:** 6, 7. **Files:** separate API/inventory, release-evidence and
+discovery batches, at most five files per batch.
+
+## 9. Candidate metadata and local qualification
+
+- [ ] Reconcile version, package, README, changelog and candidate docs.
+- [ ] Run applicable local qualification without package/benchmark skips.
+- [ ] Build current/historical versioned sites and validate the offline ZIP.
+
+**Acceptance:** Consistent candidate artifacts and retained local results,
+with unexecuted targets identified. **Verify:** Qualifier and RELEASING.md.
+**Dependencies:** 8. **Files:** version, package, README, changelog, qualification
+record, split into small batches as necessary.
+
+## 10. Publish and verify the exact release
+
+- [ ] Pass required Linux/Windows archive qualification and supported-target CI.
+- [ ] Apply real publication date/support policy, merge validated branch and
+  require green exact default-branch CI before v2.5.0 tag/publication.
+- [ ] Verify source/docs archives, checksums/assets, current site/history and
+  retain exact-commit target-specific evidence.
+
+**Acceptance:** Published artifacts match the qualified default-branch commit.
+**Verify:** Publication/archive checks in RELEASING.md. **Dependencies:** 9.
