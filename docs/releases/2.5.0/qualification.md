@@ -13,13 +13,17 @@ are in [`performance-evidence.md`](performance-evidence.md).
 
 ## Cross-platform clean-archive results
 
-The [release qualification workflow run 38182263994](https://github.com/ikelaiah/mathlib-fp/actions/runs/38182263994)
-completed for source commit `ecfc68434e7040a5b1919eacbf144039eb65d457`.
+The [release qualification workflow run 38183814730](https://github.com/ikelaiah/mathlib-fp/actions/runs/38183814730)
+completed for stable-promotion source commit
+`f81a89652b2e5a7553af324c00d78b845f813e28`.
 Its Windows x86-64 job verified the checksummed clean source ZIP and passed
 the full qualification profile. Its Linux x86-64 job verified the checksummed
 clean source tar archive and passed the full qualification profile with new
 outbound connections blocked. Both jobs uploaded target-specific qualification
 artifacts; the retained checksums are in the workflow run's artifact metadata.
+The profile detected all seven declared numerical faults, including the four
+2.5.0 spectral mutations for normalization, padded-boundary coverage, Hermitian
+validation, and zero-allocation execution.
 
 ## Local Windows results
 
@@ -50,5 +54,5 @@ report; no general FFT speedup claim is made. Machine-readable results are in
 
 The three unchanged stable numerical-evidence families are carried forward
 from 2.4.0 in [`numerical-evidence.json`](numerical-evidence.json). New spectral
-plan reference, round-trip, failure, and resource budgets passed on the
-checksummed Linux and Windows source archives.
+plan reference, round-trip, failure, resource, and mutation budgets passed on
+the checksummed Linux and Windows source archives.

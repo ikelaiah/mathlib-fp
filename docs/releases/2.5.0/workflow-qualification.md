@@ -15,7 +15,7 @@ markers, standard output digests, and exported-artifact digests are recorded in
 [`workflow-qualification-win64.json`](workflow-qualification-win64.json).
 The complete local gate results are in
 [`qualification-win64.json`](qualification-win64.json). The GitHub-hosted
-[release qualification run 38182263994](https://github.com/ikelaiah/mathlib-fp/actions/runs/38182263994)
-passed the Linux and Windows clean-archive jobs for source commit
-`ecfc68434e7040a5b1919eacbf144039eb65d457`; each job retained its
+[release qualification run 38183814730](https://github.com/ikelaiah/mathlib-fp/actions/runs/38183814730)
+passed the Linux and Windows clean-archive jobs for stable-promotion source
+commit `f81a89652b2e5a7553af324c00d78b845f813e28`; each job retained its
 target-specific evidence artifact.
