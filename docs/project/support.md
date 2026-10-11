@@ -1,9 +1,8 @@
 # Supported platform matrix
 
-Version 2.5.0 release candidate adds reusable FFT/STFT plans and inverse STFT.
-Local Windows candidate qualification passed; exact-commit Linux and Windows
-CI remains pending. The support tiers below remain based on the published
-2.4.0 qualification. Version 2.4.0 added reusable
+Version 2.5.0 adds reusable FFT/STFT plans and inverse STFT. It passed
+checksummed clean-archive qualification on Windows x86-64 and Linux x86-64.
+The support tiers below include the 2.5.0 qualification. Version 2.4.0 added reusable
 sparse-direct symbolic analysis and minimum-degree ordering while retaining
 the Free Pascal source and standard RTL/FCL runtime. The dense real-double
 SDIRK2 stiff ODE path is unchanged. The
@@ -21,20 +20,20 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The 2.4.0 release qualification passed on 2026-10-08 from checksummed clean
+The 2.5.0 release qualification passed on 2026-10-12 from checksummed clean
 Linux and Windows archives. See the current
-[qualification record](../releases/2.4.0/qualification.md). The 2.0.0
-qualification remains historical.
+[qualification record](../releases/2.5.0/qualification.md). The 2.4.0 and
+2.0.0 qualifications remain historical.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.4.0 clean-archive qualification, 2026-10-08 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.4.0 clean-archive qualification, 2026-10-08 | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.5.0 clean-archive qualification, 2026-10-12 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.5.0 clean-archive qualification, 2026-10-12 | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The qualified `v2.4.0` release has Linux and Windows primary evidence. See the
+The qualified `v2.5.0` release has Linux and Windows primary evidence. See the
 linked qualification record for the run, qualified commit, and archive digests.
 
 ### Exact profiles

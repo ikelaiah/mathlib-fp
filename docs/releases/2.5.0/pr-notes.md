@@ -1,6 +1,6 @@
-# 2.5.0 candidate review notes
+# 2.5.0 release review notes
 
-The candidate adds fixed-geometry reusable FFT and STFT plans. The supported
+The release adds fixed-geometry reusable FFT and STFT plans. The supported
 scope is double-complex FFT execution and real-double padded STFT analysis and
 weighted overlap-add synthesis. Existing transforms and PSD APIs remain
 source-compatible.
@@ -14,6 +14,6 @@ guidance.
 The Windows x64 performance evidence meets its numerical, allocation, and
 workspace ceilings. Its advisory comparison flags the allocating FFT path at
 N=4096 and N=65536 above the 1.5 review band; the report records these measured
-tradeoffs and makes no blanket speed claim. Linux and clean-archive release
-qualification, supported-target CI, merge, tag, publication, and archive
-verification remain release prerequisites.
+tradeoffs and makes no blanket speed claim. Linux and Windows clean-archive
+release qualification passed. Merge, tag, publication, and archive verification
+are tracked in the release checklist.

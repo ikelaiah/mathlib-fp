@@ -1,6 +1,6 @@
-# mathlib-fp 2.5.0 (candidate notes)
+# mathlib-fp 2.5.0
 
-**Status:** Draft for release qualification. Not published.
+Released 2026-10-12.
 
 ## Added
 

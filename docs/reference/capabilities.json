@@ -466,7 +466,7 @@
       "family": "reusable_spectral_plans",
       "unit": "EngineeringLib.DSP",
       "entry_points": ["TFFTPlan", "Execute", "ExecuteInto", "TSTFTPlan", "Analyze", "AnalyzeInto", "Synthesize", "SynthesizeInto"],
-      "maturity": "candidate",
+      "maturity": "stable",
       "scalars": ["double", "double_complex"],
       "shapes": ["radix2_fft", "arbitrary_length_fft", "fixed_geometry_full_spectrum_stft"],
       "complexity": "FFT O(N log N); STFT O(frame_count * frame_length log frame_length); prepared storage reported exactly",

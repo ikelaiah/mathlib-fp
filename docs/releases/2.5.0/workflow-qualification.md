@@ -1,6 +1,7 @@
 # v2.5.0 workflow qualification
 
-**Status:** The local Windows candidate workflow gate passed.
+**Result:** The local Windows and cross-platform clean-archive workflow gates
+passed on 2026-10-12.
 
 The public example
 [`42_spectral_plan_reconstruction.pas`](../../../examples/42_spectral_plan_reconstruction.pas)
@@ -13,5 +14,8 @@ cross-domain workflows on Windows 11 x86-64 with FPC 3.2.2. Their success
 markers, standard output digests, and exported-artifact digests are recorded in
 [`workflow-qualification-win64.json`](workflow-qualification-win64.json).
 The complete local gate results are in
-[`qualification-win64.json`](qualification-win64.json). Linux and Windows
-clean-archive qualification for the exact candidate commit remains pending.
+[`qualification-win64.json`](qualification-win64.json). The GitHub-hosted
+[release qualification run 38182263994](https://github.com/ikelaiah/mathlib-fp/actions/runs/38182263994)
+passed the Linux and Windows clean-archive jobs for source commit
+`ecfc68434e7040a5b1919eacbf144039eb65d457`; each job retained its
+target-specific evidence artifact.

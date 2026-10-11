@@ -1,8 +1,9 @@
 # v2.5.0 reusable spectral processing checklist
 
-**Status:** Implementation and local Windows x64 candidate qualification
-passed on 12 October 2026. Exact-commit cross-platform CI and publication
-remain pending.
+**Status:** Implementation and local Windows x64 qualification passed on
+12 October 2026. The GitHub-hosted Linux and Windows clean-archive qualification
+also passed; merge, publication and archive verification are tracked in stage
+10.
 Contract: [spec](spec-2.5.md). Sequence: [plan](plan-2.5.md).
 
 ## 1. Independent fixtures and baseline

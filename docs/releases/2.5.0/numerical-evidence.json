@@ -199,5 +199,5 @@
     }
   ],
   "carried_forward_from": "2.4.0",
-  "carry_forward_reason": "The three existing stable families are unchanged in 2.5.0. Their published references, limits, and test coverage remain applicable; new spectral-plan fixtures and budgets are recorded in the 2.5.0 specification and focused test suite while those APIs are candidates."
+  "carry_forward_reason": "The three existing stable families are unchanged in 2.5.0. Their published references, limits, and test coverage remain applicable; the new spectral-plan fixtures and budgets are recorded in the 2.5.0 specification and focused test suite."
 }

@@ -1,16 +1,25 @@
 # v2.5.0 qualification record
 
-**Status:** Local Windows candidate qualification passed on 2026-10-12.
-Cross-platform clean-archive CI, merge, stable tag, and publication remain
-pending. No release has been published.
+**Result:** Local Windows and GitHub-hosted Linux/Windows clean-archive
+qualification passed on 2026-10-12.
 
 ## Scope and source baseline
 
 The release contract is [`../../../tasks/spec-2.5.md`](../../../tasks/spec-2.5.md).
 The frozen v2.4.0 source commit is `17009ac` (`v2.4.0`). Its Windows x64 FFT
 and legacy STFT timings are in
-[`performance-baseline.md`](performance-baseline.md); candidate comparisons
+[`performance-baseline.md`](performance-baseline.md); 2.5.0 comparisons
 are in [`performance-evidence.md`](performance-evidence.md).
+
+## Cross-platform clean-archive results
+
+The [release qualification workflow run 38182263994](https://github.com/ikelaiah/mathlib-fp/actions/runs/38182263994)
+completed for source commit `ecfc68434e7040a5b1919eacbf144039eb65d457`.
+Its Windows x86-64 job verified the checksummed clean source ZIP and passed
+the full qualification profile. Its Linux x86-64 job verified the checksummed
+clean source tar archive and passed the full qualification profile with new
+outbound connections blocked. Both jobs uploaded target-specific qualification
+artifacts; the retained checksums are in the workflow run's artifact metadata.
 
 ## Local Windows results
 
@@ -41,18 +50,5 @@ report; no general FFT speedup claim is made. Machine-readable results are in
 
 The three unchanged stable numerical-evidence families are carried forward
 from 2.4.0 in [`numerical-evidence.json`](numerical-evidence.json). New spectral
-plan reference, round-trip, failure, and resource budgets remain candidate
-evidence until publication.
-
-## Remaining release gates
-
-| Gate | Status | Evidence |
-| --- | --- | --- |
-| Linux and Windows clean-archive qualification | Pending | Exact candidate commit required by `.github/workflows/release-qualification.yml` |
-| Green default-branch CI | Pending | Must pass for the exact commit selected for `v2.5.0` |
-| Stable tag and publication | Pending | Requires merged, qualified default-branch commit |
-| Source/docs archives, checksums, versioned site | Pending | Must match the published commit and tag |
-
-The candidate documentation manifest keeps 2.4.0 as the published stable
-version. Stable promotion and its publication date occur only after the exact
-commit gates pass.
+plan reference, round-trip, failure, and resource budgets passed on the
+checksummed Linux and Windows source archives.
