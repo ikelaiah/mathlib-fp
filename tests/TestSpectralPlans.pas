@@ -265,7 +265,9 @@ begin
             Input[K].Re * ExpectedScale, Restored[K].Re, Tolerance);
           Tolerance := 5E-11 * Max(1.0,
             Abs(Input[K].Im * ExpectedScale));
-          AssertEquals('FFT forward/inverse imaginary round trip',
+          AssertEquals(Format(
+            'FFT forward/inverse imaginary round trip N=%d mode=%d sample=%d',
+            [N, Ord(Modes[I]), K]),
             Input[K].Im * ExpectedScale, Restored[K].Im, Tolerance);
         end;
       end;
