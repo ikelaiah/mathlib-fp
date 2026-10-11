@@ -1,0 +1,576 @@
+{
+  "schema_version": 1,
+  "release": "2.5.0",
+  "captured_on": "2026-10-12",
+  "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+  "host": {
+    "os": "Windows 11 build 26300",
+    "cpu": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "logical_cpus": 16,
+    "compiler": "Free Pascal 3.2.2 Win64",
+    "flags": [
+      "-B",
+      "-O3",
+      "-FcUTF8"
+    ]
+  },
+  "timer": "QueryPerformanceCounter, fractional milliseconds",
+  "baseline": {
+    "release": "2.4.0",
+    "commit": "17009ac",
+    "runner": "benchmarks/LegacySpectralBaseline.lpr",
+    "sample_count": 3,
+    "measurements": [
+      {
+        "id": "fft-allocating-n10007",
+        "shape": "10007",
+        "warm_iterations": 10,
+        "warm_ms": [
+          97.106499,
+          99.841499,
+          97.496399
+        ],
+        "warm_ms_per_iteration_median": 9.7496399,
+        "checksums": [
+          23.723690491754,
+          23.723690491754,
+          23.723690491754
+        ]
+      },
+      {
+        "id": "fft-allocating-n1009",
+        "shape": "1009",
+        "warm_iterations": 50,
+        "warm_ms": [
+          30.351801,
+          30.5921,
+          30.005798
+        ],
+        "warm_ms_per_iteration_median": 0.60703602,
+        "checksums": [
+          -42.094009167335,
+          -42.094009167335,
+          -42.094009167335
+        ]
+      },
+      {
+        "id": "fft-allocating-n4096",
+        "shape": "4096",
+        "warm_iterations": 20,
+        "warm_ms": [
+          6.7586,
+          7.0389,
+          6.8578
+        ],
+        "warm_ms_per_iteration_median": 0.34289000000000003,
+        "checksums": [
+          30.542151194092,
+          30.542151194092,
+          30.542151194092
+        ]
+      },
+      {
+        "id": "fft-allocating-n64",
+        "shape": "64",
+        "warm_iterations": 5000,
+        "warm_ms": [
+          30.436899,
+          29.746899,
+          29.499399
+        ],
+        "warm_ms_per_iteration_median": 0.0059493798,
+        "checksums": [
+          -5.238336303429,
+          -5.238336303429,
+          -5.238336303429
+        ]
+      },
+      {
+        "id": "fft-allocating-n65536",
+        "shape": "65536",
+        "warm_iterations": 5,
+        "warm_ms": [
+          35.765102,
+          35.229,
+          38.1259
+        ],
+        "warm_ms_per_iteration_median": 7.1530204,
+        "checksums": [
+          54.585501663111,
+          54.585501663111,
+          54.585501663111
+        ]
+      },
+      {
+        "id": "legacy-stft-n255-h85",
+        "shape": "65536_255_85",
+        "warm_iterations": 3,
+        "warm_ms": [
+          350.087921,
+          363.354706,
+          355.049805
+        ],
+        "warm_ms_per_iteration_median": 118.349935,
+        "checksums": [
+          -0.092669746594,
+          -0.092669746594,
+          -0.092669746594
+        ]
+      },
+      {
+        "id": "legacy-stft-n256-h128",
+        "shape": "65536_256_128",
+        "warm_iterations": 3,
+        "warm_ms": [
+          41.914497,
+          40.881298,
+          54.115501
+        ],
+        "warm_ms_per_iteration_median": 13.971499,
+        "checksums": [
+          -0.092397057425,
+          -0.092397057425,
+          -0.092397057425
+        ]
+      }
+    ]
+  },
+  "candidate": {
+    "runner": "benchmarks/SpectralPlanBenchmarkRunner.lpr",
+    "sample_count": 3,
+    "measurements": [
+      {
+        "id": "spectral-fft-allocating-n10007",
+        "shape": "10007",
+        "warm_iterations": 10,
+        "warm_ms": [
+          96.034805,
+          97.941002,
+          97.763702
+        ],
+        "warm_ms_per_iteration_median": 9.776370199999999,
+        "cold_ms": [
+          244.115997,
+          253.033493,
+          248.298111
+        ],
+        "allocations_per_batch": 10,
+        "retained_bytes": 1732976,
+        "working_elements": 32768,
+        "checksums": [
+          23.723690491497,
+          23.723690491497,
+          23.723690491497
+        ]
+      },
+      {
+        "id": "spectral-fft-allocating-n1009",
+        "shape": "1009",
+        "warm_iterations": 50,
+        "warm_ms": [
+          22.866098,
+          24.537001,
+          22.8417
+        ],
+        "warm_ms_per_iteration_median": 0.45732196,
+        "cold_ms": [
+          50.209999,
+          51.075397,
+          52.8773
+        ],
+        "allocations_per_batch": 50,
+        "retained_bytes": 114448,
+        "working_elements": 2048,
+        "checksums": [
+          -42.094009167316,
+          -42.094009167316,
+          -42.094009167316
+        ]
+      },
+      {
+        "id": "spectral-fft-allocating-n4096",
+        "shape": "4096",
+        "warm_iterations": 20,
+        "warm_ms": [
+          10.3858,
+          10.4774,
+          12.5398
+        ],
+        "warm_ms_per_iteration_median": 0.52387,
+        "cold_ms": [
+          34.712898,
+          32.1301,
+          32.153698
+        ],
+        "allocations_per_batch": 20,
+        "retained_bytes": 131072,
+        "working_elements": 4096,
+        "checksums": [
+          30.542151194093,
+          30.542151194093,
+          30.542151194093
+        ]
+      },
+      {
+        "id": "spectral-fft-allocating-n64",
+        "shape": "64",
+        "warm_iterations": 5000,
+        "warm_ms": [
+          26.875299,
+          27.0604,
+          27.040199
+        ],
+        "warm_ms_per_iteration_median": 0.0054080398,
+        "cold_ms": [
+          51.756603,
+          54.1269,
+          53.560501
+        ],
+        "allocations_per_batch": 5000,
+        "retained_bytes": 2048,
+        "working_elements": 64,
+        "checksums": [
+          -5.238336303429,
+          -5.238336303429,
+          -5.238336303429
+        ]
+      },
+      {
+        "id": "spectral-fft-allocating-n65536",
+        "shape": "65536",
+        "warm_iterations": 5,
+        "warm_ms": [
+          56.1096,
+          56.426399,
+          57.145599
+        ],
+        "warm_ms_per_iteration_median": 11.285279800000001,
+        "cold_ms": [
+          33.744801,
+          36.018101,
+          33.855801
+        ],
+        "allocations_per_batch": 5,
+        "retained_bytes": 2097152,
+        "working_elements": 65536,
+        "checksums": [
+          54.58550166307,
+          54.58550166307,
+          54.58550166307
+        ]
+      },
+      {
+        "id": "spectral-fft-into-n10007",
+        "shape": "10007",
+        "warm_iterations": 10,
+        "warm_ms": [
+          95.139397,
+          97.753296,
+          95.780602
+        ],
+        "warm_ms_per_iteration_median": 9.5780602,
+        "cold_ms": [
+          244.115997,
+          253.033493,
+          248.298111
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 1732976,
+        "working_elements": 32768,
+        "checksums": [
+          23.723690491497,
+          23.723690491497,
+          23.723690491497
+        ]
+      },
+      {
+        "id": "spectral-fft-into-n1009",
+        "shape": "1009",
+        "warm_iterations": 50,
+        "warm_ms": [
+          22.909,
+          25.427799,
+          22.8734
+        ],
+        "warm_ms_per_iteration_median": 0.45818,
+        "cold_ms": [
+          50.209999,
+          51.075397,
+          52.8773
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 114448,
+        "working_elements": 2048,
+        "checksums": [
+          -42.094009167316,
+          -42.094009167316,
+          -42.094009167316
+        ]
+      },
+      {
+        "id": "spectral-fft-into-n4096",
+        "shape": "4096",
+        "warm_iterations": 20,
+        "warm_ms": [
+          10.4723,
+          10.2475,
+          11.0579
+        ],
+        "warm_ms_per_iteration_median": 0.523615,
+        "cold_ms": [
+          34.712898,
+          32.1301,
+          32.153698
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 131072,
+        "working_elements": 4096,
+        "checksums": [
+          30.542151194093,
+          30.542151194093,
+          30.542151194093
+        ]
+      },
+      {
+        "id": "spectral-fft-into-n64",
+        "shape": "64",
+        "warm_iterations": 5000,
+        "warm_ms": [
+          26.3153,
+          28.131901,
+          26.094999
+        ],
+        "warm_ms_per_iteration_median": 0.00526306,
+        "cold_ms": [
+          51.756603,
+          54.1269,
+          53.560501
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 2048,
+        "working_elements": 64,
+        "checksums": [
+          -5.238336303429,
+          -5.238336303429,
+          -5.238336303429
+        ]
+      },
+      {
+        "id": "spectral-fft-into-n65536",
+        "shape": "65536",
+        "warm_iterations": 5,
+        "warm_ms": [
+          53.957195,
+          54.437599,
+          54.127201
+        ],
+        "warm_ms_per_iteration_median": 10.8254402,
+        "cold_ms": [
+          33.744801,
+          36.018101,
+          33.855801
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 2097152,
+        "working_elements": 65536,
+        "checksums": [
+          54.58550166307,
+          54.58550166307,
+          54.58550166307
+        ]
+      },
+      {
+        "id": "spectral-stft-analyze-allocating-255_85",
+        "shape": "65536_255_85",
+        "warm_iterations": 3,
+        "warm_ms": [
+          273.558289,
+          269.535217,
+          267.685608
+        ],
+        "warm_ms_per_iteration_median": 89.84507233333333,
+        "cold_ms": [
+          28.063398,
+          26.7841,
+          27.532099
+        ],
+        "allocations_per_batch": 9,
+        "retained_bytes": 4773712,
+        "working_elements": 594156,
+        "checksums": [
+          -0.092363395858,
+          -0.092363395858,
+          -0.092363395858
+        ]
+      },
+      {
+        "id": "spectral-stft-analyze-allocating-256_128",
+        "shape": "65536_256_128",
+        "warm_iterations": 3,
+        "warm_ms": [
+          60.104801,
+          64.369598,
+          60.510296
+        ],
+        "warm_ms_per_iteration_median": 20.170098666666664,
+        "cold_ms": [
+          20.891699,
+          21.070801,
+          21.0222
+        ],
+        "allocations_per_batch": 9,
+        "retained_bytes": 3700736,
+        "working_elements": 462080,
+        "checksums": [
+          -0.092083821903,
+          -0.092083821903,
+          -0.092083821903
+        ]
+      },
+      {
+        "id": "spectral-stft-analyze-into-255_85",
+        "shape": "65536_255_85",
+        "warm_iterations": 3,
+        "warm_ms": [
+          261.707123,
+          275.130585,
+          271.389374
+        ],
+        "warm_ms_per_iteration_median": 90.46312466666666,
+        "cold_ms": [
+          28.063398,
+          26.7841,
+          27.532099
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 4773712,
+        "working_elements": 594156,
+        "checksums": [
+          -0.092363395858,
+          -0.092363395858,
+          -0.092363395858
+        ]
+      },
+      {
+        "id": "spectral-stft-analyze-into-256_128",
+        "shape": "65536_256_128",
+        "warm_iterations": 3,
+        "warm_ms": [
+          59.465797,
+          63.0051,
+          58.254597
+        ],
+        "warm_ms_per_iteration_median": 19.821932333333333,
+        "cold_ms": [
+          20.891699,
+          21.070801,
+          21.0222
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 3700736,
+        "working_elements": 462080,
+        "checksums": [
+          -0.092083821903,
+          -0.092083821903,
+          -0.092083821903
+        ]
+      },
+      {
+        "id": "spectral-stft-synthesize-allocating-255_85",
+        "shape": "65536_255_85",
+        "warm_iterations": 3,
+        "warm_ms": [
+          321.494385,
+          303.877197,
+          300.814117
+        ],
+        "warm_ms_per_iteration_median": 101.292399,
+        "cold_ms": [
+          28.063398,
+          26.7841,
+          27.532099
+        ],
+        "allocations_per_batch": 3,
+        "retained_bytes": 4773712,
+        "working_elements": 594156,
+        "checksums": [
+          0.126086424685,
+          0.126086424685,
+          0.126086424685
+        ]
+      },
+      {
+        "id": "spectral-stft-synthesize-allocating-256_128",
+        "shape": "65536_256_128",
+        "warm_iterations": 3,
+        "warm_ms": [
+          91.939003,
+          86.363701,
+          84.628502
+        ],
+        "warm_ms_per_iteration_median": 28.787900333333337,
+        "cold_ms": [
+          20.891699,
+          21.070801,
+          21.0222
+        ],
+        "allocations_per_batch": 3,
+        "retained_bytes": 3700736,
+        "working_elements": 462080,
+        "checksums": [
+          0.126086424685,
+          0.126086424685,
+          0.126086424685
+        ]
+      },
+      {
+        "id": "spectral-stft-synthesize-into-255_85",
+        "shape": "65536_255_85",
+        "warm_iterations": 3,
+        "warm_ms": [
+          388.093903,
+          301.5271,
+          295.498199
+        ],
+        "warm_ms_per_iteration_median": 100.50903333333333,
+        "cold_ms": [
+          28.063398,
+          26.7841,
+          27.532099
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 4773712,
+        "working_elements": 594156,
+        "checksums": [
+          0.126086424685,
+          0.126086424685,
+          0.126086424685
+        ]
+      },
+      {
+        "id": "spectral-stft-synthesize-into-256_128",
+        "shape": "65536_256_128",
+        "warm_iterations": 3,
+        "warm_ms": [
+          87.441399,
+          84.788605,
+          85.140106
+        ],
+        "warm_ms_per_iteration_median": 28.380035333333336,
+        "cold_ms": [
+          20.891699,
+          21.070801,
+          21.0222
+        ],
+        "allocations_per_batch": 0,
+        "retained_bytes": 3700736,
+        "working_elements": 462080,
+        "checksums": [
+          0.126086424685,
+          0.126086424685,
+          0.126086424685
+        ]
+      }
+    ]
+  }
+}

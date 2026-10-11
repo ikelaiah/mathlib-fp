@@ -189,6 +189,29 @@ def load_catalogue(path: Path) -> dict[str, Any]:
     return value
 
 
+def load_mutation_catalogue(root: Path, base_path: Path) -> dict[str, Any]:
+    """Combine retained baseline mutations with the current release evidence."""
+    catalogues = [load_catalogue(base_path)]
+    version_path = repository_file(root, "VERSION")
+    release = version_path.read_text(encoding="utf-8").strip()
+    supplemental_path = root / "docs" / "releases" / release / "numerical-evidence.json"
+    if (
+        supplemental_path.is_file()
+        and supplemental_path.resolve() != base_path.resolve()
+    ):
+        catalogues.append(load_catalogue(supplemental_path))
+
+    merged = dict(catalogues[0])
+    families: list[Any] = []
+    for catalogue in catalogues:
+        records = catalogue.get("families")
+        if not isinstance(records, list):
+            raise ValueError("catalogue.families must be a list")
+        families.extend(records)
+    merged["families"] = families
+    return merged
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -202,7 +225,8 @@ def main() -> int:
     )
     args = parser.parse_args()
     try:
-        mutations = mutations_from_catalogue(load_catalogue(args.catalogue))
+        catalogue = load_mutation_catalogue(ROOT, args.catalogue)
+        mutations = mutations_from_catalogue(catalogue)
         if len(mutations) < 3:
             raise ValueError("at least three high-risk fault injections are required")
         work_dir = (ROOT / args.work_dir).resolve()

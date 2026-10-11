@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.5.0] - 2026-10-12
+
+### Added
+
+- Added reusable radix-2 and Bluestein FFT plans with prepared execution,
+  normalization options, and workspace diagnostics.
+- Added padded STFT analysis and weighted overlap-add synthesis plans for
+  complete-signal reconstruction and conjugate-pair editing.
+- Added a deterministic spectral reconstruction example and checked
+  numerical, allocation, workspace, and performance evidence.
+
 ## [2.4.0] - 2026-10-08
 
 ### Added

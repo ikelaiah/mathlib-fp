@@ -88,6 +88,33 @@ class PerformanceEvidenceTests(unittest.TestCase):
         self.assertEqual(10, parsed[0]["cold_ms"])
         self.assertEqual(2.0, parsed[0]["checksum"])
 
+    def test_preserves_submillisecond_timing_precision(self) -> None:
+        parsed = parse_perf_output(
+            row("spectral-fft", "spectral_plans", "small").replace(
+                "cold_ms=10|warm_ms=20", "cold_ms=0.125|warm_ms=0.0375"
+            )
+        )
+        self.assertEqual(0.125, parsed[0]["cold_ms"])
+        self.assertEqual(0.0375, parsed[0]["warm_ms"])
+
+    def test_rejects_negative_timing(self) -> None:
+        malformed = row("spectral-fft", "spectral_plans", "small").replace(
+            "warm_ms=20", "warm_ms=-0.5"
+        )
+        with self.assertRaisesRegex(EvidenceError, "must be non-negative"):
+            parse_perf_output(malformed)
+
+    def test_accepts_a_new_semantic_release_manifest(self) -> None:
+        manifest = {
+            "schema_version": 1,
+            "release": "2.5.0",
+            "required_coverage": {"spectral_plans": ["small"]},
+            "benchmarks": [contract("spectral-fft", "spectral_plans", "small")],
+        }
+        rows = parse_perf_output(row("spectral-fft", "spectral_plans", "small"))
+        evidence = validate_evidence(manifest, rows, "test-host")
+        self.assertEqual("pass", evidence["status"])
+
     def test_rejects_duplicate_row_keys(self) -> None:
         malformed = row("dense-small", "dense", "small") + "|cold_ms=11"
         with self.assertRaisesRegex(EvidenceError, "duplicate key cold_ms"):

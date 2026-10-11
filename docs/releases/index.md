@@ -2,7 +2,16 @@
 
 Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.4.0 — current published stable
+## 2.5.0 — current published stable
+
+- [Release notes](2.5.0/release-notes.md)
+- [Qualification record](2.5.0/qualification.md)
+- [Performance evidence](2.5.0/performance-evidence.md)
+- [Numerical fixture provenance](2.5.0/numerical-fixture-provenance.md)
+- [API reference](../reference/api/reference-2.5.0.md)
+- [Release review notes](2.5.0/pr-notes.md)
+
+## 2.4.0 — previous stable release
 
 - [Release notes](2.4.0/release-notes.md)
 - [Linux and Windows clean-archive qualification](2.4.0/qualification.md)

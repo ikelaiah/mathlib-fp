@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.4.0",
+  "release": "2.5.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -461,6 +461,21 @@
       "docs": "docs/guides/domains/dense-linear-algebra.md",
       "tests": "tests/TestDenseDecompositions.pas",
       "limitations": ["real-input nonsymmetric eigenvalues only; no real nonsymmetric complex-input API", "dense matrices only", "no polynomial eigenvalue, shift-invert, or interior-target workflow"]
+    },
+    {
+      "family": "reusable_spectral_plans",
+      "unit": "EngineeringLib.DSP",
+      "entry_points": ["TFFTPlan", "Execute", "ExecuteInto", "TSTFTPlan", "Analyze", "AnalyzeInto", "Synthesize", "SynthesizeInto"],
+      "maturity": "stable",
+      "scalars": ["double", "double_complex"],
+      "shapes": ["radix2_fft", "arbitrary_length_fft", "fixed_geometry_full_spectrum_stft"],
+      "complexity": "FFT O(N log N); STFT O(frame_count * frame_length log frame_length); prepared storage reported exactly",
+      "accuracy": "independent 90-digit DFT fixtures, normalization and round-trip budgets; weighted overlap-add reconstruction",
+      "docs": "docs/guides/domains/applied-numerics.md",
+      "example": "examples/42_spectral_plan_reconstruction.pas",
+      "benchmark": "benchmarks/SpectralPlanBenchmarkRunner.lpr",
+      "tests": "tests/TestSpectralPlans.pas",
+      "limitations": ["Plans have fixed geometry and mutable serial workspaces; overlapping use on one plan is rejected", "STFT uses full spectra and explicit zero padding and is not streaming", "Caller-supplied edited spectra must remain finite and Hermitian"]
     }
   ]
 }

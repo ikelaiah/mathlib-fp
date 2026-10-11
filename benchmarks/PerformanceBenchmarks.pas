@@ -17,11 +17,13 @@ procedure WritePerformanceRow(const Identifier, Domain, Scale, ScalarKind,
   const WorkingElements, DenseShapeElements: QWord; const Checksum,
   Tolerance: Double; const Setup: string);
 procedure RunV195PerformanceBenchmarks;
+procedure RunV250PerformanceBenchmarks;
 
 implementation
 
 uses
   Math,
+  SpectralPlanBenchmarks,
   MathBase.SharedTypes,
   MathBase.Complex,
   StatsLib.Streaming,
@@ -445,6 +447,11 @@ begin
     32, 4, 2, 500);
   BenchmarkAnalysis('data-analysis-pca-large', 'large',
     '1024x8_components4', 1024, 8, 4, 3);
+end;
+
+procedure RunV250PerformanceBenchmarks;
+begin
+  SpectralPlanBenchmarks.RunV250SpectralPlanBenchmarks;
 end;
 
 end.

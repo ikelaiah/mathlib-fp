@@ -438,7 +438,7 @@ def package_gate(
 
 
 def benchmark_gate(
-    qualification: Qualification, compiler: str,
+    qualification: Qualification, compiler: str, release: str,
 ) -> None:
     directory = qualification.work / "benchmark"
     directory.mkdir(parents=True, exist_ok=True)
@@ -457,17 +457,22 @@ def benchmark_gate(
         [str(executable_path(directory, "BenchmarkRunner"))],
         timeout=1800,
     )
-    qualification.run(
-        "benchmark-validate",
-        [
-            sys.executable,
-            str(ROOT / "tools" / "check_performance_evidence.py"),
-            "--compiler", compiler,
-            "--captured-output", str(qualification.logs / "benchmark-run.log"),
-            "--work-dir", str(directory),
-            "--result", str(qualification.work / "performance-results.json"),
-        ],
-    )
+    validation = [
+        sys.executable,
+        str(ROOT / "tools" / "check_performance_evidence.py"),
+    ]
+    if release == "2.5.0":
+        validation.extend([
+            "--manifest",
+            str(ROOT / "docs" / "releases" / "2.5.0" / "performance-evidence.json"),
+        ])
+    validation.extend([
+        "--compiler", compiler,
+        "--captured-output", str(qualification.logs / "benchmark-run.log"),
+        "--work-dir", str(directory),
+        "--result", str(qualification.work / "performance-results.json"),
+    ])
+    qualification.run("benchmark-validate", validation)
 
 
 def portability_gate(
@@ -617,7 +622,7 @@ def main() -> int:
         if not args.skip_package:
             package_gate(qualification, args.lazbuild)
         if not args.skip_benchmark:
-            benchmark_gate(qualification, args.compiler)
+            benchmark_gate(qualification, args.compiler, args.release)
     except (OSError, RuntimeError, subprocess.TimeoutExpired, ValueError) as exc:
         qualification.write_results(args.release, compiler_version)
         print(exc, file=sys.stderr)

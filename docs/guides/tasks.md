@@ -61,6 +61,7 @@ If a task is not supported by a documented entry point, it is marked
 | Carnot efficiency of an ideal heat engine | `EngineeringLib.Thermodynamics` | `TThermodynamicsKit.CarnotEfficiency(HotK, ColdK)` | [quick-start program](domains/engineering.md#engineeringlibthermodynamics-tthermodynamicskit) |
 | Windowed-sinc FIR low-pass filter | `EngineeringLib.Signal` | `TSignalKit.DesignFIRLowPass(Cutoff, Order, Window)`; `ApplyFIRFilter` | [`24_sensor_pipeline.pas`](../../examples/24_sensor_pipeline.pas) |
 | Block convolution with a finite impulse response | `EngineeringLib.DSP` | `TOverlapAddConvolver.ProcessBlock` then `Flush` | [`21_release_1_8_workflows.pas`](../../examples/21_release_1_8_workflows.pas) |
+| Repeatedly analyze, edit, and reconstruct a finite signal | `EngineeringLib.DSP` | `TSTFTPlan.AnalyzeInto`; edit conjugate bins; `SynthesizeInto` | [`42_spectral_plan_reconstruction.pas`](../../examples/42_spectral_plan_reconstruction.pas) |
 
 ## NumericsLib
 

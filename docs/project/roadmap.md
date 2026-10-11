@@ -804,33 +804,35 @@ supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
-## Previous release: 2.4.0 — Sparse Direct II
+## 2.4.0 — Sparse Direct II
 
 Version 2.4.0 adds reusable sparse LU symbolic analysis, deterministic
 minimum-degree ordering, and pattern reuse while keeping the existing natural
 ordering API source-compatible. See the [release notes](../releases/2.4.0/release-notes.md)
 and [qualification record](../releases/2.4.0/qualification.md).
 
-## Next release: 2.5.0 — Reusable spectral processing
+## Previous release: 2.5.0 — Reusable spectral processing
 
-The selected scope adds reusable double-complex FFT plans and real-double
-STFT analysis/synthesis plans in `EngineeringLib.DSP`. Existing STFT,
-periodogram, Welch and other spectral estimators remain the baseline.
-The new workflow prepares storage once, repeatedly analyzes a finite signal,
-and reconstructs its complete original sample range after symmetric spectrum
-edits. Explicit padding, window-coverage, normalization, ownership and failure
-contracts are fixed in the [2.5 specification](../../tasks/spec-2.5.md).
+Version 2.5.0 adds reusable double-complex FFT plans and real-double STFT
+analysis/synthesis plans in `EngineeringLib.DSP`. Existing STFT, periodogram,
+Welch and other spectral estimators remain available. Plans prepare storage
+once, analyze a finite signal repeatedly, and reconstruct its complete
+original sample range after symmetric spectrum edits. Explicit padding,
+window-coverage, normalization, ownership and failure contracts are defined
+in the [2.5 specification](../../tasks/spec-2.5.md).
 
-Completion requires independent numerical references, a runnable reconstruction
-example, exact warm allocation/storage gates, reviewed matching-condition
-timings, current API/capability documentation, and release qualification.
-Implementation follows the [plan](../../tasks/plan-2.5.md) and
-[checklist](../../tasks/todo-2.5.md). No speedup is claimed before measurements.
+The implementation, independent numerical references, runnable reconstruction
+example, allocation/storage gates, current API/capability documentation, and
+checksummed Linux and Windows clean-archive qualification are complete. The
+[qualification record](../releases/2.5.0/qualification.md) and
+[performance report](../releases/2.5.0/performance-evidence.md) document the
+evidence and timing tradeoffs; no blanket speedup is claimed. Implementation
+follows the [plan](../../tasks/plan-2.5.md) and
+[checklist](../../tasks/todo-2.5.md).
 
 SIMD/threaded backends, broader filters/wavelets/resampling, new PSD estimators
 and unrelated dense/sparse optimization are outside this gate. Performance
-remains an evidence-led track across releases; 2.5.0 has no promised publication
-date and is not yet a supported or qualified release.
+remains an evidence-led track across releases.
 
 ## 2.3.2 — Comparison scope boundaries
 
