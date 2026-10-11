@@ -10,7 +10,7 @@ implementation
 
 uses
   SysUtils, Math,
-  {$IFDEF WINDOWS}Windows,{$ELSE}BaseUnix,{$ENDIF}
+  {$IFDEF WINDOWS}Windows,{$ELSE}Unix,{$ENDIF}
   MathBase.SharedTypes, MathBase.Complex,
   AlgebraLib.DenseMatrices,
   EngineeringLib.Signal, EngineeringLib.DSP;
