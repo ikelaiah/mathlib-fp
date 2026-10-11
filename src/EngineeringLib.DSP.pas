@@ -112,6 +112,81 @@ type
     property Z2: Double read FZ2;
   end;
 
+  { Owns a fixed-size complex FFT workspace. Valid ExecuteInto calls reuse all
+    prepared storage; one instance rejects overlapping execution. }
+  TFFTPlan = class
+  private
+    FLength: SizeInt;
+    FWorkLength: SizeInt;
+    FIsBluestein: Boolean;
+    FWorkspace: TComplexArray;
+    FTwiddles: TComplexArray;
+    FBluesteinKernel: TComplexArray;
+    FChirp: TComplexArray;
+    FBitReverse: array of SizeInt;
+    FBusy: LongInt;
+    FRetainedBytes: SizeInt;
+    procedure Acquire;
+    procedure Release;
+    procedure Radix2Prepared(const Inverse: Boolean);
+    procedure TransformPrepared(const Input: TComplexArray;
+      const Inverse: Boolean; const Normalization: TFFTNormalization);
+  public
+    constructor Create(const ATransformLength: SizeInt);
+    destructor Destroy; override;
+    function Execute(const Input: TComplexArray;
+      const Inverse: Boolean = False;
+      const Normalization: TFFTNormalization = fnBackward): TComplexArray;
+    procedure ExecuteInto(const Input: TComplexArray;
+      var Destination: TComplexArray; const Inverse: Boolean = False;
+      const Normalization: TFFTNormalization = fnBackward);
+    function TransformLength: SizeInt;
+    function WorkspaceElements: SizeInt;
+    function RetainedBytes: SizeInt;
+  end;
+
+  { Fixed-geometry full-spectrum STFT analysis and weighted overlap-add
+    synthesis for one finite real-double signal. }
+  TSTFTPlan = class
+  private
+    FSampleCount: SizeInt;
+    FFrameLength: SizeInt;
+    FHopLength: SizeInt;
+    FFrameCount: SizeInt;
+    FLeftPadding: SizeInt;
+    FRightPadding: SizeInt;
+    FPaddedLength: SizeInt;
+    FWindow: TDoubleArray;
+    FDenominator: TDoubleArray;
+    FFrame: TComplexArray;
+    FAccumulator: TDoubleArray;
+    FStagedResult: TDoubleArray;
+    FStagedSpectrum: IDenseComplexMatrix;
+    FFFT: TFFTPlan;
+    FBusy: LongInt;
+    FRetainedBytes: SizeInt;
+    procedure Acquire;
+    procedure Release;
+    procedure ValidateSpectrum(const Spectrum: IDenseComplexMatrix);
+  public
+    constructor Create(const ASampleCount, AFrameLength, AHopLength: SizeInt;
+      const WindowType: TWindowType = wtHann);
+    destructor Destroy; override;
+    function Analyze(const Input: TDoubleArray): IDenseComplexMatrix;
+    procedure AnalyzeInto(const Input: TDoubleArray;
+      const Destination: IDenseComplexMatrix);
+    function Synthesize(const Spectrum: IDenseComplexMatrix): TDoubleArray;
+    procedure SynthesizeInto(const Spectrum: IDenseComplexMatrix;
+      var Destination: TDoubleArray);
+    function SampleCount: SizeInt;
+    function FrameLength: SizeInt;
+    function HopLength: SizeInt;
+    function FrameCount: SizeInt;
+    function LeftPadding: SizeInt;
+    function RightPadding: SizeInt;
+    function RetainedBytes: SizeInt;
+  end;
+
   TDSPKit = class
   public
     class function DFTReference(const Input: TComplexArray;
@@ -267,6 +342,92 @@ begin
   end;
 end;
 
+function CheckedSizeAdd(const LeftValue, RightValue: SizeInt;
+  const Operation: string): SizeInt;
+begin
+  if (RightValue > 0) and (LeftValue > High(SizeInt) - RightValue) then
+    raise EDSPError.Create(Operation + ': size arithmetic overflow.');
+  if (RightValue < 0) and (LeftValue < Low(SizeInt) - RightValue) then
+    raise EDSPError.Create(Operation + ': size arithmetic overflow.');
+  Result := LeftValue + RightValue;
+end;
+
+function CheckedSizeMultiply(const LeftValue, RightValue: SizeInt;
+  const Operation: string): SizeInt;
+begin
+  if (LeftValue < 0) or (RightValue < 0) then
+    raise EDSPError.Create(Operation + ': negative allocation size.');
+  if (RightValue <> 0) and
+    (LeftValue > High(SizeInt) div RightValue) then
+    raise EDSPError.Create(Operation + ': size arithmetic overflow.');
+  Result := LeftValue * RightValue;
+end;
+
+function CheckedArrayBytes(const ElementCount, ElementSize: SizeInt;
+  const Operation: string): SizeInt;
+begin
+  Result := CheckedSizeMultiply(ElementCount, ElementSize, Operation);
+end;
+
+function CheckedByteSum(const CurrentValue, AdditionalValue: SizeInt;
+  const Operation: string): SizeInt;
+begin
+  Result := CheckedSizeAdd(CurrentValue, AdditionalValue, Operation);
+end;
+
+function SquareModulo(const Value, Modulus: QWord): QWord;
+var
+  Addend, Multiplier: QWord;
+begin
+  Result := 0;
+  Addend := Value mod Modulus;
+  Multiplier := Value;
+  while Multiplier <> 0 do
+  begin
+    if (Multiplier and 1) <> 0 then
+      Result := (Result + Addend) mod Modulus;
+    Addend := (Addend + Addend) mod Modulus;
+    Multiplier := Multiplier shr 1;
+  end;
+end;
+
+function IsFiniteDouble(const Value: Double): Boolean; inline;
+begin
+  Result := not IsNan(Value) and not IsInfinite(Value);
+end;
+
+function StableMagnitude(const Value: TComplex): Double;
+var
+  A, B, Swap, Factor: Double;
+begin
+  A := Abs(Value.Re);
+  B := Abs(Value.Im);
+  if A < B then
+  begin
+    Swap := A;
+    A := B;
+    B := Swap;
+  end;
+  if A = 0.0 then
+    Exit(0.0);
+  Factor := Sqrt(1.0 + Sqr(B / A));
+  if A > MaxDouble / Factor then
+    Result := Infinity
+  else
+    Result := A * Factor;
+end;
+
+procedure AcquireBusyFlag(var Busy: LongInt; const Operation: string);
+begin
+  if InterlockedCompareExchange(Busy, 1, 0) <> 0 then
+    raise EDSPError.Create(Operation + ': plan is already executing.');
+end;
+
+procedure ReleaseBusyFlag(var Busy: LongInt); inline;
+begin
+  InterlockedExchange(Busy, 0);
+end;
+
 function NormalizationScale(const Count: SizeInt; const Inverse: Boolean;
   const Normalization: TFFTNormalization): Double;
 begin
@@ -297,6 +458,629 @@ begin
     Values[I].Re := Values[I].Re * Factor;
     Values[I].Im := Values[I].Im * Factor;
   end;
+end;
+
+constructor TFFTPlan.Create(const ATransformLength: SizeInt);
+var
+  I, Bit, Bits, ReverseIndex, Value, MinimumWork, TotalBytes,
+    ArrayBytes: SizeInt;
+  Angle, ChirpAngle: Double;
+  Chirp: TComplex;
+begin
+  inherited Create;
+  FBusy := 0;
+  FLength := ATransformLength;
+  if FLength < 1 then
+    raise EDSPError.Create('TFFTPlan.Create: TransformLength must be positive.');
+
+  FIsBluestein := (FLength and (FLength - 1)) <> 0;
+  if FIsBluestein then
+  begin
+    if FLength > (High(SizeInt) div 2) + 1 then
+      raise EDSPError.Create(
+        'TFFTPlan.Create: Bluestein workspace dimension overflows.');
+    MinimumWork := 2 * FLength - 1;
+    FWorkLength := NextPowerOfTwo(MinimumWork);
+  end
+  else
+    FWorkLength := FLength;
+
+  { Prove every array payload and the retained-byte total representable before
+    asking the allocator for any part of a plan. }
+  TotalBytes := 0;
+  ArrayBytes := CheckedArrayBytes(FWorkLength, SizeOf(TComplex),
+    'TFFTPlan.Create workspace');
+  TotalBytes := CheckedByteSum(TotalBytes, ArrayBytes,
+    'TFFTPlan.Create retained storage');
+  ArrayBytes := CheckedArrayBytes(FWorkLength div 2, SizeOf(TComplex),
+    'TFFTPlan.Create twiddle table');
+  TotalBytes := CheckedByteSum(TotalBytes, ArrayBytes,
+    'TFFTPlan.Create retained storage');
+  ArrayBytes := CheckedArrayBytes(FWorkLength, SizeOf(SizeInt),
+    'TFFTPlan.Create bit-reversal table');
+  TotalBytes := CheckedByteSum(TotalBytes, ArrayBytes,
+    'TFFTPlan.Create retained storage');
+  if FIsBluestein then
+  begin
+    ArrayBytes := CheckedArrayBytes(FWorkLength, SizeOf(TComplex),
+      'TFFTPlan.Create Bluestein kernel');
+    TotalBytes := CheckedByteSum(TotalBytes, ArrayBytes,
+      'TFFTPlan.Create retained storage');
+    ArrayBytes := CheckedArrayBytes(FLength, SizeOf(TComplex),
+      'TFFTPlan.Create chirp table');
+    TotalBytes := CheckedByteSum(TotalBytes, ArrayBytes,
+      'TFFTPlan.Create retained storage');
+  end;
+
+  SetLength(FWorkspace, FWorkLength);
+  SetLength(FBitReverse, FWorkLength);
+  SetLength(FTwiddles, FWorkLength div 2);
+  Bits := 0;
+  Value := FWorkLength;
+  while Value > 1 do
+  begin
+    Inc(Bits);
+    Value := Value shr 1;
+  end;
+  for I := 0 to FWorkLength - 1 do
+  begin
+    Value := I;
+    ReverseIndex := 0;
+    for Bit := 1 to Bits do
+    begin
+      ReverseIndex := (ReverseIndex shl 1) or (Value and 1);
+      Value := Value shr 1;
+    end;
+    FBitReverse[I] := ReverseIndex;
+  end;
+  for I := 0 to High(FTwiddles) do
+  begin
+    Angle := -2.0 * DSP_PI * Double(I) / Double(FWorkLength);
+    FTwiddles[I] := TComplex.Create(Cos(Angle), Sin(Angle));
+  end;
+
+  if FIsBluestein then
+  begin
+    SetLength(FChirp, FLength);
+    for I := 0 to FLength - 1 do
+    begin
+      { n^2 only affects exp(i*pi*n^2/N) modulo 2N. Reducing it as an
+        integer keeps large chirp phases accurate before libm range reduction. }
+      ChirpAngle := DSP_PI *
+        Double(SquareModulo(QWord(I), 2 * QWord(FLength))) /
+        Double(FLength);
+      FChirp[I] := TComplex.Create(Cos(ChirpAngle), -Sin(ChirpAngle));
+      Chirp := FChirp[I].Conjugate;
+      FWorkspace[I] := Chirp;
+      if I > 0 then
+        FWorkspace[FWorkLength - I] := Chirp;
+    end;
+    Radix2Prepared(False);
+    FBluesteinKernel := FWorkspace;
+    FWorkspace := nil;
+    SetLength(FWorkspace, FWorkLength);
+  end;
+
+  FRetainedBytes := TotalBytes;
+end;
+
+destructor TFFTPlan.Destroy;
+begin
+  FWorkspace := nil;
+  FTwiddles := nil;
+  FBluesteinKernel := nil;
+  FChirp := nil;
+  FBitReverse := nil;
+  inherited Destroy;
+end;
+
+procedure TFFTPlan.Acquire;
+begin
+  AcquireBusyFlag(FBusy, 'TFFTPlan.ExecuteInto');
+end;
+
+procedure TFFTPlan.Release;
+begin
+  ReleaseBusyFlag(FBusy);
+end;
+
+procedure TFFTPlan.Radix2Prepared(const Inverse: Boolean);
+var
+  I, J, StageLength, HalfLength, BlockStart, TwiddleIndex: SizeInt;
+  EvenValue, OddValue, Twiddle: TComplex;
+begin
+  for I := 0 to FWorkLength - 1 do
+    if I < FBitReverse[I] then
+    begin
+      EvenValue := FWorkspace[I];
+      FWorkspace[I] := FWorkspace[FBitReverse[I]];
+      FWorkspace[FBitReverse[I]] := EvenValue;
+    end;
+
+  StageLength := 2;
+  while StageLength <= FWorkLength do
+  begin
+    HalfLength := StageLength shr 1;
+    BlockStart := 0;
+    while BlockStart < FWorkLength do
+    begin
+      for J := 0 to HalfLength - 1 do
+      begin
+        TwiddleIndex := J * (FWorkLength div StageLength);
+        Twiddle := FTwiddles[TwiddleIndex];
+        if Inverse then
+          Twiddle := Twiddle.Conjugate;
+        EvenValue := FWorkspace[BlockStart + J];
+        OddValue := FWorkspace[BlockStart + J + HalfLength] * Twiddle;
+        FWorkspace[BlockStart + J] := EvenValue + OddValue;
+        FWorkspace[BlockStart + J + HalfLength] := EvenValue - OddValue;
+      end;
+      Inc(BlockStart, StageLength);
+    end;
+    if StageLength = FWorkLength then
+      Break;
+    StageLength := StageLength shl 1;
+  end;
+end;
+
+procedure TFFTPlan.TransformPrepared(const Input: TComplexArray;
+  const Inverse: Boolean; const Normalization: TFFTNormalization);
+var
+  I: SizeInt;
+  Value, Product: TComplex;
+  Scale: Double;
+begin
+  Scale := NormalizationScale(FLength, Inverse, Normalization);
+  if FIsBluestein then
+  begin
+    for I := 0 to FLength - 1 do
+    begin
+      Value := Input[I];
+      if Inverse then
+        Value.Im := -Value.Im;
+      FWorkspace[I] := Value * FChirp[I];
+    end;
+    for I := FLength to FWorkLength - 1 do
+      FWorkspace[I] := TComplex.Zero;
+    Radix2Prepared(False);
+    for I := 0 to FWorkLength - 1 do
+      FWorkspace[I] := FWorkspace[I] * FBluesteinKernel[I];
+    Radix2Prepared(True);
+    for I := 0 to FLength - 1 do
+    begin
+      Product := (FWorkspace[I] * (1.0 / Double(FWorkLength))) * FChirp[I];
+      if Inverse then
+        Product := Product.Conjugate;
+      FWorkspace[I] := Product * Scale;
+    end;
+  end
+  else
+  begin
+    for I := 0 to FLength - 1 do
+      FWorkspace[I] := Input[I];
+    Radix2Prepared(Inverse);
+    if Scale <> 1.0 then
+      for I := 0 to FLength - 1 do
+        FWorkspace[I] := FWorkspace[I] * Scale;
+  end;
+
+  for I := 0 to FLength - 1 do
+    if not FWorkspace[I].IsFinite then
+      raise EDSPError.CreateFmt(
+        'TFFTPlan.Execute: numerical overflow at output bin %d.', [I]);
+end;
+
+function TFFTPlan.Execute(const Input: TComplexArray;
+  const Inverse: Boolean; const Normalization: TFFTNormalization):
+  TComplexArray;
+begin
+  Result := nil;
+  SetLength(Result, FLength);
+  ExecuteInto(Input, Result, Inverse, Normalization);
+end;
+
+procedure TFFTPlan.ExecuteInto(const Input: TComplexArray;
+  var Destination: TComplexArray; const Inverse: Boolean;
+  const Normalization: TFFTNormalization);
+var
+  I: SizeInt;
+begin
+  Acquire;
+  try
+    if Length(Input) <> FLength then
+      raise EDSPError.CreateFmt(
+        'TFFTPlan.ExecuteInto: input length must be %d; got %d.',
+        [FLength, Length(Input)]);
+    if Length(Destination) <> FLength then
+      raise EDSPError.CreateFmt(
+        'TFFTPlan.ExecuteInto: destination length must be %d; got %d.',
+        [FLength, Length(Destination)]);
+    { Calling this also validates the enumeration before any output is touched. }
+    NormalizationScale(FLength, Inverse, Normalization);
+    RequireFinite(Input, 'TFFTPlan.ExecuteInto');
+    try
+      TransformPrepared(Input, Inverse, Normalization);
+    except
+      on E: EMathError do
+        raise EDSPError.Create(
+          'TFFTPlan.ExecuteInto: floating-point failure during transform.');
+    end;
+    for I := 0 to FLength - 1 do
+      Destination[I] := FWorkspace[I];
+  finally
+    Release;
+  end;
+end;
+
+function TFFTPlan.TransformLength: SizeInt;
+begin
+  Result := FLength;
+end;
+
+function TFFTPlan.WorkspaceElements: SizeInt;
+begin
+  Result := Length(FWorkspace);
+end;
+
+function TFFTPlan.RetainedBytes: SizeInt;
+begin
+  Result := FRetainedBytes;
+end;
+
+constructor TSTFTPlan.Create(const ASampleCount, AFrameLength,
+  AHopLength: SizeInt; const WindowType: TWindowType);
+var
+  Numerator, FullHops, I, Frame, LocalIndex, PaddedIndex, SampleIndex,
+    WindowBytes, FrameBytes, DenominatorBytes, AccumulatorBytes,
+    ResultBytes, SpectrumElements, SpectrumBytes, OwnBytes, TotalBytes:
+    SizeInt;
+  MinimumDenominator, MaximumDenominator, Weight, AddedValue: Double;
+begin
+  inherited Create;
+  FBusy := 0;
+  FSampleCount := ASampleCount;
+  FFrameLength := AFrameLength;
+  FHopLength := AHopLength;
+  if FSampleCount < 1 then
+    raise EDSPError.Create('TSTFTPlan.Create: SampleCount must be positive.');
+  if (FFrameLength < 2) or (FFrameLength > High(Integer)) then
+    raise EDSPError.Create(
+      'TSTFTPlan.Create: FrameLength must be in [2, High(Integer)].');
+  if (FHopLength < 1) or (FHopLength > FFrameLength) then
+    raise EDSPError.Create(
+      'TSTFTPlan.Create: HopLength must be in [1, FrameLength].');
+  case WindowType of
+    wtRectangular, wtHamming, wtHann, wtBlackman: ;
+  else
+    raise EDSPError.Create('TSTFTPlan.Create: unknown window type.');
+  end;
+
+  FLeftPadding := FFrameLength - 1;
+  Numerator := CheckedSizeAdd(FSampleCount, FFrameLength - 2,
+    'TSTFTPlan.Create frame count');
+  FullHops := Numerator div FHopLength;
+  if (Numerator mod FHopLength) <> 0 then
+    FullHops := CheckedSizeAdd(FullHops, 1,
+      'TSTFTPlan.Create frame count');
+  FFrameCount := CheckedSizeAdd(FullHops, 1,
+    'TSTFTPlan.Create frame count');
+  FPaddedLength := CheckedSizeAdd(FFrameLength,
+    CheckedSizeMultiply(FFrameCount - 1, FHopLength,
+      'TSTFTPlan.Create padded length'), 'TSTFTPlan.Create padded length');
+  FRightPadding := CheckedSizeAdd(FPaddedLength, -FLeftPadding,
+    'TSTFTPlan.Create right padding');
+  FRightPadding := CheckedSizeAdd(FRightPadding, -FSampleCount,
+    'TSTFTPlan.Create right padding');
+  if FRightPadding < 0 then
+    raise EDSPError.Create('TSTFTPlan.Create: invalid padding geometry.');
+
+  SpectrumElements := CheckedSizeMultiply(FFrameCount, FFrameLength,
+    'TSTFTPlan.Create spectrum matrix');
+  SpectrumBytes := CheckedArrayBytes(SpectrumElements, SizeOf(TComplex),
+    'TSTFTPlan.Create spectrum matrix');
+  WindowBytes := CheckedArrayBytes(FFrameLength, SizeOf(Double),
+    'TSTFTPlan.Create window');
+  FrameBytes := CheckedArrayBytes(FFrameLength, SizeOf(TComplex),
+    'TSTFTPlan.Create frame workspace');
+  DenominatorBytes := CheckedArrayBytes(FSampleCount, SizeOf(Double),
+    'TSTFTPlan.Create denominator');
+  AccumulatorBytes := CheckedArrayBytes(FPaddedLength, SizeOf(Double),
+    'TSTFTPlan.Create overlap accumulator');
+  ResultBytes := CheckedArrayBytes(FSampleCount, SizeOf(Double),
+    'TSTFTPlan.Create result staging');
+  OwnBytes := 0;
+  OwnBytes := CheckedByteSum(OwnBytes, SpectrumBytes,
+    'TSTFTPlan.Create retained storage');
+  OwnBytes := CheckedByteSum(OwnBytes, WindowBytes,
+    'TSTFTPlan.Create retained storage');
+  OwnBytes := CheckedByteSum(OwnBytes, FrameBytes,
+    'TSTFTPlan.Create retained storage');
+  OwnBytes := CheckedByteSum(OwnBytes, DenominatorBytes,
+    'TSTFTPlan.Create retained storage');
+  OwnBytes := CheckedByteSum(OwnBytes, AccumulatorBytes,
+    'TSTFTPlan.Create retained storage');
+  OwnBytes := CheckedByteSum(OwnBytes, ResultBytes,
+    'TSTFTPlan.Create retained storage');
+  TotalBytes := OwnBytes;
+  { The nested plan performs its own checked sizing before allocating. }
+  FFFT := TFFTPlan.Create(FFrameLength);
+  TotalBytes := CheckedByteSum(TotalBytes, FFFT.RetainedBytes,
+    'TSTFTPlan.Create retained storage');
+
+  FWindow := TSignalKit.GenerateWindow(WindowType, Integer(FFrameLength));
+  SetLength(FDenominator, FSampleCount);
+  for I := 0 to FSampleCount - 1 do
+    FDenominator[I] := 0.0;
+  for Frame := 0 to FFrameCount - 1 do
+    for LocalIndex := 0 to FFrameLength - 1 do
+    begin
+      PaddedIndex := Frame * FHopLength + LocalIndex;
+      SampleIndex := PaddedIndex - FLeftPadding;
+      if (SampleIndex >= 0) and (SampleIndex < FSampleCount) then
+      begin
+        Weight := FWindow[LocalIndex];
+        AddedValue := Weight * Weight;
+        FDenominator[SampleIndex] :=
+          SafeSum(FDenominator[SampleIndex], AddedValue,
+            'TSTFTPlan.Create coverage denominator');
+      end;
+    end;
+
+  MinimumDenominator := MaxDouble;
+  MaximumDenominator := 0.0;
+  for I := 0 to FSampleCount - 1 do
+  begin
+    if not IsFiniteDouble(FDenominator[I]) then
+      raise EDSPError.Create(
+        'TSTFTPlan.Create: coverage denominator is non-finite.');
+    if FDenominator[I] < MinimumDenominator then
+      MinimumDenominator := FDenominator[I];
+    if FDenominator[I] > MaximumDenominator then
+      MaximumDenominator := FDenominator[I];
+  end;
+  if (MaximumDenominator <= 0.0) or
+    (MinimumDenominator <= 1E-12 * MaximumDenominator) then
+    raise EDSPError.Create(
+      'TSTFTPlan.Create: window and hop do not provide conditioned coverage.');
+
+  SetLength(FFrame, FFrameLength);
+  SetLength(FAccumulator, FPaddedLength);
+  SetLength(FStagedResult, FSampleCount);
+  FStagedSpectrum := TDenseComplexMatrix.Zeros(FFrameCount, FFrameLength);
+  FRetainedBytes := TotalBytes;
+end;
+
+destructor TSTFTPlan.Destroy;
+begin
+  FFFT.Free;
+  FFFT := nil;
+  FWindow := nil;
+  FDenominator := nil;
+  FFrame := nil;
+  FAccumulator := nil;
+  FStagedResult := nil;
+  FStagedSpectrum := nil;
+  inherited Destroy;
+end;
+
+procedure TSTFTPlan.Acquire;
+begin
+  AcquireBusyFlag(FBusy, 'TSTFTPlan');
+end;
+
+procedure TSTFTPlan.Release;
+begin
+  ReleaseBusyFlag(FBusy);
+end;
+
+function TSTFTPlan.Analyze(const Input: TDoubleArray): IDenseComplexMatrix;
+begin
+  Result := nil;
+  Result := TDenseComplexMatrix.Zeros(FFrameCount, FFrameLength);
+  AnalyzeInto(Input, Result);
+end;
+
+procedure TSTFTPlan.AnalyzeInto(const Input: TDoubleArray;
+  const Destination: IDenseComplexMatrix);
+var
+  Frame, LocalIndex, SampleIndex, I: SizeInt;
+  FrameStart: SizeInt;
+  Value: Double;
+begin
+  Acquire;
+  try
+    if Length(Input) <> FSampleCount then
+      raise EDSPError.CreateFmt(
+        'TSTFTPlan.AnalyzeInto: input length must be %d; got %d.',
+        [FSampleCount, Length(Input)]);
+    RequireFinite(Input, 'TSTFTPlan.AnalyzeInto');
+    if Destination = nil then
+      raise EDSPError.Create(
+        'TSTFTPlan.AnalyzeInto: destination matrix must not be nil.');
+    if (Destination.Rows <> FFrameCount) or
+      (Destination.Cols <> FFrameLength) then
+      raise EDSPError.CreateFmt(
+        'TSTFTPlan.AnalyzeInto: destination must have shape %d x %d.',
+        [FFrameCount, FFrameLength]);
+
+    for Frame := 0 to FFrameCount - 1 do
+    begin
+      FrameStart := Frame * FHopLength - FLeftPadding;
+      for LocalIndex := 0 to FFrameLength - 1 do
+      begin
+        SampleIndex := FrameStart + LocalIndex;
+        if (SampleIndex < 0) or (SampleIndex >= FSampleCount) then
+          Value := 0.0
+        else
+          Value := SafeProduct(Input[SampleIndex], FWindow[LocalIndex],
+            'TSTFTPlan.AnalyzeInto windowing');
+        FFrame[LocalIndex] := TComplex.Create(Value, 0.0);
+      end;
+      FFFT.ExecuteInto(FFrame, FFrame, False, fnNone);
+      for I := 0 to FFrameLength - 1 do
+        FStagedSpectrum[Frame, I] := FFrame[I];
+    end;
+
+    { Publish only after every frame was validated and transformed. }
+    for Frame := 0 to FFrameCount - 1 do
+      for I := 0 to FFrameLength - 1 do
+        Destination[Frame, I] := FStagedSpectrum[Frame, I];
+  finally
+    Release;
+  end;
+end;
+
+procedure TSTFTPlan.ValidateSpectrum(const Spectrum: IDenseComplexMatrix);
+var
+  Frame, Bin, PairBin: SizeInt;
+  Value, PairValue: TComplex;
+  Scale, Magnitude, ResidualReal, ResidualImag, Tolerance: Double;
+begin
+  if Spectrum = nil then
+    raise EDSPError.Create('TSTFTPlan.Synthesize: spectrum matrix must not be nil.');
+  if (Spectrum.Rows <> FFrameCount) or
+    (Spectrum.Cols <> FFrameLength) then
+    raise EDSPError.CreateFmt(
+      'TSTFTPlan.Synthesize: spectrum must have shape %d x %d.',
+      [FFrameCount, FFrameLength]);
+
+  for Frame := 0 to FFrameCount - 1 do
+  begin
+    Scale := 1.0;
+    for Bin := 0 to FFrameLength - 1 do
+    begin
+      Value := Spectrum[Frame, Bin];
+      if not Value.IsFinite then
+        raise EDSPError.CreateFmt(
+          'TSTFTPlan.Synthesize: spectrum frame %d bin %d must be finite.',
+          [Frame, Bin]);
+      Magnitude := StableMagnitude(Value);
+      if not IsFiniteDouble(Magnitude) then
+        raise EDSPError.CreateFmt(
+          'TSTFTPlan.Synthesize: spectrum magnitude overflows at frame %d bin %d.',
+          [Frame, Bin]);
+      if Magnitude > Scale then
+        Scale := Magnitude;
+    end;
+    Tolerance := 1E-11;
+    Value := Spectrum[Frame, 0];
+    if Abs(Value.Im / Scale) > Tolerance then
+      raise EDSPError.CreateFmt(
+        'TSTFTPlan.Synthesize: frame %d has a non-real DC bin.', [Frame]);
+    for Bin := 1 to (FFrameLength - 1) div 2 do
+    begin
+      PairBin := FFrameLength - Bin;
+      Value := Spectrum[Frame, Bin];
+      PairValue := Spectrum[Frame, PairBin];
+      ResidualReal := Value.Re / Scale - PairValue.Re / Scale;
+      ResidualImag := Value.Im / Scale + PairValue.Im / Scale;
+      if StableMagnitude(TComplex.Create(ResidualReal, ResidualImag)) >
+        Tolerance then
+        raise EDSPError.CreateFmt(
+          'TSTFTPlan.Synthesize: frame %d bins %d and %d are not conjugates.',
+          [Frame, Bin, PairBin]);
+    end;
+    if (FFrameLength mod 2) = 0 then
+    begin
+      Value := Spectrum[Frame, FFrameLength div 2];
+      if Abs(Value.Im / Scale) > Tolerance then
+        raise EDSPError.CreateFmt(
+          'TSTFTPlan.Synthesize: frame %d has a non-real Nyquist bin.',
+          [Frame]);
+    end;
+  end;
+end;
+
+function TSTFTPlan.Synthesize(const Spectrum: IDenseComplexMatrix):
+  TDoubleArray;
+begin
+  Result := nil;
+  SetLength(Result, FSampleCount);
+  SynthesizeInto(Spectrum, Result);
+end;
+
+procedure TSTFTPlan.SynthesizeInto(const Spectrum: IDenseComplexMatrix;
+  var Destination: TDoubleArray);
+var
+  Frame, LocalIndex, PaddedIndex, SampleIndex, I: SizeInt;
+  Contribution: Double;
+begin
+  Acquire;
+  try
+    if Length(Destination) <> FSampleCount then
+      raise EDSPError.CreateFmt(
+        'TSTFTPlan.SynthesizeInto: destination length must be %d; got %d.',
+        [FSampleCount, Length(Destination)]);
+    ValidateSpectrum(Spectrum);
+
+    for I := 0 to FPaddedLength - 1 do
+      FAccumulator[I] := 0.0;
+    for Frame := 0 to FFrameCount - 1 do
+    begin
+      for LocalIndex := 0 to FFrameLength - 1 do
+        FFrame[LocalIndex] := Spectrum[Frame, LocalIndex];
+      FFFT.ExecuteInto(FFrame, FFrame, True, fnBackward);
+      for LocalIndex := 0 to FFrameLength - 1 do
+      begin
+        PaddedIndex := Frame * FHopLength + LocalIndex;
+        { The inverse frame already contains x*w; multiply by w once so
+          overlap-add accumulates x*w^2 for the precomputed denominator. }
+        Contribution := SafeProduct(FFrame[LocalIndex].Re,
+          FWindow[LocalIndex],
+          'TSTFTPlan.Synthesize overlap-add');
+        FAccumulator[PaddedIndex] := SafeSum(FAccumulator[PaddedIndex],
+          Contribution, 'TSTFTPlan.Synthesize overlap-add');
+      end;
+    end;
+
+    for I := 0 to FSampleCount - 1 do
+    begin
+      SampleIndex := FLeftPadding + I;
+      FStagedResult[I] := FAccumulator[SampleIndex] / FDenominator[I];
+      if not IsFiniteDouble(FStagedResult[I]) then
+        raise EDSPError.CreateFmt(
+          'TSTFTPlan.Synthesize: numerical overflow at sample %d.', [I]);
+    end;
+    for I := 0 to FSampleCount - 1 do
+      Destination[I] := FStagedResult[I];
+  finally
+    Release;
+  end;
+end;
+
+function TSTFTPlan.SampleCount: SizeInt;
+begin
+  Result := FSampleCount;
+end;
+
+function TSTFTPlan.FrameLength: SizeInt;
+begin
+  Result := FFrameLength;
+end;
+
+function TSTFTPlan.HopLength: SizeInt;
+begin
+  Result := FHopLength;
+end;
+
+function TSTFTPlan.FrameCount: SizeInt;
+begin
+  Result := FFrameCount;
+end;
+
+function TSTFTPlan.LeftPadding: SizeInt;
+begin
+  Result := FLeftPadding;
+end;
+
+function TSTFTPlan.RightPadding: SizeInt;
+begin
+  Result := FRightPadding;
+end;
+
+function TSTFTPlan.RetainedBytes: SizeInt;
+begin
+  Result := FRetainedBytes;
 end;
 
 procedure Radix2Unscaled(var Values: TComplexArray; const Inverse: Boolean);

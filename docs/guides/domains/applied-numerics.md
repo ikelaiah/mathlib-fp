@@ -46,6 +46,7 @@ Kalman filtering without private array conversions.
 | Task | API | Selection guidance |
 | --- | --- | --- |
 | General complex DFT | `TDSPKit.Transform` | Radix-2 for power-of-two lengths; portable Bluestein otherwise |
+| Repeated fixed-length complex DFT | `TFFTPlan` | Prepare once, reuse `ExecuteInto` and caller-owned arrays; arbitrary lengths use cached Bluestein state |
 | Real input spectrum | `TDSPKit.RealTransform` | Returns the same shared complex array used by other complex kernels |
 | Image/grid transform | `TDSPKit.Transform2D` | Uses `IDenseComplexMatrix`; rows then columns |
 | Small convolution | `TDSPKit.Convolve(..., cmDirect)` | Lowest setup cost; exact documented output length |
@@ -75,6 +76,39 @@ the same length as its input. Both accept the deterministic direct/FFT
 selection enum and are compared with direct convolution in the test oracle.
 
 ## Spectral analysis and filters
+
+### Reusable FFT and reversible STFT
+
+`TFFTPlan` owns its transform length, twiddle/chirp tables, and scratch. Call
+`Execute` when a new result array is convenient; call `ExecuteInto` with a
+pre-sized destination for repeated work. Forward sign and the four
+`TFFTNormalization` choices match `TDSPKit.Transform`. Inputs and outputs must
+have exactly the prepared length and contain finite values. Exact in-place
+array use is supported. One plan rejects overlapping calls with `EDSPError`;
+separate plans can run concurrently. Create a plan before a repeated loop and
+release it with `Free` in a `try/finally` block.
+
+`TSTFTPlan` fixes sample count, frame length, hop, and an existing symmetric
+window at construction. It uses full unshifted complex spectra and pads with
+`FrameLength - 1` samples on the left, then enough zeros on the right to retain
+the final partial frame. `LeftPadding`, `RightPadding`, and `FrameCount` report
+that geometry. Unlike the legacy `ShortTimeFourierTransform`, which emits only
+complete frames, its output is paired with `Synthesize`/`SynthesizeInto` to
+reconstruct every original sample using weighted overlap-add. This matrix is
+an unscaled STFT, not a PSD; use `Periodogram` or `Welch` for power estimates.
+
+The same window and hop are required to synthesize an analyzed matrix. Each
+frame must have conjugate-paired bins, with real DC and (for even frame lengths)
+real Nyquist values. Edit both members of a pair together. `AnalyzeInto`
+accepts an exact-shape dense matrix or writable view; `SynthesizeInto` accepts
+an exact-length destination. Both preserve the destination on validation or
+numerical failure. Pre-sized warm `Into` calls reuse plan storage and allocate
+nothing. A plan is mutable workspace and rejects overlapping/reentrant use;
+create one plan per concurrent execution.
+
+See the runnable [spectral edit and reconstruction example](../../../examples/42_spectral_plan_reconstruction.pas)
+for repeated analysis, a symmetric bin edit, reconstruction, and residual
+reporting.
 
 - `Periodogram` produces a one-sided PSD with frequencies in caller-supplied
   sample-rate units.

@@ -35,7 +35,7 @@ def layout_path(name: str, legacy: str) -> Path:
 
 NEXT_RELEASE = ""
 PUBLISHED_STABLE = "2.4.0"
-# The 2.4.0 snapshot owns every source unit present in this tree.
+# The current release snapshot owns every source unit present in this tree.
 UNRELEASED_SOURCE_UNITS: set[str] = set()
 UNRELEASED_INTERFACE_CHANGES: dict[str, dict[str, str]] = {}
 API_BASELINE_RELEASE = "1.9.0"
@@ -49,6 +49,7 @@ CURRENT_REFERENCE_PATH = layout_path("api_reference", f"API_REFERENCE_{CURRENT_R
 FROZEN_1_9_SNAPSHOT_SHA256 = "bade8ef2810d0b70183436ef83792488ff308b2955e51564e08afb49596816f0"
 FROZEN_1_9_REFERENCE_SHA256 = "59b7ac1e1431b0d97c7bfc2015588ab21a0509b35787127186a96e843f76943b"
 HISTORICAL_RELEASES = [
+    "2.4.0",
     "2.3.2",
     "2.3.1",
     "2.3.0",
@@ -311,8 +312,7 @@ def main() -> int:
                     errors.append(
                         f"{relative}: public interface differs from the current "
                         "release snapshot without an exact documented next-release "
-                        "allowance; update the v2.4 allowance or regenerate the "
-                        "current API snapshot"
+                        "allowance; regenerate the current API snapshot"
                     )
             if unit is not None:
                 identities: set[tuple[object, ...]] = set()

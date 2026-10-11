@@ -721,4 +721,5 @@ begin
   BenchmarkLargeSparseSolve;
   BenchmarkLargeMatrixFreeSolve;
   RunV195PerformanceBenchmarks;
+  RunV250PerformanceBenchmarks;
 end.

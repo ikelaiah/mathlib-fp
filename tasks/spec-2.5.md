@@ -1,7 +1,8 @@
 # Spec: v2.5.0 reusable spectral processing
 
 **Status:** Finalized release scope and design contract, 11 October 2026.
-Implementation and qualification are pending.
+Implementation and Windows x64 local candidate qualification passed on
+12 October 2026. Exact-commit Linux/Windows CI and publication remain pending.
 Sequence: [plan](plan-2.5.md). Acceptance: [checklist](todo-2.5.md).
 
 ## Objective and demonstrated workflow
@@ -261,7 +262,7 @@ New-Item -ItemType Directory -Force build-temp/spectral-plans | Out-Null
 fpc -B -FcUTF8 -Fusrc -Futests -FUbuild-temp/spectral-plans -FEbuild-temp/spectral-plans tests/SpectralPlanRunner.lpr
 & .\build-temp\spectral-plans\SpectralPlanRunner.exe -a --format=plain
 python tools/test_performance_evidence.py
-python tools/check_performance_evidence.py --compiler fpc --work-dir build-temp/performance-2.5
+python tools/check_performance_evidence.py --manifest docs/releases/2.5.0/performance-evidence.json --compiler fpc --work-dir build-temp/performance-2.5
 python tools/check_docs.py
 .\build-examples.ps1
 python tools/check_example_output.py

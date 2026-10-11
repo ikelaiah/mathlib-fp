@@ -1,9 +1,12 @@
 # Supported platform matrix
 
-Version 2.4.0 adds reusable sparse-direct symbolic analysis and
-minimum-degree ordering while retaining the Free Pascal source
-and standard RTL/FCL runtime.
-The dense real-double SDIRK2 stiff ODE path is unchanged. The
+Version 2.5.0 release candidate adds reusable FFT/STFT plans and inverse STFT.
+Local Windows candidate qualification passed; exact-commit Linux and Windows
+CI remains pending. The support tiers below remain based on the published
+2.4.0 qualification. Version 2.4.0 added reusable
+sparse-direct symbolic analysis and minimum-degree ordering while retaining
+the Free Pascal source and standard RTL/FCL runtime. The dense real-double
+SDIRK2 stiff ODE path is unchanged. The
 machine-readable source for this matrix is
 [`portability-evidence-1.9.6.json`](../portability-evidence-1.9.6.json); the
 [evidence report](../releases/1.9.6/portability-evidence.md) explains the unchanged target

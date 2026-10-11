@@ -1,0 +1,1034 @@
+{
+  "schema_version": 1,
+  "release": "2.5.0",
+  "compiler_flags": [
+    "-O3"
+  ],
+  "timer": "GetTickCount64 whole milliseconds for legacy rows; QueryPerformanceCounter (Windows) or gettimeofday (Unix) fractional milliseconds for spectral_plans rows",
+  "required_coverage": {
+    "dense": [
+      "small",
+      "large"
+    ],
+    "sparse": [
+      "large"
+    ],
+    "iterative": [
+      "large"
+    ],
+    "dsp": [
+      "small",
+      "large"
+    ],
+    "modelling": [
+      "small",
+      "large"
+    ],
+    "statistics": [
+      "small",
+      "large"
+    ],
+    "data_analysis": [
+      "small",
+      "large"
+    ],
+    "spectral_plans": [
+      "small",
+      "large"
+    ]
+  },
+  "benchmarks": [
+    {
+      "id": "sparse-cg-large",
+      "domain": "sparse",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "100000x100000_nnz100000",
+      "setup": "prepared_csr_preconditioner_workspace",
+      "claim_id": "sparse-cg-prepared-linear-storage",
+      "timing_semantics": "cold prepared solve followed by twenty warmed Into solves",
+      "allocation_semantics": "zero logical result allocations during warmed Into solves",
+      "retained_semantics": "sampled live-heap delta after the warmed solve batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.0,
+        "absolute_tolerance": 1e-10
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 65536,
+        "working_elements_max": 3300041,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 129.7,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "iterative-cg-large",
+      "domain": "iterative",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "200000x200000_matrix_free",
+      "setup": "prepared_matrix_free_workspace",
+      "claim_id": "matrix-free-cg-prepared-linear-storage",
+      "timing_semantics": "cold prepared solve followed by twenty warmed Into solves",
+      "allocation_semantics": "zero logical result allocations during warmed Into solves",
+      "retained_semantics": "sampled live-heap delta after the warmed solve batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.0,
+        "absolute_tolerance": 1e-10
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 65536,
+        "working_elements_max": 5800041,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 167.95,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "dense-gemm-small-portable",
+      "domain": "dense",
+      "scale": "small",
+      "scalar": "double",
+      "shape": "16x16x16",
+      "setup": "prepared_inputs_destination",
+      "claim_id": "dense-small-into-overhead",
+      "timing_semantics": "one cold Into multiply and five thousand warmed Into multiplies",
+      "allocation_semantics": "zero logical result allocations because the destination is reused",
+      "retained_semantics": "sampled live-heap delta after the warmed batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 10.409648841241,
+        "absolute_tolerance": 1e-12
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 0,
+        "working_elements_max": 768,
+        "dense_shape_elements_max": 256
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 0.1282,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "dense-gemm-large-portable",
+      "domain": "dense",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "127x129x65",
+      "setup": "prepared_inputs_destination",
+      "claim_id": "dense-large-portable-reference",
+      "timing_semantics": "one cold portable multiply and five warmed portable multiplies",
+      "allocation_semantics": "zero logical result allocations because the destination is reused",
+      "retained_semantics": "sampled live-heap delta after the warmed batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 71.146615849875,
+        "absolute_tolerance": 1e-12
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 0,
+        "working_elements_max": 33023,
+        "dense_shape_elements_max": 8255
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 31.2,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "dense-gemm-large-auto",
+      "domain": "dense",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "127x129x65",
+      "setup": "prepared_inputs_destination",
+      "claim_id": "dense-large-auto-dispatch",
+      "timing_semantics": "one cold automatic multiply and five warmed automatic multiplies",
+      "allocation_semantics": "zero logical result allocations because the destination is reused",
+      "retained_semantics": "sampled live-heap delta after the warmed batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 71.146615849875,
+        "absolute_tolerance": 1e-12
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 0,
+        "working_elements_max": 33023,
+        "dense_shape_elements_max": 8255
+      },
+      "same_run_comparison": {
+        "baseline_id": "dense-gemm-large-portable",
+        "metric": "warm_ms_per_iteration",
+        "review_ratio": 1.5,
+        "enforcement": "advisory"
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 34.4,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "dsp-convolution-small-direct",
+      "domain": "dsp",
+      "scale": "small",
+      "scalar": "double",
+      "shape": "8x3",
+      "setup": "prepared_signals_allocating_result",
+      "claim_id": "dsp-small-direct-overhead",
+      "timing_semantics": "one cold direct convolution and one hundred thousand warmed calls",
+      "allocation_semantics": "one logical returned array per warmed call",
+      "retained_semantics": "sampled live-heap delta after releasing the last returned array",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 4.0,
+        "absolute_tolerance": 1e-12
+      },
+      "hard_limits": {
+        "allocations_max": 100000,
+        "retained_bytes_max": 0,
+        "working_elements_max": 10,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "dsp-fft-large-baseline",
+      "domain": "dsp",
+      "scale": "large",
+      "scalar": "double_complex",
+      "shape": "65536",
+      "setup": "prepared_input_copy_plus_in_place_fft",
+      "claim_id": "dsp-radix2-existing-baseline",
+      "timing_semantics": "copy plus one cold in-place FFT and five warmed matched calls",
+      "allocation_semantics": "one logical work-array copy per warmed call",
+      "retained_semantics": "sampled live-heap delta after releasing the work array",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 133.953544935419,
+        "absolute_tolerance": 2e-08
+      },
+      "hard_limits": {
+        "allocations_max": 5,
+        "retained_bytes_max": 0,
+        "working_elements_max": 65536,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 6.4,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "dsp-fft-large-candidate",
+      "domain": "dsp",
+      "scale": "large",
+      "scalar": "double_complex",
+      "shape": "65536",
+      "setup": "prepared_input_allocating_transform",
+      "claim_id": "dsp-radix2-public-transform",
+      "timing_semantics": "one cold allocating Transform and five warmed matched calls",
+      "allocation_semantics": "one logical returned array per warmed call",
+      "retained_semantics": "sampled live-heap delta after releasing the returned array",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 133.953544935419,
+        "absolute_tolerance": 2e-08
+      },
+      "hard_limits": {
+        "allocations_max": 5,
+        "retained_bytes_max": 0,
+        "working_elements_max": 65536,
+        "dense_shape_elements_max": 0
+      },
+      "same_run_comparison": {
+        "baseline_id": "dsp-fft-large-baseline",
+        "metric": "warm_ms_per_iteration",
+        "review_ratio": 2.0,
+        "enforcement": "advisory"
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 78.2,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "modelling-integral-small",
+      "domain": "modelling",
+      "scale": "small",
+      "scalar": "double",
+      "shape": "scalar_interval",
+      "setup": "sin_0_pi_default_tolerances",
+      "claim_id": "modelling-small-adaptive-overhead",
+      "timing_semantics": "one cold integral and one hundred thousand warmed calls",
+      "allocation_semantics": "no caller-visible result allocation",
+      "retained_semantics": "sampled live-heap delta after the warmed batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 2.0,
+        "absolute_tolerance": 1e-10
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 0,
+        "working_elements_max": 1,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "modelling-qmc-large",
+      "domain": "modelling",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "2d_100000_samples",
+      "setup": "halton_seed_7_prepared_bounds",
+      "claim_id": "modelling-large-qmc-throughput",
+      "timing_semantics": "one cold deterministic QMC integral and three warmed calls",
+      "allocation_semantics": "one logical point workspace per warmed call",
+      "retained_semantics": "sampled live-heap delta after the warmed batch",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 1.0,
+        "absolute_tolerance": 5e-05
+      },
+      "hard_limits": {
+        "allocations_max": 3,
+        "retained_bytes_max": 0,
+        "working_elements_max": 2,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 31.0,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "statistics-online-small",
+      "domain": "statistics",
+      "scale": "small",
+      "scalar": "double",
+      "shape": "64_values",
+      "setup": "fresh_record_per_iteration",
+      "claim_id": "statistics-small-stream-overhead",
+      "timing_semantics": "one cold 64-value stream and five thousand warmed streams",
+      "allocation_semantics": "zero logical allocations for value-record state",
+      "retained_semantics": "six retained scalar accumulators and sampled zero heap growth",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.031830581001,
+        "absolute_tolerance": 1e-12
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 0,
+        "working_elements_max": 6,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 0.0064,
+          "review_ratio": 2.0
+        }
+      ]
+    },
+    {
+      "id": "statistics-online-large",
+      "domain": "statistics",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "2000000_values",
+      "setup": "fresh_record_per_iteration",
+      "claim_id": "statistics-large-stream-throughput",
+      "timing_semantics": "one cold two-million-value stream and three warmed streams",
+      "allocation_semantics": "zero logical allocations for value-record state",
+      "retained_semantics": "six retained scalar accumulators and sampled zero heap growth",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.510795259328,
+        "absolute_tolerance": 1e-12
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 0,
+        "working_elements_max": 6,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 166.667,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "data-analysis-pca-small",
+      "domain": "data_analysis",
+      "scale": "small",
+      "scalar": "double",
+      "shape": "32x4_components2",
+      "setup": "prepared_dense_input_allocating_pca",
+      "claim_id": "analysis-small-pca-overhead",
+      "timing_semantics": "one cold PCA and five hundred warmed allocating calls",
+      "allocation_semantics": "six logical returned arrays or matrix handles per warmed call",
+      "retained_semantics": "sampled live heap includes the last returned PCA result",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.999989324977,
+        "absolute_tolerance": 1e-10
+      },
+      "hard_limits": {
+        "allocations_max": 3000,
+        "retained_bytes_max": 4096,
+        "working_elements_max": 200,
+        "dense_shape_elements_max": 128
+      }
+    },
+    {
+      "id": "data-analysis-pca-large",
+      "domain": "data_analysis",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "1024x8_components4",
+      "setup": "prepared_dense_input_allocating_pca",
+      "claim_id": "analysis-large-pca-throughput",
+      "timing_semantics": "one cold PCA and three warmed allocating calls",
+      "allocation_semantics": "six logical returned arrays or matrix handles per warmed call",
+      "retained_semantics": "sampled live heap includes the last returned PCA result",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.145502770516,
+        "absolute_tolerance": 1e-10
+      },
+      "hard_limits": {
+        "allocations_max": 18,
+        "retained_bytes_max": 65536,
+        "working_elements_max": 12320,
+        "dense_shape_elements_max": 8192
+      },
+      "prior_baselines": [
+        {
+          "release": "1.9.4",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 26.0,
+          "review_ratio": 1.5
+        }
+      ]
+    },
+    {
+      "id": "spectral-fft-into-n64",
+      "domain": "spectral_plans",
+      "scale": "small",
+      "scalar": "double_complex",
+      "shape": "64",
+      "setup": "cold_create_destroy_batch_10000_then_reused_destination",
+      "claim_id": "spectral-fft-into-n64",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -5.238336303429,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 2048,
+        "working_elements_max": 64,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "spectral-fft-allocating-n64",
+      "domain": "spectral_plans",
+      "scale": "small",
+      "scalar": "double_complex",
+      "shape": "64",
+      "setup": "cold_create_destroy_batch_10000_then_allocating_result",
+      "claim_id": "spectral-fft-allocating-n64",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -5.238336303429,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 5000,
+        "retained_bytes_max": 2048,
+        "working_elements_max": 64,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "2.4.0",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 0.0059493798,
+          "review_ratio": 1.5,
+          "sample_count": 3,
+          "compiler_flags": [
+            "-O3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spectral-fft-into-n4096",
+      "domain": "spectral_plans",
+      "scale": "small",
+      "scalar": "double_complex",
+      "shape": "4096",
+      "setup": "cold_create_destroy_batch_100_then_reused_destination",
+      "claim_id": "spectral-fft-into-n4096",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 30.542151194093,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 131072,
+        "working_elements_max": 4096,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "spectral-fft-allocating-n4096",
+      "domain": "spectral_plans",
+      "scale": "small",
+      "scalar": "double_complex",
+      "shape": "4096",
+      "setup": "cold_create_destroy_batch_100_then_allocating_result",
+      "claim_id": "spectral-fft-allocating-n4096",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 30.542151194093,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 20,
+        "retained_bytes_max": 131072,
+        "working_elements_max": 4096,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "2.4.0",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 0.34289000000000003,
+          "review_ratio": 1.5,
+          "sample_count": 3,
+          "compiler_flags": [
+            "-O3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spectral-fft-into-n65536",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double_complex",
+      "shape": "65536",
+      "setup": "cold_create_destroy_batch_5_then_reused_destination",
+      "claim_id": "spectral-fft-into-n65536",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 54.58550166307,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 2097152,
+        "working_elements_max": 65536,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "spectral-fft-allocating-n65536",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double_complex",
+      "shape": "65536",
+      "setup": "cold_create_destroy_batch_5_then_allocating_result",
+      "claim_id": "spectral-fft-allocating-n65536",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 54.58550166307,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 5,
+        "retained_bytes_max": 2097152,
+        "working_elements_max": 65536,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "2.4.0",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 7.1530204,
+          "review_ratio": 1.5,
+          "sample_count": 3,
+          "compiler_flags": [
+            "-O3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spectral-fft-into-n1009",
+      "domain": "spectral_plans",
+      "scale": "small",
+      "scalar": "double_complex",
+      "shape": "1009",
+      "setup": "cold_create_destroy_batch_100_then_reused_destination",
+      "claim_id": "spectral-fft-into-n1009",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -42.094009167316,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 114448,
+        "working_elements_max": 2048,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "spectral-fft-allocating-n1009",
+      "domain": "spectral_plans",
+      "scale": "small",
+      "scalar": "double_complex",
+      "shape": "1009",
+      "setup": "cold_create_destroy_batch_100_then_allocating_result",
+      "claim_id": "spectral-fft-allocating-n1009",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -42.094009167316,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 50,
+        "retained_bytes_max": 114448,
+        "working_elements_max": 2048,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "2.4.0",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 0.60703602,
+          "review_ratio": 1.5,
+          "sample_count": 3,
+          "compiler_flags": [
+            "-O3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spectral-fft-into-n10007",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double_complex",
+      "shape": "10007",
+      "setup": "cold_create_destroy_batch_25_then_reused_destination",
+      "claim_id": "spectral-fft-into-n10007",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 23.723690491497,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 1732976,
+        "working_elements_max": 32768,
+        "dense_shape_elements_max": 0
+      }
+    },
+    {
+      "id": "spectral-fft-allocating-n10007",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double_complex",
+      "shape": "10007",
+      "setup": "cold_create_destroy_batch_25_then_allocating_result",
+      "claim_id": "spectral-fft-allocating-n10007",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 23.723690491497,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 10,
+        "retained_bytes_max": 1732976,
+        "working_elements_max": 32768,
+        "dense_shape_elements_max": 0
+      },
+      "prior_baselines": [
+        {
+          "release": "2.4.0",
+          "host_key": "windows-amd64-intel64-family-6-model-141-stepping-1-genuineintel-3.2.2",
+          "warm_ms_per_iteration": 9.7496399,
+          "review_ratio": 1.5,
+          "sample_count": 3,
+          "compiler_flags": [
+            "-O3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spectral-stft-analyze-into-256_128",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_256_128",
+      "setup": "cold_create_destroy_batch_5_then_reused_matrix",
+      "claim_id": "spectral-stft-analyze-into-256_128",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -0.092083821903,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 3700736,
+        "working_elements_max": 462080,
+        "dense_shape_elements_max": 131840
+      }
+    },
+    {
+      "id": "spectral-stft-analyze-allocating-256_128",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_256_128",
+      "setup": "cold_create_destroy_batch_5_then_allocating_matrix",
+      "claim_id": "spectral-stft-analyze-allocating-256_128",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -0.092083821903,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 9,
+        "retained_bytes_max": 3700736,
+        "working_elements_max": 462080,
+        "dense_shape_elements_max": 131840
+      }
+    },
+    {
+      "id": "spectral-stft-synthesize-into-256_128",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_256_128",
+      "setup": "cold_create_destroy_batch_5_then_reused_array",
+      "claim_id": "spectral-stft-synthesize-into-256_128",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.126086424685,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 3700736,
+        "working_elements_max": 462080,
+        "dense_shape_elements_max": 131840
+      }
+    },
+    {
+      "id": "spectral-stft-synthesize-allocating-256_128",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_256_128",
+      "setup": "cold_create_destroy_batch_5_then_allocating_array",
+      "claim_id": "spectral-stft-synthesize-allocating-256_128",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.126086424685,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 3,
+        "retained_bytes_max": 3700736,
+        "working_elements_max": 462080,
+        "dense_shape_elements_max": 131840
+      }
+    },
+    {
+      "id": "spectral-stft-analyze-into-255_85",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_255_85",
+      "setup": "cold_create_destroy_batch_5_then_reused_matrix",
+      "claim_id": "spectral-stft-analyze-into-255_85",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -0.092363395858,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 4773712,
+        "working_elements_max": 594156,
+        "dense_shape_elements_max": 197625
+      }
+    },
+    {
+      "id": "spectral-stft-analyze-allocating-255_85",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_255_85",
+      "setup": "cold_create_destroy_batch_5_then_allocating_matrix",
+      "claim_id": "spectral-stft-analyze-allocating-255_85",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": -0.092363395858,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 9,
+        "retained_bytes_max": 4773712,
+        "working_elements_max": 594156,
+        "dense_shape_elements_max": 197625
+      }
+    },
+    {
+      "id": "spectral-stft-synthesize-into-255_85",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_255_85",
+      "setup": "cold_create_destroy_batch_5_then_reused_array",
+      "claim_id": "spectral-stft-synthesize-into-255_85",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "zero GetMem/AllocMem/ReAllocMem calls during valid prepared Into calls",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.126086424685,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 0,
+        "retained_bytes_max": 4773712,
+        "working_elements_max": 594156,
+        "dense_shape_elements_max": 197625
+      }
+    },
+    {
+      "id": "spectral-stft-synthesize-allocating-255_85",
+      "domain": "spectral_plans",
+      "scale": "large",
+      "scalar": "double",
+      "shape": "65536_255_85",
+      "setup": "cold_create_destroy_batch_5_then_allocating_array",
+      "claim_id": "spectral-stft-synthesize-allocating-255_85",
+      "timing_semantics": "measured cold plan construction/destruction batch and warmed calls; three-run per-call medians are in performance-samples.json",
+      "allocation_semantics": "one independent result is returned per warmed allocating call; manager call count is measured directly",
+      "retained_semantics": "exact owned numeric array payload from the plan RetainedBytes API; excludes object headers, allocator overhead and caller outputs",
+      "complexity_tripwire": {
+        "metric": "working_elements",
+        "policy": "exact_ceiling"
+      },
+      "checksum": {
+        "value": 0.126086424685,
+        "absolute_tolerance": 5e-11
+      },
+      "hard_limits": {
+        "allocations_max": 3,
+        "retained_bytes_max": 4773712,
+        "working_elements_max": 594156,
+        "dense_shape_elements_max": 197625
+      }
+    }
+  ]
+}

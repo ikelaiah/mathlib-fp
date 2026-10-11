@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile, run, and validate the offline 1.9.5 performance evidence."""
+"""Compile, run, and validate a versioned offline performance manifest."""
 
 from __future__ import annotations
 
@@ -24,15 +24,13 @@ DEFAULT_MANIFEST = LAYOUT.canonical_path("performance-evidence-1.9.5.json")
 assert DEFAULT_MANIFEST is not None
 DEFAULT_WORK = ROOT / "build-temp" / "performance-evidence"
 INTEGER_FIELDS = {
-    "cold_ms",
-    "warm_ms",
     "warm_iterations",
     "allocations",
     "retained_bytes",
     "working_elements",
     "dense_shape_elements",
 }
-FLOAT_FIELDS = {"checksum", "tolerance"}
+FLOAT_FIELDS = {"cold_ms", "warm_ms", "checksum", "tolerance"}
 TEXT_FIELDS = {"id", "domain", "scale", "scalar", "shape", "setup"}
 ROW_FIELDS = TEXT_FIELDS | INTEGER_FIELDS | FLOAT_FIELDS
 HARD_LIMIT_FIELDS = {
@@ -81,6 +79,8 @@ def _parse_value(key: str, value: str, line_number: int) -> object:
             parsed = float(value)
             if not math.isfinite(parsed):
                 raise ValueError("must be finite")
+            if key in {"cold_ms", "warm_ms"} and parsed < 0.0:
+                raise ValueError("must be non-negative")
             if key == "tolerance" and parsed < 0.0:
                 raise ValueError("must be non-negative")
             return parsed
@@ -144,8 +144,9 @@ def _require_list(value: object, label: str) -> list[Any]:
 def _validate_manifest(manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
     if manifest.get("schema_version") != 1:
         raise EvidenceError("manifest.schema_version must be 1")
-    if manifest.get("release") != "1.9.5":
-        raise EvidenceError("manifest.release must be 1.9.5")
+    release = manifest.get("release")
+    if not isinstance(release, str) or not re.fullmatch(r"\d+\.\d+\.\d+", release):
+        raise EvidenceError("manifest.release must be a semantic version")
     coverage = _require_mapping(
         manifest.get("required_coverage"), "manifest.required_coverage"
     )
@@ -482,7 +483,7 @@ def main() -> int:
         validated = validate_evidence(manifest, rows, str(metadata["host_key"]))
         result = {
             "schema_version": 1,
-            "release": "1.9.5",
+            "release": manifest["release"],
             "manifest": manifest_path.relative_to(ROOT).as_posix()
             if manifest_path.is_relative_to(ROOT)
             else str(manifest_path),

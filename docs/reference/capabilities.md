@@ -34,6 +34,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Explicit local random state | Stable | UInt64 state; single/double output | Reproducible simulation stream, not cryptographic; mutable instances require caller synchronization |
 | Online and mergeable statistics | Stable | Double real | Constant retained state; moments through variance only |
 | Applied DSP | Stable | Single/double real/complex | Batch/arbitrary/2-D transforms, direct/FFT/overlap convolution, spectra, Haar, and bounded filter state |
+| Reusable spectral plans (2.5.0 candidate) | Candidate | Double real and double complex | Fixed geometry; serial plans reject overlapping use; arbitrary FFT lengths use cached Bluestein workspace; STFT returns full spectra and pads both boundaries |
 | Statistical inference and regression | Stable | Double real | Paired distribution APIs, estimation/tests/corrections, SVD OLS, and binary logistic with identifiability status |
 | Typed data analysis | Stable | Double real dense | PCA, seeded clustering/splits/forests, fitted standardization, binary LDA, and exact low-dimensional KD tree |
 | Linear-Gaussian state space | Stable | Double real | Scalar and dense multivariate Kalman filtering/forecasting; no controls, missing observations, or smoothing |
@@ -52,7 +53,10 @@ Target qualifications and platform-specific limitations are defined by the
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.4.0 capability inventory. Sparse direct solving now includes a
+This is the 2.5.0 release-candidate capability inventory. It adds reusable
+FFT and STFT plans with inverse STFT to the existing applied DSP family. These
+candidate APIs have local Windows x64 evidence; supported-target qualification
+is still in progress. Sparse direct solving now includes a
 reusable minimum-degree symbolic analysis and sparse numeric LU. The
 [MathBase guide](../guides/domains/math-base.md)
 documents Bessel J/Y and modified I/K at orders zero and one, Legendre

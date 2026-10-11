@@ -804,14 +804,14 @@ supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
-## Previous release: 2.4.0 — Sparse Direct II
+## Previous published stable release: 2.4.0 — Sparse Direct II
 
 Version 2.4.0 adds reusable sparse LU symbolic analysis, deterministic
 minimum-degree ordering, and pattern reuse while keeping the existing natural
 ordering API source-compatible. See the [release notes](../releases/2.4.0/release-notes.md)
 and [qualification record](../releases/2.4.0/qualification.md).
 
-## Next release: 2.5.0 — Reusable spectral processing
+## Release candidate target: 2.5.0 — Reusable spectral processing
 
 The selected scope adds reusable double-complex FFT plans and real-double
 STFT analysis/synthesis plans in `EngineeringLib.DSP`. Existing STFT,
@@ -830,7 +830,8 @@ Implementation follows the [plan](../../tasks/plan-2.5.md) and
 SIMD/threaded backends, broader filters/wavelets/resampling, new PSD estimators
 and unrelated dense/sparse optimization are outside this gate. Performance
 remains an evidence-led track across releases; 2.5.0 has no promised publication
-date and is not yet a supported or qualified release.
+date and is not yet a supported stable release. Local candidate qualification
+passed; the exact-commit cross-platform release gates remain pending.
 
 ## 2.3.2 — Comparison scope boundaries
 

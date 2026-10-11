@@ -20,6 +20,20 @@ its band requests review rather than pretending shared-runner wall time is
 mathematically exact. The human claim map and limitations are in
 [`PERFORMANCE_EVIDENCE_1.9.5.md`](../../releases/1.9.5/performance-evidence.md).
 
+## v2.5.0 spectral-plan evidence
+
+v2.5.0 adds 18 `spectral_plans` rows for reusable and allocating FFT/STFT
+calls. These rows use `QueryPerformanceCounter` on Windows and
+`gettimeofday` on Unix, and report fractional milliseconds; existing rows
+retain the established whole-millisecond timer. The focused
+[`SpectralPlanBenchmarkRunner.lpr`](../../../benchmarks/SpectralPlanBenchmarkRunner.lpr)
+repeats spectral-only samples without running unrelated workloads.
+[`LegacySpectralBaseline.lpr`](../../../benchmarks/LegacySpectralBaseline.lpr)
+compiles against frozen v2.4.0 source with FPC 3.2.2 and `-O3`. FFT allocating
+timings use matching inputs, sizes, and iteration counts. Legacy and padded
+STFT timings are reported separately because they process different frame
+coverage.
+
 ## Matrix multiplication paths
 
 `MultiplyInto` remains the portable compensated oracle.

@@ -1,6 +1,7 @@
 # Implementation plan: v2.5.0 reusable spectral processing
 
-**Status:** Finalized for implementation on 11 October 2026.
+**Status:** Implementation and local Windows candidate qualification passed
+on 12 October 2026. Exact-commit cross-platform CI and publication remain.
 
 ## Objective and scope
 

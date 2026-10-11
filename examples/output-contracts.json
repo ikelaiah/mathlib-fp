@@ -217,6 +217,16 @@
         "fill entries: 0"
       ],
       "final_line": "sparse direct: success"
+    },
+    {
+      "path": "examples/42_spectral_plan_reconstruction.pas",
+      "contains": [
+        "STFT frames =",
+        "sample count = 4096",
+        "maximum round-trip residual =",
+        "edited RMS change ="
+      ],
+      "final_line": "SPECTRAL_PLAN_EXAMPLE_OK"
     }
   ]
 }

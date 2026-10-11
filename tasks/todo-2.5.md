@@ -1,24 +1,26 @@
 # v2.5.0 reusable spectral processing checklist
 
-**Status:** Scope finalized; implementation pending.
+**Status:** Implementation and local Windows x64 candidate qualification
+passed on 12 October 2026. Exact-commit cross-platform CI and publication
+remain pending.
 Contract: [spec](spec-2.5.md). Sequence: [plan](plan-2.5.md).
 
 ## 1. Independent fixtures and baseline
 
-- [ ] Commit FFT/STFT fixtures, generator and provenance, focused tests/runner.
-- [ ] Include normalization, windows, overlap coverage and reconstructed signals.
-- [ ] Capture unmodified v2.4 FFT/STFT timings, commit, host, flags and setup.
+- [x] Commit FFT/STFT fixtures, generator and provenance, focused tests/runner.
+- [x] Include normalization, windows, overlap coverage and reconstructed signals.
+- [x] Capture unmodified v2.4 FFT/STFT timings, commit, host, flags and setup.
 
 **Acceptance:** Independent expected values; exact workload and baseline
-conditions. **Verify:** Reproducible fixture generation, corrupt-value rejection
-and focused failures before implementation. **Dependencies:** Spec.
+conditions. **Verify:** Reproducible fixture generation, injected corrupt-value
+rejection and focused failures. **Dependencies:** Spec.
 **Files:** focused unit/runner, fixture include, reference generator.
 
 ## 2. Radix-2 FFT plan
 
-- [ ] Implement fixed-length lifetime, cached tables/scratch, Execute/ExecuteInto.
-- [ ] Support four normalizations, exact in-place arrays and input preservation.
-- [ ] Add invalid-call/busy-plan recovery tests and public workflow docs.
+- [x] Implement fixed-length lifetime, cached tables/scratch, Execute/ExecuteInto.
+- [x] Support four normalizations, exact in-place arrays and input preservation.
+- [x] Add invalid-call/busy-plan recovery tests and public workflow docs.
 
 **Acceptance:** Reference budgets pass; pre-sized warm execution allocates
 nothing; invalid dimensions/values/arithmetic preserve destination.
@@ -27,9 +29,9 @@ nothing; invalid dimensions/values/arithmetic preserve destination.
 
 ## 3. Arbitrary-length FFT preparation
 
-- [ ] Cache Bluestein chirps, transformed kernel and convolution scratch.
-- [ ] Guard element/byte overflow; report exact numeric workspace/retained bytes.
-- [ ] Qualify odd/composite/prime lengths and independent plan ownership.
+- [x] Cache Bluestein chirps, transformed kernel and convolution scratch.
+- [x] Guard element/byte overflow; report exact numeric workspace/retained bytes.
+- [x] Qualify odd/composite/prime lengths and independent plan ownership.
 
 **Acceptance:** Same API, error and normalization rules with zero warm
 allocations. **Verify:** References, round trips, conjugation/scaling, existing
@@ -38,9 +40,9 @@ transform comparisons, checked/heap runs. **Dependencies:** 2.
 
 ## 4. Reusable STFT analysis
 
-- [ ] Fix geometry/window at construction and prepare complete scratch storage.
-- [ ] Implement Analyze/AnalyzeInto with full bins and specified zero padding.
-- [ ] Document the existing STFT's complete-frame convention and new plan policy.
+- [x] Fix geometry/window at construction and prepare complete scratch storage.
+- [x] Implement Analyze/AnalyzeInto with full bins and specified zero padding.
+- [x] Document the existing STFT's complete-frame convention and new plan policy.
 
 **Acceptance:** Independent frame DFTs, exact shape/padding/tail coverage,
 input immutability and strided matrix destinations meet the contract.
@@ -49,9 +51,9 @@ input immutability and strided matrix destinations meet the contract.
 
 ## 5. Synthesis and failure handling
 
-- [ ] Implement Synthesize/SynthesizeInto with weighted overlap-add and trimming.
-- [ ] Check coverage, finite spectra, Hermitian symmetry, DC and Nyquist.
-- [ ] Qualify destination atomicity, busy guards, recovery, leaks and independence.
+- [x] Implement Synthesize/SynthesizeInto with weighted overlap-add and trimming.
+- [x] Check coverage, finite spectra, Hermitian symmetry, DC and Nyquist.
+- [x] Qualify destination atomicity, busy guards, recovery, leaks and independence.
 
 **Acceptance:** Every sample round-trips within budget; symmetric spectral
 edits match independent reconstruction; invalid calls preserve destinations.
@@ -60,10 +62,10 @@ edits match independent reconstruction; invalid calls preserve destinations.
 
 ## 6. Complete runnable workflow
 
-- [ ] Add a deterministic signal, repeated analysis, conjugate-bin editing,
+- [x] Add a deterministic signal, repeated analysis, conjugate-bin editing,
   synthesis, residual reporting and final success marker.
-- [ ] Register the example, check output bounds and repeat-run identity.
-- [ ] Link the user task and describe interpretation/limits.
+- [x] Register the example, check output bounds and repeat-run identity.
+- [x] Link the user task and describe interpretation/limits.
 
 **Acceptance:** Public-API-only program demonstrates reconstruction and reuse.
 **Verify:** Example build and output contract commands in the spec.
@@ -71,9 +73,9 @@ edits match independent reconstruction; invalid calls preserve destinations.
 
 ## 7. Performance evidence
 
-- [ ] Add cold/prepared FFT and STFT/synthesis cases at the spec's sizes.
-- [ ] Count allocation/reallocation calls and exact retained workspace.
-- [ ] Separate construction/output-allocation/execution time; retain numerical
+- [x] Add cold/prepared FFT and STFT/synthesis cases at the spec's sizes.
+- [x] Count allocation/reallocation calls and exact retained workspace.
+- [x] Separate construction/output-allocation/execution time; retain numerical
   gates; review matching-host comparisons and all material regressions.
 
 **Acceptance:** Zero valid warm allocations and bounded storage are exact
@@ -84,10 +86,10 @@ performance guide.
 
 ## 8. API, capability and release documentation
 
-- [ ] Register focused tests in TestRunner and generate current API evidence;
+- [x] Register focused tests in TestRunner and generate current API evidence;
   require a clean second generation.
-- [ ] Update implemented capability inventory, selection and limits.
-- [ ] Create 2.5 release notes, numerical/performance evidence, review notes and
+- [x] Update implemented capability inventory, selection and limits.
+- [x] Create 2.5 release notes, numerical/performance evidence, review notes and
   qualification records identifying actual targets/results.
 
 **Acceptance:** All artifacts agree on the additive surface and scope.
@@ -97,9 +99,9 @@ discovery batches, at most five files per batch.
 
 ## 9. Candidate metadata and local qualification
 
-- [ ] Reconcile version, package, README, changelog and candidate docs.
-- [ ] Run applicable local qualification without package/benchmark skips.
-- [ ] Build current/historical versioned sites and validate the offline ZIP.
+- [x] Reconcile version, package, README, changelog and candidate docs.
+- [x] Run applicable local qualification without package/benchmark skips.
+- [x] Build current/historical versioned sites and validate the offline ZIP.
 
 **Acceptance:** Consistent candidate artifacts and retained local results,
 with unexecuted targets identified. **Verify:** Qualifier and RELEASING.md.
