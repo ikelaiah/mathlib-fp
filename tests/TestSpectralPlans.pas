@@ -161,7 +161,8 @@ var
   Plan: TFFTPlan;
   Input, Actual, Restored, ReferenceSpectrum: TComplexArray;
   I, J, K, N, WorkspaceLength, PatternIndex, ScaleIndex: SizeInt;
-  ExpectedScale, Tolerance, Amplitude, MagnitudeScale: Double;
+  ExpectedScale, Tolerance, Amplitude, MagnitudeScale,
+    ErrorMagnitude: Double;
 begin
   SetLength(Input, 7);
   for I := 0 to 6 do
@@ -257,18 +258,22 @@ begin
           ExpectedScale := N
         else
           ExpectedScale := 1.0;
+        { Match the specified corpus budget: normalize the largest complex
+          residual by max(1, the largest complex reference magnitude). }
+        MagnitudeScale := 1.0;
+        for K := 0 to High(Input) do
+          MagnitudeScale := Max(MagnitudeScale,
+            Sqrt(Sqr(Input[K].Re * ExpectedScale) +
+              Sqr(Input[K].Im * ExpectedScale)));
+        Tolerance := 5E-11 * MagnitudeScale;
         for K := 0 to High(Input) do
         begin
-          Tolerance := 5E-11 * Max(1.0,
-            Abs(Input[K].Re * ExpectedScale));
-          AssertEquals('FFT forward/inverse real round trip',
-            Input[K].Re * ExpectedScale, Restored[K].Re, Tolerance);
-          Tolerance := 5E-11 * Max(1.0,
-            Abs(Input[K].Im * ExpectedScale));
-          AssertEquals(Format(
-            'FFT forward/inverse imaginary round trip N=%d mode=%d sample=%d',
-            [N, Ord(Modes[I]), K]),
-            Input[K].Im * ExpectedScale, Restored[K].Im, Tolerance);
+          ErrorMagnitude := Sqrt(
+            Sqr(Restored[K].Re - Input[K].Re * ExpectedScale) +
+            Sqr(Restored[K].Im - Input[K].Im * ExpectedScale));
+          AssertTrue(Format(
+            'FFT normalized round trip N=%d mode=%d sample=%d',
+            [N, Ord(Modes[I]), K]), ErrorMagnitude <= Tolerance);
         end;
       end;
 
