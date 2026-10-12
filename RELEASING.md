@@ -25,8 +25,9 @@ Use this checklist for every mathlib-fp release.
   timing movements without treating machine-specific timings as hard limits.
 - [ ] Confirm the Lazarus package and complete test suite compile and pass for
   both Win64 and Win32.
-- [ ] Install `packages/lazarus/mathlib_fp.lpk` in a clean Lazarus profile and
-  compile a small consumer project.
+- [ ] Register `packages/lazarus/mathlib_fp.lpk` as a package link in a clean
+  Lazarus profile and compile a small consumer project. This is a runtime-only
+  package and is not installed into the IDE.
 - [ ] Check all Markdown links and compare documented public names with the
   declarations in each unit's `interface` section.
 - [ ] Build the current release under its versioned static-site path, rebuild
@@ -172,7 +173,8 @@ lazbuild --build-all packages/lazarus/mathlib_fp.lpk
   tree.
 - [ ] Confirm the archive includes `src/`, `docs/`, `examples/`, package
   metadata, tests, and the license, but no compiler output.
-- [ ] Install `packages/lazarus/mathlib_fp.lpk` from a clean environment.
+- [ ] Register `packages/lazarus/mathlib_fp.lpk` as a package link in a clean
+  Lazarus profile, then compile and run a consumer project.
 - [ ] Download the offline documentation ZIP, verify its adjacent SHA-256, and
   confirm its landing page identifies the release and links older versions.
 - [ ] Mark only the maintained release lines as supported in `SECURITY.md`.
