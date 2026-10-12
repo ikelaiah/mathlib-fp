@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   current release links, package metadata, and documentation inventory.
 - Carried forward the unchanged stable-family numerical-evidence catalogue
   from 2.5.0 with the 2.5.1 inventory identifier and provenance recorded.
+- Carried forward the 2.5.0 benchmark contract for qualification, without
+  adding a new performance claim.
 
 ## [2.5.0] - 2026-10-12
 

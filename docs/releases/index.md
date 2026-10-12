@@ -9,6 +9,9 @@ Release notes, qualification records, audits, manifests, and machine-readable ev
 - [Workflow qualification](2.5.1/workflow-qualification.md)
 - [Numerical-evidence catalogue](2.5.1/numerical-evidence.json) and
   [provenance](2.5.1/numerical-evidence-provenance.md)
+- [Performance contract manifest](2.5.1/performance-evidence.json) and
+  [provenance](2.5.1/performance-evidence-provenance.md); measured evidence
+  remains in the [2.5.0 report](2.5.0/performance-evidence.md)
 - [Release review notes](2.5.1/pr-notes.md)
 
 No Pascal source or public API changed in 2.5.1. The technical capability

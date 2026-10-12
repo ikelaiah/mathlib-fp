@@ -839,12 +839,18 @@ def main() -> int:
         errors.append(f"docs/versions.json: invalid version manifest: {exc}")
 
     if version_release_state == "stable":
-        numerical_evidence = DOCS / "releases" / CURRENT_RELEASE / "numerical-evidence.json"
-        if not numerical_evidence.is_file():
-            errors.append(
-                f"missing current stable numerical-evidence catalogue: "
-                f"{numerical_evidence.relative_to(ROOT)}"
+        for evidence_name in (
+            "numerical-evidence.json",
+            "performance-evidence.json",
+        ):
+            evidence_manifest = (
+                DOCS / "releases" / CURRENT_RELEASE / evidence_name
             )
+            if not evidence_manifest.is_file():
+                errors.append(
+                    f"missing current stable evidence manifest: "
+                    f"{evidence_manifest.relative_to(ROOT)}"
+                )
 
     release_files = [
         layout_path("release_notes", f"RELEASE_NOTES_{CURRENT_RELEASE}.md"),

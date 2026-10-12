@@ -461,11 +461,11 @@ def benchmark_gate(
         sys.executable,
         str(ROOT / "tools" / "check_performance_evidence.py"),
     ]
-    if release == "2.5.0":
-        validation.extend([
-            "--manifest",
-            str(ROOT / "docs" / "releases" / "2.5.0" / "performance-evidence.json"),
-        ])
+    release_manifest = (
+        ROOT / "docs" / "releases" / release / "performance-evidence.json"
+    )
+    if release_manifest.is_file():
+        validation.extend(["--manifest", str(release_manifest)])
     validation.extend([
         "--compiler", compiler,
         "--captured-output", str(qualification.logs / "benchmark-run.log"),
