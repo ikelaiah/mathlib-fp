@@ -8,5 +8,9 @@ Released 2026-10-12.
   the 3.0.0 compatibility gate.
 - Preserved the v2.5.0 documentation site in the published version history and
   aligned current release links and package metadata.
+- Carried forward the unchanged stable-family numerical-evidence catalogue
+  from 2.5.0 with the 2.5.1 inventory identifier and provenance recorded.
+- Carried forward the 2.5.0 benchmark contract for qualification, without
+  adding a new performance claim.
 
 No Pascal source, numerical behavior, or public API changed.
