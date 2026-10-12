@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.5.1] - 2026-10-12
+
+### Documentation
+
+- Clarified the current 2.5.1 documentation release and retained 2.5.0 as the
+  unchanged API and technical qualification baseline.
+- Updated the release roadmap with bounded plans for 2.6.0, 2.7.0, 2.8.0,
+  2.9.0, and the 3.0.0 compatibility gate.
+- Preserved the v2.5.0 documentation site in release history and corrected
+  current release links, package metadata, and documentation inventory.
+
 ## [2.5.0] - 2026-10-12
 
 ### Added

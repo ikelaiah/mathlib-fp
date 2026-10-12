@@ -1,8 +1,11 @@
 # Supported platform matrix
 
-Version 2.5.0 adds reusable FFT/STFT plans and inverse STFT. It passed
-checksummed clean-archive qualification on Windows x86-64 and Linux x86-64.
-The support tiers below include the 2.5.0 qualification. Version 2.4.0 added reusable
+Version 2.5.1 is a documentation-only patch: it changes no Pascal source or
+public API and does not reset the technical support evidence. Version 2.5.0
+adds reusable FFT/STFT plans and inverse STFT. It passed checksummed
+clean-archive qualification on Windows x86-64 and Linux x86-64. The support
+tiers below retain the 2.5.0 qualification as their latest technical evidence.
+Version 2.4.0 added reusable
 sparse-direct symbolic analysis and minimum-degree ordering while retaining
 the Free Pascal source and standard RTL/FCL runtime. The dense real-double
 SDIRK2 stiff ODE path is unchanged. The
@@ -20,6 +23,7 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
+The current documentation release is 2.5.1; its technical baseline is 2.5.0.
 The 2.5.0 release qualification passed on 2026-10-12 from checksummed clean
 Linux and Windows archives. See the current
 [qualification record](../releases/2.5.0/qualification.md). The 2.4.0 and

@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-Consult the [2.5.0 API reference](reference/api/reference-2.5.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md). Version 2.5.0 is the current published stable release.
+The current published release is 2.5.1, a documentation-only patch. Consult the unchanged [2.5.0 API reference](reference/api/reference-2.5.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md) for the current technical baseline.
 
 ## Domains
 

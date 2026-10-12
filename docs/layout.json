@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "description": "Canonical current documentation paths. Artifacts name release-owned and machine-readable records; aliases preserve former user-guide URLs only.",
-  "current_release": "2.5.0",
+  "current_release": "2.5.1",
   "artifacts": {
-    "release_notes": "releases/2.5.0/release-notes.md",
-    "pr_notes": "releases/2.5.0/pr-notes.md",
-    "qualification": "releases/2.5.0/qualification.md",
-    "workflow_qualification": "releases/2.5.0/workflow-qualification.md",
+    "release_notes": "releases/2.5.1/release-notes.md",
+    "pr_notes": "releases/2.5.1/pr-notes.md",
+    "qualification": "releases/2.5.1/qualification.md",
+    "workflow_qualification": "releases/2.5.1/workflow-qualification.md",
     "capability_manifest": "releases/1.10.0/capability-manifest.md",
     "capability_manifest_json": "releases/1.10.0/capability-manifest.json",
     "public_api": "reference/api/public-api-2.5.0.json",
