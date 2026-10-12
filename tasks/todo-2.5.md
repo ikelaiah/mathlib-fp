@@ -1,9 +1,9 @@
 # v2.5.0 reusable spectral processing checklist
 
-**Status:** Implementation and local Windows x64 qualification passed on
-12 October 2026. The GitHub-hosted Linux and Windows clean-archive qualification
-also passed; merge, publication and archive verification are tracked in stage
-10.
+**Status:** v2.5.0 was published on 12 October 2026 after implementation,
+cross-platform clean-archive qualification, exact-commit CI, and archive/site
+verification. Evidence is recorded in the
+[qualification record](../docs/releases/2.5.0/qualification.md).
 Contract: [spec](spec-2.5.md). Sequence: [plan](plan-2.5.md).
 
 ## 1. Independent fixtures and baseline
@@ -111,11 +111,19 @@ record, split into small batches as necessary.
 
 ## 10. Publish and verify the exact release
 
-- [ ] Pass required Linux/Windows archive qualification and supported-target CI.
-- [ ] Apply real publication date/support policy, merge validated branch and
+- [x] Pass required Linux/Windows archive qualification and supported-target CI.
+- [x] Apply real publication date/support policy, merge validated branch and
   require green exact default-branch CI before v2.5.0 tag/publication.
-- [ ] Verify source/docs archives, checksums/assets, current site/history and
+- [x] Verify source/docs archives, checksums/assets, current site/history and
   retain exact-commit target-specific evidence.
 
-**Acceptance:** Published artifacts match the qualified default-branch commit.
-**Verify:** Publication/archive checks in RELEASING.md. **Dependencies:** 9.
+**Acceptance:** Published artifacts match the qualified default-branch commit
+`1193b90fc3e127e7ff6b4884df48df867eb63ddc`. **Verify:** PR #65 was merged to
+`main`; CI run [38184788877](https://github.com/ikelaiah/mathlib-fp/actions/runs/38184788877)
+passed before tagging, and tag qualification run
+[38213375071](https://github.com/ikelaiah/mathlib-fp/actions/runs/38213375071)
+passed 126 Linux and 127 Windows gates with no failures. Release
+[v2.5.0](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.5.0), source
+and offline documentation checksums, and deployed site/history are recorded in
+the [qualification record](../docs/releases/2.5.0/qualification.md).
+**Dependencies:** 9.

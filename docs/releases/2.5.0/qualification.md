@@ -56,3 +56,37 @@ The three unchanged stable numerical-evidence families are carried forward
 from 2.4.0 in [`numerical-evidence.json`](numerical-evidence.json). New spectral
 plan reference, round-trip, failure, resource, and mutation budgets passed on
 the checksummed Linux and Windows source archives.
+
+## Published tag results
+
+The published `v2.5.0` tag resolves to exact default-branch commit
+`1193b90fc3e127e7ff6b4884df48df867eb63ddc`. The [default-branch CI run
+38184788877](https://github.com/ikelaiah/mathlib-fp/actions/runs/38184788877)
+passed its Linux and Windows jobs on that commit before tagging. The [release
+qualification run 38213375071](https://github.com/ikelaiah/mathlib-fp/actions/runs/38213375071)
+then passed on the tag: Linux x86-64 passed all 126 gates and Windows x86-64
+passed all 127 gates, with zero failures on either target. The jobs used FPC
+3.2.2; the Windows job also used Lazarus 4.8 and passed the Lazarus package
+consumer gate. The checked source archive SHA-256 values were:
+
+- Linux tar.gz: `91ec96fbb82064e4422b0ed5085ded0d2f91ff0c658e45daac968cdefb06c9a7`
+- Windows ZIP: `572439c4a5e29487de18c84d174f1a26d6f8d4a0eac73447942bce389b49cb49`
+
+The [published release](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.5.0)
+is titled `mathlib-fp 2.5.0`; its body starts with `### Added` and contains
+the changelog entries without repeating the release title. The [documentation
+workflow run 38213375072](https://github.com/ikelaiah/mathlib-fp/actions/runs/38213375072)
+passed, including deployment. Its offline documentation asset
+`mathlib-fp-docs-2.5.0.zip` is attached with a matching SHA-256 sidecar; the
+archive SHA-256 is
+`06905d75f52ec883b8b18fde23e41f8f2fc1a01a3f393fdfe7a4e340548d3bfc`.
+The deployed [versioned documentation](https://ikelaiah.github.io/mathlib-fp/2.5.0/)
+and [release index](https://ikelaiah.github.io/mathlib-fp/) both returned HTTP
+200; the index identifies 2.5.0 as current and retains the 2.4.0 history link.
+
+The GitHub source ZIP was also extracted independently. It contained `src/`,
+`docs/`, `examples/`, `packages/lazarus/mathlib_fp.lpk`, `tests/`, and the
+license, with no compiler outputs. The README matrix quick-start compiled
+from that extracted tree with FPC 3.2.2 and ran with the documented result.
+A clean Lazarus profile registered the runtime package link and successfully
+compiled and ran a consumer project.
