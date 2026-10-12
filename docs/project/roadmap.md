@@ -191,12 +191,20 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 2.2.0 | Nonsymmetric and generalised spectral algebra | Hessenberg/Schur foundation with ordering, convergence, residual, and failure contracts |
 | 2.3.0 | Stiff and implicit ODEs | A documented stiff-solver baseline with Jacobian, tolerance, and convergence diagnostics |
 | 2.4.0 | Sparse Direct II | Fill-reducing ordering, reusable symbolic analysis, and sparse numeric factors |
-| 2.5.0 (next) | Reusable spectral processing | Prepared FFT/STFT execution and inverse STFT with bounded workspace and performance evidence |
+| 2.5.0 | Reusable spectral processing | Prepared FFT/STFT execution and inverse STFT with bounded workspace and performance evidence |
+| 2.5.1 | Documentation-only maintenance | Current release guidance, retained 2.5.0 technical evidence, and updated release roadmap |
+| 2.6.0 | Signal Processing II | Stable SOS IIR filter design/application with response, state, and stability diagnostics |
+| 2.7.0 | Statistics II | Logistic and Poisson generalized linear models with convergence and failure diagnostics |
+| 2.8.0 | Data Analysis II | A validated PLS regression workflow for correlated multivariate data |
+| 2.9.0 | Optimization II | A deterministic bounded global-search baseline with explicit budgets and termination status |
+| 3.0.0 (major gate) | Compatibility and integrated-workflow review | A deliberate API migration only where previously announced breaking changes are still needed |
 
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
-and Sparse Direct II shipped in 2.4.0. The next gate is 2.5.0 reusable spectral
-processing, defined below. Other candidate lanes remain directions that are
-not version promises.
+Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
+2.5.0. Version 2.5.1 is a documentation-only patch; the next capability gate
+is 2.6.0, defined below. The later 2.7.0–3.0.0 gates give an ordered plan, not
+date promises or final public API designs. Other candidate lanes remain
+uncommitted directions.
 
 ## Implementation discipline
 
@@ -804,41 +812,18 @@ supported boundary. See the [release notes](../releases/2.3.0/release-notes.md),
 [qualification record](../releases/2.3.0/qualification.md), and
 [modelling guide](../guides/domains/numerical-modelling.md#choose-an-algorithm).
 
+## 2.3.2 — Comparison scope boundaries
+
+Version 2.3.2 made the comparison guide's account of mathlib-fp's current
+scope boundaries explicit. It contained no Pascal source or public API changes.
+See the [2.3.2 release notes](../releases/2.3.2/release-notes.md).
+
 ## 2.4.0 — Sparse Direct II
 
 Version 2.4.0 adds reusable sparse LU symbolic analysis, deterministic
 minimum-degree ordering, and pattern reuse while keeping the existing natural
 ordering API source-compatible. See the [release notes](../releases/2.4.0/release-notes.md)
 and [qualification record](../releases/2.4.0/qualification.md).
-
-## Previous release: 2.5.0 — Reusable spectral processing
-
-Version 2.5.0 adds reusable double-complex FFT plans and real-double STFT
-analysis/synthesis plans in `EngineeringLib.DSP`. Existing STFT, periodogram,
-Welch and other spectral estimators remain available. Plans prepare storage
-once, analyze a finite signal repeatedly, and reconstruct its complete
-original sample range after symmetric spectrum edits. Explicit padding,
-window-coverage, normalization, ownership and failure contracts are defined
-in the [2.5 specification](../../tasks/spec-2.5.md).
-
-The implementation, independent numerical references, runnable reconstruction
-example, allocation/storage gates, current API/capability documentation, and
-checksummed Linux and Windows clean-archive qualification are complete. The
-[qualification record](../releases/2.5.0/qualification.md) and
-[performance report](../releases/2.5.0/performance-evidence.md) document the
-evidence and timing tradeoffs; no blanket speedup is claimed. Implementation
-follows the [plan](../../tasks/plan-2.5.md) and
-[checklist](../../tasks/todo-2.5.md).
-
-SIMD/threaded backends, broader filters/wavelets/resampling, new PSD estimators
-and unrelated dense/sparse optimization are outside this gate. Performance
-remains an evidence-led track across releases.
-
-## 2.3.2 — Comparison scope boundaries
-
-Version 2.3.2 made the comparison guide's account of mathlib-fp's current
-scope boundaries explicit. It contained no Pascal source or public API changes.
-See the [2.3.2 release notes](../releases/2.3.2/release-notes.md).
 
 ## 2.4.0 roadmap scope
 
@@ -863,6 +848,110 @@ and residual checks. See the [v2.4.0 release notes](../releases/2.4.0/release-no
 and
 [reusable direct factors](../guides/domains/sparse-linear-algebra.md#reusable-direct-factors) for
 the current baseline.
+
+## Previous release: 2.5.1 — Documentation-only maintenance
+
+Version 2.5.1 updates current release links and package metadata, preserves the
+2.5.0 site as history, and makes the next five capability gates explicit. It
+contains no Pascal source or public API changes. The v2.5.0 API reference and
+Linux/Windows technical qualification therefore remain the current technical
+baseline; the 2.5.1 documentation and CI checks do not replace that numerical
+qualification. See the [2.5.1 release notes](../releases/2.5.1/release-notes.md)
+and [validation record](../releases/2.5.1/qualification.md).
+
+## 2.5.0 — Reusable spectral processing capability release
+
+Version 2.5.0 adds reusable double-complex FFT plans and real-double STFT
+analysis/synthesis plans in `EngineeringLib.DSP`. Existing STFT, periodogram,
+Welch and other spectral estimators remain available. Plans prepare storage
+once, analyze a finite signal repeatedly, and reconstruct its complete
+original sample range after symmetric spectrum edits. Explicit padding,
+window-coverage, normalization, ownership and failure contracts are defined
+in the [2.5 specification](../../tasks/spec-2.5.md).
+
+The implementation, independent numerical references, runnable reconstruction
+example, allocation/storage gates, API/capability documentation, and
+checksummed Linux and Windows clean-archive qualification are complete. The
+[qualification record](../releases/2.5.0/qualification.md) and
+[performance report](../releases/2.5.0/performance-evidence.md) document the
+evidence and timing tradeoffs; no blanket speedup is claimed. Implementation
+follows the [plan](../../tasks/plan-2.5.md) and
+[checklist](../../tasks/todo-2.5.md).
+
+SIMD/threaded backends, broader filters/wavelets/resampling, new PSD estimators
+and unrelated dense/sparse optimization are outside this gate. Performance
+remains an evidence-led track across releases.
+
+## Next release: 2.6.0 — Signal Processing II
+
+Deliver a bounded, stable IIR filtering workflow built around second-order
+sections (SOS): Butterworth and Chebyshev Type I low-pass, high-pass, band-pass,
+and band-stop designs for real-double signals. The workflow includes explicit
+filter-state ownership for streaming application, response evaluation, and
+stability/design validation diagnostics.
+
+The release gate requires independent reference cases for coefficients and
+frequency response, edge and invalid-design coverage, streaming continuity
+checks, runnable examples, documented numerical limits, and the supported
+platform CI profile. It does not include FIR design, resampling/polyphase
+methods, DCT/DST, wavelets, or accelerated backends.
+
+## Planned release: 2.7.0 — Statistics II
+
+Add a real-double generalized linear model baseline for logistic and Poisson
+regression using documented logit/log links and iteratively reweighted least
+squares. Expose convergence status, iteration and deviance diagnostics,
+rank/conditioning failures, and explicit handling of complete separation and
+invalid response domains. Include independent reference fixtures, model
+diagnostics, examples, and guidance for choosing the model.
+
+Robust regression, survival/reliability analysis, causal inference, and broader
+state-space work are outside this milestone. The gate is accurate, explainable
+fit results and explicit non-convergence/failure behavior on supported targets.
+
+## Planned release: 2.8.0 — Data Analysis II
+
+Add a focused partial least squares (PLS) regression workflow for centered and
+scaled multivariate predictors, with component selection, prediction, and
+cross-validation diagnostics. Define behavior for constant columns, rank
+deficiency, missing data, and component counts beyond the available rank.
+Validate against independent fixtures and demonstrate prediction on a
+correlated-variable example.
+
+Non-negative matrix factorization, independent component analysis, canonical
+correlation, and incremental/truncated PCA are not part of this gate. They stay
+candidate lanes until their contracts and maintenance case are separately
+reviewed.
+
+## Planned release: 2.9.0 — Optimization II
+
+Provide a reproducible bounded global-search baseline for scalar objectives,
+with explicit bounds, evaluation budgets, deterministic seed/state, stopping
+criteria, and best-so-far diagnostics. Include an optional local polishing
+phase with separately reported evaluations and termination status. Document
+that a heuristic result is not a proof of global optimality and compare against
+independent test problems.
+
+Mixed-integer and mixed-integer nonlinear programming, global-optimality
+certificates, and unbounded black-box search are excluded. The release gate is
+repeatable behavior, bounded resource use, and truthful termination reports.
+
+## Planned major gate: 3.0.0 — Compatibility and integrated workflows
+
+Review the public API after the 2.6–2.9 capability work, resolve only
+previously announced breaking changes whose migration runway is complete, and
+publish a tested 2.x-to-3.0 migration guide with compatibility adapters where
+practical. Qualify representative workflows that cross signal processing,
+statistical modelling, data analysis, and optimization; audit naming,
+ownership, errors, diagnostics, examples, and distribution as one coherent
+surface.
+
+The major number alone is not a reason to break source compatibility. If no
+approved incompatible change remains after its documented minor-release
+runway, ship compatible consolidation as 2.10.0 and keep 3.0.0 unassigned until
+a genuine migration is justified. In either case, release readiness requires
+the normal independent references, documentation, and supported-platform
+qualification.
 
 ### Performance acceleration track
 

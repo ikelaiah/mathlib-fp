@@ -1,10 +1,15 @@
 {
   "schema_version": 1,
-  "current": "2.5.0",
+  "current": "2.5.1",
+  "api_baseline": "2.5.0",
   "release_state": "stable",
   "site_url": "https://ikelaiah.github.io/mathlib-fp",
   "repository_url": "https://github.com/ikelaiah/mathlib-fp",
   "versions": [
+    {
+      "release": "2.5.1",
+      "source_ref": "v2.5.1"
+    },
     {
       "release": "2.5.0",
       "source_ref": "v2.5.0"

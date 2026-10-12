@@ -16,6 +16,13 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 CURRENT_RELEASE = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 try:
+    VERSION_MANIFEST = json.loads(
+        (DOCS / "versions.json").read_text(encoding="utf-8")
+    )
+    CURRENT_API_RELEASE = VERSION_MANIFEST.get("api_baseline", CURRENT_RELEASE)
+except (OSError, ValueError):
+    CURRENT_API_RELEASE = CURRENT_RELEASE
+try:
     LAYOUT = load_layout(DOCS / "layout.json", DOCS, CURRENT_RELEASE)
 except LayoutError as exc:
     raise SystemExit(f"docs layout: {exc}") from exc
@@ -33,15 +40,19 @@ def layout_path(name: str, legacy: str) -> Path:
     return LAYOUT.artifact(name)
 
 
-NEXT_RELEASE = ""
-PUBLISHED_STABLE = "2.5.0"
+NEXT_RELEASE = "2.6.0"
+PUBLISHED_STABLE = "2.5.1"
 # The current release snapshot owns every source unit present in this tree.
 UNRELEASED_SOURCE_UNITS: set[str] = set()
 UNRELEASED_INTERFACE_CHANGES: dict[str, dict[str, str]] = {}
 API_BASELINE_RELEASE = "1.9.0"
 API_DECISION_RELEASE = "1.9.3"
-CURRENT_SNAPSHOT_PATH = layout_path("public_api", f"public-api-{CURRENT_RELEASE}.json")
-CURRENT_REFERENCE_PATH = layout_path("api_reference", f"API_REFERENCE_{CURRENT_RELEASE}.md")
+CURRENT_SNAPSHOT_PATH = layout_path(
+    "public_api", f"public-api-{CURRENT_API_RELEASE}.json"
+)
+CURRENT_REFERENCE_PATH = layout_path(
+    "api_reference", f"API_REFERENCE_{CURRENT_API_RELEASE}.md"
+)
 # Immutable historical 1.9 baseline. These SHA-256 digests must stay constant:
 # the frozen 1.9 public-API snapshot and its human reference are never
 # regenerated or mutated, so an historical diff cannot be made to appear empty
@@ -49,6 +60,7 @@ CURRENT_REFERENCE_PATH = layout_path("api_reference", f"API_REFERENCE_{CURRENT_R
 FROZEN_1_9_SNAPSHOT_SHA256 = "bade8ef2810d0b70183436ef83792488ff308b2955e51564e08afb49596816f0"
 FROZEN_1_9_REFERENCE_SHA256 = "59b7ac1e1431b0d97c7bfc2015588ab21a0509b35787127186a96e843f76943b"
 HISTORICAL_RELEASES = [
+    "2.5.0",
     "2.4.0",
     "2.3.2",
     "2.3.1",
@@ -269,7 +281,7 @@ def main() -> int:
     snapshot_declarations: list[tuple[str, dict[str, object]]] = []
     try:
         snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-        assert snapshot["release"] == CURRENT_RELEASE
+        assert snapshot["release"] == CURRENT_API_RELEASE
         assert snapshot["schema_version"] == 3
         assert snapshot["decision_release"] == API_DECISION_RELEASE
         assert snapshot["identity"] == [
@@ -804,7 +816,16 @@ def main() -> int:
         versions = json.loads((DOCS / "versions.json").read_text(encoding="utf-8"))
         assert versions["schema_version"] == 1
         assert versions["current"] == CURRENT_RELEASE
+        assert versions.get("api_baseline", CURRENT_RELEASE) == CURRENT_API_RELEASE
         listed_releases = [item["release"] for item in versions["versions"]]
+        assert CURRENT_API_RELEASE in listed_releases
+        if not LAYOUT.legacy:
+            assert LAYOUT.artifact("public_api").name == (
+                f"public-api-{CURRENT_API_RELEASE}.json"
+            )
+            assert LAYOUT.artifact("api_reference").name == (
+                f"reference-{CURRENT_API_RELEASE}.md"
+            )
         if versions.get("release_state") == "candidate":
             assert versions["published_stable"] == PUBLISHED_STABLE
             assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]

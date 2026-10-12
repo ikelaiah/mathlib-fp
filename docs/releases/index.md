@@ -2,7 +2,17 @@
 
 Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.5.0 — current published stable
+## 2.5.1 — current published stable (documentation-only)
+
+- [Release notes](2.5.1/release-notes.md)
+- [Qualification and validation record](2.5.1/qualification.md)
+- [Workflow qualification](2.5.1/workflow-qualification.md)
+- [Release review notes](2.5.1/pr-notes.md)
+
+No Pascal source or public API changed in 2.5.1. The technical capability
+release, API reference, and retained platform qualification remain at 2.5.0.
+
+## 2.5.0 — previous capability release
 
 - [Release notes](2.5.0/release-notes.md)
 - [Qualification record](2.5.0/qualification.md)
