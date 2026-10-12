@@ -7,6 +7,8 @@ Release notes, qualification records, audits, manifests, and machine-readable ev
 - [Release notes](2.5.1/release-notes.md)
 - [Qualification and validation record](2.5.1/qualification.md)
 - [Workflow qualification](2.5.1/workflow-qualification.md)
+- [Numerical-evidence catalogue](2.5.1/numerical-evidence.json) and
+  [provenance](2.5.1/numerical-evidence-provenance.md)
 - [Release review notes](2.5.1/pr-notes.md)
 
 No Pascal source or public API changed in 2.5.1. The technical capability

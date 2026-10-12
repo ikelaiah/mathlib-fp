@@ -812,10 +812,12 @@ def main() -> int:
         if example.name not in index:
             errors.append(f"example missing from examples/README.md: {example.name}")
 
+    version_release_state = None
     try:
         versions = json.loads((DOCS / "versions.json").read_text(encoding="utf-8"))
         assert versions["schema_version"] == 1
         assert versions["current"] == CURRENT_RELEASE
+        version_release_state = versions.get("release_state")
         assert versions.get("api_baseline", CURRENT_RELEASE) == CURRENT_API_RELEASE
         listed_releases = [item["release"] for item in versions["versions"]]
         assert CURRENT_API_RELEASE in listed_releases
@@ -835,6 +837,14 @@ def main() -> int:
         assert versions["repository_url"].startswith("https://")
     except (ValueError, KeyError, AssertionError) as exc:
         errors.append(f"docs/versions.json: invalid version manifest: {exc}")
+
+    if version_release_state == "stable":
+        numerical_evidence = DOCS / "releases" / CURRENT_RELEASE / "numerical-evidence.json"
+        if not numerical_evidence.is_file():
+            errors.append(
+                f"missing current stable numerical-evidence catalogue: "
+                f"{numerical_evidence.relative_to(ROOT)}"
+            )
 
     release_files = [
         layout_path("release_notes", f"RELEASE_NOTES_{CURRENT_RELEASE}.md"),
