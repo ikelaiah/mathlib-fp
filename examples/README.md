@@ -56,6 +56,7 @@ closest to your project. For a shorter task-first route, use the
 | `41_sparse_direct_ordering.pas` | AlgebraLib | Analyze a sparse pattern, factor with minimum-degree ordering, and solve in the original coordinate order |
 | `42_spectral_plan_reconstruction.pas` | EngineeringLib DSP | Reuse full-spectrum STFT analysis, edit a conjugate-bin pair, and reconstruct the complete original signal |
 | `43_sos_iir_filter.pas` | EngineeringLib DSP | Design a stable Butterworth SOS low-pass, inspect its response, and preserve state across streaming blocks |
+| `44_generalized_linear_models.pas` | StatsLib GLM | Fit logistic and Poisson models, inspect diagnostics, predict counts, and handle separation |
 
 ## Build and run
 

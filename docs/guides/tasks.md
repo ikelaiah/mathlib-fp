@@ -51,6 +51,7 @@ If a task is not supported by a documented entry point, it is marked
 | Seeded bootstrap confidence interval | `StatsLib.Stats` | `TStatsKit.BootstrapConfidenceInterval(Data, Alpha, Iterations, Seed)` | [`01_stats_basics.pas`](../../examples/01_stats_basics.pas) |
 | Streaming mean/variance in constant memory | `StatsLib.Streaming` | `TOnlineStatistics.Create`; `Add`; `Merge` | [`19_applied_data_pipeline.pas`](../../examples/19_applied_data_pipeline.pas) |
 | OLS regression with diagnostics | `StatsLib.Inference` | `TInferenceKit.FitOLS(Design, Response)` | [`26_probability_finance.pas`](../../examples/26_probability_finance.pas) |
+| Fit a binary outcome or count model and predict | `StatsLib.GLM` | `TGLMKit.FitLogistic` / `FitPoisson`; inspect `Status` and `Identifiable`; `PredictMean` | [`44_generalized_linear_models.pas`](../../examples/44_generalized_linear_models.pas) |
 
 ## EngineeringLib
 

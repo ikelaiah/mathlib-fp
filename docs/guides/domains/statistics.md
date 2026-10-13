@@ -4,7 +4,7 @@ Statistical analysis domain for Free Pascal covering descriptive statistics,
 hypothesis testing, correlation, normality tests, robust methods, bootstrap,
 and non-parametric tests.
 
-Depends on: **MathBase**
+Depends on: **MathBase**, **AlgebraLib** for typed regression designs.
 
 ## Learning routes
 
@@ -23,6 +23,7 @@ and returns newly allocated result arrays where the operation requires them.
 | Mean/group comparison | `TInferenceKit` test selected by design | [Test selection](#test-selection) |
 | Distribution fit | `EstimateNormal`/matching estimate | [Distribution selection](#distribution-selection) |
 | Regression with diagnostics | `FitOLS` or `FitLogistic` | [Regression selection](#regression-selection-and-failure-contracts) |
+| Binary or count generalized linear model | `TGLMKit.FitLogistic` or `FitPoisson` | [Model choice, failure statuses and prediction](generalized-linear-models.md) |
 
 ### Advanced route
 
@@ -38,6 +39,7 @@ transition from `TStatsKit` to fitted/streaming records needs no glue copy.
 | `StatsLib.Stats` | [StatsLib.Stats.pas](../../../src/StatsLib.Stats.pas) | `TStatsKit` |
 | `StatsLib.Streaming` | [StatsLib.Streaming.pas](../../../src/StatsLib.Streaming.pas) | `TOnlineStatistics` |
 | `StatsLib.Inference` | [StatsLib.Inference.pas](../../../src/StatsLib.Inference.pas) | `TInferenceKit` |
+| `StatsLib.GLM` | [StatsLib.GLM.pas](../../../src/StatsLib.GLM.pas) | `TGLMKit` |
 
 ---
 
@@ -99,7 +101,8 @@ numerical rank, degrees of freedom, and `Status`. A rank-deficient design is
 reported rather than hidden; covariance-style standard errors require full
 rank and positive residual degrees of freedom.
 
-`FitLogistic(Design, Labels)` fits binary labels using Newton/IRLS steps.
+The retained `TInferenceKit.FitLogistic(Design, Labels)` fits integer binary
+labels using Newton/IRLS steps.
 `Status`, `Iterations`, and `Identifiable` distinguish convergence from
 complete/quasi separation or singular information. Probabilities and the best
 finite coefficient estimate remain inspectable on a non-identifiable result.
@@ -108,8 +111,11 @@ Every new inference API rejects non-finite data, inconsistent shapes, invalid
 probabilities, and insufficient sample sizes with `EInferenceError`. The
 `TCountMatrix` alias represents contingency rows. The
 implementation is a portable double-precision baseline; survival analysis,
-factor analysis, robust covariance families, multinomial/count GLMs, and
-certified exact small-sample tables remain outside 1.8.
+factor analysis, robust covariance families, multinomial GLMs, and
+certified exact small-sample tables remain outside the maintained baseline.
+Version 2.7.0 adds a focused [canonical GLM workflow](generalized-linear-models.md)
+through `TGLMKit.FitLogistic` and `FitPoisson`, with real-double responses,
+explicit failure statuses, model diagnostics and prediction.
 
 ## Core Types
 

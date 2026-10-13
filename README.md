@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.6.0" src="https://img.shields.io/badge/version-2.6.0-brightgreen.svg">
+  <img alt="Version 2.7.0" src="https://img.shields.io/badge/version-2.7.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,10 +26,10 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.6.0 is the current stable release.** It adds stable SOS IIR design and
-> streaming for Butterworth and Chebyshev Type I low-pass, high-pass,
-> band-pass, and band-stop filters. See the [2.6.0 release notes](docs/releases/2.6.0/release-notes.md),
-> [qualification record](docs/releases/2.6.0/qualification.md),
+> **2.7.0 is the current stable release.** It adds logistic and Poisson generalized
+> linear models with explicit convergence/failure diagnostics, standard errors
+> and prediction. See the [2.7.0 release notes](docs/releases/2.7.0/release-notes.md),
+> [qualification record](docs/releases/2.7.0/qualification.md),
 > [capability inventory](docs/reference/capabilities.md), and
 > [changelog](CHANGELOG.md) when evaluating an upgrade.
 
@@ -42,7 +42,7 @@ domain.
 Get the source directly with git:
 
 ```bash
-git clone --depth 1 --branch v2.6.0 \
+git clone --depth 1 --branch v2.7.0 \
   https://github.com/ikelaiah/mathlib-fp.git
 ```
 
@@ -50,23 +50,30 @@ or as a source archive with `wget`:
 
 ```bash
 wget \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.6.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.7.0.tar.gz
 ```
 
 or with `curl`:
 
 ```bash
 curl -L -o mathlib-fp.tar.gz \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.6.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.7.0.tar.gz
 ```
 
 > No package manager or install step is required for direct source use; add
 > `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
 
 Direct source use is canonical. The
-[2.6.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.6.0)
+[2.7.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.7.0)
 is the source of published stable `.zip`, `.tar.gz`, offline documentation,
 and checksum artifacts.
+
+The release also provides a [checksummed source tarball](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.tar.gz)
+with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.tar.gz.sha256),
+and a [source ZIP](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.zip)
+with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.zip.sha256).
+These checksum-bearing archives have repository files at their root; extract
+into a new directory, then add `src/` to the compiler unit path.
 
 ### 1. Multiply two matrices
 

@@ -1,11 +1,11 @@
-name: 1.9 experience feedback
-description: Report friction installing, choosing, using, or migrating mathlib-fp 1.9
-title: "[1.9 feedback]: "
+name: Release experience feedback
+description: Report friction installing, choosing, using, or migrating mathlib-fp
+title: "[Release feedback]: "
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for helping us improve the 1.9 first-use path. For a private security issue, follow SECURITY.md instead of using this public form.
+        Help improve the current first-use path. Include the release version you used. For a private security issue, follow SECURITY.md instead of using this public form.
   - type: dropdown
     id: category
     attributes:
@@ -17,14 +17,14 @@ body:
         - Unexpected error or status
         - Missing algorithm-selection guidance
         - Migration from an earlier API
-        - Other 1.9 usability problem
+        - Other usability problem
     validations:
       required: true
   - type: input
     id: version
     attributes:
       label: mathlib-fp version or commit
-      placeholder: v1.9.4 or a commit SHA
+      placeholder: v2.7.0 or a commit SHA
     validations:
       required: true
   - type: input

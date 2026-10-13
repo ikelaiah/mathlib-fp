@@ -51,6 +51,7 @@ uses
   StatsLib.Stats,
   StatsLib.Streaming,
   StatsLib.Inference,
+  StatsLib.GLM,
   { ProbabilityLib }
   ProbabilityLib.Distributions,
   { CombinatoricsLib }

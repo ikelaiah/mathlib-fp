@@ -345,6 +345,10 @@ def documentation_gates(
     qualification: Qualification, compiler: str, release: str,
 ) -> None:
     qualification.run(
+        "glm-reference-fixtures",
+        [sys.executable, str(ROOT / "tools" / "generate_glm_reference.py"), "--check"],
+    )
+    qualification.run(
         "sos-iir-reference-fixtures",
         [
             sys.executable,

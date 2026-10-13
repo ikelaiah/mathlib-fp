@@ -37,6 +37,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Stable SOS IIR filtering | Stable | Double real | Butterworth and Chebyshev Type I in four responses; prototype order 1–12; explicit streaming state and pole/response diagnostics |
 | Reusable spectral plans | Stable | Double real and double complex | Fixed geometry; serial plans reject overlapping use; arbitrary FFT lengths use cached Bluestein workspace; STFT returns full spectra and pads both boundaries |
 | Statistical inference and regression | Stable | Double real | Paired distribution APIs, estimation/tests/corrections, SVD OLS, and binary logistic with identifiability status |
+| Canonical generalized linear models | Stable (v2.7.0) | Double real | Bernoulli logit and Poisson log; explicit design/intercept; finite information and convergence required; no weights, offsets, regularization or robust covariance |
 | Typed data analysis | Stable | Double real dense | PCA, seeded clustering/splits/forests, fitted standardization, binary LDA, and exact low-dimensional KD tree |
 | Linear-Gaussian state space | Stable | Double real | Scalar and dense multivariate Kalman filtering/forecasting; no controls, missing observations, or smoothing |
 | Numerical interchange and inspection | Stable | Single/double real/complex and random state | Coordinate double/complex Matrix Market and four-scalar sparse binary; independent nonzero/per-axis dimension caps |
@@ -50,13 +51,14 @@ Target qualifications and platform-specific limitations are defined by the
 | Advanced iterative variants | Unsupported | — | No block/flexible Krylov, algebraic multigrid, or parallel/SIMD sparse dispatch |
 | Nonsymmetric, generalized, Hessenberg, and Schur spectral algebra | Stable | Double real and complex | Dense matrices; nonsymmetric eigenpairs use real input; no polynomial, shift-invert, or interior-target path |
 | Advanced DSP design and wavelets | Unsupported | — | Haar is stable; equiripple, advanced IIR families, broader wavelets, and packets remain conditional |
-| Conditional statistics and data science | Unsupported | — | Survival/factor analysis, robust covariance, multinomial/count GLMs, boosting, and broader forecasting were not activated |
+| Conditional statistics and data science | Unsupported | — | Survival/factor analysis, robust covariance, multinomial and additional count families, boosting, and broader forecasting were not activated |
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.5.0 capability inventory. It adds reusable FFT and STFT plans
-with inverse STFT to the existing applied DSP family. The release passed
-checksummed clean-archive qualification on Windows x86-64 and Linux x86-64.
+This is the 2.7.0 capability inventory. It adds canonical logistic and
+Poisson GLMs to the existing statistical inference workflows, alongside the
+stable SOS IIR and reusable spectral processing paths. Qualification status
+is recorded in the [current release report](../releases/2.7.0/qualification.md).
 Sparse direct solving now includes a
 reusable minimum-degree symbolic analysis and sparse numeric LU. The
 [MathBase guide](../guides/domains/math-base.md)

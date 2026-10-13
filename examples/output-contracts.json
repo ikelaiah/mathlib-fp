@@ -238,6 +238,18 @@
         "tones: 30-Hz amplitude ="
       ],
       "final_line": "workflow: success"
+    },
+    {
+      "path": "examples/44_generalized_linear_models.pas",
+      "contains": [
+        "logistic: converged, rank = 2",
+        "logistic slope = 0.361321",
+        "Poisson: converged, rank = 2",
+        "Poisson slope = 0.476797",
+        "predicted counts at x=0 and x=2: 1.058467, 2.746745",
+        "separation: no finite logistic MLE"
+      ],
+      "final_line": "GLM workflow: success"
     }
   ]
 }
