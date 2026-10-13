@@ -36,7 +36,7 @@ Prediction validates the entire design and returns fresh storage; it rejects
 nonconverged results and nonrepresentable inverse-link results.
 
 Results expose family, status, message, iteration count, numerical rank,
-condition indicator, identifiable flag, coefficients, fitted means, response
+condition indicator, identifiable and finite-iterate flags, coefficients, fitted means, response
 and signed deviance residuals, standard errors, deviance, null deviance,
 Pearson chi-square, residual degrees of freedom, and accepted deviance history.
 Null deviance is the constant-mean comparator even for a design without an
@@ -53,8 +53,10 @@ explicit, and minimum-norm substitution is never silently accepted.
 
 Evaluate logistic loss through stable softplus expressions and Poisson loss
 through the log link. Backtracking accepts only finite non-increasing
-deviance, with at most 40 halvings per IRLS step. Convergence requires both
-relative deviance and scaled coefficient change. Iteration limits and stalled
+deviance (allowing 8 binary64 epsilons times 1 + previous deviance for summation
+roundoff), with at most 40 halvings per IRLS step. Convergence requires both
+relative deviance and the unhalved scaled correction, so a shortened step
+cannot manufacture convergence. Iteration limits and stalled
 steps are explicit results. Numerical overflow becomes numerical failure with
 the last finite iterate rather than false convergence.
 
@@ -68,7 +70,11 @@ double information is no longer reliably estimable. An all-zero Poisson
 response with a strictly negative fitted linear predictor on every row also
 certifies a boundary MLE. Standard errors and prediction are unavailable for
 all failed fits. Accepted finite means/residuals/deviance remain diagnostic
-last-iterate values, not an estimated finite MLE.
+last-iterate values, not an estimated finite MLE. `HasFiniteIterate` is false
+when even the initial objective is not representable; such results have empty
+mean/history arrays and zero placeholders for unavailable statistics. Numerical
+failure with a finite iterate retains coefficients, means and history but
+clears residuals and zeroes unavailable null/Pearson statistics.
 
 ## Structure, style and verification
 
