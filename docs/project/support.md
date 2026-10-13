@@ -1,14 +1,13 @@
 # Supported platform matrix
 
-Version 2.6.0 adds real-double Butterworth and Chebyshev Type I SOS IIR
-design and stateful streaming. Local Windows qualification, exact-main CI, and
-hosted checksummed Linux/Windows clean-archive qualification passed on
-2026-10-13. The results are tracked in the
-[2.6.0 qualification report](../releases/2.6.0/qualification.md).
-Version 2.5.0 adds reusable FFT/STFT plans and inverse STFT. It passed
-checksummed clean-archive qualification on Windows x86-64 and Linux x86-64 and
-remains the previous completed primary archive qualification; the 2.6.0
-release workflow now provides the latest primary archive evidence.
+Version 2.7.0 adds real-double logistic and Poisson generalized linear models.
+Focused and normal Windows tests passed; full local qualification and hosted
+exact-commit/clean-archive results are being collected before tagging. See the
+[2.7.0 qualification report](../releases/2.7.0/qualification.md).
+The retained 2.6.0 Linux/Windows clean-archive qualification passed on
+2026-10-13, and remains the completed primary evidence until the new release
+qualification passes. Version 2.6.0 added stable SOS IIR filtering and 2.5.0
+added reusable FFT/STFT plans and inverse STFT.
 Version 2.4.0 added reusable
 sparse-direct symbolic analysis and minimum-degree ordering while retaining
 the Free Pascal source and standard RTL/FCL runtime. The dense real-double
@@ -27,9 +26,9 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The current release tree targets 2.6.0. Its local full qualification and
-hosted Linux/Windows clean-archive qualification passed. See the 2.6.0 report
-for exact status and retained evidence. The 2.5.0 qualification is historical.
+The current release tree targets 2.7.0. Exact target qualification is tracked
+in its report above; previous evidence is retained below until those checks
+finish. No target claim is inferred from another platform.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -39,7 +38,7 @@ for exact status and retained evidence. The 2.5.0 qualification is historical.
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The 2.6.0 release tree is qualified on the Linux and Windows primary profiles.
+The retained 2.6.0 release tree is qualified on both primary profiles.
 This does not add qualification claims for other operating systems, CPUs, or
 compiler versions.
 

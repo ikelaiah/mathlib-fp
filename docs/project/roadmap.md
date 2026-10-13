@@ -202,7 +202,7 @@ vector arithmetic is new public API and belongs to 1.4.0.
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
 Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
 2.5.0. Version 2.5.1 was a documentation-only patch; 2.6.0 completed the
-next capability gate below. The later 2.7.0–3.0.0 gates give an ordered plan, not
+Signal Processing II gate; 2.7.0 completes Statistics II. The later 2.8.0–3.0.0 gates give an ordered plan, not
 date promises or final public API designs. Other candidate lanes remain
 uncommitted directions.
 
@@ -898,7 +898,7 @@ qualification passed; exact-commit and clean-archive platform status is in the
 [qualification record](../releases/2.6.0/qualification.md). See also the
 [release notes](../releases/2.6.0/release-notes.md).
 
-## Next release: 2.7.0 — Statistics II
+## Previous release: 2.7.0 — Statistics II
 
 Add a real-double generalized linear model baseline for logistic and Poisson
 regression using documented logit/log links and iteratively reweighted least
@@ -911,7 +911,13 @@ Robust regression, survival/reliability analysis, causal inference, and broader
 state-space work are outside this milestone. The gate is accurate, explainable
 fit results and explicit non-convergence/failure behavior on supported targets.
 
-## Planned release: 2.8.0 — Data Analysis II
+Version 2.7.0 delivers both canonical families with scaled pivoted-QR IRLS,
+prediction, final-information standard errors and explicit failure statuses.
+See the [GLM guide](../guides/domains/generalized-linear-models.md),
+[release notes](../releases/2.7.0/release-notes.md) and
+[qualification record](../releases/2.7.0/qualification.md).
+
+## Next release: 2.8.0 — Data Analysis II
 
 Add a focused partial least squares (PLS) regression workflow for centered and
 scaled multivariate predictors, with component selection, prediction, and
