@@ -4,10 +4,10 @@ Contract: [spec](spec-2.6.md). Sequence: [plan](plan-2.6.md).
 
 ## 1. Stability and response foundations
 
-- [ ] Add the public SOS response and stability diagnostic records and API.
-- [ ] Test denominator Jury conditions, pole radius, margins, and invalid
+- [x] Add the public SOS response and stability diagnostic records and API.
+- [x] Test denominator Jury conditions, pole radius, margins, and invalid
   coefficients using analytic first- and second-order fixtures.
-- [ ] Test complex SOS response at DC, interior frequencies, and Nyquist.
+- [x] Test complex SOS response at DC, interior frequencies, and Nyquist.
 
 **Acceptance:** Stable, boundary, and unstable cases are distinguished;
 frequency response agrees with independent section formulas. **Dependencies:**

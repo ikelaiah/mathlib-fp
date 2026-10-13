@@ -40,6 +40,7 @@ uses
   , TestMLLib
   , TestGeometryLib
   , TestAppliedNumerics
+  , TestSOSIIR
   , TestSpectralPlans
   , TestPublicAPI;
 

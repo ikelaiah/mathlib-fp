@@ -24,6 +24,7 @@ type
 
   TFFTNormalization = (fnBackward, fnForward, fnUnitary, fnNone);
   TConvolutionMethod = (cmAutomatic, cmDirect, cmFFT);
+  TIIRResponse = (irLowPass, irHighPass, irBandPass, irBandStop);
   TComplexBatch = array of TComplexArray;
   TSingleComplexBatch = array of TSingleComplexArray;
 
@@ -99,6 +100,20 @@ type
     A1, A2: Double;
   end;
 
+  TSOSCoefficients = array of TBiquadCoefficients;
+
+  TSOSStabilityDiagnostics = record
+    IsStable: Boolean;
+    MaximumPoleRadius: Double;
+    MinimumStabilityMargin: Double;
+    FirstUnstableSection: SizeInt;
+  end;
+
+  TSOSFrequencyResponse = record
+    FrequenciesHz: TDoubleArray;
+    Values: TComplexArray;
+  end;
+
   TStreamingBiquad = record
   private
     FCoefficients: TBiquadCoefficients;
@@ -110,6 +125,23 @@ type
     function ProcessBlock(const Input: TDoubleArray): TDoubleArray;
     property Z1: Double read FZ1;
     property Z2: Double read FZ2;
+  end;
+
+  { Mutable streaming state for an immutable snapshot of real SOS sections. }
+  TStreamingSOSFilter = record
+  private
+    FSections: TSOSCoefficients;
+    FState: TDoubleArray;
+  public
+    class function Create(const Coefficients: TSOSCoefficients):
+      TStreamingSOSFilter; static;
+    procedure Reset;
+    function ProcessBlock(const Input: TDoubleArray): TDoubleArray;
+    function State: TDoubleArray;
+    procedure RestoreState(const Values: TDoubleArray);
+    function Coefficients: TSOSCoefficients;
+    function SectionCount: SizeInt;
+    function StateSize: SizeInt;
   end;
 
   { Owns a fixed-size complex FFT workspace. Valid ExecuteInto calls reuse all
@@ -260,6 +292,11 @@ type
 
     class function DesignButterworthLowPass(const NormalizedCutoff: Double):
       TBiquadCoefficients; static;
+    class function AnalyzeSOSStability(
+      const Coefficients: TSOSCoefficients): TSOSStabilityDiagnostics; static;
+    class function EvaluateSOSResponse(const Coefficients: TSOSCoefficients;
+      const SampleRateHz: Double; const FrequenciesHz: TDoubleArray):
+      TSOSFrequencyResponse; static;
   end;
 
 implementation
@@ -340,6 +377,63 @@ begin
         'NextPowerOfTwo: transform workspace dimension overflow.');
     Result := Result shl 1;
   end;
+end;
+
+procedure RequireFiniteSOS(const Coefficients: TSOSCoefficients;
+  const Operation: string);
+var
+  I: SizeInt;
+begin
+  if Length(Coefficients) = 0 then
+    raise EDSPError.Create(Operation + ': at least one SOS section is required.');
+  for I := 0 to High(Coefficients) do
+    if IsNan(Coefficients[I].B0) or IsInfinite(Coefficients[I].B0) or
+       IsNan(Coefficients[I].B1) or IsInfinite(Coefficients[I].B1) or
+       IsNan(Coefficients[I].B2) or IsInfinite(Coefficients[I].B2) or
+       IsNan(Coefficients[I].A1) or IsInfinite(Coefficients[I].A1) or
+       IsNan(Coefficients[I].A2) or IsInfinite(Coefficients[I].A2) then
+      raise EDSPError.CreateFmt(
+        '%s: section %d must contain only finite coefficients.',
+        [Operation, I]);
+end;
+
+function SOSSectionPoleRadius(const A1, A2: Double): Double;
+var
+  Scale, Linear, Constant, Discriminant, RootDiscriminant: Double;
+  Root1, Root2, LargestRoot: Double;
+begin
+  Scale := Max(1.0, Max(Abs(A1), Sqrt(Abs(A2))));
+  Linear := A1 / Scale;
+  Constant := (A2 / Scale) / Scale;
+  Discriminant := Linear * Linear - 4.0 * Constant;
+
+  if Discriminant < 0.0 then
+  begin
+    if Constant <= 0.0 then
+      Exit(Infinity);
+    LargestRoot := Sqrt(Constant);
+  end
+  else
+  begin
+    RootDiscriminant := Sqrt(Discriminant);
+    if Linear >= 0.0 then
+      Root1 := -0.5 * (Linear + RootDiscriminant)
+    else
+      Root1 := -0.5 * (Linear - RootDiscriminant);
+    if Root1 = 0.0 then
+    begin
+      Root1 := -0.5 * (Linear + RootDiscriminant);
+      Root2 := -0.5 * (Linear - RootDiscriminant);
+    end
+    else
+      Root2 := Constant / Root1;
+    LargestRoot := Max(Abs(Root1), Abs(Root2));
+  end;
+
+  if (LargestRoot > 1.0) and (Scale > MaxDouble / LargestRoot) then
+    Result := Infinity
+  else
+    Result := Scale * LargestRoot;
 end;
 
 function CheckedSizeAdd(const LeftValue, RightValue: SizeInt;
@@ -2014,6 +2108,92 @@ begin
   Result.A2 := (1.0 - Alpha) / A0;
 end;
 
+class function TDSPKit.AnalyzeSOSStability(
+  const Coefficients: TSOSCoefficients): TSOSStabilityDiagnostics;
+var
+  I: SizeInt;
+  SectionStable: Boolean;
+  Radius: Double;
+begin
+  RequireFiniteSOS(Coefficients, 'AnalyzeSOSStability');
+  Result.IsStable := True;
+  Result.MaximumPoleRadius := 0.0;
+  Result.MinimumStabilityMargin := 1.0;
+  Result.FirstUnstableSection := -1;
+  for I := 0 to High(Coefficients) do
+  begin
+    { Jury's strict second-order conditions for z^2 + A1*z + A2. }
+    SectionStable := (Coefficients[I].A2 > -1.0) and
+      (Coefficients[I].A2 < 1.0) and
+      (Coefficients[I].A1 > -1.0 - Coefficients[I].A2) and
+      (Coefficients[I].A1 < 1.0 + Coefficients[I].A2);
+    Radius := SOSSectionPoleRadius(Coefficients[I].A1,
+      Coefficients[I].A2);
+    Result.MaximumPoleRadius := Max(Result.MaximumPoleRadius, Radius);
+    if not SectionStable then
+    begin
+      Result.IsStable := False;
+      if Result.FirstUnstableSection < 0 then
+        Result.FirstUnstableSection := I;
+    end;
+  end;
+  Result.MinimumStabilityMargin := 1.0 - Result.MaximumPoleRadius;
+end;
+
+class function TDSPKit.EvaluateSOSResponse(
+  const Coefficients: TSOSCoefficients; const SampleRateHz: Double;
+  const FrequenciesHz: TDoubleArray): TSOSFrequencyResponse;
+var
+  I, J: SizeInt;
+  Angle: Double;
+  ZInverse, ZInverseSquared, Numerator, Denominator, Value: TComplex;
+begin
+  RequireFiniteSOS(Coefficients, 'EvaluateSOSResponse');
+  if IsNan(SampleRateHz) or IsInfinite(SampleRateHz) or
+     (SampleRateHz <= 0.0) then
+    raise EDSPError.Create(
+      'EvaluateSOSResponse: SampleRateHz must be finite and positive.');
+  if Length(FrequenciesHz) = 0 then
+    raise EDSPError.Create(
+      'EvaluateSOSResponse: at least one frequency is required.');
+  for I := 0 to High(FrequenciesHz) do
+    if IsNan(FrequenciesHz[I]) or IsInfinite(FrequenciesHz[I]) or
+       (FrequenciesHz[I] < 0.0) or
+       (FrequenciesHz[I] > SampleRateHz * 0.5) then
+      raise EDSPError.CreateFmt(
+        'EvaluateSOSResponse: frequency %d must lie in [0, Nyquist].', [I]);
+
+  Result.FrequenciesHz := Copy(FrequenciesHz);
+  Result.Values := nil;
+  SetLength(Result.Values, Length(FrequenciesHz));
+  for I := 0 to High(FrequenciesHz) do
+  begin
+    Angle := 2.0 * DSP_PI * (FrequenciesHz[I] / SampleRateHz);
+    ZInverse := TComplex.Create(Cos(Angle), -Sin(Angle));
+    ZInverseSquared := ZInverse * ZInverse;
+    Value := TComplex.One;
+    for J := 0 to High(Coefficients) do
+    begin
+      Numerator := TComplex.Create(Coefficients[J].B0, 0.0) +
+        ZInverse * Coefficients[J].B1 +
+        ZInverseSquared * Coefficients[J].B2;
+      Denominator := TComplex.Create(1.0, 0.0) +
+        ZInverse * Coefficients[J].A1 +
+        ZInverseSquared * Coefficients[J].A2;
+      if (Denominator.Re = 0.0) and (Denominator.Im = 0.0) then
+        raise EDSPError.CreateFmt(
+          'EvaluateSOSResponse: section %d has a zero denominator at frequency %g Hz.',
+          [J, FrequenciesHz[I]]);
+      Value := (Value * Numerator) / Denominator;
+      if not Value.IsFinite then
+        raise EDSPError.CreateFmt(
+          'EvaluateSOSResponse: response overflow at frequency %g Hz.',
+          [FrequenciesHz[I]]);
+    end;
+    Result.Values[I] := Value;
+  end;
+end;
+
 class function TStreamingFIR.Create(
   const Coefficients: TDoubleArray): TStreamingFIR;
 begin
@@ -2145,6 +2325,118 @@ begin
   end;
   FZ1 := State1;
   FZ2 := State2;
+end;
+
+class function TStreamingSOSFilter.Create(
+  const Coefficients: TSOSCoefficients): TStreamingSOSFilter;
+var
+  Diagnostics: TSOSStabilityDiagnostics;
+begin
+  RequireFiniteSOS(Coefficients, 'TStreamingSOSFilter.Create');
+  if Length(Coefficients) > High(SizeInt) div 2 then
+    raise EDSPError.Create(
+      'TStreamingSOSFilter.Create: state size overflow.');
+  Diagnostics := TDSPKit.AnalyzeSOSStability(Coefficients);
+  if not Diagnostics.IsStable then
+    raise EDSPError.CreateFmt(
+      'TStreamingSOSFilter.Create: section %d is not strictly stable.',
+      [Diagnostics.FirstUnstableSection]);
+  Result.FSections := Copy(Coefficients);
+  SetLength(Result.FState, 2 * Length(Coefficients));
+end;
+
+procedure TStreamingSOSFilter.Reset;
+begin
+  if Length(FSections) = 0 then
+    raise EDSPError.Create('TStreamingSOSFilter.Reset: filter is not initialized.');
+  FState := nil;
+  SetLength(FState, 2 * Length(FSections));
+end;
+
+function TStreamingSOSFilter.ProcessBlock(
+  const Input: TDoubleArray): TDoubleArray;
+var
+  NewState: TDoubleArray;
+  I, J, StateIndex: SizeInt;
+  Value, OutputValue, NewZ1, NewZ2: Double;
+begin
+  if (Length(FSections) = 0) or
+     (Length(FState) <> 2 * Length(FSections)) then
+    raise EDSPError.Create(
+      'TStreamingSOSFilter.ProcessBlock: filter state is not initialized.');
+  RequireFinite(Input, 'TStreamingSOSFilter.ProcessBlock');
+  NewState := Copy(FState);
+  Result := nil;
+  SetLength(Result, Length(Input));
+  for I := 0 to High(Input) do
+  begin
+    Value := Input[I];
+    for J := 0 to High(FSections) do
+    begin
+      StateIndex := 2 * J;
+      OutputValue := SafeSum(SafeProduct(FSections[J].B0, Value,
+        'TStreamingSOSFilter.ProcessBlock'), NewState[StateIndex],
+        'TStreamingSOSFilter.ProcessBlock');
+      NewZ1 := SafeSum(SafeSum(
+        SafeProduct(FSections[J].B1, Value,
+          'TStreamingSOSFilter.ProcessBlock'),
+        -SafeProduct(FSections[J].A1, OutputValue,
+          'TStreamingSOSFilter.ProcessBlock'),
+        'TStreamingSOSFilter.ProcessBlock'), NewState[StateIndex + 1],
+        'TStreamingSOSFilter.ProcessBlock');
+      NewZ2 := SafeSum(
+        SafeProduct(FSections[J].B2, Value,
+          'TStreamingSOSFilter.ProcessBlock'),
+        -SafeProduct(FSections[J].A2, OutputValue,
+          'TStreamingSOSFilter.ProcessBlock'),
+        'TStreamingSOSFilter.ProcessBlock');
+      if IsNan(OutputValue) or IsInfinite(OutputValue) or
+         IsNan(NewZ1) or IsInfinite(NewZ1) or
+         IsNan(NewZ2) or IsInfinite(NewZ2) then
+        raise EDSPError.CreateFmt(
+          'TStreamingSOSFilter.ProcessBlock: numerical overflow at sample %d, section %d.',
+          [I, J]);
+      NewState[StateIndex] := NewZ1;
+      NewState[StateIndex + 1] := NewZ2;
+      Value := OutputValue;
+    end;
+    Result[I] := Value;
+  end;
+  FState := NewState;
+end;
+
+function TStreamingSOSFilter.State: TDoubleArray;
+begin
+  Result := Copy(FState);
+end;
+
+procedure TStreamingSOSFilter.RestoreState(const Values: TDoubleArray);
+begin
+  if (Length(FSections) = 0) or
+     (Length(FState) <> 2 * Length(FSections)) then
+    raise EDSPError.Create(
+      'TStreamingSOSFilter.RestoreState: filter state is not initialized.');
+  if Length(Values) <> Length(FState) then
+    raise EDSPError.CreateFmt(
+      'TStreamingSOSFilter.RestoreState: expected %d values; got %d.',
+      [Length(FState), Length(Values)]);
+  RequireFinite(Values, 'TStreamingSOSFilter.RestoreState');
+  FState := Copy(Values);
+end;
+
+function TStreamingSOSFilter.Coefficients: TSOSCoefficients;
+begin
+  Result := Copy(FSections);
+end;
+
+function TStreamingSOSFilter.SectionCount: SizeInt;
+begin
+  Result := Length(FSections);
+end;
+
+function TStreamingSOSFilter.StateSize: SizeInt;
+begin
+  Result := Length(FState);
 end;
 
 end.
