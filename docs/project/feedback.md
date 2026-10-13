@@ -1,7 +1,7 @@
-# Feedback on mathlib-fp 1.9
+# Feedback on mathlib-fp
 
 Use the focused
-[1.9 feedback form](https://github.com/ikelaiah/mathlib-fp/issues/new?template=release_feedback.yml)
+[release feedback form](https://github.com/ikelaiah/mathlib-fp/issues/new?template=release_feedback.yml)
 when the library works incorrectly or when the first-use path is harder than
 it should be. Choose the closest category:
 

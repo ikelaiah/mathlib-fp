@@ -1,65 +1,40 @@
 # Release maintenance view
 
-> Refreshed for each stable release. Automation of this page is future work.
+Refreshed for v2.7.0 on 2026-10-14.
 
-This table is a maintenance snapshot for the current stable release (1.9.9),
-not a scorecard. Every count is reproducible from the cited files:
+Counts describe the current source/API and curated capability inventory.
+They are not a scorecard or a substitute for numerical and platform evidence.
 
-- **Stable capability families** — stable families tracked in
-  [`capabilities.json`](../capabilities.json). The capability inventory
-  deliberately enumerates only the curated families that carry qualification
-  evidence; domains it does not enumerate are marked `not measured` rather
-  than estimated.
-- **Units** — public units in the frozen
-  [`public-api-1.9.json`](../public-api-1.9.json) snapshot, matching the
-  [`provenance-audit-1.9.9.json`](../provenance-audit-1.9.9.json) unit list.
-- **Public API rows** — declarations in the frozen 2,880-row 1.9 snapshot,
-  summed per domain. The count includes every snapshot classification
-  (recommended, advanced, compatibility, experimental, and implementation
-  support), so it is an upper bound on the application-facing surface, not the
-  curated common path.
-- **Runnable examples** — examples in
-  [`examples/README.md`](../../examples/README.md) whose domain column names the
-  domain; the cross-domain migration example (`23_api_migration_preview.pas`)
-  is counted separately.
-- **Qualification status** — provenance audit coverage in 1.9.9. Deeper
-  numerical, performance, and workflow evidence is in the release-specific
-  reports listed below.
-- **Known limitations** — the guide or capability-inventory boundary for each
-  domain, not an exhaustive list.
+- Units and declaration rows come from the [current API snapshot](../reference/api/public-api-2.7.0.json).
+- Stable families come from [capabilities.json](../reference/capabilities.json); zero means this curated inventory has no separately measured family for that domain.
+- Example counts use domain labels in [examples/README.md](../../examples/README.md); shared examples may count in more than one domain.
+- Qualification status is in the [v2.7.0 report](../releases/2.7.0/qualification.md), not inferred from source counts.
 
-| Domain | Stable capability families | Units | Public API rows | Runnable examples | Qualification status | Known limitations |
-| ------ | -------------------------- | ----: | --------------: | ----------------: | -------------------- | ----------------- |
-| AlgebraLib | 12 | 13 | 1064 | 6 | Provenance-audited (13 units) | Dense row-major, no broadcasting; LU `Solve` is square-only; nonsymmetric and generalized eigensystems are unreleased 2.2 development APIs; complex Schur uses an explicit QR step with worst-case `O(n^4)` work; polynomial eigensystems remain deferred; sparse products may create fill; partial eigensystems are largest-magnitude only |
-| CombinatoricsLib | not measured | 1 | 43 | 1 | Provenance-audited (1 unit) | Fixed-width integers overflow at documented maxima (`Factorial` > 20, `CatalanNumber` > 30, `BellNumber` > 18); `K <= N` required; not arbitrary precision |
-| EngineeringLib | 1 | 8 | 421 | 6 | Provenance-audited (8 units) | Temperature conversions are affine; time units are fixed-duration conventions; Haar is power-of-two; equiripple/Chebyshev/elliptic IIR design and wavelets beyond Haar are outside 1.8 |
-| FinanceLib | not measured | 3 | 71 | 2 | Provenance-audited (3 units) | Rates are decimals; discrete period compounding except Black-Scholes (continuous); IRR needs a positive initial investment and one positive future flow |
-| GeometryLib | not measured | 1 | 132 | 1 | Provenance-audited (1 unit) | `Normalise` raises on zero/non-finite vectors; arithmetic operators propagate NaN/Infinity; degenerate constructions raise |
-| InterchangeLib | 1 | 1 | 14 | 1 | Provenance-audited (1 unit) | Only the documented spline/FIR/standardiser/scalar-Kalman adapters persist; decomposition factors and general object graphs are not stable formats |
-| MathBase | 5 | 9 | 239 | 7 | Provenance-audited (9 units) | `StudentT` covers `X >= 0` only; triangle/circle helpers do not validate degenerate input; budgets are corpus-tested, not worst-case proofs |
-| MLLib | 1 | 2 | 129 | 3 | Provenance-audited (2 units) | Dense, serial, in-memory baselines; no boosting, distributed training, or multiclass LDA; forest importance is not causal |
-| NumericsLib | 3 | 4 | 272 | 4 | Provenance-audited (4 units) | Explicit non-stiff ODE path only (stiff systems are a post-2.0 gate); `LagrangeInterp` ill-conditioned beyond ~10 knots; `GaussLegendre5` uses five evaluations |
-| OptimizationLib | 2 | 2 | 126 | 3 | Provenance-audited (2 units) | Local solvers are local only; `SimplexLP` is standard-form `min c'x` with `Ax <= b`, `x >= 0`; no MILP or interior-point LP |
-| ProbabilityLib | not measured | 1 | 76 | 2 | Provenance-audited (1 unit) | PDF/PMF return 0 and CDF clamps out-of-domain `X`; parameter order is `(X, params...)`; `StudentTTwoTail` for two-sided tests |
-| StatsLib | 2 | 3 | 177 | 6 | Provenance-audited (3 units) | Sample `Variance` (n−1) versus population `StdDev` (n); tests are two-sided; covariance-style standard errors need full rank; no survival/factor/robust-covariance families |
-| TimeSeriesLib | 1 | 2 | 116 | 4 | Provenance-audited (2 units) | `ARIMAForecast` needs the original series to undifference; Kalman filters are linear-Gaussian baselines; `Undifference` needs `D` initial values |
+| Domain | Stable capability families | Units | Public API rows | Runnable examples | Important limitations |
+| --- | ---: | ---: | ---: | ---: | --- |
+| AlgebraLib | 13 | 14 | 1209 | 13 | Dense and sparse serial baselines; sparse fill is data dependent; partial eigensystems target largest magnitude |
+| CombinatoricsLib | 0 | 1 | 43 | 1 | Fixed-width integer overflow limits; no arbitrary precision |
+| EngineeringLib | 3 | 8 | 472 | 6 | SOS Butterworth/Chebyshev I prototype orders 1–12; no equiripple, resampling or broader wavelet families |
+| FinanceLib | 0 | 3 | 71 | 2 | Documented rate/time conventions and bounded numerical models |
+| GeometryLib | 0 | 1 | 133 | 1 | Zero/non-finite normalization and degenerate constructions follow explicit contracts |
+| InterchangeLib | 1 | 1 | 14 | 1 | Selected model adapters; no arbitrary model/decomposition graph persistence |
+| MLLib | 1 | 2 | 129 | 3 | Dense in-memory serial PCA/clustering/forest baselines; no PLS until its next gate |
+| MathBase | 6 | 10 | 258 | 14 | Function-specific real domains and fixture budgets; no general symbolic algebra |
+| NumericsLib | 4 | 4 | 310 | 5 | Dense SDIRK2 stiff ODE baseline; no DAEs, mass matrices or sparse stiff systems |
+| OptimizationLib | 2 | 2 | 126 | 3 | Local and dense constrained baselines; no mixed-integer or certified global optimizer |
+| ProbabilityLib | 0 | 1 | 76 | 2 | Documented distribution parameter/domain conventions and finite scalar arithmetic |
+| StatsLib | 3 | 4 | 221 | 7 | Canonical Bernoulli/Poisson GLMs; no weights, offsets, regularization or robust covariance; moderate dense data |
+| TimeSeriesLib | 1 | 2 | 116 | 4 | Linear-Gaussian filtering/forecasting baseline; no missing-observation or smoothing workflow |
 
-## Qualification evidence for this release
+The snapshot contains 53 units and 3,178 declarations; the example catalogue contains 45 programs.
+Declarations include advanced, compatibility and specialization support; they
+are not a count of recommended application entry points.
 
-Qualification and evidence are published per release; the 1.9.9 set includes
-the [qualification report](../releases/1.9.9/qualification.md),
-[workflow qualification](../releases/1.9.8/workflow-qualification.md),
-[numerical evidence](../releases/1.9.4/numerical-evidence.md),
-[performance evidence](../releases/1.9.5/performance-evidence.md),
-[portability evidence](../releases/1.9.6/portability-evidence.md), and the
-[provenance audit](../releases/1.9.9/provenance-audit.md). The
-[capability inventory](../reference/capabilities.md) is the authority for maturity and
-limitations.
+## Current evidence
 
-## What this page does not measure
-
-Line counts and test-file counts are not the principal health measure and are
-not used to rank domains. As a secondary context note, the current `src/`
-contains about 49,400 lines of Pascal across 50 units, dominated by AlgebraLib
-(~17,200 lines) followed by EngineeringLib (~4,800) and MathBase (~4,600).
-Size reflects history and algorithm density, not health.
+See the [numerical catalogue](../releases/2.7.0/numerical-evidence.json),
+[workflow qualification](../releases/2.7.0/workflow-qualification.md),
+[performance contract](../releases/2.7.0/performance-evidence.json), and
+[support matrix](support.md). The [historical 1.9.9 provenance audit](../releases/1.9.9/provenance-audit.md)
+remains frozen evidence for its own baseline; new numerical families carry
+their own cited provenance and validation in the current release.

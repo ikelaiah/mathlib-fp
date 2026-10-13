@@ -24,3 +24,4 @@ needs. Compile with `src/` on the Free Pascal unit path.
 | Multiply two typed matrices | `AlgebraLib.DenseMatrices`, `AlgebraLib.DenseKernels` | `TDenseDoubleMatrix.FromArray`, `Multiply(A, B)` | [README quick start](../../README.md#1-multiply-two-matrices) |
 | Least-squares fit with diagnostics | `AlgebraLib.DenseDecompositions` | `LeastSquares(A, B, Info)` | [`16_dense_solver_selection.pas`](../../examples/16_dense_solver_selection.pas) |
 | Reproducible seeded random numbers | `MathBase.Random` | `TLocalRandom.Seeded(Seed)`, `NextUInt64` | [`20_interchange_replay.pas`](../../examples/20_interchange_replay.pas) |
+| Fit binary outcomes or integer counts | `StatsLib.GLM` | `TGLMKit.FitLogistic` / `FitPoisson`; inspect `Status` before `PredictMean` | [`44_generalized_linear_models.pas`](../../examples/44_generalized_linear_models.pas) |
