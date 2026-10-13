@@ -3,6 +3,8 @@
 **Status:** Scope and initial API contract finalized 13 October 2026.
 Sequence: [plan](plan-2.6.md). Acceptance: [checklist](todo-2.6.md).
 This specification implements the bounded [2.6.0 roadmap gate](../docs/project/roadmap.md#next-release-260--signal-processing-ii).
+The public representation and streaming-state choices are recorded in
+[ADR-0001](../docs/decisions/0001-stable-sos-iir-filters.md).
 
 ## Objective
 
@@ -119,6 +121,10 @@ test the designed coefficients themselves, rather than only a plotted or
 sampled output. Reference generation is development-only; normal tests and
 release qualification use checked-in values and require no Python numerical
 package or network.
+
+Regenerate and check the decimal coefficient corpus with
+`python tools/generate_sos_iir_reference.py` and
+`python tools/generate_sos_iir_reference.py --check`.
 
 Add a deterministic example that designs one filter, checks response and
 stability diagnostics, and processes one signal in multiple blocks while

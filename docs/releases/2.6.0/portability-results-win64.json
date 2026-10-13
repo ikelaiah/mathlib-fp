@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "release": "1.9.6",
+  "evidence_date": "2026-10-13",
+  "manifest": "docs/releases/1.9.6/portability-evidence.json",
+  "compiler_flags": [
+    "-O2"
+  ],
+  "compile_command": [
+    "fpc",
+    "-B",
+    "-O2",
+    "-FcUTF8",
+    "-FuC:\\Users\\iwank\\Documents\\github\\mathlib-fp\\src",
+    "-FUC:\\Users\\iwank\\Documents\\github\\mathlib-fp\\build-temp\\release-qualification-2.6.0\\portability",
+    "-FEC:\\Users\\iwank\\Documents\\github\\mathlib-fp\\build-temp\\release-qualification-2.6.0\\portability",
+    "C:\\Users\\iwank\\Documents\\github\\mathlib-fp\\tools\\PortabilityProbe.lpr"
+  ],
+  "compiler": {
+    "command": "fpc",
+    "version": "3.2.2",
+    "target_os": "win64",
+    "target_cpu": "x86_64"
+  },
+  "audit": {
+    "status": "pass",
+    "source_units": 52,
+    "package_dependencies": [
+      "FCL"
+    ],
+    "findings": [],
+    "categories": {
+      "filesystem": "No stable source opens repository-relative or absolute files implicitly; stream APIs are caller-owned.",
+      "locale": "Invariant interchange supplies explicit decimal settings; the native probe changes the process decimal separator.",
+      "endianness": "Binary persistence writes and reads explicit little-endian fields instead of record layouts.",
+      "floating_point": "The native probe records scalar sizes; the full numerical suite supplies tolerance and edge-case checks.",
+      "calling_convention": "No stable source declaration uses a foreign calling convention or external symbol.",
+      "address_space": "Typed storage uses SizeInt/SizeUInt and checked products; 32-bit tests exercise the secondary tier.",
+      "runtime_dependency": "Stable sources do not load libraries, spawn processes, or import network units; the package requires only FCL."
+    }
+  },
+  "status": "pass",
+  "target_id": "win64-x86_64",
+  "tier": "primary",
+  "required_profile": [
+    "normal-tests",
+    "optimized-tests",
+    "runtime-checked-heap-tests",
+    "examples-and-output-contracts",
+    "documentation-and-offline-html",
+    "numerical-and-mutation-evidence",
+    "performance-evidence",
+    "portability-probe-and-audit",
+    "lazarus-package",
+    "checksummed-clean-source-archive"
+  ],
+  "executed_checks": [
+    "portability-probe-and-audit"
+  ],
+  "observations": {
+    "release": "1.9.6",
+    "target_os": "win64",
+    "target_cpu": "x86_64",
+    "compiler_version": "3.2.2",
+    "pointer_bits": 64,
+    "sizeint_bits": 64,
+    "single_bytes": 4,
+    "double_bytes": 8,
+    "extended_bytes": 8,
+    "endian": "little",
+    "locale_guard": "pass",
+    "numerical_checksum": "3ff0000000000000",
+    "binary_fixture_hex": "4d465042494e310001000100010000000000000001000000000000000800000000000000e913f8c7000000000000f03f"
+  }
+}

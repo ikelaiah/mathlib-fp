@@ -1,10 +1,13 @@
 # Supported platform matrix
 
-Version 2.5.1 is a documentation-only patch: it changes no Pascal source or
-public API and does not reset the technical support evidence. Version 2.5.0
-adds reusable FFT/STFT plans and inverse STFT. It passed checksummed
-clean-archive qualification on Windows x86-64 and Linux x86-64. The support
-tiers below retain the 2.5.0 qualification as their latest technical evidence.
+Version 2.6.0 adds real-double Butterworth and Chebyshev Type I SOS IIR
+design and stateful streaming. Its local Windows qualification passed; the
+checksummed Linux/Windows archive runs are required before publication and are
+tracked in the [2.6.0 qualification report](../releases/2.6.0/qualification.md).
+Version 2.5.0 adds reusable FFT/STFT plans and inverse STFT. It passed
+checksummed clean-archive qualification on Windows x86-64 and Linux x86-64 and
+remains the latest completed primary archive qualification until the 2.6.0
+release workflow passes.
 Version 2.4.0 added reusable
 sparse-direct symbolic analysis and minimum-degree ordering while retaining
 the Free Pascal source and standard RTL/FCL runtime. The dense real-double
@@ -23,11 +26,11 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The current documentation release is 2.5.1; its technical baseline is 2.5.0.
-The 2.5.0 release qualification passed on 2026-10-12 from checksummed clean
-Linux and Windows archives. See the current
-[qualification record](../releases/2.5.0/qualification.md). The 2.4.0 and
-2.0.0 qualifications remain historical.
+The current release tree targets 2.6.0. Its local full qualification passed;
+the latest completed primary clean-archive evidence remains the 2.5.0 run from
+2026-10-12. See the 2.6.0 report for exact status and the 2.5.0 report for the
+currently retained Linux/Windows primary profiles. The 2.4.0 qualification is
+historical.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -37,8 +40,9 @@ Linux and Windows archives. See the current
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The qualified `v2.5.0` release has Linux and Windows primary evidence. See the
-linked qualification record for the run, qualified commit, and archive digests.
+The qualified `v2.5.0` release has Linux and Windows primary evidence. The
+2.6.0 local Windows result does not extend the target matrix or replace those
+archive claims before its cross-platform release workflow completes.
 
 ### Exact profiles
 

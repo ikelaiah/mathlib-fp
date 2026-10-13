@@ -344,6 +344,14 @@ def build_and_run_examples(
 def documentation_gates(
     qualification: Qualification, compiler: str, release: str,
 ) -> None:
+    qualification.run(
+        "sos-iir-reference-fixtures",
+        [
+            sys.executable,
+            str(ROOT / "tools" / "generate_sos_iir_reference.py"),
+            "--check",
+        ],
+    )
     for script in (
         "test_api_decision.py",
         "test_api_snapshot.py",

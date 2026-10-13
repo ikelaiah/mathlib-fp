@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.5.1",
+  "release": "2.6.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -275,7 +275,21 @@
       "example": "examples/19_applied_data_pipeline.pas",
       "benchmark": "benchmarks/BenchmarkRunner.lpr",
       "tests": "tests/TestAppliedNumerics.pas",
-      "limitations": ["finite inputs only", "overlap/FIR state is bounded by taps", "biquad retains two delay values", "equiripple and advanced IIR design plus wavelet packets remain open"]
+      "limitations": ["finite inputs only", "overlap/FIR state is bounded by taps", "biquad retains two delay values", "equiripple, Chebyshev Type II, elliptic/Bessel IIR design, and wavelet packets remain open"]
+    },
+    {
+      "family": "stable_sos_iir_filtering",
+      "unit": "EngineeringLib.DSP",
+      "entry_points": ["TIIRResponse", "TSOSCoefficients", "TSOSStabilityDiagnostics", "TSOSFrequencyResponse", "TStreamingSOSFilter", "DesignButterworthSOS", "DesignChebyshevISOS", "AnalyzeSOSStability", "EvaluateSOSResponse"],
+      "maturity": "stable",
+      "scalars": ["double"],
+      "shapes": ["real_second_order_section_cascade", "streaming_state"],
+      "complexity": "O(samples * sections) time and O(sections) retained state",
+      "accuracy": "100-digit Decimal coefficient and complex-response references; strict pole-radius stability checks; prewarped design edges",
+      "docs": "docs/guides/domains/applied-numerics.md",
+      "example": "examples/43_sos_iir_filter.pas",
+      "tests": "tests/TestSOSIIR.pas",
+      "limitations": ["prototype order 1 through 12; band responses have twice the prototype order", "real-double serial filtering only", "no automatic order selection, zero-phase filtering, or coefficient clipping"]
     },
     {
       "family": "typed_data_analysis",
@@ -324,7 +338,7 @@
       "family": "advanced_dsp_design_and_wavelets",
       "maturity": "unsupported",
       "scalars": [],
-      "limitations": ["Haar analysis/synthesis is stable; equiripple and Chebyshev/elliptic/Bessel design plus broader wavelets/wavelet packets remain conditional and unqualified"]
+      "limitations": ["stable SOS Butterworth and Chebyshev Type I design is available; Chebyshev Type II, elliptic/Bessel IIR design, broader wavelets, and wavelet packets remain unsupported"]
     },
     {
       "family": "statistical_inference_and_regression",

@@ -17,7 +17,7 @@ Acceptance is tracked in [todo-2.6.md](todo-2.6.md).
   the filter reusable and unchanged.
 - Keep plotting and GUI integration outside this release and library API.
 - Add high-precision or analytically independent fixtures, tests, docs, and a
-  single end-to-end example before candidate release metadata.
+  single end-to-end example before stable release metadata.
 
 ## Dependency order
 
@@ -29,7 +29,7 @@ spec and reference provenance
   -> SOS complex response and independent references
   -> streaming state, atomic blocks, restore/reset
   -> end-to-end example and user docs
-  -> API/capability/numerical evidence and candidate metadata
+  -> API/capability/numerical evidence and release metadata
   -> local/cross-platform qualification, PR, merge, tag and publication
 ```
 

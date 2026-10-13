@@ -292,6 +292,19 @@ type
 
     class function DesignButterworthLowPass(const NormalizedCutoff: Double):
       TBiquadCoefficients; static;
+    class function DesignButterworthSOS(const Response: TIIRResponse;
+      const Order: SizeInt; const SampleRateHz, CutoffHz: Double):
+      TSOSCoefficients; overload; static;
+    class function DesignButterworthSOS(const Response: TIIRResponse;
+      const Order: SizeInt; const SampleRateHz, LowCutoffHz,
+      HighCutoffHz: Double): TSOSCoefficients; overload; static;
+    class function DesignChebyshevISOS(const Response: TIIRResponse;
+      const Order: SizeInt; const SampleRateHz, CutoffHz,
+      PassbandRippleDb: Double): TSOSCoefficients; overload; static;
+    class function DesignChebyshevISOS(const Response: TIIRResponse;
+      const Order: SizeInt; const SampleRateHz, LowCutoffHz,
+      HighCutoffHz, PassbandRippleDb: Double): TSOSCoefficients;
+      overload; static;
     class function AnalyzeSOSStability(
       const Coefficients: TSOSCoefficients): TSOSStabilityDiagnostics; static;
     class function EvaluateSOSResponse(const Coefficients: TSOSCoefficients;
@@ -304,6 +317,16 @@ implementation
 const
   DIRECT_CONVOLUTION_THRESHOLD = 4096;
   DSP_PI: Double = 3.141592653589793238462643383279502884;
+  DSP_DOUBLE_EPSILON: Double = 2.220446049250313080847263336181640625E-16;
+  MAX_IIR_PROTOTYPE_ORDER = 12;
+
+type
+  TSOSRootPair = record
+    First: TComplex;
+    Second: TComplex;
+    FirstOrder: Boolean;
+  end;
+  TSOSRootPairArray = array of TSOSRootPair;
 
 procedure RequireFinite(const Values: TDoubleArray; const Operation: string);
 var
@@ -434,6 +457,439 @@ begin
     Result := Infinity
   else
     Result := Scale * LargestRoot;
+end;
+
+function IsEffectivelyRealRoot(const Value: TComplex): Boolean;
+begin
+  Result := Abs(Value.Im) <= 64.0 * DSP_DOUBLE_EPSILON *
+    Max(1.0, Abs(Value.Re));
+end;
+
+function PairSOSRoots(const Roots: TComplexArray;
+  const Operation: string): TSOSRootPairArray;
+var
+  Used: array of Boolean;
+  RealRoots: TDoubleArray;
+  I, J, BestIndex, RealCount, PairIndex: SizeInt;
+  BestDistance, Distance, Tolerance, RealPart, ImaginaryPart, Temp: Double;
+  Value, Candidate: TComplex;
+begin
+  if Length(Roots) = 0 then
+    raise EDSPError.Create(Operation + ': root set must not be empty.');
+  Result := nil;
+  SetLength(Used, Length(Roots));
+  SetLength(RealRoots, Length(Roots));
+  SetLength(Result, (Length(Roots) + 1) div 2);
+  PairIndex := 0;
+  RealCount := 0;
+  for I := 0 to High(Roots) do
+  begin
+    if Used[I] then Continue;
+    Value := Roots[I];
+    if not Value.IsFinite then
+      raise EDSPError.CreateFmt('%s: root %d is not finite.', [Operation, I]);
+    Used[I] := True;
+    if IsEffectivelyRealRoot(Value) then
+    begin
+      RealRoots[RealCount] := Value.Re;
+      Inc(RealCount);
+      Continue;
+    end;
+
+    BestIndex := -1;
+    BestDistance := Infinity;
+    for J := 0 to High(Roots) do
+      if (J <> I) and not Used[J] then
+      begin
+        Candidate := Roots[J];
+        Distance := (Candidate - Value.Conjugate).Magnitude;
+        if Distance < BestDistance then
+        begin
+          BestDistance := Distance;
+          BestIndex := J;
+        end;
+      end;
+    Tolerance := 1E-9 * Max(1.0, Value.Magnitude);
+    if (BestIndex < 0) or (BestDistance > Tolerance) then
+      raise EDSPError.CreateFmt(
+        '%s: root %d has no matching conjugate.', [Operation, I]);
+    Used[BestIndex] := True;
+    RealPart := 0.5 * (Value.Re + Roots[BestIndex].Re);
+    ImaginaryPart := 0.5 * (Abs(Value.Im) + Abs(Roots[BestIndex].Im));
+    Result[PairIndex].First := TComplex.Create(RealPart, ImaginaryPart);
+    Result[PairIndex].Second := Result[PairIndex].First.Conjugate;
+    Inc(PairIndex);
+  end;
+
+  for I := 1 to RealCount - 1 do
+  begin
+    Temp := RealRoots[I];
+    J := I;
+    while (J > 0) and (RealRoots[J - 1] > Temp) do
+    begin
+      RealRoots[J] := RealRoots[J - 1];
+      Dec(J);
+    end;
+    RealRoots[J] := Temp;
+  end;
+  for I := 0 to (RealCount div 2) - 1 do
+  begin
+    Result[PairIndex].First := TComplex.Create(RealRoots[2 * I], 0.0);
+    Result[PairIndex].Second := TComplex.Create(RealRoots[2 * I + 1], 0.0);
+    Inc(PairIndex);
+  end;
+  if (Length(Roots) mod 2) <> 0 then
+  begin
+    if (RealCount mod 2) = 0 then
+      raise EDSPError.Create(Operation + ': odd root set has no real singleton.');
+    Result[PairIndex].First := TComplex.Create(RealRoots[RealCount - 1], 0.0);
+    Result[PairIndex].Second := TComplex.Zero;
+    Result[PairIndex].FirstOrder := True;
+    Inc(PairIndex);
+  end
+  else if (RealCount mod 2) <> 0 then
+    raise EDSPError.Create(Operation + ': even root set has an unmatched real root.');
+
+  if PairIndex <> Length(Result) then
+    raise EDSPError.Create(Operation + ': root pairing count is inconsistent.');
+end;
+
+procedure SOSPolynomialFromRoots(const Pair: TSOSRootPair;
+  out FirstCoefficient, SecondCoefficient: Double; const Operation: string);
+var
+  SumRoots, ProductRoots: TComplex;
+begin
+  if Pair.FirstOrder then
+  begin
+    FirstCoefficient := -Pair.First.Re;
+    SecondCoefficient := 0.0;
+    Exit;
+  end;
+  SumRoots := Pair.First + Pair.Second;
+  ProductRoots := Pair.First * Pair.Second;
+  if (Abs(SumRoots.Im) > 1E-10 * Max(1.0, Abs(SumRoots.Re))) or
+     (Abs(ProductRoots.Im) > 1E-10 * Max(1.0, Abs(ProductRoots.Re))) then
+    raise EDSPError.Create(Operation + ': paired roots do not form real coefficients.');
+  FirstCoefficient := -SumRoots.Re;
+  SecondCoefficient := ProductRoots.Re;
+end;
+
+function PrewarpIIRFrequency(const SampleRateHz, FrequencyHz: Double;
+  const Operation: string): Double;
+var
+  Ratio, Angle: Double;
+begin
+  if IsNan(FrequencyHz) or IsInfinite(FrequencyHz) or
+     (FrequencyHz <= 0.0) or (FrequencyHz >= SampleRateHz * 0.5) then
+    raise EDSPError.Create(Operation + ': cutoff must lie strictly between DC and Nyquist.');
+  Ratio := FrequencyHz / SampleRateHz;
+  Angle := DSP_PI * Ratio;
+  if (Ratio <= 0.0) or (Ratio >= 0.5) or
+     (Angle <= 0.0) or (Angle >= DSP_PI * 0.5) then
+    raise EDSPError.Create(Operation + ': cutoff is outside the representable prewarping range.');
+  Result := Tan(Angle);
+  if IsNan(Result) or IsInfinite(Result) or (Result <= 0.0) then
+    raise EDSPError.Create(Operation + ': cutoff prewarping is not finite.');
+end;
+
+function ChebyshevPassbandEpsilon(const RippleDb: Double): Double;
+var
+  Exponent, Delta: Double;
+begin
+  Exponent := RippleDb * (Ln(10.0) / 10.0);
+  if RippleDb < 1E-6 then
+  begin
+    Delta := Exponent;
+    Result := Sqrt(RippleDb) * Sqrt(Ln(10.0) / 10.0) *
+      Sqrt(1.0 + Delta * 0.5 + Delta * Delta / 6.0);
+  end
+  else
+    Result := Sqrt(Exp(Exponent) - 1.0);
+end;
+
+function ChebyshevArcSinh(const Value: Double): Double;
+begin
+  if Value < 1E150 then
+    Result := Ln(Value + Sqrt(Value * Value + 1.0))
+  else
+    Result := Ln(Value) + Ln(2.0);
+end;
+
+function BuildIIRPrototypePoles(const Order: SizeInt;
+  const Chebyshev: Boolean; const RippleDb: Double;
+  out Epsilon: Double): TComplexArray;
+var
+  I: SizeInt;
+  Angle, Mu: Double;
+begin
+  Result := nil;
+  SetLength(Result, Order);
+  Epsilon := 0.0;
+  if Chebyshev then
+  begin
+    Epsilon := ChebyshevPassbandEpsilon(RippleDb);
+    if (Epsilon <= 0.0) or IsNan(Epsilon) or IsInfinite(Epsilon) then
+      raise EDSPError.Create('DesignChebyshevISOS: ripple has no finite epsilon representation.');
+    Mu := ChebyshevArcSinh(1.0 / Epsilon) / Order;
+    for I := 0 to Order - 1 do
+    begin
+      Angle := DSP_PI * (2.0 * I + 1.0) / (2.0 * Order);
+      Result[I] := TComplex.Create(-Sinh(Mu) * Sin(Angle),
+        Cosh(Mu) * Cos(Angle));
+    end;
+  end
+  else
+    for I := 0 to Order - 1 do
+    begin
+      Angle := DSP_PI * (2.0 * I + 1.0 + Order) / (2.0 * Order);
+      Result[I] := TComplex.Create(Cos(Angle), Sin(Angle));
+    end;
+end;
+
+function MapIIRPoleToDigital(const AnalogPole: TComplex;
+  const Operation: string): TComplex;
+var
+  Denominator: TComplex;
+begin
+  Denominator := TComplex.One - AnalogPole;
+  if (Denominator.Re = 0.0) and (Denominator.Im = 0.0) then
+    raise EDSPError.Create(Operation + ': bilinear pole mapping is singular.');
+  Result := (TComplex.One + AnalogPole) / Denominator;
+  if not Result.IsFinite then
+    raise EDSPError.Create(Operation + ': bilinear pole mapping overflowed.');
+end;
+
+function TransformIIRPoles(const Prototype: TComplexArray;
+  const Response: TIIRResponse; const LowWarped, HighWarped: Double):
+  TComplexArray;
+var
+  I, OutputIndex: SizeInt;
+  Pole, DiscriminantRoot, Value1, Value2: TComplex;
+  Bandwidth, Center: Double;
+begin
+  Result := nil;
+  if Response in [irLowPass, irHighPass] then
+    SetLength(Result, Length(Prototype))
+  else
+    SetLength(Result, 2 * Length(Prototype));
+  OutputIndex := 0;
+  if Response in [irBandPass, irBandStop] then
+  begin
+    Bandwidth := HighWarped - LowWarped;
+    Center := Sqrt(LowWarped * HighWarped);
+  end
+  else
+  begin
+    Bandwidth := LowWarped;
+    Center := LowWarped;
+  end;
+
+  for I := 0 to High(Prototype) do
+  begin
+    Pole := Prototype[I];
+    case Response of
+      irLowPass:
+        Value1 := Pole * LowWarped;
+      irHighPass:
+        Value1 := TComplex.Create(LowWarped, 0.0) / Pole;
+      irBandPass:
+        begin
+          DiscriminantRoot := CSqrt(
+            (Pole * Bandwidth) * (Pole * Bandwidth) - 4.0 * Sqr(Center));
+          Value1 := (Pole * Bandwidth + DiscriminantRoot) * 0.5;
+          Value2 := (Pole * Bandwidth - DiscriminantRoot) * 0.5;
+        end;
+      irBandStop:
+        begin
+          DiscriminantRoot := CSqrt(TComplex.Create(Sqr(Bandwidth), 0.0) -
+            (Pole * Pole) * (4.0 * Sqr(Center)));
+          Value1 := (TComplex.Create(Bandwidth, 0.0) + DiscriminantRoot) /
+            (Pole * 2.0);
+          Value2 := (TComplex.Create(Bandwidth, 0.0) - DiscriminantRoot) /
+            (Pole * 2.0);
+        end;
+    end;
+    if not Value1.IsFinite then
+      raise EDSPError.Create('IIR design: analog pole transform overflowed.');
+    Result[OutputIndex] := MapIIRPoleToDigital(Value1, 'IIR design');
+    Inc(OutputIndex);
+    if Response in [irBandPass, irBandStop] then
+    begin
+      if not Value2.IsFinite then
+        raise EDSPError.Create('IIR design: analog pole transform overflowed.');
+      Result[OutputIndex] := MapIIRPoleToDigital(Value2, 'IIR design');
+      Inc(OutputIndex);
+    end;
+  end;
+end;
+
+function BuildDigitalIIRZeros(const Order: SizeInt; const Response: TIIRResponse;
+  const LowWarped, HighWarped: Double): TComplexArray;
+var
+  I, Count: SizeInt;
+  Center, Denominator: Double;
+  PositiveZero: TComplex;
+begin
+  Result := nil;
+  if Response in [irLowPass, irHighPass] then
+    Count := Order
+  else
+    Count := 2 * Order;
+  SetLength(Result, Count);
+  case Response of
+    irLowPass:
+      for I := 0 to Order - 1 do Result[I] := TComplex.Create(-1.0, 0.0);
+    irHighPass:
+      for I := 0 to Order - 1 do Result[I] := TComplex.One;
+    irBandPass:
+      for I := 0 to Order - 1 do
+      begin
+        Result[I] := TComplex.One;
+        Result[Order + I] := TComplex.Create(-1.0, 0.0);
+      end;
+    irBandStop:
+      begin
+        Center := Sqrt(LowWarped * HighWarped);
+        Denominator := 1.0 + Sqr(Center);
+        PositiveZero := TComplex.Create(
+          (1.0 - Sqr(Center)) / Denominator,
+          (2.0 * Center) / Denominator);
+        for I := 0 to Order - 1 do
+        begin
+          Result[I] := PositiveZero;
+          Result[Order + I] := PositiveZero.Conjugate;
+        end;
+      end;
+  end;
+end;
+
+function ComplexLogMagnitude(const Value: TComplex;
+  const Operation: string): Double;
+var
+  Scale, NormalizedMagnitude: Double;
+begin
+  if not Value.IsFinite then
+    raise EDSPError.Create(Operation + ': non-finite section response.');
+  Scale := Max(Abs(Value.Re), Abs(Value.Im));
+  if Scale = 0.0 then
+    raise EDSPError.Create(Operation + ': zero section response at normalization frequency.');
+  NormalizedMagnitude := Sqrt(Sqr(Value.Re / Scale) + Sqr(Value.Im / Scale));
+  Result := Ln(Scale) + Ln(NormalizedMagnitude);
+end;
+
+procedure EvaluateSOSSection(const Coefficients: TBiquadCoefficients;
+  const FrequencyFraction: Double; out Numerator, Denominator: TComplex);
+var
+  Angle: Double;
+  ZInverse, ZInverseSquared: TComplex;
+begin
+  Angle := 2.0 * DSP_PI * FrequencyFraction;
+  ZInverse := TComplex.Create(Cos(Angle), -Sin(Angle));
+  ZInverseSquared := ZInverse * ZInverse;
+  Numerator := TComplex.Create(Coefficients.B0, 0.0) +
+    ZInverse * Coefficients.B1 + ZInverseSquared * Coefficients.B2;
+  Denominator := TComplex.Create(1.0, 0.0) +
+    ZInverse * Coefficients.A1 + ZInverseSquared * Coefficients.A2;
+end;
+
+function DesignSOSInternal(const Response: TIIRResponse; const Order: SizeInt;
+  const SampleRateHz, CutoffOrLowHz, HighCutoffHz, RippleDb: Double;
+  const Chebyshev: Boolean): TSOSCoefficients;
+var
+  Prototype, DigitalPoles, DigitalZeros: TComplexArray;
+  PolePairs, ZeroPairs: TSOSRootPairArray;
+  I: SizeInt;
+  LowWarped, HighWarped, Center, ReferenceHz, ReferenceGainLog: Double;
+  Epsilon, SectionGainLog, SectionGain: Double;
+  Numerator, Denominator: TComplex;
+  Diagnostics: TSOSStabilityDiagnostics;
+begin
+  Result := nil;
+  if (Order < 1) or (Order > MAX_IIR_PROTOTYPE_ORDER) then
+    raise EDSPError.CreateFmt(
+      'IIR design: prototype order must be between 1 and %d.',
+      [MAX_IIR_PROTOTYPE_ORDER]);
+  if IsNan(SampleRateHz) or IsInfinite(SampleRateHz) or
+     (SampleRateHz <= 0.0) then
+    raise EDSPError.Create('IIR design: SampleRateHz must be finite and positive.');
+  if (Response < irLowPass) or (Response > irBandStop) then
+    raise EDSPError.Create('IIR design: Response is not a valid filter type.');
+  if Chebyshev and (IsNan(RippleDb) or IsInfinite(RippleDb) or
+     (RippleDb <= 0.0) or (RippleDb > 12.0)) then
+    raise EDSPError.Create(
+      'DesignChebyshevISOS: PassbandRippleDb must be in (0, 12].');
+  if Response in [irLowPass, irHighPass] then
+  begin
+    if HighCutoffHz <> 0.0 then
+      raise EDSPError.Create('IIR design: single-edge response has an unexpected second edge.');
+    LowWarped := PrewarpIIRFrequency(SampleRateHz, CutoffOrLowHz, 'IIR design');
+    HighWarped := 0.0;
+  end
+  else
+  begin
+    if IsNan(HighCutoffHz) or IsInfinite(HighCutoffHz) or
+       (HighCutoffHz <= CutoffOrLowHz) then
+      raise EDSPError.Create('IIR design: band edges must be finite and strictly increasing.');
+    LowWarped := PrewarpIIRFrequency(SampleRateHz, CutoffOrLowHz, 'IIR design');
+    HighWarped := PrewarpIIRFrequency(SampleRateHz, HighCutoffHz, 'IIR design');
+  end;
+
+  Prototype := BuildIIRPrototypePoles(Order, Chebyshev, RippleDb, Epsilon);
+  DigitalPoles := TransformIIRPoles(Prototype, Response, LowWarped, HighWarped);
+  DigitalZeros := BuildDigitalIIRZeros(Order, Response, LowWarped, HighWarped);
+  PolePairs := PairSOSRoots(DigitalPoles, 'IIR design poles');
+  ZeroPairs := PairSOSRoots(DigitalZeros, 'IIR design zeros');
+  if Length(PolePairs) <> Length(ZeroPairs) then
+    raise EDSPError.Create('IIR design: pole and zero section counts differ.');
+
+  SetLength(Result, Length(PolePairs));
+  for I := 0 to High(Result) do
+  begin
+    Result[I].B0 := 1.0;
+    SOSPolynomialFromRoots(ZeroPairs[I], Result[I].B1, Result[I].B2,
+      'IIR design zeros');
+    SOSPolynomialFromRoots(PolePairs[I], Result[I].A1, Result[I].A2,
+      'IIR design poles');
+  end;
+
+  if Response = irHighPass then
+    ReferenceHz := SampleRateHz * 0.5
+  else if Response = irBandPass then
+  begin
+    Center := Sqrt(LowWarped * HighWarped);
+    ReferenceHz := SampleRateHz * ArcTan(Center) / DSP_PI;
+  end
+  else
+    ReferenceHz := 0.0;
+
+  ReferenceGainLog := 0.0;
+  if Chebyshev and ((Order mod 2) = 0) then
+    ReferenceGainLog := -0.5 * Ln(1.0 + Sqr(Epsilon));
+  for I := 0 to High(Result) do
+  begin
+    EvaluateSOSSection(Result[I], ReferenceHz / SampleRateHz,
+      Numerator, Denominator);
+    if (Denominator.Re = 0.0) and (Denominator.Im = 0.0) then
+      raise EDSPError.CreateFmt('IIR design: section %d has a singular normalization response.', [I]);
+    SectionGainLog := ReferenceGainLog / Length(Result) -
+      (ComplexLogMagnitude(Numerator, 'IIR design') -
+       ComplexLogMagnitude(Denominator, 'IIR design'));
+    if (SectionGainLog > 709.0) or (SectionGainLog < -740.0) then
+      raise EDSPError.CreateFmt('IIR design: section %d gain is not representable.', [I]);
+    SectionGain := Exp(SectionGainLog);
+    if IsNan(SectionGain) or IsInfinite(SectionGain) or (SectionGain = 0.0) then
+      raise EDSPError.CreateFmt('IIR design: section %d gain is not representable.', [I]);
+    Result[I].B0 := Result[I].B0 * SectionGain;
+    Result[I].B1 := Result[I].B1 * SectionGain;
+    Result[I].B2 := Result[I].B2 * SectionGain;
+  end;
+
+  RequireFiniteSOS(Result, 'IIR design');
+  Diagnostics := TDSPKit.AnalyzeSOSStability(Result);
+  if not Diagnostics.IsStable then
+    raise EDSPError.CreateFmt(
+      'IIR design: digital section %d is not strictly stable.',
+      [Diagnostics.FirstUnstableSection]);
 end;
 
 function CheckedSizeAdd(const LeftValue, RightValue: SizeInt;
@@ -2106,6 +2562,50 @@ begin
   Result.B2 := Result.B0;
   Result.A1 := -2.0 * Cosine / A0;
   Result.A2 := (1.0 - Alpha) / A0;
+end;
+
+class function TDSPKit.DesignButterworthSOS(const Response: TIIRResponse;
+  const Order: SizeInt; const SampleRateHz, CutoffHz: Double):
+  TSOSCoefficients;
+begin
+  if not (Response in [irLowPass, irHighPass]) then
+    raise EDSPError.Create(
+      'DesignButterworthSOS: this overload requires a low-pass or high-pass response.');
+  Result := DesignSOSInternal(Response, Order, SampleRateHz, CutoffHz, 0.0,
+    0.0, False);
+end;
+
+class function TDSPKit.DesignButterworthSOS(const Response: TIIRResponse;
+  const Order: SizeInt; const SampleRateHz, LowCutoffHz,
+  HighCutoffHz: Double): TSOSCoefficients;
+begin
+  if not (Response in [irBandPass, irBandStop]) then
+    raise EDSPError.Create(
+      'DesignButterworthSOS: this overload requires a band-pass or band-stop response.');
+  Result := DesignSOSInternal(Response, Order, SampleRateHz, LowCutoffHz,
+    HighCutoffHz, 0.0, False);
+end;
+
+class function TDSPKit.DesignChebyshevISOS(const Response: TIIRResponse;
+  const Order: SizeInt; const SampleRateHz, CutoffHz,
+  PassbandRippleDb: Double): TSOSCoefficients;
+begin
+  if not (Response in [irLowPass, irHighPass]) then
+    raise EDSPError.Create(
+      'DesignChebyshevISOS: this overload requires a low-pass or high-pass response.');
+  Result := DesignSOSInternal(Response, Order, SampleRateHz, CutoffHz, 0.0,
+    PassbandRippleDb, True);
+end;
+
+class function TDSPKit.DesignChebyshevISOS(const Response: TIIRResponse;
+  const Order: SizeInt; const SampleRateHz, LowCutoffHz,
+  HighCutoffHz, PassbandRippleDb: Double): TSOSCoefficients;
+begin
+  if not (Response in [irBandPass, irBandStop]) then
+    raise EDSPError.Create(
+      'DesignChebyshevISOS: this overload requires a band-pass or band-stop response.');
+  Result := DesignSOSInternal(Response, Order, SampleRateHz, LowCutoffHz,
+    HighCutoffHz, PassbandRippleDb, True);
 end;
 
 class function TDSPKit.AnalyzeSOSStability(

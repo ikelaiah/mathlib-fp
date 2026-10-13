@@ -227,6 +227,17 @@
         "edited RMS change ="
       ],
       "final_line": "SPECTRAL_PLAN_EXAMPLE_OK"
+    },
+    {
+      "path": "examples/43_sos_iir_filter.pas",
+      "contains": [
+        "filter: Butterworth low-pass, sections = 2",
+        "stability: stable, maximum pole radius =",
+        "response: cutoff gain =",
+        "streaming: 10 blocks, 4 state values",
+        "tones: 30-Hz amplitude ="
+      ],
+      "final_line": "workflow: success"
     }
   ]
 }
