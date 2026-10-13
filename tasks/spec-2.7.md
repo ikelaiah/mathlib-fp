@@ -56,7 +56,8 @@ through the log link. Backtracking accepts only finite non-increasing
 deviance (allowing 8 binary64 epsilons times 1 + previous deviance for summation
 roundoff), with at most 40 halvings per IRLS step. Convergence requires both
 relative deviance and the unhalved scaled correction, so a shortened step
-cannot manufacture convergence. Iteration limits and stalled
+cannot manufacture convergence. Its linear-predictor correction must also be
+small, and the requested tolerance is at most 0.01. Iteration limits and stalled
 steps are explicit results. Numerical overflow becomes numerical failure with
 the last finite iterate rather than false convergence.
 

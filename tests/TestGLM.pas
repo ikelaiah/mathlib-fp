@@ -60,13 +60,13 @@ begin
     for J := 0 to X.Cols - 1 do
     begin
       AssertEquals('reference coefficient', GLMReferences[C].Coefficients[J],
-        Fit.Coefficients[J], 2E-8 * Max(1, Abs(GLMReferences[C].Coefficients[J])));
+        Fit.Coefficients[J], 2E-8 * Max(Double(1), Abs(GLMReferences[C].Coefficients[J])));
       AssertEquals('reference standard error', GLMReferences[C].Errors[J],
-        Fit.StandardErrors[J], 2E-8 * Max(1, GLMReferences[C].Errors[J]));
+        Fit.StandardErrors[J], 2E-8 * Max(Double(1), GLMReferences[C].Errors[J]));
     end;
     for I := 0 to X.Rows - 1 do
       AssertEquals('reference fitted mean', GLMReferences[C].Means[I],
-        Fit.FittedMeans[I], 2E-9 * Max(1, GLMReferences[C].Means[I]));
+        Fit.FittedMeans[I], 2E-9 * Max(Double(1), GLMReferences[C].Means[I]));
     AssertEquals('reference deviance', GLMReferences[C].Deviance, Fit.Deviance, 2E-8);
     AssertEquals('reference Pearson chi-square', GLMReferences[C].Pearson,
       Fit.PearsonChiSquare, 2E-8);
@@ -146,6 +146,7 @@ begin
   ExpectFitError(X, TDoubleArray.Create(0, 0.5), O, True);
   O.MaxIterations := 0; ExpectFitError(X, Y, O);
   O := TGLMOptions.Default; O.Tolerance := NaN; ExpectFitError(X, Y, O);
+  O := TGLMOptions.Default; O.Tolerance := 0.1; ExpectFitError(X, Y, O);
   O := TGLMOptions.Default; O.RankTolerance := 0; ExpectFitError(X, Y, O);
   O := TGLMOptions.Default; O.MinimumConditionIndicator := 1.1;
   ExpectFitError(X, Y, O);
@@ -207,13 +208,16 @@ begin
 end;
 
 procedure TGLMTest.TestQuasiSeparationNeverConverges;
-var X: IDenseDoubleMatrix; Fit: TGLMFitResult;
+var X: IDenseDoubleMatrix; Fit: TGLMFitResult; O: TGLMOptions;
 begin
   X := TDenseDoubleMatrix.FromValues(4,2,[1,-1, 1,0, 1,0, 1,1]);
   Fit := TGLMKit.FitLogistic(X,TDoubleArray.Create(0,0,1,1));
   AssertTrue('quasi-separation is not a converged finite estimate', Fit.Status <> glsConverged);
   AssertFalse('quasi-separated information is not reported as identifiable', Fit.Identifiable);
   AssertEquals('quasi-separated standard errors withheld', 0, Length(Fit.StandardErrors));
+  O := TGLMOptions.Default; O.Tolerance := 0.01;
+  Fit := TGLMKit.FitLogistic(X,TDoubleArray.Create(0,0,1,1),O);
+  AssertTrue('loose supported tolerance does not invent a finite MLE', Fit.Status <> glsConverged);
 end;
 
 procedure TGLMTest.TestPoissonBoundaryAndNoIntercept;

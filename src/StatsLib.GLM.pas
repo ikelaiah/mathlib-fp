@@ -93,7 +93,7 @@ begin
     raise EGLMError.Create('GLM fit: response length must equal rows, with rows >= columns.');
   if (Options.MaxIterations < 1) or (Options.MaxIterations > 10000) or
      not Finite(Options.Tolerance) or (Options.Tolerance <= 0) or
-     (Options.Tolerance >= 1) or not Finite(Options.RankTolerance) or
+     (Options.Tolerance > 0.01) or not Finite(Options.RankTolerance) or
      (Options.RankTolerance <= 0) or (Options.RankTolerance >= 1) or
      not Finite(Options.MinimumConditionIndicator) or
      (Options.MinimumConditionIndicator <= 0) or
@@ -320,7 +320,7 @@ var X, Target, Solution: IDenseDoubleMatrix; Factor: IDenseDoubleQR;
     NewEtas: TDoubleArray;
   I, J, Iteration, Halving: SizeInt;
   RootWeight, NewDeviance, OldDeviance, Step, Change, BetaNorm, FullChange,
-    Average: Double;
+    Average, LinearChange, EtaNorm, Correction: Double;
   Accepted, Representable, ConstantColumn: Boolean;
 begin
   ValidateFit(Design, Y, Options, Family);
@@ -335,21 +335,21 @@ begin
     if Scales[J] = 0 then Scales[J] := 1;
     for I := 0 to Design.Rows - 1 do X[I,J] := Design[I,J] / Scales[J];
   end;
-  if Family = gfPoissonLog then
-  begin
-    Average := 0;
-    for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
-    if Finite(Average) and (Average > 0) and (Ln(Average) < 700) then
-      for J := 0 to X.Cols - 1 do
-      begin
-        ConstantColumn := X[0,J] <> 0;
-        for I := 1 to X.Rows - 1 do
-          ConstantColumn := ConstantColumn and (X[I,J] = X[0,J]);
-        if ConstantColumn then
-        begin Beta[J] := Ln(Average) / X[0,J]; Break; end;
-      end;
-  end;
   try
+    if Family = gfPoissonLog then
+    begin
+      Average := 0;
+      for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
+      if Finite(Average) and (Average > 0) and (Ln(Average) < 700) then
+        for J := 0 to X.Cols - 1 do
+        begin
+          ConstantColumn := X[0,J] <> 0;
+          for I := 1 to X.Rows - 1 do
+            ConstantColumn := ConstantColumn and (X[I,J] = X[0,J]);
+          if ConstantColumn then
+          begin Beta[J] := Ln(Average) / X[0,J]; Break; end;
+        end;
+    end;
     if not Evaluate(X, Y, Beta, Family, Means, Weights, Etas, Result.Deviance) then
       raise EGLMError.Create('GLM initial objective is not representable.');
     Result.HasFiniteIterate := True;
@@ -366,7 +366,16 @@ begin
         BetaNorm := Max(BetaNorm, Abs(Beta[J]));
       end;
       FullChange := Change;
-      if (Change <= Options.Tolerance * (1 + BetaNorm)) and
+      LinearChange := 0; EtaNorm := 0;
+      for I := 0 to X.Rows - 1 do
+      begin
+        Correction := 0;
+        for J := 0 to X.Cols - 1 do Correction := Correction + X[I,J] * Solution[J,0];
+        LinearChange := Max(LinearChange, Abs(Correction));
+        EtaNorm := Max(EtaNorm, Abs(Etas[I]));
+      end;
+      if (LinearChange <= Options.Tolerance * (1 + EtaNorm)) and
+         (Change <= Options.Tolerance * (1 + BetaNorm)) and
          ((Length(Result.DevianceHistory) = 1) or
           (Result.DevianceHistory[Length(Result.DevianceHistory)-2] - Result.Deviance
            <= Options.Tolerance * (1 + Result.Deviance))) then
@@ -405,6 +414,7 @@ begin
       Result.DevianceHistory[High(Result.DevianceHistory)] := NewDeviance;
       if BoundaryStatus(Y, Etas, Family, Result.Status) then Break;
       if (FullChange <= Options.Tolerance * (1 + BetaNorm)) and
+         (LinearChange <= Options.Tolerance * (1 + EtaNorm)) and
          (OldDeviance - NewDeviance <= Options.Tolerance * (1 + NewDeviance)) then
       begin
         Result.Status := glsConverged; Break;
