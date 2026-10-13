@@ -2,6 +2,16 @@
 
 Contract: [spec](spec-2.6.md). Sequence: [plan](plan-2.6.md).
 
+**Published:** `v2.6.0` points to qualified main commit `a2dea33`. See
+[implementation PR #69](https://github.com/ikelaiah/mathlib-fp/pull/69),
+[qualification docs PR #70](https://github.com/ikelaiah/mathlib-fp/pull/70),
+[the GitHub release](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.6.0),
+[exact-commit CI](https://github.com/ikelaiah/mathlib-fp/actions/runs/38367955549),
+[release qualification](https://github.com/ikelaiah/mathlib-fp/actions/runs/38368964761),
+and [documentation deployment](https://github.com/ikelaiah/mathlib-fp/actions/runs/38368964724).
+The published offline documentation SHA-256 is
+`12b81ccec724fe26473de27945a2412e05c4b856d63cb303206c5038849d54cc`.
+
 ## 1. Stability and response foundations
 
 - [x] Add the public SOS response and stability diagnostic records and API.
@@ -80,10 +90,10 @@ changelog, VERSION, package, README, API/capability records, support policy.
   qualification on the release tree.
 - [x] Obtain green Linux/Windows exact-commit CI and full hosted release
   qualification before tagging.
-- [ ] Create and merge the PR under repository release policy; tag exact main
+- [x] Create and merge the PR under repository release policy; tag exact main
   commit `v2.6.0`, publish title `mathlib-fp 2.6.0`, and use only changelog
   entries in the release body (do not repeat the title there).
-- [ ] Verify checksummed source/offline-doc archives, attachment, and deployed
+- [x] Verify checksummed source/offline-doc archives, attachment, and deployed
   versioned site; finish qualification evidence.
 
 **Acceptance:** Published release artifacts resolve to the qualified exact
