@@ -76,9 +76,9 @@ changelog, VERSION, package, README, API/capability records, support policy.
   package build and consumer gates.
 - [x] Review the implementation and complete the documentation, API, numerical,
   performance, portability, migration, workflow, and convergence gates.
-- [ ] Run the Win32 package consumer and Linux/Windows checksummed clean-archive
+- [x] Run the Win32 package consumer and Linux/Windows checksummed clean-archive
   qualification on the release tree.
-- [ ] Obtain green Linux/Windows exact-commit CI and full hosted release
+- [x] Obtain green Linux/Windows exact-commit CI and full hosted release
   qualification before tagging.
 - [ ] Create and merge the PR under repository release policy; tag exact main
   commit `v2.6.0`, publish title `mathlib-fp 2.6.0`, and use only changelog

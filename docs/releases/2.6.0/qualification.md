@@ -1,8 +1,10 @@
 # v2.6.0 qualification record
 
-**Result:** The full local Windows qualification passed 130 gates on
-2026-10-13. GitHub-hosted checksummed Linux/Windows archive qualification and
-exact default-branch CI remain required before tagging.
+**Result:** The full local Windows qualification passed 130 gates, exact-main
+CI passed, and GitHub-hosted checksummed Linux/Windows clean-archive
+qualification passed on 2026-10-13. The [release qualification workflow]
+(https://github.com/ikelaiah/mathlib-fp/actions/workflows/release-qualification.yml)
+retains the hosted run artifacts and runs again for the published tag.
 
 ## Scope and source baseline
 
@@ -33,8 +35,10 @@ baseline, above the 1.5 review band. These spectral-plan timings are unrelated
 to the new SOS API; no SOS performance claim is made. See
 [`performance-results.json`](performance-results.json).
 
-## Published-tag results
+## Publication workflow
 
-Pending the exact default-branch commit's green CI, checksummed clean-archive
-qualification on Linux and Windows, and documentation deployment. The local
-qualification did not claim network isolation or a cross-platform result.
+The exact-main Linux and Windows CI jobs and both checksummed clean-archive
+qualification jobs passed before tagging. The release event reruns qualification
+from the immutable tag; the documentation workflow deploys the versioned site
+and attaches the offline HTML archive with its SHA-256 file. These hosted
+results are separate from the local Windows run above.
