@@ -93,7 +93,7 @@ begin
     raise EGLMError.Create('GLM fit: response length must equal rows, with rows >= columns.');
   if (Options.MaxIterations < 1) or (Options.MaxIterations > 10000) or
      not Finite(Options.Tolerance) or (Options.Tolerance <= 0) or
-     (Options.Tolerance > 0.01) or not Finite(Options.RankTolerance) or
+     (Options.Tolerance > Double(0.01)) or not Finite(Options.RankTolerance) or
      (Options.RankTolerance <= 0) or (Options.RankTolerance >= 1) or
      not Finite(Options.MinimumConditionIndicator) or
      (Options.MinimumConditionIndicator <= 0) or
