@@ -9,3 +9,8 @@ Use this baseline for moderate dense problems; bounded iteration does not
 remove the dense memory cost. Existing benchmark correctness, allocation and
 storage checks remain release gates, with timing comparisons reported
 according to their retained pass/review policy.
+
+The local 133-gate qualification passed its benchmark hard checks. One
+allocating FFT N=65536 timing row returned advisory `review` at 1.561x its
+matching-host 2.4.0 baseline; see [measurements](performance-results.json).
+This timing is outside the new GLM family.

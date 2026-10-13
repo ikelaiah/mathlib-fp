@@ -1,12 +1,11 @@
 # Supported platform matrix
 
 Version 2.7.0 adds real-double logistic and Poisson generalized linear models.
-Focused and normal Windows tests passed; full local qualification and hosted
-exact-commit/clean-archive results are being collected before tagging. See the
+Full local Windows qualification passed 133 gates, and hosted Linux/Windows
+CI and checksummed clean-archive qualification passed on 2026-10-14. See the
 [2.7.0 qualification report](../releases/2.7.0/qualification.md).
 The retained 2.6.0 Linux/Windows clean-archive qualification passed on
-2026-10-13, and remains the completed primary evidence until the new release
-qualification passes. Version 2.6.0 added stable SOS IIR filtering and 2.5.0
+2026-10-13. Version 2.6.0 added stable SOS IIR filtering and 2.5.0
 added reusable FFT/STFT plans and inverse STFT.
 Version 2.4.0 added reusable
 sparse-direct symbolic analysis and minimum-degree ordering while retaining
@@ -26,19 +25,22 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The current release tree targets 2.7.0. Exact target qualification is tracked
-in its report above; previous evidence is retained below until those checks
-finish. No target claim is inferred from another platform.
+The current release tree targets 2.7.0. Its full local qualification and hosted
+Linux/Windows clean-archive qualification passed. Exact source and publication
+gates are recorded in the report above. No target claim is inferred from
+another platform.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.6.0 clean-archive qualification, 2026-10-13 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.6.0 clean-archive qualification, 2026-10-13 | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.7.0 clean-archive qualification, 2026-10-14 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.7.0 clean-archive qualification, 2026-10-14 | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The retained 2.6.0 release tree is qualified on both primary profiles.
+The 2.7.0 release tree is qualified on both primary profiles. Local and hosted
+Win32 complete-suite/package checks also passed, retaining its bounded
+secondary profile.
 This does not add qualification claims for other operating systems, CPUs, or
 compiler versions.
 

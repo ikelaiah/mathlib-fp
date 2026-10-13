@@ -137,8 +137,10 @@ All returned arrays are freshly owned and inputs are not retained. Ordinary
 Pascal record assignment aliases dynamic arrays; use `Copy` before editing an
 array in a copied result. Separate fits and predictions share no mutable
 global state. Prediction returns a fresh array, handles large finite logits
-as probabilities rounded to 0 or 1, and raises `EGLMError` for a
-nonrepresentable linear predictor or Poisson inverse link.
+as probabilities rounded to 0 or 1. Poisson predictions require
+`abs(eta) <= 700`, matching the bounded inverse-link evaluation domain.
+An unsupported inverse-link domain or nonrepresentable linear predictor raises
+`EGLMError`.
 
 ## Numerical evidence and compatibility
 

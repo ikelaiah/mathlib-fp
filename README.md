@@ -72,6 +72,8 @@ The release also provides a [checksummed source tarball](https://github.com/ikel
 with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.tar.gz.sha256),
 and a [source ZIP](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.zip)
 with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.7.0/mathlib-fp-2.7.0.zip.sha256).
+These checksum-bearing archives have repository files at their root; extract
+into a new directory, then add `src/` to the compiler unit path.
 
 ### 1. Multiply two matrices
 

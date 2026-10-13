@@ -1,0 +1,13 @@
+{
+  "release": "2.7.0",
+  "compiler": "FPC 3.2.2",
+  "target": "i386-win32",
+  "flags": [
+    "-O2",
+    "-gl",
+    "-FcUTF8"
+  ],
+  "tests": 1025,
+  "errors": 0,
+  "failures": 0
+}

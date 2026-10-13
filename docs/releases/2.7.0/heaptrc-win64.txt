@@ -1,0 +1,7 @@
+C:\Users\iwank\Documents\github\mathlib-fp\build-temp\release-2.7.0-final\tests\checked-heap\bin\TestRunner.exe -a --format=plain 
+Heap dump by heaptrc unit of C:\Users\iwank\Documents\github\mathlib-fp\build-temp\release-2.7.0-final\tests\checked-heap\bin\TestRunner.exe
+18039974 memory blocks allocated : 5507327622/5583457224
+18039974 memory blocks freed     : 5507327622/5583457224
+0 unfreed memory blocks : 0
+True heap size : 720896 (288 used in System startup)
+True free heap : 720608

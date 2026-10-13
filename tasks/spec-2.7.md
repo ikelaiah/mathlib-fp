@@ -33,7 +33,8 @@ aliasing rules, so callers use `Copy` before editing a copied array. There is
 no hidden mutable state. Standard errors are present only for a converged,
 identifiable fit and use the inverse expected information with dispersion 1.
 Prediction validates the entire design and returns fresh storage; it rejects
-nonconverged results and nonrepresentable inverse-link results.
+nonconverged results and nonrepresentable inverse-link results. Poisson
+prediction uses the same bounded inverse-link domain, `abs(eta) <= 700`.
 
 Results expose family, status, message, iteration count, numerical rank,
 condition indicator, identifiable and finite-iterate flags, coefficients, fitted means, response
