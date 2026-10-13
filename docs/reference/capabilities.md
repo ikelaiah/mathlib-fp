@@ -33,7 +33,8 @@ Target qualifications and platform-specific limitations are defined by the
 | Shared iteration diagnostics | Stable | Result metadata | Algorithms expose only statuses applicable to their model |
 | Explicit local random state | Stable | UInt64 state; single/double output | Reproducible simulation stream, not cryptographic; mutable instances require caller synchronization |
 | Online and mergeable statistics | Stable | Double real | Constant retained state; moments through variance only |
-| Applied DSP | Stable | Single/double real/complex | Batch/arbitrary/2-D transforms, direct/FFT/overlap convolution, spectra, Haar, and bounded filter state |
+| Applied DSP | Stable | Single/double real/complex | Batch/arbitrary/2-D transforms, direct/FFT/overlap convolution, spectra, Haar, and bounded FIR/biquad state |
+| Stable SOS IIR filtering | Stable | Double real | Butterworth and Chebyshev Type I in four responses; prototype order 1–12; explicit streaming state and pole/response diagnostics |
 | Reusable spectral plans | Stable | Double real and double complex | Fixed geometry; serial plans reject overlapping use; arbitrary FFT lengths use cached Bluestein workspace; STFT returns full spectra and pads both boundaries |
 | Statistical inference and regression | Stable | Double real | Paired distribution APIs, estimation/tests/corrections, SVD OLS, and binary logistic with identifiability status |
 | Typed data analysis | Stable | Double real dense | PCA, seeded clustering/splits/forests, fitted standardization, binary LDA, and exact low-dimensional KD tree |

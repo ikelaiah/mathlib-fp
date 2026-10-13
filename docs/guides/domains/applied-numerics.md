@@ -126,6 +126,40 @@ reporting.
   biquad. `TStreamingBiquad` uses transposed direct form II and zero initial
   state.
 
+For a higher-order IIR filter, `DesignButterworthSOS` and
+`DesignChebyshevISOS` return a cascade of normalized second-order sections
+(SOS). The response overloads accept a prototype order from 1 through 12, a
+sample rate in hertz, and either one cutoff for low/high-pass or two ordered
+cutoffs for band-pass/band-stop. Band-pass and band-stop total order is twice
+the prototype order. Edges must be strictly between DC and Nyquist. Chebyshev
+Type I additionally takes a passband-ripple value in `(0, 12]` dB; its
+passband peak is normalized to one. Butterworth critical edges are at
+`1/sqrt(2)` gain. Digital edge prewarping preserves the specified edge
+frequencies.
+
+`TDSPKit.AnalyzeSOSStability` reports the maximum pole radius, strict stability,
+and unit-circle margin. `EvaluateSOSResponse` returns complex responses in
+caller-specified hertz from DC through Nyquist. Each `TBiquadCoefficients`
+section represents
+`(B0 + B1*z^-1 + B2*z^-2) / (1 + A1*z^-1 + A2*z^-2)`; the denominator constant
+is one. Designers return real conjugate-paired sections rather than expanding
+a high-order polynomial.
+
+`TStreamingSOSFilter.Create` snapshots finite stable coefficients and begins
+with zero state. `ProcessBlock` uses transposed direct form II and preserves
+state between calls. `State` returns copied `[z1,z2]` pairs, and
+`RestoreState` resumes a stream from a finite snapshot of the same length.
+`Reset` returns to zero state. A complete invalid or overflowing block leaves
+the previous state unchanged. Copying the value record gives an independent
+future stream; callers must synchronize concurrent access to one record.
+Filter designs or responses outside the finite supported range raise
+`EDSPError` rather than silently clipping coefficients.
+
+See the runnable [SOS IIR workflow](../../../examples/43_sos_iir_filter.pas)
+for response/stability inspection and a two-tone signal processed in multiple
+blocks. The existing `DesignButterworthLowPass` and `TStreamingBiquad` remain
+available for a single second-order section.
+
 Normalized cutoff is cycles/sample in `(0, 0.5)`. FIR and biquad processing
 assume zero state after construction or `Reset`. A complete invalid block is
 rejected before state advances, including arithmetic overflow; spectral
@@ -272,9 +306,9 @@ binary, network, GUI, or hidden global state.
 
 ## Important open items
 
-The 1.8 stable boundary does not claim equiripple filters,
-Chebyshev/elliptic/Bessel IIR design, wavelet packets, survival/factor
-analysis, robust covariance families, controlled or smoothed state-space
+The stable boundary does not claim equiripple filters, Chebyshev Type II,
+elliptic/Bessel IIR design, automatic filter-order selection, wavelet packets,
+survival/factor analysis, robust covariance families, controlled or smoothed state-space
 models, or parallel/SIMD execution. Logistic regression is the only new
 generalized-linear-model family. See the [capability inventory](../../reference/capabilities.md)
 rather than inferring support from the roadmap.

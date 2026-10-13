@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.5.1" src="https://img.shields.io/badge/version-2.5.1-brightgreen.svg">
+  <img alt="Version 2.6.0" src="https://img.shields.io/badge/version-2.6.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,11 +26,10 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.5.1 is the current stable documentation release.** It updates release
-> guidance and the roadmap; it does not change Pascal source or public APIs.
-> The latest capability release is 2.5.0, which adds reusable FFT/STFT plans
-> and inverse STFT. Review the [2.5.1 release notes](docs/releases/2.5.1/release-notes.md),
-> [2.5.0 performance evidence](docs/releases/2.5.0/performance-evidence.md),
+> **2.6.0 is the current stable release.** It adds stable SOS IIR design and
+> streaming for Butterworth and Chebyshev Type I low-pass, high-pass,
+> band-pass, and band-stop filters. See the [2.6.0 release notes](docs/releases/2.6.0/release-notes.md),
+> [qualification record](docs/releases/2.6.0/qualification.md),
 > [capability inventory](docs/reference/capabilities.md), and
 > [changelog](CHANGELOG.md) when evaluating an upgrade.
 
@@ -43,7 +42,7 @@ domain.
 Get the source directly with git:
 
 ```bash
-git clone --depth 1 --branch v2.5.1 \
+git clone --depth 1 --branch v2.6.0 \
   https://github.com/ikelaiah/mathlib-fp.git
 ```
 
@@ -51,21 +50,21 @@ or as a source archive with `wget`:
 
 ```bash
 wget \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.5.1.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.6.0.tar.gz
 ```
 
 or with `curl`:
 
 ```bash
 curl -L -o mathlib-fp.tar.gz \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.5.1.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.6.0.tar.gz
 ```
 
 > No package manager or install step is required for direct source use; add
 > `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
 
 Direct source use is canonical. The
-[2.5.1 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.5.1)
+[2.6.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.6.0)
 is the source of published stable `.zip`, `.tar.gz`, offline documentation,
 and checksum artifacts.
 

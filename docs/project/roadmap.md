@@ -201,8 +201,8 @@ vector arithmetic is new public API and belongs to 1.4.0.
 
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
 Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
-2.5.0. Version 2.5.1 is a documentation-only patch; the next capability gate
-is 2.6.0, defined below. The later 2.7.0–3.0.0 gates give an ordered plan, not
+2.5.0. Version 2.5.1 was a documentation-only patch; 2.6.0 completed the
+next capability gate below. The later 2.7.0–3.0.0 gates give an ordered plan, not
 date promises or final public API designs. Other candidate lanes remain
 uncommitted directions.
 
@@ -849,7 +849,7 @@ and
 [reusable direct factors](../guides/domains/sparse-linear-algebra.md#reusable-direct-factors) for
 the current baseline.
 
-## Previous release: 2.5.1 — Documentation-only maintenance
+## 2.5.1 — Documentation-only maintenance
 
 Version 2.5.1 updates current release links and package metadata, preserves the
 2.5.0 site as history, and makes the next five capability gates explicit. It
@@ -882,7 +882,7 @@ SIMD/threaded backends, broader filters/wavelets/resampling, new PSD estimators
 and unrelated dense/sparse optimization are outside this gate. Performance
 remains an evidence-led track across releases.
 
-## Next release: 2.6.0 — Signal Processing II
+## Previous release: 2.6.0 — Signal Processing II
 
 Deliver a bounded, stable IIR filtering workflow built around second-order
 sections (SOS): Butterworth and Chebyshev Type I low-pass, high-pass, band-pass,
@@ -890,13 +890,15 @@ and band-stop designs for real-double signals. The workflow includes explicit
 filter-state ownership for streaming application, response evaluation, and
 stability/design validation diagnostics.
 
-The release gate requires independent reference cases for coefficients and
-frequency response, edge and invalid-design coverage, streaming continuity
-checks, runnable examples, documented numerical limits, and the supported
-platform CI profile. It does not include FIR design, resampling/polyphase
-methods, DCT/DST, wavelets, or accelerated backends.
+Version 2.6.0 delivers the bounded SOS design and streaming workflow, with
+independent coefficient/response fixtures, edge and invalid-design coverage,
+and a runnable example. It does not include FIR design, resampling/polyphase
+methods, DCT/DST, wavelets, or accelerated backends. The local Windows
+qualification passed; exact-commit and clean-archive platform status is in the
+[qualification record](../releases/2.6.0/qualification.md). See also the
+[release notes](../releases/2.6.0/release-notes.md).
 
-## Planned release: 2.7.0 — Statistics II
+## Next release: 2.7.0 — Statistics II
 
 Add a real-double generalized linear model baseline for logistic and Poisson
 regression using documented logit/log links and iteratively reweighted least

@@ -62,6 +62,8 @@ If a task is not supported by a documented entry point, it is marked
 | Windowed-sinc FIR low-pass filter | `EngineeringLib.Signal` | `TSignalKit.DesignFIRLowPass(Cutoff, Order, Window)`; `ApplyFIRFilter` | [`24_sensor_pipeline.pas`](../../examples/24_sensor_pipeline.pas) |
 | Block convolution with a finite impulse response | `EngineeringLib.DSP` | `TOverlapAddConvolver.ProcessBlock` then `Flush` | [`21_release_1_8_workflows.pas`](../../examples/21_release_1_8_workflows.pas) |
 | Repeatedly analyze, edit, and reconstruct a finite signal | `EngineeringLib.DSP` | `TSTFTPlan.AnalyzeInto`; edit conjugate bins; `SynthesizeInto` | [`42_spectral_plan_reconstruction.pas`](../../examples/42_spectral_plan_reconstruction.pas) |
+| Design a stable low-pass or band-pass IIR filter | `EngineeringLib.DSP` | `DesignButterworthSOS` or `DesignChebyshevISOS`; inspect `AnalyzeSOSStability` and `EvaluateSOSResponse` | [`43_sos_iir_filter.pas`](../../examples/43_sos_iir_filter.pas) |
+| Apply an IIR filter across streaming blocks | `EngineeringLib.DSP` | `TStreamingSOSFilter.Create`; `ProcessBlock`; save/restore `State` | [`43_sos_iir_filter.pas`](../../examples/43_sos_iir_filter.pas) |
 
 ## NumericsLib
 

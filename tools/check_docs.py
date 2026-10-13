@@ -40,8 +40,8 @@ def layout_path(name: str, legacy: str) -> Path:
     return LAYOUT.artifact(name)
 
 
-NEXT_RELEASE = "2.6.0"
-PUBLISHED_STABLE = "2.5.1"
+NEXT_RELEASE = "2.7.0"
+PUBLISHED_STABLE = "2.6.0"
 # The current release snapshot owns every source unit present in this tree.
 UNRELEASED_SOURCE_UNITS: set[str] = set()
 UNRELEASED_INTERFACE_CHANGES: dict[str, dict[str, str]] = {}
@@ -60,6 +60,7 @@ CURRENT_REFERENCE_PATH = layout_path(
 FROZEN_1_9_SNAPSHOT_SHA256 = "bade8ef2810d0b70183436ef83792488ff308b2955e51564e08afb49596816f0"
 FROZEN_1_9_REFERENCE_SHA256 = "59b7ac1e1431b0d97c7bfc2015588ab21a0509b35787127186a96e843f76943b"
 HISTORICAL_RELEASES = [
+    "2.5.1",
     "2.5.0",
     "2.4.0",
     "2.3.2",
@@ -616,6 +617,15 @@ def main() -> int:
         "TNonFinitePolicy",
         "TDSPKit",
         "TFFTNormalization",
+        "TIIRResponse",
+        "TSOSCoefficients",
+        "TSOSStabilityDiagnostics",
+        "TSOSFrequencyResponse",
+        "TStreamingSOSFilter",
+        "DesignButterworthSOS",
+        "DesignChebyshevISOS",
+        "AnalyzeSOSStability",
+        "EvaluateSOSResponse",
         "TComplexBatch",
         "TSingleComplexBatch",
         "TOverlapAddConvolver",
