@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 2.8.x | :white_check_mark: |
 | 2.7.x | :white_check_mark: |
 | 2.6.x | :white_check_mark: |
 | 2.5.x | :white_check_mark: |
@@ -26,8 +27,8 @@ The 2.3.x line is supported through 2027-04-08, six months after the 2.4.0
 publication. The 2.4.x line is supported through 2027-04-12, six months after
 the 2.5.0 publication. The 2.5.x line is supported through 2027-04-13, six
 months after the 2.6.0 publication. The 2.6.x line is supported through 2027-04-14, six months after
-the 2.7.0 publication. The 2.7.x line is supported until the earlier of one
-year after publication or six months after 2.8.0 is published.
+the 2.7.0 publication. The 2.7.x line is supported through 2027-04-14, six
+months after the 2.8.0 publication.
 Security support for the 1.10.x and 1.9.x lines ended on
 2026-03-21, six months after 2.0.0 was published. Security fixes are published
 as patch releases for every supported affected line with

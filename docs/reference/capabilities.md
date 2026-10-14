@@ -38,6 +38,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Reusable spectral plans | Stable | Double real and double complex | Fixed geometry; serial plans reject overlapping use; arbitrary FFT lengths use cached Bluestein workspace; STFT returns full spectra and pads both boundaries |
 | Statistical inference and regression | Stable | Double real | Paired distribution APIs, estimation/tests/corrections, SVD OLS, and binary logistic with identifiability status |
 | Canonical generalized linear models | Stable (v2.7.0) | Double real | Bernoulli logit and Poisson log; explicit design/intercept; finite information and convergence required; no weights, offsets, regularization or robust covariance |
+| Partial least-squares regression | Stable (v2.8.0) | Double real | One continuous response, dense complete rows, rank-limited PLS1 and random K-fold selection; no multi-response, imputation, robust fitting or confidence intervals |
 | Typed data analysis | Stable | Double real dense | PCA, seeded clustering/splits/forests, fitted standardization, binary LDA, and exact low-dimensional KD tree |
 | Linear-Gaussian state space | Stable | Double real | Scalar and dense multivariate Kalman filtering/forecasting; no controls, missing observations, or smoothing |
 | Numerical interchange and inspection | Stable | Single/double real/complex and random state | Coordinate double/complex Matrix Market and four-scalar sparse binary; independent nonzero/per-axis dimension caps |
@@ -55,10 +56,12 @@ Target qualifications and platform-specific limitations are defined by the
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.7.0 capability inventory. It adds canonical logistic and
-Poisson GLMs to the existing statistical inference workflows, alongside the
-stable SOS IIR and reusable spectral processing paths. Qualification status
-is recorded in the [current release report](../releases/2.7.0/qualification.md).
+This is the 2.8.0 capability inventory. It adds a focused PLS1 regression
+workflow with deterministic cross-validation component selection for
+correlated predictors. Qualification status is recorded in the
+[current release report](../releases/2.8.0/qualification.md). It carries
+forward the v2.7.0 logistic and Poisson GLM families, stable SOS IIR filtering,
+and reusable spectral processing.
 Sparse direct solving now includes a
 reusable minimum-degree symbolic analysis and sparse numeric LU. The
 [MathBase guide](../guides/domains/math-base.md)

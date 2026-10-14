@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.7.0",
+  "release": "2.8.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -1212,6 +1212,39 @@
         "separation certificates are not an exhaustive LP classifier",
         "information boundaries: logistic abs(eta) < 36 and Poisson abs(eta) < 700",
         "dispersion fixed at one; no robust covariance"
+      ]
+    },
+    {
+      "family": "partial_least_squares_regression",
+      "unit": "MLLib.PLS",
+      "entry_points": [
+        "EPLSError",
+        "TPLSOptions",
+        "TPLSStatus",
+        "TPLSModel",
+        "TPLSKit",
+        "Fit",
+        "Predict"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "double"
+      ],
+      "shapes": [
+        "rows_as_observations",
+        "correlated_predictors",
+        "single_continuous_response"
+      ],
+      "complexity": "dense O(F*(n*p*r + n*r^2)) fitting and cross-validation work for F folds, n rows, p predictors, and r components; O(n*p + n*r + p*r) working storage",
+      "accuracy": "80-digit Decimal independent coefficients and pooled RMSECV references, analytic linear identities, and rank/constant/failure checks",
+      "docs": "docs/guides/domains/machine-learning.md",
+      "example": "examples/45_partial_least_squares.pas",
+      "tests": "tests/TestPLS.pas",
+      "limitations": [
+        "one continuous response only; no multi-response PLS2",
+        "complete dense row-major data only; missing values are rejected",
+        "random K-fold validation assumes exchangeable observations",
+        "no robust fitting, confidence intervals, or feature-importance scores"
       ]
     }
   ]

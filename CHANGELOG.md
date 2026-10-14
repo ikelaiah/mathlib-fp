@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.8.0] - 2026-10-14
+
+### Added
+
+- Added dense real-double PLS1 regression for correlated predictors, with
+  predictor scaling, rank-aware component limits, deterministic cross-validated
+  RMSE selection, original-unit coefficients, and prediction.
+- Added high-precision Decimal fit/CV references, analytic and adversarial
+  tests, a runnable correlated-predictor example, and model-selection guidance.
+
+### Documentation
+
+- Updated the current API, capability inventory, examples, package metadata,
+  release roadmap, and versioned documentation for Data Analysis II.
+
 ## [2.7.0] - 2026-10-14
 
 ### Added

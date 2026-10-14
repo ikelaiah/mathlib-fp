@@ -26,6 +26,7 @@ uses
   , TestFinanceAliases
   , TestStatsLib
   , TestGLM
+  , TestPLS
   , TestEngineeringLib
   , TestEngineeringLib_FluidDynamics
   , TestEngineeringLib_Signal
