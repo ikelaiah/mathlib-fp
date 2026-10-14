@@ -121,6 +121,7 @@ If a task is not supported by a documented entry point, it is marked
 | Task | Unit | Entry point | Runnable example |
 | ---- | ---- | ----------- | ---------------- |
 | Fit a linear regression model | `MLLib.MachineLearning` | `TMLKit.LinearRegression(X, Y)` | [`11_machinelearning.pas`](../../examples/11_machinelearning.pas) |
+| Regression with correlated predictors | `MLLib.PLS` | `TPLSKit.Fit(X, Y)`; inspect `SelectedComponents` and `RMSECV` | [`45_partial_least_squares.pas`](../../examples/45_partial_least_squares.pas) |
 | Fit a logistic-regression classifier | `MLLib.MachineLearning` | `TMLKit.LogisticRegression(TrainX, TrainY)`; `LogisticPredict` | [`11_machinelearning.pas`](../../examples/11_machinelearning.pas) |
 | Reproducible train/test split | `MLLib.MachineLearning` | `TMLKit.TrainTestSplit(X, Y, Fraction, Seed, TrainX, ...)` | [`11_machinelearning.pas`](../../examples/11_machinelearning.pas) |
 | Cluster data with k-means | `MLLib.MachineLearning` | `TMLKit.KMeans(X, K)` | [`11_machinelearning.pas`](../../examples/11_machinelearning.pas) |

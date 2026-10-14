@@ -52,6 +52,7 @@ jobs:
         run: |
           release="$(cat VERSION)"
           python3 tools/generate_sos_iir_reference.py --check
+          python3 tools/generate_pls_reference.py --check
           python3 tools/test_api_decision.py
           python3 tools/test_api_snapshot.py
           python3 tools/test_doc_examples.py
@@ -200,6 +201,8 @@ jobs:
         run: |
           $release = (Get-Content VERSION).Trim()
           python tools/generate_sos_iir_reference.py --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/generate_pls_reference.py --check
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/test_api_decision.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

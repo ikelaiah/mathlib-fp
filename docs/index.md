@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The current release is 2.7.0, adding [logistic and Poisson regression](guides/domains/generalized-linear-models.md). Consult the [2.7.0 API reference](reference/api/reference-2.7.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md) for the current technical baseline.
+The current release is 2.8.0, adding [PLS regression for correlated predictors](guides/domains/machine-learning.md#partial-least-squares-regression). Consult the [2.8.0 API reference](reference/api/reference-2.8.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md) for the current technical baseline.
 
 ## Domains
 

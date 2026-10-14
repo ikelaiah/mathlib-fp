@@ -202,7 +202,8 @@ vector arithmetic is new public API and belongs to 1.4.0.
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
 Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
 2.5.0. Version 2.5.1 was a documentation-only patch; 2.6.0 completed the
-Signal Processing II gate; 2.7.0 completes Statistics II. The later 2.8.0–3.0.0 gates give an ordered plan, not
+Signal Processing II gate, 2.7.0 completed Statistics II, and 2.8.0 completes
+Data Analysis II. The later 2.9.0–3.0.0 gates give an ordered plan, not
 date promises or final public API designs. Other candidate lanes remain
 uncommitted directions.
 
@@ -898,6 +899,30 @@ qualification passed; exact-commit and clean-archive platform status is in the
 [qualification record](../releases/2.6.0/qualification.md). See also the
 [release notes](../releases/2.6.0/release-notes.md).
 
+## Previous release: 2.8.0 — Data Analysis II
+
+Add a focused partial least squares (PLS) regression workflow for centered and
+scaled multivariate predictors, with component selection, prediction, and
+cross-validation diagnostics. Define behavior for constant columns, rank
+deficiency, missing data, and component counts beyond the available rank.
+Validate against independent fixtures and demonstrate prediction on a
+correlated-variable example.
+
+Non-negative matrix factorization, independent component analysis, canonical
+correlation, and incremental/truncated PCA are not part of this gate. They stay
+candidate lanes until their contracts and maintenance case are separately
+reviewed.
+
+Version 2.8.0 delivers dense real-double PLS1 regression for one continuous
+response, predictor scaling, deterministic leakage-free K-fold component
+selection, rank/constant/missing-value contracts, original-scale prediction,
+independent Decimal references, and the correlated-predictor example. It does
+not include multi-response PLS2, imputation, robust fitting, confidence
+intervals, or dependency-aware time/group folds. See the
+[PLS guide](../guides/domains/machine-learning.md#partial-least-squares-regression),
+[release notes](../releases/2.8.0/release-notes.md), and
+[qualification report](../releases/2.8.0/qualification.md).
+
 ## Previous release: 2.7.0 — Statistics II
 
 Add a real-double generalized linear model baseline for logistic and Poisson
@@ -917,21 +942,7 @@ See the [GLM guide](../guides/domains/generalized-linear-models.md),
 [release notes](../releases/2.7.0/release-notes.md) and
 [qualification record](../releases/2.7.0/qualification.md).
 
-## Next release: 2.8.0 — Data Analysis II
-
-Add a focused partial least squares (PLS) regression workflow for centered and
-scaled multivariate predictors, with component selection, prediction, and
-cross-validation diagnostics. Define behavior for constant columns, rank
-deficiency, missing data, and component counts beyond the available rank.
-Validate against independent fixtures and demonstrate prediction on a
-correlated-variable example.
-
-Non-negative matrix factorization, independent component analysis, canonical
-correlation, and incremental/truncated PCA are not part of this gate. They stay
-candidate lanes until their contracts and maintenance case are separately
-reviewed.
-
-## Planned release: 2.9.0 — Optimization II
+## Next release: 2.9.0 — Optimization II
 
 Provide a reproducible bounded global-search baseline for scalar objectives,
 with explicit bounds, evaluation budgets, deterministic seed/state, stopping

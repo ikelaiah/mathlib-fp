@@ -250,6 +250,15 @@
         "separation: no finite logistic MLE"
       ],
       "final_line": "GLM workflow: success"
+    },
+    {
+      "path": "examples/45_partial_least_squares.pas",
+      "contains": [
+        "validation: 5 folds, 2 components selected",
+        "RMSECV: mean only=5.126896, 1=2.263450, 2=0.000000",
+        "predict: 5.275000"
+      ],
+      "final_line": "workflow: success"
     }
   ]
 }

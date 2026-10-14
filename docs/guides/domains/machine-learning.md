@@ -23,6 +23,7 @@ a small row-major `TDoubleMatrix`, allocates a fitted model, and prints
 | --- | --- | --- |
 | Scale features | fitted standardisation for train/test work | [Preprocessing](#preprocessing) |
 | Continuous prediction | `LinearRegression` / typed `FitOLS` | [Regression](#regression) |
+| Regression with correlated predictors | `TPLSKit.Fit` | [PLS regression](#partial-least-squares-regression) |
 | Classification | logistic, KNN, or forest by data/diagnostics | [Classification](#classification) |
 | Unlabelled grouping | seeded k-means++ or hierarchical clustering | [Clustering](#clustering) |
 | Lower-dimensional representation | typed PCA | [Dimensionality reduction](#dimensionality-reduction) |
@@ -265,6 +266,56 @@ YHat := TMLKit.LinearPredict(model, Xnew);
 ```
 
 Applies a fitted LinearRegression or RidgeRegression model to new data.
+
+### Partial least-squares regression
+
+Use `MLLib.PLS.TPLSKit.Fit` when predictor columns carry overlapping
+information and ordinary least squares is sensitive to their collinearity.
+This focused PLS1 workflow models one continuous response, standardizes
+predictors by default, and selects the component count by deterministic
+cross-validation:
+
+```pascal
+uses MathBase.SharedTypes, MLLib.MachineLearning, MLLib.PLS;
+
+var
+  X, NewRows: TDoubleMatrix;
+  Y, Predicted: TDoubleArray;
+  Model: TPLSModel;
+begin
+  X := TDoubleMatrix.Create(
+    TDoubleArray.Create(0.0, 0.0),
+    TDoubleArray.Create(1.0, 2.0),
+    TDoubleArray.Create(2.0, 4.0),
+    TDoubleArray.Create(3.0, 6.0),
+    TDoubleArray.Create(4.0, 8.0),
+    TDoubleArray.Create(5.0, 10.0));
+  Y := TDoubleArray.Create(1.0, 3.0, 5.0, 7.0, 9.0, 11.0);
+  Model := TPLSKit.Fit(X, Y);
+  NewRows := TDoubleMatrix.Create(TDoubleArray.Create(6.0, 12.0));
+  Predicted := TPLSKit.Predict(Model, NewRows);
+  WriteLn('components selected: ', Model.SelectedComponents);
+  WriteLn('prediction: ', Predicted[0]:0:1);
+end;
+```
+
+`RMSECV[0]` is the fold-training-mean baseline; index `k` reports pooled
+root-mean-square prediction error with `k` components. The selected model uses
+the smallest component count attaining the lowest RMSECV. The default uses
+five folds (or `N-1` when there are fewer than six observations) and seed
+1729. Each fold learns preprocessing from its training rows only. Random
+folds assume exchangeable observations; they do not account for time or group
+dependencies.
+
+Constant predictors remain in the coefficient vector with coefficient zero
+and do not count toward numerical rank. Collinear columns reduce the measured
+rank; the default component cap follows that rank. A requested cap above rank
+raises `EPLSError`. Non-finite and missing values are rejected before fitting.
+A constant response yields a valid mean-only model. Multi-response PLS,
+imputation, robust fitting, and confidence intervals are outside this release.
+See [example 45](../../../examples/45_partial_least_squares.pas) for a complete
+correlated-predictor workflow and [ADR 0003](../../decisions/0003-pls-regression.md)
+for the API and numerical choices.
 
 ---
 

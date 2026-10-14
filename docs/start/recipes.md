@@ -25,6 +25,7 @@ callbacks, options, or result statuses are unfamiliar.
 | --- | --- | --- |
 | Dense square solve | [Typed dense solve](../guides/domains/typed-dense-matrices.md#60-second-solve) | [Dense solver choice](../guides/domains/dense-linear-algebra.md#choose-a-dense-solver) |
 | Dense least squares | [Least-squares program](../guides/domains/dense-linear-algebra.md#60-second-least-squares-solve) | [QR, CPQR, and SVD contracts](../guides/domains/dense-linear-algebra.md#choose-a-dense-solver) |
+| Regression with correlated predictors | [PLS workflow example](../../examples/45_partial_least_squares.pas) | [Component selection and limits](../guides/domains/machine-learning.md#partial-least-squares-regression) |
 | Sparse solve | [Sparse CG program](../guides/domains/sparse-linear-algebra.md#sixty-second-sparse-solve) | [Iterative solver choice](../guides/domains/sparse-linear-algebra.md#choose-an-iterative-solver) |
 | Descriptive statistics | [Statistics quick start](../guides/domains/statistics.md#quick-start) | [Inference and regression choice](../guides/domains/statistics.md#inference-distributions-and-regression-in-18) |
 | Streaming statistics | [Online spectral summary](../guides/domains/applied-numerics.md#60-second-workflow) | [Mergeable statistics contract](../guides/domains/applied-numerics.md#online-and-mergeable-statistics) |
@@ -54,6 +55,17 @@ QR rather than normal equations. The checked program prints
 `intercept=3.500 slope=1.400` and its residual. Use CPQR when rank is uncertain
 and SVD when a minimum-norm result is required. Each call returns a newly
 allocated double-real result; reusable factors retain a copied factorisation.
+
+## Correlated predictor regression
+
+Use [`TPLSKit.Fit`](../guides/domains/machine-learning.md#partial-least-squares-regression)
+when several measured variables carry overlapping information. It centers and
+by default scales predictor columns, selects a component count by seeded
+cross-validation, and stores original-unit coefficients for prediction. The
+checked [PLS example](../../examples/45_partial_least_squares.pas) selects two
+components from three correlated columns and predicts `5.275000`. Read the
+RMSECV and rank diagnostics; random fold validation assumes exchangeable rows,
+and missing values are rejected.
 
 ## Sparse solve
 
