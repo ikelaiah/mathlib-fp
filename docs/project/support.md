@@ -3,7 +3,8 @@
 Version 2.8.0 adds dense real-double PLS1 regression for correlated predictors.
 Full local Windows qualification passed 136 gates on 2026-10-14. The
 [2.8.0 qualification report](../releases/2.8.0/qualification.md) records the
-results; hosted Linux/Windows and clean-source-archive gates remain pending.
+results; hosted Linux/Windows CI and checksummed clean-source-archive
+qualification passed on 2026-10-14.
 The retained 2.6.0 Linux/Windows clean-archive qualification passed on
 2026-10-13. Version 2.6.0 added stable SOS IIR filtering and 2.5.0
 added reusable FFT/STFT plans and inverse STFT.
@@ -26,23 +27,21 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 ## Support tiers and current evidence
 
 The current release tree targets 2.8.0. Its full local Windows qualification
-passed. Hosted Linux/Windows CI and checksummed clean-source-archive
-qualification remain pending. No target claim is inferred from another platform.
+passed, as did hosted Linux/Windows CI and checksummed clean-source-archive
+qualification. No target claim is inferred from another platform.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.8.0 local qualification, 2026-10-14 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.7.0 clean-archive qualification, 2026-10-14 | P-Linux |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.8.0 hosted clean-archive qualification, 2026-10-14 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.8.0 hosted clean-archive qualification, 2026-10-14 | P-Linux |
 | Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The 2.7.0 release tree is qualified on both primary profiles. Local and hosted
-Win32 complete-suite/package checks also passed, retaining its bounded
-secondary profile. For v2.8.0, Windows has full local evidence; Linux/Windows
-hosted CI and checksummed clean-source-archive qualification remain pending.
-This does not add qualification claims for other operating systems, CPUs, or
-compiler versions.
+The 2.8.0 release tree is qualified on both primary profiles. Local and hosted
+Win32 complete-suite/package checks also passed for the retained 2.7.0
+secondary profile. This does not add qualification claims for other operating
+systems, CPUs, or compiler versions.
 
 ### Exact profiles
 

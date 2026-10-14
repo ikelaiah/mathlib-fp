@@ -26,6 +26,12 @@ FPC 3.2.2, using
 
 ## Hosted and publication gates
 
-Pull-request Linux/Windows CI and the checksummed clean-source-archive release
-qualification are pending. They must pass before the v2.8.0 tag is created.
+Pull-request Linux/Windows CI passed on 2026-10-14 in
+[PR #73](https://github.com/ikelaiah/mathlib-fp/pull/73). The checksummed
+clean-source-archive qualification also passed on both primary profiles in
+[workflow run #75](https://github.com/ikelaiah/mathlib-fp/actions/runs/38549338444):
+Linux ran offline from the extracted tarball, and Windows qualified from the
+extracted ZIP. The run published separate Linux and Windows qualification
+artifacts. These gates passed before the v2.8.0 tag was created.
+
 The release body is changelog content only; its title stays in the title field.

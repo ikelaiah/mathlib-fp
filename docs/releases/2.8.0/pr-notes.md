@@ -7,4 +7,8 @@ mapping, constant predictors/responses, and array ownership.
 
 Qualification evidence is recorded in
 [`qualification.md`](qualification.md), the machine-readable numerical
-catalogue, and the release PR once final CI completes.
+catalogue, and [release PR #73](https://github.com/ikelaiah/mathlib-fp/pull/73).
+
+Linux and Windows PR CI passed, including the Lazarus Win64/Win32 package
+build. The Linux and Windows checksummed clean-source-archive profiles passed
+in [workflow run #75](https://github.com/ikelaiah/mathlib-fp/actions/runs/38549338444).
