@@ -70,6 +70,7 @@ uses
   TimeSeriesLib.StateSpace,
   { MLLib }
   MLLib.MachineLearning,
+  MLLib.PLS,
   MLLib.Analysis,
   { Optional cross-domain adapters }
   InterchangeLib.Models,
