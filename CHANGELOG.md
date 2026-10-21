@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.11.0] - 2026-10-22
+
+### Added
+
+- Added expanding-window and fixed-width rolling-window validation splits
+  with explicit training sizes, horizons, steps and row gaps.
+- Added a deterministic future-holdout PLS workflow and hand-enumerated tests
+  for chronology, overlapping horizons, omitted partial windows and failures.
+
+### Compatibility
+
+- Existing seeded split and PLS paths remain available. Chronological builders
+  use caller row order and no random state; gaps measure rows, not durations.
+
 ## [2.10.0] - 2026-10-22
 
 ### Added

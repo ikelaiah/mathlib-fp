@@ -15,6 +15,9 @@ type
     procedure TestGroupedRowsNeverLeak;
     procedure TestManyDistinctGroups;
     procedure TestStratifiedRowsAndReplay;
+    procedure TestExpandingChronologyAndGap;
+    procedure TestRollingOverlapAndReplay;
+    procedure TestChronologicalFailures;
   end;
 
 implementation
@@ -133,6 +136,92 @@ begin
     TAnalysisKit.StratifiedKFoldSplits(Labels, 5, 99);
     Fail('insufficient class size accepted');
   except on E: EAnalysisError do ; end;
+end;
+
+procedure TTestValidation.TestExpandingChronologyAndGap;
+var S: TValidationSplits; F, I: Integer;
+begin
+  S := TAnalysisKit.ExpandingWindowSplits(12, 4, 2, 3, 1);
+  AssertEquals(2, Length(S));
+  for F := 0 to 1 do
+  begin
+    TAnalysisKit.ValidateSplit(12, S[F]);
+    AssertEquals(4 + F * 3, Length(S[F].TrainingRows));
+    for I := 0 to High(S[F].TrainingRows) do
+      AssertEquals(I, S[F].TrainingRows[I]);
+    AssertEquals(2, Length(S[F].ValidationRows));
+    AssertEquals(5 + F * 3, S[F].ValidationRows[0]);
+    AssertEquals(6 + F * 3, S[F].ValidationRows[1]);
+    AssertEquals(2, S[F].ValidationRows[0] -
+      S[F].TrainingRows[High(S[F].TrainingRows)]);
+  end;
+end;
+
+procedure TTestValidation.TestRollingOverlapAndReplay;
+var S, Replay: TValidationSplits; F, I: Integer;
+begin
+  RandSeed := 456;
+  S := TAnalysisKit.RollingWindowSplits(10, 3, 3, 1);
+  Replay := TAnalysisKit.RollingWindowSplits(10, 3, 3, 1);
+  AssertEquals(456, RandSeed);
+  AssertEquals(5, Length(S));
+  for F := 0 to High(S) do
+  begin
+    TAnalysisKit.ValidateSplit(10, S[F]);
+    AssertEquals(3, Length(S[F].TrainingRows));
+    AssertEquals(3, Length(S[F].ValidationRows));
+    for I := 0 to 2 do
+    begin
+      AssertEquals(F + I, S[F].TrainingRows[I]);
+      AssertEquals(F + 3 + I, S[F].ValidationRows[I]);
+      AssertEquals(S[F].ValidationRows[I], Replay[F].ValidationRows[I]);
+    end;
+  end;
+  S := TAnalysisKit.RollingWindowSplits(8, 3, 2, 100, 2);
+  AssertEquals(1, Length(S));
+  AssertEquals(5, S[0].ValidationRows[0]);
+  AssertEquals(2, S[0].TrainingRows[2]);
+end;
+
+procedure TTestValidation.TestChronologicalFailures;
+var LargeCount: Int64;
+begin
+  try
+    TAnalysisKit.ExpandingWindowSplits(5, 3, 2, 1, 1);
+    Fail('insufficient history accepted');
+  except on E: EAnalysisError do ; end;
+  try
+    TAnalysisKit.RollingWindowSplits(5, 0, 2, 1);
+    Fail('empty training accepted');
+  except on E: EAnalysisError do ; end;
+  try
+    TAnalysisKit.ExpandingWindowSplits(5, 2, 0, 1);
+    Fail('empty horizon accepted');
+  except on E: EAnalysisError do ; end;
+  try
+    TAnalysisKit.RollingWindowSplits(5, 2, 2, 0);
+    Fail('zero step accepted');
+  except on E: EAnalysisError do ; end;
+  try
+    TAnalysisKit.ExpandingWindowSplits(5, 2, 2, 1, -1);
+    Fail('negative gap accepted');
+  except on E: EAnalysisError do ; end;
+  try
+    TAnalysisKit.RollingWindowSplits(5, High(SizeInt), 2, 1);
+    Fail('overflow geometry accepted');
+  except on E: EAnalysisError do ; end;
+  try
+    TAnalysisKit.ExpandingWindowSplits(5, 2, 2, 1, High(SizeInt));
+    Fail('overflow gap accepted');
+  except on E: EAnalysisError do ; end;
+  if SizeOf(SizeInt) > SizeOf(Integer) then
+  begin
+    LargeCount := Int64(High(Integer)) + 1;
+    try
+      TAnalysisKit.RollingWindowSplits(SizeInt(LargeCount), 2, 2, 1);
+      Fail('unrepresentable chronological row space accepted');
+    except on E: EAnalysisError do ; end;
+  end;
 end;
 
 initialization

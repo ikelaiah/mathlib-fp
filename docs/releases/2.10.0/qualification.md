@@ -43,3 +43,16 @@ The resulting exact main commit must pass CI before the tag is created.
 Publication follows [RELEASING.md](../../../RELEASING.md). The GitHub release
 body contains changelog content and begins with `### Added`; the release title
 is set only in the title field.
+
+## Published artifact verification
+
+[v2.10.0](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.10.0) names
+main commit `9447176e6a5013f89969ec3eebfe71cba40a8f47`, whose
+[Linux/Windows CI](https://github.com/ikelaiah/mathlib-fp/actions/runs/39674463973)
+passed. The [documentation publication](https://github.com/ikelaiah/mathlib-fp/actions/runs/39675567101)
+deployed the versioned site and attached the offline ZIP and SHA-256.
+Downloaded source/docs checksums, matching ZIP/tar contents, GitHub automatic
+archive, both README quick starts, grouped workflow, fresh Lazarus consumer,
+offline/current links, live retained release identities, all six assets and
+the title-free body passed on 2026-10-22. The
+[verification record](publication-verification.json) retains these checks.
