@@ -64,11 +64,13 @@ uses
   { OptimizationLib }
   OptimizationLib.Optimization,
   OptimizationLib.Convex,
+  OptimizationLib.Global,
   { TimeSeriesLib }
   TimeSeriesLib.TimeSeries,
   TimeSeriesLib.StateSpace,
   { MLLib }
   MLLib.MachineLearning,
+  MLLib.PLS,
   MLLib.Analysis,
   { Optional cross-domain adapters }
   InterchangeLib.Models,

@@ -22,6 +22,7 @@ does not expose a destination or workspace.
 | Bounded scalar minimum | `GoldenSection` or `BrentMinimize` | [Single-variable methods](#single-variable-minimization) |
 | Smooth multivariate minimum | `L-BFGS` | [Solver selection](#solver-selection-guide) |
 | Derivative-free multivariate minimum | `NelderMead` | [Solver selection](#solver-selection-guide) |
+| Bounded global search | `TGlobalOptimizationKit.DifferentialEvolution` | [Bounds, budgets, replay and heuristic limits](global-optimization.md) |
 | Linear constraints/model | `SimplexLP` | [Linear programming](#linear-programming) |
 | Dense convex QP/SOCP | `TConvexOptimizationKit` | [Convex solver choice](convex-optimization.md#choose-a-solver) |
 

@@ -1,10 +1,11 @@
 # Supported platform matrix
 
-Version 2.8.0 adds dense real-double PLS1 regression for correlated predictors.
-Full local Windows qualification passed 136 gates on 2026-10-14. The
-[2.8.0 qualification report](../releases/2.8.0/qualification.md) records the
-results; hosted Linux/Windows CI and checksummed clean-source-archive
-qualification passed on 2026-10-14.
+Version 2.9.0 adds bounded differential-evolution global search with explicit
+random state, strict call budgets, and optional bounded local polishing.
+The [2.9.0 qualification record](../releases/2.9.0/qualification.md) records
+local and hosted validation. All 138 local Windows gates passed on 2026-10-21;
+hosted Linux/Windows CI and both checksummed clean-source-archive profiles also
+passed on that date.
 The retained 2.6.0 Linux/Windows clean-archive qualification passed on
 2026-10-13. Version 2.6.0 added stable SOS IIR filtering and 2.5.0
 added reusable FFT/STFT plans and inverse STFT.
@@ -26,21 +27,21 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The current release tree targets 2.8.0. Its full local Windows qualification
-passed, as did hosted Linux/Windows CI and checksummed clean-source-archive
-qualification. No target claim is inferred from another platform.
+The current release tree targets 2.9.0. Its normal, optimized and checked/heap
+suites, full local qualification, hosted Linux/Windows CI and both primary
+clean-archive profiles passed. No target claim is inferred from another platform.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.8.0 hosted clean-archive qualification, 2026-10-14 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.8.0 hosted clean-archive qualification, 2026-10-14 | P-Linux |
-| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 1.9.6 retained evidence; reruns on each change | S-Win32 |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.9.0 hosted clean-archive qualification, 2026-10-21 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.9.0 hosted clean-archive qualification, 2026-10-21 | P-Linux |
+| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 2.9.0 local/hosted complete suite and package, 2026-10-21 | S-Win32 |
 
 Evidence dates and refs describe configurations that actually ran. They are
 not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The 2.8.0 release tree is qualified on both primary profiles. Local and hosted
-Win32 complete-suite/package checks also passed for the retained 2.7.0
-secondary profile. This does not add qualification claims for other operating
+The 2.9.0 release tree is qualified on both primary profiles. Local and hosted
+Win32 complete-suite/package checks also passed for the secondary profile.
+This does not add qualification claims for other operating
 systems, CPUs, or compiler versions.
 
 ### Exact profiles
@@ -98,7 +99,7 @@ files to the offline machine, verify the checksum, and extract the archive.
 Adding `src/` to the FPC unit path is sufficient; no configure or generation
 step is required. The release page also provides a separately checksummed
 offline HTML ZIP generated from the same tagged documentation. Extract it and
-open the latest published archive, `mathlib-fp-docs-2.2.0/index.html`,
+open the release archive's `mathlib-fp-docs-2.9.0/index.html`,
 locally.
 
 The release qualification workflows perform these same checksum, clean-

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.8.0",
+  "release": "2.9.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -1245,6 +1245,37 @@
         "complete dense row-major data only; missing values are rejected",
         "random K-fold validation assumes exchangeable observations",
         "no robust fitting, confidence intervals, or feature-importance scores"
+      ]
+    },
+    {
+      "family": "bounded_global_optimization",
+      "unit": "OptimizationLib.Global",
+      "entry_points": [
+        "TGlobalSearchStatus",
+        "TGlobalPolishStatus",
+        "TGlobalOptimizationOptions",
+        "TGlobalOptimizationResult",
+        "TGlobalOptimizationKit",
+        "DifferentialEvolution"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "double"
+      ],
+      "shapes": [
+        "finite_box",
+        "scalar_objective"
+      ],
+      "complexity": "O(population*dimensions + population^2) work per generation plus objective cost; O(population*dimensions) storage; strict global and polish callback budgets",
+      "accuracy": "Known analytic Rastrigin, Rosenbrock, Ackley and shifted quadratic minima; deterministic replay, exact budgets, adversarial bounds and ownership tests",
+      "docs": "docs/guides/domains/global-optimization.md",
+      "example": "examples/46_bounded_global_search.pas",
+      "tests": "tests/TestGlobalOptimization.pas",
+      "limitations": [
+        "heuristic only; no global-optimality certificate",
+        "finite continuous box bounds only; no mixed-integer or nonlinear constraints",
+        "serial dense population; callback execution time is caller-controlled",
+        "reproducible on one profile, not a cross-platform bitwise guarantee"
       ]
     }
   ]

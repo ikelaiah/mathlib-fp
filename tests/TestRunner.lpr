@@ -38,6 +38,7 @@ uses
   , TestProbabilityLib
   , TestCombinatoricsLib
   , TestOptimizationLib
+  , TestGlobalOptimization
   , TestTimeSeriesLib
   , TestMLLib
   , TestGeometryLib

@@ -29,6 +29,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Adaptive integration, fitting, vector equations, polynomial roots, and ODEs | Stable | Double real plus complex root result | `SolveODE` remains explicit Dormand-Prince; sampling error values are estimates |
 | Stiff initial-value ODE integration | Stable (v2.3.0) | Dense real-double explicit-form systems | Alexander SDIRK2; analytic, automatic, or finite-difference Jacobians; no mass matrices, DAEs, PDEs, or sparse stiff solves |
 | Diagnostic nonlinear and linear optimisation | Stable | Double real | Detailed bounds/status/best iterate, warm starts, constrained/Pareto baselines, and two-phase dense LP |
+| Bounded global optimization | Stable (v2.9.0) | Double real | Differential evolution and optional bounded coordinate polish; strict separate call budgets; heuristic, no global-optimality certificate or integer/nonlinear constraints |
 | Dense convex QP and SOCP | Stable | Double real | Dense continuous models; SOCP needs a strictly feasible start; general certificates are not claimed |
 | Shared iteration diagnostics | Stable | Result metadata | Algorithms expose only statuses applicable to their model |
 | Explicit local random state | Stable | UInt64 state; single/double output | Reproducible simulation stream, not cryptographic; mutable instances require caller synchronization |
@@ -56,12 +57,12 @@ Target qualifications and platform-specific limitations are defined by the
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.8.0 capability inventory. It adds a focused PLS1 regression
-workflow with deterministic cross-validation component selection for
-correlated predictors. Qualification status is recorded in the
-[current release report](../releases/2.8.0/qualification.md). It carries
-forward the v2.7.0 logistic and Poisson GLM families, stable SOS IIR filtering,
-and reusable spectral processing.
+This is the 2.9.0 capability inventory. It adds reproducible bounded global
+search with explicit random state, separate global and polish evaluation
+budgets, and truthful heuristic termination diagnostics. Qualification status
+is recorded in the [current release report](../releases/2.9.0/qualification.md).
+It carries forward PLS1 regression, logistic and Poisson GLMs, stable SOS IIR
+filtering, and reusable spectral processing.
 Sparse direct solving now includes a
 reusable minimum-degree symbolic analysis and sparse numeric LU. The
 [MathBase guide](../guides/domains/math-base.md)

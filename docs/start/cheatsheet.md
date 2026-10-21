@@ -16,6 +16,7 @@ needs. Compile with `src/` on the Free Pascal unit path.
 | Find a bracketed scalar root | `NumericsLib.Numerics` | `TNumericsKit.Brent(F, A, B)` | [`13_numerical_methods.pas`](../../examples/13_numerical_methods.pas) |
 | Upper-tail normal probability | `ProbabilityLib.Distributions` | `TProbabilityKit.NormalSurvival(X, Mu, Sigma)` | [`07_probability.pas`](../../examples/07_probability.pas) |
 | Count combinations `C(n, k)` | `CombinatoricsLib.Combinatorics` | `TCombinatoricsKit.Combination(N, K)` | [`08_combinatorics.pas`](../../examples/08_combinatorics.pas) |
+| Search a finite box for a global minimum | `OptimizationLib.Global` | `TGlobalOptimizationKit.DifferentialEvolution(F, Lower, Upper)` | [`46_bounded_global_search.pas`](../../examples/46_bounded_global_search.pas) |
 | Minimise a single-variable function | `OptimizationLib.Optimization` | `TOptimizationKit.GoldenSection(F, A, B)` | [`09_optimization.pas`](../../examples/09_optimization.pas) |
 | Smooth a time series | `TimeSeriesLib.TimeSeries` | `TTimeSeriesKit.SimpleMovingAverage(Y, Window)` | [`10_timeseries.pas`](../../examples/10_timeseries.pas) |
 | Fit a linear regression | `MLLib.MachineLearning` | `TMLKit.LinearRegression(X, Y)` | [`11_machinelearning.pas`](../../examples/11_machinelearning.pas) |
