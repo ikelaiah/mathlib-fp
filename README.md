@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.10.0" src="https://img.shields.io/badge/version-2.10.0-brightgreen.svg">
+  <img alt="Version 2.11.0" src="https://img.shields.io/badge/version-2.11.0-brightgreen.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,10 +26,10 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.10.0 is the current stable release.**
-> It adds grouped and stratified validation splits, explicit training
-> and validation rows, and PLS component selection on supplied splits. See the [2.10.0 release notes](docs/releases/2.10.0/release-notes.md),
-> [qualification record](docs/releases/2.10.0/qualification.md),
+> **2.11.0 is the current stable release.**
+> It adds expanding and rolling chronological validation windows with
+> explicit horizons, steps and gaps, plus a future-holdout PLS workflow. See the [2.11.0 release notes](docs/releases/2.11.0/release-notes.md),
+> [qualification record](docs/releases/2.11.0/qualification.md),
 > [capability inventory](docs/reference/capabilities.md), and
 > [changelog](CHANGELOG.md) when evaluating an upgrade.
 
@@ -42,7 +42,7 @@ domain.
 Get the source directly with git:
 
 ```bash
-git clone --depth 1 --branch v2.10.0 \
+git clone --depth 1 --branch v2.11.0 \
   https://github.com/ikelaiah/mathlib-fp.git
 ```
 
@@ -50,28 +50,28 @@ or as a source archive with `wget`:
 
 ```bash
 wget \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.10.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.11.0.tar.gz
 ```
 
 or with `curl`:
 
 ```bash
 curl -L -o mathlib-fp.tar.gz \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.10.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.11.0.tar.gz
 ```
 
 > No package manager or install step is required for direct source use; add
 > `src/` to the Free Pascal unit path, for example `fpc -Fusrc ...`.
 
 Direct source use is canonical. The
-[2.10.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.10.0)
+[2.11.0 release page](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.11.0)
 is the source of published stable `.zip`, `.tar.gz`, offline documentation,
 and checksum artifacts.
 
-The release provides a [checksummed source tarball](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.10.0/mathlib-fp-2.10.0.tar.gz)
-with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.10.0/mathlib-fp-2.10.0.tar.gz.sha256),
-and a [source ZIP](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.10.0/mathlib-fp-2.10.0.zip)
-with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.10.0/mathlib-fp-2.10.0.zip.sha256).
+The release provides a [checksummed source tarball](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.11.0/mathlib-fp-2.11.0.tar.gz)
+with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.11.0/mathlib-fp-2.11.0.tar.gz.sha256),
+and a [source ZIP](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.11.0/mathlib-fp-2.11.0.zip)
+with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.11.0/mathlib-fp-2.11.0.zip.sha256).
 These checksum-bearing archives have repository files at their root; extract
 into a new directory, then add `src/` to the compiler unit path.
 
@@ -207,7 +207,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 48 commented walkthroughs with
+The [`examples/`](examples/) directory contains 49 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [beginner guide](docs/start/beginner-guide.md), choose a short task from the
 [beginner recipes](docs/start/recipes.md), or follow the

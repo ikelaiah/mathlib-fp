@@ -279,6 +279,16 @@
         "outer RMSE: PLS=0.000000, OLS=0.000000"
       ],
       "final_line": "grouped model validation: success"
+    },
+    {
+      "path": "examples/48_chronological_validation.pas",
+      "contains": [
+        "chronology: 3 expanding windows, horizon=3, gap=1",
+        "scored validation rows: 9",
+        "untouched future rows: 6; RMSE=0.000000",
+        "A row gap does not remove every source of temporal leakage."
+      ],
+      "final_line": "chronological validation: success"
     }
   ]
 }

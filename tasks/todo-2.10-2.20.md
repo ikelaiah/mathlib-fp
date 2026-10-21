@@ -23,7 +23,7 @@ slices before work starts. The four checkboxes are milestones, not one task.
 
 | Release | Need/spec | Numerical/reference gates | Workflow/compatibility | Release verified |
 | --- | --- | --- | --- | --- |
-| 2.11.0 Chronological validation | [ ] | [ ] | [ ] | [ ] |
+| 2.11.0 Chronological validation | [x] | [x] | [x] | [ ] |
 | 2.12.0 GLM offsets/exposure | [ ] | [ ] | [ ] | [ ] |
 | 2.13.0 GLM frequency weights | [ ] | [ ] | [ ] | [ ] |
 | 2.14.0 Prediction persistence | [ ] | [ ] | [ ] | [ ] |

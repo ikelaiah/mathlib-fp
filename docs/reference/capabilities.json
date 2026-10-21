@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.10.0",
+  "release": "2.11.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -1287,7 +1287,9 @@
         "TValidationSplits",
         "ValidateSplit",
         "GroupKFoldSplits",
-        "StratifiedKFoldSplits"
+        "StratifiedKFoldSplits",
+        "ExpandingWindowSplits",
+        "RollingWindowSplits"
       ],
       "maturity": "stable",
       "scalars": [
@@ -1297,17 +1299,19 @@
       "shapes": [
         "explicit_train_validation_rows",
         "grouped_rows",
-        "class_labels"
+        "class_labels",
+        "caller_ordered_chronological_rows"
       ],
-      "complexity": "O(n log n + g log g + g*f + n*f) split construction for n rows, g groups and f folds; O(n*f) result storage",
-      "accuracy": "enumerated group, class, overlap, replay and grouped outer-test fixtures",
+      "complexity": "O(n log n + g log g + g*f + n*f) split construction for n rows, g groups and f folds; O(n*f) result storage; chronological builders take O(total returned indices) time and storage",
+      "accuracy": "enumerated group, class, overlap, replay and grouped outer-test fixtures; hand-enumerated chronological windows, gaps and overlapping horizons",
       "docs": "docs/guides/domains/machine-learning.md",
       "example": "examples/47_grouped_model_validation.pas",
       "tests": "tests/TestValidation.pas",
       "limitations": [
         "grouped and stratified splits are separate policies",
-        "chronological rolling splits are planned for a later release",
-        "caller-supplied splits may omit or score rows repeatedly"
+        "caller-supplied splits may omit or score rows repeatedly",
+        "chronology follows caller row order; no irregular-time duration windows",
+        "a row gap alone does not eliminate all temporal leakage"
       ]
     }
   ]

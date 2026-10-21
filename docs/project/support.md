@@ -1,5 +1,8 @@
 # Supported platform matrix
 
+Version 2.11.0 adds chronological validation. Its supported-platform
+qualification is pending; the retained evidence below belongs to v2.10.0.
+
 Version 2.10.0 adds explicit grouped/stratified validation and supplied-split
 PLS selection. The [qualification record](../releases/2.10.0/qualification.md)
 records all 140 local Windows gates and successful hosted Linux/Windows CI and

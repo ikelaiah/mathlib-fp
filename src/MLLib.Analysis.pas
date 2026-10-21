@@ -117,6 +117,12 @@ type
     class function StratifiedKFoldSplits(const Labels: TIntegerArray;
       const FoldCount: SizeInt; const Seed: QWord = 42):
       TValidationSplits; static;
+    class function ExpandingWindowSplits(const SampleCount,
+      MinimumTrainingRows, ValidationRows, StepRows: SizeInt;
+      const GapRows: SizeInt = 0): TValidationSplits; static;
+    class function RollingWindowSplits(const SampleCount,
+      TrainingRows, ValidationRows, StepRows: SizeInt;
+      const GapRows: SizeInt = 0): TValidationSplits; static;
     class function FitBinaryLDA(const Data: IDenseDoubleMatrix;
       const Labels: TIntegerArray; const NegativeClass, PositiveClass: Integer;
       const Ridge: Double = 1E-9): TBinaryLDAResult; static;
@@ -775,6 +781,54 @@ begin
     StartAt := StopAt;
   end;
   Result := BuildSplitsFromAssignments(Assignment, FoldCount);
+end;
+
+function BuildChronologicalSplits(const SampleCount, TrainingRows,
+  ValidationRows, StepRows, GapRows: SizeInt;
+  const Expanding: Boolean): TValidationSplits;
+var WindowCount, F, I, ValidationStart, TrainingEnd, TrainingStart: SizeInt;
+begin
+  Result := nil;
+  if (SampleCount < 2) or (SampleCount > High(Integer)) or
+    (TrainingRows < 1) or (TrainingRows > SampleCount) or
+    (ValidationRows < 1) or (StepRows < 1) or (GapRows < 0) then
+    raise EAnalysisError.Create('Chronological splits: invalid window geometry.');
+  if GapRows > SampleCount - TrainingRows then
+    raise EAnalysisError.Create('Chronological splits: insufficient history.');
+  if ValidationRows > SampleCount - TrainingRows - GapRows then
+    raise EAnalysisError.Create('Chronological splits: insufficient history.');
+  WindowCount := 1 + (SampleCount - TrainingRows - GapRows -
+    ValidationRows) div StepRows;
+  SetLength(Result, WindowCount);
+  for F := 0 to WindowCount - 1 do
+  begin
+    ValidationStart := TrainingRows + GapRows + F * StepRows;
+    TrainingEnd := ValidationStart - GapRows;
+    if Expanding then TrainingStart := 0
+    else TrainingStart := TrainingEnd - TrainingRows;
+    SetLength(Result[F].TrainingRows, TrainingEnd - TrainingStart);
+    SetLength(Result[F].ValidationRows, ValidationRows);
+    for I := 0 to High(Result[F].TrainingRows) do
+      Result[F].TrainingRows[I] := TrainingStart + I;
+    for I := 0 to ValidationRows - 1 do
+      Result[F].ValidationRows[I] := ValidationStart + I;
+  end;
+end;
+
+class function TAnalysisKit.ExpandingWindowSplits(const SampleCount,
+  MinimumTrainingRows, ValidationRows, StepRows: SizeInt;
+  const GapRows: SizeInt): TValidationSplits;
+begin
+  Result := BuildChronologicalSplits(SampleCount, MinimumTrainingRows,
+    ValidationRows, StepRows, GapRows, True);
+end;
+
+class function TAnalysisKit.RollingWindowSplits(const SampleCount,
+  TrainingRows, ValidationRows, StepRows: SizeInt;
+  const GapRows: SizeInt): TValidationSplits;
+begin
+  Result := BuildChronologicalSplits(SampleCount, TrainingRows,
+    ValidationRows, StepRows, GapRows, False);
 end;
 
 class function TAnalysisKit.FitBinaryLDA(const Data: IDenseDoubleMatrix;

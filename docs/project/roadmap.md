@@ -1025,7 +1025,7 @@ PLS selection, and per-split scoring diagnostics. See the
 [release notes](../releases/2.10.0/release-notes.md) and
 [qualification record](../releases/2.10.0/qualification.md).
 
-## Next release: 2.11.0 — Chronological model validation
+## Previous release: 2.11.0 — Chronological model validation
 
 Build expanding-window and fixed-width rolling-window splits on 2.10 row sets.
 Expose minimum training size, validation horizon, step, and a gap measured in
@@ -1042,7 +1042,12 @@ outside the initial contract.
 This supplies evaluation tools, not new forecasting estimators or a claim that
 a row gap eliminates every source of temporal leakage.
 
-## Planned 2.12.0 — GLM offsets and Poisson exposure
+Version 2.11.0 delivers expanding and rolling row windows, explicit horizons,
+steps and gaps, and a future-holdout PLS workflow. See the
+[release notes](../releases/2.11.0/release-notes.md) and
+[qualification record](../releases/2.11.0/qualification.md).
+
+## Next release: 2.12.0 — GLM offsets and Poisson exposure
 
 Extend existing Bernoulli-logit and Poisson-log fits with known additive linear
 predictor offsets; support positive exposure for Poisson models through its
