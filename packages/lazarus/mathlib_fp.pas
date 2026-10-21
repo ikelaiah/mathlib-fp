@@ -64,6 +64,7 @@ uses
   { OptimizationLib }
   OptimizationLib.Optimization,
   OptimizationLib.Convex,
+  OptimizationLib.Global,
   { TimeSeriesLib }
   TimeSeriesLib.TimeSeries,
   TimeSeriesLib.StateSpace,

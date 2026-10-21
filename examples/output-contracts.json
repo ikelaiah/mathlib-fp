@@ -259,6 +259,17 @@
         "predict: 5.275000"
       ],
       "final_line": "workflow: success"
+    },
+    {
+      "path": "examples/46_bounded_global_search.pas",
+      "contains": [
+        "Rastrigin: best objective = 0.00000000",
+        "global stop: population tolerance",
+        "evaluations: global=",
+        "replay: identical on this profile",
+        "A heuristic result is not a global-optimality certificate."
+      ],
+      "final_line": "bounded global search: success"
     }
   ]
 }

@@ -202,9 +202,10 @@ vector arithmetic is new public API and belongs to 1.4.0.
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
 Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
 2.5.0. Version 2.5.1 was a documentation-only patch; 2.6.0 completed the
-Signal Processing II gate, 2.7.0 completed Statistics II, and 2.8.0 completes
-Data Analysis II. The later 2.9.0–3.0.0 gates give an ordered plan, not
-date promises or final public API designs. Other candidate lanes remain
+Signal Processing II gate, 2.7.0 completed Statistics II, 2.8.0 completed
+Data Analysis II, and 2.9.0 completes Optimization II. The 3.0.0 gate is a
+compatibility and workflow review; its timing and final API design remain
+open. Other candidate lanes remain
 uncommitted directions.
 
 ## Implementation discipline
@@ -942,7 +943,7 @@ See the [GLM guide](../guides/domains/generalized-linear-models.md),
 [release notes](../releases/2.7.0/release-notes.md) and
 [qualification record](../releases/2.7.0/qualification.md).
 
-## Next release: 2.9.0 — Optimization II
+## Previous release: 2.9.0 — Optimization II
 
 Provide a reproducible bounded global-search baseline for scalar objectives,
 with explicit bounds, evaluation budgets, deterministic seed/state, stopping
@@ -955,7 +956,14 @@ Mixed-integer and mixed-integer nonlinear programming, global-optimality
 certificates, and unbounded black-box search are excluded. The release gate is
 repeatable behavior, bounded resource use, and truthful termination reports.
 
-## Planned major gate: 3.0.0 — Compatibility and integrated workflows
+Version 2.9.0 delivers DE/rand/1/bin with deferred population updates,
+finite-box normalization, local seeded or explicit random state, strict global
+and polish call budgets, and optional bounded coordinate polishing. See the
+[global-search guide](../guides/domains/global-optimization.md),
+[release notes](../releases/2.9.0/release-notes.md), and
+[qualification record](../releases/2.9.0/qualification.md).
+
+## Next release: 3.0.0 — Compatibility and integrated workflows
 
 Review the public API after the 2.6–2.9 capability work, resolve only
 previously announced breaking changes whose migration runway is complete, and

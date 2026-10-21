@@ -79,7 +79,7 @@ not a promise that every seed/problem finds the global minimum.
 
 Follow existing Object Pascal static Kit/advanced-record conventions:
 `Options := TGlobalOptimizationOptions.Defaults;`. Source in `src/`,
-FPCUnit tests in `tests/TestGlobalOptimization.pas`, runnable example 47 in
+FPCUnit tests in `tests/TestGlobalOptimization.pas`, runnable example 46 in
 `examples/`, guide and release evidence in `docs/`. No new dependencies.
 
 Compile and run: `fpc -B -FcUTF8 -Fusrc -FUbuild-temp/global tests/TestRunner.lpr`

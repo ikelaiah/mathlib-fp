@@ -57,6 +57,7 @@ closest to your project. For a shorter task-first route, use the
 | `42_spectral_plan_reconstruction.pas` | EngineeringLib DSP | Reuse full-spectrum STFT analysis, edit a conjugate-bin pair, and reconstruct the complete original signal |
 | `43_sos_iir_filter.pas` | EngineeringLib DSP | Design a stable Butterworth SOS low-pass, inspect its response, and preserve state across streaming blocks |
 | `44_generalized_linear_models.pas` | StatsLib GLM | Fit logistic and Poisson models, inspect diagnostics, predict counts, and handle separation |
+| `46_bounded_global_search.pas` | OptimizationLib | Reproducible bounded differential evolution, separate local polishing, budgets and truthful termination |
 | `45_partial_least_squares.pas` | MLLib | Select PLS regression components by cross-validation for correlated predictors, then predict a new response |
 
 ## Build and run

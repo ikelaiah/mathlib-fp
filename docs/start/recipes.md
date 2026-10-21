@@ -31,6 +31,7 @@ callbacks, options, or result statuses are unfamiliar.
 | Streaming statistics | [Online spectral summary](../guides/domains/applied-numerics.md#60-second-workflow) | [Mergeable statistics contract](../guides/domains/applied-numerics.md#online-and-mergeable-statistics) |
 | Normal probability | [Normal CDF quick start](../guides/domains/probability.md#quick-start) | [Distribution reference](../guides/domains/probability.md#continuous-distributions) |
 | Interpolation and fitting | [Nonlinear fit program](../guides/domains/numerical-modelling.md#60-second-example) | [Modelling algorithm choice](../guides/domains/numerical-modelling.md#choose-an-algorithm) |
+| Bounded global search | [Global-search quick start](../guides/domains/global-optimization.md#quick-start) | [Budgets and heuristic termination](../guides/domains/global-optimization.md#termination-and-polishing) |
 | Optimisation | [Scalar optimisation quick start](../guides/domains/optimization.md#quick-start) | [Diagnostic solver choice](../guides/domains/optimization.md#solver-selection-guide) |
 | FFT convolution and filtering | [DSP workflow](../guides/domains/applied-numerics.md#60-second-workflow) | [Transform/convolution choice](../guides/domains/applied-numerics.md#choose-a-transform-or-convolution) |
 | Time series | [Moving-average quick start](../guides/domains/time-series.md#quick-start) | [ARIMA and state-space choice](../guides/domains/time-series.md#state-space-selection-in-18) |

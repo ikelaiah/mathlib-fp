@@ -100,6 +100,7 @@ If a task is not supported by a documented entry point, it is marked
 
 | Task | Unit | Entry point | Runnable example |
 | ---- | ---- | ----------- | ---------------- |
+| Search a bounded multivariate objective globally | `OptimizationLib.Global` | `TGlobalOptimizationKit.DifferentialEvolution(F, Lower, Upper, Options)`; inspect `Status` and budgets | [`46_bounded_global_search.pas`](../../examples/46_bounded_global_search.pas) |
 | Minimise a bounded single-variable function | `OptimizationLib.Optimization` | `TOptimizationKit.GoldenSection(F, A, B)` | [`09_optimization.pas`](../../examples/09_optimization.pas) |
 | Minimise a smooth multivariate function | `OptimizationLib.Optimization` | `TOptimizationKit.LBFGS(F, Grad, X0)` | [`09_optimization.pas`](../../examples/09_optimization.pas) |
 | Minimise a derivative-free function | `OptimizationLib.Optimization` | `TOptimizationKit.NelderMead(F, X0)` | [`09_optimization.pas`](../../examples/09_optimization.pas) |
