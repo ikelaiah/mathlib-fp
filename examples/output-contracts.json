@@ -298,6 +298,15 @@
         "Prediction requires an exposure for each new observation."
       ],
       "final_line": "count rates: success"
+    },
+    {
+      "path": "examples/50_frequency_weighted_glm.pas",
+      "contains": [
+        "stored rows=3; replicated observations=6",
+        "explicitly repeated fit: agrees",
+        "Weights count independent repeated observations; prediction needs no weights."
+      ],
+      "final_line": "frequency weighted GLM: success"
     }
   ]
 }

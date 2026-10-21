@@ -226,6 +226,12 @@ jobs:
           ref: v2.11.0
           path: historical-2.11.0
 
+      - name: Check out immutable 2.12.0 documentation source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v2.12.0
+          path: historical-2.12.0
+
       - name: Read current release version
         run: |
           test "$(cat current/VERSION)" = "${{ needs.resolve.outputs.release }}"
@@ -330,6 +336,10 @@ jobs:
             --versions current/docs/versions.json \
             --release 2.11.0 --output site/2.11.0 --site-root site
           python3 current/tools/build_docs.py \
+            --source historical-2.12.0/docs \
+            --versions current/docs/versions.json \
+            --release 2.12.0 --output site/2.12.0 --site-root site
+          python3 current/tools/build_docs.py \
             --source historical-2.0.0/docs \
             --versions current/docs/versions.json \
             --release 2.0.0 --output site/2.0.0 --site-root site
@@ -352,6 +362,7 @@ jobs:
           python3 -c 'import json; assert json.load(open("site/2.9.0/release.json"))["release"] == "2.9.0"'
           python3 -c 'import json; assert json.load(open("site/2.10.0/release.json"))["release"] == "2.10.0"'
           python3 -c 'import json; assert json.load(open("site/2.11.0/release.json"))["release"] == "2.11.0"'
+          python3 -c 'import json; assert json.load(open("site/2.12.0/release.json"))["release"] == "2.12.0"'
           python3 -c 'import json; assert json.load(open("site/2.0.0/release.json"))["release"] == "2.0.0"'
           python3 -c 'import json; assert json.load(open("site/1.10.0/release.json"))["release"] == "1.10.0"'
           python3 -c 'import json; assert json.load(open("site/1.9.9/release.json"))["release"] == "1.9.9"'
@@ -378,6 +389,7 @@ jobs:
           grep -q '2.9.0/index.html' site/index.html
           grep -q '2.10.0/index.html' site/index.html
           grep -q '2.11.0/index.html' site/index.html
+          grep -q '2.12.0/index.html' site/index.html
           grep -q '2.0.0/index.html' site/index.html
           grep -q '1.10.0/index.html' site/index.html
           grep -q '1.9.9/index.html' site/index.html

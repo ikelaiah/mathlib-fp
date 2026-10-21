@@ -1,5 +1,8 @@
 # Supported platform matrix
 
+Version 2.13.0 adds integer frequency-weighted GLMs. Its supported-platform qualification is
+pending; the retained evidence below belongs to previous releases.
+
 Version 2.12.0 adds GLM offsets and Poisson exposure. Its supported-platform
 qualification is pending; the retained evidence below belongs to v2.11.0.
 

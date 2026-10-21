@@ -13,6 +13,9 @@ uses
   SysUtils, Math, MathBase.SharedTypes,
   AlgebraLib.DenseMatrices, AlgebraLib.DenseDecompositions;
 
+const
+  GLM_MAX_FREQUENCY_COUNT = 2147483647;
+
 type
   EGLMError = class(Exception);
   TGLMFamily = (gfBernoulliLogit, gfPoissonLog);
@@ -26,8 +29,11 @@ type
     class function Default: TGLMOptions; static;
   end;
 
+  TGLMFrequencyWeights = array of QWord;
+
   TGLMInputs = record
     Offsets, Exposures: TDoubleArray;
+    FrequencyWeights: TGLMFrequencyWeights;
     class function Default: TGLMInputs; static;
   end;
 
@@ -38,6 +44,8 @@ type
     Iterations, Rank, DegreesOfFreedom: SizeInt;
     Identifiable, HasFiniteIterate: Boolean;
     UsesOffsets, UsesExposure: Boolean;
+    FrequencyCount: SizeInt;
+    DiagnosticRows: TIntegerArray;
     ConditionIndicator, Deviance, NullDeviance, PearsonChiSquare: Double;
     Coefficients, StandardErrors, FittedMeans, ResponseResiduals,
       DevianceResiduals, DevianceHistory: TDoubleArray;
@@ -79,6 +87,7 @@ implementation
 class function TGLMInputs.Default: TGLMInputs;
 begin
   Result.Offsets := nil; Result.Exposures := nil;
+  Result.FrequencyWeights := nil;
 end;
 
 class function TGLMOptions.Default: TGLMOptions;
@@ -122,6 +131,61 @@ begin
     if not Finite(Result[I]) then
       raise EGLMError.Create('GLM inputs: combined offset is not representable.');
   end;
+end;
+
+function BuildFrequencies(const Inputs: TGLMInputs; const Rows: SizeInt;
+  out Total: SizeInt; out DiagnosticRows: TIntegerArray): TDoubleArray;
+var I, ActiveCount: SizeInt; Value: QWord;
+begin
+  Result := nil; DiagnosticRows := nil; Total := 0;
+  if Length(Inputs.FrequencyWeights) = 0 then
+  begin
+    Total := Rows; SetLength(Result, Rows);
+    for I := 0 to Rows - 1 do Result[I] := 1;
+    Exit;
+  end;
+  if (Length(Inputs.FrequencyWeights) <> Rows) or
+    (Rows > High(Integer)) then
+    raise EGLMError.Create('GLM frequencies: weights must match representable rows.');
+  ActiveCount := 0;
+  for I := 0 to Rows - 1 do
+  begin
+    Value := Inputs.FrequencyWeights[I];
+    if Value > QWord(GLM_MAX_FREQUENCY_COUNT) - QWord(Total) then
+      raise EGLMError.Create('GLM frequencies: total exceeds the supported count.');
+    Inc(Total, SizeInt(Value));
+    if Value <> 0 then Inc(ActiveCount);
+  end;
+  if Total = 0 then raise EGLMError.Create('GLM frequencies: positive total required.');
+  SetLength(Result, Rows); SetLength(DiagnosticRows, ActiveCount);
+  ActiveCount := 0;
+  for I := 0 to Rows - 1 do
+  begin
+    Result[I] := Inputs.FrequencyWeights[I];
+    if Result[I] <> 0 then
+    begin DiagnosticRows[ActiveCount] := I; Inc(ActiveCount); end;
+  end;
+end;
+
+function ResponseAverage(const Y, Frequencies: TDoubleArray;
+  const Total: SizeInt): Double;
+var I: SizeInt;
+begin
+  Result := 0;
+  for I := 0 to High(Y) do
+    if Frequencies[I] <> 0 then
+      Result := Result + (Y[I] / Total) * Frequencies[I];
+  if not Finite(Result) then raise EGLMError.Create('GLM response average overflow.');
+end;
+
+function SelectDiagnosticRows(const Values: TDoubleArray;
+  const Rows: TIntegerArray): TDoubleArray;
+var I: SizeInt;
+begin
+  Result := nil;
+  if Length(Values) = 0 then Exit;
+  SetLength(Result, Length(Rows));
+  for I := 0 to High(Rows) do Result[I] := Values[Rows[I]];
 end;
 
 procedure ValidateDesign(const Design: IDenseDoubleMatrix;
@@ -224,15 +288,16 @@ begin
   end;
 end;
 
-function OffsetNullIntercept(const Y, Offsets: TDoubleArray;
-  const Family: TGLMFamily): Double;
+function OffsetNullIntercept(const Y, Offsets, Frequencies: TDoubleArray;
+  const Total: SizeInt; const Family: TGLMFamily): Double;
 var I, Iteration: SizeInt; Average, Peak, LowOffset, Sum, Lower, Upper,
   Middle, Mean, Weight: Double;
 begin
-  Average := 0; Peak := Offsets[0]; LowOffset := Offsets[0];
+  Average := ResponseAverage(Y, Frequencies, Total);
+  Peak := -Infinity; LowOffset := Infinity;
   for I := 0 to High(Y) do
+    if Frequencies[I] <> 0 then
   begin
-    Average := Average + Y[I] / Length(Y);
     Peak := Max(Peak, Offsets[I]); LowOffset := Min(LowOffset, Offsets[I]);
   end;
   if not Finite(Average) then raise EGLMError.Create('GLM null mean overflow.');
@@ -240,7 +305,9 @@ begin
   if Family = gfPoissonLog then
   begin
     Sum := 0;
-    for I := 0 to High(Y) do Sum := Sum + Exp(Offsets[I] - Peak) / Length(Y);
+    for I := 0 to High(Y) do
+      if Frequencies[I] <> 0 then
+        Sum := Sum + (Exp(Offsets[I] - Peak) / Total) * Frequencies[I];
     Result := (Ln(Average) - Peak) - Ln(Sum);
   end
   else
@@ -253,10 +320,11 @@ begin
       if (Middle = Lower) or (Middle = Upper) then Break;
       Sum := 0;
       for I := 0 to High(Y) do
+        if Frequencies[I] <> 0 then
       begin
         if not InverseLink(Family, Middle + Offsets[I], Mean, Weight) then
           raise EGLMError.Create('GLM null inverse link is not representable.');
-        Sum := Sum + Mean / Length(Y);
+        Sum := Sum + (Mean / Total) * Frequencies[I];
       end;
       if Sum < Average then Lower := Middle else Upper := Middle;
     end;
@@ -265,33 +333,35 @@ begin
   if not Finite(Result) then raise EGLMError.Create('GLM null intercept overflow.');
   Sum := 0;
   for I := 0 to High(Y) do
+    if Frequencies[I] <> 0 then
   begin
     if not InverseLink(Family, Result + Offsets[I], Mean, Weight) then
       raise EGLMError.Create('GLM null inverse link is not representable.');
-    Sum := Sum + Mean / Length(Y);
+    Sum := Sum + (Mean / Total) * Frequencies[I];
   end;
   if Abs(Sum - Average) > 1E-10 * Max(Double(1), Average) then
     raise EGLMError.Create('GLM null intercept score is not representable.');
 end;
 
-function OffsetNullDeviance(const Y, Offsets: TDoubleArray;
-  const Family: TGLMFamily): Double;
+function OffsetNullDeviance(const Y, Offsets, Frequencies: TDoubleArray;
+  const Total: SizeInt; const Family: TGLMFamily): Double;
 var I: SizeInt; Intercept, Eta, Mean, Weight, Average: Double;
 begin
-  Result := 0; Average := 0;
-  for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
+  Result := 0; Average := ResponseAverage(Y, Frequencies, Total);
   if (Average = 0) or ((Family = gfBernoulliLogit) and (Average = 1)) then Exit;
-  Intercept := OffsetNullIntercept(Y, Offsets, Family);
+  Intercept := OffsetNullIntercept(Y, Offsets, Frequencies, Total, Family);
   for I := 0 to High(Y) do
+    if Frequencies[I] <> 0 then
   begin
     Eta := Intercept + Offsets[I];
     if not InverseLink(Family, Eta, Mean, Weight) then
       raise EGLMError.Create('GLM null inverse link is not representable.');
-    Result := Result + UnitDeviance(Family, Y[I], Eta, Mean);
+    Result := Result + UnitDeviance(Family, Y[I], Eta, Mean) * Frequencies[I];
   end;
 end;
 
-function Evaluate(const X: IDenseDoubleMatrix; const Y, Beta, Offsets: TDoubleArray;
+function Evaluate(const X: IDenseDoubleMatrix;
+  const Y, Beta, Offsets, Frequencies: TDoubleArray;
   const Family: TGLMFamily; out Means, Weights, Etas: TDoubleArray;
   out Deviance: Double): Boolean;
 var I, J: SizeInt; Eta, Contribution: Double;
@@ -301,11 +371,14 @@ begin
   SetLength(Means, X.Rows); SetLength(Weights, X.Rows); SetLength(Etas, X.Rows);
   for I := 0 to X.Rows - 1 do
   begin
+    if Frequencies[I] = 0 then Continue;
     Eta := Offsets[I];
     for J := 0 to X.Cols - 1 do Eta := Eta + X[I,J] * Beta[J];
     Etas[I] := Eta;
     if not InverseLink(Family, Eta, Means[I], Weights[I]) or (Weights[I] <= 0) then Exit;
-    Contribution := UnitDeviance(Family, Y[I], Eta, Means[I]);
+    Weights[I] := Weights[I] * Frequencies[I];
+    if not Finite(Weights[I]) then Exit;
+    Contribution := UnitDeviance(Family, Y[I], Eta, Means[I]) * Frequencies[I];
     if not Finite(Contribution) then Exit;
     Deviance := Deviance + Contribution;
     if not Finite(Deviance) then Exit;
@@ -314,24 +387,35 @@ begin
 end;
 
 function WeightedFactor(const X: IDenseDoubleMatrix; const Y, Means,
-  Weights: TDoubleArray; const Options: TGLMOptions;
+  Weights, Frequencies: TDoubleArray; const Total: SizeInt;
+  const Options: TGLMOptions;
   out Target: IDenseDoubleMatrix; out MaximumRootWeight: Double): IDenseDoubleQR;
-var A: IDenseDoubleMatrix; I, J: SizeInt; Root: Double;
+var A: IDenseDoubleMatrix; I, J: SizeInt; Root, MaximumVarianceRoot: Double;
 begin
-  MaximumRootWeight := 0;
+  MaximumRootWeight := 0; MaximumVarianceRoot := 0;
   for I := 0 to High(Weights) do
+    if Frequencies[I] <> 0 then
+  begin
     MaximumRootWeight := Max(MaximumRootWeight, Sqrt(Weights[I]));
+    MaximumVarianceRoot := Max(MaximumVarianceRoot,
+      Sqrt(Weights[I] / Frequencies[I]));
+  end;
   A := TDenseDoubleMatrix.Zeros(X.Rows, X.Cols);
   Target := TDenseDoubleMatrix.Zeros(X.Rows, 1);
   for I := 0 to X.Rows - 1 do
   begin
+    if Frequencies[I] = 0 then Continue;
     Root := Sqrt(Weights[I]);
     for J := 0 to X.Cols - 1 do A[I,J] := (Root / MaximumRootWeight) * X[I,J];
-    Target[I,0] := ((Y[I] - Means[I]) / Root) / MaximumRootWeight;
+    Target[I,0] := ((Y[I] - Means[I]) / Root) *
+      (Frequencies[I] / MaximumRootWeight);
     if not Finite(Target[I,0]) then
       raise EGLMError.Create('GLM IRLS: nonrepresentable weighted correction.');
   end;
-  Result := FactorPivotedQR(A, Options.RankTolerance * Sqrt(X.Rows));
+  { Compact weighted rows and expanded repeated rows differ only by the
+    maximum-root normalization. Preserve the expanded-design rank cutoff. }
+  Result := FactorPivotedQR(A, (Options.RankTolerance * Sqrt(Total)) *
+    (MaximumVarianceRoot / MaximumRootWeight));
 end;
 
 function CheckFactor(const Factor: IDenseDoubleQR; const Columns: SizeInt;
@@ -346,7 +430,7 @@ begin
   else Result := True;
 end;
 
-function BoundaryStatus(const Y, Etas: TDoubleArray;
+function BoundaryStatus(const Y, Etas, Frequencies: TDoubleArray;
   const Family: TGLMFamily; const X: IDenseDoubleMatrix;
   const Beta: TDoubleArray; out Status: TGLMStatus): Boolean;
 var I, J: SizeInt; MaxEta, MinMargin, MaxEtaValue, DirectionEta: Double;
@@ -354,6 +438,7 @@ var I, J: SizeInt; MaxEta, MinMargin, MaxEtaValue, DirectionEta: Double;
 begin
   MaxEta := 0; MinMargin := Infinity; MaxEtaValue := -Infinity; AllZero := True;
   for I := 0 to High(Etas) do
+    if Frequencies[I] <> 0 then
   begin
     DirectionEta := 0;
     for J := 0 to X.Cols - 1 do
@@ -400,16 +485,16 @@ begin
   end;
 end;
 
-procedure FinishDiagnostics(const Y, Etas, Means, Weights: TDoubleArray;
+procedure FinishDiagnostics(const Y, Etas, Means, Weights,
+  Frequencies: TDoubleArray; const Total: SizeInt;
   var Fit: TGLMFitResult);
 var I: SizeInt; Average, NullEta, NullMean, D, Residual: Double;
 begin
-  Fit.DegreesOfFreedom := Length(Y) - Fit.Rank;
+  Fit.DegreesOfFreedom := Total - Fit.Rank;
   Fit.FittedMeans := Copy(Means);
   SetLength(Fit.ResponseResiduals, Length(Y));
   SetLength(Fit.DevianceResiduals, Length(Y));
-  Average := 0;
-  for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
+  Average := ResponseAverage(Y, Frequencies, Total);
   if not Finite(Average) then raise EGLMError.Create('GLM null mean is not representable.');
   Fit.NullDeviance := 0; Fit.PearsonChiSquare := 0;
   if Fit.Family = gfBernoulliLogit then
@@ -420,16 +505,18 @@ begin
   else if Average > 0 then NullEta := Ln(Average) else NullEta := 0;
   NullMean := Average;
   for I := 0 to High(Y) do
+    if Frequencies[I] <> 0 then
   begin
     Residual := Y[I] - Means[I]; Fit.ResponseResiduals[I] := Residual;
-    D := UnitDeviance(Fit.Family, Y[I], Etas[I], Means[I]);
+    D := UnitDeviance(Fit.Family, Y[I], Etas[I], Means[I]) * Frequencies[I];
     Fit.DevianceResiduals[I] := Sqrt(D);
     if Residual < 0 then Fit.DevianceResiduals[I] := -Fit.DevianceResiduals[I];
-    Fit.PearsonChiSquare := Fit.PearsonChiSquare + Sqr(Residual / Sqrt(Weights[I]));
+    Fit.PearsonChiSquare := Fit.PearsonChiSquare +
+      Sqr((Residual / Sqrt(Weights[I])) * Frequencies[I]);
     if ((Fit.Family = gfBernoulliLogit) and (Average > 0) and (Average < 1)) or
        ((Fit.Family = gfPoissonLog) and (Average > 0)) then
       Fit.NullDeviance := Fit.NullDeviance +
-        UnitDeviance(Fit.Family, Y[I], NullEta, NullMean);
+        UnitDeviance(Fit.Family, Y[I], NullEta, NullMean) * Frequencies[I];
   end;
 end;
 
@@ -446,56 +533,67 @@ const Messages: array[TGLMStatus] of String = (
   'No finite non-increasing deviance step was found.');
 var X, Target, Solution: IDenseDoubleMatrix; Factor: IDenseDoubleQR;
   Scales, Beta, Candidate, Means, Weights, Etas, NewMeans, NewWeights,
-    NewEtas, Offsets: TDoubleArray;
-  I, J, Iteration, Halving: SizeInt;
+    NewEtas, Offsets, Frequencies: TDoubleArray;
+  DiagnosticRows: TIntegerArray;
+  I, J, Iteration, Halving, FrequencyCount: SizeInt;
   RootWeight, NewDeviance, OldDeviance, Step, Change, BetaNorm, FullChange,
     Average, LinearChange, EtaNorm, Correction, InitialIntercept: Double;
   Accepted, Representable, ConstantColumn: Boolean;
 begin
   ValidateFit(Design, Y, Options, Family);
+  Frequencies := BuildFrequencies(Inputs, Design.Rows, FrequencyCount, DiagnosticRows);
   Offsets := BuildOffsets(Inputs, Design.Rows, Family);
   Result := Default(TGLMFitResult); Result.Family := Family;
   Result.UsesOffsets := Length(Inputs.Offsets) <> 0;
   Result.UsesExposure := Length(Inputs.Exposures) <> 0;
+  Result.FrequencyCount := FrequencyCount;
   Result.Status := glsIterationLimit;
   SetLength(Scales, Design.Cols); SetLength(Beta, Design.Cols);
   SetLength(Candidate, Design.Cols); SetLength(Result.Coefficients, Design.Cols);
   X := TDenseDoubleMatrix.Zeros(Design.Rows, Design.Cols);
   for J := 0 to Design.Cols - 1 do
   begin
-    for I := 0 to Design.Rows - 1 do Scales[J] := Max(Scales[J], Abs(Design[I,J]));
+    for I := 0 to Design.Rows - 1 do
+      if Frequencies[I] <> 0 then Scales[J] := Max(Scales[J], Abs(Design[I,J]));
     if Scales[J] = 0 then Scales[J] := 1;
-    for I := 0 to Design.Rows - 1 do X[I,J] := Design[I,J] / Scales[J];
+    for I := 0 to Design.Rows - 1 do
+      if Frequencies[I] <> 0 then X[I,J] := Design[I,J] / Scales[J];
   end;
   try
     if Family = gfPoissonLog then
     begin
-      Average := 0;
-      for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
+      Average := ResponseAverage(Y, Frequencies, FrequencyCount);
       if Finite(Average) and (Average > 0) and (Ln(Average) < 700) then
       begin
         InitialIntercept := Ln(Average);
         for J := 0 to X.Cols - 1 do
         begin
-          ConstantColumn := X[0,J] <> 0;
-          for I := 1 to X.Rows - 1 do
-            ConstantColumn := ConstantColumn and (X[I,J] = X[0,J]);
+          Correction := 0;
+          for I := 0 to X.Rows - 1 do
+            if Frequencies[I] <> 0 then begin Correction := X[I,J]; Break; end;
+          ConstantColumn := Correction <> 0;
+          for I := 0 to X.Rows - 1 do
+            if Frequencies[I] <> 0 then
+              ConstantColumn := ConstantColumn and (X[I,J] = Correction);
           if ConstantColumn then
           begin
             if Result.UsesOffsets or Result.UsesExposure then
-              InitialIntercept := OffsetNullIntercept(Y, Offsets, Family);
-            Beta[J] := InitialIntercept / X[0,J]; Break;
+              InitialIntercept := OffsetNullIntercept(Y, Offsets, Frequencies,
+                FrequencyCount, Family);
+            Beta[J] := InitialIntercept / Correction; Break;
           end;
         end;
       end;
     end;
-    if not Evaluate(X, Y, Beta, Offsets, Family, Means, Weights, Etas, Result.Deviance) then
+    if not Evaluate(X, Y, Beta, Offsets, Frequencies, Family,
+      Means, Weights, Etas, Result.Deviance) then
       raise EGLMError.Create('GLM initial objective is not representable.');
     Result.HasFiniteIterate := True;
     SetLength(Result.DevianceHistory, 1); Result.DevianceHistory[0] := Result.Deviance;
     for Iteration := 1 to Options.MaxIterations do
     begin
-      Factor := WeightedFactor(X, Y, Means, Weights, Options, Target, RootWeight);
+      Factor := WeightedFactor(X, Y, Means, Weights, Frequencies,
+        FrequencyCount, Options, Target, RootWeight);
       if not CheckFactor(Factor, X.Cols, Options, Result) then Break;
       Solution := Factor.SolveLeastSquares(Target);
       Change := 0; BetaNorm := 0;
@@ -528,7 +626,7 @@ begin
           Candidate[J] := Beta[J] + Step * Solution[J,0];
           Representable := Representable and Finite(Candidate[J] / Scales[J]);
         end;
-        if Representable and Evaluate(X, Y, Candidate, Offsets, Family,
+        if Representable and Evaluate(X, Y, Candidate, Offsets, Frequencies, Family,
            NewMeans, NewWeights, NewEtas, NewDeviance)
            and (NewDeviance <= OldDeviance +
              8 * 2.2204460492503131E-16 * (1 + OldDeviance)) then
@@ -551,7 +649,7 @@ begin
       Result.Deviance := NewDeviance; Result.Iterations := Iteration;
       SetLength(Result.DevianceHistory, Length(Result.DevianceHistory) + 1);
       Result.DevianceHistory[High(Result.DevianceHistory)] := NewDeviance;
-      if BoundaryStatus(Y, Etas, Family, X, Beta, Result.Status) then Break;
+      if BoundaryStatus(Y, Etas, Frequencies, Family, X, Beta, Result.Status) then Break;
       if (FullChange <= Options.Tolerance * (1 + BetaNorm)) and
          (LinearChange <= Options.Tolerance * (1 + EtaNorm)) and
          (OldDeviance - NewDeviance <= Options.Tolerance * (1 + NewDeviance)) then
@@ -563,7 +661,8 @@ begin
       IRLS point. Inferential diagnostics are withheld on every failed fit. }
     if Result.Status = glsConverged then
     begin
-      Factor := WeightedFactor(X, Y, Means, Weights, Options, Target, RootWeight);
+      Factor := WeightedFactor(X, Y, Means, Weights, Frequencies,
+        FrequencyCount, Options, Target, RootWeight);
       if CheckFactor(Factor, X.Cols, Options, Result) then
         StandardErrors(Factor, Scales, RootWeight, Result.StandardErrors);
     end;
@@ -573,9 +672,10 @@ begin
       if not Finite(Result.Coefficients[J]) then
         raise EGLMError.Create('GLM coefficient is not representable.');
     end;
-    FinishDiagnostics(Y, Etas, Means, Weights, Result);
+    FinishDiagnostics(Y, Etas, Means, Weights, Frequencies, FrequencyCount, Result);
     if Result.UsesOffsets or Result.UsesExposure then
-      Result.NullDeviance := OffsetNullDeviance(Y, Offsets, Family);
+      Result.NullDeviance := OffsetNullDeviance(Y, Offsets, Frequencies,
+        FrequencyCount, Family);
     if not Finite(Result.PearsonChiSquare) or not Finite(Result.NullDeviance) then
       raise EGLMError.Create('GLM diagnostics are not representable.');
   except
@@ -599,6 +699,13 @@ begin
   Result.Identifiable := Result.Status = glsConverged;
   if not Result.Identifiable then Result.StandardErrors := nil;
   Result.Message := Messages[Result.Status];
+  if Length(Inputs.FrequencyWeights) <> 0 then
+  begin
+    Result.DiagnosticRows := DiagnosticRows;
+    Result.FittedMeans := SelectDiagnosticRows(Result.FittedMeans, DiagnosticRows);
+    Result.ResponseResiduals := SelectDiagnosticRows(Result.ResponseResiduals, DiagnosticRows);
+    Result.DevianceResiduals := SelectDiagnosticRows(Result.DevianceResiduals, DiagnosticRows);
+  end;
 end;
 
 class function TGLMKit.FitLogistic(const Design: IDenseDoubleMatrix;
@@ -648,6 +755,8 @@ begin
      not (Fit.Family in [gfBernoulliLogit, gfPoissonLog]) then
     raise EGLMError.Create('PredictMean: a converged identifiable GLM fit is required.');
   ValidateDesign(Design, 'PredictMean');
+  if Length(Inputs.FrequencyWeights) <> 0 then
+    raise EGLMError.Create('PredictMean: frequency weights are training inputs only.');
   if (Design.Rows > 0) and
     ((Fit.UsesOffsets <> (Length(Inputs.Offsets) <> 0)) or
      (Fit.UsesExposure <> (Length(Inputs.Exposures) <> 0))) then
