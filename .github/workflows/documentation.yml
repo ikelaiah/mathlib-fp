@@ -202,6 +202,12 @@ jobs:
           ref: v2.7.0
           path: historical-2.7.0
 
+      - name: Check out immutable 2.8.0 documentation source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: v2.8.0
+          path: historical-2.8.0
+
       - name: Read current release version
         run: |
           test "$(cat current/VERSION)" = "${{ needs.resolve.outputs.release }}"
@@ -289,6 +295,10 @@ jobs:
             --source historical-2.7.0/docs \
             --versions current/docs/versions.json \
             --release 2.7.0 --output site/2.7.0 --site-root site
+          python3 current/tools/build_docs.py \
+            --source historical-2.8.0/docs \
+            --versions current/docs/versions.json \
+            --release 2.8.0 --output site/2.8.0 --site-root site
           python3 current/tools/build_docs.py \
             --source historical-2.0.0/docs \
             --versions current/docs/versions.json \

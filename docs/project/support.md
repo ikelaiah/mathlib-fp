@@ -98,7 +98,7 @@ files to the offline machine, verify the checksum, and extract the archive.
 Adding `src/` to the FPC unit path is sufficient; no configure or generation
 step is required. The release page also provides a separately checksummed
 offline HTML ZIP generated from the same tagged documentation. Extract it and
-open the latest published archive, `mathlib-fp-docs-2.2.0/index.html`,
+open the release archive's `mathlib-fp-docs-2.9.0/index.html`,
 locally.
 
 The release qualification workflows perform these same checksum, clean-
