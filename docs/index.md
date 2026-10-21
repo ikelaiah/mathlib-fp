@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The current source candidate is 2.10.0; the published stable release is 2.9.0. The candidate adds [grouped model validation](guides/domains/machine-learning.md#partial-least-squares-regression). Consult the [2.10.0 API reference](reference/api/reference-2.10.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md) for the candidate technical baseline.
+The current stable release is 2.10.0. It adds [grouped model validation](guides/domains/machine-learning.md#partial-least-squares-regression). Consult the [2.10.0 API reference](reference/api/reference-2.10.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md) for the current technical baseline.
 
 ## Domains
 

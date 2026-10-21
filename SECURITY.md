@@ -31,7 +31,8 @@ the 2.5.0 publication. The 2.5.x line is supported through 2027-04-13, six
 months after the 2.6.0 publication. The 2.6.x line is supported through 2027-04-14, six months after
 the 2.7.0 publication. The 2.7.x line is supported through 2027-04-14, six
 months after the 2.8.0 publication. The 2.8.x line is supported through
-2027-04-21, six months after the 2.9.0 publication.
+2027-04-21, six months after the 2.9.0 publication. The 2.9.x line is supported
+through 2027-04-22, six months after the 2.10.0 publication.
 Security support for the 1.10.x and 1.9.x lines ended on
 2026-03-21, six months after 2.0.0 was published. Security fixes are published
 as patch releases for every supported affected line with

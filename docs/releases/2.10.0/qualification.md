@@ -26,11 +26,19 @@ retains the gate list.
 
 ## Hosted qualification and publication gates
 
-Linux and Windows CI, checksummed clean-source-archive qualification, a
-clean-profile Lazarus consumer, exact-main CI, and published artifact checks
-remain required. Linux qualification must block new outbound connections from
-the extracted archive; Windows qualifies a verified clean ZIP. The released
-tag must identify the exact validated main commit.
+Linux and Windows CI passed in [PR #75](https://github.com/ikelaiah/mathlib-fp/pull/75)
+and [CI run](https://github.com/ikelaiah/mathlib-fp/actions/runs/39671164036).
+The [clean-source-archive run](https://github.com/ikelaiah/mathlib-fp/actions/runs/39671129119)
+passed 139 Linux gates and 140 Windows gates. Linux blocked new outbound
+connections after extraction and checksum verification; Windows qualified its
+verified clean ZIP. Separate platform evidence artifacts were retained.
+
+Local clean ZIP/tar preflight verified identical source contents, the README
+quick start, grouped-validation example, fresh-profile Lazarus package consumer,
+and offline documentation identity, checksum, and links.
+
+The finalized branch must retain green CI and clean-archive qualification.
+The resulting exact main commit must pass CI before the tag is created.
 
 Publication follows [RELEASING.md](../../../RELEASING.md). The GitHub release
 body contains changelog content and begins with `### Added`; the release title

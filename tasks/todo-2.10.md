@@ -5,7 +5,7 @@
 - [x] Add grouped outer-test workflow and checked output contract.
 - [x] Update candidate API, package, capabilities, evidence and docs.
 - [x] Complete final local qualification and five-axis code review.
-- [ ] Obtain hosted Linux/Windows CI and clean-archive qualification.
+- [x] Obtain hosted Linux/Windows CI and clean-archive qualification.
 - [ ] Finalize stable metadata, merge, and verify exact main CI.
 - [ ] Publish v2.10.0 and verify archives, checksums and versioned docs.
 

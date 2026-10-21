@@ -956,7 +956,7 @@ See the [GLM guide](../guides/domains/generalized-linear-models.md),
 [release notes](../releases/2.7.0/release-notes.md) and
 [qualification record](../releases/2.7.0/qualification.md).
 
-## Previous published stable release: 2.9.0 — Optimization II
+## Previous release: 2.9.0 — Optimization II
 
 Provide a reproducible bounded global-search baseline for scalar objectives,
 with explicit bounds, evaluation budgets, deterministic seed/state, stopping
@@ -1000,7 +1000,7 @@ supported-platform and clean-archive qualification. Performance claims require
 measured time, memory, and accuracy evidence. Reference tools may generate
 offline fixtures but must not become runtime dependencies.
 
-## Release candidate target: 2.10.0 — Shared validation and grouped model selection
+## Previous release: 2.10.0 — Shared validation and grouped model selection
 
 Add explicit training/validation row-set pairs, grouped and stratified split
 builders, and a PLS overload consuming supplied splits. Reuse the existing
@@ -1020,7 +1020,12 @@ training sets cannot be represented as the complement of a validation fold.
 No generic estimator framework, automatic hyperparameter search, PLS2, or
 combined stratified-group optimizer is included.
 
-## Planned 2.11.0 — Chronological model validation
+Version 2.10.0 delivers explicit, grouped and stratified row sets, supplied-split
+PLS selection, and per-split scoring diagnostics. See the
+[release notes](../releases/2.10.0/release-notes.md) and
+[qualification record](../releases/2.10.0/qualification.md).
+
+## Next release: 2.11.0 — Chronological model validation
 
 Build expanding-window and fixed-width rolling-window splits on 2.10 row sets.
 Expose minimum training size, validation horizon, step, and a gap measured in
