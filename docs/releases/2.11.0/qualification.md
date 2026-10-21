@@ -39,3 +39,16 @@ The finalized branch must retain green CI and clean-archive qualification, and
 the resulting exact main commit must pass CI before tagging. Publication and
 downloaded artifact verification follow [RELEASING.md](../../../RELEASING.md).
 Release bodies contain changelog content; the title stays in the title field.
+
+## Published artifact verification
+
+[v2.11.0](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.11.0) names
+main commit `3bc5be2ec81dbcd6cbd5a79e6af223ed9b388380`, whose
+[Linux/Windows CI](https://github.com/ikelaiah/mathlib-fp/actions/runs/39679027271)
+passed. The [documentation publication](https://github.com/ikelaiah/mathlib-fp/actions/runs/39680145824)
+deployed the versioned site and attached the offline ZIP and SHA-256.
+Downloaded checksums, matching source ZIP/tar contents, the automatic GitHub
+archive, README quick starts, the release workflow, a fresh Lazarus consumer,
+offline/current links, live retained release identities, six assets and the
+title-free body passed on 2026-10-22. The
+[verification record](publication-verification.json) retains these checks.
