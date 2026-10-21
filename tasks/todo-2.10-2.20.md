@@ -1,8 +1,9 @@
 # v2.10.0–v2.20.0 execution checklist
 
-The v2.10.0 implementation is in release qualification. See the [plan](plan-2.10-2.20.md) for task
+v2.10.0 is published and verified. v2.11.0 is in final qualification;
+v2.12.0 implementation is underway. Releases through v2.14.0 are authorized. See the [plan](plan-2.10-2.20.md) for task
 dependencies and verification, and the [roadmap](../docs/project/roadmap.md) for
-scope, exclusions, and acceptance gates. Only v2.10.0 is the next design target.
+scope, exclusions, and acceptance gates. Later releases remain planned capability gates.
 
 ## v2.10.0 — Validation splits
 
@@ -14,7 +15,7 @@ scope, exclusions, and acceptance gates. Only v2.10.0 is the next design target.
 - [x] E: Integrate supplied splits into PLS with per-split diagnostics.
 - [x] Checkpoint: old default results preserved; training-only preprocessing verified.
 - [x] F: Demonstrate model comparison with an untouched outer test set.
-- [ ] G: Review, qualify, release, and verify published artifacts.
+- [x] G: Review, qualify, release, and verify published artifacts.
 
 ## Later release activation and delivery
 
