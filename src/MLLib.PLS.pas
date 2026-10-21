@@ -16,7 +16,7 @@ interface
 uses
   Classes, SysUtils, Math,
   MathBase.SharedTypes,
-  MLLib.MachineLearning;
+  MLLib.MachineLearning, MLLib.Analysis;
 
 type
   EPLSError = class(Exception);
@@ -31,6 +31,7 @@ type
   end;
 
   TPLSStatus = (plsConverged, plsMeanOnly);
+  TPLSFoldErrors = array of TDoubleArray;
 
   TPLSModel = record
     Coefficients: TDoubleArray; { one per original predictor }
@@ -43,6 +44,9 @@ type
     CrossValidationFolds: SizeInt;
     CrossValidationSeed: LongWord;
     RMSECV: TDoubleArray; { index 0 is the fold-training-mean baseline }
+    FoldRMSECV: TPLSFoldErrors; { supplied-split fits only }
+    FoldSampleCounts: TIntegerArray; { scored rows per supplied split }
+    CrossValidationSampleCount: SizeInt; { counted row occurrences }
     Status: TPLSStatus;
   end;
 
@@ -54,6 +58,12 @@ type
     class function Fit(const X: MLLib.MachineLearning.TDoubleMatrix;
       const Y: TDoubleArray; const Options: TPLSOptions): TPLSModel;
       overload; static;
+    class function Fit(const X: MLLib.MachineLearning.TDoubleMatrix;
+      const Y: TDoubleArray; const Splits: TValidationSplits): TPLSModel;
+      overload; static;
+    class function Fit(const X: MLLib.MachineLearning.TDoubleMatrix;
+      const Y: TDoubleArray; const Splits: TValidationSplits;
+      const Options: TPLSOptions): TPLSModel; overload; static;
     { Predict from new rows with the same predictor columns and order. }
     class function Predict(const Model: TPLSModel;
       const XNew: MLLib.MachineLearning.TDoubleMatrix): TDoubleArray; static;
@@ -617,6 +627,9 @@ begin
   Result.PredictorMeans := nil;
   Result.PredictorScales := nil;
   Result.RMSECV := nil;
+  Result.FoldRMSECV := nil;
+  Result.FoldSampleCounts := nil;
+  Result.CrossValidationSampleCount := 0;
   ValidateData(X, Y);
   ValidateOptions(Options, Length(X));
   FullFit := InternalFit(X, Y, Options.ScalePredictors,
@@ -699,6 +712,145 @@ begin
     Result.Status := plsMeanOnly
   else
     Result.Status := plsConverged;
+end;
+
+procedure BuildValidationRows(const X: TPLSMatrix; const Y: TDoubleArray;
+  const Split: TValidationSplit; out TrainX, TestX: TPLSMatrix;
+  out TrainY, TestY: TDoubleArray);
+var I, Row: SizeInt;
+begin
+  SetLength(TrainX, Length(Split.TrainingRows));
+  SetLength(TrainY, Length(Split.TrainingRows));
+  for I := 0 to High(TrainX) do
+  begin
+    Row := Split.TrainingRows[I];
+    TrainX[I] := Copy(X[Row]); TrainY[I] := Y[Row];
+  end;
+  SetLength(TestX, Length(Split.ValidationRows));
+  SetLength(TestY, Length(Split.ValidationRows));
+  for I := 0 to High(TestX) do
+  begin
+    Row := Split.ValidationRows[I];
+    TestX[I] := Copy(X[Row]); TestY[I] := Y[Row];
+  end;
+end;
+
+class function TPLSKit.Fit(const X: MLLib.MachineLearning.TDoubleMatrix;
+  const Y: TDoubleArray; const Splits: TValidationSplits): TPLSModel;
+begin
+  Result := Fit(X, Y, Splits, TPLSOptions.Default);
+end;
+
+class function TPLSKit.Fit(const X: MLLib.MachineLearning.TDoubleMatrix;
+  const Y: TDoubleArray; const Splits: TValidationSplits;
+  const Options: TPLSOptions): TPLSModel;
+type TErrorRows = array of TScaledSquares;
+var
+  FullFit, FoldFit: TPLSInternalFit;
+  TrainX, TestX: TPLSMatrix;
+  TrainY, TestY: TDoubleArray;
+  PooledErrors: TErrorRows;
+  FoldErrors: array of TErrorRows;
+  EffectiveMax, CVMax, FoldIndex, FoldFitCount, I, K, J,
+    BestComponent, SelectedComponent, ScoredCount: SizeInt;
+  Prediction, Difference, MinimumError: Double;
+begin
+  Result.Coefficients := nil;
+  Result.PredictorMeans := nil;
+  Result.PredictorScales := nil;
+  Result.RMSECV := nil;
+  Result.FoldRMSECV := nil;
+  Result.FoldSampleCounts := nil;
+  ValidateData(X, Y);
+  ValidateOptions(Options, Length(X));
+  if Options.Folds <> 0 then
+    raise EPLSError.Create('Fit: Folds must be zero with supplied splits.');
+  if Length(Splits) < 2 then
+    raise EPLSError.Create('Fit: at least two supplied splits are required.');
+  ScoredCount := 0;
+  for FoldIndex := 0 to High(Splits) do
+  begin
+    TAnalysisKit.ValidateSplit(Length(X), Splits[FoldIndex]);
+    if Length(Splits[FoldIndex].TrainingRows) < 2 then
+      raise EPLSError.Create('Fit: split training set needs at least two rows.');
+    if ScoredCount > High(SizeInt) - Length(Splits[FoldIndex].ValidationRows) then
+      raise EPLSError.Create('Fit: scored row count overflow.');
+    Inc(ScoredCount, Length(Splits[FoldIndex].ValidationRows));
+  end;
+  FullFit := InternalFit(X, Y, Options.ScalePredictors,
+    -1, Options.RankTolerance);
+  if Options.MaxComponents > FullFit.Rank then
+    raise EPLSError.CreateFmt('Fit: MaxComponents (%d) exceeds the measured ' +
+      'predictor rank (%d)', [Options.MaxComponents, FullFit.Rank]);
+  if Options.MaxComponents = 0 then EffectiveMax := FullFit.Rank
+  else EffectiveMax := Options.MaxComponents;
+  CVMax := EffectiveMax;
+  SetLength(PooledErrors, EffectiveMax + 1);
+  SetLength(FoldErrors, Length(Splits));
+  SetLength(Result.FoldSampleCounts, Length(Splits));
+  for FoldIndex := 0 to High(Splits) do
+  begin
+    BuildValidationRows(X, Y, Splits[FoldIndex],
+      TrainX, TestX, TrainY, TestY);
+    FoldFit := InternalFit(TrainX, TrainY, Options.ScalePredictors,
+      EffectiveMax, Options.RankTolerance);
+    FoldFitCount := FoldFit.ComponentCount;
+    if FoldFitCount < CVMax then CVMax := FoldFitCount;
+    Result.FoldSampleCounts[FoldIndex] := Length(TestY);
+    SetLength(FoldErrors[FoldIndex], FoldFitCount + 1);
+    for I := 0 to High(TestX) do
+      for K := 0 to FoldFitCount do
+      begin
+        Prediction := PredictInternal(FoldFit, K, TestX[I]);
+        Difference := TestY[I] - Prediction;
+        RequireFinite(Difference, 'Cross-validation residual');
+        AddScaledSquare(PooledErrors[K], Difference);
+        AddScaledSquare(FoldErrors[FoldIndex][K], Difference);
+      end;
+  end;
+  SetLength(Result.RMSECV, CVMax + 1);
+  SetLength(Result.FoldRMSECV, Length(Splits));
+  BestComponent := 0;
+  MinimumError := ScaledRMSE(PooledErrors[0], ScoredCount);
+  for K := 0 to CVMax do
+  begin
+    Result.RMSECV[K] := ScaledRMSE(PooledErrors[K], ScoredCount);
+    if Result.RMSECV[K] < MinimumError then
+    begin
+      MinimumError := Result.RMSECV[K]; BestComponent := K;
+    end;
+    for FoldIndex := 0 to High(Splits) do
+    begin
+      if Length(Result.FoldRMSECV[FoldIndex]) = 0 then
+        SetLength(Result.FoldRMSECV[FoldIndex], CVMax + 1);
+      Result.FoldRMSECV[FoldIndex][K] :=
+        ScaledRMSE(FoldErrors[FoldIndex][K],
+          Result.FoldSampleCounts[FoldIndex]);
+    end;
+  end;
+  SelectedComponent := BestComponent;
+  Result.Coefficients := Copy(FullFit.Betas[SelectedComponent]);
+  for J := 0 to High(Result.Coefficients) do
+  begin
+    Result.Coefficients[J] := Result.Coefficients[J] *
+      FullFit.ResponseScale / FullFit.Scales[J];
+    RequireFinite(Result.Coefficients[J], 'Original-scale coefficient');
+  end;
+  Result.Intercept := FullFit.ResponseMean;
+  for J := 0 to High(Result.Coefficients) do
+    Result.Intercept := Result.Intercept -
+      FullFit.Means[J] * Result.Coefficients[J];
+  RequireFinite(Result.Intercept, 'Original-scale intercept');
+  Result.PredictorMeans := Copy(FullFit.Means);
+  Result.PredictorScales := Copy(FullFit.Scales);
+  Result.PredictorRank := FullFit.Rank;
+  Result.SelectedComponents := SelectedComponent;
+  Result.ValidatedComponents := CVMax;
+  Result.CrossValidationFolds := Length(Splits);
+  Result.CrossValidationSeed := 0;
+  Result.CrossValidationSampleCount := ScoredCount;
+  if SelectedComponent = 0 then Result.Status := plsMeanOnly
+  else Result.Status := plsConverged;
 end;
 
 class function TPLSKit.Predict(const Model: TPLSModel;

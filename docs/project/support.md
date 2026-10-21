@@ -1,5 +1,9 @@
 # Supported platform matrix
 
+Version 2.10.0 release candidate adds explicit grouped/stratified validation
+and supplied-split PLS selection. Its supported-platform qualification is
+pending; the evidence below belongs to the published v2.9.0 release.
+
 Version 2.9.0 adds bounded differential-evolution global search with explicit
 random state, strict call budgets, and optional bounded local polishing.
 The [2.9.0 qualification record](../releases/2.9.0/qualification.md) records
@@ -27,9 +31,10 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The current release tree targets 2.9.0. Its normal, optimized and checked/heap
-suites, full local qualification, hosted Linux/Windows CI and both primary
-clean-archive profiles passed. No target claim is inferred from another platform.
+The current release tree targets 2.10.0. Its new validation behavior is under
+qualification. The v2.9.0 normal, optimized and checked/heap suites, full local
+qualification, hosted Linux/Windows CI and both primary clean-archive profiles
+passed. No target claim is inferred from another platform.
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |

@@ -41,6 +41,7 @@ type
     TrainingRows: TIntegerArray;
     ValidationRows: TIntegerArray;
   end;
+  TValidationSplits = array of TValidationSplit;
 
   TBinaryLDAResult = record
     Direction: TDoubleArray;
@@ -108,6 +109,14 @@ type
       TValidationSplit; static;
     class function KFoldAssignments(const SampleCount, FoldCount: SizeInt;
       const Seed: QWord = 42): TIntegerArray; static;
+    class procedure ValidateSplit(const SampleCount: SizeInt;
+      const Split: TValidationSplit); static;
+    class function GroupKFoldSplits(const Groups: TIntegerArray;
+      const FoldCount: SizeInt; const Seed: QWord = 42):
+      TValidationSplits; static;
+    class function StratifiedKFoldSplits(const Labels: TIntegerArray;
+      const FoldCount: SizeInt; const Seed: QWord = 42):
+      TValidationSplits; static;
     class function FitBinaryLDA(const Data: IDenseDoubleMatrix;
       const Labels: TIntegerArray; const NegativeClass, PositiveClass: Integer;
       const Ridge: Double = 1E-9): TBinaryLDAResult; static;
@@ -546,6 +555,226 @@ begin
   ShuffleIndices(Indices, Generator);
   for I := 0 to SampleCount - 1 do
     Result[Indices[I]] := I mod FoldCount;
+end;
+
+type
+  TLabelRow = record
+    LabelId, Row: Integer;
+  end;
+  TLabelRows = array of TLabelRow;
+
+procedure SortLabelRows(var Rows: TLabelRows; LeftIndex, RightIndex: SizeInt);
+var I, J, Pivot: SizeInt; Temporary: TLabelRow;
+begin
+  I := LeftIndex; J := RightIndex;
+  Pivot := Rows[(LeftIndex + RightIndex) div 2].LabelId;
+  repeat
+    while Rows[I].LabelId < Pivot do Inc(I);
+    while Rows[J].LabelId > Pivot do Dec(J);
+    if I <= J then
+    begin
+      Temporary := Rows[I]; Rows[I] := Rows[J]; Rows[J] := Temporary;
+      Inc(I); Dec(J);
+    end;
+  until I > J;
+  if LeftIndex < J then SortLabelRows(Rows, LeftIndex, J);
+  if I < RightIndex then SortLabelRows(Rows, I, RightIndex);
+end;
+
+procedure SortGroupsBySize(var Order: TIntegerArray;
+  var Scratch: TIntegerArray; const Counts: TIntegerArray;
+  const First, AfterLast: SizeInt);
+var Middle, LeftAt, RightAt, At: SizeInt;
+begin
+  if AfterLast - First <= 1 then Exit;
+  Middle := First + (AfterLast - First) div 2;
+  SortGroupsBySize(Order, Scratch, Counts, First, Middle);
+  SortGroupsBySize(Order, Scratch, Counts, Middle, AfterLast);
+  LeftAt := First; RightAt := Middle;
+  for At := First to AfterLast - 1 do
+  begin
+    { Equal sizes keep their seeded shuffled order. }
+    if (LeftAt < Middle) and ((RightAt >= AfterLast) or
+      (Counts[Order[LeftAt]] >= Counts[Order[RightAt]])) then
+    begin
+      Scratch[At] := Order[LeftAt]; Inc(LeftAt);
+    end
+    else
+    begin
+      Scratch[At] := Order[RightAt]; Inc(RightAt);
+    end;
+  end;
+  for At := First to AfterLast - 1 do Order[At] := Scratch[At];
+end;
+
+function BuildSplitsFromAssignments(const Assignment: TIntegerArray;
+  const FoldCount: SizeInt): TValidationSplits;
+var
+  Counts, TrainAt, ValidAt: TIntegerArray;
+  I, F: SizeInt;
+begin
+  Result := nil;
+  SetLength(Result, FoldCount);
+  SetLength(Counts, FoldCount);
+  SetLength(TrainAt, FoldCount);
+  SetLength(ValidAt, FoldCount);
+  for I := 0 to High(Assignment) do Inc(Counts[Assignment[I]]);
+  for F := 0 to FoldCount - 1 do
+  begin
+    if (Counts[F] = 0) or (Counts[F] = Length(Assignment)) then
+      raise EAnalysisError.Create('Validation: empty training or validation fold.');
+    SetLength(Result[F].TrainingRows, Length(Assignment) - Counts[F]);
+    SetLength(Result[F].ValidationRows, Counts[F]);
+  end;
+  for I := 0 to High(Assignment) do
+    for F := 0 to FoldCount - 1 do
+      if Assignment[I] = F then
+      begin
+        Result[F].ValidationRows[ValidAt[F]] := I;
+        Inc(ValidAt[F]);
+      end
+      else
+      begin
+        Result[F].TrainingRows[TrainAt[F]] := I;
+        Inc(TrainAt[F]);
+      end;
+end;
+
+class procedure TAnalysisKit.ValidateSplit(const SampleCount: SizeInt;
+  const Split: TValidationSplit);
+var Seen: array of Boolean; I, Row: SizeInt;
+begin
+  if (SampleCount < 2) or (SampleCount > High(Integer)) or
+    (Length(Split.TrainingRows) = 0) or
+    (Length(Split.ValidationRows) = 0) then
+    raise EAnalysisError.Create('ValidateSplit: nonempty train and validation rows required.');
+  SetLength(Seen, SampleCount);
+  for I := 0 to High(Split.TrainingRows) do
+  begin
+    Row := Split.TrainingRows[I];
+    if (Row < 0) or (Row >= SampleCount) then
+      raise EAnalysisError.Create('ValidateSplit: training row out of range.');
+    if Seen[Row] then
+      raise EAnalysisError.Create('ValidateSplit: duplicate training row.');
+    Seen[Row] := True;
+  end;
+  for I := 0 to High(Split.ValidationRows) do
+  begin
+    Row := Split.ValidationRows[I];
+    if (Row < 0) or (Row >= SampleCount) then
+      raise EAnalysisError.Create('ValidateSplit: validation row out of range.');
+    if Seen[Row] then
+      raise EAnalysisError.Create('ValidateSplit: duplicate or overlapping row.');
+    Seen[Row] := True;
+  end;
+end;
+
+class function TAnalysisKit.GroupKFoldSplits(const Groups: TIntegerArray;
+  const FoldCount: SizeInt; const Seed: QWord): TValidationSplits;
+var
+  Rows: TLabelRows;
+  GroupIds, GroupCounts, GroupFolds, Priority, Scratch, FoldSizes,
+    Assignment: TIntegerArray;
+  Generator: TLocalRandom;
+  N, G, StartAt, StopAt, I, J, Best, Temporary, GroupIndex,
+    LowIndex, HighIndex, Middle: SizeInt;
+begin
+  Result := nil;
+  N := Length(Groups);
+  if (N < 2) or (N > High(Integer)) or (FoldCount < 2) or
+    (FoldCount > N) then
+    raise EAnalysisError.Create('GroupKFoldSplits: invalid sample or fold count.');
+  SetLength(Rows, N);
+  for I := 0 to N - 1 do
+  begin
+    Rows[I].LabelId := Groups[I]; Rows[I].Row := I;
+  end;
+  SortLabelRows(Rows, 0, N - 1);
+  SetLength(GroupIds, N); SetLength(GroupCounts, N);
+  G := 0; StartAt := 0;
+  while StartAt < N do
+  begin
+    StopAt := StartAt + 1;
+    while (StopAt < N) and (Rows[StopAt].LabelId = Rows[StartAt].LabelId) do
+      Inc(StopAt);
+    GroupIds[G] := Rows[StartAt].LabelId;
+    GroupCounts[G] := StopAt - StartAt;
+    Inc(G); StartAt := StopAt;
+  end;
+  if FoldCount > G then
+    raise EAnalysisError.Create('GroupKFoldSplits: fewer groups than folds.');
+  SetLength(GroupIds, G); SetLength(GroupCounts, G);
+  SetLength(GroupFolds, G); SetLength(Priority, G);
+  SetLength(Scratch, G);
+  SetLength(FoldSizes, FoldCount); SetLength(Assignment, N);
+  for I := 0 to G - 1 do Priority[I] := I;
+  Generator := TLocalRandom.Seeded(Seed);
+  for I := G - 1 downto 1 do
+  begin
+    J := Generator.NextInteger(I + 1);
+    Temporary := Priority[I]; Priority[I] := Priority[J]; Priority[J] := Temporary;
+  end;
+  SortGroupsBySize(Priority, Scratch, GroupCounts, 0, G);
+  for I := 0 to G - 1 do
+  begin
+    Best := 0;
+    for J := 1 to FoldCount - 1 do
+      if FoldSizes[J] < FoldSizes[Best] then Best := J;
+    GroupIndex := Priority[I]; GroupFolds[GroupIndex] := Best;
+    Inc(FoldSizes[Best], GroupCounts[GroupIndex]);
+  end;
+  for I := 0 to N - 1 do
+  begin
+    LowIndex := 0; HighIndex := G - 1;
+    repeat
+      Middle := (LowIndex + HighIndex) div 2;
+      if GroupIds[Middle] < Groups[I] then LowIndex := Middle + 1
+      else HighIndex := Middle - 1;
+    until LowIndex > HighIndex;
+    Assignment[I] := GroupFolds[LowIndex];
+  end;
+  Result := BuildSplitsFromAssignments(Assignment, FoldCount);
+end;
+
+class function TAnalysisKit.StratifiedKFoldSplits(const Labels: TIntegerArray;
+  const FoldCount: SizeInt; const Seed: QWord): TValidationSplits;
+var
+  Rows: TLabelRows;
+  Assignment: TIntegerArray;
+  Generator: TLocalRandom;
+  N, I, J, StartAt, StopAt, FoldStart, Temporary: SizeInt;
+begin
+  Result := nil; N := Length(Labels);
+  if (N < 2) or (N > High(Integer)) or (FoldCount < 2) or
+    (FoldCount > N) then
+    raise EAnalysisError.Create('StratifiedKFoldSplits: invalid sample or fold count.');
+  SetLength(Rows, N); SetLength(Assignment, N);
+  for I := 0 to N - 1 do
+  begin
+    Rows[I].LabelId := Labels[I]; Rows[I].Row := I;
+  end;
+  SortLabelRows(Rows, 0, N - 1);
+  Generator := TLocalRandom.Seeded(Seed);
+  StartAt := 0; FoldStart := 0;
+  while StartAt < N do
+  begin
+    StopAt := StartAt + 1;
+    while (StopAt < N) and (Rows[StopAt].LabelId = Rows[StartAt].LabelId) do
+      Inc(StopAt);
+    if StopAt - StartAt < FoldCount then
+      raise EAnalysisError.Create('StratifiedKFoldSplits: class smaller than fold count.');
+    for I := StopAt - 1 downto StartAt + 1 do
+    begin
+      J := StartAt + Generator.NextInteger(I - StartAt + 1);
+      Temporary := Rows[I].Row; Rows[I].Row := Rows[J].Row;
+      Rows[J].Row := Temporary;
+    end;
+    for I := StartAt to StopAt - 1 do
+      Assignment[Rows[I].Row] := (FoldStart + I - StartAt) mod FoldCount;
+    FoldStart := (FoldStart + StopAt - StartAt) mod FoldCount;
+    StartAt := StopAt;
+  end;
+  Result := BuildSplitsFromAssignments(Assignment, FoldCount);
 end;
 
 class function TAnalysisKit.FitBinaryLDA(const Data: IDenseDoubleMatrix;

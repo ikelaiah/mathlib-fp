@@ -197,16 +197,29 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 2.7.0 | Statistics II | Logistic and Poisson generalized linear models with convergence and failure diagnostics |
 | 2.8.0 | Data Analysis II | A validated PLS regression workflow for correlated multivariate data |
 | 2.9.0 | Optimization II | A deterministic bounded global-search baseline with explicit budgets and termination status |
-| 3.0.0 (major gate) | Compatibility and integrated-workflow review | A deliberate API migration only where previously announced breaking changes are still needed |
+| 2.10.0 | Shared validation splits and grouped model selection | Compare models on explicit, reproducible training/validation rows |
+| 2.11.0 | Chronological model validation | Evaluate future observations with rolling or expanding training windows |
+| 2.12.0 | GLM offsets and Poisson exposure | Model counts collected over unequal observation periods |
+| 2.13.0 | GLM frequency weights | Fit repeated observations without physically duplicating rows |
+| 2.14.0 | GLM and PLS prediction persistence | Save, reload, and deploy fitted prediction models |
+| 2.15.0 | Kalman filtering with missing observations | Continue estimation through complete or partial sensor dropouts |
+| 2.16.0 | Fixed-interval state smoothing | Reconstruct historical states using later observations |
+| 2.17.0 | Windowed low-pass FIR design | Design inspectable anti-alias filters with explicit delay |
+| 2.18.0 | Rational polyphase resampling | Convert sample rates with bounded streaming state |
+| 2.19.0 | Streaming DSP persistence | Save and resume SOS filtering and rational resampling |
+| 2.20.0 | Truncated PCA | Extract leading components with measured resource savings |
+| 3.0.0 (unassigned major gate) | Compatibility review | A deliberate API migration only where previously announced breaking changes are still needed |
 
 The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
 Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
 2.5.0. Version 2.5.1 was a documentation-only patch; 2.6.0 completed the
 Signal Processing II gate, 2.7.0 completed Statistics II, 2.8.0 completed
-Data Analysis II, and 2.9.0 completes Optimization II. The 3.0.0 gate is a
-compatibility and workflow review; its timing and final API design remain
-open. Other candidate lanes remain
-uncommitted directions.
+Data Analysis II, and 2.9.0 completes Optimization II. The proposed 2.10.0–2.20.0
+sequence completes validation, deployment, state estimation, and sample-rate
+conversion workflows before expanding PCA scalability. Only 2.10.0 is the next
+design target. Later slots require the activation gates below and may be
+reordered, split, or replaced when evidence changes. These are planning targets,
+not dates or claims of implementation. The 3.0.0 gate remains unassigned.
 
 ## Implementation discipline
 
@@ -943,7 +956,7 @@ See the [GLM guide](../guides/domains/generalized-linear-models.md),
 [release notes](../releases/2.7.0/release-notes.md) and
 [qualification record](../releases/2.7.0/qualification.md).
 
-## Previous release: 2.9.0 — Optimization II
+## Previous published stable release: 2.9.0 — Optimization II
 
 Provide a reproducible bounded global-search baseline for scalar objectives,
 with explicit bounds, evaluation budgets, deterministic seed/state, stopping
@@ -963,7 +976,224 @@ and polish call budgets, and optional bounded coordinate polishing. See the
 [release notes](../releases/2.9.0/release-notes.md), and
 [qualification record](../releases/2.9.0/qualification.md).
 
-## Next release: 3.0.0 — Compatibility and integrated workflows
+## Planning horizon: 2.10.0–2.20.0
+
+This sequence was reviewed against the 2.9.0 source and capability inventory.
+Existing seeded holdout/K-fold helpers, training-only PLS preprocessing,
+nonlinear robust losses, SOS filtering, and model adapters remain the baseline;
+they are not counted again as new features. No current issue backlog establishes
+demand for every proposed extension. Before activating each release, demonstrate
+a workflow that benefits from its scope and record its numerical and maintenance
+case under the [contribution gate](governance.md#contribution-gate-for-new-domains).
+
+Review priorities after 2.11, 2.14, 2.16, and 2.19. A failed activation gate
+defers that scope; it does not justify filler APIs or a release merely to occupy
+a version number. Exact public types and algorithms need a per-release spec.
+Detailed execution planning is in
+[the release plan](../../tasks/plan-2.10-2.20.md) and
+[task checklist](../../tasks/todo-2.10-2.20.md).
+
+Every release must preserve existing 2.x calls and documented seeded behavior,
+keep a complete portable Pascal implementation, and ship independent references,
+edge/failure tests, a runnable workflow, API and guide updates, and normal
+supported-platform and clean-archive qualification. Performance claims require
+measured time, memory, and accuracy evidence. Reference tools may generate
+offline fixtures but must not become runtime dependencies.
+
+## Release candidate target: 2.10.0 — Shared validation and grouped model selection
+
+Add explicit training/validation row-set pairs, grouped and stratified split
+builders, and a PLS overload consuming supplied splits. Reuse the existing
+K-fold surface where behavior agrees; preserve its output and the existing PLS
+default shuffle. Explicit row sets are necessary because future chronological
+training sets cannot be represented as the complement of a validation fold.
+
+- Gate: validate indices, duplicates, disjointness, empty sets, insufficient
+  groups, and the documented policy for small classes; group splits never put
+  a group in both training and validation within a split.
+- Gate: PLS learns preprocessing and component selection from training rows;
+  report per-split errors, scored row counts, and aggregation semantics. An
+  untouched outer test set is used for the final workflow evaluation.
+- Gate: a grouped correlated-predictor example compares existing models on the
+  same rows and preserves all default seeded regression fixtures.
+
+No generic estimator framework, automatic hyperparameter search, PLS2, or
+combined stratified-group optimizer is included.
+
+## Planned 2.11.0 — Chronological model validation
+
+Build expanding-window and fixed-width rolling-window splits on 2.10 row sets.
+Expose minimum training size, validation horizon, step, and a gap measured in
+rows. Require caller-ordered observations; irregular-time duration windows are
+outside the initial contract.
+
+- Gate: every training index precedes validation, the requested gap is honored,
+  and invalid/insufficient histories fail explicitly.
+- Gate: preprocessing and PLS selection remain within each training window;
+  overlapping validation windows have explicit scoring/aggregation rules.
+- Gate: a future-observation workflow demonstrates chronological evaluation,
+  with hand-enumerated split fixtures and a deterministic replay.
+
+This supplies evaluation tools, not new forecasting estimators or a claim that
+a row gap eliminates every source of temporal leakage.
+
+## Planned 2.12.0 — GLM offsets and Poisson exposure
+
+Extend existing Bernoulli-logit and Poisson-log fits with known additive linear
+predictor offsets; support positive exposure for Poisson models through its
+logarithm. Prediction accepts the corresponding new-observation inputs.
+
+- Gate: independent fixtures cover unequal exposure, nonzero offsets, null
+  deviance, convergence failures, and prediction; zero offsets/unit exposures
+  reproduce the existing behavior within its numerical contract.
+- Gate: reject invalid dimensions/nonfinite offsets/nonpositive exposure and
+  specify whether simultaneous offset and exposure inputs are allowed.
+- Gate: a count-rate example explains expected counts versus rates and shows
+  that deployment needs exposure for each new observation.
+
+Weight semantics, regularization, additional families, and robust covariance
+are deferred.
+
+## Planned 2.13.0 — GLM frequency weights
+
+Add explicitly named nonnegative integer frequency weights to the existing GLM
+families, including offset/exposure fits. A weight means row replication, not
+inverse variance, survey weighting, or an unspecified importance score.
+
+- Gate: coefficients, deviance, information-based standard errors, and degrees
+  of freedom agree with explicitly replicated small datasets.
+- Gate: zero-weight rows, zero total weight, effective rank, integer/count
+  overflow, and interactions with separation and offsets have explicit tests.
+- Gate: a repeated-observation workflow demonstrates reduced stored row count;
+  unit weights preserve unweighted results and diagnostics.
+
+Fractional/analytic weights, grouped-binomial response formats, and robust
+covariance require separate designs.
+
+## Planned 2.14.0 — Prediction model persistence
+
+Extend selected-model interchange with GLM and PLS prediction adapters after
+2.12–2.13 settle their contracts. Store the family/link, coefficients, intercept
+convention, predictor order/count, required preprocessing, and prediction input
+requirements. Distinguish an inference artifact from the full training report.
+
+- Gate: fit/save/reload/predict agrees with in-memory prediction; transformations
+  are applied exactly once, including PLS original-scale coefficients.
+- Gate: version, scalar encoding, dimensions, integrity, finite values, and
+  allocation caps are checked before accepting an artifact; malformed and
+  unsupported versions fail explicitly.
+- Gate: a separate clean-archive consumer loads models without training data;
+  legacy spline/FIR/standardizer/scalar-Kalman fixtures still load.
+
+No arbitrary object graphs, callbacks, executable payloads, or automatic
+serialization of every diagnostic/training row.
+
+## Planned 2.15.0 — Kalman filtering with missing observations
+
+Add explicit observation masks for the dense linear-Gaussian filter. Partial
+observations select the corresponding observation-model rows and measurement
+covariance submatrix; an entirely missing observation performs prediction only.
+
+- Gate: masked updates agree with an independently constructed reduced system,
+  including correlated measurement noise and changing masks.
+- Gate: all-missing steps, observed nonfinite values, mask dimensions, covariance
+  failures, innovations, and observed-dimension likelihood terms are specified.
+- Gate: a sensor-dropout workflow recovers when observations resume and matches
+  existing results when all channels are present.
+
+This does not add imputation, nonlinear filters, controls, or parameter fitting.
+
+## Planned 2.16.0 — Fixed-interval state smoothing
+
+Add a Rauch–Tung–Striebel backward smoother over a recorded forward-filter
+history, including 2.15 masked observations. Retain only the documented history
+needed for the fixed interval; report memory requirements before allocation.
+
+- Gate: state means/covariances match independent small-system references;
+  the final smoothed state agrees with the final filtered state.
+- Gate: use linear solves rather than explicit inverses; define singular
+  predicted-covariance failure and test symmetry/positive-semidefinite behavior
+  within published tolerances without silently adding regularization.
+- Gate: a historical trajectory example distinguishes filtering, forecasting,
+  and smoothing and covers zero/one-step and missing-observation intervals.
+
+No EM estimation, nonlinear smoothing, or fixed-lag streaming smoother.
+
+## Planned 2.17.0 — Windowed low-pass FIR design
+
+Add a bounded real-double windowed-sinc low-pass designer for the existing FIR
+execution paths, with an explicitly selected window, odd tap count, cutoff,
+sample rate, and DC normalization. Start with one documented window family;
+choose it in the numerical design, not by accumulating options.
+
+- Gate: coefficient symmetry, unit DC gain, frequency normalization, and
+  delay of (tap count - 1)/2 samples have independent analytical fixtures.
+- Gate: measured passband/stopband response accompanies each example; cutoff
+  and window parameters are not advertised as unverified attenuation guarantees.
+- Gate: batch and existing streaming FIR execution agree across chunk sizes;
+  invalid geometry and excessive tap counts are rejected with bounded storage.
+
+Equiripple, automatic minimum-order design, high/band-pass families, and
+fractional delay remain outside this first slice.
+
+## Planned 2.18.0 — Rational polyphase resampling
+
+Use 2.17 anti-alias FIR design in a real-double rational up/down resampler.
+Reduce positive integer rate factors; define filter cutoff at the intermediate
+sample rate, gain, causal delay, phase, output length, startup, and final flush.
+
+- Gate: compare against a slow direct upsample/filter/downsample oracle with
+  matching delay and boundary conventions; cover impulses, DC, tones, aliases,
+  unity ratio, and non-coprime factors.
+- Gate: batch output equals arbitrary streaming chunk partitions after the
+  documented flush; retained state is independent of total stream length.
+- Gate: output-count arithmetic, ratios, filter length, and allocation have
+  explicit limits; a sample-rate conversion example reports delay and measured
+  alias rejection rather than claiming zero-phase live processing.
+
+No asynchronous clock recovery, arbitrary time warping, or multichannel
+scheduling framework.
+
+## Planned 2.19.0 — Streaming DSP persistence
+
+Add versioned selected-state adapters for SOS filters and the 2.18 resampler,
+including coefficients/configuration, delay elements, phase, and flush state.
+Reuse the interchange envelope after checking that its limits fit these models.
+
+- Gate: uninterrupted processing matches save/reload/continue at arbitrary
+  chunk boundaries on the same qualified execution profile.
+- Gate: distinguish reset configuration from live state; validate dimensions,
+  finite coefficients/state, stability requirements, ratios, and allocation
+  limits; reject corrupted and incompatible formats.
+- Gate: a restartable acquisition example resumes in a separate process;
+  cross-platform artifacts have explicit numerical tolerances and do not claim
+  bitwise identity across compilers or architectures.
+
+No active thread, file handle, callback, or arbitrary processing-graph snapshot.
+
+## Planned 2.20.0 — Truncated PCA
+
+Provide leading-component PCA for dense real-double datasets where the existing
+full decomposition has demonstrated time or memory cost. Choose a partial SVD
+algorithm through an early benchmark/reference experiment; keep existing PCA
+unchanged. Include reusable fit/transform behavior, training means, explained
+variance, reconstruction diagnostics, and explicit work/convergence limits.
+
+- Activation gate: publish representative shapes and required accuracy showing
+  a useful measured resource improvement over existing full PCA. If this fails,
+  defer or replace the slot rather than shipping a renamed full decomposition.
+- Gate: compare residuals, orthogonality, explained variance, reconstruction,
+  and invariant subspaces against full SVD, including repeated singular values,
+  rank deficiency, constant columns, and exhausted budgets.
+- Gate: document algorithm/state determinism, supported ranks and memory bounds;
+  fit preprocessing on training rows and demonstrate held-out transformation.
+
+Sparse/matrix-free inputs, incremental PCA, GPU paths, and automatic solver
+dispatch are deferred. At this checkpoint, rerun integrated validation,
+deployment, state-estimation, and DSP workflows and review compatibility debt;
+completion of 2.20 does not itself trigger 3.0.
+
+## Unassigned major gate: 3.0.0 — Compatibility and integrated workflows
 
 Review the public API after the 2.6–2.9 capability work, resolve only
 previously announced breaking changes whose migration runway is complete, and
@@ -975,8 +1205,9 @@ surface.
 
 The major number alone is not a reason to break source compatibility. If no
 approved incompatible change remains after its documented minor-release
-runway, ship compatible consolidation as 2.10.0 and keep 3.0.0 unassigned until
-a genuine migration is justified. In either case, release readiness requires
+runway, continue the compatible 2.x sequence and keep 3.0.0 unassigned until
+a genuine migration is justified. Integrated workflow qualification applies to
+every minor release rather than waiting for a major. Release readiness requires
 the normal independent references, documentation, and supported-platform
 qualification.
 

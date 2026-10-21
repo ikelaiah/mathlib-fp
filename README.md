@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.9.0" src="https://img.shields.io/badge/version-2.9.0-brightgreen.svg">
+  <img alt="Version 2.10.0 release candidate" src="https://img.shields.io/badge/version-2.10.0--rc-blue.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,10 +26,10 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.9.0 is the current stable release.** It adds reproducible bounded global search
-> with explicit evaluation budgets, deterministic local random state, and
-> optional bounded local polishing. See the [2.9.0 release notes](docs/releases/2.9.0/release-notes.md),
-> [qualification record](docs/releases/2.9.0/qualification.md),
+> **2.9.0 is the published stable release; 2.10.0 is a release candidate.**
+> The candidate adds grouped and stratified validation splits, explicit training
+> and validation rows, and PLS component selection on supplied splits. See the [2.10.0 release notes](docs/releases/2.10.0/release-notes.md),
+> [qualification record](docs/releases/2.10.0/qualification.md),
 > [capability inventory](docs/reference/capabilities.md), and
 > [changelog](CHANGELOG.md) when evaluating an upgrade.
 
@@ -42,7 +42,7 @@ domain.
 Get the source directly with git:
 
 ```bash
-git clone --depth 1 --branch v2.9.0 \
+git clone --depth 1 --branch release/v2.10.0 \
   https://github.com/ikelaiah/mathlib-fp.git
 ```
 
@@ -50,14 +50,14 @@ or as a source archive with `wget`:
 
 ```bash
 wget \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.9.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/heads/release/v2.10.0.tar.gz
 ```
 
 or with `curl`:
 
 ```bash
 curl -L -o mathlib-fp.tar.gz \
-  https://github.com/ikelaiah/mathlib-fp/archive/refs/tags/v2.9.0.tar.gz
+  https://github.com/ikelaiah/mathlib-fp/archive/refs/heads/release/v2.10.0.tar.gz
 ```
 
 > No package manager or install step is required for direct source use; add
@@ -68,7 +68,7 @@ Direct source use is canonical. The
 is the source of published stable `.zip`, `.tar.gz`, offline documentation,
 and checksum artifacts.
 
-The release also provides a [checksummed source tarball](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.9.0/mathlib-fp-2.9.0.tar.gz)
+The published stable release provides a [checksummed source tarball](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.9.0/mathlib-fp-2.9.0.tar.gz)
 with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.9.0/mathlib-fp-2.9.0.tar.gz.sha256),
 and a [source ZIP](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.9.0/mathlib-fp-2.9.0.zip)
 with its [SHA-256 sidecar](https://github.com/ikelaiah/mathlib-fp/releases/download/v2.9.0/mathlib-fp-2.9.0.zip.sha256).
@@ -207,7 +207,7 @@ difference between domains, units, and Kit classes.
 
 ## 🧪 Try an example
 
-The [`examples/`](examples/) directory contains 47 commented walkthroughs with
+The [`examples/`](examples/) directory contains 48 commented walkthroughs with
 at least one runnable program for every domain. Newcomers can follow the
 [beginner guide](docs/start/beginner-guide.md), choose a short task from the
 [beginner recipes](docs/start/recipes.md), or follow the

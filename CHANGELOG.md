@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.10.0] - 2026-10-22
+
+### Added
+
+- Added explicit, grouped and stratified validation splits and a PLS fit overload for caller-supplied training/validation rows.
+- Added pooled and per-split PLS diagnostics and a grouped outer-test comparison with ordinary least squares.
+
 ## [2.9.0] - 2026-10-21
 
 ### Added

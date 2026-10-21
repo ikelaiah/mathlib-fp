@@ -270,6 +270,15 @@
         "A heuristic result is not a global-optimality certificate."
       ],
       "final_line": "bounded global search: success"
+    },
+    {
+      "path": "examples/47_grouped_model_validation.pas",
+      "contains": [
+        "validation: 3 training groups, 1 untouched test group",
+        "PLS grouped folds: 3, scored rows: 9",
+        "outer RMSE: PLS=0.000000, OLS=0.000000"
+      ],
+      "final_line": "grouped model validation: success"
     }
   ]
 }

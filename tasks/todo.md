@@ -1,5 +1,9 @@
 # 2.1 Special Functions II task list
 
+> Historical checklist retained below. Current planning horizon:
+> [v2.10.0–v2.20.0 checklist](todo-2.10-2.20.md) and
+> [plan](plan-2.10-2.20.md). No future implementation is marked complete.
+
 ## 1. Freeze the first contract
 
 **Status:** Complete for J/Y.

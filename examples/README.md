@@ -59,6 +59,7 @@ closest to your project. For a shorter task-first route, use the
 | `44_generalized_linear_models.pas` | StatsLib GLM | Fit logistic and Poisson models, inspect diagnostics, predict counts, and handle separation |
 | `45_partial_least_squares.pas` | MLLib | Select PLS regression components by cross-validation for correlated predictors, then predict a new response |
 | `46_bounded_global_search.pas` | OptimizationLib | Reproducible bounded differential evolution, separate local polishing, budgets and truthful termination |
+| `47_grouped_model_validation.pas` | MLLib | Keep one group untouched while comparing PLS and OLS on the same rows |
 
 ## Build and run
 
