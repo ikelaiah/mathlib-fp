@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The current stable release is 2.11.0. It adds [chronological model validation](guides/domains/machine-learning.md#partial-least-squares-regression). Consult the [2.11.0 API reference](reference/api/reference-2.11.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md) for the current technical baseline.
+The current stable release is 2.12.0. It adds known GLM offsets, Poisson exposure, and explicit new-observation prediction inputs. Consult the [2.12.0 API reference](reference/api/reference-2.12.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md).
 
 ## Domains
 

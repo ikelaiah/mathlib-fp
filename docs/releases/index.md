@@ -2,7 +2,17 @@
 
 Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.11.0 — current release
+## 2.12.0 — current release
+
+- [Release notes](2.12.0/release-notes.md)
+- [Qualification and validation](2.12.0/qualification.md)
+- [Workflow qualification](2.12.0/workflow-qualification.md)
+- [API reference](../reference/api/reference-2.12.0.md)
+- [Numerical catalogue](2.12.0/numerical-evidence.json) and [provenance](2.12.0/numerical-evidence-provenance.md)
+- [Performance contract](2.12.0/performance-evidence.json)
+- [Release review notes](2.12.0/pr-notes.md)
+
+## 2.11.0 — previous stable release
 
 - [Release notes](2.11.0/release-notes.md)
 - [Qualification and validation](2.11.0/qualification.md)

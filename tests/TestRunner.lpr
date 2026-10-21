@@ -25,7 +25,7 @@ uses
   , TestFinanceLib
   , TestFinanceAliases
   , TestStatsLib
-  , TestGLM
+  , TestGLM, TestGLMOffsets
   , TestPLS
   , TestValidation
   , TestEngineeringLib

@@ -26,12 +26,18 @@ type
     class function Default: TGLMOptions; static;
   end;
 
+  TGLMInputs = record
+    Offsets, Exposures: TDoubleArray;
+    class function Default: TGLMInputs; static;
+  end;
+
   TGLMFitResult = record
     Family: TGLMFamily;
     Status: TGLMStatus;
     Message: String;
     Iterations, Rank, DegreesOfFreedom: SizeInt;
     Identifiable, HasFiniteIterate: Boolean;
+    UsesOffsets, UsesExposure: Boolean;
     ConditionIndicator, Deviance, NullDeviance, PearsonChiSquare: Double;
     Coefficients, StandardErrors, FittedMeans, ResponseResiduals,
       DevianceResiduals, DevianceHistory: TDoubleArray;
@@ -49,11 +55,31 @@ type
     class function FitPoisson(const Design: IDenseDoubleMatrix;
       const Response: TDoubleArray; const Options: TGLMOptions):
       TGLMFitResult; overload; static;
+    class function FitLogistic(const Design: IDenseDoubleMatrix;
+      const Response: TDoubleArray; const Inputs: TGLMInputs):
+      TGLMFitResult; overload; static;
+    class function FitLogistic(const Design: IDenseDoubleMatrix;
+      const Response: TDoubleArray; const Inputs: TGLMInputs;
+      const Options: TGLMOptions): TGLMFitResult; overload; static;
+    class function FitPoisson(const Design: IDenseDoubleMatrix;
+      const Response: TDoubleArray; const Inputs: TGLMInputs):
+      TGLMFitResult; overload; static;
+    class function FitPoisson(const Design: IDenseDoubleMatrix;
+      const Response: TDoubleArray; const Inputs: TGLMInputs;
+      const Options: TGLMOptions): TGLMFitResult; overload; static;
     class function PredictMean(const Fit: TGLMFitResult;
-      const Design: IDenseDoubleMatrix): TDoubleArray; static;
+      const Design: IDenseDoubleMatrix): TDoubleArray; overload; static;
+    class function PredictMean(const Fit: TGLMFitResult;
+      const Design: IDenseDoubleMatrix; const Inputs: TGLMInputs):
+      TDoubleArray; overload; static;
   end;
 
 implementation
+
+class function TGLMInputs.Default: TGLMInputs;
+begin
+  Result.Offsets := nil; Result.Exposures := nil;
+end;
 
 class function TGLMOptions.Default: TGLMOptions;
 begin
@@ -66,6 +92,36 @@ end;
 function Finite(const Value: Double): Boolean; inline;
 begin
   Result := not IsNan(Value) and not IsInfinite(Value);
+end;
+
+function BuildOffsets(const Inputs: TGLMInputs; const Rows: SizeInt;
+  const Family: TGLMFamily): TDoubleArray;
+var I: SizeInt;
+begin
+  Result := nil;
+  if ((Length(Inputs.Offsets) <> 0) and (Length(Inputs.Offsets) <> Rows)) or
+     ((Length(Inputs.Exposures) <> 0) and (Length(Inputs.Exposures) <> Rows)) then
+    raise EGLMError.Create('GLM inputs: offset/exposure lengths must match rows.');
+  if (Family <> gfPoissonLog) and (Length(Inputs.Exposures) <> 0) then
+    raise EGLMError.Create('GLM inputs: exposure requires the Poisson log link.');
+  SetLength(Result, Rows);
+  for I := 0 to Rows - 1 do
+  begin
+    if Length(Inputs.Offsets) <> 0 then
+    begin
+      if not Finite(Inputs.Offsets[I]) then
+        raise EGLMError.Create('GLM inputs: offsets must be finite.');
+      Result[I] := Inputs.Offsets[I];
+    end;
+    if Length(Inputs.Exposures) <> 0 then
+    begin
+      if not Finite(Inputs.Exposures[I]) or (Inputs.Exposures[I] <= 0) then
+        raise EGLMError.Create('GLM inputs: exposures must be positive and finite.');
+      Result[I] := Result[I] + Ln(Inputs.Exposures[I]);
+    end;
+    if not Finite(Result[I]) then
+      raise EGLMError.Create('GLM inputs: combined offset is not representable.');
+  end;
 end;
 
 procedure ValidateDesign(const Design: IDenseDoubleMatrix;
@@ -168,7 +224,74 @@ begin
   end;
 end;
 
-function Evaluate(const X: IDenseDoubleMatrix; const Y, Beta: TDoubleArray;
+function OffsetNullIntercept(const Y, Offsets: TDoubleArray;
+  const Family: TGLMFamily): Double;
+var I, Iteration: SizeInt; Average, Peak, LowOffset, Sum, Lower, Upper,
+  Middle, Mean, Weight: Double;
+begin
+  Average := 0; Peak := Offsets[0]; LowOffset := Offsets[0];
+  for I := 0 to High(Y) do
+  begin
+    Average := Average + Y[I] / Length(Y);
+    Peak := Max(Peak, Offsets[I]); LowOffset := Min(LowOffset, Offsets[I]);
+  end;
+  if not Finite(Average) then raise EGLMError.Create('GLM null mean overflow.');
+  if (Average = 0) or ((Family = gfBernoulliLogit) and (Average = 1)) then Exit(0);
+  if Family = gfPoissonLog then
+  begin
+    Sum := 0;
+    for I := 0 to High(Y) do Sum := Sum + Exp(Offsets[I] - Peak) / Length(Y);
+    Result := (Ln(Average) - Peak) - Ln(Sum);
+  end
+  else
+  begin
+    Lower := -Peak - 40; Upper := -LowOffset + 40;
+    Middle := 0;
+    for Iteration := 1 to 200 do
+    begin
+      Middle := Lower / 2 + Upper / 2;
+      if (Middle = Lower) or (Middle = Upper) then Break;
+      Sum := 0;
+      for I := 0 to High(Y) do
+      begin
+        if not InverseLink(Family, Middle + Offsets[I], Mean, Weight) then
+          raise EGLMError.Create('GLM null inverse link is not representable.');
+        Sum := Sum + Mean / Length(Y);
+      end;
+      if Sum < Average then Lower := Middle else Upper := Middle;
+    end;
+    Result := Middle;
+  end;
+  if not Finite(Result) then raise EGLMError.Create('GLM null intercept overflow.');
+  Sum := 0;
+  for I := 0 to High(Y) do
+  begin
+    if not InverseLink(Family, Result + Offsets[I], Mean, Weight) then
+      raise EGLMError.Create('GLM null inverse link is not representable.');
+    Sum := Sum + Mean / Length(Y);
+  end;
+  if Abs(Sum - Average) > 1E-10 * Max(Double(1), Average) then
+    raise EGLMError.Create('GLM null intercept score is not representable.');
+end;
+
+function OffsetNullDeviance(const Y, Offsets: TDoubleArray;
+  const Family: TGLMFamily): Double;
+var I: SizeInt; Intercept, Eta, Mean, Weight, Average: Double;
+begin
+  Result := 0; Average := 0;
+  for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
+  if (Average = 0) or ((Family = gfBernoulliLogit) and (Average = 1)) then Exit;
+  Intercept := OffsetNullIntercept(Y, Offsets, Family);
+  for I := 0 to High(Y) do
+  begin
+    Eta := Intercept + Offsets[I];
+    if not InverseLink(Family, Eta, Mean, Weight) then
+      raise EGLMError.Create('GLM null inverse link is not representable.');
+    Result := Result + UnitDeviance(Family, Y[I], Eta, Mean);
+  end;
+end;
+
+function Evaluate(const X: IDenseDoubleMatrix; const Y, Beta, Offsets: TDoubleArray;
   const Family: TGLMFamily; out Means, Weights, Etas: TDoubleArray;
   out Deviance: Double): Boolean;
 var I, J: SizeInt; Eta, Contribution: Double;
@@ -178,7 +301,7 @@ begin
   SetLength(Means, X.Rows); SetLength(Weights, X.Rows); SetLength(Etas, X.Rows);
   for I := 0 to X.Rows - 1 do
   begin
-    Eta := 0;
+    Eta := Offsets[I];
     for J := 0 to X.Cols - 1 do Eta := Eta + X[I,J] * Beta[J];
     Etas[I] := Eta;
     if not InverseLink(Family, Eta, Means[I], Weights[I]) or (Weights[I] <= 0) then Exit;
@@ -224,15 +347,20 @@ begin
 end;
 
 function BoundaryStatus(const Y, Etas: TDoubleArray;
-  const Family: TGLMFamily; out Status: TGLMStatus): Boolean;
-var I: SizeInt; MaxEta, MinMargin, MaxEtaValue: Double; AllZero: Boolean;
+  const Family: TGLMFamily; const X: IDenseDoubleMatrix;
+  const Beta: TDoubleArray; out Status: TGLMStatus): Boolean;
+var I, J: SizeInt; MaxEta, MinMargin, MaxEtaValue, DirectionEta: Double;
+  AllZero: Boolean;
 begin
   MaxEta := 0; MinMargin := Infinity; MaxEtaValue := -Infinity; AllZero := True;
   for I := 0 to High(Etas) do
   begin
+    DirectionEta := 0;
+    for J := 0 to X.Cols - 1 do
+      DirectionEta := DirectionEta + X[I,J] * Beta[J];
     MaxEta := Max(MaxEta, Abs(Etas[I]));
-    MaxEtaValue := Max(MaxEtaValue, Etas[I]);
-    MinMargin := Min(MinMargin, (2 * Y[I] - 1) * Etas[I]);
+    MaxEtaValue := Max(MaxEtaValue, DirectionEta);
+    MinMargin := Min(MinMargin, (2 * Y[I] - 1) * DirectionEta);
     AllZero := AllZero and (Y[I] = 0);
   end;
   Result := True;
@@ -306,7 +434,8 @@ begin
 end;
 
 function FitModel(const Design: IDenseDoubleMatrix; const Y: TDoubleArray;
-  const Options: TGLMOptions; const Family: TGLMFamily): TGLMFitResult;
+  const Inputs: TGLMInputs; const Options: TGLMOptions;
+  const Family: TGLMFamily): TGLMFitResult;
 const Messages: array[TGLMStatus] of String = (
   'Converged with full-rank finite information.', 'IRLS iteration limit reached.',
   'Design or weighted information is rank deficient.',
@@ -317,14 +446,17 @@ const Messages: array[TGLMStatus] of String = (
   'No finite non-increasing deviance step was found.');
 var X, Target, Solution: IDenseDoubleMatrix; Factor: IDenseDoubleQR;
   Scales, Beta, Candidate, Means, Weights, Etas, NewMeans, NewWeights,
-    NewEtas: TDoubleArray;
+    NewEtas, Offsets: TDoubleArray;
   I, J, Iteration, Halving: SizeInt;
   RootWeight, NewDeviance, OldDeviance, Step, Change, BetaNorm, FullChange,
-    Average, LinearChange, EtaNorm, Correction: Double;
+    Average, LinearChange, EtaNorm, Correction, InitialIntercept: Double;
   Accepted, Representable, ConstantColumn: Boolean;
 begin
   ValidateFit(Design, Y, Options, Family);
+  Offsets := BuildOffsets(Inputs, Design.Rows, Family);
   Result := Default(TGLMFitResult); Result.Family := Family;
+  Result.UsesOffsets := Length(Inputs.Offsets) <> 0;
+  Result.UsesExposure := Length(Inputs.Exposures) <> 0;
   Result.Status := glsIterationLimit;
   SetLength(Scales, Design.Cols); SetLength(Beta, Design.Cols);
   SetLength(Candidate, Design.Cols); SetLength(Result.Coefficients, Design.Cols);
@@ -341,16 +473,23 @@ begin
       Average := 0;
       for I := 0 to High(Y) do Average := Average + Y[I] / Length(Y);
       if Finite(Average) and (Average > 0) and (Ln(Average) < 700) then
+      begin
+        InitialIntercept := Ln(Average);
         for J := 0 to X.Cols - 1 do
         begin
           ConstantColumn := X[0,J] <> 0;
           for I := 1 to X.Rows - 1 do
             ConstantColumn := ConstantColumn and (X[I,J] = X[0,J]);
           if ConstantColumn then
-          begin Beta[J] := Ln(Average) / X[0,J]; Break; end;
+          begin
+            if Result.UsesOffsets or Result.UsesExposure then
+              InitialIntercept := OffsetNullIntercept(Y, Offsets, Family);
+            Beta[J] := InitialIntercept / X[0,J]; Break;
+          end;
         end;
+      end;
     end;
-    if not Evaluate(X, Y, Beta, Family, Means, Weights, Etas, Result.Deviance) then
+    if not Evaluate(X, Y, Beta, Offsets, Family, Means, Weights, Etas, Result.Deviance) then
       raise EGLMError.Create('GLM initial objective is not representable.');
     Result.HasFiniteIterate := True;
     SetLength(Result.DevianceHistory, 1); Result.DevianceHistory[0] := Result.Deviance;
@@ -389,7 +528,7 @@ begin
           Candidate[J] := Beta[J] + Step * Solution[J,0];
           Representable := Representable and Finite(Candidate[J] / Scales[J]);
         end;
-        if Representable and Evaluate(X, Y, Candidate, Family,
+        if Representable and Evaluate(X, Y, Candidate, Offsets, Family,
            NewMeans, NewWeights, NewEtas, NewDeviance)
            and (NewDeviance <= OldDeviance +
              8 * 2.2204460492503131E-16 * (1 + OldDeviance)) then
@@ -412,7 +551,7 @@ begin
       Result.Deviance := NewDeviance; Result.Iterations := Iteration;
       SetLength(Result.DevianceHistory, Length(Result.DevianceHistory) + 1);
       Result.DevianceHistory[High(Result.DevianceHistory)] := NewDeviance;
-      if BoundaryStatus(Y, Etas, Family, Result.Status) then Break;
+      if BoundaryStatus(Y, Etas, Family, X, Beta, Result.Status) then Break;
       if (FullChange <= Options.Tolerance * (1 + BetaNorm)) and
          (LinearChange <= Options.Tolerance * (1 + EtaNorm)) and
          (OldDeviance - NewDeviance <= Options.Tolerance * (1 + NewDeviance)) then
@@ -435,6 +574,8 @@ begin
         raise EGLMError.Create('GLM coefficient is not representable.');
     end;
     FinishDiagnostics(Y, Etas, Means, Weights, Result);
+    if Result.UsesOffsets or Result.UsesExposure then
+      Result.NullDeviance := OffsetNullDeviance(Y, Offsets, Family);
     if not Finite(Result.PearsonChiSquare) or not Finite(Result.NullDeviance) then
       raise EGLMError.Create('GLM diagnostics are not representable.');
   except
@@ -466,7 +607,7 @@ begin Result := FitLogistic(Design, Response, TGLMOptions.Default); end;
 
 class function TGLMKit.FitLogistic(const Design: IDenseDoubleMatrix;
   const Response: TDoubleArray; const Options: TGLMOptions): TGLMFitResult;
-begin Result := FitModel(Design, Response, Options, gfBernoulliLogit); end;
+begin Result := FitModel(Design, Response, TGLMInputs.Default, Options, gfBernoulliLogit); end;
 
 class function TGLMKit.FitPoisson(const Design: IDenseDoubleMatrix;
   const Response: TDoubleArray): TGLMFitResult;
@@ -474,17 +615,44 @@ begin Result := FitPoisson(Design, Response, TGLMOptions.Default); end;
 
 class function TGLMKit.FitPoisson(const Design: IDenseDoubleMatrix;
   const Response: TDoubleArray; const Options: TGLMOptions): TGLMFitResult;
-begin Result := FitModel(Design, Response, Options, gfPoissonLog); end;
+begin Result := FitModel(Design, Response, TGLMInputs.Default, Options, gfPoissonLog); end;
+
+class function TGLMKit.FitLogistic(const Design: IDenseDoubleMatrix;
+  const Response: TDoubleArray; const Inputs: TGLMInputs): TGLMFitResult;
+begin Result := FitLogistic(Design, Response, Inputs, TGLMOptions.Default); end;
+
+class function TGLMKit.FitLogistic(const Design: IDenseDoubleMatrix;
+  const Response: TDoubleArray; const Inputs: TGLMInputs;
+  const Options: TGLMOptions): TGLMFitResult;
+begin Result := FitModel(Design, Response, Inputs, Options, gfBernoulliLogit); end;
+
+class function TGLMKit.FitPoisson(const Design: IDenseDoubleMatrix;
+  const Response: TDoubleArray; const Inputs: TGLMInputs): TGLMFitResult;
+begin Result := FitPoisson(Design, Response, Inputs, TGLMOptions.Default); end;
+
+class function TGLMKit.FitPoisson(const Design: IDenseDoubleMatrix;
+  const Response: TDoubleArray; const Inputs: TGLMInputs;
+  const Options: TGLMOptions): TGLMFitResult;
+begin Result := FitModel(Design, Response, Inputs, Options, gfPoissonLog); end;
 
 class function TGLMKit.PredictMean(const Fit: TGLMFitResult;
   const Design: IDenseDoubleMatrix): TDoubleArray;
-var I, J: SizeInt; Eta, Weight: Double;
+begin Result := PredictMean(Fit, Design, TGLMInputs.Default); end;
+
+class function TGLMKit.PredictMean(const Fit: TGLMFitResult;
+  const Design: IDenseDoubleMatrix; const Inputs: TGLMInputs): TDoubleArray;
+var I, J: SizeInt; Eta, Weight: Double; Offsets: TDoubleArray;
 begin
   Result := nil;
   if (Fit.Status <> glsConverged) or not Fit.Identifiable or
      not (Fit.Family in [gfBernoulliLogit, gfPoissonLog]) then
     raise EGLMError.Create('PredictMean: a converged identifiable GLM fit is required.');
   ValidateDesign(Design, 'PredictMean');
+  if (Design.Rows > 0) and
+    ((Fit.UsesOffsets <> (Length(Inputs.Offsets) <> 0)) or
+     (Fit.UsesExposure <> (Length(Inputs.Exposures) <> 0))) then
+    raise EGLMError.Create('PredictMean: new rows require the fitted offset/exposure kinds.');
+  Offsets := BuildOffsets(Inputs, Design.Rows, Fit.Family);
   if Design.Cols <> Length(Fit.Coefficients) then
     raise EGLMError.Create('PredictMean: design columns must match coefficient count.');
   for J := 0 to High(Fit.Coefficients) do
@@ -494,7 +662,7 @@ begin
   try
     for I := 0 to Design.Rows - 1 do
     begin
-      Eta := 0;
+      Eta := Offsets[I];
       for J := 0 to Design.Cols - 1 do Eta := Eta + Design[I,J] * Fit.Coefficients[J];
       if not InverseLink(Fit.Family, Eta, Result[I], Weight) then
         raise EGLMError.Create('PredictMean: inverse link is not representable.');

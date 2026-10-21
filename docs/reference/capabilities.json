@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.11.0",
+  "release": "2.12.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -1190,7 +1190,8 @@
         "TGLMKit",
         "FitLogistic",
         "FitPoisson",
-        "PredictMean"
+        "PredictMean",
+        "TGLMInputs"
       ],
       "maturity": "stable",
       "scalars": [
@@ -1199,19 +1200,22 @@
       "shapes": [
         "rows_as_observations",
         "explicit_design_columns",
-        "binary_or_count_response"
+        "binary_or_count_response",
+        "known_offsets",
+        "positive_poisson_exposure"
       ],
       "complexity": "O(iterations*(n^2*p+n*p^2) + p^3) time; shared QR temporarily materializes Q, requiring O(n^2+n*p+p^2) working storage",
-      "accuracy": "90-digit Decimal independent Newton references, analytic information/deviance, and adversarial status/scale fixtures",
+      "accuracy": "90-digit Decimal independent Newton references, analytic information/deviance, and adversarial status/scale fixtures; analytic 80-digit offset/exposure information and null-deviance references",
       "docs": "docs/guides/domains/generalized-linear-models.md",
       "example": "examples/44_generalized_linear_models.pas",
       "tests": "tests/TestGLM.pas",
       "limitations": [
-        "Bernoulli logit and Poisson log only; no weights, offsets, grouped trials or regularization",
+        "Bernoulli logit and Poisson log only; no weights, grouped trials or regularization",
         "explicit intercept and finite full-rank designs required",
         "separation certificates are not an exhaustive LP classifier",
         "information boundaries: logistic abs(eta) < 36 and Poisson abs(eta) < 700",
-        "dispersion fixed at one; no robust covariance"
+        "dispersion fixed at one; no robust covariance",
+        "prediction requires the fitted offset/exposure input kinds on new rows"
       ]
     },
     {
