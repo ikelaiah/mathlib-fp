@@ -27,6 +27,7 @@ uses
   , TestStatsLib
   , TestGLM
   , TestPLS
+  , TestValidation
   , TestEngineeringLib
   , TestEngineeringLib_FluidDynamics
   , TestEngineeringLib_Signal

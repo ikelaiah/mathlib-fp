@@ -1,0 +1,574 @@
+{
+  "schema_version": 1,
+  "release": "2.10.0",
+  "inventory": "docs/reference/capabilities.json",
+  "inventory_release": "2.10.0",
+  "families": [
+    {
+      "family": "bessel_elliptic_exponential_integral",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real double inputs within each function's documented validated domain, including stated endpoint limits and exclusions.",
+      "budget": {
+        "kind": "relative_error",
+        "metric": "Absolute difference from independent reference values, with the test's 5e-13 absolute floor and 5e-12 relative allowance",
+        "limit": 5e-12,
+        "unit": "function output units"
+      },
+      "reference": {
+        "method": "120-digit decimal reference corpora, independent quadrature for E1 values, and documented mathematical identities",
+        "source": "Repository-generated reference include files cite NIST DLMF; reference generators use decimal arithmetic and Gauss-Legendre quadrature",
+        "precision": "At least 120 decimal digits during reference generation, rounded to IEEE-754 binary64 literals",
+        "parameters": "Bessel small and large arguments; modified Bessel domain and scale cases; incomplete and complete elliptic integrals including Pi; Jacobi quarter periods; Ei/E1 tails; convergent 2F1 parameter and argument fixtures",
+        "license": "Repository-authored generators and fixtures under MIT; mathematical reference material is cited from NIST DLMF",
+        "regeneration": "Run the generate_*_data.py tools referenced by each include header, then run the cited special-function test units"
+      },
+      "tests": [
+        {
+          "path": "tests/TestSpecialFunctions.pas",
+          "assertions": [
+            "procedure TTestBessel.TestJReferenceCorpus;",
+            "procedure TTestBessel.TestYReferenceCorpus;",
+            "Y0 negative domain"
+          ],
+          "kind": "independent decimal references, identities, and domain edges"
+        },
+        {
+          "path": "tests/TestModifiedBessel.pas",
+          "assertions": [
+            "procedure TTestModifiedBessel.TestReferenceCorpus;",
+            "I/K Wronskian",
+            "K0 negative domain"
+          ],
+          "kind": "independent decimal references, identities, and domain edges"
+        },
+        {
+          "path": "tests/TestEllipticIntegrals.pas",
+          "assertions": [
+            "procedure TTestEllipticIntegrals.TestIncompleteReferenceCorpus;",
+            "procedure TTestEllipticIntegrals.TestThirdKindReferenceValues;",
+            "F(phi, 0)"
+          ],
+          "kind": "decimal/quadrature references and endpoint/domain checks"
+        },
+        {
+          "path": "tests/TestJacobiElliptic.pas",
+          "assertions": [
+            "procedure TTestJacobiElliptic.TestIndependentReferences;",
+            "sn(K,m)=1",
+            "infinite parameter"
+          ],
+          "kind": "independent decimal references, quarter-period identities, and domain edges"
+        },
+        {
+          "path": "tests/TestExponentialIntegrals.pas",
+          "assertions": [
+            "procedure TTestExponentialIntegrals.TestEiReferenceCorpus;",
+            "procedure TTestExponentialIntegrals.TestE1ReferenceCorpus;",
+            "Ei below validated range"
+          ],
+          "kind": "independent decimal/quadrature references and pole/domain checks"
+        },
+        {
+          "path": "tests/TestGaussHypergeometric.pas",
+          "assertions": [
+            "procedure TTestGaussHypergeometric.TestReferenceCorpus;",
+            "F(1,1;2;0.5) identity",
+            "X above range"
+          ],
+          "kind": "independent decimal references, identities, and convergence-domain checks"
+        }
+      ],
+      "edge_cases": [
+        "Function-specific poles and finite endpoint limits are checked explicitly.",
+        "NaN, infinity, and out-of-domain values follow the documented rejection behavior.",
+        "Elliptic Pi principal-value poles, unsupported characteristics, and hypergeometric analytic continuation are excluded."
+      ],
+      "documentation": "docs/guides/domains/math-base.md"
+    },
+    {
+      "family": "remaining_advanced_spectral_linear_algebra",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real or complex double dense matrices and regular real or complex matrix pencils in documented supported dimensions.",
+      "budget": {
+        "kind": "residual",
+        "metric": "Normalized reconstruction, orthogonality/unitarity, and generalized eigenpair residuals; maximum explicit generalized residual fixture threshold",
+        "limit": 1e-07,
+        "unit": "dimensionless normalized residual"
+      },
+      "reference": {
+        "method": "Independently reconstructed Schur factorizations, known eigenvalue fixtures, orthogonality/unitarity checks, and normalized homogeneous generalized-eigenpair residuals",
+        "source": "Repository-authored fixtures and independently computed residuals in TestDenseDecompositions",
+        "precision": "IEEE-754 binary64 real and complex arithmetic",
+        "parameters": "Real/complex Hessenberg and Schur factors, nonsymmetric real eigenpairs, finite and infinite generalized eigenvalues, and real/complex 3x3 pencils",
+        "license": "Repository-authored tests under MIT; no third-party reference data",
+        "regeneration": "Run TestDenseDecompositions; recompute the stated factor reconstructions and normalized homogeneous eigenpair residuals from the fixtures"
+      },
+      "tests": [
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "real generalized Schur reconstructs A",
+            "finite generalized eigenpair residual is small",
+            "3x3 generalized eigenvectors report small residuals"
+          ],
+          "kind": "factor reconstruction and normalized eigenpair residual"
+        },
+        {
+          "path": "tests/TestDenseDecompositions.pas",
+          "assertions": [
+            "complex generalized Schur reconstructs A",
+            "complex generalized eigenpair residual is small",
+            "3x3 complex generalized eigenpair residual is small"
+          ],
+          "kind": "complex factor reconstruction and normalized eigenpair residual"
+        }
+      ],
+      "edge_cases": [
+        "Singular B produces projective infinite generalized eigenvalues where supported.",
+        "Empty inputs, invalid dimensions, non-finite entries, and bounded-iteration failures have explicit tests.",
+        "Repeated or clustered eigenvalues may rotate their eigenvector basis; polynomial and interior-target workflows are outside this family."
+      ],
+      "documentation": "docs/guides/domains/dense-linear-algebra.md"
+    },
+    {
+      "family": "stiff_ode_integration",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real-double explicit-form initial-value systems with smooth right-hand sides over the integration interval, dense state Jacobians, and tolerances for which the bounded step and Newton iteration converges.",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "Fixture-specific endpoint, interpolation, and event bounds; the Robertson endpoint uses 20*(rtol*abs(reference)+10*atol) per component (maximum allowed state deviation 2.2e-3).",
+        "limit": 0.0022,
+        "unit": "state units; event-time bounds are separately asserted"
+      },
+      "reference": {
+        "method": "Closed-form forced-stiff scalar solution and published Robertson kinetics endpoint values",
+        "source": "The repository spec cites the SUNDIALS cvRoberts_dns.c example: https://github.com/LLNL/sundials/blob/main/examples/cvode/serial/cvRoberts_dns.c",
+        "precision": "IEEE-754 binary64; published Robertson decimal values are represented as binary64 literals",
+        "parameters": "Forced equation y'=-1000*(y-cos(t))-sin(t), y(0)=0; Robertson system at t=4e10 with y0=[1,0,0], rtol=1e-4 and atols=[1e-8,1e-14,1e-6]",
+        "license": "Repository-authored test fixture under the project license; upstream SUNDIALS source is cited and no third-party implementation code is copied",
+        "regeneration": "Run TestNumericalModelling. Review the cited SUNDIALS endpoint fixture and evaluate the forced-problem identity y(t)=cos(t)-exp(-1000*t); no network access is needed at test time."
+      },
+      "tests": [
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": [
+            "procedure TTestNumericalModelling.TestStiffODEJacobianModesAndEvents;",
+            "tighter tolerances reduce endpoint error",
+            "stiff event found",
+            "analytic Jacobian endpoint",
+            "automatic Jacobian endpoint",
+            "backward integration endpoint",
+            "non-stiff result agrees with explicit solver"
+          ],
+          "kind": "closed-form stiff endpoint and dense-output accuracy, tolerance refinement, event location, analytic/automatic/finite-difference Jacobians, backward integration, and non-stiff comparison"
+        },
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": [
+            "procedure TTestNumericalModelling.TestStiffODERobertsonReference;",
+            "Robertson stiff status",
+            "Robertson integration accepted steps",
+            "Robertson component %d reference: expected %.16g, got %.16g"
+          ],
+          "kind": "published Robertson reference endpoint with per-component absolute/relative tolerance weighting"
+        },
+        {
+          "path": "tests/TestNumericalModelling.pas",
+          "assertions": [
+            "procedure TTestNumericalModelling.TestStiffODEValidation;",
+            "missing analytic Jacobian is rejected",
+            "wrong Jacobian dimensions are rejected",
+            "step limit is reported",
+            "Newton failure is reported as breakdown",
+            "non-finite derivative output is rejected",
+            "nested stiff integration is reentrant"
+          ],
+          "kind": "invalid-input, iteration-limit, Newton-breakdown, non-finite-output, and reentrancy checks"
+        }
+      ],
+      "edge_cases": [
+        "Forward and backward integration, scalar and component tolerances, interpolation, and directional event localization are covered.",
+        "Finite-difference, analytic, and automatic Jacobian modes are tested against the same forced-stiff reference.",
+        "Missing or malformed Jacobians, zero combined tolerance, non-finite or wrong-dimension derivatives, step exhaustion, and Newton failure have explicit outcomes.",
+        "The Robertson kinetics system exercises a three-component stiff trajectory at t=4e10; sparse Jacobians, mass matrices, DAEs, and large-scale solves are outside the supported domain."
+      ],
+      "documentation": "docs/guides/domains/numerical-modelling.md"
+    },
+    {
+      "family": "reusable_spectral_plans",
+      "status": "qualified",
+      "risk": "high",
+      "input_domain": "Finite real and complex Double inputs for FFT lengths 1, 2, 3, 7, 8, 31, 64, 1009, 10007, and 65536, plus finite real signals with supported STFT frame and hop geometry and a window with complete overlap coverage.",
+      "budget": {
+        "kind": "residual",
+        "metric": "Maximum FFT corpus and reconstructed-sample residual normalized by max(1, maximum reference magnitude); the committed direct-DFT and edited weighted overlap-add fixtures have tighter fixture-specific bounds.",
+        "limit": 5e-11,
+        "unit": "dimensionless normalized residual"
+      },
+      "reference": {
+        "method": "Independent 90-digit Decimal direct DFT values, direct four-point STFT frame sums, explicit inverse-DFT weighted overlap-add reconstruction, and round-trip properties.",
+        "source": "Repository-authored generator and fixtures in tools/generate_spectral_plan_fixtures.py and tests/SpectralPlanFixtures.inc; Pascal plan code is not used to generate expected values.",
+        "precision": "90 decimal digits during generation, with expected fixture components rounded to 55 decimal places before binary64 parsing.",
+        "parameters": "Four FFT normalization modes, radix-2 and Bluestein lengths, deterministic complex inputs over amplitudes 1e-6 through 1e6, padded STFT frames including non-divisible tails and boundary impulses, supported windows, and a symmetric conjugate-bin edit.",
+        "license": "Repository-authored test generator and fixtures under MIT; no third-party numerical implementation or reference data.",
+        "regeneration": "Run python tools/generate_spectral_plan_fixtures.py and execute the TestSpectralPlans FPCUnit group; the normal test suite consumes the committed include without network access."
+      },
+      "tests": [
+        {
+          "path": "tests/TestSpectralPlans.pas",
+          "assertions": [
+            "procedure TSpectralPlanTest.TestFFTIndependentFixtureAndNormalizations;",
+            "direct DFT forward normalization real bin",
+            "FFT normalized round trip N=%d mode=%d sample=%d"
+          ],
+          "kind": "independent DFT comparison, all normalization modes, and normalized corpus round trips"
+        },
+        {
+          "path": "tests/TestSpectralPlans.pas",
+          "assertions": [
+            "procedure TSpectralPlanTest.TestSTFTIndependentFixtureAndEditedReconstruction;",
+            "direct-DFT STFT real frame bin",
+            "independent inverse-DFT weighted overlap-add fixture"
+          ],
+          "kind": "independent padded-frame spectra and edited weighted overlap-add reconstruction"
+        },
+        {
+          "path": "tests/TestSpectralPlans.pas",
+          "assertions": [
+            "warm FFT Into performs no memory-manager allocations",
+            "warm Bluestein Into performs no memory-manager allocations",
+            "warm STFT Into analysis and synthesis allocate nothing"
+          ],
+          "kind": "exact warmed allocation-call checks for prepared radix-2, Bluestein, and STFT execution"
+        },
+        {
+          "path": "tests/TestSpectralPlans.pas",
+          "assertions": [
+            "STFT reconstructs every original sample",
+            "first and last impulses survive padded STFT",
+            "broken conjugate-pair spectrum raises EDSPError"
+          ],
+          "kind": "round-trip, padded-boundary, and Hermitian validation checks"
+        }
+      ],
+      "edge_cases": [
+        "Zero, impulse, tone, deterministic complex data, and amplitudes from 1e-6 to 1e6 exercise radix-2 and Bluestein paths.",
+        "Forward and inverse transforms are checked under backward, forward, unitary, and unscaled normalization.",
+        "First and last samples, non-divisible tails, signals shorter than a frame, supported windows, and invalid overlap coverage exercise STFT padding and trimming.",
+        "Non-finite and overflow inputs, malformed DC/Nyquist values, broken conjugate pairs, invalid destinations, busy-plan use, and recovery after errors have explicit tests.",
+        "Prepared Into calls must perform exactly zero allocation/reallocation calls; concurrent execution requires independent plans."
+      ],
+      "documentation": "docs/guides/domains/applied-numerics.md",
+      "fault_injections": [
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "      if Inverse then Result := 1.0 / Double(Count) else Result := 1.0;",
+          "replacement": "      if Inverse then Result := 1.0 else Result := 1.0;",
+          "test": "tests/TestSpectralPlans.pas"
+        },
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "      FrameStart := Frame * FHopLength - FLeftPadding;",
+          "replacement": "      FrameStart := Frame * FHopLength;",
+          "test": "tests/TestSpectralPlans.pas"
+        },
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "      if StableMagnitude(TComplex.Create(ResidualReal, ResidualImag)) >\n        Tolerance then",
+          "replacement": "      if False then",
+          "test": "tests/TestSpectralPlans.pas"
+        },
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "      Destination[I] := FWorkspace[I];",
+          "replacement": "      Destination[I] := FWorkspace[I];\n    SetLength(FWorkspace, Length(FWorkspace) + 1);",
+          "test": "tests/TestSpectralPlans.pas"
+        }
+      ]
+    },
+    {
+      "family": "stable_sos_iir_filtering",
+      "status": "qualified",
+      "risk": "high",
+      "input_domain": "Finite real-double coefficients, frequencies, and signals; prototype orders 1 through 12; positive sample rate; cutoff edges strictly inside DC and Nyquist; Chebyshev-I ripple in (0, 12] dB.",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "Maximum absolute difference in SOS coefficient and complex-response components against the independent 100-digit Decimal reference fixtures",
+        "limit": 2e-14,
+        "unit": "coefficient or response component"
+      },
+      "reference": {
+        "method": "100-digit Python Decimal calculations for bilinear SOS coefficient cases and complex response components, complemented by analytic edge-gain, ripple, stability, and direct-form recurrence checks",
+        "source": "Repository-authored generator tools/generate_sos_iir_reference.py; no SciPy, network, or external runtime is used to generate or consume fixtures",
+        "precision": "100 decimal digits during reference generation, rounded to binary64 literals",
+        "parameters": "2nd-order Butterworth low-pass coefficients and complex responses at DC, 50, 100, 250, and 500 Hz; 1st- and 2nd-order Chebyshev-I low-pass coefficients; every order 1–12 across both design families and four response types at strict Nyquist-adjacent design domains",
+        "license": "Repository-authored generator and fixtures under MIT; design equations are independently implemented from the cited analog-prototype and bilinear-transform identities",
+        "regeneration": "Run python tools/generate_sos_iir_reference.py and python tools/generate_sos_iir_reference.py --check; normal tests and release qualification only check the committed include"
+      },
+      "tests": [
+        {
+          "path": "tests/TestSOSIIR.pas",
+          "assertions": [
+            "procedure TSOSIIRTest.TestDesignedResponseMatchesHighPrecisionReference;",
+            "procedure TSOSIIRTest.TestResponseValidationRejectsInvalidFrequenciesAndPoles;",
+            "procedure TSOSIIRTest.TestButterworthSOSDesignsAndCriticalEdges;",
+            "procedure TSOSIIRTest.TestChebyshevIIndependentRippleAndPoleReferences;",
+            "procedure TSOSIIRTest.TestAllSupportedOrdersHaveStableEdgeResponses;",
+            "procedure TSOSIIRTest.TestStreamingImpulseAndStepReferences;",
+            "procedure TSOSIIRTest.TestStreamingFailureIsAtomicAndResettable;"
+          ],
+          "kind": "independent decimal coefficients/response, analytic design edges, all response/order families, stability, direct-form recurrence, and atomic failure checks"
+        }
+      ],
+      "edge_cases": [
+        "Prototype order limits, invalid response/overload combinations, ordered band edges, strict Nyquist limits, non-finite coefficients, frequencies and state values, and bounded ripple are rejected.",
+        "Odd/even Chebyshev ripple endpoints, complex and real poles, unit-circle instability, and exact zero denominators have explicit reference or analytic checks.",
+        "Empty and multi-block streams, copied/restored state, late arithmetic overflow, and rejected input preserve the documented state contract."
+      ],
+      "documentation": "docs/guides/domains/applied-numerics.md",
+      "fault_injections": [
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "      (Coefficients[I].A2 < 1.0) and",
+          "replacement": "      (Coefficients[I].A2 <= 1.0) and",
+          "test": "tests/TestSOSIIR.pas"
+        },
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "  Result.MinimumStabilityMargin := 1.0 - Result.MaximumPoleRadius;",
+          "replacement": "  Result.MinimumStabilityMargin := 2.0 - Result.MaximumPoleRadius;",
+          "test": "tests/TestSOSIIR.pas"
+        },
+        {
+          "source": "src/EngineeringLib.DSP.pas",
+          "needle": "  FState := NewState;\nend;\n\nfunction TStreamingSOSFilter.State",
+          "replacement": "  FState := Copy(FState);\nend;\n\nfunction TStreamingSOSFilter.State",
+          "test": "tests/TestSOSIIR.pas"
+        }
+      ]
+    },
+    {
+      "family": "canonical_generalized_linear_models",
+      "status": "qualified",
+      "risk": "high",
+      "input_domain": "Finite real-double full-rank design; exactly binary responses or nonnegative integer counts; explicitly bounded inverse-link information.",
+      "budget": {
+        "kind": "relative_error",
+        "metric": "Coefficients and standard errors within 2e-8 times max(1,abs(reference)); means 2e-9 times max(1,reference); deviance/Pearson 2e-8 absolute on validated corpus.",
+        "limit": 2e-08,
+        "unit": "coefficient, mean and diagnostic units as specified"
+      },
+      "reference": {
+        "method": "90-digit Decimal Newton normal equations and pivoted Gaussian elimination, independent of production binary64 pivoted QR IRLS",
+        "source": "Repository-authored generator; family/link/deviance definitions from https://www.statsmodels.org/stable/glm.html and R glm documentation",
+        "precision": "90 decimal digits, rounded to IEEE binary64 literals",
+        "parameters": "Six Bernoulli/Poisson intercept, two- and three-predictor fits including scaled predictors; analytic and failure cases",
+        "license": "Repository-authored generator and fixtures under MIT; mathematical definitions cited from primary documentation",
+        "regeneration": "python tools/generate_glm_reference.py; python tools/generate_glm_reference.py --check; run TGLMTest"
+      },
+      "tests": [
+        {
+          "path": "tests/TestGLM.pas",
+          "assertions": [
+            "procedure TGLMTest.TestIndependentReferenceFits;",
+            "procedure TGLMTest.TestAnalyticInterceptModels;",
+            "procedure TGLMTest.TestCompleteSeparationCertificates;",
+            "procedure TGLMTest.TestQuasiSeparationNeverConverges;",
+            "procedure TGLMTest.TestRankAndConditionFailures;"
+          ],
+          "kind": "Independent high-precision, analytic, finite-domain and convergence/failure checks"
+        }
+      ],
+      "edge_cases": [
+        "Complete and quasi-separation, rank/conditioning and iteration limits never expose inferential success.",
+        "Non-finite/invalid domains raise EGLMError; numerical failure retains only available last-iterate diagnostics.",
+        "Extreme predictor units, strided input, row permutation, zero-count boundary and no-intercept counterexamples are tested."
+      ],
+      "documentation": "docs/guides/domains/generalized-linear-models.md",
+      "fault_injections": [
+        {
+          "source": "src/StatsLib.GLM.pas",
+          "needle": "Errors[J] := (Sqrt(SumSquares[I]) / RootWeight) / Scales[J];",
+          "replacement": "Errors[J] := 2 * (Sqrt(SumSquares[I]) / RootWeight) / Scales[J];",
+          "test": "tests/TestGLM.pas"
+        },
+        {
+          "source": "src/StatsLib.GLM.pas",
+          "needle": "Status := glsCompleteSeparation",
+          "replacement": "Status := glsConverged",
+          "test": "tests/TestGLM.pas"
+        },
+        {
+          "source": "src/StatsLib.GLM.pas",
+          "needle": "Fit.Rank < Columns",
+          "replacement": "Fit.Rank > Columns",
+          "test": "tests/TestGLM.pas"
+        }
+      ]
+    },
+    {
+      "family": "partial_least_squares_regression",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite real-double predictors in a rectangular dense row-major matrix, at least three observations, and a finite single continuous response; missing data are rejected.",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "Absolute difference from the 80-digit Decimal fixture for original-scale intercept, coefficients, and pooled K-fold RMSECV",
+        "limit": 1e-10,
+        "unit": "response units for intercept/RMSECV and response per predictor unit for coefficients"
+      },
+      "reference": {
+        "method": "80-digit Python Decimal implementation of centered/scaled PLS1 score extraction, sequential deflation, rotation reconstruction, and fixed-fold pooled RMSECV",
+        "source": "Repository-authored tools/generate_pls_reference.py and tests/PLSReference.inc; formulas follow cited predictive PLS regression references",
+        "precision": "80 decimal digits during generation, rounded to 25-digit scientific literals for binary64 tests",
+        "parameters": "Ten observations, three deliberately correlated predictor columns of numerical rank two, one exact continuous response, five folds, seed 1729, and component counts zero through two",
+        "license": "Repository-authored generator and fixtures under MIT; cited papers are mathematical references only",
+        "regeneration": "Run python tools/generate_pls_reference.py; verify with --check; run tests/TestPLS.pas"
+      },
+      "tests": [
+        {
+          "path": "tests/TestPLS.pas",
+          "assertions": [
+            "TestDecimalReferenceFitAndCrossValidation",
+            "TestCorrelatedPredictorsUseTwoComponents"
+          ],
+          "kind": "independent Decimal coefficients, intercept, pooled RMSECV, latent-rank recovery, and analytic predictions"
+        },
+        {
+          "path": "tests/TestPLS.pas",
+          "assertions": [
+            "TestThreeComponentsRecoverExactLinearModel"
+          ],
+          "kind": "analytic full-rank three-component coefficient and intercept recovery"
+        },
+        {
+          "path": "tests/TestPLS.pas",
+          "assertions": [
+            "TestRankDeficiencyAndConstantPredictor",
+            "TestTooManyComponentsRaises",
+            "TestConstantResponseIsMeanOnly"
+          ],
+          "kind": "rank boundary, constant-column, component-cap, and constant-response checks"
+        },
+        {
+          "path": "tests/TestPLS.pas",
+          "assertions": [
+            "TestNonFiniteAndRaggedInputsRaise",
+            "TestCrossValidationIsSeededAndRepeatable",
+            "TestFitDoesNotMutateInputs"
+          ],
+          "kind": "input-domain, deterministic-fold, and ownership checks"
+        }
+      ],
+      "edge_cases": [
+        "Constant predictors remain present with zero coefficients and do not contribute to numerical rank.",
+        "Collinear designs use the measured numerical rank; a requested component cap above that rank raises EPLSError.",
+        "A constant response yields a valid mean-only model with zero baseline RMSECV.",
+        "NaN, infinity, missing values, ragged matrices, invalid folds, response-length mismatch, and malformed prediction inputs are rejected.",
+        "Cross-validation learns scaling and components from training rows only and uses a deterministic local shuffle."
+      ],
+      "documentation": "docs/guides/domains/machine-learning.md"
+    },
+    {
+      "family": "bounded_global_optimization",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite ordered nonempty real-double box, deterministic scalar callback; fixed coordinates allowed. Nonfinite callback results are rejected and counted.",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "Objective error against analytic zero minima: Rastrigin 1e-7, Rosenbrock 1e-8, Ackley 1e-6; fixed seed and published boxes, at most 20000 global calls. These are corpus limits, not universal guarantees.",
+        "limit": 1e-06,
+        "unit": "objective units"
+      },
+      "reference": {
+        "method": "Independent analytic minima from published test-function definitions; exact shifted quadratic and linear boundary minimum identities",
+        "source": "SFU Virtual Library of Simulation Experiments: https://www.sfu.ca/~ssurjano/optimization.html; Storn and Price (1997), DOI 10.1023/A:1008202821328 for search algorithm only",
+        "precision": "Analytic zero/one minima and binary64 evaluation; no optimizer output is used as its own numerical reference",
+        "parameters": "Two-dimensional Rastrigin [-5.12,5.12]^2, Rosenbrock [-2,2] x [-1,3], Ackley [-5,5]^2; seed 1729, population 32, 20000 calls; shifted quadratic and linear boundary cases",
+        "license": "Repository-authored MIT implementation and tests; cited literature supplies mathematics only, no copied third-party code",
+        "regeneration": "Compile/run tests/TestGlobalOptimization.pas through tests/TestRunner.lpr in normal, optimized and runtime-checked/heap modes; run examples/46_bounded_global_search.pas"
+      },
+      "tests": [
+        {
+          "path": "tests/TestGlobalOptimization.pas",
+          "assertions": [
+            "FindsKnownMultimodalMinimum",
+            "ChecksIndependentProblemMinima"
+          ],
+          "kind": "Independent analytic minima and bounded local refinement"
+        },
+        {
+          "path": "tests/TestGlobalOptimization.pas",
+          "assertions": [
+            "HonorsPartialInitializationAndGenerationBudgets",
+            "ReplaysSeedWithoutTouchingGlobalRandom",
+            "HandlesFixedAndExtremeBounds",
+            "RejectsNonfiniteValues",
+            "PolishImprovesWithoutExceedingSeparateBudget",
+            "ProtectsInputsAndBestFromCallbackMutation"
+          ],
+          "kind": "Exact budgets, state replay, range, failure and ownership contracts"
+        }
+      ],
+      "edge_cases": [
+        "Partial initialization/generation budgets return best observed point without overrun.",
+        "All-fixed boxes consume one call; no finite value yields explicit status and empty best point.",
+        "Opposite-sign extreme bounds avoid width overflow; fixed and narrow coordinates stay bounded.",
+        "Local polish uses a separate strict budget and never worsens the best finite point.",
+        "NaN/infinite objective results count; callback exceptions propagate; caller/global RNG and array ownership contracts are tested."
+      ],
+      "documentation": "docs/guides/domains/global-optimization.md"
+    },
+    {
+      "family": "validation_splits",
+      "status": "qualified",
+      "risk": "standard",
+      "input_domain": "Finite row count with zero-based disjoint train/validation sets; integer group or class labels and a valid fold count.",
+      "budget": {
+        "kind": "absolute_error",
+        "metric": "Analytic grouped outer-test PLS and OLS RMSE on a two-predictor linear-response fixture; separate exact row-assignment and count checks.",
+        "limit": 1e-08,
+        "unit": "response units"
+      },
+      "reference": {
+        "method": "Independently enumerated group/class row assignments and analytic linear response y=5+1.5*t-0.8*u.",
+        "source": "Repository-authored fixtures; scikit-learn cross-validation documentation for group separation and evaluation methodology: https://scikit-learn.org/stable/modules/cross_validation.html",
+        "precision": "Exact integer membership/count reference and binary64 analytic response with 1e-8 outer-RMSE bound.",
+        "parameters": "Four groups of three rows, first three for fitting/selection and fourth untouched; two correlated predictors, three grouped folds.",
+        "license": "Repository-authored MIT code and fixtures; cited documentation supplies methodological background only.",
+        "regeneration": "Compile/run tests/TestValidation.pas and tests/TestPLS.pas through tests/TestRunner.lpr; run examples/47_grouped_model_validation.pas"
+      },
+      "tests": [
+        {
+          "path": "tests/TestValidation.pas",
+          "assertions": [
+            "TestExplicitRowsAndFailures",
+            "TestGroupedRowsNeverLeak",
+            "TestStratifiedRowsAndReplay"
+          ],
+          "kind": "Row-set validation, group separation, class counts and deterministic replay"
+        },
+        {
+          "path": "tests/TestPLS.pas",
+          "assertions": [
+            "TestSuppliedSplitsPoolScoredRows",
+            "TestSuppliedSplitsRejectInvalidRows"
+          ],
+          "kind": "Pooled and per-split PLS scoring with supplied row sets"
+        }
+      ],
+      "edge_cases": [
+        "Overlapping and out-of-range rows fail before fitting.",
+        "A group never crosses train and validation within a split.",
+        "Each class needs enough rows to appear in every stratified fold.",
+        "Repeated validation rows count as repeated scored occurrences."
+      ],
+      "documentation": "docs/guides/domains/machine-learning.md"
+    }
+  ],
+  "carried_forward_from": "2.9.0",
+  "carry_forward_reason": "Existing qualified contracts are retained; v2.10.0 adds validation-split and grouped PLS workflow evidence with enumerated assignment and analytic outer-prediction fixtures."
+}

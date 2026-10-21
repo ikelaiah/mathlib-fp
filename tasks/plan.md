@@ -1,5 +1,9 @@
 # Implementation plan: 2.1 Special Functions II
 
+> Historical plan retained below. Current planning horizon:
+> [v2.10.0–v2.20.0](plan-2.10-2.20.md), with
+> [execution checklist](todo-2.10-2.20.md). The next design target is v2.10.0.
+
 ## Overview
 
 Add a bounded, documented real `Double` special-function surface in small,

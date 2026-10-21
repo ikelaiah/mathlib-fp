@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.9.0",
+  "release": "2.10.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -1224,7 +1224,8 @@
         "TPLSModel",
         "TPLSKit",
         "Fit",
-        "Predict"
+        "Predict",
+        "TPLSFoldErrors"
       ],
       "maturity": "stable",
       "scalars": [
@@ -1236,14 +1237,14 @@
         "single_continuous_response"
       ],
       "complexity": "dense O(F*(n*p*r + n*r^2)) fitting and cross-validation work for F folds, n rows, p predictors, and r components; O(n*p + n*r + p*r) working storage",
-      "accuracy": "80-digit Decimal independent coefficients and pooled RMSECV references, analytic linear identities, and rank/constant/failure checks",
+      "accuracy": "80-digit Decimal independent coefficients and pooled RMSECV references, analytic linear identities, and rank/constant/failure checks; grouped and overlapping row-set fixtures with pooled and per-split counts",
       "docs": "docs/guides/domains/machine-learning.md",
       "example": "examples/45_partial_least_squares.pas",
       "tests": "tests/TestPLS.pas",
       "limitations": [
         "one continuous response only; no multi-response PLS2",
         "complete dense row-major data only; missing values are rejected",
-        "random K-fold validation assumes exchangeable observations",
+        "default random K-fold validation assumes exchangeable observations; supplied grouped splits are available",
         "no robust fitting, confidence intervals, or feature-importance scores"
       ]
     },
@@ -1276,6 +1277,37 @@
         "finite continuous box bounds only; no mixed-integer or nonlinear constraints",
         "serial dense population; callback execution time is caller-controlled",
         "reproducible on one profile, not a cross-platform bitwise guarantee"
+      ]
+    },
+    {
+      "family": "validation_splits",
+      "unit": "MLLib.Analysis",
+      "entry_points": [
+        "TValidationSplit",
+        "TValidationSplits",
+        "ValidateSplit",
+        "GroupKFoldSplits",
+        "StratifiedKFoldSplits"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "integer_indices",
+        "double_model_data"
+      ],
+      "shapes": [
+        "explicit_train_validation_rows",
+        "grouped_rows",
+        "class_labels"
+      ],
+      "complexity": "O(n log n + g log g + g*f + n*f) split construction for n rows, g groups and f folds; O(n*f) result storage",
+      "accuracy": "enumerated group, class, overlap, replay and grouped outer-test fixtures",
+      "docs": "docs/guides/domains/machine-learning.md",
+      "example": "examples/47_grouped_model_validation.pas",
+      "tests": "tests/TestValidation.pas",
+      "limitations": [
+        "grouped and stratified splits are separate policies",
+        "chronological rolling splits are planned for a later release",
+        "caller-supplied splits may omit or score rows repeatedly"
       ]
     }
   ]

@@ -9,7 +9,7 @@ uses
   fpcunit, testregistry,
   MathBase.SharedTypes,
   MLLib.MachineLearning,
-  MLLib.PLS;
+  MLLib.PLS, MLLib.Analysis;
 
 type
   TTestPLS = class(TTestCase)
@@ -34,11 +34,66 @@ type
     procedure TestAllConstantPredictorsAreMeanOnly;
     procedure TestTamperedModelIsRejected;
     procedure TestInsufficientRowsAndResponseShapeRaise;
+    procedure TestSuppliedSplitsPoolScoredRows;
+    procedure TestSuppliedSplitsRejectInvalidRows;
   end;
 
 implementation
 
 {$I PLSReference.inc}
+
+procedure TTestPLS.TestSuppliedSplitsPoolScoredRows;
+var
+  X: TDoubleMatrix;
+  Y: TDoubleArray;
+  Splits: TValidationSplits;
+  Model: TPLSModel;
+  I: Integer;
+begin
+  SetLength(X, 8); SetLength(Y, 8); SetLength(Splits, 2);
+  for I := 0 to 7 do
+  begin
+    X[I] := TDoubleArray.Create(I);
+    Y[I] := 3 + 2 * I;
+  end;
+  Splits[0].TrainingRows := TIntegerArray.Create(0, 2, 4, 6);
+  Splits[0].ValidationRows := TIntegerArray.Create(1, 3);
+  Splits[1].TrainingRows := TIntegerArray.Create(0, 2, 4, 6);
+  Splits[1].ValidationRows := TIntegerArray.Create(3, 5, 7);
+  Model := TPLSKit.Fit(X, Y, Splits, TPLSOptions.Default);
+  AssertEquals(2, Model.CrossValidationFolds);
+  AssertEquals(5, Model.CrossValidationSampleCount);
+  AssertEquals(2, Model.FoldSampleCounts[0]);
+  AssertEquals(3, Model.FoldSampleCounts[1]);
+  AssertEquals(2, Length(Model.FoldRMSECV));
+  AssertEquals(1, Model.SelectedComponents);
+  AssertNear('slope', 2.0, Model.Coefficients[0], 1E-11);
+  AssertNear('pooled error', 0.0, Model.RMSECV[1], 1E-11);
+  AssertNear('fold 0', 0.0, Model.FoldRMSECV[0][1], 1E-11);
+  AssertNear('fold 1', 0.0, Model.FoldRMSECV[1][1], 1E-11);
+  AssertNear('training-only pooled mean baseline', Sqrt(19.2),
+    Model.RMSECV[0], 1E-11);
+  AssertNear('first split mean baseline', Sqrt(8.0),
+    Model.FoldRMSECV[0][0], 1E-11);
+  AssertNear('second split mean baseline', Sqrt(Double(80.0) / Double(3.0)),
+    Model.FoldRMSECV[1][0], 1E-11);
+end;
+
+procedure TTestPLS.TestSuppliedSplitsRejectInvalidRows;
+var X: TDoubleMatrix; Y: TDoubleArray; Splits: TValidationSplits; I: Integer;
+begin
+  SetLength(X, 4); SetLength(Y, 4); SetLength(Splits, 2);
+  for I := 0 to 3 do
+  begin X[I] := TDoubleArray.Create(I); Y[I] := I; end;
+  Splits[0].TrainingRows := TIntegerArray.Create(0, 1);
+  Splits[0].ValidationRows := TIntegerArray.Create(2);
+  Splits[1].TrainingRows := TIntegerArray.Create(0, 2);
+  Splits[1].ValidationRows := TIntegerArray.Create(2);
+  try
+    TPLSKit.Fit(X, Y, Splits);
+    Fail('overlapping rows accepted');
+  except on E: EAnalysisError do ; end;
+end;
 
 procedure TTestPLS.AssertNear(const AMessage: String; Expected, Actual,
   Tolerance: Double);
