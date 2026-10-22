@@ -37,6 +37,12 @@ type
     class function Default: TGLMInputs; static;
   end;
 
+  TGLMPredictionModel = record
+    Family: TGLMFamily;
+    Coefficients: TDoubleArray;
+    UsesOffsets, UsesExposure: Boolean;
+  end;
+
   TGLMFitResult = record
     Family: TGLMFamily;
     Status: TGLMStatus;
@@ -53,6 +59,8 @@ type
 
   TGLMKit = class
   public
+    class function ToPredictionModel(const Fit: TGLMFitResult):
+      TGLMPredictionModel; static;
     class function FitLogistic(const Design: IDenseDoubleMatrix;
       const Response: TDoubleArray): TGLMFitResult; overload; static;
     class function FitLogistic(const Design: IDenseDoubleMatrix;
@@ -78,6 +86,11 @@ type
     class function PredictMean(const Fit: TGLMFitResult;
       const Design: IDenseDoubleMatrix): TDoubleArray; overload; static;
     class function PredictMean(const Fit: TGLMFitResult;
+      const Design: IDenseDoubleMatrix; const Inputs: TGLMInputs):
+      TDoubleArray; overload; static;
+    class function PredictMean(const Model: TGLMPredictionModel;
+      const Design: IDenseDoubleMatrix): TDoubleArray; overload; static;
+    class function PredictMean(const Model: TGLMPredictionModel;
       const Design: IDenseDoubleMatrix; const Inputs: TGLMInputs):
       TDoubleArray; overload; static;
   end;
@@ -748,32 +761,57 @@ begin Result := PredictMean(Fit, Design, TGLMInputs.Default); end;
 
 class function TGLMKit.PredictMean(const Fit: TGLMFitResult;
   const Design: IDenseDoubleMatrix; const Inputs: TGLMInputs): TDoubleArray;
+begin Result := PredictMean(ToPredictionModel(Fit), Design, Inputs); end;
+
+procedure ValidateGLMPrediction(const Model: TGLMPredictionModel);
+var J: SizeInt;
+begin
+  if not (Model.Family in [gfBernoulliLogit, gfPoissonLog]) or
+    (Length(Model.Coefficients) = 0) or
+    (Model.UsesExposure and (Model.Family <> gfPoissonLog)) then
+    raise EGLMError.Create('GLM prediction: invalid family, coefficients or exposure kind.');
+  for J := 0 to High(Model.Coefficients) do
+    if not Finite(Model.Coefficients[J]) then
+      raise EGLMError.Create('GLM prediction: coefficients must be finite.');
+end;
+
+class function TGLMKit.ToPredictionModel(const Fit: TGLMFitResult):
+  TGLMPredictionModel;
+begin
+  if (Fit.Status <> glsConverged) or not Fit.Identifiable then
+    raise EGLMError.Create('PredictMean: a converged identifiable GLM fit is required.');
+  Result.Family := Fit.Family; Result.Coefficients := Copy(Fit.Coefficients);
+  Result.UsesOffsets := Fit.UsesOffsets; Result.UsesExposure := Fit.UsesExposure;
+  ValidateGLMPrediction(Result);
+end;
+
+class function TGLMKit.PredictMean(const Model: TGLMPredictionModel;
+  const Design: IDenseDoubleMatrix): TDoubleArray;
+begin Result := PredictMean(Model, Design, TGLMInputs.Default); end;
+
+class function TGLMKit.PredictMean(const Model: TGLMPredictionModel;
+  const Design: IDenseDoubleMatrix; const Inputs: TGLMInputs): TDoubleArray;
 var I, J: SizeInt; Eta, Weight: Double; Offsets: TDoubleArray;
 begin
   Result := nil;
-  if (Fit.Status <> glsConverged) or not Fit.Identifiable or
-     not (Fit.Family in [gfBernoulliLogit, gfPoissonLog]) then
-    raise EGLMError.Create('PredictMean: a converged identifiable GLM fit is required.');
+  ValidateGLMPrediction(Model);
   ValidateDesign(Design, 'PredictMean');
   if Length(Inputs.FrequencyWeights) <> 0 then
     raise EGLMError.Create('PredictMean: frequency weights are training inputs only.');
   if (Design.Rows > 0) and
-    ((Fit.UsesOffsets <> (Length(Inputs.Offsets) <> 0)) or
-     (Fit.UsesExposure <> (Length(Inputs.Exposures) <> 0))) then
+    ((Model.UsesOffsets <> (Length(Inputs.Offsets) <> 0)) or
+     (Model.UsesExposure <> (Length(Inputs.Exposures) <> 0))) then
     raise EGLMError.Create('PredictMean: new rows require the fitted offset/exposure kinds.');
-  Offsets := BuildOffsets(Inputs, Design.Rows, Fit.Family);
-  if Design.Cols <> Length(Fit.Coefficients) then
+  Offsets := BuildOffsets(Inputs, Design.Rows, Model.Family);
+  if Design.Cols <> Length(Model.Coefficients) then
     raise EGLMError.Create('PredictMean: design columns must match coefficient count.');
-  for J := 0 to High(Fit.Coefficients) do
-    if not Finite(Fit.Coefficients[J]) then
-      raise EGLMError.Create('PredictMean: coefficients must be finite.');
   SetLength(Result, Design.Rows);
   try
     for I := 0 to Design.Rows - 1 do
     begin
       Eta := Offsets[I];
-      for J := 0 to Design.Cols - 1 do Eta := Eta + Design[I,J] * Fit.Coefficients[J];
-      if not InverseLink(Fit.Family, Eta, Result[I], Weight) then
+      for J := 0 to Design.Cols - 1 do Eta := Eta + Design[I,J] * Model.Coefficients[J];
+      if not InverseLink(Model.Family, Eta, Result[I], Weight) then
         raise EGLMError.Create('PredictMean: inverse link is not representable.');
     end;
   except

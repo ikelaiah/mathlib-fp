@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 2.14.x | :white_check_mark: |
 | 2.13.x | :white_check_mark: |
 | 2.12.x | :white_check_mark: |
 | 2.11.x | :white_check_mark: |
@@ -75,3 +76,6 @@ the 2.12.0 publication.
 
 The 2.12.x line is supported through 2027-04-22, six months after
 the 2.13.0 publication.
+
+The 2.13.x line is supported through 2027-04-22, six months after
+the 2.14.0 publication.

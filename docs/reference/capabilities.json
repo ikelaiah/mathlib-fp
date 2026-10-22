@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.13.0",
+  "release": "2.14.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -836,7 +836,11 @@
         "SaveStandardization",
         "LoadStandardization",
         "SaveScalarKalman",
-        "LoadScalarKalman"
+        "LoadScalarKalman",
+        "SaveGLMPrediction",
+        "LoadGLMPrediction",
+        "SavePLSPrediction",
+        "LoadPLSPrediction"
       ],
       "maturity": "stable",
       "scalars": [
@@ -846,16 +850,19 @@
         "cubic_spline",
         "streaming_fir",
         "standardization_model",
-        "scalar_kalman_state"
+        "scalar_kalman_state",
+        "glm_prediction",
+        "pls_prediction"
       ],
       "complexity": "O(serialized elements) encoding, validation, and copy",
-      "accuracy": "version/kind/CRC/resource-cap/corruption and behavioral round-trip fixtures",
+      "accuracy": "version/kind/CRC/resource-cap/corruption and behavioral round-trip fixtures; analytic deployment predictions and independent fixed legacy envelopes",
       "docs": "docs/guides/domains/interchange.md",
-      "example": "examples/21_release_1_8_workflows.pas",
-      "tests": "tests/TestAppliedNumerics.pas",
+      "example": "examples/51_prediction_persistence.pas",
+      "tests": "tests/TestPredictionPersistence.pas",
       "limitations": [
         "little-endian adapter format version 1",
-        "no decomposition, forest, arbitrary graph, or multivariate Kalman persistence"
+        "no decomposition, forest, arbitrary graph, or multivariate Kalman persistence",
+        "GLM and PLS artifacts contain indexed prediction parameters, not training reports or semantic feature names"
       ]
     },
     {
@@ -1193,7 +1200,9 @@
         "PredictMean",
         "TGLMInputs",
         "TGLMFrequencyWeights",
-        "GLM_MAX_FREQUENCY_COUNT"
+        "GLM_MAX_FREQUENCY_COUNT",
+        "TGLMPredictionModel",
+        "ToPredictionModel"
       ],
       "maturity": "stable",
       "scalars": [
@@ -1233,7 +1242,9 @@
         "TPLSKit",
         "Fit",
         "Predict",
-        "TPLSFoldErrors"
+        "TPLSFoldErrors",
+        "TPLSPredictionModel",
+        "ToPredictionModel"
       ],
       "maturity": "stable",
       "scalars": [

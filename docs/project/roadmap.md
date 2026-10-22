@@ -1080,7 +1080,7 @@ inverse variance, survey weighting, or an unspecified importance score.
 Fractional/analytic weights, grouped-binomial response formats, and robust
 covariance require separate designs.
 
-## Next release: 2.14.0 — Prediction model persistence
+## Previous release: 2.14.0 — Prediction model persistence
 
 Extend selected-model interchange with GLM and PLS prediction adapters after
 2.12–2.13 settle their contracts. Store the family/link, coefficients, intercept
@@ -1098,7 +1098,7 @@ requirements. Distinguish an inference artifact from the full training report.
 No arbitrary object graphs, callbacks, executable payloads, or automatic
 serialization of every diagnostic/training row.
 
-## Planned 2.15.0 — Kalman filtering with missing observations
+## Next release: 2.15.0 — Kalman filtering with missing observations
 
 Add explicit observation masks for the dense linear-Gaussian filter. Partial
 observations select the corresponding observation-model rows and measurement
