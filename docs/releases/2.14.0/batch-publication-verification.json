@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "verified_on": "2026-10-22",
+  "checks": [
+    "all five published in order",
+    "release commits follow main ancestry",
+    "six assets per release",
+    "title-free release bodies",
+    "v2.14.0 is latest"
+  ],
+  "releases": [
+    {
+      "release": "2.10.0",
+      "source_commit": "9447176e6a5013f89969ec3eebfe71cba40a8f47",
+      "published_at": "2026-10-21T21:03:05Z",
+      "url": "https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.10.0",
+      "assets": [
+        "mathlib-fp-2.10.0.tar.gz",
+        "mathlib-fp-2.10.0.tar.gz.sha256",
+        "mathlib-fp-2.10.0.zip",
+        "mathlib-fp-2.10.0.zip.sha256",
+        "mathlib-fp-docs-2.10.0.zip",
+        "mathlib-fp-docs-2.10.0.zip.sha256"
+      ],
+      "body_excludes_title": true
+    },
+    {
+      "release": "2.11.0",
+      "source_commit": "3bc5be2ec81dbcd6cbd5a79e6af223ed9b388380",
+      "published_at": "2026-10-21T21:36:19Z",
+      "url": "https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.11.0",
+      "assets": [
+        "mathlib-fp-2.11.0.tar.gz",
+        "mathlib-fp-2.11.0.tar.gz.sha256",
+        "mathlib-fp-2.11.0.zip",
+        "mathlib-fp-2.11.0.zip.sha256",
+        "mathlib-fp-docs-2.11.0.zip",
+        "mathlib-fp-docs-2.11.0.zip.sha256"
+      ],
+      "body_excludes_title": true
+    },
+    {
+      "release": "2.12.0",
+      "source_commit": "eafaed532063e0fc41a6068a9b68e104fd69a93b",
+      "published_at": "2026-10-22T06:31:27Z",
+      "url": "https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.12.0",
+      "assets": [
+        "mathlib-fp-2.12.0.tar.gz",
+        "mathlib-fp-2.12.0.tar.gz.sha256",
+        "mathlib-fp-2.12.0.zip",
+        "mathlib-fp-2.12.0.zip.sha256",
+        "mathlib-fp-docs-2.12.0.zip",
+        "mathlib-fp-docs-2.12.0.zip.sha256"
+      ],
+      "body_excludes_title": true
+    },
+    {
+      "release": "2.13.0",
+      "source_commit": "37905e1e8e4c824967e92c6ddfb068b285617ad8",
+      "published_at": "2026-10-22T06:54:13Z",
+      "url": "https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.13.0",
+      "assets": [
+        "mathlib-fp-2.13.0.tar.gz",
+        "mathlib-fp-2.13.0.tar.gz.sha256",
+        "mathlib-fp-2.13.0.zip",
+        "mathlib-fp-2.13.0.zip.sha256",
+        "mathlib-fp-docs-2.13.0.zip",
+        "mathlib-fp-docs-2.13.0.zip.sha256"
+      ],
+      "body_excludes_title": true
+    },
+    {
+      "release": "2.14.0",
+      "source_commit": "c66b4ab37b0718f6be7864c97762602fe6f782c8",
+      "published_at": "2026-10-22T07:15:19Z",
+      "url": "https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.14.0",
+      "assets": [
+        "mathlib-fp-2.14.0.tar.gz",
+        "mathlib-fp-2.14.0.tar.gz.sha256",
+        "mathlib-fp-2.14.0.zip",
+        "mathlib-fp-2.14.0.zip.sha256",
+        "mathlib-fp-docs-2.14.0.zip",
+        "mathlib-fp-docs-2.14.0.zip.sha256"
+      ],
+      "body_excludes_title": true
+    }
+  ]
+}
