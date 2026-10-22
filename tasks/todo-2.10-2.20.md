@@ -1,6 +1,6 @@
 # v2.10.0–v2.20.0 execution checklist
 
-v2.10.0 through v2.12.0 are published and verified. v2.13.0 is in final
+v2.10.0 through v2.13.0 are published and verified. v2.14.0 is in final
 qualification. Releases through v2.14.0 are authorized. See the [plan](plan-2.10-2.20.md) for task
 dependencies and verification, and the [roadmap](../docs/project/roadmap.md) for
 scope, exclusions, and acceptance gates. Later releases remain planned capability gates.
@@ -26,7 +26,7 @@ slices before work starts. The four checkboxes are milestones, not one task.
 | --- | --- | --- | --- | --- |
 | 2.11.0 Chronological validation | [x] | [x] | [x] | [x] |
 | 2.12.0 GLM offsets/exposure | [x] | [x] | [x] | [x] |
-| 2.13.0 GLM frequency weights | [x] | [x] | [x] | [ ] |
+| 2.13.0 GLM frequency weights | [x] | [x] | [x] | [x] |
 | 2.14.0 Prediction persistence | [x] | [x] | [x] | [ ] |
 | 2.15.0 Missing-observation filtering | [ ] | [ ] | [ ] | [ ] |
 | 2.16.0 RTS smoothing | [ ] | [ ] | [ ] | [ ] |

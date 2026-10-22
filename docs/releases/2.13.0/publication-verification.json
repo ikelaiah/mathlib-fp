@@ -1,0 +1,19 @@
+{
+  "release": "2.13.0",
+  "source_commit": "37905e1e8e4c824967e92c6ddfb068b285617ad8",
+  "checks": [
+    "source and docs SHA-256",
+    "identical clean ZIP/tar source",
+    "GitHub automatic archive with text line-ending normalization",
+    "README quick start",
+    "50_frequency_weighted_glm example",
+    "clean-profile Lazarus consumer",
+    "offline docs identity and links",
+    "live root/current identity",
+    "all preserved release identities",
+    "six published assets",
+    "published body excludes title"
+  ],
+  "status": "passed",
+  "verified_on": "2026-10-22"
+}
