@@ -608,7 +608,7 @@
       "documentation": "docs/guides/domains/machine-learning.md"
     },
     {
-      "family": "selected_model_persistence",
+      "family": "glm_pls_prediction_persistence",
       "status": "qualified",
       "risk": "standard",
       "input_domain": "Finite nonempty binary64 GLM/PLS coefficients with supported family/input conventions and bounded checked envelopes.",
@@ -639,7 +639,13 @@
       ],
       "limitations": [
         "Prediction parameters only; no training reports, arbitrary objects or semantic feature names"
-      ]
+      ],
+      "edge_cases": [
+        "Reserved codes, incompatible exposure/family, nonfinite values and empty vectors fail.",
+        "Caps and byte overflow are rejected before stream reads or payload allocation.",
+        "Legacy kind bytes and projected coefficient ownership remain independent."
+      ],
+      "documentation": "docs/guides/domains/interchange.md"
     }
   ],
   "carried_forward_from": "2.13.0",

@@ -836,7 +836,32 @@
         "SaveStandardization",
         "LoadStandardization",
         "SaveScalarKalman",
-        "LoadScalarKalman",
+        "LoadScalarKalman"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "double"
+      ],
+      "shapes": [
+        "cubic_spline",
+        "streaming_fir",
+        "standardization_model",
+        "scalar_kalman_state"
+      ],
+      "complexity": "O(serialized elements) encoding, validation, and copy",
+      "accuracy": "version/kind/CRC/resource-cap/corruption and behavioral round-trip fixtures",
+      "docs": "docs/guides/domains/interchange.md",
+      "example": "examples/21_release_1_8_workflows.pas",
+      "tests": "tests/TestAppliedNumerics.pas",
+      "limitations": [
+        "little-endian adapter format version 1",
+        "no decomposition, forest, arbitrary graph, or multivariate Kalman persistence"
+      ]
+    },
+    {
+      "family": "glm_pls_prediction_persistence",
+      "unit": "InterchangeLib.Models",
+      "entry_points": [
         "SaveGLMPrediction",
         "LoadGLMPrediction",
         "SavePLSPrediction",
@@ -847,10 +872,6 @@
         "double"
       ],
       "shapes": [
-        "cubic_spline",
-        "streaming_fir",
-        "standardization_model",
-        "scalar_kalman_state",
         "glm_prediction",
         "pls_prediction"
       ],
@@ -860,9 +881,8 @@
       "example": "examples/51_prediction_persistence.pas",
       "tests": "tests/TestPredictionPersistence.pas",
       "limitations": [
-        "little-endian adapter format version 1",
-        "no decomposition, forest, arbitrary graph, or multivariate Kalman persistence",
-        "GLM and PLS artifacts contain indexed prediction parameters, not training reports or semantic feature names"
+        "little-endian model envelope version 1, kinds 5 and 6",
+        "indexed prediction parameters only; no training reports or semantic feature names"
       ]
     },
     {

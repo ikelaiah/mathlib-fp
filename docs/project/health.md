@@ -17,7 +17,7 @@ They are not a scorecard or a substitute for numerical and platform evidence.
 | EngineeringLib | 3 | 8 | 472 | 6 | SOS Butterworth/Chebyshev I prototype orders 1–12; no equiripple, resampling or broader wavelet families |
 | FinanceLib | 0 | 3 | 71 | 2 | Documented rate/time conventions and bounded numerical models |
 | GeometryLib | 0 | 1 | 133 | 1 | Zero/non-finite normalization and degenerate constructions follow explicit contracts |
-| InterchangeLib | 1 | 1 | 18 | 2 | Selected adapters including GLM/PLS prediction; no arbitrary model/decomposition graphs |
+| InterchangeLib | 2 | 1 | 18 | 2 | Selected adapters including GLM/PLS prediction; no arbitrary model/decomposition graphs |
 | MLLib | 3 | 3 | 173 | 6 | Dense serial analysis with grouped/stratified/chronological validation and PLS1; no duration windows, PLS2, imputation, or robust fitting |
 | MathBase | 6 | 10 | 258 | 14 | Function-specific real domains and fixture budgets; no general symbolic algebra |
 | NumericsLib | 4 | 4 | 310 | 5 | Dense SDIRK2 stiff ODE baseline; no DAEs, mass matrices or sparse stiff systems |

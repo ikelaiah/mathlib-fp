@@ -55,6 +55,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Nonsymmetric, generalized, Hessenberg, and Schur spectral algebra | Stable | Double real and complex | Dense matrices; nonsymmetric eigenpairs use real input; no polynomial, shift-invert, or interior-target path |
 | Advanced DSP design and wavelets | Unsupported | — | Haar is stable; equiripple, advanced IIR families, broader wavelets, and packets remain conditional |
 | Conditional statistics and data science | Unsupported | — | Survival/factor analysis, robust covariance, multinomial and additional count families, boosting, and broader forecasting were not activated |
+| GLM/PLS prediction persistence | Stable | Double real | Explicit indexed columns and input conventions; prediction parameters only |
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
