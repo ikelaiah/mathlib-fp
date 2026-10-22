@@ -1,7 +1,7 @@
 # v2.10.0–v2.20.0 execution checklist
 
-v2.10.0 through v2.13.0 are published and verified. v2.14.0 is in final
-qualification. Releases through v2.14.0 are authorized. See the [plan](plan-2.10-2.20.md) for task
+v2.10.0 through v2.14.0 are published and verified. The authorized five-release
+batch is complete; v2.15.0 through v2.20.0 remain planned capability gates. See the [plan](plan-2.10-2.20.md) for task
 dependencies and verification, and the [roadmap](../docs/project/roadmap.md) for
 scope, exclusions, and acceptance gates. Later releases remain planned capability gates.
 
@@ -27,7 +27,7 @@ slices before work starts. The four checkboxes are milestones, not one task.
 | 2.11.0 Chronological validation | [x] | [x] | [x] | [x] |
 | 2.12.0 GLM offsets/exposure | [x] | [x] | [x] | [x] |
 | 2.13.0 GLM frequency weights | [x] | [x] | [x] | [x] |
-| 2.14.0 Prediction persistence | [x] | [x] | [x] | [ ] |
+| 2.14.0 Prediction persistence | [x] | [x] | [x] | [x] |
 | 2.15.0 Missing-observation filtering | [ ] | [ ] | [ ] | [ ] |
 | 2.16.0 RTS smoothing | [ ] | [ ] | [ ] | [ ] |
 | 2.17.0 Low-pass FIR design | [ ] | [ ] | [ ] | [ ] |
@@ -37,11 +37,17 @@ slices before work starts. The four checkboxes are milestones, not one task.
 
 ## Horizon checkpoints
 
-- [ ] After 2.11: verify grouped/chronological workflows; reassess GLM demand.
-- [ ] After 2.14: verify a separate model consumer; reassess state-space need.
+- [x] After 2.11: verify grouped/chronological workflows; reassess GLM demand.
+- [x] After 2.14: verify a separate model consumer; reassess state-space need.
 - [ ] After 2.16: verify masked filtering/smoothing; reassess sample-rate workflow.
 - [ ] After 2.19: verify process restart; require measured PCA feasibility evidence.
 - [ ] After 2.20: rerun integrated workflows and review actual compatibility debt.
 
 No major version is triggered by checking the final box. Any incompatible
 change requires its own approved migration and deprecation runway.
+
+The 2.11 checkpoint was satisfied by grouped and chronological workflow
+verification and the subsequent analytic offset/exposure and integer-frequency
+GLM releases. The 2.14 checkpoint passed with a separately compiled consumer
+using only artifacts and new observations. State-space work remains planned;
+this batch does not activate v2.15.0 or later capabilities.
