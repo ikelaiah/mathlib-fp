@@ -23,7 +23,19 @@ retains the representative consumer checks.
 
 ## Hosted and publication gates
 
-Hosted Linux/Windows CI and checksummed clean-archive qualification, a fresh
-archive consumer, exact-main CI, and downloaded release/docs verification
-remain required. The final tag must name the validated main tree. Release
-bodies contain changelog content; the release title stays in the title field.
+Linux and Windows CI passed in [PR #77](https://github.com/ikelaiah/mathlib-fp/pull/77)
+and [CI run](https://github.com/ikelaiah/mathlib-fp/actions/runs/39679753766).
+The [clean-archive run](https://github.com/ikelaiah/mathlib-fp/actions/runs/39679724007)
+passed 143 Linux and 144 Windows gates.
+Linux blocked new outbound connections after checksum verification and
+extraction; Windows qualified its verified ZIP. Separate platform artifacts
+retain the complete evidence.
+
+Local archive preflight verified SHA-256, matching ZIP/tar contents, the README
+quick start, the release example, a fresh-profile Lazarus package consumer,
+and offline documentation identity and links.
+
+The finalized branch must retain green CI and clean-archive qualification, and
+the resulting exact main commit must pass CI before tagging. Publication and
+downloaded artifact verification follow [RELEASING.md](../../../RELEASING.md).
+Release bodies contain changelog content; the title stays in the title field.
