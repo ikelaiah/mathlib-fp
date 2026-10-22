@@ -4,6 +4,6 @@
 - [x] Implement numerical paths, edge cases, and the release workflow.
 - [x] Complete local qualification and five-axis review.
 - [x] Pass hosted Linux/Windows CI and clean-archive qualification.
-- [ ] Merge, verify exact main, publish and check downloaded artifacts/docs.
+- [x] Merge, verify exact main, publish and check downloaded artifacts/docs.
 
 Release bodies begin with changelog content; the title stays in the title field.

@@ -1064,7 +1064,7 @@ logarithm. Prediction accepts the corresponding new-observation inputs.
 Weight semantics, regularization, additional families, and robust covariance
 are deferred.
 
-## Next release: 2.13.0 — GLM frequency weights
+## Previous release: 2.13.0 — GLM frequency weights
 
 Add explicitly named nonnegative integer frequency weights to the existing GLM
 families, including offset/exposure fits. A weight means row replication, not
@@ -1080,7 +1080,7 @@ inverse variance, survey weighting, or an unspecified importance score.
 Fractional/analytic weights, grouped-binomial response formats, and robust
 covariance require separate designs.
 
-## Planned 2.14.0 — Prediction model persistence
+## Next release: 2.14.0 — Prediction model persistence
 
 Extend selected-model interchange with GLM and PLS prediction adapters after
 2.12–2.13 settle their contracts. Store the family/link, coefficients, intercept

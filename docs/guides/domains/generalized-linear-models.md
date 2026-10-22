@@ -81,13 +81,39 @@ generally a constant count mean. The Poisson null rate is total count divided
 by total effective exposure; the Bernoulli null intercept solves its monotone
 score equation. Numerical failure to represent that diagnostic is explicit.
 
+### Integer frequency weights
+
+Set `Inputs.FrequencyWeights` to a `TGLMFrequencyWeights` array of nonnegative
+integer counts. A count means independent row replication, including its
+response, offset and exposure. Nil means unit weights; zero excludes a row from
+estimation and diagnostics. All stored input values must still satisfy their
+domain/finite checks. The positive total is at most
+`GLM_MAX_FREQUENCY_COUNT` (2,147,483,647 on every target); invalid lengths, zero
+total or count overflow raise `EGLMError`. Fitting never allocates the expanded
+replicated dataset. Working memory depends on stored rows.
+
+`FrequencyCount` is the total observation count. With explicit weights,
+`DiagnosticRows` maps the positive-weight stored rows to `FittedMeans`,
+`ResponseResiduals` and `DevianceResiduals`, in original row order. Response
+residuals remain y minus mean; deviance residuals include the square root of
+frequency so their squares sum to total deviance. Nil weights leave
+`DiagnosticRows` empty and preserve the full-row result arrays. Standard errors,
+null deviance, Pearson statistics and residual degrees of freedom use the
+replicated-data interpretation. Zero-weight rows cannot supply rank or prevent
+separation. These counts are not fractional/analytic, survey or importance weights.
+
+Weights are training inputs: prediction rejects nonempty new-row frequency
+weights and requires only the fitted offset/exposure kinds.
+[Example 50](../../../examples/50_frequency_weighted_glm.pas) stores three rows
+representing six observations and checks prediction against explicit replication.
+
 Use `TGLMOptions.Default` before changing options:
 
 | Field | Default | Meaning |
 | --- | --- | --- |
 | `MaxIterations` | 100 | 1 through 10,000 IRLS iterations |
 | `Tolerance` | 1e-8 | Relative deviance, unhalved normalized coefficient and linear-predictor corrections; finite, greater than 0 and at most 0.01 |
-| `RankTolerance` | 1e-12 | Absolute QR cutoff is this value times `sqrt(rows)` on normalized weighted design; finite, strictly between 0 and 1 |
+| `RankTolerance` | 1e-12 | Equivalent replicated-design absolute QR cutoff, adjusted for maximum-root normalization; unit weights use this value times `sqrt(rows)`; finite, strictly between 0 and 1 |
 | `MinimumConditionIndicator` | 1e-10 | Minimum accepted QR diagonal ratio; finite, greater than 0 and at most 1 |
 
 Fit requires a nonnil design with at least one column, at least as many rows
@@ -106,7 +132,7 @@ moderate dense data. Up to 40 step halvings
 are allowed. An increase of at most 8 binary64 epsilons times `1 + deviance`
 is treated as summation roundoff. The unhalved correction must be small before
 convergence, and the unhalved linear-predictor correction must also be small;
-a tiny backtracking step alone cannot signal success. No frequency/analytic
+a tiny backtracking step alone cannot signal success. No fractional/analytic
 weights, grouped-binomial trials, regularization or additional families
 are implemented in this release.
 
@@ -115,6 +141,7 @@ are implemented in this release.
 `TGLMFitResult` contains `Family`, `Status`, `Message`, `Iterations`, `Rank`,
 `DegreesOfFreedom`, `ConditionIndicator`, `Identifiable`, `HasFiniteIterate`,
 `UsesOffsets`, `UsesExposure`,
+`FrequencyCount`, `DiagnosticRows`,
 `Coefficients`, `StandardErrors`, `FittedMeans`, `ResponseResiduals`,
 `DevianceResiduals`, `Deviance`, `NullDeviance`, `PearsonChiSquare` and
 `DevianceHistory`.
@@ -133,7 +160,7 @@ are implemented in this release.
 `ConditionIndicator` is the minimum/maximum accepted QR diagonal ratio of the
 normalized weighted design. It is an indicator, not a rigorous reciprocal
 condition number. `Rank` describes the last factored information, and residual
-degrees of freedom are observation count minus that rank. Standard errors are
+degrees of freedom are total frequency minus that rank. Standard errors are
 computed from the final expected information, with column permutations and
 predictor units restored. Failed fits have empty `StandardErrors` and
 `Identifiable = False`; prediction rejects them.

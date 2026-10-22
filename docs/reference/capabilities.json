@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.12.0",
+  "release": "2.13.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -1191,7 +1191,9 @@
         "FitLogistic",
         "FitPoisson",
         "PredictMean",
-        "TGLMInputs"
+        "TGLMInputs",
+        "TGLMFrequencyWeights",
+        "GLM_MAX_FREQUENCY_COUNT"
       ],
       "maturity": "stable",
       "scalars": [
@@ -1202,20 +1204,22 @@
         "explicit_design_columns",
         "binary_or_count_response",
         "known_offsets",
-        "positive_poisson_exposure"
+        "positive_poisson_exposure",
+        "integer_frequency_counts"
       ],
       "complexity": "O(iterations*(n^2*p+n*p^2) + p^3) time; shared QR temporarily materializes Q, requiring O(n^2+n*p+p^2) working storage",
-      "accuracy": "90-digit Decimal independent Newton references, analytic information/deviance, and adversarial status/scale fixtures; analytic 80-digit offset/exposure information and null-deviance references",
+      "accuracy": "90-digit Decimal independent Newton references, analytic information/deviance, and adversarial status/scale fixtures; analytic 80-digit offset/exposure information and null-deviance references; explicit-replication references for both families, information and weighted diagnostics",
       "docs": "docs/guides/domains/generalized-linear-models.md",
       "example": "examples/44_generalized_linear_models.pas",
       "tests": "tests/TestGLM.pas",
       "limitations": [
-        "Bernoulli logit and Poisson log only; no weights, grouped trials or regularization",
+        "Bernoulli logit and Poisson log only; integer replication weights, no fractional/analytic weights, grouped trials or regularization",
         "explicit intercept and finite full-rank designs required",
         "separation certificates are not an exhaustive LP classifier",
         "information boundaries: logistic abs(eta) < 36 and Poisson abs(eta) < 700",
         "dispersion fixed at one; no robust covariance",
-        "prediction requires the fitted offset/exposure input kinds on new rows"
+        "prediction requires the fitted offset/exposure input kinds on new rows",
+        "frequency total at most 2147483647; diagnostics map positive-weight stored rows"
       ]
     },
     {

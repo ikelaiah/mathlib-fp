@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The current stable release is 2.12.0. It adds known GLM offsets, Poisson exposure, and explicit new-observation prediction inputs. Consult the [2.12.0 API reference](reference/api/reference-2.12.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md).
+The current stable release is 2.13.0. It adds integer frequency-weighted GLMs with replicated-data diagnostics and checked observation counts. Consult the [2.13.0 API reference](reference/api/reference-2.13.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md).
 
 ## Domains
 

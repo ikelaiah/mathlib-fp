@@ -38,7 +38,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Stable SOS IIR filtering | Stable | Double real | Butterworth and Chebyshev Type I in four responses; prototype order 1–12; explicit streaming state and pole/response diagnostics |
 | Reusable spectral plans | Stable | Double real and double complex | Fixed geometry; serial plans reject overlapping use; arbitrary FFT lengths use cached Bluestein workspace; STFT returns full spectra and pads both boundaries |
 | Statistical inference and regression | Stable | Double real | Paired distribution APIs, estimation/tests/corrections, SVD OLS, and binary logistic with identifiability status |
-| Canonical generalized linear models | Stable (v2.7.0, extended v2.12.0) | Double real | Bernoulli logit and Poisson log; explicit design/intercept; finite information and convergence required; known offsets/Poisson exposure; no weights, regularization or robust covariance |
+| Canonical generalized linear models | Stable (v2.7.0, extended v2.12.0–v2.13.0) | Double real | Bernoulli logit and Poisson log; explicit design/intercept; finite information and convergence required; known offsets/Poisson exposure and integer frequency weights; no analytic weights, regularization or robust covariance |
 | Partial least-squares regression | Stable (v2.8.0, extended v2.10.0) | Double real | One continuous response, dense complete rows, rank-limited PLS1, default random or supplied grouped validation; no multi-response, imputation, robust fitting or confidence intervals |
 | Validation splits | Stable (v2.10.0, extended v2.11.0) | Integer row and group/class labels | Explicit, grouped, stratified, expanding or rolling train/validation rows; caller-ordered chronology, no duration-based or combined stratified-group builder |
 | Typed data analysis | Stable | Double real dense | PCA, seeded clustering/splits/forests, fitted standardization, binary LDA, and exact low-dimensional KD tree |
@@ -58,7 +58,7 @@ Target qualifications and platform-specific limitations are defined by the
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.12.0 capability inventory. It adds explicit grouped/stratified
+This is the 2.13.0 capability inventory. It adds explicit grouped/stratified
 validation row sets and supplied-split PLS component selection with pooled and
 per-split error diagnostics. Qualification status
 is recorded in the [current release report](../releases/2.9.0/qualification.md).

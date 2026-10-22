@@ -62,6 +62,7 @@ closest to your project. For a shorter task-first route, use the
 | `47_grouped_model_validation.pas` | MLLib | Keep one group untouched while comparing PLS and OLS on the same rows |
 | `48_chronological_validation.pas` | MLLib | Expanding chronological PLS windows with a gap and an untouched future holdout |
 | `49_count_rates.pas` | StatsLib | Fit unequal Poisson exposure and predict new expected counts and rates |
+| `50_frequency_weighted_glm.pas` | StatsLib | Store repeated observations once and verify weighted GLM predictions against explicit replication |
 
 ## Build and run
 
