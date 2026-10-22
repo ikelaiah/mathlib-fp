@@ -196,6 +196,14 @@ as probabilities rounded to 0 or 1. Poisson predictions require
 An unsupported inverse-link domain or nonrepresentable linear predictor raises
 `EGLMError`.
 
+## Portable prediction
+
+`TGLMKit.ToPredictionModel(Fit)` validates a converged, identifiable fit and
+returns owned `TGLMPredictionModel` coefficients, family and offset/exposure
+requirements. `PredictMean` accepts that record with the same new-row contract.
+Optional [prediction persistence](interchange.md#selected-model-persistence)
+saves this record without training rows, frequency weights or fit diagnostics.
+
 ## Numerical evidence and compatibility
 
 Six independent 90-digit Decimal reference fits cover both families,

@@ -10,7 +10,7 @@ interface
 uses
   Classes, SysUtils, Math, MathBase.SharedTypes,
   NumericsLib.Interpolation, EngineeringLib.DSP, MLLib.Analysis,
-  TimeSeriesLib.StateSpace;
+  TimeSeriesLib.StateSpace, StatsLib.GLM, MLLib.PLS;
 
 const
   DEFAULT_MAX_MODEL_ELEMENTS=16000000;
@@ -34,6 +34,14 @@ function LoadStandardization(const Stream:TStream;
 procedure SaveScalarKalman(const Stream:TStream;
   const Model:TScalarKalmanFilter);
 function LoadScalarKalman(const Stream:TStream):TScalarKalmanFilter;
+procedure SaveGLMPrediction(const Stream:TStream;
+  const Model:TGLMPredictionModel);
+function LoadGLMPrediction(const Stream:TStream;
+  const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TGLMPredictionModel;
+procedure SavePLSPrediction(const Stream:TStream;
+  const Model:TPLSPredictionModel);
+function LoadPLSPrediction(const Stream:TStream;
+  const MaxElements:QWord=DEFAULT_MAX_MODEL_ELEMENTS):TPLSPredictionModel;
 function SummarizeCubicSpline(const Model:TCubicSplineInterpolator):String;
 function SummarizeStreamingFIR(const Model:TStreamingFIR):String;
 function SummarizeStandardization(const Model:TStandardizationModel):String;
@@ -43,7 +51,7 @@ implementation
 
 type
   TModelKind=(mkCubicSpline=1,mkStreamingFIR=2,
-    mkStandardization=3,mkScalarKalman=4);
+    mkStandardization=3,mkScalarKalman=4,mkGLMPrediction=5,mkPLSPrediction=6);
 
 const
   MODEL_MAGIC:array[0..7] of Byte=(
@@ -69,16 +77,23 @@ procedure AppendDouble(var Bytes:TBytes; Value:Double);
 var Bits:QWord;
 begin Move(Value,Bits,SizeOf(Bits)); AppendUInt64(Bytes,Bits); end;
 
+procedure PutUInt64(var Bytes:TBytes; Offset:Integer; Value:QWord); forward;
+
 procedure AppendVector(var Bytes:TBytes; const Values:TDoubleArray);
-var I:Integer;
+var I,N,Count:Integer; Bits:QWord;
 begin
-  AppendUInt64(Bytes,Length(Values));
+  if Length(Bytes)>High(Integer)-8 then
+    raise EModelInterchangeError.Create('Model persistence: vector header exceeds capacity.');
+  if Length(Values)>(High(Integer)-8-Length(Bytes)) div 8 then
+    raise EModelInterchangeError.Create('Model persistence: vector byte size exceeds capacity.');
+  N:=Length(Bytes); Count:=Length(Values);
+  SetLength(Bytes,N+8+Count*8); PutUInt64(Bytes,N,Count);
   for I:=0 to High(Values) do
   begin
     if not Finite(Values[I]) then
       raise EModelInterchangeError.CreateFmt(
         'Model persistence: value %d must be finite.',[I]);
-    AppendDouble(Bytes,Values[I]);
+    Move(Values[I],Bits,SizeOf(Bits)); PutUInt64(Bytes,N+8+I*8,Bits);
   end;
 end;
 
@@ -402,6 +417,83 @@ begin
   Configuration:=TScalarKalmanConfiguration.Create(
     Transition,Observation,ProcessVariance,MeasurementVariance);
   Result:=TScalarKalmanFilter.Create(Configuration,Estimate,Variance);
+end;
+
+function PredictionByteLimit(const MaxElements,Overhead:QWord):QWord;
+begin
+  if (MaxElements<1) or
+    (MaxElements>(QWord(High(Integer))-Overhead) div 8) then
+    raise EModelInterchangeError.Create('Prediction model: invalid or excessive element limit.');
+  Result:=Overhead+MaxElements*8;
+end;
+
+procedure CheckGLMPrediction(const Model:TGLMPredictionModel);
+begin
+  if not (Model.Family in [gfBernoulliLogit,gfPoissonLog]) or
+    (Length(Model.Coefficients)=0) or
+    (Model.UsesExposure and (Model.Family<>gfPoissonLog)) then
+    raise EModelInterchangeError.Create('GLM prediction model: invalid family, shape or exposure kind.');
+end;
+
+procedure SaveGLMPrediction(const Stream:TStream;
+  const Model:TGLMPredictionModel);
+var Payload:TBytes;
+begin
+  CheckGLMPrediction(Model);
+  Payload:=nil; SetLength(Payload,8);
+  Payload[0]:=1; Payload[1]:=Ord(Model.Family); Payload[2]:=Ord(Model.Family);
+  if Model.UsesOffsets then Payload[6]:=1;
+  if Model.UsesExposure then Payload[6]:=Payload[6] or 2;
+  AppendVector(Payload,Model.Coefficients);
+  WriteEnvelope(Stream,mkGLMPrediction,Payload);
+end;
+
+function LoadGLMPrediction(const Stream:TStream;
+  const MaxElements:QWord):TGLMPredictionModel;
+var Payload:TBytes; Offset:Integer;
+begin
+  Result:=Default(TGLMPredictionModel);
+  Payload:=ReadEnvelope(Stream,mkGLMPrediction,PredictionByteLimit(MaxElements,16));
+  if Length(Payload)<16 then
+    raise EModelInterchangeError.Create('GLM prediction model: truncated header/vector.');
+  if (Payload[0]<>1) or (Payload[1]>Ord(High(TGLMFamily))) or
+    (Payload[2]<>Payload[1]) or (Payload[3]<>0) or (Payload[4]<>0) or
+    (Payload[5]<>0) or ((Payload[6] and $FC)<>0) or (Payload[7]<>0) then
+    raise EModelInterchangeError.Create('GLM prediction model: unsupported encoding or convention.');
+  Result.Family:=TGLMFamily(Payload[1]);
+  Result.UsesOffsets:=(Payload[6] and 1)<>0;
+  Result.UsesExposure:=(Payload[6] and 2)<>0;
+  Offset:=8; Result.Coefficients:=ReadVector(Payload,Offset,MaxElements);
+  RequireEnd(Payload,Offset); CheckGLMPrediction(Result);
+end;
+
+procedure SavePLSPrediction(const Stream:TStream;
+  const Model:TPLSPredictionModel);
+var Payload:TBytes;
+begin
+  if (Length(Model.Coefficients)=0) or not Finite(Model.Intercept) then
+    raise EModelInterchangeError.Create('PLS prediction model: nonempty coefficients and finite intercept required.');
+  Payload:=nil; SetLength(Payload,8); Payload[0]:=1; Payload[1]:=1;
+  AppendDouble(Payload,Model.Intercept); AppendVector(Payload,Model.Coefficients);
+  WriteEnvelope(Stream,mkPLSPrediction,Payload);
+end;
+
+function LoadPLSPrediction(const Stream:TStream;
+  const MaxElements:QWord):TPLSPredictionModel;
+var Payload:TBytes; Offset,I:Integer;
+begin
+  Result:=Default(TPLSPredictionModel);
+  Payload:=ReadEnvelope(Stream,mkPLSPrediction,PredictionByteLimit(MaxElements,24));
+  if Length(Payload)<24 then
+    raise EModelInterchangeError.Create('PLS prediction model: truncated header/vector.');
+  if (Payload[0]<>1) or (Payload[1]<>1) or (Payload[2]<>0) or (Payload[3]<>0) then
+    raise EModelInterchangeError.Create('PLS prediction model: unsupported encoding or convention.');
+  for I:=4 to 7 do if Payload[I]<>0 then
+    raise EModelInterchangeError.Create('PLS prediction model: reserved field is nonzero.');
+  Offset:=8; Result.Intercept:=ReadDouble(Payload,Offset);
+  Result.Coefficients:=ReadVector(Payload,Offset,MaxElements); RequireEnd(Payload,Offset);
+  if Length(Result.Coefficients)=0 then
+    raise EModelInterchangeError.Create('PLS prediction model: nonempty coefficients required.');
 end;
 
 function SummarizeCubicSpline(

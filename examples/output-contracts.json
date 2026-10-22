@@ -307,6 +307,14 @@
         "Weights count independent repeated observations; prediction needs no weights."
       ],
       "final_line": "frequency weighted GLM: success"
+    },
+    {
+      "path": "examples/51_prediction_persistence.pas",
+      "contains": [
+        "reloaded predictions: GLM=8.000000; PLS=223.000000",
+        "Artifacts contain prediction parameters and explicit input conventions."
+      ],
+      "final_line": "prediction persistence: success"
     }
   ]
 }

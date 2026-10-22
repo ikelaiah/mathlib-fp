@@ -55,15 +55,16 @@ Target qualifications and platform-specific limitations are defined by the
 | Nonsymmetric, generalized, Hessenberg, and Schur spectral algebra | Stable | Double real and complex | Dense matrices; nonsymmetric eigenpairs use real input; no polynomial, shift-invert, or interior-target path |
 | Advanced DSP design and wavelets | Unsupported | — | Haar is stable; equiripple, advanced IIR families, broader wavelets, and packets remain conditional |
 | Conditional statistics and data science | Unsupported | — | Survival/factor analysis, robust covariance, multinomial and additional count families, boosting, and broader forecasting were not activated |
+| GLM/PLS prediction persistence | Stable | Double real | Explicit indexed columns and input conventions; prediction parameters only |
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
 | Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
 
-This is the 2.13.0 capability inventory. It adds explicit grouped/stratified
-validation row sets and supplied-split PLS component selection with pooled and
-per-split error diagnostics. Qualification status
-is recorded in the [current release report](../releases/2.9.0/qualification.md).
-It carries forward PLS1 regression, logistic and Poisson GLMs, stable SOS IIR
-filtering, and reusable spectral processing.
+This is the 2.14.0 capability inventory. It adds owned GLM/PLS prediction
+records and portable prediction artifacts with explicit input conventions.
+Qualification status is recorded in the
+[current release report](../releases/2.14.0/qualification.md). It retains
+frequency-weighted offset/exposure GLMs, grouped and chronological validation,
+PLS1 regression, stable SOS IIR filtering and reusable spectral processing.
 Sparse direct solving now includes a
 reusable minimum-degree symbolic analysis and sparse numeric LU. The
 [MathBase guide](../guides/domains/math-base.md)

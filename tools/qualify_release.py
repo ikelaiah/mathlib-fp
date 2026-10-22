@@ -633,6 +633,13 @@ def main() -> int:
         documentation_gates(qualification, args.compiler, args.release)
         migration_rehearsal_gate(qualification, args.compiler)
         workflow_qualification_gate(qualification, args.compiler)
+        if tuple(int(part) for part in args.release.split('.')) >= (2, 14, 0):
+            qualification.run(
+                "prediction-persistence-consumer",
+                [sys.executable, str(ROOT / "tools/check_prediction_persistence.py"),
+                 "--compiler", args.compiler,
+                 "--work-dir", str(qualification.work / "prediction-persistence")],
+            )
         convergence_gate(qualification)
         portability_gate(qualification, args.compiler)
         if not args.skip_package:

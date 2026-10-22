@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.13.0",
+  "release": "2.14.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -859,6 +859,33 @@
       ]
     },
     {
+      "family": "glm_pls_prediction_persistence",
+      "unit": "InterchangeLib.Models",
+      "entry_points": [
+        "SaveGLMPrediction",
+        "LoadGLMPrediction",
+        "SavePLSPrediction",
+        "LoadPLSPrediction"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "double"
+      ],
+      "shapes": [
+        "glm_prediction",
+        "pls_prediction"
+      ],
+      "complexity": "O(serialized elements) encoding, validation, and copy",
+      "accuracy": "version/kind/CRC/resource-cap/corruption and behavioral round-trip fixtures; analytic deployment predictions and independent fixed legacy envelopes",
+      "docs": "docs/guides/domains/interchange.md",
+      "example": "examples/51_prediction_persistence.pas",
+      "tests": "tests/TestPredictionPersistence.pas",
+      "limitations": [
+        "little-endian model envelope version 1, kinds 5 and 6",
+        "indexed prediction parameters only; no training reports or semantic feature names"
+      ]
+    },
+    {
       "family": "bounded_mathematical_expressions",
       "unit": "MathBase.Expressions",
       "entry_points": [
@@ -1193,7 +1220,9 @@
         "PredictMean",
         "TGLMInputs",
         "TGLMFrequencyWeights",
-        "GLM_MAX_FREQUENCY_COUNT"
+        "GLM_MAX_FREQUENCY_COUNT",
+        "TGLMPredictionModel",
+        "ToPredictionModel"
       ],
       "maturity": "stable",
       "scalars": [
@@ -1233,7 +1262,9 @@
         "TPLSKit",
         "Fit",
         "Predict",
-        "TPLSFoldErrors"
+        "TPLSFoldErrors",
+        "TPLSPredictionModel",
+        "ToPredictionModel"
       ],
       "maturity": "stable",
       "scalars": [

@@ -50,8 +50,15 @@ type
     Status: TPLSStatus;
   end;
 
+  TPLSPredictionModel = record
+    Coefficients: TDoubleArray; { original predictor units; no second transform }
+    Intercept: Double;
+  end;
+
   TPLSKit = class
   public
+    class function ToPredictionModel(const Model: TPLSModel):
+      TPLSPredictionModel; static;
     { Fit one continuous response from a row-major predictor matrix. }
     class function Fit(const X: MLLib.MachineLearning.TDoubleMatrix;
       const Y: TDoubleArray): TPLSModel; overload; static;
@@ -66,7 +73,11 @@ type
       const Options: TPLSOptions): TPLSModel; overload; static;
     { Predict from new rows with the same predictor columns and order. }
     class function Predict(const Model: TPLSModel;
-      const XNew: MLLib.MachineLearning.TDoubleMatrix): TDoubleArray; static;
+      const XNew: MLLib.MachineLearning.TDoubleMatrix): TDoubleArray;
+      overload; static;
+    class function Predict(const Model: TPLSPredictionModel;
+      const XNew: MLLib.MachineLearning.TDoubleMatrix): TDoubleArray;
+      overload; static;
   end;
 
 implementation
@@ -855,23 +866,43 @@ end;
 
 class function TPLSKit.Predict(const Model: TPLSModel;
   const XNew: MLLib.MachineLearning.TDoubleMatrix): TDoubleArray;
-var
-  I, J, P: SizeInt;
-  Value, StandardValue: Double;
+begin Result := Predict(ToPredictionModel(Model), XNew); end;
+
+procedure ValidatePLSPrediction(const Model: TPLSPredictionModel);
+var J: SizeInt;
 begin
-  Result := nil;
+  if Length(Model.Coefficients) = 0 then
+    raise EPLSError.Create('Predict: model is uninitialized or invalid');
+  if not IsFiniteValue(Model.Intercept) then
+    raise EPLSError.Create('Predict: model intercept must be finite');
+  for J := 0 to High(Model.Coefficients) do
+    if not IsFiniteValue(Model.Coefficients[J]) then
+      raise EPLSError.Create('Predict: model coefficients must be finite');
+end;
+
+class function TPLSKit.ToPredictionModel(const Model: TPLSModel):
+  TPLSPredictionModel;
+var J, P: SizeInt;
+begin
   P := Length(Model.Coefficients);
   if (P = 0) or (Length(Model.PredictorMeans) <> P) or
     (Length(Model.PredictorScales) <> P) then
     raise EPLSError.Create('Predict: model is uninitialized or invalid');
-  if not IsFiniteValue(Model.Intercept) then
-    raise EPLSError.Create('Predict: model intercept must be finite');
   for J := 0 to P - 1 do
-    if not IsFiniteValue(Model.Coefficients[J]) or
-      not IsFiniteValue(Model.PredictorMeans[J]) or
+    if not IsFiniteValue(Model.PredictorMeans[J]) or
       not IsFiniteValue(Model.PredictorScales[J]) or
       (Model.PredictorScales[J] <= 0.0) then
       raise EPLSError.Create('Predict: model parameters must be finite and valid');
+  Result.Coefficients := Copy(Model.Coefficients); Result.Intercept := Model.Intercept;
+  ValidatePLSPrediction(Result);
+end;
+
+class function TPLSKit.Predict(const Model: TPLSPredictionModel;
+  const XNew: MLLib.MachineLearning.TDoubleMatrix): TDoubleArray;
+var I, J, P: SizeInt; Value: Double;
+begin
+  Result := nil;
+  ValidatePLSPrediction(Model); P := Length(Model.Coefficients);
   if Length(XNew) = 0 then
     raise EPLSError.Create('Predict: at least one observation is required');
   SetLength(Result, Length(XNew));
@@ -884,8 +915,7 @@ begin
     begin
       if not IsFiniteValue(XNew[I][J]) then
         raise EPLSError.Create('Predict: predictor values must be finite');
-      StandardValue := XNew[I][J];
-      Value := Value + Model.Coefficients[J] * StandardValue;
+      Value := Value + Model.Coefficients[J] * XNew[I][J];
       RequireFinite(Value, 'Prediction');
     end;
     Result[I] := Value;

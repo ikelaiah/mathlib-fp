@@ -538,3 +538,12 @@ No other external libraries required.
 - **Dense in-memory baselines.** The typed-analysis APIs are dense, serial,
   in-memory paths; multiclass LDA, boosting, and distributed training are
   outside 1.8.
+
+## Portable PLS prediction
+
+`TPLSKit.ToPredictionModel(Fit)` validates the fitted metadata and returns an
+owned `TPLSPredictionModel` with original-unit coefficients and intercept.
+Its `Predict` overload consumes original-unit columns in fitted order;
+training centering/scaling is already included. Optional
+[prediction persistence](interchange.md#selected-model-persistence) saves
+this record for a separate consumer without training scores or rows.

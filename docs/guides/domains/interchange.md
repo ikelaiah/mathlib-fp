@@ -174,6 +174,8 @@ rename it after success.
 | `TStreamingFIR` | `SaveStreamingFIR` / `LoadStreamingFIR` | coefficient snapshot and current history |
 | `TStandardizationModel` | `SaveStandardization` / `LoadStandardization` | fitted means and positive scales |
 | `TScalarKalmanFilter` | `SaveScalarKalman` / `LoadScalarKalman` | configuration, current estimate, and covariance |
+| `TGLMPredictionModel` | `SaveGLMPrediction` / `LoadGLMPrediction` | family/link, design coefficients, required offset/exposure kinds |
+| `TPLSPredictionModel` | `SavePLSPrediction` / `LoadPLSPrediction` | original-unit coefficients and separate intercept |
 
 The model envelope is version 1, little endian, kind tagged, and CRC-32
 protected. Loaders enforce payload/element caps, validate the complete object,
@@ -190,6 +192,33 @@ These adapters are deliberately separate from the numerical units, so using a
 spline, filter, standardizer, or Kalman filter never pulls persistence into
 the numerical dependency graph. The schema does not dump Pascal record memory
 and therefore does not depend on record padding.
+
+Project a successful GLM fit with `TGLMKit.ToPredictionModel`, or a fitted PLS
+model with `TPLSKit.ToPredictionModel`. Projection validates the fit and copies
+its coefficients. These records belong to numerical units; prediction needs no
+interchange dependency. Loading returns prediction records without creating
+training diagnostics or a fit status.
+
+GLM new rows retain fitted design-column order and the explicit intercept
+column. Supply the recorded offset/exposure kinds for those new rows; frequency
+weights are training inputs. PLS coefficients and intercept already incorporate
+training centering/scaling. Predict on original-unit columns in fitted order,
+without applying another standardization transform.
+
+[Example 51](../../../examples/51_prediction_persistence.pas) fits, projects,
+saves, reloads and checks both models. Pass an output directory to write two
+artifacts. The [separate consumer](../../../tests/consumers/PredictionConsumer.lpr)
+loads only those artifacts and new rows and verifies GLM 8 and PLS 223.
+`python tools/check_prediction_persistence.py` compiles and runs both programs
+in separate directories and is included in release qualification.
+
+The [schema decision](../../decisions/0004-prediction-model-persistence.md)
+defines model kinds 5 and 6. Existing kinds 1–4 retain their version and bytes.
+Prediction loaders reject unknown conventions, incompatible family/link or
+exposure flags, nonfinite values, empty vectors, corrupt/truncated payloads and
+trailing payload bytes. Positive element and byte limits are checked before
+allocation. These formats store indexed columns, not semantic feature names,
+training rows, scores, standard errors or executable objects.
 
 ## Bounded expression evaluation
 
@@ -213,7 +242,7 @@ Pascal or scripting runtime.
 
 ## Open persistence families
 
-Version 1.9 does not promise decomposition or preconditioner factors, arbitrary
+The current format does not promise decomposition or preconditioner factors, arbitrary
 model graphs, decision forests, multivariate Kalman filters, or general filter
 objects as stable formats. Adding one requires a separate versioned schema and
 compatibility tests; raw Pascal record dumps are not accepted as persistence.
@@ -230,5 +259,5 @@ compatibility tests; raw Pascal record dumps are not accepted as persistence.
   synchronously and never retain it; write a temporary file and rename it for
   transactional replacement.
 - **Only selected models persist.** `InterchangeLib.Models` covers the
-  documented spline/FIR/standardizer/scalar-Kalman adapters; decomposition
+  documented spline/FIR/standardizer/scalar-Kalman and GLM/PLS prediction adapters; decomposition
   factors, forests, and general object graphs are not stable formats.
