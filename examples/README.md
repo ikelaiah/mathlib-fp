@@ -61,6 +61,7 @@ closest to your project. For a shorter task-first route, use the
 | `46_bounded_global_search.pas` | OptimizationLib | Reproducible bounded differential evolution, separate local polishing, budgets and truthful termination |
 | `47_grouped_model_validation.pas` | MLLib | Keep one group untouched while comparing PLS and OLS on the same rows |
 | `48_chronological_validation.pas` | MLLib | Expanding chronological PLS windows with a gap and an untouched future holdout |
+| `49_count_rates.pas` | StatsLib | Fit unequal Poisson exposure and predict new expected counts and rates |
 
 ## Build and run
 

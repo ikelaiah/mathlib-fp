@@ -289,6 +289,15 @@
         "A row gap does not remove every source of temporal leakage."
       ],
       "final_line": "chronological validation: success"
+    },
+    {
+      "path": "examples/49_count_rates.pas",
+      "contains": [
+        "Poisson exposure fit: converged",
+        "new exposure=3; expected count=12.000000; rate=4.000000",
+        "Prediction requires an exposure for each new observation."
+      ],
+      "final_line": "count rates: success"
     }
   ]
 }

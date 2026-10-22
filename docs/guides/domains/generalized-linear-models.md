@@ -10,8 +10,8 @@ Check `Status = glsConverged` and `Identifiable` before interpreting a fit.
 | Response | Entry point | Link and mean | Assumptions |
 | --- | --- | --- | --- |
 | Continuous real measurement | `TInferenceKit.FitOLS` | Linear conditional mean | OLS residual assumptions for inference |
-| Individual binary observation, exactly 0 or 1 | `TGLMKit.FitLogistic` | `log(p/(1-p)) = X*beta` | Independent Bernoulli observations |
-| Nonnegative integer count | `TGLMKit.FitPoisson` | `log(mean) = X*beta` | Independent counts with conditional variance equal to mean |
+| Individual binary observation, exactly 0 or 1 | `TGLMKit.FitLogistic` | `log(p/(1-p)) = X*beta + offset` | Independent Bernoulli observations |
+| Nonnegative integer count | `TGLMKit.FitPoisson` | `log(mean) = X*beta + offset + ln(exposure)` | Independent counts with conditional variance equal to mean |
 
 A Poisson model may fit a count mean while understating uncertainty when data
 are overdispersed. Inspect `PearsonChiSquare / DegreesOfFreedom` when degrees
@@ -56,6 +56,31 @@ counts and handles a complete-separation certificate.
 overloads accepting `TGLMOptions`. `PredictMean(Fit, Design)` returns
 probabilities or expected counts for a compatible prediction design.
 
+### Known offsets and exposure
+
+Initialize `TGLMInputs.Default` and set `Offsets` and/or `Exposures` before
+calling `FitLogistic(Design, Response, Inputs)` or `FitPoisson(Design, Response,
+Inputs)`. Both also accept a final `TGLMOptions`. Each nonempty input array
+must match design rows. Offsets are finite known additions to the linear
+predictor with coefficient fixed at one. Positive finite exposure is Poisson
+only; its logarithm is added to the predictor. Both may be supplied together.
+Empty arrays mean zero offset and unit exposure. Invalid inputs raise
+`EGLMError` before fitting, including exposure on a logistic fit.
+
+`UsesOffsets` and `UsesExposure` record the supplied input kinds. Use
+`PredictMean(Fit, NewDesign, NewInputs)` with the same kinds on the new rows;
+missing or unexpected kinds fail, even when training used zeros or units.
+Training values are never reused. Prediction returns expected counts for a
+Poisson model. Dividing by new-row exposure gives a rate; any offset effect
+remains in that rate. [Example 49](../../../examples/49_count_rates.pas) fits
+unequal exposure and predicts a count and rate at a new exposure.
+
+Null deviance uses a fitted free intercept with the same known offsets and
+exposures, even when the full design has no intercept. It is therefore not
+generally a constant count mean. The Poisson null rate is total count divided
+by total effective exposure; the Bernoulli null intercept solves its monotone
+score equation. Numerical failure to represent that diagnostic is explicit.
+
 Use `TGLMOptions.Default` before changing options:
 
 | Field | Default | Meaning |
@@ -81,14 +106,15 @@ moderate dense data. Up to 40 step halvings
 are allowed. An increase of at most 8 binary64 epsilons times `1 + deviance`
 is treated as summation roundoff. The unhalved correction must be small before
 convergence, and the unhalved linear-predictor correction must also be small;
-a tiny backtracking step alone cannot signal success. No weights,
-offset/exposure, grouped-binomial trials, regularization or additional families
+a tiny backtracking step alone cannot signal success. No frequency/analytic
+weights, grouped-binomial trials, regularization or additional families
 are implemented in this release.
 
 ## Result and failure interpretation
 
 `TGLMFitResult` contains `Family`, `Status`, `Message`, `Iterations`, `Rank`,
 `DegreesOfFreedom`, `ConditionIndicator`, `Identifiable`, `HasFiniteIterate`,
+`UsesOffsets`, `UsesExposure`,
 `Coefficients`, `StandardErrors`, `FittedMeans`, `ResponseResiduals`,
 `DevianceResiduals`, `Deviance`, `NullDeviance`, `PearsonChiSquare` and
 `DevianceHistory`.
@@ -113,12 +139,13 @@ predictor units restored. Failed fits have empty `StandardErrors` and
 `Identifiable = False`; prediction rejects them.
 
 Response residuals are observed minus fitted mean. Signed deviance residual
-squares sum to deviance. `NullDeviance` compares with a constant mean even when
-the supplied design has no intercept. History contains the initial objective
+squares sum to deviance. Without known offsets/exposure, `NullDeviance` compares
+with a constant mean even when the supplied design has no intercept. History contains the initial objective
 and each accepted step, with the stated roundoff allowance.
 
 The separation search produces a strict certificate when an IRLS iterate
-separates every row. It is not an exhaustive linear-programming test;
+separates every row using the fitted `X*beta` direction, excluding fixed offsets.
+It is not an exhaustive linear-programming test;
 quasi-separation or other undetected separation can instead end at a rank,
 condition, boundary or iteration failure. Logistic fits stop at `abs(eta) >= 36`
 and Poisson fits at `abs(eta) >= 700` before declaring convergence. These

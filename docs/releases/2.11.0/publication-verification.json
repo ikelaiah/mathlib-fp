@@ -1,0 +1,19 @@
+{
+  "release": "2.11.0",
+  "source_commit": "3bc5be2ec81dbcd6cbd5a79e6af223ed9b388380",
+  "checks": [
+    "source and docs SHA-256",
+    "identical clean ZIP/tar source",
+    "GitHub automatic archive with text line-ending normalization",
+    "README quick start",
+    "chronological_validation example",
+    "clean-profile Lazarus consumer",
+    "offline docs identity and links",
+    "live root/current identity",
+    "all preserved release identities",
+    "six published assets",
+    "published body excludes title"
+  ],
+  "status": "passed",
+  "verified_on": "2026-10-22"
+}

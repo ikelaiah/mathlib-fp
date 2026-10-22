@@ -1047,7 +1047,7 @@ steps and gaps, and a future-holdout PLS workflow. See the
 [release notes](../releases/2.11.0/release-notes.md) and
 [qualification record](../releases/2.11.0/qualification.md).
 
-## Next release: 2.12.0 — GLM offsets and Poisson exposure
+## Previous release: 2.12.0 — GLM offsets and Poisson exposure
 
 Extend existing Bernoulli-logit and Poisson-log fits with known additive linear
 predictor offsets; support positive exposure for Poisson models through its
@@ -1064,7 +1064,7 @@ logarithm. Prediction accepts the corresponding new-observation inputs.
 Weight semantics, regularization, additional families, and robust covariance
 are deferred.
 
-## Planned 2.13.0 — GLM frequency weights
+## Next release: 2.13.0 — GLM frequency weights
 
 Add explicitly named nonnegative integer frequency weights to the existing GLM
 families, including offset/exposure fits. A weight means row replication, not

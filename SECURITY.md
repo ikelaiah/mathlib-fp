@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 2.12.x | :white_check_mark: |
 | 2.11.x | :white_check_mark: |
 | 2.10.x | :white_check_mark: |
 | 2.9.x | :white_check_mark: |
@@ -67,3 +68,6 @@ Please include the following information:
 ## Preferred Languages
 
 We prefer all communications to be in English.
+
+The 2.11.x line is supported through 2027-04-22, six months after
+the 2.12.0 publication.
