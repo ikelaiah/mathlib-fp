@@ -27,7 +27,7 @@ slices before work starts. The four checkboxes are milestones, not one task.
 | 2.11.0 Chronological validation | [x] | [x] | [x] | [x] |
 | 2.12.0 GLM offsets/exposure | [x] | [x] | [x] | [x] |
 | 2.13.0 GLM frequency weights | [x] | [x] | [x] | [ ] |
-| 2.14.0 Prediction persistence | [ ] | [ ] | [ ] | [ ] |
+| 2.14.0 Prediction persistence | [x] | [x] | [x] | [ ] |
 | 2.15.0 Missing-observation filtering | [ ] | [ ] | [ ] | [ ] |
 | 2.16.0 RTS smoothing | [ ] | [ ] | [ ] | [ ] |
 | 2.17.0 Low-pass FIR design | [ ] | [ ] | [ ] | [ ] |

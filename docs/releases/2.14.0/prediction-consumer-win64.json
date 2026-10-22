@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "checks": [
+    "separate compiled consumer",
+    "artifacts and new observations only; no training data copied",
+    "GLM expected count with new exposure",
+    "PLS original-unit prediction"
+  ],
+  "consumer_sha256": "1ec6478929d24767ac79e947ba0d38a28eaff6311a2b1f50339b271ca00f9c5a",
+  "artifacts": {
+    "glm.mfpmodel": {
+      "bytes": 48,
+      "sha256": "01c1a47dd47c9ce4ce4a73cbcfa7b1ec572b812d4e1c28cd41b427e2941c3fb5"
+    },
+    "pls.mfpmodel": {
+      "bytes": 64,
+      "sha256": "c48fd9948b49cb1eac72dcbc3edb79d5f62e16d85a0b14528e6a9fb27df2beec"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 - [x] Specify and test the contract before implementation.
 - [x] Implement numerical paths, edge cases, and the release workflow.
-- [ ] Complete local qualification and five-axis review.
+- [x] Complete local qualification and five-axis review.
 - [ ] Pass hosted Linux/Windows CI and clean-archive qualification.
 - [ ] Merge, verify exact main, publish and check downloaded artifacts/docs.
 
