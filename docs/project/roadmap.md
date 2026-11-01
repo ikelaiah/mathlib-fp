@@ -202,11 +202,11 @@ vector arithmetic is new public API and belongs to 1.4.0.
 | 2.12.0 | GLM offsets and Poisson exposure | Model counts collected over unequal observation periods |
 | 2.13.0 | GLM frequency weights | Fit repeated observations without physically duplicating rows |
 | 2.14.0 | GLM and PLS prediction persistence | Save, reload, and deploy fitted prediction models |
-| 2.15.0 | Kalman filtering with missing observations | Continue estimation through complete or partial sensor dropouts |
-| 2.16.0 | Fixed-interval state smoothing | Reconstruct historical states using later observations |
-| 2.17.0 | Windowed low-pass FIR design | Design inspectable anti-alias filters with explicit delay |
-| 2.18.0 | Rational polyphase resampling | Convert sample rates with bounded streaming state |
-| 2.19.0 | Streaming DSP persistence | Save and resume SOS filtering and rational resampling |
+| 2.15.0 | Parallel dense kernels | Opt-in multithreaded dense multiplication that reproduces serial results |
+| 2.16.0 | Special Functions III | Digamma/polygamma, zeta, Lambert W, integer-order Bessel, and Airy functions with measured budgets |
+| 2.17.0 | Exact big integers and rationals | Exact integer and fraction arithmetic without fixed-width overflow |
+| 2.18.0 | Wavelets and DCT | Multi-level Daubechies transforms and DCT-II/III on reusable spectral plans |
+| 2.19.0 | SIMD dense multiplication (conditional) | Faster x86-64 dense products where measured, with the portable path as oracle |
 | 2.20.0 | Truncated PCA | Extract leading components with measured resource savings |
 | 3.0.0 (unassigned major gate) | Compatibility review | A deliberate API migration only where previously announced breaking changes are still needed |
 
@@ -214,9 +214,14 @@ The 2.1 and 2.2 scopes shipped in 2.2.0, stiff integration shipped in 2.3.0,
 Sparse Direct II shipped in 2.4.0, and reusable spectral processing shipped in
 2.5.0. Version 2.5.1 was a documentation-only patch; 2.6.0 completed the
 Signal Processing II gate, 2.7.0 completed Statistics II, 2.8.0 completed
-Data Analysis II, and 2.9.0 completes Optimization II. The proposed 2.10.0–2.20.0
-sequence completes validation, deployment, state estimation, and sample-rate
-conversion workflows before expanding PCA scalability. Only 2.10.0 is the next
+Data Analysis II, and 2.9.0 completes Optimization II. Versions 2.10.0–2.14.0
+completed validation and deployment workflows. The post-2.14 priority review
+re-sequenced 2.15.0–2.20.0 toward gaps recorded on the
+[comparison page](../guides/topics/comparison.md): parallel and SIMD execution,
+special-function breadth, exact arbitrary-size arithmetic, wavelets and DCT, and
+truncated decompositions. The state-estimation and sample-rate conversion scopes
+previously planned for 2.15.0–2.19.0 are deferred, not rejected; see
+[deferred workflow scopes](#deferred-workflow-scopes). Only 2.15.0 is the next
 design target. Later slots require the activation gates below and may be
 reordered, split, or replaced when evidence changes. These are planning targets,
 not dates or claims of implementation. The 3.0.0 gate remains unassigned.
@@ -1000,6 +1005,34 @@ supported-platform and clean-archive qualification. Performance claims require
 measured time, memory, and accuracy evidence. Reference tools may generate
 offline fixtures but must not become runtime dependencies.
 
+### Post-2.14 priority review
+
+The scheduled review after 2.14 compared the remaining plan with the
+[comparison page](../guides/topics/comparison.md). That page records four areas
+where other Pascal libraries are stronger: SIMD performance, multi-precision
+arithmetic, array semantics, and Delphi support. The 2.14.0 source confirms
+further breadth gaps: special functions beyond Bessel orders zero and one,
+wavelets beyond Haar, no DCT, and no truncated SVD. The previously planned
+2.15.0–2.19.0 scopes deepened state-estimation and sample-rate workflows that
+none of the compared libraries is described as offering, and no issue backlog
+had established demand for them. The re-sequenced horizon targets gaps where a
+Free Pascal user would otherwise need a second general-purpose numerical
+library, consistent with the [product ambition](#product-ambition).
+
+Deliberately not pursued for parity: Delphi compatibility, GPU execution,
+neural-network training, correctly rounded elementary functions, and general
+N-dimensional arrays. These are existing design boundaries, specialist
+domains, or would introduce a competing API layer. Narrow row/column
+broadcasting on the existing typed dense matrices may be considered later if a
+workflow needs it.
+
+The activation rules above are unchanged: each re-sequenced release still needs
+a demonstrated workflow, a per-release spec, and the contribution gate before
+implementation. The task plan and checklist record the 2.10.0–2.14.0 execution;
+their 2.15.0–2.20.0 entries are refreshed when each release is activated. The
+comparison page's mathlib-fp entry, which still describes 2.4.0, is refreshed
+as part of the 2.15.0 documentation work.
+
 ## Previous release: 2.10.0 — Shared validation and grouped model selection
 
 Add explicit training/validation row-set pairs, grouped and stratified split
@@ -1098,88 +1131,113 @@ requirements. Distinguish an inference artifact from the full training report.
 No arbitrary object graphs, callbacks, executable payloads, or automatic
 serialization of every diagnostic/training row.
 
-## Next release: 2.15.0 — Kalman filtering with missing observations
+## Next release: 2.15.0 — Parallel dense kernels
 
-Add explicit observation masks for the dense linear-Gaussian filter. Partial
-observations select the corresponding observation-model rows and measurement
-covariance submatrix; an entirely missing observation performs prediction only.
+Add an opt-in, bounded parallel execution path for typed dense matrix
+multiplication across all four scalar kinds, building on the existing serial
+blocked kernel. The caller chooses the worker count. The default remains one
+worker, so existing results and determinism are unchanged unless parallel
+execution is requested. Extend to blocked LU/Cholesky factorization or batched
+FFT only where the same benchmark evidence shows a measured gain.
 
-- Gate: masked updates agree with an independently constructed reduced system,
-  including correlated measurement noise and changing masks.
-- Gate: all-missing steps, observed nonfinite values, mask dimensions, covariance
-  failures, innovations, and observed-dimension likelihood terms are specified.
-- Gate: a sensor-dropout workflow recovers when observations resume and matches
-  existing results when all channels are present.
+- Activation gate: publish representative shapes, compiler flags, and hardware
+  where the serial blocked kernel is the measured bottleneck, using the existing
+  canonical `PERF` benchmark pipeline.
+- Gate: work partitioning preserves each output element's summation order, so
+  parallel and serial results agree bitwise; any extended path that cannot
+  guarantee this documents its tolerance per scalar kind.
+- Gate: small inputs stay on the serial path without thread start-up cost;
+  worker counts are bounded and validated; Unix programs without an installed
+  thread manager (`cthreads`) fall back to serial execution explicitly, as the
+  legacy `IMatrix` multiply already does; calls are safe when the caller also
+  uses threads.
+- Gate: a large-product workflow reports measured speedup, scaling efficiency,
+  peak memory, and accuracy on named shapes; no universal speedup is claimed.
 
-This does not add imputation, nonlinear filters, controls, or parameter fitting.
+No GPU, distributed, or out-of-core execution; no hidden global configuration
+that changes ordinary serial calls; no SIMD intrinsics in this release.
 
-## Planned 2.16.0 — Fixed-interval state smoothing
+## Planned 2.16.0 — Special Functions III
 
-Add a Rauch–Tung–Striebel backward smoother over a recorded forward-filter
-history, including 2.15 masked observations. Retain only the documented history
-needed for the fixed interval; report memory requirements before allocation.
+Extend MathBase with real-double digamma and polygamma, the Riemann zeta
+function (with Hurwitz zeta only if the polygamma design needs it), both real
+branches of Lambert W, integer-order Bessel J/Y and modified I/K built on the
+existing orders zero and one, and Airy Ai/Bi with derivatives. Each family
+documents its domain, accuracy budget, and convergence limits in the same style
+as the 2.1 Special Functions II scope.
 
-- Gate: state means/covariances match independent small-system references;
-  the final smoothed state agrees with the final filtered state.
-- Gate: use linear solves rather than explicit inverses; define singular
-  predicted-covariance failure and test symmetry/positive-semidefinite behavior
-  within published tolerances without silently adding regularization.
-- Gate: a historical trajectory example distinguishes filtering, forecasting,
-  and smoothing and covers zero/one-step and missing-observation intervals.
+- Gate: offline high-precision reference fixtures, generated in the same way as
+  the existing Bessel and elliptic generators in `tools/`, cover each family's
+  domain, including poles, branch points, overflow/underflow boundaries, and
+  large-argument asymptotic regions.
+- Gate: integer-order Bessel recurrences run in their numerically stable
+  direction with documented order and argument limits; Lambert W branch
+  selection and the −1/e branch point are explicit.
+- Gate: published error budgets are measured, not asserted; out-of-domain
+  inputs fail or return documented values consistently with existing MathBase
+  functions.
 
-No EM estimation, nonlinear smoothing, or fixed-lag streaming smoother.
+Complex arguments, fractional-order Bessel functions, and analytic continuation
+remain outside this release.
 
-## Planned 2.17.0 — Windowed low-pass FIR design
+## Planned 2.17.0 — Exact big integers and rationals
 
-Add a bounded real-double windowed-sinc low-pass designer for the existing FIR
-execution paths, with an explicitly selected window, odd tap count, cutoff,
-sample rate, and DC normalization. Start with one documented window family;
-choose it in the numerical design, not by accumulating options.
+Add an arbitrary-size signed integer type and an exact rational type built on
+it, in a new unit with explicit value semantics. Provide arithmetic,
+comparison, documented integer division/remainder conventions, GCD,
+exponentiation by non-negative integers, decimal and hexadecimal parsing and
+formatting, and exact conversion to and from `Int64` and `Double` with explicit
+rounding rules. Rationals are always reduced with a positive denominator. Exact
+factorial and binomial helpers serve combinatorics workflows.
 
-- Gate: coefficient symmetry, unit DC gain, frequency normalization, and
-  delay of (tap count - 1)/2 samples have independent analytical fixtures.
-- Gate: measured passband/stopband response accompanies each example; cutoff
-  and window parameters are not advertised as unverified attenuation guarantees.
-- Gate: batch and existing streaming FIR execution agree across chunk sizes;
-  invalid geometry and excessive tap counts are rejected with bounded storage.
+- Activation gate: demonstrate a workflow that fails with current fixed-width
+  types, such as exact large binomials or exact rational elimination, and pass
+  the contribution gate as a new domain.
+- Gate: offline fixtures from an independent exact implementation, such as
+  Python integers and fractions, cover sign combinations, carries, zero, powers
+  of the limb base, and very large operands; division identities hold exactly.
+- Gate: operand sizes and parse lengths have explicit limits; memory growth and
+  algorithm complexity, including any fast-multiplication threshold, are
+  documented.
 
-Equiripple, automatic minimum-order design, high/band-pass families, and
-fractional delay remain outside this first slice.
+Arbitrary-precision or decimal floating point, modular or cryptographic
+arithmetic, and constant-time guarantees are not included.
 
-## Planned 2.18.0 — Rational polyphase resampling
+## Planned 2.18.0 — Wavelets and DCT
 
-Use 2.17 anti-alias FIR design in a real-double rational up/down resampler.
-Reduce positive integer rate factors; define filter cutoff at the intermediate
-sample rate, gain, causal delay, phase, output length, startup, and final flush.
+Add multi-level discrete wavelet transforms with exact reconstruction for a
+small, fixed set of orthogonal Daubechies filters alongside the existing Haar
+transform, and DCT-II/DCT-III with an orthonormal scaling option built on the
+reusable spectral plans.
 
-- Gate: compare against a slow direct upsample/filter/downsample oracle with
-  matching delay and boundary conventions; cover impulses, DC, tones, aliases,
-  unity ratio, and non-coprime factors.
-- Gate: batch output equals arbitrary streaming chunk partitions after the
-  documented flush; retained state is independent of total stream length.
-- Gate: output-count arithmetic, ratios, filter length, and allocation have
-  explicit limits; a sample-rate conversion example reports delay and measured
-  alias rejection rather than claiming zero-phase live processing.
+- Gate: filter coefficients match published tables; forward/inverse round
+  trips reconstruct within published tolerances for the supported lengths under
+  one documented boundary-extension mode.
+- Gate: DCT outputs match a direct O(n²) oracle and offline reference fixtures;
+  DCT-III inverts DCT-II under the documented scaling.
+- Gate: a denoising or compression workflow shows coefficient thresholding and
+  reconstruction error on named data.
 
-No asynchronous clock recovery, arbitrary time warping, or multichannel
-scheduling framework.
+Wavelet packets, continuous wavelet transforms, biorthogonal families, and DST
+remain outside this release.
 
-## Planned 2.19.0 — Streaming DSP persistence
+## Planned 2.19.0 — SIMD dense multiplication (conditional)
 
-Add versioned selected-state adapters for SOS filters and the 2.18 resampler,
-including coefficients/configuration, delay elements, phase, and flush state.
-Reuse the interchange envelope after checking that its limits fit these models.
+Add an optional x86-64 SSE2/AVX2 micro-kernel for typed dense multiplication,
+enabled at compile time and written in this source tree. The portable Pascal
+kernel remains the default on other targets and the correctness oracle
+everywhere.
 
-- Gate: uninterrupted processing matches save/reload/continue at arbitrary
-  chunk boundaries on the same qualified execution profile.
-- Gate: distinguish reset configuration from live state; validate dimensions,
-  finite coefficients/state, stability requirements, ratios, and allocation
-  limits; reject corrupted and incompatible formats.
-- Gate: a restartable acquisition example resumes in a separate process;
-  cross-platform artifacts have explicit numerical tolerances and do not claim
-  bitwise identity across compilers or architectures.
+- Activation gate: 2.15 benchmark evidence shows the single-thread kernel is
+  compute-bound and a prototype yields a measured, reproducible gain on
+  supported FPC targets. If it does not, defer or replace this slot.
+- Gate: cross-path tests compare SIMD and portable results for every supported
+  scalar kind with documented tolerances, including any fused multiply-add
+  rounding difference; runtime CPU checks prevent unsupported instructions.
+- Gate: non-x86-64 builds and builds without the option compile and pass
+  unchanged; the support matrix states which targets qualify.
 
-No active thread, file handle, callback, or arbitrary processing-graph snapshot.
+No ARM-specific kernels, auto-tuning, or vendor BLAS dependency in this release.
 
 ## Planned 2.20.0 — Truncated PCA
 
@@ -1200,8 +1258,102 @@ variance, reconstruction diagnostics, and explicit work/convergence limits.
 
 Sparse/matrix-free inputs, incremental PCA, GPU paths, and automatic solver
 dispatch are deferred. At this checkpoint, rerun integrated validation,
-deployment, state-estimation, and DSP workflows and review compatibility debt;
+deployment, linear-algebra, special-function, and DSP workflows, review the
+deferred workflow scopes against user demand, and review compatibility debt;
 completion of 2.20 does not itself trigger 3.0.
+
+## Deferred workflow scopes
+
+These scopes were planned as 2.15.0–2.19.0 before the post-2.14 priority
+review. Their designs and gates are retained unchanged. Each may be
+reactivated, in this dependency order, when an issue or workflow demonstrates
+need; none has an assigned version.
+
+### Kalman filtering with missing observations
+
+Add explicit observation masks for the dense linear-Gaussian filter. Partial
+observations select the corresponding observation-model rows and measurement
+covariance submatrix; an entirely missing observation performs prediction only.
+
+- Gate: masked updates agree with an independently constructed reduced system,
+  including correlated measurement noise and changing masks.
+- Gate: all-missing steps, observed nonfinite values, mask dimensions, covariance
+  failures, innovations, and observed-dimension likelihood terms are specified.
+- Gate: a sensor-dropout workflow recovers when observations resume and matches
+  existing results when all channels are present.
+
+This does not add imputation, nonlinear filters, controls, or parameter fitting.
+
+### Fixed-interval state smoothing
+
+Add a Rauch–Tung–Striebel backward smoother over a recorded forward-filter
+history, including masked observations from the missing-observation scope.
+Retain only the documented history needed for the fixed interval; report memory
+requirements before allocation.
+
+- Gate: state means/covariances match independent small-system references;
+  the final smoothed state agrees with the final filtered state.
+- Gate: use linear solves rather than explicit inverses; define singular
+  predicted-covariance failure and test symmetry/positive-semidefinite behavior
+  within published tolerances without silently adding regularization.
+- Gate: a historical trajectory example distinguishes filtering, forecasting,
+  and smoothing and covers zero/one-step and missing-observation intervals.
+
+No EM estimation, nonlinear smoothing, or fixed-lag streaming smoother.
+
+### Windowed low-pass FIR design
+
+Add a bounded real-double windowed-sinc low-pass designer for the existing FIR
+execution paths, with an explicitly selected window, odd tap count, cutoff,
+sample rate, and DC normalization. Start with one documented window family;
+choose it in the numerical design, not by accumulating options.
+
+- Gate: coefficient symmetry, unit DC gain, frequency normalization, and
+  delay of (tap count - 1)/2 samples have independent analytical fixtures.
+- Gate: measured passband/stopband response accompanies each example; cutoff
+  and window parameters are not advertised as unverified attenuation guarantees.
+- Gate: batch and existing streaming FIR execution agree across chunk sizes;
+  invalid geometry and excessive tap counts are rejected with bounded storage.
+
+Equiripple, automatic minimum-order design, high/band-pass families, and
+fractional delay remain outside this first slice.
+
+### Rational polyphase resampling
+
+Use the windowed FIR anti-alias design in a real-double rational up/down
+resampler. Reduce positive integer rate factors; define filter cutoff at the
+intermediate sample rate, gain, causal delay, phase, output length, startup,
+and final flush.
+
+- Gate: compare against a slow direct upsample/filter/downsample oracle with
+  matching delay and boundary conventions; cover impulses, DC, tones, aliases,
+  unity ratio, and non-coprime factors.
+- Gate: batch output equals arbitrary streaming chunk partitions after the
+  documented flush; retained state is independent of total stream length.
+- Gate: output-count arithmetic, ratios, filter length, and allocation have
+  explicit limits; a sample-rate conversion example reports delay and measured
+  alias rejection rather than claiming zero-phase live processing.
+
+No asynchronous clock recovery, arbitrary time warping, or multichannel
+scheduling framework.
+
+### Streaming DSP persistence
+
+Add versioned selected-state adapters for SOS filters and the rational
+resampler, including coefficients/configuration, delay elements, phase, and
+flush state. Reuse the interchange envelope after checking that its limits fit
+these models.
+
+- Gate: uninterrupted processing matches save/reload/continue at arbitrary
+  chunk boundaries on the same qualified execution profile.
+- Gate: distinguish reset configuration from live state; validate dimensions,
+  finite coefficients/state, stability requirements, ratios, and allocation
+  limits; reject corrupted and incompatible formats.
+- Gate: a restartable acquisition example resumes in a separate process;
+  cross-platform artifacts have explicit numerical tolerances and do not claim
+  bitwise identity across compilers or architectures.
+
+No active thread, file handle, callback, or arbitrary processing-graph snapshot.
 
 ## Unassigned major gate: 3.0.0 — Compatibility and integrated workflows
 
@@ -1223,8 +1375,10 @@ qualification.
 
 ### Performance acceleration track
 
-Optional parallel and SIMD work is evidence-driven and is not tied to a
-promised minor version:
+Parallel and SIMD work remains evidence-driven. Opt-in threaded dense
+multiplication is scheduled for 2.15.0 and a conditional x86-64 SIMD kernel for
+2.19.0; both keep their activation gates and are deferred if measurements do
+not justify them. All acceleration work follows these rules:
 
 - the complete portable Pascal implementation remains the reference and oracle;
 - optimise only benchmarked bottlenecks;
@@ -1254,7 +1408,8 @@ review; lanes may be reordered or rejected.
 - broader practical wavelet support.
 
 Activation requires clear API boundaries, reference evidence, and demonstrated
-workflow value.
+workflow value. Daubechies wavelets and DCT-II/III are scheduled for 2.18.0;
+windowed FIR design and resampling are deferred workflow scopes.
 
 #### Statistics II
 
