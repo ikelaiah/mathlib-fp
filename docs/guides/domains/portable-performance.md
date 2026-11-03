@@ -91,8 +91,13 @@ MultiplyParallelInto(A, B, Destination, 4);  // same bits as MultiplyBlockedInto
   cannot start, the calling thread computes its rows.
 - **Floating-point state.** On x86, workers load the caller's x87 control word
   (and MXCSR on x86-64), so rounding and exception masks match. A worker
-  exception, such as `EOverflow`, is re-raised in the caller after all workers
-  finish. When several partitions fail, the lowest-row failure is raised.
+  exception is re-raised in the caller after all workers finish; when several
+  partitions fail, the lowest-row failure is raised. An arithmetic fault such
+  as overflow raises an `EMathError` on both paths. On Windows the class
+  matches the serial kernel. On Linux, FPC chooses the class from sticky
+  status flags, so the same overflow may surface as `EOverflow` in a worker
+  and `EInvalidOp` on the calling thread. Catch `EMathError` rather than a
+  specific subclass.
 - **Validation and memory.** Validation matches `MultiplyBlockedInto` and
   happens before any destination write. Aliased destinations use one
   temporary. The parallel path adds only per-worker bookkeeping and thread

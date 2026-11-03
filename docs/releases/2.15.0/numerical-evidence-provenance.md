@@ -12,8 +12,11 @@ must have the same IEEE 754 bit pattern, for all four scalar kinds. Fixtures are
 deterministic trigonometric matrices authored in the repository. The tests
 cover uneven row partitions, more requested workers than rows, block sizes from
 1 to `High(SizeInt)`, strided views, aliased destinations and a non-default
-rounding mode. They also check overflow in a worker partition, which must
-raise the same exception class as the serial kernel. The evidence gate also
+rounding mode. They also check that overflow in a worker partition raises an
+`EMathError` in the caller, as the serial kernel does. On Windows the class
+must also match the serial kernel. On Linux, FPC chooses the class from
+sticky status flags, which the calling thread's earlier x87 work can leave
+set, so the serial class itself is not stable there. The evidence gate also
 records the largest difference from the portable `MultiplyInto` oracle, which
 is zero on the qualification host.
 

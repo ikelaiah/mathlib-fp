@@ -459,9 +459,34 @@ begin
   try
     Proc();
   except
+    on E: EMathError do
+      Result := 'EMathError:' + E.ClassName;
     on E: Exception do
       Result := E.ClassName;
   end;
+end;
+
+{ Windows reports the hardware exception code, so serial and worker classes
+  match. FPC's Linux SIGFPE handler instead classifies from sticky status
+  flags (x87 first), which earlier x87 work in the calling thread can leave
+  set; a fresh worker may therefore report EOverflow where the caller reports
+  EInvalidOp. Both are EMathError, which is the portable contract. }
+procedure AssertSameMathFailure(const Name, SerialClass,
+  ParallelClass: string; const ExpectRaise: Boolean);
+begin
+  if not ExpectRaise then
+  begin
+    TAssert.AssertEquals(Name + ' serial', '', SerialClass);
+    TAssert.AssertEquals(Name + ' parallel', '', ParallelClass);
+    Exit;
+  end;
+  TAssert.AssertEquals(Name + ' serial is a math error', 'EMathError:',
+    Copy(SerialClass, 1, 11));
+  TAssert.AssertEquals(Name + ' parallel is a math error', 'EMathError:',
+    Copy(ParallelClass, 1, 11));
+{$IFDEF MSWINDOWS}
+  TAssert.AssertEquals(Name + ' same class', SerialClass, ParallelClass);
+{$ENDIF}
 end;
 
 var
@@ -497,8 +522,6 @@ var
   Caller: TCallerThread;
 begin
   MaskBefore := GetExceptionMask;
-  // The serial class is platform specific (EOverflow on Windows, EInvalidOp
-  // from the Linux SIGFPE mapping); the parallel path must match it.
   ExpectRaise := not (exOverflow in MaskBefore);
   // A caller thread may run with different FPU masks. Its workers must not
   // change the process-wide FPU defaults that the RTL restores after an
@@ -526,8 +549,8 @@ begin
   OverflowDestination := TDenseDoubleMatrix.Zeros(80, 64);
   SerialClass := RaisedClass(@SerialDoubleOverflow);
   ParallelClass := RaisedClass(@ParallelDoubleOverflow);
-  AssertEquals('double serial raises', ExpectRaise, SerialClass <> '');
-  AssertEquals('double worker exception class', SerialClass, ParallelClass);
+  AssertSameMathFailure('double overflow', SerialClass, ParallelClass,
+    ExpectRaise);
 
   OverflowSA := SingleMatrix(80, 64, 1.0);
   OverflowSB := SingleMatrix(64, 64, 2.0);
@@ -539,8 +562,8 @@ begin
   OverflowSDestination := TDenseSingleMatrix.Zeros(80, 64);
   SerialClass := RaisedClass(@SerialSingleOverflow);
   ParallelClass := RaisedClass(@ParallelSingleOverflow);
-  AssertEquals('single serial raises', ExpectRaise, SerialClass <> '');
-  AssertEquals('single worker exception class', SerialClass, ParallelClass);
+  AssertSameMathFailure('single overflow', SerialClass, ParallelClass,
+    ExpectRaise);
   AssertTrue('caller exception mask unchanged',
     GetExceptionMask = MaskBefore);
   end;

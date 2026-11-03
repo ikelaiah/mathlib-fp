@@ -35,7 +35,10 @@ Contract:
   defaults that the RTL restores after floating-point exceptions.
 - A worker that cannot start leaves its partition to the calling thread. A
   worker exception is re-raised in the caller, after every worker has joined,
-  as the original exception object; the lowest-row failure wins.
+  as the original exception object; the lowest-row failure wins. Arithmetic
+  faults are `EMathError` on both paths, with the same class on Windows; FPC's
+  Linux SIGFPE handler classifies from sticky x87/MXCSR status flags, so the
+  subclass can differ between a fresh worker and the calling thread.
 - There is no pool, global setting or shared mutable state, so concurrent
   calls from caller threads are independent.
 

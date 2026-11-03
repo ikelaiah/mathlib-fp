@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Compatibility
 
-- Existing multiply, blocked and automatic calls keep their dispatch and results; no ordinary call starts threads. Workers copy the caller's x87/MXCSR control state without changing RTL process defaults, and worker exceptions are re-raised in the caller. LU, Cholesky and FFT remain serial.
+- Existing multiply, blocked and automatic calls keep their dispatch and results; no ordinary call starts threads. Workers copy the caller's x87/MXCSR control state without changing RTL process defaults, and worker exceptions are re-raised in the caller as `EMathError` arithmetic faults (the same subclass on Windows; on Linux FPC may classify an overflow differently on the calling thread). LU, Cholesky and FFT remain serial.
 
 ## [2.14.0] - 2026-10-22
 
