@@ -53,8 +53,70 @@ finite-input contracts. Cross-path tests use the portable result as oracle and
 also check deterministic repeat results and unchanged destinations after
 validation failure.
 
-The blocked implementation is serial. No parallel or SIMD path is stable in
-1.9.5, so every supported target retains the complete portable implementation.
+The blocked implementation is serial, and `MultiplyAutoInto` never starts
+threads. Every supported target retains the complete portable implementation.
+
+## Opt-in parallel multiplication
+
+Version 2.15.0 adds `MultiplyParallelInto(A, B, Destination, WorkerCount,
+BlockSize)` for single, double, single-complex and complex matrices:
+
+```pascal
+uses
+  {$IFDEF UNIX}cthreads,{$ENDIF} // first, so Unix programs can start threads
+  AlgebraLib.DenseMatrices, AlgebraLib.DenseKernels;
+
+MultiplyParallelInto(A, B, Destination, 4);  // same bits as MultiplyBlockedInto
+```
+
+- **Caller-chosen workers.** `WorkerCount` must be in
+  1..`DENSE_PARALLEL_MAX_WORKERS` (64). Counts above the processor count are
+  honoured, so choose a count no larger than your available processors.
+  There is no global setting or thread pool. Concurrent calls from your own
+  threads are independent.
+- **Bitwise determinism.** Output rows are split into contiguous partitions,
+  and each element uses the serial blocked kernel's increasing-`K`
+  compensated sum. The result therefore equals `MultiplyBlockedInto` with the
+  same block size, bit for bit, for every scalar kind and worker count.
+- **Serial fallback.** `EffectiveMultiplyWorkers(Rows, Inner, Columns,
+  Requested)` reports the workers a call will use. It returns 1 for one
+  requested worker, a product with fewer than two rows or no work, and a
+  program without a thread manager. Otherwise it allows at most one worker
+  per row and per `DENSE_PARALLEL_MIN_WORK_PER_WORKER` (131,072)
+  multiply-adds, so small products never pay thread start-up costs. A Unix
+  program without `cthreads` therefore runs serially;
+  `DenseThreadingAvailable` reports this.
+- **Calling thread participates.** The calling thread computes the first
+  partition and each other partition runs on a short-lived worker. If a worker
+  cannot start, the calling thread computes its rows.
+- **Floating-point state.** On x86, workers load the caller's x87 control word
+  (and MXCSR on x86-64), so rounding and exception masks match. A worker
+  exception, such as `EOverflow`, is re-raised in the caller after all workers
+  finish. When several partitions fail, the lowest-row failure is raised.
+- **Validation and memory.** Validation matches `MultiplyBlockedInto` and
+  happens before any destination write. Aliased destinations use one
+  temporary. The parallel path adds only per-worker bookkeeping and thread
+  stacks, with no extra matrix-sized storage.
+
+Only multiplication is parallel in 2.15.0. Dense LU, Cholesky and batched FFT
+remain serial because no benchmark evidence yet shows a gain for them.
+
+### Measured scaling
+
+`tools/check_parallel_multiply.py` runs named shapes at 1, 2, 4 and 8 workers,
+one process per row. It records speedup, scaling efficiency, peak resident
+memory and accuracy. On the 2.15.0 Windows x86-64 qualification host (16
+logical processors, FPC 3.2.2 `-O3`), speedups were about 1.8–2.0× with 2
+workers, 3.2–4.0× with 4 and 4.1–5.1× with 8. Those figures come from a
+256³ double product, a 384×128×320 double product and a 160³ complex
+product. Every run was bitwise identical to the serial kernel. See the
+[release evidence](../../releases/2.15.0/parallel-multiply-win64.json).
+These figures describe that host only; they are not a universal speedup claim.
+Run the gate on your own hardware:
+
+```text
+python tools/check_parallel_multiply.py --compiler fpc
+```
 
 Applied power-of-two DSP transforms reuse the tested native radix-2 FFT kernel
 for supported array sizes. The explicit portable twiddle-recurrence fallback

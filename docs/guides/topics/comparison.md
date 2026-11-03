@@ -2,7 +2,9 @@
 
 Reviewed 3 October 2026. This is a representative shortlist of Pascal math
 libraries and Pascal-facing numerical packages, not a benchmark or a claim of
-complete compatibility across every compiler and platform. The GitHub-hosted
+complete compatibility across every compiler and platform. The mathlib-fp
+entry and its limitations were refreshed for v2.15.0 on 4 November 2026; the
+other entries keep their October review. The GitHub-hosted
 projects are listed first; established projects distributed through other
 upstream channels follow. Check each upstream project for its current release,
 compiler support, and license when evaluating it for a project.
@@ -17,7 +19,7 @@ compiler support, and license when evaluating it for a project.
 | [FastMath](https://github.com/neslib/FastMath) | Simplified BSD; Delphi | Single-precision scalar operations, 2D/3D/4D vectors, small matrices, and quaternions | Designed for graphics and SIMD workloads. Its `Fast*` routines make speed-oriented approximations available as a distinct choice. |
 | [CAI Neural API](https://github.com/joaopauloschuler/neural-api) | LGPL-2.1 with a custom linking exception; current master targets Free Pascal/Lazarus, and Delphi users are directed to tag v2.0.0 | Neural-network training and inference, with AVX/AVX2/AVX512 CPU paths and optional OpenCL | A dedicated machine-learning API with CPU and GPU acceleration paths; the project provides a Delphi-compatible release tag alongside its current FPC branch. |
 | [MPArith](https://github.com/JulStrat/MPArith) | Free Pascal and Delphi source; terms are in [`copying_we.txt`](https://github.com/JulStrat/MPArith/blob/master/copying_we.txt) | Arbitrary-precision integer, rational, real, and complex arithmetic | A multiprecision collection with test programs, demos, and calculator examples alongside its numeric units. |
-| [mathlib-fp 2.4.0](https://github.com/ikelaiah/mathlib-fp) | MIT; native Free Pascal source (FPC 3.2.2+) | 13 focused domains spanning algebra, probability, statistics, engineering/DSP, numerics, optimisation, time series, machine learning, finance, geometry, and interchange | A broad, FPC-first toolkit with no mandatory third-party numerical runtime, versioned web/offline docs, runnable learning examples, a capability inventory, and release qualification. It uses FPC's `objfpc` dialect and does not claim Delphi compatibility. |
+| [mathlib-fp 2.15.0](https://github.com/ikelaiah/mathlib-fp) | MIT; native Free Pascal source (FPC 3.2.2+) | 13 focused domains spanning dense/sparse algebra, special functions, probability, statistics and GLMs, engineering/DSP, numerics and stiff ODEs, optimisation, time series, machine learning with validated model selection, finance, geometry, and interchange | A broad, FPC-first toolkit with no mandatory third-party numerical runtime, versioned web/offline docs, runnable learning examples, a capability inventory, and release qualification. Dense multiplication has an opt-in multithreaded path that reproduces serial results bitwise. It uses FPC's `objfpc` dialect and does not claim Delphi compatibility. |
 
 ## Specialized GitHub projects
 
@@ -61,15 +63,17 @@ array semantics, and Delphi support.
 
 ## Current limitations of mathlib-fp
 
-For a balanced comparison, these are boundaries of the released v2.4.0 scope,
+For a balanced comparison, these are boundaries of the released v2.15.0 scope,
 as recorded in the [capability inventory](../../reference/capabilities.md).
 They describe what a user should not assume is included; they are not a
 roadmap or a judgement about other libraries.
 
 - **Compiler focus:** mathlib-fp targets Free Pascal 3.2.2+ in `objfpc` mode;
   Delphi compatibility is not claimed.
-- **Execution backends:** the stable paths are portable and serial. There is
-  no stable SIMD or thread-pool API, nor a GPU, distributed, or out-of-core
+- **Execution backends:** the stable paths are portable Pascal. Dense matrix
+  multiplication can use caller-chosen worker threads; other algorithms,
+  including factorizations and FFTs, are serial. There is no SIMD path, thread
+  pool, automatic parallel dispatch, or GPU, distributed, or out-of-core
   backend.
 - **Precision and algorithms:** typed dense kernels cover single and double
   real and complex values, while many higher-level workflows are double-only.
@@ -118,4 +122,4 @@ library is declared superior on the basis of raw function counts.
 - GitHub projects — upstream repositories for [mrMath](https://github.com/mikerabat/mrmath), [numerik](https://github.com/ariaghora/numerik), [pas-core-math](https://github.com/joaopauloschuler/pas-core-math), [FastMath](https://github.com/neslib/FastMath), [CAI Neural API](https://github.com/joaopauloschuler/neural-api), [MPArith](https://github.com/JulStrat/MPArith), [TIntX](https://github.com/Xor-el/IntXLib4Pascal), [BigDecimalMath](https://github.com/benibela/bigdecimalmath), and [DelphiBigNumbers](https://github.com/rvelthuis/DelphiBigNumbers).
 - Other upstream sources — [JEDI Math](https://sourceforge.net/projects/jedimath/), [OptiVec](https://www.optivec.com/), [AMath/DAMath](https://www.wolfgang-ehrhardt.de/misc_en.html#amath), [MtxVec Core Edition](https://www.dewresearch.com/products/mtxvec/core/), and [ALGLIB Free Edition](https://www.alglib.net/download.php).
 - DFF Library — [community listing](https://github.com/juliomar/awesome-delphi#math) and [upstream collection](https://www.delphiforfun.org/Programs/Library/Default.htm).
-- mathlib-fp — [repository](https://github.com/ikelaiah/mathlib-fp), [v2.4.0 release](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.4.0), and the in-repository [capability inventory](../../reference/capabilities.md).
+- mathlib-fp — [repository](https://github.com/ikelaiah/mathlib-fp), [v2.15.0 release](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.15.0), and the in-repository [capability inventory](../../reference/capabilities.md).

@@ -221,8 +221,8 @@ re-sequenced 2.15.0–2.20.0 toward gaps recorded on the
 special-function breadth, exact arbitrary-size arithmetic, wavelets and DCT, and
 truncated decompositions. The state-estimation and sample-rate conversion scopes
 previously planned for 2.15.0–2.19.0 are deferred, not rejected; see
-[deferred workflow scopes](#deferred-workflow-scopes). Only 2.15.0 is the next
-design target. Later slots require the activation gates below and may be
+[deferred workflow scopes](#deferred-workflow-scopes). Version 2.15.0 delivered
+opt-in parallel dense multiplication; only 2.16.0 is the next design target. Later slots require the activation gates below and may be
 reordered, split, or replaced when evidence changes. These are planning targets,
 not dates or claims of implementation. The 3.0.0 gate remains unassigned.
 
@@ -1028,9 +1028,9 @@ workflow needs it.
 
 The activation rules above are unchanged: each re-sequenced release still needs
 a demonstrated workflow, a per-release spec, and the contribution gate before
-implementation. The task plan and checklist record the 2.10.0–2.14.0 execution;
-their 2.15.0–2.20.0 entries are refreshed when each release is activated. The
-comparison page's mathlib-fp entry, which still describes 2.4.0, is refreshed
+implementation. The task plan and checklist record the 2.10.0–2.15.0 execution;
+their 2.16.0–2.20.0 entries are refreshed when each release is activated. The
+comparison page's mathlib-fp entry was refreshed to the 2.15.0 capability set
 as part of the 2.15.0 documentation work.
 
 ## Previous release: 2.10.0 — Shared validation and grouped model selection
@@ -1131,7 +1131,7 @@ requirements. Distinguish an inference artifact from the full training report.
 No arbitrary object graphs, callbacks, executable payloads, or automatic
 serialization of every diagnostic/training row.
 
-## Next release: 2.15.0 — Parallel dense kernels
+## Previous release: 2.15.0 — Parallel dense kernels
 
 Add an opt-in, bounded parallel execution path for typed dense matrix
 multiplication across all four scalar kinds, building on the existing serial
@@ -1157,7 +1157,14 @@ FFT only where the same benchmark evidence shows a measured gain.
 No GPU, distributed, or out-of-core execution; no hidden global configuration
 that changes ordinary serial calls; no SIMD intrinsics in this release.
 
-## Planned 2.16.0 — Special Functions III
+Version 2.15.0 delivers `MultiplyParallelInto` for all four scalar kinds with
+`EffectiveMultiplyWorkers` and `DenseThreadingAvailable`. Results are bitwise
+identical to `MultiplyBlockedInto`; LU, Cholesky and batched FFT were not
+extended because only the multiplication kernel was measured. See the
+[release notes](../releases/2.15.0/release-notes.md) and
+[qualification record](../releases/2.15.0/qualification.md).
+
+## Next release: 2.16.0 — Special Functions III
 
 Extend MathBase with real-double digamma and polygamma, the Riemann zeta
 function (with Hurwitz zeta only if the polygamma design needs it), both real
@@ -1376,9 +1383,8 @@ qualification.
 ### Performance acceleration track
 
 Parallel and SIMD work remains evidence-driven. Opt-in threaded dense
-multiplication is scheduled for 2.15.0 and a conditional x86-64 SIMD kernel for
-2.19.0; both keep their activation gates and are deferred if measurements do
-not justify them. All acceleration work follows these rules:
+multiplication shipped in 2.15.0; a conditional x86-64 SIMD kernel remains
+planned for 2.19.0 and is deferred if measurements do not justify it. All acceleration work follows these rules:
 
 - the complete portable Pascal implementation remains the reference and oracle;
 - optimise only benchmarked bottlenecks;

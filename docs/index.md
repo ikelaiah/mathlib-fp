@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The current stable release is 2.14.0. It adds portable GLM and PLS prediction artifacts with explicit input conventions and checked model schemas. Consult the [2.14.0 API reference](reference/api/reference-2.14.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md).
+The current stable release is 2.15.0. It adds opt-in parallel dense matrix multiplication with caller-chosen workers and results bitwise identical to the serial kernel. Consult the [2.15.0 API reference](reference/api/reference-2.15.0.md), [capability inventory](reference/capabilities.md), [support matrix](project/support.md), and [API conventions](reference/api/conventions-2.0.md).
 
 ## Domains
 

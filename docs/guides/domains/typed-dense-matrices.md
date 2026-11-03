@@ -12,6 +12,11 @@ scalar families. The serial blocked traversal preserves the portable kernel's
 increasing-inner-index accumulation order; the portable path remains the
 correctness oracle. See [Portable performance](portable-performance.md).
 
+Version 2.15 adds opt-in `MultiplyParallelInto` for all four scalar families.
+The caller chooses the worker count, and results are bitwise identical to
+`MultiplyBlockedInto`. Ordinary multiply calls never start threads. See
+[parallel multiplication](portable-performance.md#opt-in-parallel-multiplication).
+
 ## 60-second solve
 
 ```pascal
