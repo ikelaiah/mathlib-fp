@@ -20,7 +20,7 @@ frameworks or changes to existing seeded results.
 | 2.12.0 | GLM offsets and Poisson exposure | Existing GLM | Medium: diagnostics and prediction semantics |
 | 2.13.0 | Integer frequency-weighted GLMs | 2.12 fit/prediction contract | Medium: effective rank and information |
 | 2.14.0 | GLM/PLS prediction persistence | 2.12–2.13 contracts, existing interchange | Medium: artifact validity and preprocessing |
-| 2.15.0 | Missing-observation Kalman updates | Existing dense state-space filter | Medium: partial covariance and likelihood |
+| 2.15.0 | Opt-in parallel dense multiplication (re-scoped after 2.14) | Existing serial blocked kernel and `PERF` pipeline | Medium: determinism, thread fallback and FPU state |
 | 2.16.0 | Fixed-interval RTS smoothing | 2.15 history/mask semantics | High: covariance conditioning and memory |
 | 2.17.0 | Windowed low-pass FIR design | Existing FIR execution | Medium: spectral and delay contracts |
 | 2.18.0 | Streaming rational resampling | 2.17 anti-alias filter | High: phase, delay, flush and output counts |

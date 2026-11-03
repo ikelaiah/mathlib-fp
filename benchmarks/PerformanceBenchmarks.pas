@@ -18,6 +18,7 @@ procedure WritePerformanceRow(const Identifier, Domain, Scale, ScalarKind,
   Tolerance: Double; const Setup: string);
 procedure RunV195PerformanceBenchmarks;
 procedure RunV250PerformanceBenchmarks;
+procedure RunV2150PerformanceBenchmarks;
 
 implementation
 
@@ -452,6 +453,68 @@ end;
 procedure RunV250PerformanceBenchmarks;
 begin
   SpectralPlanBenchmarks.RunV250SpectralPlanBenchmarks;
+end;
+
+{ v2.15.0: serial blocked and opt-in four-worker multiplication on the same
+  prepared operands. The parallel result must match the serial one bitwise;
+  its timing is compared with the serial row from the same run. }
+procedure BenchmarkDenseParallel;
+const
+  RowsA = 192;
+  Inner = 160;
+  ColsB = 176;
+  Workers = 4;
+  WarmIterations = 3;
+var
+  A, B, SerialDestination, ParallelDestination: IDenseDoubleMatrix;
+  Started, ColdSerial, ColdParallel, WarmSerial, WarmParallel,
+    HeapBaseline: QWord;
+  Iteration, I, J: SizeInt;
+  Elements: QWord;
+begin
+  A := TDenseDoubleMatrix.Zeros(RowsA, Inner);
+  B := TDenseDoubleMatrix.Zeros(Inner, ColsB);
+  SerialDestination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
+  ParallelDestination := TDenseDoubleMatrix.Zeros(RowsA, ColsB);
+  FillDensePair(A, B);
+  Elements := RowsA * Inner + Inner * ColsB + RowsA * ColsB;
+
+  Started := GetTickCount64;
+  MultiplyBlockedInto(A, B, SerialDestination);
+  ColdSerial := GetTickCount64 - Started;
+  HeapBaseline := GetHeapStatus.TotalAllocated;
+  Started := GetTickCount64;
+  for Iteration := 1 to WarmIterations do
+    MultiplyBlockedInto(A, B, SerialDestination);
+  WarmSerial := GetTickCount64 - Started;
+  WritePerformanceRow('dense-gemm-parallel-serial', 'dense', 'large',
+    'double', '192x160x176', ColdSerial, WarmSerial, WarmIterations, 0,
+    RetainedHeapDelta(HeapBaseline), Elements, RowsA * ColsB,
+    SerialDestination[0, 0] + SerialDestination[RowsA - 1, ColsB - 1],
+    1.0E-12, 'prepared_inputs_destination');
+
+  Started := GetTickCount64;
+  MultiplyParallelInto(A, B, ParallelDestination, Workers);
+  ColdParallel := GetTickCount64 - Started;
+  HeapBaseline := GetHeapStatus.TotalAllocated;
+  Started := GetTickCount64;
+  for Iteration := 1 to WarmIterations do
+    MultiplyParallelInto(A, B, ParallelDestination, Workers);
+  WarmParallel := GetTickCount64 - Started;
+  for I := 0 to RowsA - 1 do
+    for J := 0 to ColsB - 1 do
+      if ParallelDestination[I, J] <> SerialDestination[I, J] then
+        Halt(21);
+  WritePerformanceRow('dense-gemm-parallel-workers4', 'dense', 'large',
+    'double', '192x160x176', ColdParallel, WarmParallel, WarmIterations, 0,
+    RetainedHeapDelta(HeapBaseline), Elements, RowsA * ColsB,
+    ParallelDestination[0, 0] + ParallelDestination[RowsA - 1, ColsB - 1],
+    1.0E-12, 'prepared_inputs_destination_workers4');
+end;
+
+procedure RunV2150PerformanceBenchmarks;
+begin
+  BenchmarkDenseParallel;
 end;
 
 end.
