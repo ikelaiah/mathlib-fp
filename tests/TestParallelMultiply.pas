@@ -490,16 +490,16 @@ end;
 
 procedure TParallelMultiplyTest.TestWorkerExceptionsPropagate;
 var
-  SerialClass, ParallelClass, Expected: string;
+  SerialClass, ParallelClass: string;
+  ExpectRaise: Boolean;
   J, Round: SizeInt;
   MaskBefore: TFPUExceptionMask;
   Caller: TCallerThread;
 begin
   MaskBefore := GetExceptionMask;
-  if exOverflow in MaskBefore then
-    Expected := ''
-  else
-    Expected := 'EOverflow';
+  // The serial class is platform specific (EOverflow on Windows, EInvalidOp
+  // from the Linux SIGFPE mapping); the parallel path must match it.
+  ExpectRaise := not (exOverflow in MaskBefore);
   // A caller thread may run with different FPU masks. Its workers must not
   // change the process-wide FPU defaults that the RTL restores after an
   // exception in this thread.
@@ -526,7 +526,7 @@ begin
   OverflowDestination := TDenseDoubleMatrix.Zeros(80, 64);
   SerialClass := RaisedClass(@SerialDoubleOverflow);
   ParallelClass := RaisedClass(@ParallelDoubleOverflow);
-  AssertEquals('double serial exception class', Expected, SerialClass);
+  AssertEquals('double serial raises', ExpectRaise, SerialClass <> '');
   AssertEquals('double worker exception class', SerialClass, ParallelClass);
 
   OverflowSA := SingleMatrix(80, 64, 1.0);
@@ -539,7 +539,7 @@ begin
   OverflowSDestination := TDenseSingleMatrix.Zeros(80, 64);
   SerialClass := RaisedClass(@SerialSingleOverflow);
   ParallelClass := RaisedClass(@ParallelSingleOverflow);
-  AssertEquals('single serial exception class', Expected, SerialClass);
+  AssertEquals('single serial raises', ExpectRaise, SerialClass <> '');
   AssertEquals('single worker exception class', SerialClass, ParallelClass);
   AssertTrue('caller exception mask unchanged',
     GetExceptionMask = MaskBefore);
