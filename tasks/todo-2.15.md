@@ -4,7 +4,7 @@
 - [x] Specify and test the contract before relying on it.
 - [x] Implement all four scalar kinds, the fallback rules and the workflow.
 - [x] Complete local qualification and five-axis review.
-- [ ] Pass hosted Linux/Windows CI and clean-archive qualification.
+- [x] Pass hosted Linux/Windows CI and clean-archive qualification.
 - [ ] Merge, verify exact main, publish and check downloaded artifacts/docs.
 
 Release bodies begin with changelog content; the title stays in the title field.

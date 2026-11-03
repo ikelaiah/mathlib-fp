@@ -54,4 +54,34 @@ speedups above describe this host only.
 
 ## Hosted and publication gates
 
-Pending hosted Linux/Windows CI and clean-archive qualification.
+Linux and Windows CI passed in [PR #82](https://github.com/ikelaiah/mathlib-fp/pull/82)
+and [CI run](https://github.com/ikelaiah/mathlib-fp/actions/runs/41728537826).
+The [clean-archive run](https://github.com/ikelaiah/mathlib-fp/actions/runs/41728530088)
+passed 152 Linux and 153 Windows gates.
+Linux blocked new outbound connections after checksum verification and
+extraction; Windows qualified its verified ZIP. Separate platform artifacts
+retain the complete evidence.
+
+The first hosted run caught a platform difference. FPC's Linux SIGFPE handler
+chooses the exception class from sticky status flags, so the serial kernel
+reported an overflow as `EInvalidOp` while a fresh worker reported
+`EOverflow`. The contract and test now require an `EMathError` on both paths
+and the same subclass on Windows; see the
+[specification](../../../tasks/spec-2.15.md).
+
+Both hosted parallel runs were bitwise equal to the serial kernel on every
+shape. On Linux, the build without `cthreads` reported no thread manager,
+used one worker and agreed bitwise, which confirms the Unix serial fallback.
+The hosted runners report 4 logical processors, but speedups were much
+smaller than on the local host. In the
+[Linux evidence](parallel-multiply-linux-hosted.json), speedup was
+1.10–1.22× with 2 workers and 1.53–1.81× with 4–8. In the
+[Windows evidence](parallel-multiply-windows-hosted.json), it was
+1.85–1.97× with 2 workers and 2.02–2.31× with 4–8. These shared runners
+saturate at about two workers' worth of throughput. This is why speedups are
+published per host and are not a universal claim.
+
+The finalized branch must retain green CI and clean-archive qualification, and
+the resulting exact main commit must pass CI before tagging. Publication and
+downloaded artifact verification follow [RELEASING.md](../../../RELEASING.md).
+Release bodies contain changelog content; the title stays in the title field.
