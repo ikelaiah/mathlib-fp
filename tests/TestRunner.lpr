@@ -17,6 +17,7 @@ uses
   , TestAlgebraLib
   , TestDenseMatrices
   , TestDenseDecompositions
+  , TestParallelMultiply
   , TestSparseMatrices
   , TestIterativeSolvers
   , TestStructuredSolvers

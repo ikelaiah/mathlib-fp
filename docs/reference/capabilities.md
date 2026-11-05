@@ -11,7 +11,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Array vector kernels | Stable | Double real and complex | The 1.3 array facade is retained; typed matrices provide the new single paths |
 | Typed dense storage and views | Stable | Single/double real/complex | Dense row-major only; no broadcasting |
 | Small 2x2 value arithmetic | Stable | Single/double real/complex | 2x2 only; batch iteration is explicit |
-| Typed dense arithmetic | Stable | Single/double real/complex | Portable O(mkn) product; no SIMD/parallel dispatch |
+| Typed dense arithmetic | Stable | Single/double real/complex | Portable O(mkn) product; no automatic SIMD/parallel dispatch |
 | Pivoted LU and direct solve | Stable | Single/double real/complex | Square systems only; no least squares |
 | Cholesky solve | Stable | Single/double real/complex | Positive-definite symmetric/Hermitian matrices only |
 | Triangular solve variants | Stable | Single/double real/complex | Dense lower/upper, unit/non-unit, ordinary/transposed/conjugate-transposed |
@@ -57,13 +57,14 @@ Target qualifications and platform-specific limitations are defined by the
 | Conditional statistics and data science | Unsupported | — | Survival/factor analysis, robust covariance, multinomial and additional count families, boosting, and broader forecasting were not activated |
 | GLM/PLS prediction persistence | Stable | Double real | Explicit indexed columns and input conventions; prediction parameters only |
 | General model/decomposition persistence | Unsupported | — | Selected adapters are stable; decomposition, forest, graph, and multivariate-state persistence remain open |
-| Parallel/SIMD dispatch | Unsupported | — | No stable thread-pool or vector-intrinsic API |
+| Opt-in parallel dense multiplication | Stable | Single/double real/complex | Caller-chosen 1–64 workers, bitwise equal to the serial blocked kernel; multiplication only |
+| Automatic parallel/SIMD dispatch | Unsupported | — | No thread pool, global parallel setting, or vector-intrinsic API |
 
-This is the 2.14.0 capability inventory. It adds owned GLM/PLS prediction
-records and portable prediction artifacts with explicit input conventions.
-Qualification status is recorded in the
-[current release report](../releases/2.14.0/qualification.md). It retains
-frequency-weighted offset/exposure GLMs, grouped and chronological validation,
+This is the 2.15.0 capability inventory. It adds opt-in parallel dense
+multiplication for all four scalar kinds whose results are bitwise identical to
+the serial blocked kernel. Qualification status is recorded in the
+[current release report](../releases/2.15.0/qualification.md). It retains
+GLM/PLS prediction persistence, frequency-weighted offset/exposure GLMs, grouped and chronological validation,
 PLS1 regression, stable SOS IIR filtering and reusable spectral processing.
 Sparse direct solving now includes a
 reusable minimum-degree symbolic analysis and sparse numeric LU. The

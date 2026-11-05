@@ -1,7 +1,8 @@
 # v2.10.0–v2.20.0 execution checklist
 
-v2.10.0 through v2.14.0 are published and verified. The authorized five-release
-batch is complete; v2.15.0 through v2.20.0 remain planned capability gates. See the [plan](plan-2.10-2.20.md) for task
+v2.10.0 through v2.14.0 are published and verified. v2.15.0 was re-scoped by
+the post-2.14 priority review to opt-in parallel dense multiplication and is
+active; v2.16.0 through v2.20.0 remain planned capability gates. See the [plan](plan-2.10-2.20.md) for task
 dependencies and verification, and the [roadmap](../docs/project/roadmap.md) for
 scope, exclusions, and acceptance gates. Later releases remain planned capability gates.
 
@@ -28,7 +29,7 @@ slices before work starts. The four checkboxes are milestones, not one task.
 | 2.12.0 GLM offsets/exposure | [x] | [x] | [x] | [x] |
 | 2.13.0 GLM frequency weights | [x] | [x] | [x] | [x] |
 | 2.14.0 Prediction persistence | [x] | [x] | [x] | [x] |
-| 2.15.0 Missing-observation filtering | [ ] | [ ] | [ ] | [ ] |
+| 2.15.0 Parallel dense kernels | [x] | [x] | [x] | [ ] |
 | 2.16.0 RTS smoothing | [ ] | [ ] | [ ] | [ ] |
 | 2.17.0 Low-pass FIR design | [ ] | [ ] | [ ] | [ ] |
 | 2.18.0 Rational resampling | [ ] | [ ] | [ ] | [ ] |

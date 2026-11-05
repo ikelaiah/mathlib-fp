@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.14.0",
+  "release": "2.15.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -136,8 +136,41 @@
       "tests": "tests/TestDenseMatrices.pas",
       "limitations": [
         "portable scalar oracle plus deterministic serial blocked traversal",
-        "no parallel or SIMD dispatch",
+        "no automatic parallel or SIMD dispatch",
         "finite inputs required"
+      ]
+    },
+    {
+      "family": "dense_parallel_multiplication",
+      "unit": "AlgebraLib.DenseKernels",
+      "entry_points": [
+        "MultiplyParallelInto",
+        "EffectiveMultiplyWorkers",
+        "DenseThreadingAvailable",
+        "DENSE_PARALLEL_MAX_WORKERS",
+        "DENSE_PARALLEL_MIN_WORK_PER_WORKER"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "single",
+        "double",
+        "single_complex",
+        "double_complex"
+      ],
+      "shapes": [
+        "dense",
+        "strided_view"
+      ],
+      "complexity": "O(m*k*n) multiply-adds split across at most min(workers, rows, m*k*n/131072) row partitions",
+      "accuracy": "bitwise equal to MultiplyBlockedInto with the same block size",
+      "docs": "docs/guides/domains/portable-performance.md",
+      "example": "examples/52_parallel_multiply.pas",
+      "benchmark": "benchmarks/ParallelMultiplyEvidence.lpr",
+      "tests": "tests/TestParallelMultiply.pas",
+      "limitations": [
+        "opt-in caller-chosen worker count 1..64; ordinary calls stay serial",
+        "Unix programs need a thread manager such as cthreads, otherwise one worker",
+        "multiplication only; LU, Cholesky and FFT remain serial"
       ]
     },
     {

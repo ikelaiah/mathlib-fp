@@ -1,18 +1,18 @@
 # Release maintenance view
 
-Refreshed for v2.14.0 on 2026-10-22.
+Refreshed for v2.15.0 on 2026-11-04.
 
 Counts describe the current source/API and curated capability inventory.
 They are not a scorecard or a substitute for numerical and platform evidence.
 
-- Units and declaration rows come from the [current API snapshot](../reference/api/public-api-2.14.0.json).
+- Units and declaration rows come from the [current API snapshot](../reference/api/public-api-2.15.0.json).
 - Stable families come from [capabilities.json](../reference/capabilities.json); zero means this curated inventory has no separately measured family for that domain.
 - Example counts use domain labels in [examples/README.md](../../examples/README.md); shared examples may count in more than one domain.
-- Qualification status is in the [v2.14.0 report](../releases/2.14.0/qualification.md), not inferred from source counts.
+- Qualification status is in the [v2.15.0 report](../releases/2.15.0/qualification.md), not inferred from source counts.
 
 | Domain | Stable capability families | Units | Public API rows | Runnable examples | Important limitations |
 | --- | ---: | ---: | ---: | ---: | --- |
-| AlgebraLib | 13 | 14 | 1209 | 13 | Dense and sparse serial baselines; sparse fill is data dependent; partial eigensystems target largest magnitude |
+| AlgebraLib | 14 | 14 | 1217 | 14 | Serial baselines plus opt-in parallel dense multiplication; sparse fill is data dependent; partial eigensystems target largest magnitude |
 | CombinatoricsLib | 0 | 1 | 43 | 1 | Fixed-width integer overflow limits; no arbitrary precision |
 | EngineeringLib | 3 | 8 | 472 | 6 | SOS Butterworth/Chebyshev I prototype orders 1–12; no equiripple, resampling or broader wavelet families |
 | FinanceLib | 0 | 3 | 71 | 2 | Documented rate/time conventions and bounded numerical models |
@@ -26,15 +26,15 @@ They are not a scorecard or a substitute for numerical and platform evidence.
 | StatsLib | 3 | 4 | 245 | 9 | Bernoulli/Poisson GLMs with offsets/exposure and integer frequencies; no analytic weights, regularization or robust covariance; moderate dense data |
 | TimeSeriesLib | 1 | 2 | 116 | 4 | Linear-Gaussian filtering/forecasting baseline; no missing-observation or smoothing workflow |
 
-The snapshot contains 55 units and 3,290 declarations; the example catalogue contains 52 programs.
+The snapshot contains 55 units and 3,298 declarations; the example catalogue contains 53 programs.
 Declarations include advanced, compatibility and specialization support; they
 are not a count of recommended application entry points.
 
 ## Current evidence
 
-See the [numerical catalogue](../releases/2.14.0/numerical-evidence.json),
-[workflow qualification](../releases/2.14.0/workflow-qualification.md),
-[performance contract](../releases/2.14.0/performance-evidence.json), and
+See the [numerical catalogue](../releases/2.15.0/numerical-evidence.json),
+[workflow qualification](../releases/2.15.0/workflow-qualification.md),
+[performance contract](../releases/2.15.0/performance-evidence.json), and
 [support matrix](support.md). The [historical 1.9.9 provenance audit](../releases/1.9.9/provenance-audit.md)
 remains frozen evidence for its own baseline; new numerical families carry
 their own cited provenance and validation in the current release.

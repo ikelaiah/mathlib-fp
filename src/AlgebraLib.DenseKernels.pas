@@ -25,6 +25,8 @@ type
 const
   DENSE_MULTIPLY_BLOCK_SIZE = 32;
   DENSE_MULTIPLY_AUTO_THRESHOLD = 131072;
+  DENSE_PARALLEL_MAX_WORKERS = 64;
+  DENSE_PARALLEL_MIN_WORK_PER_WORKER = 131072;
 
 type
   TSingleUnaryKernel = function(const Value: Single): Single;
@@ -190,6 +192,35 @@ procedure MultiplyAutoInto(const A, B, Destination:
   IDenseComplexMatrix); overload;
 function SelectedMultiplyPath(const Rows, InnerDimension,
   Columns: SizeInt): TDenseMultiplyPath;
+
+{ Opt-in parallel blocked multiplication. The caller chooses WorkerCount in
+  1..DENSE_PARALLEL_MAX_WORKERS; ordinary multiply calls never start threads.
+  Output rows are partitioned across EffectiveMultiplyWorkers workers, the
+  calling thread computes one partition, and every element uses the serial
+  blocked arithmetic, so results are bitwise identical to MultiplyBlockedInto
+  with the same block size. Validation precedes any destination write. }
+procedure MultiplyParallelInto(const A, B, Destination:
+  IDenseSingleMatrix; const WorkerCount: SizeInt;
+  const BlockSize: SizeInt = DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyParallelInto(const A, B, Destination:
+  IDenseDoubleMatrix; const WorkerCount: SizeInt;
+  const BlockSize: SizeInt = DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyParallelInto(const A, B, Destination:
+  IDenseSingleComplexMatrix; const WorkerCount: SizeInt;
+  const BlockSize: SizeInt = DENSE_MULTIPLY_BLOCK_SIZE); overload;
+procedure MultiplyParallelInto(const A, B, Destination:
+  IDenseComplexMatrix; const WorkerCount: SizeInt;
+  const BlockSize: SizeInt = DENSE_MULTIPLY_BLOCK_SIZE); overload;
+{ Workers MultiplyParallelInto would use: 1 when RequestedWorkers is 1, the
+  product has fewer than two rows or no work, or no thread manager is
+  installed (a Unix program without cthreads); otherwise at most one worker
+  per row and per DENSE_PARALLEL_MIN_WORK_PER_WORKER multiply-adds. Raises
+  for negative dimensions or a RequestedWorkers outside the valid range. }
+function EffectiveMultiplyWorkers(const Rows, InnerDimension, Columns,
+  RequestedWorkers: SizeInt): SizeInt;
+{ True on Windows, and on Unix when the program installs a thread manager
+  such as cthreads. }
+function DenseThreadingAvailable: Boolean;
 
 function Dot(const A, B: IDenseSingleMatrix): Single; overload;
 function Dot(const A, B: IDenseDoubleMatrix): Double; overload;
@@ -1200,12 +1231,180 @@ begin
       ': BlockSize must be positive.');
 end;
 
+{ Row-range blocked kernels shared by the serial and parallel paths. Each
+  output element accumulates K in increasing order with compensation; neither
+  the row range nor the tile position changes that arithmetic, so a row
+  partition reproduces the serial result exactly. Tile ends are computed
+  without forming Start + BlockSize, which may overflow for huge blocks. }
+procedure BlockedRowsSingle(const A, B, Work: IDenseSingleMatrix;
+  const RowStart, RowEnd, BlockSize: SizeInt);
+var
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Sum, Correction: Double;
+begin
+  IBlock := RowStart;
+  while IBlock < RowEnd do
+  begin
+    if BlockSize >= RowEnd - IBlock then IEnd := RowEnd
+    else IEnd := IBlock + BlockSize;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      if BlockSize >= B.Cols - JBlock then JEnd := B.Cols
+      else JEnd := JBlock + BlockSize;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          Sum := 0.0;
+          Correction := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            if BlockSize >= A.Cols - KBlock then KEnd := A.Cols
+            else KEnd := KBlock + BlockSize;
+            for K := KBlock to KEnd - 1 do
+              AddCompensated(Double(A[I, K]) * Double(B[K, J]),
+                Sum, Correction);
+            KBlock := KEnd;
+          end;
+          Work[I, J] := Single(Sum + Correction);
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+end;
+
+procedure BlockedRowsDouble(const A, B, Work: IDenseDoubleMatrix;
+  const RowStart, RowEnd, BlockSize: SizeInt);
+var
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Sum, Correction: Double;
+begin
+  IBlock := RowStart;
+  while IBlock < RowEnd do
+  begin
+    if BlockSize >= RowEnd - IBlock then IEnd := RowEnd
+    else IEnd := IBlock + BlockSize;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      if BlockSize >= B.Cols - JBlock then JEnd := B.Cols
+      else JEnd := JBlock + BlockSize;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          Sum := 0.0;
+          Correction := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            if BlockSize >= A.Cols - KBlock then KEnd := A.Cols
+            else KEnd := KBlock + BlockSize;
+            for K := KBlock to KEnd - 1 do
+              AddCompensated(A[I, K] * B[K, J], Sum, Correction);
+            KBlock := KEnd;
+          end;
+          Work[I, J] := Sum + Correction;
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+end;
+
+procedure BlockedRowsSingleComplex(const A, B, Work:
+  IDenseSingleComplexMatrix; const RowStart, RowEnd, BlockSize: SizeInt);
+var
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Product: TSingleComplex;
+  SumRe, SumIm, CorrectionRe, CorrectionIm: Double;
+begin
+  IBlock := RowStart;
+  while IBlock < RowEnd do
+  begin
+    if BlockSize >= RowEnd - IBlock then IEnd := RowEnd
+    else IEnd := IBlock + BlockSize;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      if BlockSize >= B.Cols - JBlock then JEnd := B.Cols
+      else JEnd := JBlock + BlockSize;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          SumRe := 0.0; SumIm := 0.0;
+          CorrectionRe := 0.0; CorrectionIm := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            if BlockSize >= A.Cols - KBlock then KEnd := A.Cols
+            else KEnd := KBlock + BlockSize;
+            for K := KBlock to KEnd - 1 do
+            begin
+              Product := A[I, K] * B[K, J];
+              AddCompensated(Product.Re, SumRe, CorrectionRe);
+              AddCompensated(Product.Im, SumIm, CorrectionIm);
+            end;
+            KBlock := KEnd;
+          end;
+          Work[I, J] := TSingleComplex.Create(
+            SumRe + CorrectionRe, SumIm + CorrectionIm);
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+end;
+
+procedure BlockedRowsComplex(const A, B, Work: IDenseComplexMatrix;
+  const RowStart, RowEnd, BlockSize: SizeInt);
+var
+  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
+  Product: TComplex;
+  SumRe, SumIm, CorrectionRe, CorrectionIm: Double;
+begin
+  IBlock := RowStart;
+  while IBlock < RowEnd do
+  begin
+    if BlockSize >= RowEnd - IBlock then IEnd := RowEnd
+    else IEnd := IBlock + BlockSize;
+    JBlock := 0;
+    while JBlock < B.Cols do
+    begin
+      if BlockSize >= B.Cols - JBlock then JEnd := B.Cols
+      else JEnd := JBlock + BlockSize;
+      for I := IBlock to IEnd - 1 do
+        for J := JBlock to JEnd - 1 do
+        begin
+          SumRe := 0.0; SumIm := 0.0;
+          CorrectionRe := 0.0; CorrectionIm := 0.0;
+          KBlock := 0;
+          while KBlock < A.Cols do
+          begin
+            if BlockSize >= A.Cols - KBlock then KEnd := A.Cols
+            else KEnd := KBlock + BlockSize;
+            for K := KBlock to KEnd - 1 do
+            begin
+              Product := A[I, K] * B[K, J];
+              AddCompensated(Product.Re, SumRe, CorrectionRe);
+              AddCompensated(Product.Im, SumIm, CorrectionIm);
+            end;
+            KBlock := KEnd;
+          end;
+          Work[I, J] := TComplex.Create(
+            SumRe + CorrectionRe, SumIm + CorrectionIm);
+        end;
+      JBlock := JEnd;
+    end;
+    IBlock := IEnd;
+  end;
+end;
+
 procedure MultiplyBlockedInto(const A, B, Destination: IDenseDoubleMatrix;
   const BlockSize: SizeInt);
 var
   Work: IDenseDoubleMatrix;
-  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
-  Sum, Correction: Double;
 begin
   RequirePositiveBlockSize(BlockSize, 'MultiplyBlockedInto(double)');
   RequireFinite(A, 'MultiplyBlockedInto(double)');
@@ -1221,37 +1420,7 @@ begin
     Work := TDenseDoubleMatrix.Zeros(A.Rows, B.Cols)
   else
     Work := Destination;
-
-  IBlock := 0;
-  while IBlock < A.Rows do
-  begin
-    IEnd := IBlock + BlockSize;
-    if IEnd > A.Rows then IEnd := A.Rows;
-    JBlock := 0;
-    while JBlock < B.Cols do
-    begin
-      JEnd := JBlock + BlockSize;
-      if JEnd > B.Cols then JEnd := B.Cols;
-      for I := IBlock to IEnd - 1 do
-        for J := JBlock to JEnd - 1 do
-        begin
-          Sum := 0.0;
-          Correction := 0.0;
-          KBlock := 0;
-          while KBlock < A.Cols do
-          begin
-            KEnd := KBlock + BlockSize;
-            if KEnd > A.Cols then KEnd := A.Cols;
-            for K := KBlock to KEnd - 1 do
-              AddCompensated(A[I, K] * B[K, J], Sum, Correction);
-            KBlock := KEnd;
-          end;
-          Work[I, J] := Sum + Correction;
-        end;
-      JBlock := JEnd;
-    end;
-    IBlock := IEnd;
-  end;
+  BlockedRowsDouble(A, B, Work, 0, A.Rows, BlockSize);
   if Work <> Destination then
     specialize CopyMatrix<Double>(Work, Destination);
 end;
@@ -1260,8 +1429,6 @@ procedure MultiplyBlockedInto(const A, B, Destination: IDenseSingleMatrix;
   const BlockSize: SizeInt);
 var
   Work: IDenseSingleMatrix;
-  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
-  Sum, Correction: Double;
 begin
   RequirePositiveBlockSize(BlockSize, 'MultiplyBlockedInto(single)');
   RequireFinite(A, 'MultiplyBlockedInto(single)');
@@ -1277,38 +1444,7 @@ begin
     Work := TDenseSingleMatrix.Zeros(A.Rows, B.Cols)
   else
     Work := Destination;
-
-  IBlock := 0;
-  while IBlock < A.Rows do
-  begin
-    IEnd := IBlock + BlockSize;
-    if IEnd > A.Rows then IEnd := A.Rows;
-    JBlock := 0;
-    while JBlock < B.Cols do
-    begin
-      JEnd := JBlock + BlockSize;
-      if JEnd > B.Cols then JEnd := B.Cols;
-      for I := IBlock to IEnd - 1 do
-        for J := JBlock to JEnd - 1 do
-        begin
-          Sum := 0.0;
-          Correction := 0.0;
-          KBlock := 0;
-          while KBlock < A.Cols do
-          begin
-            KEnd := KBlock + BlockSize;
-            if KEnd > A.Cols then KEnd := A.Cols;
-            for K := KBlock to KEnd - 1 do
-              AddCompensated(Double(A[I, K]) * Double(B[K, J]),
-                Sum, Correction);
-            KBlock := KEnd;
-          end;
-          Work[I, J] := Single(Sum + Correction);
-        end;
-      JBlock := JEnd;
-    end;
-    IBlock := IEnd;
-  end;
+  BlockedRowsSingle(A, B, Work, 0, A.Rows, BlockSize);
   if Work <> Destination then
     specialize CopyMatrix<Single>(Work, Destination);
 end;
@@ -1317,9 +1453,6 @@ procedure MultiplyBlockedInto(const A, B, Destination:
   IDenseSingleComplexMatrix; const BlockSize: SizeInt);
 var
   Work: IDenseSingleComplexMatrix;
-  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
-  Product: TSingleComplex;
-  SumRe, SumIm, CorrectionRe, CorrectionIm: Double;
 begin
   RequirePositiveBlockSize(BlockSize,
     'MultiplyBlockedInto(single complex)');
@@ -1336,42 +1469,7 @@ begin
     Work := TDenseSingleComplexMatrix.Zeros(A.Rows, B.Cols)
   else
     Work := Destination;
-
-  IBlock := 0;
-  while IBlock < A.Rows do
-  begin
-    IEnd := IBlock + BlockSize;
-    if IEnd > A.Rows then IEnd := A.Rows;
-    JBlock := 0;
-    while JBlock < B.Cols do
-    begin
-      JEnd := JBlock + BlockSize;
-      if JEnd > B.Cols then JEnd := B.Cols;
-      for I := IBlock to IEnd - 1 do
-        for J := JBlock to JEnd - 1 do
-        begin
-          SumRe := 0.0; SumIm := 0.0;
-          CorrectionRe := 0.0; CorrectionIm := 0.0;
-          KBlock := 0;
-          while KBlock < A.Cols do
-          begin
-            KEnd := KBlock + BlockSize;
-            if KEnd > A.Cols then KEnd := A.Cols;
-            for K := KBlock to KEnd - 1 do
-            begin
-              Product := A[I, K] * B[K, J];
-              AddCompensated(Product.Re, SumRe, CorrectionRe);
-              AddCompensated(Product.Im, SumIm, CorrectionIm);
-            end;
-            KBlock := KEnd;
-          end;
-          Work[I, J] := TSingleComplex.Create(
-            SumRe + CorrectionRe, SumIm + CorrectionIm);
-        end;
-      JBlock := JEnd;
-    end;
-    IBlock := IEnd;
-  end;
+  BlockedRowsSingleComplex(A, B, Work, 0, A.Rows, BlockSize);
   if Work <> Destination then
     specialize CopyMatrix<TSingleComplex>(Work, Destination);
 end;
@@ -1380,9 +1478,6 @@ procedure MultiplyBlockedInto(const A, B, Destination:
   IDenseComplexMatrix; const BlockSize: SizeInt);
 var
   Work: IDenseComplexMatrix;
-  IBlock, JBlock, KBlock, IEnd, JEnd, KEnd, I, J, K: SizeInt;
-  Product: TComplex;
-  SumRe, SumIm, CorrectionRe, CorrectionIm: Double;
 begin
   RequirePositiveBlockSize(BlockSize, 'MultiplyBlockedInto(complex)');
   RequireFinite(A, 'MultiplyBlockedInto(complex)');
@@ -1398,44 +1493,394 @@ begin
     Work := TDenseComplexMatrix.Zeros(A.Rows, B.Cols)
   else
     Work := Destination;
-
-  IBlock := 0;
-  while IBlock < A.Rows do
-  begin
-    IEnd := IBlock + BlockSize;
-    if IEnd > A.Rows then IEnd := A.Rows;
-    JBlock := 0;
-    while JBlock < B.Cols do
-    begin
-      JEnd := JBlock + BlockSize;
-      if JEnd > B.Cols then JEnd := B.Cols;
-      for I := IBlock to IEnd - 1 do
-        for J := JBlock to JEnd - 1 do
-        begin
-          SumRe := 0.0; SumIm := 0.0;
-          CorrectionRe := 0.0; CorrectionIm := 0.0;
-          KBlock := 0;
-          while KBlock < A.Cols do
-          begin
-            KEnd := KBlock + BlockSize;
-            if KEnd > A.Cols then KEnd := A.Cols;
-            for K := KBlock to KEnd - 1 do
-            begin
-              Product := A[I, K] * B[K, J];
-              AddCompensated(Product.Re, SumRe, CorrectionRe);
-              AddCompensated(Product.Im, SumIm, CorrectionIm);
-            end;
-            KBlock := KEnd;
-          end;
-          Work[I, J] := TComplex.Create(
-            SumRe + CorrectionRe, SumIm + CorrectionIm);
-        end;
-      JBlock := JEnd;
-    end;
-    IBlock := IEnd;
-  end;
+  BlockedRowsComplex(A, B, Work, 0, A.Rows, BlockSize);
   if Work <> Destination then
     specialize CopyMatrix<TComplex>(Work, Destination);
+end;
+
+{ Opt-in parallel multiplication. Rows are split into contiguous partitions;
+  the calling thread computes the first and each other partition runs on its
+  own short-lived worker. There is no pool, global setting, or shared mutable
+  state, so concurrent calls from caller threads are independent. On x86
+  targets workers load the caller's x87 control word (and MXCSR on x86-64),
+  so rounding, precision and exception masks match the calling thread. The
+  registers are loaded directly: the RTL Set8087CW/SetMXCSR helpers also
+  overwrite the process-wide defaults used to reset the FPU after exceptions
+  in every thread. A partition whose
+  worker cannot start runs on the calling thread. A worker exception is
+  re-raised in the caller after every worker has been joined; when several
+  partitions fail, the lowest-row partition's exception is raised. }
+type
+  TRowRangeKernel = procedure(const Context: Pointer;
+    const RowStart, RowEnd: SizeInt);
+
+  TSingleMultiplyContext = record
+    A, B, Work: IDenseSingleMatrix;
+    BlockSize: SizeInt;
+  end;
+  PSingleMultiplyContext = ^TSingleMultiplyContext;
+
+  TDoubleMultiplyContext = record
+    A, B, Work: IDenseDoubleMatrix;
+    BlockSize: SizeInt;
+  end;
+  PDoubleMultiplyContext = ^TDoubleMultiplyContext;
+
+  TSingleComplexMultiplyContext = record
+    A, B, Work: IDenseSingleComplexMatrix;
+    BlockSize: SizeInt;
+  end;
+  PSingleComplexMultiplyContext = ^TSingleComplexMultiplyContext;
+
+  TComplexMultiplyContext = record
+    A, B, Work: IDenseComplexMatrix;
+    BlockSize: SizeInt;
+  end;
+  PComplexMultiplyContext = ^TComplexMultiplyContext;
+
+  TRowPartition = record
+    Kernel: TRowRangeKernel;
+    Context: Pointer;
+    RowStart, RowEnd: SizeInt;
+{$IF DEFINED(CPUX86_64) OR DEFINED(CPUI386)}
+    ControlWord: Word;
+{$ENDIF}
+{$IFDEF CPUX86_64}
+    MXCSR: DWord;
+{$ENDIF}
+    Failure: TObject;
+    ThreadId: TThreadID;
+    Started: Boolean;
+  end;
+  PRowPartition = ^TRowPartition;
+
+procedure SingleRowsKernel(const Context: Pointer;
+  const RowStart, RowEnd: SizeInt);
+begin
+  with PSingleMultiplyContext(Context)^ do
+    BlockedRowsSingle(A, B, Work, RowStart, RowEnd, BlockSize);
+end;
+
+procedure DoubleRowsKernel(const Context: Pointer;
+  const RowStart, RowEnd: SizeInt);
+begin
+  with PDoubleMultiplyContext(Context)^ do
+    BlockedRowsDouble(A, B, Work, RowStart, RowEnd, BlockSize);
+end;
+
+procedure SingleComplexRowsKernel(const Context: Pointer;
+  const RowStart, RowEnd: SizeInt);
+begin
+  with PSingleComplexMultiplyContext(Context)^ do
+    BlockedRowsSingleComplex(A, B, Work, RowStart, RowEnd, BlockSize);
+end;
+
+procedure ComplexRowsKernel(const Context: Pointer;
+  const RowStart, RowEnd: SizeInt);
+begin
+  with PComplexMultiplyContext(Context)^ do
+    BlockedRowsComplex(A, B, Work, RowStart, RowEnd, BlockSize);
+end;
+
+procedure RunPartition(const Partition: PRowPartition);
+begin
+  try
+    Partition^.Kernel(Partition^.Context, Partition^.RowStart,
+      Partition^.RowEnd);
+  except
+    Partition^.Failure := TObject(AcquireExceptionObject);
+  end;
+end;
+
+procedure LoadCallerFPUState(const Partition: PRowPartition);
+{$IF DEFINED(CPUX86_64) OR DEFINED(CPUI386)}
+var
+  ControlWord: Word;
+{$IFDEF CPUX86_64}
+  MXCSR: DWord;
+{$ENDIF}
+begin
+  ControlWord := Partition^.ControlWord;
+  asm
+    fnclex
+    fldcw ControlWord
+  end;
+{$IFDEF CPUX86_64}
+  // Load the control bits only; the caller's sticky status flags stay there.
+  MXCSR := Partition^.MXCSR and not DWord($3F);
+  asm
+    ldmxcsr MXCSR
+  end;
+{$ENDIF}
+end;
+{$ELSE}
+begin
+end;
+{$ENDIF}
+
+function PartitionThread(Parameter: Pointer): PtrInt;
+var
+  Partition: PRowPartition;
+begin
+  Partition := PRowPartition(Parameter);
+  LoadCallerFPUState(Partition);
+  RunPartition(Partition);
+  Result := 0;
+end;
+
+procedure RunRowPartitions(const Kernel: TRowRangeKernel;
+  const Context: Pointer; const Rows, Workers: SizeInt);
+var
+  Partitions: array of TRowPartition;
+  Base, Extra, W: SizeInt;
+  Failure: TObject;
+begin
+  if Workers <= 1 then
+  begin
+    Kernel(Context, 0, Rows);
+    Exit;
+  end;
+  Partitions := nil;
+  SetLength(Partitions, Workers);
+  Base := Rows div Workers;
+  Extra := Rows mod Workers;
+  for W := 0 to Workers - 1 do
+  begin
+    Partitions[W].Kernel := Kernel;
+    Partitions[W].Context := Context;
+    Partitions[W].RowStart := W * Base + Min(W, Extra);
+    Partitions[W].RowEnd := Partitions[W].RowStart + Base;
+    if W < Extra then
+      Inc(Partitions[W].RowEnd);
+{$IF DEFINED(CPUX86_64) OR DEFINED(CPUI386)}
+    Partitions[W].ControlWord := Get8087CW;
+{$ENDIF}
+{$IFDEF CPUX86_64}
+    Partitions[W].MXCSR := GetMXCSR;
+{$ENDIF}
+    Partitions[W].Failure := nil;
+    Partitions[W].ThreadId := TThreadID(0);
+    Partitions[W].Started := False;
+  end;
+  try
+    for W := 1 to Workers - 1 do
+    begin
+      try
+        Partitions[W].ThreadId := BeginThread(@PartitionThread,
+          @Partitions[W]);
+      except
+        Partitions[W].ThreadId := TThreadID(0);
+      end;
+      Partitions[W].Started := Partitions[W].ThreadId <> TThreadID(0);
+    end;
+    RunPartition(@Partitions[0]);
+    for W := 1 to Workers - 1 do
+      if not Partitions[W].Started then
+        RunPartition(@Partitions[W]);
+  finally
+    for W := 1 to Workers - 1 do
+      if Partitions[W].Started then
+      begin
+        WaitForThreadTerminate(Partitions[W].ThreadId, 0);
+        CloseThread(Partitions[W].ThreadId);
+      end;
+  end;
+  Failure := nil;
+  for W := 0 to Workers - 1 do
+    if Partitions[W].Failure <> nil then
+    begin
+      if Failure = nil then
+        Failure := Partitions[W].Failure
+      else
+        Partitions[W].Failure.Free;
+    end;
+  if Failure <> nil then
+    raise Failure;
+end;
+
+function DenseThreadingAvailable: Boolean;
+{$IFDEF UNIX}
+var
+  Manager: TThreadManager;
+{$ENDIF}
+begin
+{$IF DEFINED(MSWINDOWS)}
+  Result := True;
+{$ELSEIF DEFINED(UNIX)}
+  // Without cthreads the RTL keeps its no-thread manager, whose InitManager
+  // is nil; starting a thread there is a fatal runtime error.
+  Manager := Default(TThreadManager);
+  Result := GetThreadManager(Manager) and Assigned(Manager.InitManager);
+{$ELSE}
+  Result := False;
+{$ENDIF}
+end;
+
+procedure RequireWorkerCount(const WorkerCount: SizeInt;
+  const Operation: string);
+begin
+  if (WorkerCount < 1) or (WorkerCount > DENSE_PARALLEL_MAX_WORKERS) then
+    raise EDenseMatrixError.CreateFmt(
+      '%s: WorkerCount must be in 1..%d; got %d.',
+      [Operation, DENSE_PARALLEL_MAX_WORKERS, WorkerCount]);
+end;
+
+function EffectiveMultiplyWorkers(const Rows, InnerDimension, Columns,
+  RequestedWorkers: SizeInt): SizeInt;
+var
+  Operations, Capacity: QWord;
+begin
+  if (Rows < 0) or (InnerDimension < 0) or (Columns < 0) then
+    raise EDenseMatrixError.Create(
+      'EffectiveMultiplyWorkers: dimensions must be non-negative.');
+  RequireWorkerCount(RequestedWorkers, 'EffectiveMultiplyWorkers');
+  Result := 1;
+  if (RequestedWorkers = 1) or (Rows < 2) or (InnerDimension = 0) or
+     (Columns = 0) or not DenseThreadingAvailable then
+    Exit;
+  if QWord(Rows) > High(QWord) div QWord(InnerDimension) then
+    Operations := High(QWord)
+  else
+  begin
+    Operations := QWord(Rows) * QWord(InnerDimension);
+    if Operations > High(QWord) div QWord(Columns) then
+      Operations := High(QWord)
+    else
+      Operations := Operations * QWord(Columns);
+  end;
+  Capacity := Operations div DENSE_PARALLEL_MIN_WORK_PER_WORKER;
+  Result := RequestedWorkers;
+  if Result > Rows then
+    Result := Rows;
+  if QWord(Result) > Capacity then
+    Result := SizeInt(Capacity);
+  if Result < 2 then
+    Result := 1;
+end;
+
+procedure MultiplyParallelInto(const A, B, Destination: IDenseSingleMatrix;
+  const WorkerCount: SizeInt; const BlockSize: SizeInt);
+const
+  Operation = 'MultiplyParallelInto(single)';
+var
+  Context: TSingleMultiplyContext;
+begin
+  RequireWorkerCount(WorkerCount, Operation);
+  RequirePositiveBlockSize(BlockSize, Operation);
+  RequireFinite(A, Operation);
+  RequireFinite(B, Operation);
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      '%s: inner dimensions must match; got %d x %d and %d x %d.',
+      [Operation, A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<Single>(Destination, A.Rows, B.Cols,
+    Operation);
+  Context.A := A;
+  Context.B := B;
+  Context.BlockSize := BlockSize;
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Context.Work := TDenseSingleMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Context.Work := Destination;
+  RunRowPartitions(@SingleRowsKernel, @Context, A.Rows,
+    EffectiveMultiplyWorkers(A.Rows, A.Cols, B.Cols, WorkerCount));
+  if Context.Work <> Destination then
+    specialize CopyMatrix<Single>(Context.Work, Destination);
+end;
+
+procedure MultiplyParallelInto(const A, B, Destination: IDenseDoubleMatrix;
+  const WorkerCount: SizeInt; const BlockSize: SizeInt);
+const
+  Operation = 'MultiplyParallelInto(double)';
+var
+  Context: TDoubleMultiplyContext;
+begin
+  RequireWorkerCount(WorkerCount, Operation);
+  RequirePositiveBlockSize(BlockSize, Operation);
+  RequireFinite(A, Operation);
+  RequireFinite(B, Operation);
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      '%s: inner dimensions must match; got %d x %d and %d x %d.',
+      [Operation, A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<Double>(Destination, A.Rows, B.Cols,
+    Operation);
+  Context.A := A;
+  Context.B := B;
+  Context.BlockSize := BlockSize;
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Context.Work := TDenseDoubleMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Context.Work := Destination;
+  RunRowPartitions(@DoubleRowsKernel, @Context, A.Rows,
+    EffectiveMultiplyWorkers(A.Rows, A.Cols, B.Cols, WorkerCount));
+  if Context.Work <> Destination then
+    specialize CopyMatrix<Double>(Context.Work, Destination);
+end;
+
+procedure MultiplyParallelInto(const A, B, Destination:
+  IDenseSingleComplexMatrix; const WorkerCount: SizeInt;
+  const BlockSize: SizeInt);
+const
+  Operation = 'MultiplyParallelInto(single complex)';
+var
+  Context: TSingleComplexMultiplyContext;
+begin
+  RequireWorkerCount(WorkerCount, Operation);
+  RequirePositiveBlockSize(BlockSize, Operation);
+  RequireFinite(A, Operation);
+  RequireFinite(B, Operation);
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      '%s: inner dimensions must match; got %d x %d and %d x %d.',
+      [Operation, A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<TSingleComplex>(Destination,
+    A.Rows, B.Cols, Operation);
+  Context.A := A;
+  Context.B := B;
+  Context.BlockSize := BlockSize;
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Context.Work := TDenseSingleComplexMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Context.Work := Destination;
+  RunRowPartitions(@SingleComplexRowsKernel, @Context, A.Rows,
+    EffectiveMultiplyWorkers(A.Rows, A.Cols, B.Cols, WorkerCount));
+  if Context.Work <> Destination then
+    specialize CopyMatrix<TSingleComplex>(Context.Work, Destination);
+end;
+
+procedure MultiplyParallelInto(const A, B, Destination: IDenseComplexMatrix;
+  const WorkerCount: SizeInt; const BlockSize: SizeInt);
+const
+  Operation = 'MultiplyParallelInto(complex)';
+var
+  Context: TComplexMultiplyContext;
+begin
+  RequireWorkerCount(WorkerCount, Operation);
+  RequirePositiveBlockSize(BlockSize, Operation);
+  RequireFinite(A, Operation);
+  RequireFinite(B, Operation);
+  if A.Cols <> B.Rows then
+    raise EDenseMatrixError.CreateFmt(
+      '%s: inner dimensions must match; got %d x %d and %d x %d.',
+      [Operation, A.Rows, A.Cols, B.Rows, B.Cols]);
+  specialize RequireDestinationShape<TComplex>(Destination, A.Rows, B.Cols,
+    Operation);
+  Context.A := A;
+  Context.B := B;
+  Context.BlockSize := BlockSize;
+  if (Destination.StorageIdentity = A.StorageIdentity) or
+     (Destination.StorageIdentity = B.StorageIdentity) then
+    Context.Work := TDenseComplexMatrix.Zeros(A.Rows, B.Cols)
+  else
+    Context.Work := Destination;
+  RunRowPartitions(@ComplexRowsKernel, @Context, A.Rows,
+    EffectiveMultiplyWorkers(A.Rows, A.Cols, B.Cols, WorkerCount));
+  if Context.Work <> Destination then
+    specialize CopyMatrix<TComplex>(Context.Work, Destination);
 end;
 
 procedure MultiplyAutoInto(const A, B, Destination: IDenseDoubleMatrix);

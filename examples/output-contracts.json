@@ -315,6 +315,15 @@
         "Artifacts contain prediction parameters and explicit input conventions."
       ],
       "final_line": "prediction persistence: success"
+    },
+    {
+      "path": "examples/52_parallel_multiply.pas",
+      "contains": [
+        "product 240x200x180: parallel and serial results are bitwise identical",
+        "small 16x16x16 product: 1 worker (no thread start-up)",
+        "worker counts outside 1..64 are rejected before any write"
+      ],
+      "final_line": "parallel multiply: success"
     }
   ]
 }

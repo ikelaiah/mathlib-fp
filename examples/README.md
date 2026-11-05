@@ -64,6 +64,7 @@ closest to your project. For a shorter task-first route, use the
 | `49_count_rates.pas` | StatsLib | Fit unequal Poisson exposure and predict new expected counts and rates |
 | `50_frequency_weighted_glm.pas` | StatsLib | Store repeated observations once and verify weighted GLM predictions against explicit replication |
 | `51_prediction_persistence.pas` | InterchangeLib | Project, save and reload GLM/PLS predictions and produce artifacts for a separate consumer |
+| `52_parallel_multiply.pas` | AlgebraLib | Multiply a large dense product with caller-chosen workers and confirm bitwise agreement with the serial kernel |
 
 ## Build and run
 

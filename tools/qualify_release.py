@@ -640,6 +640,20 @@ def main() -> int:
                  "--compiler", args.compiler,
                  "--work-dir", str(qualification.work / "prediction-persistence")],
             )
+        if tuple(int(part) for part in args.release.split('.')) >= (2, 15, 0):
+            qualification.run(
+                "parallel-multiply-contract",
+                [sys.executable, str(ROOT / "tools/test_parallel_multiply.py")],
+            )
+            qualification.run(
+                "parallel-multiply-evidence",
+                [sys.executable, str(ROOT / "tools/check_parallel_multiply.py"),
+                 "--compiler", args.compiler,
+                 "--work-dir", str(qualification.work / "parallel-multiply"),
+                 "--result",
+                 str(qualification.work / "parallel-multiply-results.json")],
+                timeout=1800,
+            )
         convergence_gate(qualification)
         portability_gate(qualification, args.compiler)
         if not args.skip_package:
