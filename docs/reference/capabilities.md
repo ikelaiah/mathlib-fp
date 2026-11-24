@@ -8,6 +8,7 @@ Target qualifications and platform-specific limitations are defined by the
 | Family | Maturity | Scalar paths | Important limitations |
 | --- | --- | --- | --- |
 | Complex scalar arithmetic | Stable | Single and double complex; elementary principal functions are double only | Single complex exposes the arithmetic needed by typed kernels, not the double elementary-function catalogue |
+| Special Functions III | 2.16.0 candidate | Double real | Positive gamma shapes, zeta above one, two real Lambert W branches, Bessel orders 0–32, and Airy functions and derivatives on `[-100, 120]` |
 | Array vector kernels | Stable | Double real and complex | The 1.3 array facade is retained; typed matrices provide the new single paths |
 | Typed dense storage and views | Stable | Single/double real/complex | Dense row-major only; no broadcasting |
 | Small 2x2 value arithmetic | Stable | Single/double real/complex | 2x2 only; batch iteration is explicit |
@@ -60,10 +61,11 @@ Target qualifications and platform-specific limitations are defined by the
 | Opt-in parallel dense multiplication | Stable | Single/double real/complex | Caller-chosen 1–64 workers, bitwise equal to the serial blocked kernel; multiplication only |
 | Automatic parallel/SIMD dispatch | Unsupported | — | No thread pool, global parallel setting, or vector-intrinsic API |
 
-This is the 2.15.0 capability inventory. It adds opt-in parallel dense
-multiplication for all four scalar kinds whose results are bitwise identical to
-the serial blocked kernel. Qualification status is recorded in the
-[current release report](../releases/2.15.0/qualification.md). It retains
+This is the 2.16.0 candidate capability inventory. It adds real-double special
+functions with bounded domains and retains opt-in parallel dense multiplication
+for all four scalar kinds with bitwise agreement with the serial blocked
+kernel. Qualification status is recorded in the
+[candidate release report](../releases/2.16.0/qualification.md). It retains
 GLM/PLS prediction persistence, frequency-weighted offset/exposure GLMs, grouped and chronological validation,
 PLS1 regression, stable SOS IIR filtering and reusable spectral processing.
 Sparse direct solving now includes a

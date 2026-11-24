@@ -5,7 +5,7 @@ unit TestSpecialFunctions;
 interface
 
 uses
-  Classes, SysUtils, Math, fpcunit, testregistry,
+  Classes, SysUtils, Math, TypInfo, fpcunit, testregistry,
   MathBase.SpecialFunctions;
 
 type
@@ -20,6 +20,13 @@ type
     procedure TestDomainAndEndpoints;
   end;
 
+  TTestSpecialFunctionsIII = class(TTestCase)
+  published
+    procedure TestIndependentReferences;
+    procedure TestDomainsAndPoles;
+    procedure TestAiryWronskian;
+  end;
+
 implementation
 
 type
@@ -28,6 +35,19 @@ type
   end;
 
 {$I BesselReference.inc}
+
+type
+  TSpecialFunctionKind = (sfDigamma, sfPolygamma, sfZeta, sfLambertW,
+    sfJ, sfY, sfI, sfK, sfAi, sfBi, sfAiPrime, sfBiPrime);
+
+  TSpecialFunctionReference = record
+    Kind: TSpecialFunctionKind;
+    Order: Integer;
+    X, Expected: Double;
+    InfinitySign: Integer;
+  end;
+
+{$I SpecialFunctionsIIIReference.inc}
 
 procedure TTestBessel.CheckReference(const LabelText: String;
   const Expected, Actual: Double);
@@ -107,7 +127,134 @@ begin
   AssertTrue('Y1 +Infinity', IsNan(BesselY1(Infinity)));
 end;
 
+procedure TTestSpecialFunctionsIII.TestIndependentReferences;
+var
+  R: TSpecialFunctionReference;
+  Actual, AbsoluteBudget, RelativeBudget, Allowed: Double;
+  LabelText: String;
+begin
+  for R in SpecialFunctionReferences do
+  begin
+    AbsoluteBudget := 2E-323;
+    RelativeBudget := 2E-12;
+    case R.Kind of
+      sfDigamma: begin
+        Actual := Digamma(R.X);
+        AbsoluteBudget := 2E-14;
+        RelativeBudget := 2E-13;
+      end;
+      sfPolygamma: Actual := Polygamma(R.Order, R.X);
+      sfZeta: begin
+        Actual := RiemannZeta(R.X);
+        RelativeBudget := 2E-14;
+      end;
+      sfLambertW: begin
+        Actual := LambertW(R.X, R.Order);
+        RelativeBudget := 1E-13;
+      end;
+      sfJ: begin
+        Actual := BesselJ(R.Order, R.X);
+        if Abs(R.X) >= R.Order then AbsoluteBudget := 8E-13;
+      end;
+      sfY: begin
+        Actual := BesselY(R.Order, R.X);
+        AbsoluteBudget := 8E-13;
+        RelativeBudget := 1E-11;
+      end;
+      sfI: Actual := ModifiedBesselI(R.Order, R.X);
+      sfK: begin
+        Actual := ModifiedBesselK(R.Order, R.X);
+        { The established, unscaled K0/K1 Chebyshev bases lose relative
+          precision as their magnitude decays toward the upper endpoint. }
+        if (R.X > 2.0) and (R.X < 16.0) then
+          RelativeBudget := 2E-10;
+      end;
+      sfAi: Actual := AiryAi(R.X);
+      sfBi: Actual := AiryBi(R.X);
+      sfAiPrime: Actual := AiryAiPrime(R.X);
+      sfBiPrime: Actual := AiryBiPrime(R.X);
+    end;
+    if R.Kind >= sfAi then
+    begin
+      RelativeBudget := 5E-12;
+      if R.X <= 0.0 then AbsoluteBudget := 2E-12;
+    end;
+    LabelText := Format('%s[%d](%.17g)',
+      [GetEnumName(TypeInfo(TSpecialFunctionKind), Ord(R.Kind)), R.Order, R.X]);
+    if R.InfinitySign <> 0 then
+    begin
+      AssertTrue(LabelText + ' expected signed infinity', IsInfinite(Actual) and
+        ((Actual > 0) = (R.InfinitySign > 0)));
+      Continue;
+    end;
+    AssertFalse(LabelText + ' expected a finite value',
+      IsNan(Actual) or IsInfinite(Actual));
+    Allowed := Max(AbsoluteBudget, RelativeBudget * Abs(R.Expected));
+    AssertTrue(LabelText + Format(': expected %.17g, got %.17g (budget %.4g)',
+      [R.Expected, Actual, Allowed]), Abs(Actual - R.Expected) <= Allowed);
+  end;
+end;
+
+procedure TTestSpecialFunctionsIII.TestDomainsAndPoles;
+const
+  BranchPoint: Double = -0.36787944117144233;
+  MinSubnormal: Double = 4.9406564584124654E-324;
+var
+  UnderflowValue: Double;
+  UnderflowBits: QWord;
+begin
+  AssertTrue('negative digamma argument', IsNan(Digamma(-1.0)));
+  AssertTrue('NaN digamma argument', IsNan(Digamma(NaN)));
+  AssertTrue('digamma pole', IsInfinite(Digamma(0.0)) and (Digamma(0.0) < 0));
+  AssertEquals('order zero delegates to digamma', Digamma(0.5), Polygamma(0, 0.5), 0.0);
+  AssertTrue('signed trigamma pole', IsInfinite(Polygamma(1, 0.0)) and
+    (Polygamma(1, 0.0) > 0));
+  AssertTrue('signed second derivative pole', IsInfinite(Polygamma(2, 0.0)) and
+    (Polygamma(2, 0.0) < 0));
+  AssertTrue('negative polygamma order', IsNan(Polygamma(-1, 1.0)));
+  AssertTrue('polygamma order bound', IsNan(Polygamma(17, 1.0)));
+  AssertTrue('polygamma nonfinite', IsNan(Polygamma(1, Infinity)));
+  AssertTrue('zeta pole', IsInfinite(RiemannZeta(1.0)) and (RiemannZeta(1.0) > 0));
+  AssertTrue('zeta outside convergent domain', IsNan(RiemannZeta(0.5)));
+  AssertTrue('nonfinite zeta argument', IsNan(RiemannZeta(Infinity)));
+  AssertEquals('W0 branch point', -1.0, LambertW(BranchPoint, 0), 0.0);
+  AssertEquals('W-1 branch point', -1.0, LambertW(BranchPoint, -1), 0.0);
+  AssertTrue('below branch point', IsNan(LambertW(-0.36787944117144239, 0)));
+  AssertTrue('unsupported Lambert branch', IsNan(LambertW(0.0, 1)));
+  AssertTrue('W-1 positive argument', IsNan(LambertW(0.1, -1)));
+  AssertTrue('W-1 zero limit', IsInfinite(LambertW(0.0, -1)) and
+    (LambertW(0.0, -1) < 0));
+  AssertTrue('W0 retains the smallest positive subnormal',
+    LambertW(MinSubnormal, 0) = MinSubnormal);
+  AssertTrue('unsupported Bessel order', IsNan(BesselJ(33, 1.0)));
+  AssertTrue('Bessel argument limit', IsNan(BesselJ(2, 101.0)));
+  AssertTrue('invalid Y argument', IsNan(BesselY(2, -1.0)));
+  AssertTrue('invalid I order', IsNan(ModifiedBesselI(-1, 1.0)));
+  AssertTrue('invalid K argument', IsNan(ModifiedBesselK(2, -1.0)));
+  AssertTrue('Y pole', IsInfinite(BesselY(3, 0.0)) and (BesselY(3, 0.0) < 0));
+  AssertTrue('K pole', IsInfinite(ModifiedBesselK(3, 0.0)) and
+    (ModifiedBesselK(3, 0.0) > 0));
+  AssertEquals('J2 underflows at a tiny positive argument', 0.0, BesselJ(2, 1E-200), 0.0);
+  AssertTrue('Airy domain limit', IsNan(AiryAi(-100.1)));
+  AssertTrue('Airy argument must be finite', IsNan(AiryBiPrime(Infinity)));
+  UnderflowValue := AiryAiPrime(120.0);
+  Move(UnderflowValue, UnderflowBits, SizeOf(UnderflowBits));
+  AssertTrue('Airy underflow preserves derivative sign', UnderflowBits = QWord(1) shl 63);
+end;
+
+procedure TTestSpecialFunctionsIII.TestAiryWronskian;
+const
+  Points: array[0..7] of Double = (-100.0, -12.0, -10.25, -1.0, 0.0, 0.5, 12.0, 50.0);
+var
+  X: Double;
+begin
+  for X in Points do
+    AssertEquals(Format('Airy Wronskian at %.17g', [X]), 1.0 / Pi,
+      AiryAi(X) * AiryBiPrime(X) - AiryAiPrime(X) * AiryBi(X), 8E-13);
+end;
+
 initialization
   RegisterTest(TTestBessel);
+  RegisterTest(TTestSpecialFunctionsIII);
 
 end.

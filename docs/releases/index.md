@@ -2,7 +2,17 @@
 
 Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.15.0 — current release
+## 2.16.0 — release candidate
+
+- [Release notes](2.16.0/release-notes.md)
+- [Qualification and validation](2.16.0/qualification.md)
+- [Workflow qualification](2.16.0/workflow-qualification.md)
+- [API reference](../reference/api/reference-2.16.0.md)
+- [Numerical catalogue](2.16.0/numerical-evidence.json) and [provenance](2.16.0/numerical-evidence-provenance.md)
+- [Performance contract](2.16.0/performance-evidence.json)
+- [Release review notes](2.16.0/pr-notes.md)
+
+## 2.15.0 — qualified source tree
 
 - [Release notes](2.15.0/release-notes.md)
 - [Qualification and validation](2.15.0/qualification.md)
@@ -12,7 +22,7 @@ Release notes, qualification records, audits, manifests, and machine-readable ev
 - [Performance contract](2.15.0/performance-evidence.json) and [parallel multiplication evidence](2.15.0/parallel-multiply-win64.json)
 - [Release review notes](2.15.0/pr-notes.md)
 
-## 2.14.0 — previous stable release
+## 2.14.0 — published stable release
 
 - [Release notes](2.14.0/release-notes.md)
 - [Qualification and validation](2.14.0/qualification.md)

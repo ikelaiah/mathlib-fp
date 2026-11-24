@@ -3,6 +3,8 @@ unit MathBase.SpecialFunctions;
 { Real Double special functions. The 2.1 development slices cover cylindrical
   Bessel J/Y and modified Bessel I/K of orders zero and one, plus bounded real
   Legendre elliptic integrals and Jacobi elliptic sn/cn/dn functions.
+  Special Functions III extends the real catalogue to higher integer orders,
+  gamma derivatives, convergent zeta, real Lambert W, and Airy solutions.
 
   Formula sources:
     https://dlmf.nist.gov/10.2  (J series)
@@ -83,6 +85,30 @@ function ExponentialIntegralE1(const X: Double): Double;
 { Real Gauss 2F1 for A,B in [-16,16], C in [0.5,32], and |X| <= 0.75.
   Nonfinite, out-of-range, and nonconvergent inputs return NaN. }
 function GaussHypergeometric2F1(const A, B, C, X: Double): Double;
+
+{ Integer orders 0..32. J and I accept |X| <= 100 and obey integer parity.
+  Y and K accept 0 <= X <= 100 and return signed infinities at their poles. }
+function BesselJ(const Order: Integer; const X: Double): Double;
+function BesselY(const Order: Integer; const X: Double): Double;
+function ModifiedBesselI(const Order: Integer; const X: Double): Double;
+function ModifiedBesselK(const Order: Integer; const X: Double): Double;
+
+{ Digamma and its derivatives on X >= 0, with signed poles at zero.
+  Polygamma supports orders 0..16. Order zero is digamma. Zeta accepts S >= 1
+  and returns +Infinity at one. Invalid or nonfinite inputs return NaN. }
+function Digamma(const X: Double): Double;
+function Polygamma(const Order: Integer; const X: Double): Double;
+function RiemannZeta(const S: Double): Double;
+
+{ Real Lambert W branches 0 and -1. Both meet at the binary64 approximation
+  of -1/e. Branch -1 accepts nonpositive inputs and tends to -Infinity at zero. }
+function LambertW(const X: Double; const Branch: Integer): Double;
+
+{ Airy functions and first derivatives on finite [-100, 120]. }
+function AiryAi(const X: Double): Double;
+function AiryBi(const X: Double): Double;
+function AiryAiPrime(const X: Double): Double;
+function AiryBiPrime(const X: Double): Double;
 
 implementation
 
@@ -407,6 +433,8 @@ const
   EulerGamma = 0.57721566490153286061;
   TwoOverPi = 0.63661977236758134308;
   MaxBesselArgument = 100.0;
+  MaxBesselOrder = 32;
+  MaxPolygammaOrder = 16;
   MaxExponentialIntegralArgument = 100.0;
   MaxJacobiEllipticArgument = 100.0;
   MaxHypergeometricParameter = 16.0;
@@ -433,16 +461,26 @@ begin
   Result := T * B1 - B2 + 0.5 * Coefficients[0];
 end;
 
+{ First term (X/2)^Order/Order!, formed as a product to avoid a large power
+  and factorial. The two original orders keep their evaluation order. }
+function BesselFirstTerm(const X: Double; const Order: Integer): Double;
+var
+  K: Integer;
+begin
+  if Order = 1 then
+    Exit(0.5 * X);
+  Result := 1.0;
+  for K := 1 to Order do
+    Result := Result * (0.5 * X / K);
+end;
+
 function ModifiedBesselISeries(const X: Double; const Order: Integer): Double;
 var
   K: Integer;
   Q, Term: Double;
 begin
   Q := Sqr(0.5 * X);
-  if Order = 0 then
-    Term := 1.0
-  else
-    Term := 0.5 * X;
+  Term := BesselFirstTerm(X, Order);
   Result := Term;
   for K := 1 to 256 do
   begin
@@ -525,16 +563,14 @@ var
   Q, Term: Double;
 begin
   Q := Sqr(0.5 * X);
-  if Order = 0 then
-    Term := 1.0
-  else
-    Term := 0.5 * X;
+  Term := BesselFirstTerm(X, Order);
   Result := Term;
   for K := 1 to 80 do
   begin
     Term := -Term * Q / (K * (K + Order));
     Result := Result + Term;
-    if Abs(Term) < 1E-17 then
+    if ((Order < 2) and (Abs(Term) < 1E-17)) or
+      ((Order >= 2) and (Abs(Term) <= Abs(Result) * 1E-17)) then
       Break;
   end;
 end;
@@ -734,6 +770,531 @@ begin
     Result := ChebyshevValue(X, 9.0, 7.0, K1MiddleChebyshev)
   else
     Result := ModifiedBesselKAsymptotic(X, 1);
+end;
+
+function ValidBesselInput(const Order: Integer; const X: Double): Boolean;
+begin
+  Result := (Order >= 0) and (Order <= MaxBesselOrder) and
+    not (IsNan(X) or IsInfinite(X)) and (Abs(X) <= MaxBesselArgument);
+end;
+
+function BesselJ(const Order: Integer; const X: Double): Double;
+var
+  K: Integer;
+  AX, Base0, Base1, Previous, Current, Next, Target: Double;
+begin
+  if not ValidBesselInput(Order, X) then
+    Exit(NaN);
+  case Order of
+    0: Exit(BesselJ0(X));
+    1: Exit(BesselJ1(X));
+  end;
+  AX := Abs(X);
+  if AX <= 4.0 then
+    Result := JSeries(AX, Order)
+  else
+  begin
+    Base0 := BesselJ0(AX);
+    Base1 := BesselJ1(AX);
+    if Order <= AX then
+    begin
+      Previous := Base0;
+      Current := Base1;
+      for K := 1 to Order - 1 do
+      begin
+        Next := (2.0 * K / AX) * Current - Previous;
+        Previous := Current;
+        Current := Next;
+      end;
+      Result := Current;
+    end
+    else
+    begin
+      { Miller recurrence for the recessive solution beyond the turning point.
+        For the bounded orders and AX > 4 the 40 extra steps remain finite. }
+      Previous := 0.0;
+      Current := 1.0;
+      Target := 0.0;
+      for K := Order + 40 downto 1 do
+      begin
+        Next := (2.0 * K / AX) * Current - Previous;
+        Previous := Current;
+        Current := Next;
+        if K = Order + 1 then
+          Target := Current;
+      end;
+      { Pick the base value farther from its zeros to normalize the sequence. }
+      if Abs(Base0) >= Abs(Base1) then
+        Result := Base0 * (Target / Current)
+      else
+        Result := Base1 * (Target / Previous);
+    end;
+  end;
+  if (X < 0.0) and Odd(Order) then
+    Result := -Result;
+end;
+
+function ForwardBessel(const Order: Integer; const X, V0, V1: Double;
+  const Modified: Boolean): Double;
+var
+  K: Integer;
+  Previous, Current, Next, Divisor, Limit: Double;
+begin
+  Previous := V0;
+  Current := V1;
+  if IsInfinite(Current) then
+    Exit(Current);
+  for K := 1 to Order - 1 do
+  begin
+    Divisor := X / (2.0 * K);
+    if Divisor < 1.0 then
+    begin
+      Limit := MaxDouble;
+      if Modified then
+        Limit := Limit - Previous;
+      if Abs(Current) > Limit * Divisor then
+      begin
+        if Modified then
+          Exit(Infinity);
+        Exit(-Infinity);
+      end;
+    end;
+    Next := Current / Divisor;
+    if Modified then
+      Next := Next + Previous
+    else
+      Next := Next - Previous;
+    Previous := Current;
+    Current := Next;
+  end;
+  Result := Current;
+end;
+
+function BesselY(const Order: Integer; const X: Double): Double;
+begin
+  if not ValidBesselInput(Order, X) or (X < 0.0) then
+    Exit(NaN);
+  case Order of
+    0: Exit(BesselY0(X));
+    1: Exit(BesselY1(X));
+  end;
+  if X = 0.0 then
+    Exit(-Infinity);
+  Result := ForwardBessel(Order, X, BesselY0(X), BesselY1(X), False);
+end;
+
+function ModifiedBesselI(const Order: Integer; const X: Double): Double;
+begin
+  if not ValidBesselInput(Order, X) then
+    Exit(NaN);
+  { The nonalternating series avoids the unstable upward I recurrence. }
+  Result := ModifiedBesselISeries(Abs(X), Order);
+  if (X < 0.0) and Odd(Order) then
+    Result := -Result;
+end;
+
+function ModifiedBesselK(const Order: Integer; const X: Double): Double;
+begin
+  if not ValidBesselInput(Order, X) or (X < 0.0) then
+    Exit(NaN);
+  case Order of
+    0: Exit(ModifiedBesselK0(X));
+    1: Exit(ModifiedBesselK1(X));
+  end;
+  if X = 0.0 then
+    Exit(Infinity);
+  Result := ForwardBessel(Order, X, ModifiedBesselK0(X), ModifiedBesselK1(X), True);
+end;
+
+function ExpInDoubleRange(const Exponent: Double): Double;
+const
+  LogMaxDouble: Double = 709.78271289338397;
+  LogHalfMinSubnormal: Double = -745.1332191019411;
+begin
+  if Exponent > LogMaxDouble then
+    Exit(Infinity);
+  if Exponent < LogHalfMinSubnormal then
+    Exit(0.0);
+  Result := Exp(Exponent);
+end;
+
+function Digamma(const X: Double): Double;
+const
+  BernoulliOverOrder: array[1..7] of Double = (
+    0.08333333333333333333, -0.00833333333333333333,
+    0.00396825396825396825, -0.00416666666666666667,
+    0.00757575757575757576, -0.02109279609279609280,
+    0.08333333333333333333);
+var
+  K: Integer;
+  Y, Inverse, Q, Correction: Double;
+begin
+  if IsNan(X) or IsInfinite(X) or (X < 0.0) then
+    Exit(NaN);
+  if (X < 1.0) and (X * MaxDouble <= 1.0) then
+    Exit(-Infinity);
+  Y := X;
+  Result := 0.0;
+  while Y < 16.0 do
+  begin
+    Result := Result - 1.0 / Y;
+    Y := Y + 1.0;
+  end;
+  { DLMF 5.11.2. Seven Bernoulli terms suffice after shifting to 16. }
+  Inverse := 1.0 / Y;
+  Q := Sqr(Inverse);
+  Correction := BernoulliOverOrder[High(BernoulliOverOrder)];
+  for K := High(BernoulliOverOrder) - 1 downto Low(BernoulliOverOrder) do
+    Correction := BernoulliOverOrder[K] + Q * Correction;
+  Result := Result + (Ln(Y) - 0.5 * Inverse - Q * Correction);
+end;
+
+{ Euler--Maclaurin tail for sum (X+k)^(-S), divided by X^(1-S).
+  Keeping the tail normalized avoids prematurely underflowing X^(-S). }
+function NormalizedZetaTail(const S, X: Double): Double;
+const
+  BernoulliOverFactorial: array[1..8] of Double = (
+    0.08333333333333333333, -0.00138888888888888889,
+    0.000033068783068783068783, -8.267195767195767196E-7,
+    2.087675698786809898E-8, -5.284190138687493185E-10,
+    1.338253653068467883E-11, -3.389680296322582867E-13);
+var
+  K: Integer;
+  Inverse, InverseSquare, Term: Double;
+begin
+  Inverse := 1.0 / X;
+  InverseSquare := Sqr(Inverse);
+  Result := 1.0 / (S - 1.0) + 0.5 * Inverse;
+  Term := S * InverseSquare;
+  for K := Low(BernoulliOverFactorial) to High(BernoulliOverFactorial) do
+  begin
+    Result := Result + BernoulliOverFactorial[K] * Term;
+    Term := Term * ((S + 2.0 * K - 1.0) * (S + 2.0 * K)) * InverseSquare;
+  end;
+end;
+
+function Polygamma(const Order: Integer; const X: Double): Double;
+const
+  TailStart = 32.0;
+var
+  K: Integer;
+  Factorial, S, Y, LogX, Normalized, Exponent: Double;
+begin
+  if Order = 0 then
+    Exit(Digamma(X));
+  if (Order < 0) or (Order > MaxPolygammaOrder) or IsNan(X) or
+    IsInfinite(X) or (X < 0.0) then
+    Exit(NaN);
+  if X = 0.0 then
+    Result := Infinity
+  else
+  begin
+    Factorial := 1.0;
+    for K := 2 to Order do
+      Factorial := Factorial * K;
+    S := Order + 1.0;
+    LogX := Ln(X);
+    if X >= TailStart then
+      Exponent := Ln(Factorial) - Order * LogX + Ln(NormalizedZetaTail(S, X))
+    else
+    begin
+      { DLMF 5.15.1 and derivatives. Factor out X^(-S) before summing. }
+      Normalized := 1.0;
+      Y := X + 1.0;
+      while Y < TailStart do
+      begin
+        Normalized := Normalized + Exp(S * (LogX - Ln(Y)));
+        Y := Y + 1.0;
+      end;
+      Normalized := Normalized + Exp(S * (LogX - Ln(Y)) + Ln(Y)) *
+        NormalizedZetaTail(S, Y);
+      Exponent := Ln(Factorial) - S * LogX + Ln(Normalized);
+    end;
+    Result := ExpInDoubleRange(Exponent);
+  end;
+  if not Odd(Order) then
+    Result := -Result;
+end;
+
+function RiemannZeta(const S: Double): Double;
+var
+  K: Integer;
+begin
+  if IsNan(S) or IsInfinite(S) or (S < 1.0) then
+    Exit(NaN);
+  if S = 1.0 then
+    Exit(Infinity);
+  if S > 64.0 then
+    Exit(1.0);
+  { DLMF 25.2.9. Add the smallest contributions first. }
+  Result := Exp((1.0 - S) * Ln(32.0)) * NormalizedZetaTail(S, 32.0);
+  for K := 31 downto 2 do
+    Result := Result + Exp(-S * Ln(Double(K)));
+  Result := 1.0 + Result;
+end;
+
+function LambertW(const X: Double; const Branch: Integer): Double;
+const
+  BranchPoint: Double = -0.36787944117144233;
+  OneOverELow: Double = -1.2428753672788363E-17;
+  EValue: Double = 2.7182818284590452354;
+  RelativeTolerance: Double = 4.4408920985006262E-16;
+  BranchSeries: array[1..7] of Double = (
+    1.0, -0.33333333333333333333, 0.15277777777777777778,
+    -0.07962962962962962963, 0.04450231481481481481,
+    -0.02598471487360376249, 0.01563563253233392122);
+var
+  K: Integer;
+  DirectEquation: Boolean;
+  P, W, LogArgument, Residual, ResidualScale, Derivative, Next, ExpW: Double;
+begin
+  if ((Branch <> 0) and (Branch <> -1)) or IsNan(X) or IsInfinite(X) or
+    (X < BranchPoint) or ((Branch = -1) and (X > 0.0)) then
+    Exit(NaN);
+  if X = BranchPoint then
+    Exit(-1.0);
+  if (Branch = -1) and (X = 0.0) then
+    Exit(-Infinity);
+  if (Branch = 0) and (Abs(X) < 1E-8) then
+    Exit(X + X * X * (-1.0 + 1.5 * X));
+
+  LogArgument := Ln(Abs(X));
+  if X < 0.0 then
+  begin
+    { A split constant retains the distance from the real branch point at
+      the first representable inputs on its right. }
+    P := Sqrt(2.0 * EValue * ((X - BranchPoint) + OneOverELow));
+    if P <= 0.02 then
+    begin
+      if Branch = -1 then
+        P := -P;
+      W := BranchSeries[High(BranchSeries)];
+      for K := High(BranchSeries) - 1 downto Low(BranchSeries) do
+        W := BranchSeries[K] + P * W;
+      Exit(-1.0 + P * W);
+    end;
+    if Branch = -1 then
+    begin
+      if X > -0.2 then
+        W := LogArgument - Ln(-LogArgument)
+      else
+        W := -1.0 - P;
+    end
+    else if X > -0.2 then
+      W := X
+    else
+      W := Min(-0.05, -1.0 + P);
+  end
+  else if X <= 1.0 then
+    W := X
+  else if X <= EValue then
+    W := 1.0
+  else
+    W := LogArgument - Ln(LogArgument);
+
+  DirectEquation := (Branch = 0) and (X <= 1.0);
+  for K := 1 to 32 do
+  begin
+    if DirectEquation then
+    begin
+      ExpW := Exp(W);
+      Residual := W * ExpW - X;
+      ResidualScale := Abs(X);
+      Derivative := (1.0 + W) * ExpW;
+    end
+    else
+    begin
+      { The logarithmic equation avoids exp(W) overflow or underflow. }
+      Residual := W + Ln(Abs(W)) - LogArgument;
+      ResidualScale := Max(1.0, Abs(LogArgument));
+      Derivative := 1.0 + 1.0 / W;
+    end;
+    { A residual at rounding precision can make Newton oscillate between
+      adjacent values, especially when the derivative is small. }
+    if Abs(Residual) <= RelativeTolerance * ResidualScale then
+      Exit(W);
+    Next := W - Residual / Derivative;
+    if X < 0.0 then
+    begin
+      if ((Branch = 0) and (Next <= -1.0)) or
+        ((Branch = -1) and (Next >= -1.0)) then
+        Next := 0.5 * (W - 1.0)
+      else if (Branch = 0) and (Next >= 0.0) then
+        Next := 0.5 * W;
+    end;
+    if Abs(Next - W) <= RelativeTolerance * Abs(Next) then
+      Exit(Next);
+    W := Next;
+  end;
+  Result := NaN;
+end;
+
+{ BEGIN GENERATED AIRY ANCHORS }
+{ Generated by tools/generate_special_functions_iii.py, mpmath 1.3.0. }
+const
+  AiryAnchors: array[-12..12, 0..3] of Double = (
+    (-6.65551750543731252E-02, -2.95719912078073077E-01, 1.02311045336797068E+00, -2.36732197831123314E-01) { X = -12 },
+    (-8.75958925570238106E-03, 3.09654767426781885E-01, -1.02732787366457945E+00, -2.20229953144644650E-02) { X = -11 },
+    (4.02412384864431899E-02, -3.14679829643838616E-01, 9.96265044132790045E-01, 1.19414113399909233E-01) { X = -10 },
+    (-2.21337215473414034E-02, 3.24947323455244907E-01, -9.75663980926331553E-01, -5.74005138436692527E-02) { X = -9 },
+    (-5.27050503563862016E-02, -3.31251580751137864E-01, 9.35560938198306546E-01, -1.59450497812981401E-01) { X = -8 },
+    (1.84280835250505648E-01, 2.93762071854413997E-01, -7.71008168410126538E-01, 4.98244590058113501E-01) { X = -7 },
+    (-3.29145173629823096E-01, -1.46698376670557046E-01, 3.45935487281342879E-01, -8.12898785105066968E-01) { X = -6 },
+    (3.50761009024114334E-01, -1.38369134901600577E-01, 3.27192818554443154E-01, 7.78411773001899232E-01) { X = -5 },
+    (-7.02655329492895137E-02, 3.92234705706999309E-01, -7.90628575368581332E-01, -1.16670567438340894E-01) { X = -4 },
+    (-3.78814293677658065E-01, -1.98289626374926531E-01, 3.14583769216598808E-01, -6.75611222685258528E-01) { X = -3 },
+    (2.27407428201685580E-01, -4.12302587956398514E-01, 6.18259020741691034E-01, 2.78795166921169513E-01) { X = -2 },
+    (5.35560883292352075E-01, 1.03997389496944606E-01, -1.01605671166452097E-02, 5.92375626422792401E-01) { X = -1 },
+    (3.55028053887817219E-01, 6.14926627446000684E-01, -2.58819403792806824E-01, 4.48288357353826383E-01) { X = 0 },
+    (1.35292416312881414E-01, 1.20742359495287133E+00, -1.59147441296793202E-01, 9.32435933392775640E-01) { X = 1 },
+    (3.49241304232743785E-02, 3.29809499997821476E+00, -5.30903844336536312E-02, 4.10068204993288976E+00) { X = 2 },
+    (6.59113935746071921E-03, 1.40373289637302321E+01, -1.19129767059513187E-02, 2.29222149663821710E+01) { X = 3 },
+    (9.51563851204801844E-04, 8.38470714084681390E+01, -1.95864095020417900E-03, 1.61926683504613408E+02) { X = 4 },
+    (1.08344428136074422E-04, 6.57792044171171142E+02, -2.47413890868462480E-04, 1.43581908021798245E+03) { X = 5 },
+    (9.94769436025288882E-06, 6.53644610480986375E+03, -2.47652003970349555E-05, 1.57256026219304767E+04) { X = 6 },
+    (7.49212886399716658E-07, 8.03277907094302500E+04, -2.00815089473879194E-06, 2.09552670873971307E+05) { X = 7 },
+    (4.69220761609923157E-08, 1.19958600412446004E+06, -1.34143929790678648E-07, 3.35434231274453877E+06) { X = 8 },
+    (2.47116843087248994E-09, 2.14728688914353475E+07, -7.48064138965894611E-09, 6.38074897809082121E+07) { X = 9 },
+    (1.10475325528986860E-10, 4.55641153548225164E+08, -3.52063367673892370E-10, 1.42923613448286581E+09) { X = 10 },
+    (4.22627586496035955E-12, 1.13557825304304771E+10, -1.41114412466285171E-11, 3.74001681969269791E+10) { X = 11 },
+    (1.39318468887536074E-13, 3.29807225829074158E+11, -4.85473655498530890E-13, 1.13550750244337085E+12) { X = 12 }
+  );
+{ END GENERATED AIRY ANCHORS }
+
+type
+  TAiryKind = (akAi, akBi, akAiPrime, akBiPrime);
+
+function AiryTaylor(const X: Double; const Kind: TAiryKind): Double;
+var
+  Center, K: Integer;
+  T: Double;
+  Coefficients: array[0..24] of Double;
+begin
+  Center := Floor(X + 0.5);
+  T := X - Center;
+  Coefficients[0] := AiryAnchors[Center, Ord(Kind) mod 2];
+  Coefficients[1] := AiryAnchors[Center, 2 + Ord(Kind) mod 2];
+  { Substitute x = Center + t into y'' = x*y. Each expansion is used only
+    within half a unit of its anchor, bounding local cancellation. }
+  Coefficients[2] := 0.5 * Center * Coefficients[0];
+  for K := 3 to High(Coefficients) do
+    Coefficients[K] := (Center * Coefficients[K - 2] + Coefficients[K - 3]) /
+      (K * (K - 1));
+  if Kind in [akAiPrime, akBiPrime] then
+  begin
+    Result := High(Coefficients) * Coefficients[High(Coefficients)];
+    for K := High(Coefficients) - 1 downto 1 do
+      Result := T * Result + K * Coefficients[K];
+  end
+  else
+  begin
+    Result := Coefficients[High(Coefficients)];
+    for K := High(Coefficients) - 1 downto 0 do
+      Result := T * Result + Coefficients[K];
+  end;
+end;
+
+function AiryAsymptotic(const X: Double; const Kind: TAiryKind): Double;
+const
+  SqrtPi: Double = 1.7724538509055160273;
+  QuarterPi: Double = 0.78539816339744830962;
+  TwoThirds: Double = 0.66666666666666666667;
+var
+  K: Integer;
+  Derivative, IsAi: Boolean;
+  AX, FourthRoot, Zeta, Term, Next, Coefficient, EvenSum, OddSum: Double;
+  SixK, Amplitude, Phase, Sine, Cosine: Double;
+begin
+  AX := Abs(X);
+  FourthRoot := Sqrt(Sqrt(AX));
+  Zeta := TwoThirds * AX * Sqrt(AX);
+  Derivative := Kind in [akAiPrime, akBiPrime];
+  IsAi := Kind in [akAi, akAiPrime];
+  EvenSum := 1.0;
+  OddSum := 0.0;
+  Term := 1.0;
+  { DLMF 9.7.2 and 9.7.5--12. Stop before a divergent term can grow. }
+  for K := 1 to 80 do
+  begin
+    SixK := 6.0 * K;
+    Next := Term * ((SixK - 5.0) * (SixK - 1.0)) / (72.0 * K * Zeta);
+    if Next >= Term then
+      Break;
+    Term := Next;
+    Coefficient := Term;
+    if Derivative then
+      Coefficient := Coefficient * ((SixK + 1.0) / (1.0 - SixK));
+    if X < 0.0 then
+    begin
+      if Odd(K div 2) then
+        Coefficient := -Coefficient;
+      if Odd(K) then
+        OddSum := OddSum + Coefficient
+      else
+        EvenSum := EvenSum + Coefficient;
+    end
+    else
+    begin
+      if IsAi and Odd(K) then
+        Coefficient := -Coefficient;
+      EvenSum := EvenSum + Coefficient;
+    end;
+    if Term < 1E-18 then
+      Break;
+  end;
+  if Derivative then
+    Amplitude := FourthRoot / SqrtPi
+  else
+    Amplitude := 1.0 / (SqrtPi * FourthRoot);
+  if X > 0.0 then
+  begin
+    { Combine the exponential and amplitude before checking Double range. }
+    if IsAi then
+      Result := ExpInDoubleRange(-Zeta + Ln(0.5 * Amplitude * EvenSum))
+    else
+      Result := ExpInDoubleRange(Zeta + Ln(Amplitude * EvenSum));
+    if Kind = akAiPrime then
+      Result := -Result;
+    Exit;
+  end;
+  Phase := Zeta - QuarterPi;
+  SinCos(Phase, Sine, Cosine);
+  case Kind of
+    akAi: Result := Amplitude * (Cosine * EvenSum + Sine * OddSum);
+    akBi: Result := Amplitude * (-Sine * EvenSum + Cosine * OddSum);
+    akAiPrime: Result := Amplitude * (Sine * EvenSum - Cosine * OddSum);
+    akBiPrime: Result := Amplitude * (Cosine * EvenSum + Sine * OddSum);
+  end;
+end;
+
+function AiryValue(const X: Double; const Kind: TAiryKind): Double;
+begin
+  if IsNan(X) or IsInfinite(X) or (X < -100.0) or (X > 120.0) then
+    Exit(NaN);
+  if Abs(X) <= 12.0 then
+    Result := AiryTaylor(X, Kind)
+  else
+    Result := AiryAsymptotic(X, Kind);
+end;
+
+function AiryAi(const X: Double): Double;
+begin
+  Result := AiryValue(X, akAi);
+end;
+
+function AiryBi(const X: Double): Double;
+begin
+  Result := AiryValue(X, akBi);
+end;
+
+function AiryAiPrime(const X: Double): Double;
+begin
+  Result := AiryValue(X, akAiPrime);
+end;
+
+function AiryBiPrime(const X: Double): Double;
+begin
+  Result := AiryValue(X, akBiPrime);
 end;
 
 function CarlsonRF(XIn, YIn, ZIn: Double): Double;

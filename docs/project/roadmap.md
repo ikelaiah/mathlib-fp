@@ -221,10 +221,12 @@ re-sequenced 2.15.0–2.20.0 toward gaps recorded on the
 special-function breadth, exact arbitrary-size arithmetic, wavelets and DCT, and
 truncated decompositions. The state-estimation and sample-rate conversion scopes
 previously planned for 2.15.0–2.19.0 are deferred, not rejected; see
-[deferred workflow scopes](#deferred-workflow-scopes). Version 2.15.0 delivered
-opt-in parallel dense multiplication; only 2.16.0 is the next design target. Later slots require the activation gates below and may be
-reordered, split, or replaced when evidence changes. These are planning targets,
-not dates or claims of implementation. The 3.0.0 gate remains unassigned.
+[deferred workflow scopes](#deferred-workflow-scopes). The 2.15.0 source tree
+includes opt-in parallel dense multiplication. The
+[release checklist](../../tasks/todo-2.15.md) tracks publication and artifact
+verification. Special Functions III is the 2.16.0 candidate scope. Later scopes
+may be reordered, split, or deferred based on the activation gates below. The
+3.0.0 gate remains unassigned.
 
 ## Implementation discipline
 
@@ -1013,11 +1015,10 @@ where other Pascal libraries are stronger: SIMD performance, multi-precision
 arithmetic, array semantics, and Delphi support. The 2.14.0 source confirms
 further breadth gaps: special functions beyond Bessel orders zero and one,
 wavelets beyond Haar, no DCT, and no truncated SVD. The previously planned
-2.15.0–2.19.0 scopes deepened state-estimation and sample-rate workflows that
-none of the compared libraries is described as offering, and no issue backlog
-had established demand for them. The re-sequenced horizon targets gaps where a
-Free Pascal user would otherwise need a second general-purpose numerical
-library, consistent with the [product ambition](#product-ambition).
+2.15.0–2.19.0 scopes deepened state-estimation and sample-rate workflows. The
+review deferred them pending demonstrated demand. The revised sequence targets
+workflows where Free Pascal users currently need another general-purpose
+numerical library, consistent with the [product ambition](#product-ambition).
 
 Deliberately not pursued for parity: Delphi compatibility, GPU execution,
 neural-network training, correctly rounded elementary functions, and general
@@ -1026,12 +1027,28 @@ domains, or would introduce a competing API layer. Narrow row/column
 broadcasting on the existing typed dense matrices may be considered later if a
 workflow needs it.
 
-The activation rules above are unchanged: each re-sequenced release still needs
-a demonstrated workflow, a per-release spec, and the contribution gate before
-implementation. The task plan and checklist record the 2.10.0–2.15.0 execution;
-their 2.16.0–2.20.0 entries are refreshed when each release is activated. The
-comparison page's mathlib-fp entry was refreshed to the 2.15.0 capability set
-as part of the 2.15.0 documentation work.
+Each release needs a demonstrated workflow, a per-release spec, and the
+contribution gate before implementation. Use the roadmap, plan, and checklist
+together when revising scope or release order.
+
+### Evidence for commercial comparisons
+
+Compare named workflows that matter to Free Pascal users evaluating commercial
+numerical libraries. Start with dense solve, FFT, and large sparse solve workloads.
+Record the implementation and version, hardware, compiler flags, input shape,
+scalar precision, thread count, and error tolerance. Report elapsed time and
+peak working memory with setup and reuse costs stated explicitly. The 2.15.0
+parallel results establish scaling against mathlib-fp's own serial kernel. A
+commercial performance claim requires a matched measurement.
+
+At the 2.16 checkpoint, review early truncated-PCA feasibility on tall and wide
+data at small target ranks. Also use real sparse matrices from the
+[SuiteSparse Matrix Collection](https://sparse.tamu.edu/about) to measure factor
+fill, peak memory, convergence, and backward error in the existing solvers.
+Use the results to decide whether a focused solver improvement, such as reusable
+sparse Cholesky for repeated symmetric positive-definite solves, should take
+priority over a later scope. These feasibility checks can proceed without
+committing to a stable API or a release slot.
 
 ## Previous release: 2.10.0 — Shared validation and grouped model selection
 
@@ -1113,7 +1130,7 @@ inverse variance, survey weighting, or an unspecified importance score.
 Fractional/analytic weights, grouped-binomial response formats, and robust
 covariance require separate designs.
 
-## Previous release: 2.14.0 — Prediction model persistence
+## Previous published stable release: 2.14.0 — Prediction model persistence
 
 Extend selected-model interchange with GLM and PLS prediction adapters after
 2.12–2.13 settle their contracts. Store the family/link, coefficients, intercept
@@ -1164,7 +1181,7 @@ extended because only the multiplication kernel was measured. See the
 [release notes](../releases/2.15.0/release-notes.md) and
 [qualification record](../releases/2.15.0/qualification.md).
 
-## Next release: 2.16.0 — Special Functions III
+## Release candidate target: 2.16.0 — Special Functions III
 
 Extend MathBase with real-double digamma and polygamma, the Riemann zeta
 function (with Hurwitz zeta only if the polygamma design needs it), both real
@@ -1180,12 +1197,19 @@ as the 2.1 Special Functions II scope.
 - Gate: integer-order Bessel recurrences run in their numerically stable
   direction with documented order and argument limits; Lambert W branch
   selection and the −1/e branch point are explicit.
-- Gate: published error budgets are measured, not asserted; out-of-domain
-  inputs fail or return documented values consistently with existing MathBase
-  functions.
+- Gate: measure error budgets by input region, using absolute error near zeros
+  and a suitable relative or ULP bound elsewhere. Document out-of-domain
+  results consistently with existing MathBase functions.
+
+Start with the function family needed by the demonstrated workflow. Split the
+release scope if the remaining families need substantially more qualification.
 
 Complex arguments, fractional-order Bessel functions, and analytic continuation
 remain outside this release.
+
+The candidate implements the bounded real-double scope. See the
+[release notes](../releases/2.16.0/release-notes.md) and
+[qualification record](../releases/2.16.0/qualification.md).
 
 ## Planned 2.17.0 — Exact big integers and rationals
 
@@ -1193,9 +1217,11 @@ Add an arbitrary-size signed integer type and an exact rational type built on
 it, in a new unit with explicit value semantics. Provide arithmetic,
 comparison, documented integer division/remainder conventions, GCD,
 exponentiation by non-negative integers, decimal and hexadecimal parsing and
-formatting, and exact conversion to and from `Int64` and `Double` with explicit
-rounding rules. Rationals are always reduced with a positive denominator. Exact
-factorial and binomial helpers serve combinatorics workflows.
+formatting, and checked conversions. Specify when conversion to `Int64` is
+exact, how finite `Double` inputs map to exact values, and how results that
+cannot be represented as `Double` are rounded or rejected. Rationals are
+always reduced with a positive denominator. Exact factorial and binomial
+helpers serve combinatorics workflows.
 
 - Activation gate: demonstrate a workflow that fails with current fixed-width
   types, such as exact large binomials or exact rational elimination, and pass
@@ -1212,10 +1238,10 @@ arithmetic, and constant-time guarantees are not included.
 
 ## Planned 2.18.0 — Wavelets and DCT
 
-Add multi-level discrete wavelet transforms with exact reconstruction for a
-small, fixed set of orthogonal Daubechies filters alongside the existing Haar
-transform, and DCT-II/DCT-III with an orthonormal scaling option built on the
-reusable spectral plans.
+Add multi-level discrete wavelet transforms with reconstruction within a
+documented floating-point tolerance for a small, fixed set of orthogonal
+Daubechies filters alongside the existing Haar transform. Build DCT-II/DCT-III
+with an orthonormal scaling option on the reusable spectral plans.
 
 - Gate: filter coefficients match published tables; forward/inverse round
   trips reconstruct within published tolerances for the supported lengths under
@@ -1235,9 +1261,9 @@ enabled at compile time and written in this source tree. The portable Pascal
 kernel remains the default on other targets and the correctness oracle
 everywhere.
 
-- Activation gate: 2.15 benchmark evidence shows the single-thread kernel is
-  compute-bound and a prototype yields a measured, reproducible gain on
-  supported FPC targets. If it does not, defer or replace this slot.
+- Activation gate: profiling identifies a compute-bound single-thread workload
+  and a prototype shows a reproducible gain over the blocked Pascal kernel on
+  supported FPC targets. Defer or replace this slot if the gain is absent.
 - Gate: cross-path tests compare SIMD and portable results for every supported
   scalar kind with documented tolerances, including any fused multiply-add
   rounding difference; runtime CPU checks prevent unsupported instructions.

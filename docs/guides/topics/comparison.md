@@ -63,8 +63,9 @@ array semantics, and Delphi support.
 
 ## Current limitations of mathlib-fp
 
-For a balanced comparison, these are boundaries of the released v2.15.0 scope,
-as recorded in the [capability inventory](../../reference/capabilities.md).
+For a balanced comparison, these are boundaries of the qualified 2.15.0 source
+scope. The [2.16.0 candidate inventory](../../reference/capabilities.md)
+lists the additive special-function capabilities.
 They describe what a user should not assume is included; they are not a
 roadmap or a judgement about other libraries.
 
@@ -122,4 +123,4 @@ library is declared superior on the basis of raw function counts.
 - GitHub projects — upstream repositories for [mrMath](https://github.com/mikerabat/mrmath), [numerik](https://github.com/ariaghora/numerik), [pas-core-math](https://github.com/joaopauloschuler/pas-core-math), [FastMath](https://github.com/neslib/FastMath), [CAI Neural API](https://github.com/joaopauloschuler/neural-api), [MPArith](https://github.com/JulStrat/MPArith), [TIntX](https://github.com/Xor-el/IntXLib4Pascal), [BigDecimalMath](https://github.com/benibela/bigdecimalmath), and [DelphiBigNumbers](https://github.com/rvelthuis/DelphiBigNumbers).
 - Other upstream sources — [JEDI Math](https://sourceforge.net/projects/jedimath/), [OptiVec](https://www.optivec.com/), [AMath/DAMath](https://www.wolfgang-ehrhardt.de/misc_en.html#amath), [MtxVec Core Edition](https://www.dewresearch.com/products/mtxvec/core/), and [ALGLIB Free Edition](https://www.alglib.net/download.php).
 - DFF Library — [community listing](https://github.com/juliomar/awesome-delphi#math) and [upstream collection](https://www.delphiforfun.org/Programs/Library/Default.htm).
-- mathlib-fp — [repository](https://github.com/ikelaiah/mathlib-fp), [v2.15.0 release](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.15.0), and the in-repository [capability inventory](../../reference/capabilities.md).
+- mathlib-fp — [repository](https://github.com/ikelaiah/mathlib-fp), [2.15.0 qualification](../../releases/2.15.0/qualification.md), and the in-repository [capability inventory](../../reference/capabilities.md).
