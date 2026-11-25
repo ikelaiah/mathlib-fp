@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.freepascal.org/"><img alt="Free Pascal 3.2.2+" src="https://img.shields.io/badge/Free%20Pascal-3.2.2+-blue.svg"></a>
   <a href="https://www.lazarus-ide.org/"><img alt="Lazarus 4.8+" src="https://img.shields.io/badge/Lazarus-4.8+-blue.svg"></a>
-  <img alt="Version 2.16.0" src="https://img.shields.io/badge/version-2.16.0-brightgreen.svg">
+  <img alt="Version 2.17.0 release candidate" src="https://img.shields.io/badge/version-2.17.0--rc-blue.svg">
   <a href="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/ikelaiah/mathlib-fp/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE.md"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-yellow.svg"></a>
 </p>
@@ -26,9 +26,10 @@
   release-qualified automated suite.
 
 > [!NOTE]
-> **2.16.0 is the current stable release.** It adds Special Functions III.
-> See the [release notes](docs/releases/2.16.0/release-notes.md) and
-> [capability inventory](docs/reference/capabilities.md).
+> **This checkout is the 2.17.0 release candidate.** It adds exact integers
+> and rationals. See the [candidate release notes](docs/releases/2.17.0/release-notes.md)
+> and [capability inventory](docs/reference/capabilities.md).
+> The candidate branch is `codex/release-2.17.0`. Stable downloads use `v2.16.0`.
 
 ## 🚀 Quick start
 

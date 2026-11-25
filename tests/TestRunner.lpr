@@ -7,6 +7,7 @@ uses
   Classes
   , consoletestrunner
   , TestMathBase
+  , TestExactArithmetic
   , TestSpecialFunctions
   , TestModifiedBessel
   , TestEllipticIntegrals

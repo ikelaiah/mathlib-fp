@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+"""Generate exact-arithmetic fixtures with the Python standard library."""
+
+from __future__ import annotations
+
+import argparse
+import random
+import struct
+from fractions import Fraction
+from pathlib import Path
+
+
+DATA = Path(__file__).resolve().parents[1] / "tests/ExactArithmeticReference.inc"
+BASE = 1 << 32
+
+
+def pascal_string(value: str) -> str:
+    return " + ".join(f"'{value[i:i + 96]}'" for i in range(0, len(value), 96))
+
+
+def integer(value: int) -> str:
+    return pascal_string(format(value, "X"))
+
+
+def ratio(value: Fraction) -> str:
+    return pascal_string(f"{value.numerator:X}/{value.denominator:X}")
+
+
+def record(**fields: str) -> str:
+    return "    (" + ";\n     ".join(f"{key}: {value}" for key, value in fields.items()) + ")"
+
+
+def pascal_array(name: str, datatype: str, rows: list[str]) -> str:
+    return (
+        f"  {name}: array[0..{len(rows) - 1}] of {datatype} = (\n"
+        + ",\n".join(rows) + "\n  );\n"
+    )
+
+
+def signed(rng: random.Random, bits: int) -> int:
+    value = rng.getrandbits(bits)
+    return -value if rng.randrange(2) else value
+
+
+def integer_cases(rng: random.Random) -> list[str]:
+    from math import gcd
+
+    correction = (BASE // 2) * BASE + 1
+    addback = (BASE // 2) * BASE**2 + 1
+    pairs = [
+        (0, 1), (BASE**3 - 1, -1), (-(BASE**3), BASE**2), (BASE, BASE + 1),
+        (BASE**3 - 1, BASE - 1), (2 * correction - 1, correction),
+        (2 * addback - 1, addback), (-(2 * addback - 1), -addback),
+        (BASE**16 - 1, BASE**8 - 1), (-1, 7), (1, -7), (2**768 + 1, 3),
+    ]
+    pairs.extend(
+        (signed(rng, rng.choice((1, 32, 65, 129, 513, 1280))),
+         signed(rng, rng.choice((1, 31, 64, 95, 301, 677))) or 1)
+        for _ in range(99)
+    )
+    rows = []
+    for a, b in pairs:
+        q = abs(a) // abs(b)
+        if (a < 0) != (b < 0):
+            q = -q
+        rows.append(record(A=integer(a), B=integer(b), Sum=integer(a + b),
+                           Difference=integer(a - b), Product=integer(a * b),
+                           Quotient=integer(q), Remainder=integer(a - b * q),
+                           GreatestDivisor=integer(gcd(a, b))))
+    return rows
+
+
+def rational_cases(rng: random.Random) -> list[str]:
+    parts = [(0, -5, 4, 6), (6, -8, -8, -9), (1, 3, 2, 3), (7, 10, -7, 10)]
+    parts.extend(
+        (signed(rng, 96), signed(rng, 128) or 1, signed(rng, 101) or 1,
+         signed(rng, 114) or 1)
+        for _ in range(34)
+    )
+    return [
+        record(
+            A=pascal_string(f"{an:X}/{ad:X}"), B=pascal_string(f"{bn:X}/{bd:X}"),
+            CanonicalA=ratio(a), CanonicalB=ratio(b), Sum=ratio(a + b),
+            Difference=ratio(a - b), Product=ratio(a * b), Quotient=ratio(a / b),
+            Order=str((a > b) - (a < b)),
+        )
+        for an, ad, bn, bd in parts
+        for a, b in [(Fraction(an, ad), Fraction(bn, bd))]
+    ]
+
+
+def bits_of(value: float) -> int:
+    return struct.unpack(">Q", struct.pack(">d", value))[0]
+
+
+def decode_cases(rng: random.Random) -> list[str]:
+    bits = [0, 1, 0x8000000000000000, 0x8000000000000001, 0x0010000000000000,
+            0x000FFFFFFFFFFFFF, 0x7FEFFFFFFFFFFFFF, 0xFFEFFFFFFFFFFFFF,
+            bits_of(0.1), bits_of(-2.25), bits_of(2.0**53), bits_of(-2.0**63)]
+    bits += [value for _ in range(42) if (value := rng.getrandbits(64)) >> 52 & 0x7FF != 0x7FF]
+    rows = []
+    for payload in bits:
+        value = struct.unpack(">d", struct.pack(">Q", payload))[0]
+        exact = Fraction.from_float(value)
+        rows.append(record(
+            Bits=f"QWord(${payload:016X})", Exact=ratio(exact),
+            Integral=str(exact.denominator == 1),
+        ))
+    return rows
+
+
+def rounding_cases(rng: random.Random) -> list[str]:
+    half_min = Fraction(1, 1 << 1075)
+    min_normal = Fraction(1, 1 << 1022)
+    overflow_tie = (1 << 1024) - (1 << 970)
+    values = [
+        Fraction(0), Fraction(1, 10), Fraction(-7, 5), Fraction(2**53 + 1),
+        Fraction(2**53 + 3), Fraction(2**54 - 1), -half_min, half_min,
+        3 * half_min, 5 * half_min, min_normal - half_min,
+        min_normal + half_min, Fraction(overflow_tie - 1),
+        Fraction(overflow_tie), Fraction(-overflow_tie),
+    ]
+    values += [
+        Fraction(signed(rng, rng.choice((10, 50, 120, 530, 1150))),
+                 signed(rng, rng.choice((1, 32, 50, 160, 820, 1150))) or 1)
+        for _ in range(55)
+    ]
+    rows = []
+    for value in values:
+        try:
+            bits, finite = bits_of(float(value)), True
+        except OverflowError:
+            bits, finite = 0, False
+        rows.append(record(Exact=ratio(value), Finite=str(finite), Bits=f"QWord(${bits:016X})"))
+    return rows
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    rng = random.Random(217)
+    text = (
+        "{ Generated by tools/generate_exact_arithmetic_reference.py. }\nconst\n"
+        + pascal_array("IntegerReferences", "TIntegerReference", integer_cases(rng))
+        + pascal_array("RationalReferences", "TRationalReference", rational_cases(rng))
+        + pascal_array("DecodeReferences", "TDecodeReference", decode_cases(rng))
+        + pascal_array("RoundingReferences", "TRoundingReference", rounding_cases(rng))
+    )
+    if parser.parse_args().check:
+        if DATA.read_text(encoding="utf-8") != text:
+            raise SystemExit("Exact arithmetic fixtures differ from the Python oracle")
+    else:
+        DATA.write_text(text, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

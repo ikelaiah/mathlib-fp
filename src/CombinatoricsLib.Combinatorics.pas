@@ -54,7 +54,7 @@ interface
 uses
   Classes, SysUtils, Math,
   MathBase.SharedTypes,
-  MathBase.Precision;
+  MathBase.Precision, MathBase.ExactArithmetic;
 
 type
   { Raised for invalid combinatorial inputs or overflow }
@@ -108,6 +108,7 @@ type
       (20! is the largest factorial that fits in Int64).
       For larger N use this unit's LogFactorial method. }
     class function Factorial(N: Integer): Int64; static;
+    class function FactorialExact(N: Integer): TBigInteger; static;
 
     { ln(n!) — log-factorial, valid for any N >= 0.
       Use this instead of Factorial when N > 20 to avoid overflow.
@@ -124,6 +125,7 @@ type
       Example: C(5,2) = 10
       Uses the multiplicative formula to avoid overflow for moderate n. }
     class function Combination(N, K: Integer): Int64; static;
+    class function CombinationExact(N, K: Integer): TBigInteger; static;
 
     { ln C(n,k) — log-combination, safe for large N.
       Example: LogCombination(100, 50) ≈ 68.158 (log of a 29-digit number) }
@@ -437,6 +439,46 @@ begin
     R := R * (N - K + I) div I;
   end;
   Result := R;
+end;
+
+class function TCombinatoricsKit.FactorialExact(N: Integer): TBigInteger;
+var
+  I: Integer;
+begin
+  if N < 0 then
+    raise ECombinatoricsError.Create('FactorialExact: N must be >= 0');
+  Result := TBigInteger.FromInt64(1);
+  for I := 2 to N do
+    Result := Result * TBigInteger.FromInt64(I);
+end;
+
+class function TCombinatoricsKit.CombinationExact(N, K: Integer): TBigInteger;
+var
+  I: Integer;
+  Multiplier, Divisor, Common: Int64;
+  Parts: TBigIntegerDivision;
+begin
+  if (N < 0) or (K < 0) or (K > N) then
+    raise ECombinatoricsError.Create('CombinationExact: require 0 <= K <= N');
+  if K > N div 2 then
+    K := N - K;
+  Result := TBigInteger.FromInt64(1);
+  for I := 1 to K do
+  begin
+    Multiplier := N - K + I;
+    Common := GCD(Multiplier, I);
+    Divisor := I div Common;
+    { After removing the common factor, Divisor is coprime to the
+      multiplier and must divide the accumulated count exactly. }
+    if Divisor <> 1 then
+    begin
+      Parts := DivideWithRemainder(Result, TBigInteger.FromInt64(Divisor));
+      if not Parts.Remainder.IsZero then
+        raise EExactArithmeticError.Create('CombinationExact: internal division was inexact');
+      Result := Parts.Quotient;
+    end;
+    Result := Result * TBigInteger.FromInt64(Multiplier div Common);
+  end;
 end;
 
 class function TCombinatoricsKit.LogCombination(N, K: Integer): Double;

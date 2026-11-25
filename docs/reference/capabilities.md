@@ -1,12 +1,13 @@
 # Capability inventory
 
 The machine-readable source for this page is
-[`capabilities.json`](../capabilities.json).
+[`capabilities.json`](capabilities.json).
 Target qualifications and platform-specific limitations are defined by the
 [support matrix](../project/support.md), not inferred from capability maturity.
 
 | Family | Maturity | Scalar paths | Important limitations |
 | --- | --- | --- | --- |
+| Exact integer and rational arithmetic | 2.17.0 candidate | Scalar integers and reduced rationals | 131,072 bits per component, decimal and hexadecimal text, explicit binary64 conversion |
 | Complex scalar arithmetic | Stable | Single and double complex; elementary principal functions are double only | Single complex exposes the arithmetic needed by typed kernels, not the double elementary-function catalogue |
 | Special Functions III | Stable (2.16.0) | Double real | Positive gamma shapes, zeta above one, two real Lambert W branches, Bessel orders 0–32, and Airy functions and derivatives on `[-100, 120]` |
 | Array vector kernels | Stable | Double real and complex | The 1.3 array facade is retained; typed matrices provide the new single paths |
@@ -61,8 +62,8 @@ Target qualifications and platform-specific limitations are defined by the
 | Opt-in parallel dense multiplication | Stable | Single/double real/complex | Caller-chosen 1–64 workers, bitwise equal to the serial blocked kernel; multiplication only |
 | Automatic parallel/SIMD dispatch | Unsupported | — | No thread pool, global parallel setting, or vector-intrinsic API |
 
-This is the 2.16.0 capability inventory. It adds real-double special
-functions with bounded domains and retains opt-in parallel dense multiplication
+This is the 2.17.0 candidate capability inventory. It adds exact integer
+and rational arithmetic and retains opt-in parallel dense multiplication
 for all four scalar kinds with bitwise agreement with the serial blocked
 kernel. Qualification status is recorded in the
 [release report](../releases/2.16.0/qualification.md). It retains

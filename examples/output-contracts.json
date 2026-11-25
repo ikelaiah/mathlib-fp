@@ -332,6 +332,14 @@
         "radial wavenumber (1/m) = 20.542489207"
       ],
       "final_line": "circular membrane: success"
+    },
+    {
+      "path": "examples/54_exact_sampling.pas",
+      "contains": [
+        "C(100, 50) = 100891344545564193334812497256",
+        "exact probability = 2110031698716658293304/13322197258529868226331"
+      ],
+      "final_line": "exact sampling: success"
     }
   ]
 }

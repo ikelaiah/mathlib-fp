@@ -32,7 +32,7 @@ slices before work starts. The four checkboxes are milestones, not one task.
 | 2.14.0 Prediction persistence | [x] | [x] | [x] | [x] |
 | 2.15.0 Parallel dense kernels | [x] | [x] | [x] | [ ] |
 | 2.16.0 Special Functions III | [x] | [x] | [x] | [x] |
-| 2.17.0 Exact integers and rationals | [ ] | [ ] | [ ] | [ ] |
+| 2.17.0 Exact integers and rationals | [x] | [x] | [x] | [ ] |
 | 2.18.0 Wavelets and DCT | [ ] | [ ] | [ ] | [ ] |
 | 2.19.0 SIMD dense multiplication (conditional) | [ ] | [ ] | [ ] | [ ] |
 | 2.20.0 Truncated PCA | [ ] | [ ] | [ ] | [ ] |

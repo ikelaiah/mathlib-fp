@@ -12,8 +12,8 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-Version 2.16.0 adds Special Functions III. Consult the
-[2.16.0 API reference](reference/api/reference-2.16.0.md),
+The 2.17.0 release candidate adds exact integers and rationals. Consult the
+[2.17.0 API reference](reference/api/reference-2.17.0.md),
 [capability inventory](reference/capabilities.md),
 [support matrix](project/support.md), and
 [API conventions](reference/api/conventions-2.0.md).

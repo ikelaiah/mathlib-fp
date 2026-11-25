@@ -14,6 +14,7 @@ uses
   MathBase.Complex,
   MathBase.Precision,
   MathBase.SpecialFunctions,
+  MathBase.ExactArithmetic,
   MathBase.Trigonometry,
   MathBase.Iteration,
   MathBase.Random,

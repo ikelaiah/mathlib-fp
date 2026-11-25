@@ -360,6 +360,14 @@ def documentation_gates(
             "--check",
         ],
     )
+    qualification.run(
+        "exact-arithmetic-reference-fixtures",
+        [
+            sys.executable,
+            str(ROOT / "tools" / "generate_exact_arithmetic_reference.py"),
+            "--check",
+        ],
+    )
     for script in (
         "test_api_decision.py",
         "test_api_snapshot.py",

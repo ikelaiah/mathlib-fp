@@ -63,11 +63,9 @@ array semantics, and Delphi support.
 
 ## Current limitations of mathlib-fp
 
-For a balanced comparison, these are boundaries of the qualified 2.15.0 source
-scope. The [2.16.0 capability inventory](../../reference/capabilities.md)
-lists the additive special-function capabilities.
-They describe what a user should not assume is included; they are not a
-roadmap or a judgement about other libraries.
+These are the boundaries of the current source. The
+[capability inventory](../../reference/capabilities.md) summarizes the
+2.17.0 candidate and the supported release families.
 
 - **Compiler focus:** mathlib-fp targets Free Pascal 3.2.2+ in `objfpc` mode;
   Delphi compatibility is not claimed.
@@ -78,10 +76,11 @@ roadmap or a judgement about other libraries.
   backend.
 - **Precision and algorithms:** typed dense kernels cover single and double
   real and complex values, while many higher-level workflows are double-only.
-  The library does not provide arbitrary-precision number types. Some
-  algorithms also have specific scope limits, such as full compact rather
-  than truncated SVD, largest-magnitude partial eigensolvers, and dense-only
-  optimisation.
+  The 2.17.0 candidate adds exact integers and rationals with a 131,072-bit
+  cap per component. Dense numerical algorithms continue to use their
+  documented floating-point types. The SVD returns full compact factors,
+  partial eigensolvers target largest magnitude, and optimisation uses
+  dense models.
 - **Specialist workflows:** the stable catalogue does not include survival or
   factor analysis, robust covariance, advanced equiripple/IIR design, broader
   wavelet families, or general decomposition and model-graph persistence.

@@ -1,8 +1,8 @@
 # Supported platform matrix
 
-Version 2.16.0 adds bounded real-double special functions.
-See its [qualification record](../releases/2.16.0/qualification.md) for
-release evidence. The platform evidence below was retained for 2.15.0.
+The 2.17.0 release candidate adds bounded exact integers and rationals.
+See the [candidate qualification record](../releases/2.17.0/qualification.md)
+for current checks and the table below for published evidence.
 
 Version 2.15.0 adds opt-in parallel dense multiplication. The
 [qualification record](../releases/2.15.0/qualification.md) records all
@@ -33,22 +33,18 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The 2.15.0 release tree's normal, optimized and checked/heap
-suites, full local qualification, hosted Linux/Windows CI and both primary
-clean-archive profiles passed. No target claim is inferred from another platform.
+The published 2.16.0 tree passed full local qualification and both hosted
+primary clean-archive profiles.
+[Qualification record](../releases/2.16.0/qualification.md) ·
+[Hosted archive verification](https://github.com/ikelaiah/mathlib-fp/actions/runs/45559346732)
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.15.0 hosted clean-archive qualification, 2026-11-04 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.15.0 hosted clean-archive qualification, 2026-11-04 | P-Linux |
-| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | 2.15.0 local/hosted complete suite and package, 2026-11-04 | S-Win32 |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.16.0 hosted clean-archive qualification, 2026-11-25 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.16.0 hosted clean-archive qualification, 2026-11-25 | P-Linux |
+| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | [2.16.0 hosted complete suite and package](https://github.com/ikelaiah/mathlib-fp/actions/runs/45558461143), 2026-11-25 | S-Win32 |
 
-Evidence dates and refs describe configurations that actually ran. They are
-not inferred across operating systems, CPUs, pointer widths, or Unix families.
-The 2.15.0 release tree is qualified on both primary profiles. Local and hosted
-Win32 complete-suite/package checks also passed for the secondary profile.
-This does not add qualification claims for other operating
-systems, CPUs, or compiler versions.
+Evidence dates and refs apply to the listed configurations.
 
 ### Exact profiles
 
