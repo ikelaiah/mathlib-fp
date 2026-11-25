@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The 2.16.0 release candidate adds Special Functions III. Consult the
+Version 2.16.0 adds Special Functions III. Consult the
 [2.16.0 API reference](reference/api/reference-2.16.0.md),
 [capability inventory](reference/capabilities.md),
 [support matrix](project/support.md), and

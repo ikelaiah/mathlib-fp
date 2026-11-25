@@ -17,4 +17,4 @@
 The [MathBase guide](../../guides/domains/math-base.md#special-functions-iii-in-2160)
 lists argument bounds, pole behavior, and runnable guidance. The
 [numerical provenance](numerical-evidence-provenance.md) records the test
-budgets for the candidate.
+budgets for this release.

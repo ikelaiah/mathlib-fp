@@ -1,6 +1,6 @@
 # Release maintenance view
 
-Refreshed for the 2.16.0 release candidate.
+Refreshed for 2.16.0.
 
 Counts describe the current source/API and curated capability inventory.
 They are not a scorecard or a substitute for numerical and platform evidence.
@@ -8,7 +8,7 @@ They are not a scorecard or a substitute for numerical and platform evidence.
 - Units and declaration rows come from the [current API snapshot](../reference/api/public-api-2.16.0.json).
 - Stable families come from [capabilities.json](../reference/capabilities.json); zero means this curated inventory has no separately measured family for that domain.
 - Example counts use domain labels in [examples/README.md](../../examples/README.md); shared examples may count in more than one domain.
-- Qualification status is in the [2.16.0 candidate report](../releases/2.16.0/qualification.md).
+- Qualification status is in the [2.16.0 report](../releases/2.16.0/qualification.md).
 
 | Domain | Stable capability families | Units | Public API rows | Runnable examples | Important limitations |
 | --- | ---: | ---: | ---: | ---: | --- |

@@ -64,7 +64,7 @@ array semantics, and Delphi support.
 ## Current limitations of mathlib-fp
 
 For a balanced comparison, these are boundaries of the qualified 2.15.0 source
-scope. The [2.16.0 candidate inventory](../../reference/capabilities.md)
+scope. The [2.16.0 capability inventory](../../reference/capabilities.md)
 lists the additive special-function capabilities.
 They describe what a user should not assume is included; they are not a
 roadmap or a judgement about other libraries.

@@ -224,7 +224,7 @@ previously planned for 2.15.0–2.19.0 are deferred, not rejected; see
 [deferred workflow scopes](#deferred-workflow-scopes). The 2.15.0 source tree
 includes opt-in parallel dense multiplication. The
 [release checklist](../../tasks/todo-2.15.md) tracks publication and artifact
-verification. Special Functions III is the 2.16.0 candidate scope. Later scopes
+verification. Version 2.16.0 delivers Special Functions III. Later scopes
 may be reordered, split, or deferred based on the activation gates below. The
 3.0.0 gate remains unassigned.
 
@@ -1130,7 +1130,7 @@ inverse variance, survey weighting, or an unspecified importance score.
 Fractional/analytic weights, grouped-binomial response formats, and robust
 covariance require separate designs.
 
-## Previous published stable release: 2.14.0 — Prediction model persistence
+## Previous release: 2.14.0 — Prediction model persistence
 
 Extend selected-model interchange with GLM and PLS prediction adapters after
 2.12–2.13 settle their contracts. Store the family/link, coefficients, intercept
@@ -1181,7 +1181,7 @@ extended because only the multiplication kernel was measured. See the
 [release notes](../releases/2.15.0/release-notes.md) and
 [qualification record](../releases/2.15.0/qualification.md).
 
-## Release candidate target: 2.16.0 — Special Functions III
+## Previous release: 2.16.0 — Special Functions III
 
 Extend MathBase with real-double digamma and polygamma, the Riemann zeta
 function (with Hurwitz zeta only if the polygamma design needs it), both real
@@ -1207,11 +1207,11 @@ release scope if the remaining families need substantially more qualification.
 Complex arguments, fractional-order Bessel functions, and analytic continuation
 remain outside this release.
 
-The candidate implements the bounded real-double scope. See the
+Version 2.16.0 implements the bounded real-double scope. See the
 [release notes](../releases/2.16.0/release-notes.md) and
 [qualification record](../releases/2.16.0/qualification.md).
 
-## Planned 2.17.0 — Exact big integers and rationals
+## Next release: 2.17.0 — Exact big integers and rationals
 
 Add an arbitrary-size signed integer type and an exact rational type built on
 it, in a new unit with explicit value semantics. Provide arithmetic,
