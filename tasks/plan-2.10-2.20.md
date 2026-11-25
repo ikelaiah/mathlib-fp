@@ -4,7 +4,7 @@ Versions 2.10.0–2.14.0 have shipped. The 2.15.0 source implementation and
 qualification are recorded in the
 [qualification report](../docs/releases/2.15.0/qualification.md). The
 [2.15.0 release checklist](todo-2.15.md) tracks publication separately.
-Special Functions III is the 2.16.0 release candidate scope. The
+Version 2.16.0 implements Special Functions III. The
 [roadmap](../docs/project/roadmap.md) defines release scopes, exclusions, and
 numerical gates. The [checklist](todo-2.10-2.20.md) tracks execution.
 

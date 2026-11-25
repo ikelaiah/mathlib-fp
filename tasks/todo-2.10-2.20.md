@@ -3,7 +3,7 @@
 Versions 2.10.0–2.14.0 are published and verified. The
 [2.15.0 release checklist](todo-2.15.md) tracks publication and artifact
 verification for the qualified parallel dense multiplication release.
-Special Functions III is the 2.16.0 release candidate scope. Later scopes require
+Version 2.16.0 implements Special Functions III. Later scopes require
 activation evidence. See the [plan](plan-2.10-2.20.md) for dependencies
 and the [roadmap](../docs/project/roadmap.md) for scope and acceptance gates.
 

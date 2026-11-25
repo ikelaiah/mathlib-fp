@@ -1,8 +1,8 @@
 # Supported platform matrix
 
-The 2.16.0 release candidate adds bounded real-double special functions.
+Version 2.16.0 adds bounded real-double special functions.
 See its [qualification record](../releases/2.16.0/qualification.md) for
-candidate results. The platform evidence below was retained for 2.15.0.
+release evidence. The platform evidence below was retained for 2.15.0.
 
 Version 2.15.0 adds opt-in parallel dense multiplication. The
 [qualification record](../releases/2.15.0/qualification.md) records all

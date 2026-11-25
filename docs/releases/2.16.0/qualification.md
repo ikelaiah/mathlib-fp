@@ -1,4 +1,4 @@
-# 2.16.0 release candidate qualification
+# 2.16.0 release qualification
 
 The [numerical provenance](numerical-evidence-provenance.md) records the
 independent reference corpus and supported error budgets. The
