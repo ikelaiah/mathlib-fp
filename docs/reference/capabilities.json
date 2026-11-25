@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.15.0",
+  "release": "2.16.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -9,6 +9,41 @@
   "provenance_audit": "docs/releases/1.9.9/provenance-audit.json",
   "api_snapshot_final": "docs/releases/1.9.9/api-snapshot-final.json",
   "capabilities": [
+    {
+      "family": "special_functions_iii",
+      "unit": "MathBase.SpecialFunctions",
+      "entry_points": [
+        "Digamma",
+        "Polygamma",
+        "RiemannZeta",
+        "LambertW",
+        "BesselJ",
+        "BesselY",
+        "ModifiedBesselI",
+        "ModifiedBesselK",
+        "AiryAi",
+        "AiryBi",
+        "AiryAiPrime",
+        "AiryBiPrime"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "double"
+      ],
+      "shapes": [
+        "scalar"
+      ],
+      "complexity": "bounded scalar series, recurrences, and iterations",
+      "accuracy": "Family and region budgets in the 2.16.0 numerical provenance",
+      "docs": "docs/guides/domains/math-base.md",
+      "tests": "tests/TestSpecialFunctions.pas",
+      "example": "examples/53_circular_membrane.pas",
+      "limitations": [
+        "real double only, with documented order and argument bounds",
+        "zeta is restricted to its convergent series and pole",
+        "polygamma is restricted to nonnegative shapes and orders 0 through 16"
+      ]
+    },
     {
       "family": "scalar_special_functions",
       "unit": "MathBase.Precision",

@@ -18,6 +18,7 @@ Copy and run the [double-real quick start](#quick-start). It prints
 | Shared real samples | `TDoubleArray` | [Shared types](#mathbasesharedtypes) |
 | Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
 | Bessel J/Y, modified I/K, Legendre elliptic integrals, Jacobi elliptic functions, Ei/E1, and real 2F1 | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
+| Higher-order Bessel functions, digamma, polygamma, zeta, Lambert W, and Airy functions | `MathBase.SpecialFunctions` | [Special Functions III](#special-functions-iii-in-2160) |
 | Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
 | Reproducible simulation | `TLocalRandom` | [Random-state contract](applied-numerics.md#reproducible-local-random-state) |
 | Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](interchange.md#choose-a-format) |
@@ -495,6 +496,32 @@ Expected output:
 ```text
 5.0000  0.9750
 ```
+
+## Special Functions III in 2.16.0
+
+These functions take real `Double` arguments and return `NaN` for invalid
+or nonfinite inputs. The documented poles and range overflow return signed
+infinities. Check `IsNan` and `IsInfinite` before passing a result to a solver.
+
+| Functions | Supported input and selection |
+| --- | --- |
+| `Digamma(X)`, `Polygamma(Order, X)` | Use for derivatives of the log gamma function at positive shapes. Orders range from 0 to 16, with order 0 equal to digamma. At zero, even orders return negative infinity and odd orders return positive infinity. |
+| `RiemannZeta(S)` | Use for the convergent real zeta series at `S > 1`. At one it returns positive infinity. |
+| `LambertW(X, Branch)` | Solves `W*Exp(W) = X`. Choose 0 for `W >= -1` and -1 for `W <= -1`. Both accept the nearest binary64 value to `-1/e` and return -1 there. Branch -1 accepts only nonpositive X and returns negative infinity at zero. |
+| `BesselJ(Order, X)`, `ModifiedBesselI(Order, X)` | Use for orders 0–32 and `abs(X) <= 100`. Negative arguments use integer parity. Use J for oscillatory cylindrical modes and I for growing modified modes. |
+| `BesselY(Order, X)`, `ModifiedBesselK(Order, X)` | Use for orders 0–32 and `0 <= X <= 100`. Y is the other oscillatory cylindrical solution and K is the decaying modified solution. At zero they return negative and positive infinity, respectively. |
+| `AiryAi(X)`, `AiryBi(X)`, `AiryAiPrime(X)`, `AiryBiPrime(X)` | Use for the solutions and first derivatives of `y'' = X*y` on `[-100, 120]`. At positive X, Ai decays and Bi grows. Tail results can underflow to signed zero or overflow to infinity. |
+
+The [circular-membrane example](../../../examples/53_circular_membrane.pas)
+uses the existing bracketed root solver to find the first positive zero of
+J2. It verifies the root and the fixed-rim condition before printing the
+wavenumber.
+
+The [numerical provenance](../../releases/2.16.0/numerical-evidence-provenance.md)
+records algorithms, measured corpus coverage, and tested error budgets.
+The Bessel loop bounds depend on order and argument. Lambert W uses at most
+32 Newton iterations, and the Airy paths use fixed local Taylor expansions
+or bounded asymptotic series.
 
 ## Dependencies
 

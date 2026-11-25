@@ -324,6 +324,14 @@
         "worker counts outside 1..64 are rejected before any write"
       ],
       "final_line": "parallel multiply: success"
+    },
+    {
+      "path": "examples/53_circular_membrane.pas",
+      "contains": [
+        "first positive J2 zero = 5.135622302",
+        "radial wavenumber (1/m) = 20.542489207"
+      ],
+      "final_line": "circular membrane: success"
     }
   ]
 }

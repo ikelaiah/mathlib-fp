@@ -1,5 +1,9 @@
 # Supported platform matrix
 
+The 2.16.0 release candidate adds bounded real-double special functions.
+See its [qualification record](../releases/2.16.0/qualification.md) for
+candidate results. The platform evidence below was retained for 2.15.0.
+
 Version 2.15.0 adds opt-in parallel dense multiplication. The
 [qualification record](../releases/2.15.0/qualification.md) records all
 153 local Windows gates, successful hosted Linux/Windows CI,
@@ -29,7 +33,7 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The current release tree targets 2.15.0. Its normal, optimized and checked/heap
+The 2.15.0 release tree's normal, optimized and checked/heap
 suites, full local qualification, hosted Linux/Windows CI and both primary
 clean-archive profiles passed. No target claim is inferred from another platform.
 
@@ -101,8 +105,7 @@ files to the offline machine, verify the checksum, and extract the archive.
 Adding `src/` to the FPC unit path is sufficient; no configure or generation
 step is required. The release page also provides a separately checksummed
 offline HTML ZIP generated from the same tagged documentation. Extract it and
-open the release archive's `mathlib-fp-docs-2.15.0/index.html`,
-locally.
+open the `index.html` inside its top-level documentation directory.
 
 The release qualification workflows perform these same checksum, clean-
 extraction, direct-source, representative-workflow, documentation, and package

@@ -40,8 +40,8 @@ def layout_path(name: str, legacy: str) -> Path:
     return LAYOUT.artifact(name)
 
 
-NEXT_RELEASE = "2.16.0"
-PUBLISHED_STABLE = "2.15.0"
+NEXT_RELEASE = "2.17.0"
+PUBLISHED_STABLE = "2.14.0"
 # The current release snapshot owns every source unit present in this tree.
 UNRELEASED_SOURCE_UNITS: set[str] = set()
 UNRELEASED_INTERFACE_CHANGES: dict[str, dict[str, str]] = {}
@@ -832,6 +832,7 @@ def main() -> int:
             errors.append(f"example missing from examples/README.md: {example.name}")
 
     version_release_state = None
+    candidate_source_ref = None
     try:
         versions = json.loads((DOCS / "versions.json").read_text(encoding="utf-8"))
         assert versions["schema_version"] == 1
@@ -850,6 +851,8 @@ def main() -> int:
         if versions.get("release_state") == "candidate":
             assert versions["published_stable"] == PUBLISHED_STABLE
             assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
+            candidate_source_ref = versions["versions"][0].get("source_ref")
+            assert isinstance(candidate_source_ref, str) and candidate_source_ref
         else:
             assert listed_releases == [CURRENT_RELEASE, *HISTORICAL_RELEASES]
         assert versions["site_url"].startswith("https://")
@@ -898,8 +901,9 @@ def main() -> int:
             "README candidate notes": (
                 f"releases/{CURRENT_RELEASE}/release-notes.md" in readme
             ),
-            "README candidate archive": (
-                f"heads/release/v{CURRENT_RELEASE}.tar.gz" in readme
+            "README candidate branch": (
+                candidate_source_ref is not None
+                and f"`{candidate_source_ref}`" in readme
             ),
             "README published stable": PUBLISHED_STABLE in readme,
             "support matrix": f"{CURRENT_RELEASE} release candidate" in support,

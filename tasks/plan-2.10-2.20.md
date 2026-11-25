@@ -1,10 +1,12 @@
 # Release plan: v2.10.0–v2.20.0
 
-Planning baseline: v2.9.0, reviewed 2026-10-22. Status: proposed release sequence;
-v2.10.0 is the next design target. This document authorizes no claim that the
-features are implemented. The [roadmap](../docs/project/roadmap.md) defines
-release scopes, exclusions, and numerical gates; the
-[checklist](todo-2.10-2.20.md) tracks future execution.
+Versions 2.10.0–2.14.0 have shipped. The 2.15.0 source implementation and
+qualification are recorded in the
+[qualification report](../docs/releases/2.15.0/qualification.md). The
+[2.15.0 release checklist](todo-2.15.md) tracks publication separately.
+Special Functions III is the 2.16.0 release candidate scope. The
+[roadmap](../docs/project/roadmap.md) defines release scopes, exclusions, and
+numerical gates. The [checklist](todo-2.10-2.20.md) tracks execution.
 
 ## Rationale and dependencies
 
@@ -21,16 +23,17 @@ frameworks or changes to existing seeded results.
 | 2.13.0 | Integer frequency-weighted GLMs | 2.12 fit/prediction contract | Medium: effective rank and information |
 | 2.14.0 | GLM/PLS prediction persistence | 2.12–2.13 contracts, existing interchange | Medium: artifact validity and preprocessing |
 | 2.15.0 | Opt-in parallel dense multiplication (re-scoped after 2.14) | Existing serial blocked kernel and `PERF` pipeline | Medium: determinism, thread fallback and FPU state |
-| 2.16.0 | Fixed-interval RTS smoothing | 2.15 history/mask semantics | High: covariance conditioning and memory |
-| 2.17.0 | Windowed low-pass FIR design | Existing FIR execution | Medium: spectral and delay contracts |
-| 2.18.0 | Streaming rational resampling | 2.17 anti-alias filter | High: phase, delay, flush and output counts |
-| 2.19.0 | SOS/resampler state persistence | 2.18 state contract, existing interchange | Medium: continuation and format limits |
+| 2.16.0 | Special Functions III | Existing real-double special functions and high-precision fixture tooling | High: branch points, recurrences, and asymptotic accuracy |
+| 2.17.0 | Exact integers and rationals | Demonstrated fixed-width limitation and new-domain approval | High: value semantics, conversion, and bounded allocation |
+| 2.18.0 | Wavelets and DCT | Existing Haar path and reusable spectral plans | Medium: boundary, normalization, and reconstruction contracts |
+| 2.19.0 | SIMD dense multiplication (conditional) | Profiled workload and reproducible gain over the portable kernel | High: CPU dispatch, rounding, and target qualification |
 | 2.20.0 | Truncated PCA | Existing dense algebra/PCA; early feasibility evidence | High: convergence and actual resource savings |
 
-The sequence is a product priority, not an assertion that every release
-technically depends on its predecessor. Reassess after 2.11, 2.14, 2.16, and
-2.19 using completed workflows, feedback, and qualification cost. Later scopes
-may move or be replaced. There are no calendar estimates or promised 3.0 date.
+The table gives the proposed order and the actual technical prerequisites.
+Reassess after 2.16 and 2.19 using completed workflows, feedback, measured
+benefit, and qualification cost. Later scopes may move or be deferred. State
+estimation and sample-rate conversion remain in the
+[deferred workflow scopes](../docs/project/roadmap.md#deferred-workflow-scopes).
 
 ## Design decisions to resolve before implementation
 
@@ -45,9 +48,11 @@ may move or be replaced. There are no calendar estimates or promised 3.0 date.
   to a serialized prediction contract.
 - Persist selected inference/state artifacts with versioning and allocation
   limits. A prediction artifact is not a training report or executable graph.
-- Define DSP batch and streaming boundary/phase conventions together. Align
-  reference outputs explicitly; an offline zero-phase result is not a live
-  causal filter with zero latency.
+- Qualify special functions by family, using named input regions and offline
+  high-precision fixtures. Specify the supported domains and failure behavior
+  before adding public entry points.
+- Specify boundary extension, normalization, and reconstruction tolerances
+  before extending the wavelet and spectral interfaces.
 - Choose truncated-PCA numerics only after residual, conditioning, memory, and
   timing experiments. A full decomposition followed by slicing does not meet
   the proposed scalability outcome.
@@ -110,12 +115,12 @@ release checklist.
 
 | Risk | Control |
 | --- | --- |
-| Eleven versions become a feature quota | Activate each with a demonstrated workflow; allow deferral/reordering |
+| Version slots become a feature quota | Activate each with a demonstrated workflow and defer or reorder when evidence changes |
 | Generic validation framework grows beyond need | Index sets and small model-specific integrations; no estimator hierarchy |
 | New defaults break reproducibility | Keep old calls and shuffles; expose new behavior through additive APIs |
 | Weight semantics produce misleading inference | Start with integer replication weights and replicated-data oracles |
 | Persistent files freeze immature contracts | Finalize prediction/state contracts first; version explicit bounded payloads |
-| Numerical corner cases delay smoothing/PCA | Probe singular/ill-conditioned systems early; report unsupported cases truthfully |
+| Numerical corner cases delay special functions or PCA | Probe critical regions and ill-conditioned cases early and narrow the supported scope if necessary |
 | Filter response or scalability claims exceed evidence | Measure the documented workload and publish limits; no universal speedup claims |
 
 MILP/MINLP, GPU, broad survival analysis, NMF/ICA/CCA, arbitrary object graphs,
@@ -145,7 +150,7 @@ provenance when a release is activated.
 
 Run `python tools/check_docs.py` and
 `python -m unittest discover -s tools -p test_release_state.py`.
-Inspect the diff for current/next-release consistency, working local links,
-unchanged historical plans/releases, and exactly eleven planned minor versions.
-Numerical qualification belongs to implementation. The plan itself makes no
-capability or support claim beyond the separately qualified release records.
+Check that the current and next release statuses, version assignments, and
+activation gates agree with the roadmap and checklist. Check local links and
+preserve historical release records. Run numerical qualification when a
+capability is implemented.

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.16.0]
+
+### Added
+
+- Added real-double digamma and polygamma, convergent real Riemann zeta,
+  both real Lambert W branches, integer-order Bessel J/Y and modified I/K,
+  and Airy Ai/Bi with their first derivatives.
+- Added independent high-precision reference fixtures and a circular-membrane
+  example that computes and checks the first positive J2 zero.
+
+### Compatibility
+
+- The new scalar calls are additive. The existing order-zero and order-one
+  Bessel entry points retain their domains and behavior. The implementation
+  uses Free Pascal and its standard units.
+
 ## [2.15.0] - 2026-11-04
 
 ### Added
