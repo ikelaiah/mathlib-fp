@@ -29,7 +29,7 @@
 > **This checkout is the 2.17.0 release candidate.** It adds exact integers
 > and rationals. See the [candidate release notes](docs/releases/2.17.0/release-notes.md)
 > and [capability inventory](docs/reference/capabilities.md).
-> The candidate branch is `codex/release-2.17.0`. Stable downloads use `v2.16.0`.
+> The candidate branch is `release/2.17.0-exact-arithmetic`. Stable downloads use `v2.16.0`.
 
 ## 🚀 Quick start
 

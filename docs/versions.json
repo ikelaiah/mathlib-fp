@@ -9,7 +9,7 @@
   "versions": [
     {
       "release": "2.17.0",
-      "source_ref": "codex/release-2.17.0"
+      "source_ref": "release/2.17.0-exact-arithmetic"
     },
     {
       "release": "2.16.0",
