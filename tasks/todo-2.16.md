@@ -5,5 +5,5 @@
 - [x] Add the circular-membrane example and an output contract.
 - [x] Generate the candidate API, capability inventory, and release documentation.
 - [x] Record full local qualification and review the result.
-- [ ] Pass hosted Linux and Windows CI and clean-archive qualification.
-- [ ] Verify exact main, publish the release, and check downloaded artifacts.
+- [x] Pass hosted Linux and Windows CI and [clean-archive qualification](https://github.com/ikelaiah/mathlib-fp/actions/runs/45559346732).
+- [x] Verify [exact main CI](https://github.com/ikelaiah/mathlib-fp/actions/runs/45558461143), publish [2.16.0](https://github.com/ikelaiah/mathlib-fp/releases/tag/v2.16.0), and check downloaded artifacts.

@@ -1236,6 +1236,10 @@ helpers serve combinatorics workflows.
 Arbitrary-precision or decimal floating point, modular or cryptographic
 arithmetic, and constant-time guarantees are not included.
 
+The [2.17.0 specification](../../tasks/spec-2.17.md) records the fixed-width
+reproduction and proposed contracts. The [implementation plan](../../tasks/plan-2.17.md)
+and [release checklist](../../tasks/todo-2.17.md) track delivery.
+
 ## Planned 2.18.0 — Wavelets and DCT
 
 Add multi-level discrete wavelet transforms with reconstruction within a
