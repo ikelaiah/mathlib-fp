@@ -1181,7 +1181,7 @@ extended because only the multiplication kernel was measured. See the
 [release notes](../releases/2.15.0/release-notes.md) and
 [qualification record](../releases/2.15.0/qualification.md).
 
-## Previous published stable release: 2.16.0 — Special Functions III
+## Previous release: 2.16.0 — Special Functions III
 
 Extend MathBase with real-double digamma and polygamma, the Riemann zeta
 function (with Hurwitz zeta only if the polygamma design needs it), both real
@@ -1211,9 +1211,9 @@ Version 2.16.0 implements the bounded real-double scope. See the
 [release notes](../releases/2.16.0/release-notes.md) and
 [qualification record](../releases/2.16.0/qualification.md).
 
-## Release candidate target: 2.17.0 — Exact big integers and rationals
+## Previous release: 2.17.0 — Exact big integers and rationals
 
-The candidate adds bounded variable-width signed integers and exact rationals
+Version 2.17.0 adds bounded variable-width signed integers and exact rationals
 in `MathBase.ExactArithmetic`. It provides arithmetic,
 comparison, documented integer division/remainder conventions, GCD,
 exponentiation by non-negative integers, decimal and hexadecimal parsing and
@@ -1241,7 +1241,7 @@ reproduction. The [resource measurements](../releases/2.17.0/exact-arithmetic-li
 record the selected 131,072-bit magnitude cap and native Windows measurements.
 The [release checklist](../../tasks/todo-2.17.md) tracks qualification.
 
-## Planned 2.18.0 — Wavelets and DCT
+## Next release: 2.18.0 — Wavelets and DCT
 
 Add multi-level discrete wavelet transforms with reconstruction within a
 documented floating-point tolerance for a small, fixed set of orthogonal

@@ -1,6 +1,6 @@
 # Release maintenance view
 
-Refreshed for the 2.17.0 candidate.
+Refreshed for 2.17.0.
 
 Counts describe the current source/API and curated capability inventory.
 They are not a scorecard or a substitute for numerical and platform evidence.

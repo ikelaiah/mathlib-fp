@@ -2,7 +2,7 @@
 
 Release notes, qualification records, audits, manifests, and machine-readable evidence are grouped by release.
 
-## 2.17.0 — release candidate
+## 2.17.0 — current stable release
 
 - [Release notes](2.17.0/release-notes.md)
 - [Qualification and validation](2.17.0/qualification.md)
@@ -12,7 +12,7 @@ Release notes, qualification records, audits, manifests, and machine-readable ev
 - [Performance contract](2.17.0/performance-evidence.json) and [exact arithmetic measurements](2.17.0/exact-arithmetic-limits.md)
 - [Release review notes](2.17.0/pr-notes.md)
 
-## 2.16.0 — published stable release
+## 2.16.0 — previous stable release
 
 - [Release notes](2.16.0/release-notes.md)
 - [Qualification and validation](2.16.0/qualification.md)
