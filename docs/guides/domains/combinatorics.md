@@ -15,6 +15,7 @@ allocate; generated permutations/combinations return managed arrays.
 | Task | Start with | Contract or failure guidance |
 | --- | --- | --- |
 | Ordered/unordered selections | `Permutation` / `Combination` | [Counting](#counting-combinations) |
+| Exact counts beyond `Int64` | `FactorialExact` / `CombinationExact` | [Exact counting](#exact-counting) |
 | Large count magnitude | `LogFactorial` / `LogCombination` | [Overflow reference](#overflow-reference) |
 | GCD, modular arithmetic, primes | matching number-theory method | [Number theory](#number-theory) |
 | Enumerate arrangements | `Permutations` / `Combinations` | [Generation](#permutation-combination-generation) |
@@ -57,6 +58,8 @@ All methods are **class static** — no `Create`/`Free` needed.
 | `LogFactorial(N)` | ln(N!) — safe for any N | `LogFactorial(100)` ≈ 363.74 |
 | `Permutation(N,K)` | P(n,k) = n!/(n-k)! ordered selection | `Permutation(5,2)` = 20 |
 | `Combination(N,K)` | C(n,k) = n!/(k!(n-k)!) unordered | `Combination(5,2)` = 10 |
+| `FactorialExact(N)` | Bounded exact factorial as `TBigInteger` | `FactorialExact(21).ToText` = `51090942171709440000` |
+| `CombinationExact(N,K)` | Bounded exact binomial coefficient as `TBigInteger` | `CombinationExact(100,50).ToText` = `100891344545564193334812497256` |
 | `LogCombination(N,K)` | ln C(n,k) — safe for large N | `LogCombination(100,50)` ≈ 68.16 |
 | `Multinomial(N, K[])` | n!/(k₁!k₂!…) | `Multinomial(6,[1,2,3])` = 60 |
 | `CatalanNumber(N)` | C_n = C(2n,n)/(n+1) | `CatalanNumber(5)` = 42 |
@@ -64,6 +67,15 @@ All methods are **class static** — no `Create`/`Free` needed.
 | `StirlingFirst(N,K)` | s(n,k) unsigned Stirling 1st kind | `StirlingFirst(4,2)` = 11 |
 | `StirlingSecond(N,K)` | S(n,k) Stirling 2nd kind | `StirlingSecond(4,2)` = 7 |
 | `DerangementCount(N)` | D_n — permutations with no fixed points | `DerangementCount(4)` = 9 |
+
+### Exact counting
+
+In 2.17.0, `FactorialExact` accepts nonnegative `N` and `CombinationExact`
+requires `0 <= K <= N`. Invalid arguments raise `ECombinatoricsError`.
+Results above 131,072 bits raise `EExactArithmeticError`. The recurrence divides
+out each denominator before multiplying the remaining factor.
+See the [exact arithmetic guide](math-base.md#exact-arithmetic-in-2170)
+and the [sampling example](../../../examples/54_exact_sampling.pas).
 
 ### Catalan numbers — what they count
 The n-th Catalan number counts many equivalent things:
@@ -218,8 +230,7 @@ end;
 multiplication across the accepted `Int64` modulus range. `LCM`, multinomial,
 Stirling, derangement, Fibonacci, Lucas, and prime-bound arithmetic perform
 explicit overflow checks and raise `ECombinatoricsError` rather than wrapping.
-These APIs still return fixed-width integers; they are not arbitrary-precision
-arithmetic routines.
+These APIs return fixed-width integers.
 
 ---
 
@@ -233,7 +244,8 @@ arithmetic routines.
 | `Fibonacci` | 92 | 7.5 × 10¹⁸ |
 | `Lucas` | 90 | 6,440,026,026,380,244,498 |
 
-For larger values use `LogFactorial` / `LogCombination` which return `Double`.
+Use `FactorialExact` or `CombinationExact` for a larger exact count, and
+`LogFactorial` or `LogCombination` for its logarithm as a `Double`.
 
 ---
 
@@ -241,18 +253,16 @@ For larger values use `LogFactorial` / `LogCombination` which return `Double`.
 
 - `MathBase.SharedTypes` — `TIntegerArray`
 - `MathBase.Precision` — `GammaLn`, used by `LogFactorial`
+- `MathBase.ExactArithmetic` — `TBigInteger`, returned by the exact counting methods
 
 ## Common mistakes
 
 - **Fixed-width counts overflow.** `Factorial` overflows above 20,
   `CatalanNumber` above 30, and `BellNumber` above 18; these raise
-  `ECombinatoricsError` rather than wrapping. Use `LogFactorial` or
-  `LogCombination` for larger values.
+  `ECombinatoricsError`. Use `FactorialExact` for larger exact factorials.
 - **Argument domains.** `Permutation` and `Combination` require `K <= N`;
   negative `N` or `K` raises.
 - **Modular inverse needs coprime input.** `ModInverse(A, M)` raises when
   `GCD(A, M) <> 1`.
-- **Not arbitrary precision.** The counting APIs return fixed-width integers;
-  they are not big-integer routines.
 
 No other external libraries required.

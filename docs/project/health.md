@@ -1,41 +1,41 @@
 # Release maintenance view
 
-Refreshed for 2.16.0.
+Refreshed for the 2.17.0 candidate.
 
 Counts describe the current source/API and curated capability inventory.
 They are not a scorecard or a substitute for numerical and platform evidence.
 
-- Units and declaration rows come from the [current API snapshot](../reference/api/public-api-2.16.0.json).
+- Units and declaration rows come from the [current API snapshot](../reference/api/public-api-2.17.0.json).
 - Stable families come from [capabilities.json](../reference/capabilities.json); zero means this curated inventory has no separately measured family for that domain.
 - Example counts use domain labels in [examples/README.md](../../examples/README.md); shared examples may count in more than one domain.
-- Qualification status is in the [2.16.0 report](../releases/2.16.0/qualification.md).
+- Qualification status is in the [2.17.0 report](../releases/2.17.0/qualification.md).
 
 | Domain | Stable capability families | Units | Public API rows | Runnable examples | Important limitations |
 | --- | ---: | ---: | ---: | ---: | --- |
 | AlgebraLib | 14 | 14 | 1217 | 14 | Serial baselines plus opt-in parallel dense multiplication; sparse fill is data dependent; partial eigensystems target largest magnitude |
-| CombinatoricsLib | 0 | 1 | 43 | 1 | Fixed-width integer overflow limits; no arbitrary precision |
+| CombinatoricsLib | 0 | 1 | 45 | 2 | Exact factorial and binomial coefficients capped at 131,072 bits |
 | EngineeringLib | 3 | 8 | 472 | 6 | SOS Butterworth/Chebyshev I prototype orders 1–12; no equiripple, resampling or broader wavelet families |
 | FinanceLib | 0 | 3 | 71 | 2 | Documented rate/time conventions and bounded numerical models |
 | GeometryLib | 0 | 1 | 133 | 1 | Zero/non-finite normalization and degenerate constructions follow explicit contracts |
 | InterchangeLib | 2 | 1 | 18 | 2 | Selected adapters including GLM/PLS prediction; no arbitrary model/decomposition graphs |
 | MLLib | 3 | 3 | 173 | 6 | Dense serial analysis with grouped/stratified/chronological validation and PLS1; no duration windows, PLS2, imputation, or robust fitting |
-| MathBase | 7 | 10 | 270 | 15 | Function-specific real domains and fixture budgets; no general symbolic algebra |
+| MathBase | 8 | 11 | 310 | 16 | Bounded exact integers and rationals alongside function-specific real domains |
 | NumericsLib | 4 | 4 | 310 | 6 | Dense SDIRK2 stiff ODE baseline; no DAEs, mass matrices or sparse stiff systems |
 | OptimizationLib | 3 | 3 | 166 | 4 | Finite-box heuristic global search and local/dense constrained baselines; no mixed-integer or global-optimality certificates |
 | ProbabilityLib | 0 | 1 | 76 | 2 | Documented distribution parameter/domain conventions and finite scalar arithmetic |
 | StatsLib | 3 | 4 | 245 | 9 | Bernoulli/Poisson GLMs with offsets/exposure and integer frequencies; no analytic weights, regularization or robust covariance; moderate dense data |
 | TimeSeriesLib | 1 | 2 | 116 | 4 | Linear-Gaussian filtering/forecasting baseline; no missing-observation or smoothing workflow |
 
-The snapshot contains 55 units and 3,310 declarations. The example catalogue
-contains 54 programs.
+The snapshot contains 56 units and 3,352 declarations. The example catalogue
+contains 55 programs.
 Declarations include advanced, compatibility and specialization support; they
 are not a count of recommended application entry points.
 
 ## Current evidence
 
-See the [numerical catalogue](../releases/2.16.0/numerical-evidence.json),
-[workflow qualification](../releases/2.16.0/workflow-qualification.md),
-[performance contract](../releases/2.16.0/performance-evidence.json), and
+See the [numerical catalogue](../releases/2.17.0/numerical-evidence.json),
+[workflow qualification](../releases/2.17.0/workflow-qualification.md),
+[performance contract](../releases/2.17.0/performance-evidence.json), and
 [support matrix](support.md). The [historical 1.9.9 provenance audit](../releases/1.9.9/provenance-audit.md)
 remains frozen evidence for its own baseline; new numerical families carry
 their own cited provenance and validation in the current release.

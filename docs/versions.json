@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "current": "2.16.0",
-  "api_baseline": "2.16.0",
-  "release_state": "stable",
+  "current": "2.17.0",
+  "api_baseline": "2.17.0",
+  "release_state": "candidate",
+  "published_stable": "2.16.0",
   "site_url": "https://ikelaiah.github.io/mathlib-fp",
   "repository_url": "https://github.com/ikelaiah/mathlib-fp",
   "versions": [
+    {
+      "release": "2.17.0",
+      "source_ref": "release/2.17.0-exact-arithmetic"
+    },
     {
       "release": "2.16.0",
       "source_ref": "v2.16.0"

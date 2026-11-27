@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [2.17.0]
+
+### Added
+
+- Added native exact signed integers and reduced rationals with checked
+  arithmetic, comparison, and decimal and hexadecimal text conversion.
+- Added exact `Int64` and binary64 input conversions and checked output
+  conversions. Binary64 outputs round to nearest, with ties to even.
+- Added exact factorial and combination helpers and an example that computes
+  a reduced sampling probability beyond the fixed-width calculation.
+
+### Compatibility
+
+- Existing fixed-width combinatorics entry points retain their behavior.
+  The exact arithmetic unit uses only the Free Pascal standard units.
+
 ## [2.16.0] - 2026-11-25
 
 ### Added

@@ -19,6 +19,7 @@ Copy and run the [double-real quick start](#quick-start). It prints
 | Floating-point comparison | `NearlyEqual` | [Precision](#mathbaseprecision) |
 | Bessel J/Y, modified I/K, Legendre elliptic integrals, Jacobi elliptic functions, Ei/E1, and real 2F1 | `MathBase.SpecialFunctions` | [2.1 development contract](#mathbasespecialfunctions-21-development) |
 | Higher-order Bessel functions, digamma, polygamma, zeta, Lambert W, and Airy functions | `MathBase.SpecialFunctions` | [Special Functions III](#special-functions-iii-in-2160) |
+| Exact counts, fractions, and binary64 conversion | `TBigInteger` / `TBigRational` | [Exact arithmetic](#exact-arithmetic-in-2170) |
 | Angles and triangle helpers | `TTrigKit` | [Trigonometry](#mathbasetrigonometry-ttrigkit) |
 | Reproducible simulation | `TLocalRandom` | [Random-state contract](applied-numerics.md#reproducible-local-random-state) |
 | Portable saved numerical data | `MathBase.Interchange` | [Interchange format choice](interchange.md#choose-a-format) |
@@ -40,6 +41,7 @@ choice documented by those guides. The examples are compiled and run in CI.
 | `MathBase.MathConstants` | [MathBase.MathConstants.pas](../../../src/MathBase.MathConstants.pas) |
 | `MathBase.Precision` | [MathBase.Precision.pas](../../../src/MathBase.Precision.pas) |
 | `MathBase.SpecialFunctions` | [MathBase.SpecialFunctions.pas](../../../src/MathBase.SpecialFunctions.pas) |
+| `MathBase.ExactArithmetic` | [MathBase.ExactArithmetic.pas](../../../src/MathBase.ExactArithmetic.pas) |
 | `MathBase.Trigonometry` | [MathBase.Trigonometry.pas](../../../src/MathBase.Trigonometry.pas) |
 | `MathBase.Iteration` | [MathBase.Iteration.pas](../../../src/MathBase.Iteration.pas) |
 | `MathBase.Random` | [MathBase.Random.pas](../../../src/MathBase.Random.pas) |
@@ -496,6 +498,58 @@ Expected output:
 ```text
 5.0000  0.9750
 ```
+
+## Exact arithmetic in 2.17.0
+
+Use `TBigInteger` for signed exact counts and `TBigRational` for exact
+fractions. The value records are immutable through their public API.
+Default values are zero. Rational results have a positive denominator
+and are reduced to lowest terms, with zero represented as `0/1`.
+
+```pascal
+uses MathBase.ExactArithmetic;
+var
+  ResultParts: TBigIntegerDivision;
+  Fraction: TBigRational;
+begin
+  ResultParts := DivideWithRemainder(TBigInteger.Parse('-30'),
+    TBigInteger.FromInt64(8));
+  Fraction := TBigRational.Parse('30/8');
+  WriteLn(ResultParts.Quotient.ToText, ' ', ResultParts.Remainder.ToText);
+  WriteLn(Fraction.ToText);
+end.
+```
+
+Expected output:
+
+```text
+-3 -6
+15/4
+```
+
+- `DivideWithRemainder` truncates toward zero. A nonzero remainder has
+  the dividend's sign. `GCD` returns a nonnegative value and accepts
+  `(0, 0)`. `Power` takes a nonnegative `QWord` exponent and defines
+  the zeroth power as one.
+- Parse signed digits in decimal or explicit `erHexadecimal`. Rational
+  text accepts one integer or two signed integers separated by `/`.
+  Text output is canonical, with uppercase hexadecimal digits and no radix
+  prefix. Each input component allows at most 39,457 decimal digits or
+  32,768 hexadecimal digits, and its magnitude must fit 131,072 bits.
+  Invalid input, division by zero, and out-of-range arithmetic raise
+  `EExactArithmeticError`.
+- `TBigRational.FromDouble` imports the exact binary value of a finite
+  `Double`. `TBigInteger.FromDouble` also requires an integer-valued input.
+  `TryToDouble` rounds to nearest with ties to even in every ambient
+  rounding mode, including for subnormals. It returns false and zero on
+  overflow. `TryToInt64` succeeds only for exactly representable integers
+  and returns false and zero otherwise.
+
+The [exact sampling example](../../../examples/54_exact_sampling.pas)
+uses `CombinationExact` and a reduced rational to calculate a sampling
+probability. The [resource guide](../../releases/2.17.0/exact-arithmetic-limits.md)
+and [numerical provenance](../../releases/2.17.0/numerical-evidence-provenance.md)
+describe the measured bounds and the reference corpus.
 
 ## Special Functions III in 2.16.0
 

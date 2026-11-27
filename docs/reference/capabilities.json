@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "2.16.0",
+  "release": "2.17.0",
   "support_matrix": "docs/project/support.md",
   "portability_evidence": "docs/releases/1.9.6/portability-evidence.json",
   "migration_rehearsal": "docs/releases/1.9.7/migration-rehearsal.json",
@@ -9,6 +9,32 @@
   "provenance_audit": "docs/releases/1.9.9/provenance-audit.json",
   "api_snapshot_final": "docs/releases/1.9.9/api-snapshot-final.json",
   "capabilities": [
+    {
+      "family": "exact_integer_rational",
+      "unit": "MathBase.ExactArithmetic",
+      "entry_points": [
+        "TBigInteger",
+        "TBigRational",
+        "DivideWithRemainder"
+      ],
+      "maturity": "stable",
+      "scalars": [
+        "exact integer",
+        "exact rational"
+      ],
+      "shapes": [
+        "scalar"
+      ],
+      "complexity": "linear limb addition, quadratic worst-case schoolbook multiplication and long division, and Euclidean GCD",
+      "accuracy": "Exact arithmetic and round-to-nearest ties-to-even binary64 export",
+      "docs": "docs/guides/domains/math-base.md",
+      "tests": "tests/TestExactArithmetic.pas",
+      "example": "examples/54_exact_sampling.pas",
+      "limitations": [
+        "131072 bits per integer or reduced rational component",
+        "decimal and hexadecimal text only"
+      ]
+    },
     {
       "family": "special_functions_iii",
       "unit": "MathBase.SpecialFunctions",
