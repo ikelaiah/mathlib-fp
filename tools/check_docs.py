@@ -41,7 +41,7 @@ def layout_path(name: str, legacy: str) -> Path:
 
 
 NEXT_RELEASE = "2.18.0"
-PUBLISHED_STABLE = "2.16.0"
+PUBLISHED_STABLE = "2.17.0"
 # The current release snapshot owns every source unit present in this tree.
 UNRELEASED_SOURCE_UNITS: set[str] = set()
 UNRELEASED_INTERFACE_CHANGES: dict[str, dict[str, str]] = {}

@@ -1,8 +1,8 @@
 # Supported platform matrix
 
-The 2.17.0 release candidate adds bounded exact integers and rationals.
-See the [candidate qualification record](../releases/2.17.0/qualification.md)
-for current checks and the table below for published evidence.
+Version 2.17.0 adds bounded exact integers and rationals. See the
+[qualification record](../releases/2.17.0/qualification.md) for the test
+profiles and release evidence.
 
 Version 2.15.0 adds opt-in parallel dense multiplication. The
 [qualification record](../releases/2.15.0/qualification.md) records all
@@ -33,16 +33,15 @@ and the frozen 1.10.0 baseline adds no target-matrix change.
 
 ## Support tiers and current evidence
 
-The published 2.16.0 tree passed full local qualification and both hosted
+The 2.17.0 source tree passed full local qualification and both hosted
 primary clean-archive profiles.
-[Qualification record](../releases/2.16.0/qualification.md) ·
-[Hosted archive verification](https://github.com/ikelaiah/mathlib-fp/actions/runs/45559346732)
+[Hosted archive qualification](https://github.com/ikelaiah/mathlib-fp/actions/runs/45591331230)
 
 | Tier | Compiler | OS / CPU | Pointer width | `Single` / `Double` / `Extended` storage | Last retained successful evidence | Exact profile |
 | --- | --- | --- | --- | --- | --- | --- |
-| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.16.0 hosted clean-archive qualification, 2026-11-25 | P-Windows |
-| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.16.0 hosted clean-archive qualification, 2026-11-25 | P-Linux |
-| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | [2.16.0 hosted complete suite and package](https://github.com/ikelaiah/mathlib-fp/actions/runs/45558461143), 2026-11-25 | S-Win32 |
+| Primary | FPC 3.2.2 | Windows x86-64 | 64-bit | 4 / 8 / 8 bytes | 2.17.0 hosted clean-archive qualification, 2026-11-25 | P-Windows |
+| Primary | FPC 3.2.2 | Linux x86-64 | 64-bit | 4 / 8 / 10 bytes | 2.17.0 hosted clean-archive qualification, 2026-11-25 | P-Linux |
+| Secondary | FPC 3.2.2 | Windows i386 | 32-bit | 4 / 8 / 10 bytes | [2.17.0 hosted complete suite and package](https://github.com/ikelaiah/mathlib-fp/actions/runs/45595291177), 2026-11-25 | S-Win32 |
 
 Evidence dates and refs apply to the listed configurations.
 

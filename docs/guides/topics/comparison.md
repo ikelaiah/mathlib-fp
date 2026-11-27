@@ -65,7 +65,7 @@ array semantics, and Delphi support.
 
 These are the boundaries of the current source. The
 [capability inventory](../../reference/capabilities.md) summarizes the
-2.17.0 candidate and the supported release families.
+2.17.0 and the supported release families.
 
 - **Compiler focus:** mathlib-fp targets Free Pascal 3.2.2+ in `objfpc` mode;
   Delphi compatibility is not claimed.
@@ -76,7 +76,7 @@ These are the boundaries of the current source. The
   backend.
 - **Precision and algorithms:** typed dense kernels cover single and double
   real and complex values, while many higher-level workflows are double-only.
-  The 2.17.0 candidate adds exact integers and rationals with a 131,072-bit
+  Version 2.17.0 adds exact integers and rationals with a 131,072-bit
   cap per component. Dense numerical algorithms continue to use their
   documented floating-point types. The SVD returns full compact factors,
   partial eigensolvers target largest magnitude, and optimisation uses

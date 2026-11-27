@@ -34,7 +34,11 @@ at 1.90× and 1.92× the matching-host 2.4.0 baselines. The FFT
 implementation and benchmark definitions match 2.16.0.
 [Performance results](performance-results-win64.json)
 
-## Publication status
+## Hosted qualification
 
-Hosted Linux and Windows qualification and clean-archive verification are
-pending for 2.17.0.
+Hosted [Linux and Windows CI](https://github.com/ikelaiah/mathlib-fp/actions/runs/45595291177)
+passed for candidate commit `d355900`. The matching
+[clean-archive run](https://github.com/ikelaiah/mathlib-fp/actions/runs/45591331230)
+passed with a SHA-256-verified ZIP on Windows and an outbound-isolated,
+SHA-256-verified tarball on Linux. The squash merge `8d5806d` retained
+the same Git tree and passed [Linux and Windows CI on main](https://github.com/ikelaiah/mathlib-fp/actions/runs/45928886400).

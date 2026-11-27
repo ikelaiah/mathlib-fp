@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 2.17.x | :white_check_mark: |
 | 2.16.x | :white_check_mark: |
 | 2.14.x | :white_check_mark: |
 | 2.13.x | :white_check_mark: |
@@ -83,3 +84,6 @@ the 2.14.0 publication.
 
 The 2.14.x line is supported through 2027-05-25, six months after
 the 2.16.0 publication.
+
+The 2.16.x line is supported through 2027-05-27, six months after
+the 2.17.0 publication.

@@ -10,5 +10,7 @@
 - [x] Measure bounded workloads and document the tested limit and scratch use.
 - [x] Integrate the unit, API snapshot, capability inventory, example, and Lazarus package for 2.17.0.
 - [x] Pass full local qualification.
-- [ ] Pass hosted Linux and Windows qualification, including Linux binary64 fixtures.
+- [x] Pass hosted Linux and Windows qualification, including Linux binary64 fixtures.
+  [CI](https://github.com/ikelaiah/mathlib-fp/actions/runs/45595291177) ·
+  [Clean-archive qualification](https://github.com/ikelaiah/mathlib-fp/actions/runs/45591331230)
 - [ ] Publish and verify the checksummed release archives.

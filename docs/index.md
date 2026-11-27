@@ -12,7 +12,7 @@ Use the [task index](guides/tasks.md), browse [domain guides](guides/domains/ind
 
 ## I need exact behaviour
 
-The 2.17.0 release candidate adds exact integers and rationals. Consult the
+Version 2.17.0 adds exact integers and rationals. Consult the
 [2.17.0 API reference](reference/api/reference-2.17.0.md),
 [capability inventory](reference/capabilities.md),
 [support matrix](project/support.md), and
