@@ -85,5 +85,5 @@ the 2.14.0 publication.
 The 2.14.x line is supported through 2027-05-25, six months after
 the 2.16.0 publication.
 
-The 2.16.x line is supported through 2027-05-27, six months after
+The 2.16.x line is supported through 2027-05-28, six months after
 the 2.17.0 publication.
